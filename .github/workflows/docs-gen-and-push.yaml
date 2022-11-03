@@ -30,7 +30,7 @@ jobs:
         with:
           submodules: true # Fetch Hugo themes (true OR recursive)
           fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
-          path: kcp
+          path: edge-mc
       - uses: actions/checkout@v3
         with:
           ref: gh-pages
@@ -57,14 +57,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
-        run: cd kcp/docs && npm install && npm ci
+        run: cd edge-mc/docs && npm install && npm ci
 
       - name: Copy readmes
-        run: tail -n +4 kcp/README.md >> kcp/docs/content/en/main/_index.md
+        run: tail -n +4 edge-mc/README.md >> edge-mc/docs/content/en/main/_index.md
 
       - name: Generate CLI and CRD docs
         run: |
-          cd kcp
+          cd edge-mc
           make generate-docs
           cat <<EOF > docs/content/en/main/cli/_index.md
           ---
@@ -72,13 +72,13 @@ jobs:
           linkTitle: "CLI Reference"
           weight: 4
           description: >
-            Reference documentation for the kcp CLI.
+            Reference documentation for the edge-mc CLI.
           ---
           EOF
 
       - name: Build hugo docs
         run: |
-          cd kcp/docs
+          cd edge-mc/docs
           hugo --minify
           mv public ../../public
 
@@ -89,7 +89,7 @@ jobs:
       - name: Update version info on tag for archive
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          cd kcp/docs
+          cd edge-mc/docs
           cat <<EOF > temp.txt
           #version-start
           archived_version = true

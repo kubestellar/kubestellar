@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: uraimo/run-on-arch-action@v2.3.0
-        name: E2E KCP tests
+        name: E2E Edge-MC tests
         id: build-ppc
         with:
           arch: ppc64le
@@ -65,7 +65,7 @@ jobs:
             chmod +x kubectl
             export PATH=$PATH:/root/
             
-            git clone https://github.com/kcp-dev/kcp.git && cd kcp
+            git clone https://github.com/kcp-dev/edge-mc.git && cd edge-mc
             export PATH=$PWD/bin:$PATH
             LOG_DIR=/tmp/e2e/shared-server/artifacts ARTIFACT_DIR=/tmp/e2e  \
             OS=linux ARCH=ppc64le E2E_PARALLELISM=4 make test-e2e -e TEST_ARGS="-timeout 50m"
