@@ -13,5 +13,5 @@ jobs:
     steps:
       - uses: actions/add-to-project@main
         with:
-          project-url: https://github.com/orgs/kcp-dev/projects/1
+          project-url: https://github.com/orgs/kcp-dev/projects/12
           github-token: ${{ secrets.GHPROJECT_TOKEN }}
