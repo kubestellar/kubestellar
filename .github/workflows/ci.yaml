@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'release-*'
+  pull_request:
+    branches:
+      - main
+      - 'release-*'
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - ".github/ISSUE_TEMPLATE/*"
+      - ".goreleaser.yaml"
+
+# NOTE!!!
+#
+# If you add a job here that is a REQUIRED status check in GitHub, you MUST add a job with the same name to ci-docs-only.yaml
+#
+# NOTE!!!
+
+env:
+  # etcd uses fsync by default, disable it for running on github actions to avoid disk contention
+  # xref: https://github.com/kcp-dev/kcp/pull/435/commits/064a517747d69c2cd8f7f8b4a595ad909e595c89
+  UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC: true
+
+jobs:
+  e2e-shared-server:
+    name: e2e-shared-server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: v1.18
+          cache: true
+      - run: make build
+
+      # Install kind with a local registry
+      - uses: container-tools/kind-action@v2
+        name: Kubernetes KinD Cluster w/local registry
+        with:
+          version: v0.14.0
+
+      - run: |-
+          go install github.com/google/ko@latest
+
+      - run: |-
+          LOG_DIR=/tmp/e2e/shared-server/artifacts ARTIFACT_DIR=/tmp/e2e COUNT=2 SUITES=transparent-multi-cluster:requires-kind \
+          make test-e2e-shared
+
+      - uses: cytopia/upload-artifact-retry-action@v0.1.2
+        if: ${{ always() }}
+        with:
+          name: e2e-shared-server
+          path: /tmp/e2e/**/artifacts/
+
+  e2e-sharded:
+    name: e2e-sharded
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: v1.18
+        cache: true
+    - run: make build
+
+    # Install kind with a local registry
+    - uses: container-tools/kind-action@v2
+      name: Kubernetes KinD Cluster w/local registry
+      with:
+        version: v0.14.0
+
+    - run: |-
+        go install github.com/google/ko@latest
+
+    - run: |-
+        LOG_DIR=/tmp/e2e/sharded/artifacts ARTIFACT_DIR=/tmp/e2e COUNT=2 SUITES=transparent-multi-cluster:requires-kind \
+        make test-e2e-sharded
+
+    - uses: cytopia/upload-artifact-retry-action@v0.1.2
+      if: ${{ always() }}
+      with:
+        name: e2e-sharded
+        path: /tmp/e2e/**/artifacts/
