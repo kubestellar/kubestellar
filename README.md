@@ -33,8 +33,7 @@ TBD
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md)
-and [Developer](docs/developers) guides.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md) guide.
 
 ## Getting in touch
 
