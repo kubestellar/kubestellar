@@ -3,14 +3,14 @@
 ## Overview
 edge-mc is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
 
-- hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
+- Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
 - Non-namespaced objects: need general support
 - Cardinality of destinations: A source object may propagate to many thousands of destinations. ​ 
 
 ## Goals
 
-- collaboratively design a component set similar to those found in current KCP TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, and etc.)
+- Collaboratively design a component set similar to those found in current KCP TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, and etc.)
 - Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
 - Validate phases of proof-of-concept with KCP, Kube SIG-Multicluster, and CNCF community members interested in Edge
 
@@ -33,9 +33,8 @@ TBD
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md)
-and [Developer](docs/developers) guides.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md) guide.
 
 ## Getting in touch
 
-You may get in touch with us with the channels availabke in the [kcp-dev community](https://github.com/kcp-dev/kcp#getting-in-touch)
+You may get in touch with us with the channels availabke in the [kcp-dev community](https://github.com/kcp-dev/kcp#getting-in-touch).
