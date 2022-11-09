@@ -37,4 +37,4 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 ## Getting in touch
 
-You may get in touch with us with the channels available in the [kcp-dev community](https://github.com/kcp-dev/kcp#getting-in-touch).
+You may get in touch with us with the channels availabke in the [kcp-dev community](https://github.com/kcp-dev/kcp#getting-in-touch).  
