@@ -25,11 +25,11 @@ edge-mc is a subproject of kcp focusing on concerns arising from edge multiclust
 
 ## Quickstart
 
-TBD
+TBD :building_construction:
 
 ## Next Steps
 
-TBD
+TBD :building_construction:
 
 ## Contributing
 
