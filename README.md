@@ -10,9 +10,9 @@ edge-mc is a subproject of kcp focusing on concerns arising from edge multiclust
 
 ## Goals
 
-- Collaboratively design a component set similar to those found in current KCP TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, and etc.)
+- collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, and etc.)
 - Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
-- Validate phases of proof-of-concept with KCP, Kube SIG-Multicluster, and CNCF community members interested in Edge.
+- Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
 
 ## Areas of exploration
 
