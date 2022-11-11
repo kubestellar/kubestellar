@@ -46,6 +46,8 @@ import (
 	schedulinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	schedulinglisters "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
+
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 )
 
 const (
@@ -67,7 +69,7 @@ func NewController(
 	c := &controller{
 		queue: queue,
 		enqueueAfter: func(ns *corev1.Namespace, duration time.Duration) {
-			key := ToClusterAwareKey(logicalcluster.From(ns), ns.Name)
+			key := edgeclient.ToClusterAwareKey(logicalcluster.From(ns), ns.Name)
 			queue.AddAfter(key, duration)
 		},
 		kcpClusterClient: kcpClusterClient,
@@ -203,7 +205,7 @@ func (c *controller) enqueueNamespace(obj interface{}) {
 	for _, obj := range placements {
 		placement := obj.(*schedulingv1alpha1.Placement)
 		namespaceKey := key
-		key := ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
+		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
 		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Namespace changed", "Namespace", namespaceKey)
 		c.queue.Add(key)
 	}
@@ -231,7 +233,7 @@ func (c *controller) enqueueLocation(obj interface{}) {
 	for _, obj := range placements {
 		placement := obj.(*schedulingv1alpha1.Placement)
 		locationKey := key
-		key := ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
+		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
 		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Location changed", "Location", locationKey)
 		c.queue.Add(key)
 	}

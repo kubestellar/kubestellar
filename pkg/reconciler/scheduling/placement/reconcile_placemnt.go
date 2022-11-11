@@ -22,13 +22,15 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v2"
 
-	edgeschedulingv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge.scheduling/v1alpha1"
-	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
-	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/kube-openapi/pkg/util/sets"
+
+	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
+	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
+	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
+
+	edgeschedulingv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge.scheduling/v1alpha1"
 )
 
 // placementReconciler watches namespaces within a cluster workspace and assigns those to location from

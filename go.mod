@@ -28,6 +28,7 @@ require (
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
+	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
@@ -64,7 +65,7 @@ require (
 	github.com/kcp-dev/client-go v0.0.0-20221103171446-a51d1144350f
 	github.com/kcp-dev/kcp/pkg/apis v0.9.1
 	github.com/pkg/errors v0.9.1 // indirect
-	sigs.k8s.io/controller-runtime v0.13.1
+	sigs.k8s.io/controller-runtime v0.12.3
 )
 
 replace (
@@ -95,3 +96,5 @@ replace (
 	k8s.io/pod-security-admission => github.com/kcp-dev/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20220915135949-eeba459ad2a1
 	k8s.io/sample-apiserver => github.com/kcp-dev/kubernetes/staging/src/k8s.io/sample-apiserver v0.0.0-20220915135949-eeba459ad2a1
 )
+
+replace sigs.k8s.io/controller-runtime v0.12.3 => github.com/kcp-dev/controller-runtime v0.12.2-0.20221006162808-d4b60cec23b4
