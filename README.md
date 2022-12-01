@@ -37,4 +37,15 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 ## Getting in touch
 
-You may get in touch with us with the channels available in the [kcp-dev community](https://github.com/kcp-dev/kcp#getting-in-touch).  
+There are several ways to communicate with us:
+
+- The [`#kcp-dev` channel](https://app.slack.com/client/T09NY5SBT/C021U8WSAFK) in the [Kubernetes Slack workspace](https://slack.k8s.io)
+- Our mailing lists:
+    - [kcp-dev](https://groups.google.com/g/kcp-dev) for development discussions
+    - [kcp-users](https://groups.google.com/g/kcp-users) for discussions among users and potential users
+- Subscribe to the [community calendar](https://calendar.google.com/calendar/embed?src=ujjomvk4fa9fgdaem32afgl7g0%40group.calendar.google.com) for community meetings and events
+    - The kcp-dev mailing list is subscribed to this calendar
+- See recordings of past SIG KCP-Edge community meetings on [YouTube](https://www.youtube.com/playlist?list=PL1ALKGr_qZKc9jyv1EfOFNfoAJo9Q6Ebd)
+- See [upcoming](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting+is%3Aclosed+) community meeting agendas and notes
+- Browse the [shared Google Drive](https://drive.google.com/drive/folders/1FN7AZ_Q1CQor6eK0gpuKwdGFNwYI517M?usp=sharing) to share design docs, notes, etc.
+    - Members of the kcp-dev mailing list can view this drive
