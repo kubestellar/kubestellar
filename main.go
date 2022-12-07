@@ -25,6 +25,9 @@ func main() {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
 
+	// For some reason, kcp-dev/client-go removed tools/clientcmd,
+	// so controller-runtime is used here to get the config,
+	// this is the only place where controller-runtime is used.
 	cfg, err := config.GetConfigWithContext("system:admin")
 	if err != nil {
 		logger.Error(err, "failed to get config, is KUBECONFIG pointing to kcp server if running out of cluster?")
@@ -54,7 +57,7 @@ func main() {
 		kcpinformers.WithExtraNamespaceScopedIndexers(edgeindexers.NamespaceScoped()),
 	)
 
-	// create edge placement controller
+	// create the kcp-scheduling-placement-controller
 	controllerConfig := rest.CopyConfig(cfg)
 	kcpClientset, err := kcpclient.NewForConfig(controllerConfig)
 	if err != nil {
@@ -74,8 +77,8 @@ func main() {
 
 	// run edge placement controller
 	kubeSharedInformerFactory.Start(ctx.Done())
-	kubeSharedInformerFactory.WaitForCacheSync(ctx.Done())
 	kcpSharedInformerFactory.Start(ctx.Done())
+	kubeSharedInformerFactory.WaitForCacheSync(ctx.Done())
 	kcpSharedInformerFactory.WaitForCacheSync(ctx.Done())
 	c.Start(ctx, 1)
 }

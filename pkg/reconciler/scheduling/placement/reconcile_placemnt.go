@@ -29,8 +29,6 @@ import (
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
-
-	edgeschedulingv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge.scheduling/v1alpha1"
 )
 
 // placementReconciler watches namespaces within a cluster workspace and assigns those to location from
@@ -40,8 +38,6 @@ type placementReconciler struct {
 }
 
 func (r *placementReconciler) reconcile(ctx context.Context, placement *schedulingv1alpha1.Placement) (reconcileStatus, *schedulingv1alpha1.Placement, error) {
-	_ = edgeschedulingv1alpha1.Placement{}
-
 	// get location workspace at first
 	var locationWorkspace logicalcluster.Name
 	if len(placement.Spec.LocationWorkspace) > 0 {
