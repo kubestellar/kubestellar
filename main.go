@@ -74,6 +74,8 @@ func main() {
 
 	// run edge placement controller
 	kubeSharedInformerFactory.Start(ctx.Done())
+	kubeSharedInformerFactory.WaitForCacheSync(ctx.Done())
 	kcpSharedInformerFactory.Start(ctx.Done())
+	kcpSharedInformerFactory.WaitForCacheSync(ctx.Done())
 	c.Start(ctx, 1)
 }
