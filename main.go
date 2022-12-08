@@ -103,7 +103,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// run edge placement controller
+	// run the kcp-scheduling-placement-controller
 	kubeSharedInformerFactory.Start(ctx.Done())
 	kcpSharedInformerFactory.Start(ctx.Done())
 	kubeSharedInformerFactory.WaitForCacheSync(ctx.Done())
