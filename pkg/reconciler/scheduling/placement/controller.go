@@ -25,9 +25,9 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
-	kcpcorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	corev1listers "github.com/kcp-dev/client-go/listers/core/v1"
 	"github.com/kcp-dev/logicalcluster/v2"
+	coreinformers "k8s.io/client-go/informers/core/v1"
+	corelisters "k8s.io/client-go/listers/core/v1"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -60,7 +60,7 @@ const (
 // a placement annotation..
 func NewController(
 	kcpClusterClient kcpclient.Interface,
-	namespaceInformer kcpcorev1informers.NamespaceClusterInformer,
+	namespaceInformer coreinformers.NamespaceInformer,
 	locationInformer schedulinginformers.LocationInformer,
 	placementInformer schedulinginformers.PlacementInformer,
 ) (*controller, error) {
@@ -160,7 +160,7 @@ type controller struct {
 
 	kcpClusterClient kcpclient.Interface
 
-	namespaceLister  corev1listers.NamespaceClusterLister
+	namespaceLister  corelisters.NamespaceLister
 	namespaceIndexer cache.Indexer
 
 	locationLister  schedulinglisters.LocationLister

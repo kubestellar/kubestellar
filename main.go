@@ -6,14 +6,15 @@ import (
 	"time"
 
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	kcpkubernetesinformers "github.com/kcp-dev/client-go/informers"
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v2"
+	kcpkubernetesinformers "k8s.io/client-go/informers"
+	kcpkubernetesclientset "k8s.io/client-go/kubernetes"
 
 	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
 	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
@@ -25,23 +26,34 @@ func main() {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
 
-	// For some reason, kcp-dev/client-go removed tools/clientcmd,
-	// so controller-runtime is used here to get the config,
-	// this is the only place where controller-runtime is used.
-	cfg, err := config.GetConfigWithContext("system:admin")
+	// create cfg
+	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	configOverrides := &clientcmd.ConfigOverrides{
+		Context: clientcmdapi.Context{
+			Cluster:  "base",
+			AuthInfo: "shard-admin",
+		},
+	}
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+	cfg, err := kubeConfig.ClientConfig()
 	if err != nil {
-		logger.Error(err, "failed to get config, is KUBECONFIG pointing to kcp server if running out of cluster?")
+		logger.Error(err, "failed to make config, if running out of cluster, make sure $KUBECONFIG points to kcp server")
 		os.Exit(1)
 	}
 
 	// create kubeSharedInformerFactory
 	kubernetesConfig := rest.CopyConfig(cfg)
-	kubeClientset, err := kcpkubernetesclientset.NewForConfig(kubernetesConfig)
+	kubeClusterClient, err := kcpkubernetesclientset.NewClusterForConfig(kubernetesConfig)
 	if err != nil {
-		logger.Error(err, "failed to create kube clientset")
+		logger.Error(err, "failed to create kube cluter client")
 		os.Exit(1)
 	}
-	kubeSharedInformerFactory := kcpkubernetesinformers.NewSharedInformerFactory(kubeClientset, 10*time.Minute)
+	kubeSharedInformerFactory := kcpkubernetesinformers.NewSharedInformerFactoryWithOptions(
+		kubeClusterClient.Cluster(logicalcluster.Wildcard),
+		resyncPeriod,
+		kcpkubernetesinformers.WithExtraClusterScopedIndexers(edgeindexers.ClusterScoped()),
+		kcpkubernetesinformers.WithExtraNamespaceScopedIndexers(edgeindexers.NamespaceScoped()),
+	)
 
 	// create kcpSharedInformerFactory
 	kcpConfig := rest.CopyConfig(cfg)
@@ -61,7 +73,7 @@ func main() {
 	controllerConfig := rest.CopyConfig(cfg)
 	kcpClientset, err := kcpclient.NewForConfig(controllerConfig)
 	if err != nil {
-		logger.Error(err, "failed to create kcp clientset")
+		logger.Error(err, "failed to create kcp clientset for controller")
 		os.Exit(1)
 	}
 	c, err := edgeplacement.NewController(
