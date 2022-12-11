@@ -32,6 +32,7 @@ import (
 	kcpkubernetesinformers "k8s.io/client-go/informers"
 	kcpkubernetesclientset "k8s.io/client-go/kubernetes"
 
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
 	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
 )
@@ -73,6 +74,7 @@ func main() {
 
 	// create kcpSharedInformerFactory
 	kcpConfig := rest.CopyConfig(cfg)
+	edgeclient.ConfigForScheduling(kcpConfig)
 	kcpClusterClient, err := kcpclient.NewClusterForConfig(kcpConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp cluster client")
@@ -87,13 +89,13 @@ func main() {
 
 	// create the kcp-scheduling-placement-controller
 	controllerConfig := rest.CopyConfig(cfg)
-	kcpClientset, err := kcpclient.NewForConfig(controllerConfig)
+	kcpClusterClientset, err := kcpclient.NewClusterForConfig(controllerConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp clientset for controller")
 		os.Exit(1)
 	}
 	c, err := edgeplacement.NewController(
-		kcpClientset,
+		*kcpClusterClientset,
 		kubeSharedInformerFactory.Core().V1().Namespaces(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Placements(),

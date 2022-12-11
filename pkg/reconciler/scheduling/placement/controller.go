@@ -59,7 +59,7 @@ const (
 // NewController returns a new controller placing namespaces onto locations by create
 // a placement annotation..
 func NewController(
-	kcpClusterClient kcpclient.Interface,
+	kcpClusterClient kcpclient.Cluster,
 	namespaceInformer coreinformers.NamespaceInformer,
 	locationInformer schedulinginformers.LocationInformer,
 	placementInformer schedulinginformers.PlacementInformer,
@@ -158,7 +158,7 @@ type controller struct {
 	queue        workqueue.RateLimitingInterface
 	enqueueAfter func(*corev1.Namespace, time.Duration)
 
-	kcpClusterClient kcpclient.Interface
+	kcpClusterClient kcpclient.Cluster
 
 	namespaceLister  corelisters.NamespaceLister
 	namespaceIndexer cache.Indexer
@@ -334,7 +334,7 @@ func (c *controller) process(ctx context.Context, key string) error {
 			return fmt.Errorf("failed to create patch for LocationDomain %s|%s: %w", clusterName, name, err)
 		}
 		logger.V(2).Info("patching placement", "patch", string(patchBytes))
-		_, uerr := c.kcpClusterClient.SchedulingV1alpha1().Placements().Patch(logicalcluster.WithCluster(ctx, clusterName), obj.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}, "status")
+		_, uerr := c.kcpClusterClient.Cluster(clusterName).SchedulingV1alpha1().Placements().Patch(logicalcluster.WithCluster(ctx, clusterName), obj.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}, "status")
 		return uerr
 	}
 
