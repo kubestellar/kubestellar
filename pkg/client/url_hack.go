@@ -17,22 +17,15 @@ limitations under the License.
 package client
 
 import (
-	"fmt"
-	"strings"
+	"net/url"
 
-	"github.com/kcp-dev/logicalcluster/v2"
+	"k8s.io/client-go/rest"
 )
 
-// ToClusterAwareKey is a legacy adapter to allow formatting keys for indexers that still use the forked
-// k8s MetaNamespaceKeyFunc.
-func ToClusterAwareKey(cluster logicalcluster.Name, name string) string {
-	return cluster.String() + "|" + name
-}
+const SchedulingAPIExportVirtualWorkspacePath string = "services/apiexport/root/scheduling.kcp.dev"
 
-func SplitClusterAwareKey(key string) (logicalcluster.Name, string) {
-	parts := strings.Split(key, "|")
-	if len(parts) != 2 {
-		panic(fmt.Sprintf("bad key: %v", key))
-	}
-	return logicalcluster.New(parts[0]), parts[1]
+func ConfigForScheduling(cfg *rest.Config) {
+	url, _ := url.Parse(cfg.Host)
+	url.Path = SchedulingAPIExportVirtualWorkspacePath
+	cfg.Host = url.String()
 }

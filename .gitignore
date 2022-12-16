@@ -8,3 +8,6 @@ build
 # JetBrains IDE files
 .idea/
 *.iml
+
+# Mac trash
+.DS_Store
