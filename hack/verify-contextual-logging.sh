@@ -26,13 +26,13 @@ LOGCHECK=${LOGCHECK:-logcheck}
 cd "$REPO_ROOT"
 
 set +o errexit
-${LOGCHECK} -check-contextual ./... > "${work_file}" 2>&1
+${LOGCHECK} -check-contextual ./... 2>&1 | sed 's/^/Root: /' > "${work_file}" 
 set -o errexit
 
 # pkg/apis is a separate module, so check that in addition to our root packages
 cd "${REPO_ROOT}"/pkg/apis
 set +o errexit
-${LOGCHECK} -check-contextual ./... >> "${work_file}" 2>&1
+${LOGCHECK} -check-contextual ./... 2>&1 | sed 's/^/APIs: /' >> "${work_file}" 
 set -o errexit
 
 is_gnu_sed() { sed --version >/dev/null 2>&1; }
@@ -57,7 +57,7 @@ work_cleaned="$( sed -e 's/[0-9]*//g' "${work_file}" )"
 log_cleaned="$( sed -e 's/[0-9]*//g' "${LOG_FILE}" )"
 
 if ! changes="$(diff <(echo "${work_cleaned}")  <(echo "${log_cleaned}") )"; then
-    echo "[ERROR] Current logging errors and saved logging errors do not match."
+    echo "[ERROR] Current logging errors and saved logging errors do not match.  Current are in ${work_file}"
     echo "${changes}"
     echo
     echo "[INFO] If you need to update the saved list, run \`make update-contextual-logging\` and commit \`hack/logcheck.out\`'"
