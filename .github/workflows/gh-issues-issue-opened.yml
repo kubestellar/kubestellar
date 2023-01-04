@@ -20,13 +20,6 @@ jobs:
               organization(login: $account){
                 projectV2(number: $number) {
                   id
-#                  fields(first:20) {
-#                    nodes {
-#                      id
-#                      name
-#                      settings
-#                    }
-#                  }
                 }
               }
             }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
