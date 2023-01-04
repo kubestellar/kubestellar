@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Get project data
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
           ACCOUNT: KCP-DEV
           PROJECT_NUMBER: 12
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
@@ -39,7 +39,7 @@ jobs:
 
       - name: Add Issue to project
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
           ISSUE_ID: ${{ github.event.issue.node_id }}
         run: |
           item_id="$( gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
