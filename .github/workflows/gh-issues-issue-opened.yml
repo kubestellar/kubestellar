@@ -17,19 +17,20 @@ jobs:
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($p_id: ID!) { 
-              node(id: $p_id) { 
-                ... on ProjectNext { 
-                  fields(first: 20) { 
-                    nodes { 
-                      id 
-                      name 
-                      settings 
-                    } 
-                  } 
+            query($account: String!, $number: Int!) {
+              organization(login: $account){
+                projectV2(number: $number) {
+                  id
+                  fields(first:10) {
+                    nodes {
+                      id
+                      name
+                      settings
+                    }
+                  }
                 }
-              } 
-            }' -f p_id=$PROJECT_ID > project_data.json
+              }
+            }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
             
           echo content=`cat project_data.json`
 #          echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
