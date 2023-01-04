@@ -17,8 +17,8 @@ jobs:
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query{ 
-              node(id: $PROJECT_ID) { 
+            query($p_id: String!) { 
+              node(id: $p_id) { 
                 ... on ProjectNext { 
                   fields(first: 20) { 
                     nodes { 
@@ -29,8 +29,9 @@ jobs:
                   } 
                 }
               } 
-            }
+            }' -f p_id=$PROJECT_ID > project_data.json
             
+          echo content=`cat project_data.json`
 #          echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
 #          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
 #          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
