@@ -12,7 +12,7 @@ jobs:
       - name: Get project data
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACCOUNT: kcp-dev
+          ACCOUNT: clubanderson
           PROJECT_NUMBER: 12
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
