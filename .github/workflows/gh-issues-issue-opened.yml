@@ -19,7 +19,7 @@ jobs:
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
             query($account: String!, $number: Int!) {
               organization(login: $account){
-                projectV2(number: $number) {
+                projectNext(number: $number) {
                   id
                 }
               }
