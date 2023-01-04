@@ -17,7 +17,7 @@ jobs:
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($p_id: String!) { 
+            query($p_id: ID!) { 
               node(id: $p_id) { 
                 ... on ProjectNext { 
                   fields(first: 20) { 
