@@ -13,13 +13,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACCOUNT: clubanderson
-          PROJECT_NUMBER: 12
+          PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($account: String!, $number: Int!) {
+            query($account: String!, $id: String!) {
               user(login: $account){
-                projectNext(number: $number) {
-                  id
+                projectNext(id: $id) {
                   fields(first:20) {
                     nodes {
                       id
@@ -29,7 +28,7 @@ jobs:
                   }
                 }
               }
-            }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
+            }' -f account=$ACCOUNT -f id=$PROJECT_ID > project_data.json
 
           echo 'CONTENT'=`cat project_data.json`
           
