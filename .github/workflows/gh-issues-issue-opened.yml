@@ -31,7 +31,7 @@ jobs:
               }
             }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
 
-          echo project_data.json
+          echo 'CONTENT'=`cat project_data.json`
           
           echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
           echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
