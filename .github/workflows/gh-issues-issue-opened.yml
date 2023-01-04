@@ -16,7 +16,7 @@ jobs:
           PROJECT_NUMBER: 12
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($account: String!, $number: String!) {
+            query($account: String!, $number: Int!) {
               user(login: $account){
                 projectNext(number: $number) {
                   id
