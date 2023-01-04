@@ -20,9 +20,9 @@ jobs:
               organization(login: $account){
                 projectV2(number: $number) {
                   id
-                  fields(first:20) {
-                    nodes {
-                      ... on ProjectV2Field {
+                  { fields(first:20) 
+                    {
+                      nodes {
                         id
                         name
                         settings
@@ -32,7 +32,7 @@ jobs:
                 }
               }
             }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
-
+            
           echo 'CONTENT'=`cat project_data.json`
           
           echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
