@@ -13,19 +13,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ACCOUNT: KCP-DEV
+          PROJECT_NUMBER: 12
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
-            query($account: String!, $number: String!) {
-              ... on ProjectNext { fields(first: 20) { 
-                nodes { 
-                  id 
-                  name
-                  settings 
+            query($account: String!, $number: Int!) {
+              organization(login: $account){
+                projectNext(number: $number) {
+                  id
+                  fields(first:10) {
+                    nodes {
+                      id
+                      name
+                      settings
+                    }
+                  }
                 }
-              } 
-            }' -f account=$ACCOUNT -f number=$PROJECT_ID > project_data.json
-            
+              }
+            }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json            
           echo 'CONTENT'=`cat project_data.json`
           
           echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
