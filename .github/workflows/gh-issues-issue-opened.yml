@@ -20,13 +20,11 @@ jobs:
               organization(login: $account){
                 projectV2(number: $number) {
                   id
-                  { fields(first:20) 
-                    {
-                      nodes {
-                        id
-                        name
-                        settings
-                      }
+                  fields(first:20) {
+                    nodes {
+                      id
+                      name
+                      settings
                     }
                   }
                 }
