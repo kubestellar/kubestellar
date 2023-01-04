@@ -22,9 +22,11 @@ jobs:
                   id
                   fields(first:20) {
                     nodes {
-                      id
-                      name
-                      settings
+                      ... on ProjectV2IterationField {
+                        id
+                        name
+                        settings
+                      }
                     }
                   }
                 }
