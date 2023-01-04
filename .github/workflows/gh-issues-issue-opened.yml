@@ -14,26 +14,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
           ACCOUNT: KCP-DEV
           PROJECT_NUMBER: 12
-          PROJECT_ID: PN_kwDOBJScKs4AH9aF
+          #PROJECT_ID: PN_kwDOBJScKs4AH9aF
         run: |
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
             query($account: String!, $number: Int!) {
               organization(login: $account){
                 projectV2(number: $number) {
                   id
-                  fields(first:10) {
-                    nodes {
-                      id
-                      name
-                      settings
-                    }
-                  }
                 }
               }
             }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
             
           echo content=`cat project_data.json`
-#          echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
+          echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
 #          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
 #          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
 #          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="New") |.id' project_data.json) >> $GITHUB_ENV
