@@ -18,23 +18,23 @@ jobs:
           gh api graphql --header 'GraphQL-Features: projects_next_graphql' -f query='
             query($account: String!, $number: Int!) {
               organization(login: $account){
-                projectsNext(number: $number) {
+                projectV2(number: $number) {
                   id
-                  fields(first:20) {
-                    nodes {
-                      id
-                      name
-                      settings
-                    }
-                  }
+#                  fields(first:20) {
+#                    nodes {
+#                      id
+#                      name
+#                      settings
+#                    }
+#                  }
                 }
               }
             }' -f account=$ACCOUNT -F number=$PROJECT_NUMBER > project_data.json
 
           echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
-          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="New") |.id' project_data.json) >> $GITHUB_ENV
+#          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
+#          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
+#          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="New") |.id' project_data.json) >> $GITHUB_ENV
 
       - name: Add Issue to project
         env:
