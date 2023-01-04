@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Get project data
         env:
-          GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GHPROJECT_TOKEN }}
           ACCOUNT: KCP-DEV
           PROJECT_NUMBER: 12
           PROJECT_ID: PN_kwDOBJScKs4AH9aF
