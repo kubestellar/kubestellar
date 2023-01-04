@@ -22,11 +22,9 @@ jobs:
                   id
                   fields(first:20) {
                     nodes {
-                      ... on ProjectV2IterationField {
-                        id
-                        name
-                        settings
-                      }
+                      id
+                      name
+                      settings
                     }
                   }
                 }
@@ -36,9 +34,9 @@ jobs:
           echo 'CONTENT'=`cat project_data.json`
           
           echo 'PROJECT_ID='$(jq '.data.user.projectNext.id' project_data.json) >> $GITHUB_ENV
-          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="New") |.id' project_data.json) >> $GITHUB_ENV
+#          echo 'DATE_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Date Posted") | .id' project_data.json) >> $GITHUB_ENV
+#          echo 'STATUS_FIELD_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
+#          echo 'TODO_OPTION_ID='$(jq '.data.user.projectNext.fields.nodes[] | select(.name== "Status") |.settings | fromjson.options[] | select(.name=="New") |.id' project_data.json) >> $GITHUB_ENV
 
       - name: Add Issue to project
         env:
