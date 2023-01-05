@@ -206,7 +206,7 @@ func (c *controller) enqueueNamespace(obj interface{}) {
 		placement := obj.(*schedulingv1alpha1.Placement)
 		namespaceKey := key
 		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
-		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Namespace changed", "Namespace", namespaceKey)
+		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Namespace changed", "namespace", namespaceKey)
 		c.queue.Add(key)
 	}
 }
@@ -234,7 +234,7 @@ func (c *controller) enqueueLocation(obj interface{}) {
 		placement := obj.(*schedulingv1alpha1.Placement)
 		locationKey := key
 		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
-		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Location changed", "Location", locationKey)
+		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Location changed", "location", locationKey)
 		c.queue.Add(key)
 	}
 }
