@@ -342,13 +342,13 @@ endif
 # 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-# .PHONY: test
-# ifdef USE_GOTESTSUM
-# test: $(GOTESTSUM)
-# endif
-# test: WHAT ?= ./...
-# # We will need to move into the sub package, of pkg/apis to run those tests.
-# test:
+.PHONY: test
+ifdef USE_GOTESTSUM
+test: $(GOTESTSUM)
+endif
+test: WHAT ?= ./...
+# We will need to move into the sub package, of pkg/apis to run those tests.
+test:
 # 	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
 # 	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
 
