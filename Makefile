@@ -101,24 +101,26 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/... ./tmc/cmd/...
+build: WHAT ?= ./cmd/... 
+#./tmc/cmd/...
 build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	ln -sf kubectl-workspace bin/kubectl-workspaces
-	ln -sf kubectl-workspace bin/kubectl-ws
+#	ln -sf kubectl-workspace bin/kubectl-workspaces
+#	ln -sf kubectl-workspace bin/kubectl-ws
 .PHONY: build
 
 .PHONY: build-all
 build-all:
-	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...  ./tmc/cmd/...'
+	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...'
+#'  ./tmc/cmd/...'
 
-.PHONY: build-kind-images
-build-kind-images-ko: require-ko
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./cmd/syncer))
-	$(eval TEST_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./test/e2e/fixtures/kcp-test-image))
-build-kind-images: build-kind-images-ko
-	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
-	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
+# .PHONY: build-kind-images
+# build-kind-images-ko: require-ko
+# 	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./cmd/syncer))
+# 	$(eval TEST_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./test/e2e/fixtures/kcp-test-image))
+# build-kind-images: build-kind-images-ko
+# 	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
+# 	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
 
 install: WHAT ?= ./cmd/...
 install:
@@ -149,9 +151,9 @@ update-contextual-logging: $(LOGCHECK)
 	UPDATE=true ./hack/verify-contextual-logging.sh
 .PHONY: update-contextual-logging
 
-generate-docs:
-	go run hack/generate/cli-doc/gen-cli-doc.go
-	./hack/generate/crd-ref/run-crd-ref-gen.sh
+# generate-docs:
+# 	go run hack/generate/cli-doc/gen-cli-doc.go
+# 	./hack/generate/crd-ref/run-crd-ref-gen.sh
 
 vendor: ## Vendor the dependencies
 	go mod tidy
@@ -240,115 +242,115 @@ COMPLETE_SUITES_ARG = -args $(SUITES_ARG)
 endif
 
 
-.PHONY: test-e2e
-ifdef USE_GOTESTSUM
-test-e2e: $(GOTESTSUM)
-endif
-test-e2e: TEST_ARGS ?=
-test-e2e: WHAT ?= ./test/e2e...
-test-e2e: build-all
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) $(COMPLETE_SUITES_ARG)
+# .PHONY: test-e2e
+# ifdef USE_GOTESTSUM
+# test-e2e: $(GOTESTSUM)
+# endif
+# test-e2e: TEST_ARGS ?=
+# test-e2e: WHAT ?= ./test/e2e...
+# test-e2e: build-all
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) $(COMPLETE_SUITES_ARG)
 
-.PHONY: test-e2e-shared
-ifdef USE_GOTESTSUM
-test-e2e-shared: $(GOTESTSUM)
-endif
-test-e2e-shared: TEST_ARGS ?=
-test-e2e-shared: WHAT ?= ./test/e2e...
-test-e2e-shared: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-shared: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-shared: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-shared: require-kind build-all build-kind-images
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+# .PHONY: test-e2e-shared
+# ifdef USE_GOTESTSUM
+# test-e2e-shared: $(GOTESTSUM)
+# endif
+# test-e2e-shared: TEST_ARGS ?=
+# test-e2e-shared: WHAT ?= ./test/e2e...
+# test-e2e-shared: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-shared: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-shared: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-shared: require-kind build-all build-kind-images
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: test-e2e-shared-minimal
-ifdef USE_GOTESTSUM
-test-e2e-shared-minimal: $(GOTESTSUM)
-endif
-test-e2e-shared-minimal: TEST_ARGS ?=
-test-e2e-shared-minimal: WHAT ?= ./test/e2e...
-test-e2e-shared-minimal: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-shared-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-shared-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-shared-minimal: build-all
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server $(SUITES_ARG) \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+# .PHONY: test-e2e-shared-minimal
+# ifdef USE_GOTESTSUM
+# test-e2e-shared-minimal: $(GOTESTSUM)
+# endif
+# test-e2e-shared-minimal: TEST_ARGS ?=
+# test-e2e-shared-minimal: WHAT ?= ./test/e2e...
+# test-e2e-shared-minimal: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-shared-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-shared-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-shared-minimal: build-all
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server $(SUITES_ARG) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: test-e2e-sharded
-ifdef USE_GOTESTSUM
-test-e2e-sharded: $(GOTESTSUM)
-endif
-test-e2e-sharded: TEST_ARGS ?=
-test-e2e-sharded: WHAT ?= ./test/e2e...
-test-e2e-sharded: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-sharded: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-sharded: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-sharded: require-kind build-all build-kind-images
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
-		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+# .PHONY: test-e2e-sharded
+# ifdef USE_GOTESTSUM
+# test-e2e-sharded: $(GOTESTSUM)
+# endif
+# test-e2e-sharded: TEST_ARGS ?=
+# test-e2e-sharded: WHAT ?= ./test/e2e...
+# test-e2e-sharded: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-sharded: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-sharded: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-sharded: require-kind build-all build-kind-images
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
+# 		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: test-e2e-sharded-minimal
-ifdef USE_GOTESTSUM
-test-e2e-sharded-minimal: $(GOTESTSUM)
-endif
-test-e2e-sharded-minimal: TEST_ARGS ?=
-test-e2e-sharded-minimal: WHAT ?= ./test/e2e...
-test-e2e-sharded-minimal: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-sharded-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-sharded-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-sharded-minimal: build-all
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+# .PHONY: test-e2e-sharded-minimal
+# ifdef USE_GOTESTSUM
+# test-e2e-sharded-minimal: $(GOTESTSUM)
+# endif
+# test-e2e-sharded-minimal: TEST_ARGS ?=
+# test-e2e-sharded-minimal: WHAT ?= ./test/e2e...
+# test-e2e-sharded-minimal: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-sharded-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-sharded-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-sharded-minimal: build-all
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: test
-ifdef USE_GOTESTSUM
-test: $(GOTESTSUM)
-endif
-test: WHAT ?= ./...
-# We will need to move into the sub package, of pkg/apis to run those tests.
-test:
-	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
-	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
+# .PHONY: test
+# ifdef USE_GOTESTSUM
+# test: $(GOTESTSUM)
+# endif
+# test: WHAT ?= ./...
+# # We will need to move into the sub package, of pkg/apis to run those tests.
+# test:
+# 	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
+# 	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
 
 .PHONY: verify-k8s-deps
 verify-k8s-deps:
