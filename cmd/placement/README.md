@@ -21,12 +21,12 @@ and insert
 	}
 ```
 into pkg/reconciler/workload/placement/placement_reconcile.go.reconcile(),
-along with the required import statement for "fmt".
+along with the required import statements for "fmt".
 After that, start kcp.
 
-Second, point $KUBECONFIG to the started kcp in the first step, then
+Second,
 ```console
-go run cmd/placement/main.go
+go run cmd/placement/main.go --kcp-kubeconfig=<path to kcp admin.kubeconfig> -v <verbosity (default 2)>
 ```
 
 #### A short demo
