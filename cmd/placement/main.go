@@ -21,11 +21,6 @@ import (
 	"os"
 	"time"
 
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
-	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
-	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
-	"github.com/kcp-dev/logicalcluster/v2"
-
 	kcpkubernetesinformers "k8s.io/client-go/informers"
 	kcpkubernetesclientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -35,6 +30,11 @@ import (
 
 	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	"github.com/kcp-dev/logicalcluster/v2"
+
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
+	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
+	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
 )
 
 func main() {
