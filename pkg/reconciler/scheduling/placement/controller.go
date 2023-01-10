@@ -25,9 +25,8 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v2"
-	coreinformers "k8s.io/client-go/informers/core/v1"
-	corelisters "k8s.io/client-go/listers/core/v1"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -37,6 +36,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	coreinformers "k8s.io/client-go/informers/core/v1"
+	corelisters "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
@@ -46,8 +47,6 @@ import (
 	schedulinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	schedulinglisters "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
-
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 )
 
 const (

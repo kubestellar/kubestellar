@@ -42,11 +42,11 @@ for CRD in ./config/crds/*.yaml; do
     fi
 done
 
-${CONTROLLER_GEN} \
-    crd \
-    rbac:roleName=manager-role \
-    webhook \
-    paths="./test/e2e/reconciler/cluster/..." \
-    output:crd:artifacts:config=test/e2e/reconciler/cluster/
+# ${CONTROLLER_GEN} \
+#     crd \
+#     rbac:roleName=manager-role \
+#     webhook \
+#     paths="./test/e2e/reconciler/cluster/..." \
+#     output:crd:artifacts:config=test/e2e/reconciler/cluster/
 
-go run ./cmd/apigen --input-dir ./config/crds --output-dir  ./config/root-phase0
+# go run ./cmd/apigen --input-dir ./config/crds --output-dir  ./config/root-phase0
