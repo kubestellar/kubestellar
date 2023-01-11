@@ -17,12 +17,13 @@ limitations under the License.
 package indexers
 
 import (
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v2"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
+
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 )
 
 const (
