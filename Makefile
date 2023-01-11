@@ -144,7 +144,7 @@ $(CODE_GENERATOR):
 lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
 #	$(GOLANGCI_LINT) run ./...
 #	$(STATICCHECK) -checks ST1019,ST1005 ./...
-#	./hack/verify-contextual-logging.sh
+	./hack/verify-contextual-logging.sh
 .PHONY: lint
 
 update-contextual-logging: $(LOGCHECK)
