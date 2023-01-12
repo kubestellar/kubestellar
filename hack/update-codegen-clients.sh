@@ -37,9 +37,9 @@ bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
 
 pushd ./pkg/apis
 ${CODE_GENERATOR} \
-  "client:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
+  "client:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
   "lister:apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
-  "informer:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
+  "informer:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
   "paths=./..." \
   "output:dir=./../client"
 popd
