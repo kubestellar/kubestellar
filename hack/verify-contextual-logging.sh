@@ -17,7 +17,6 @@
 set -o nounset
 set -o pipefail
 set -o errexit
-set -x
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)
 LOG_FILE="${REPO_ROOT}/hack/logcheck.out"
