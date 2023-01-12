@@ -30,16 +30,16 @@ CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.i
 # "core:v1alpha1 workload:v1alpha1 apiresource:v1alpha1 tenancy:v1alpha1 tenancy:v1beta1 apis:v1alpha1 scheduling:v1alpha1 topology:v1alpha1" \
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
   github.com/kcp-dev/edge-mc/pkg/client github.com/kcp-dev/edge-mc/pkg/apis \
-  "core:v1alpha1 apis:v1alpha1" \
+  "apis:v1alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kcp-dev/edge-mc
 
 pushd ./pkg/apis
 ${CODE_GENERATOR} \
-  "client:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+  "client:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
   "lister:apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
-  "informer:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+  "informer:outputPackagePath=github.com/kcp-dev/edge-mc/pkg/client,singleClusterClientPackagePath=github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned,apiPackagePath=github.com/kcp-dev/edge-mc/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
   "paths=./..." \
   "output:dir=./../client"
 popd
@@ -67,7 +67,7 @@ popd
 #   "output:dir=./../client"
 # popd
 
-# go install "${CODEGEN_PKG}"/cmd/openapi-gen
+go install "${CODEGEN_PKG}"/cmd/openapi-gen
 
 # "$GOPATH"/bin/openapi-gen  \
 # # --input-dirs github.com/kcp-dev/edge-mc/pkg/apis/workload/v1alpha1 \

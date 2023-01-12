@@ -188,7 +188,7 @@ codegen: crds $(CODE_GENERATOR)
 verify-codegen:
 	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
 		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/kcp; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
 	fi
 
 	$(MAKE) codegen
@@ -204,7 +204,7 @@ $(OPENSHIFT_GOIMPORTS):
 
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
-	$(OPENSHIFT_GOIMPORTS) -m github.com/kcp-dev/kcp
+	$(OPENSHIFT_GOIMPORTS) -m github.com/kcp-dev/edge-mc
 
 $(TOOLS_DIR)/verify_boilerplate.py:
 	mkdir -p $(TOOLS_DIR)
