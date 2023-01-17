@@ -22,22 +22,20 @@ import (
 
 	"github.com/spf13/cobra"
 
-	kcpkubernetesinformers "k8s.io/client-go/informers"
-	kcpkubernetesclientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
+	kcpkubernetesinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	placementoptions "github.com/kcp-dev/edge-mc/cmd/placement/options"
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
-	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
 	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
-	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
+	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 func NewPlacementCommand() *cobra.Command {
@@ -100,42 +98,38 @@ func Run(ctx context.Context, options *placementoptions.Options) error {
 
 	// create kubeSharedInformerFactory
 	kubernetesConfig := rest.CopyConfig(cfg)
-	kubeClusterClient, err := kcpkubernetesclientset.NewClusterForConfig(kubernetesConfig)
+	clientgoExternalClient, err := kcpkubernetesclientset.NewForConfig(kubernetesConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kube cluter client")
 		return err
 	}
-	kubeSharedInformerFactory := kcpkubernetesinformers.NewSharedInformerFactoryWithOptions(
-		kubeClusterClient.Cluster(logicalcluster.Wildcard),
+	kubeSharedInformerFactory := kcpkubernetesinformers.NewSharedInformerFactory(
+		clientgoExternalClient,
 		resyncPeriod,
-		kcpkubernetesinformers.WithExtraClusterScopedIndexers(edgeindexers.ClusterScoped()),
-		kcpkubernetesinformers.WithExtraNamespaceScopedIndexers(edgeindexers.NamespaceScoped()),
 	)
 
 	// create kcpSharedInformerFactory
 	kcpConfig := rest.CopyConfig(cfg)
 	edgeclient.ConfigForScheduling(kcpConfig)
-	kcpClusterClient, err := kcpclient.NewClusterForConfig(kcpConfig)
+	kcpClusterClient, err := kcpclientset.NewForConfig(kcpConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp cluster client")
 		return err
 	}
 	kcpSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(
-		kcpClusterClient.Cluster(logicalcluster.Wildcard),
+		kcpClusterClient,
 		resyncPeriod,
-		kcpinformers.WithExtraClusterScopedIndexers(edgeindexers.ClusterScoped()),
-		kcpinformers.WithExtraNamespaceScopedIndexers(edgeindexers.NamespaceScoped()),
 	)
 
 	// create the kcp-scheduling-placement-controller
 	controllerConfig := rest.CopyConfig(cfg)
-	kcpClusterClientset, err := kcpclient.NewClusterForConfig(controllerConfig)
+	kcpClusterClientset, err := kcpclientset.NewForConfig(controllerConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp clientset for controller")
 		return err
 	}
 	c, err := edgeplacement.NewController(
-		*kcpClusterClientset,
+		kcpClusterClientset,
 		kubeSharedInformerFactory.Core().V1().Namespaces(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Placements(),

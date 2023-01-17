@@ -1,5 +1,6 @@
 This is the kcp-scheduling-placement controller separated from kcp-dev/kcp.
 The purpose of this work is documented in the Summary of [this PR](https://github.com/kcp-dev/edge-mc/pull/58).
+It works with kcp v0.10.0.
 
 #### Run the controller
 Two steps should be taken to run the controller.
