@@ -30,15 +30,14 @@ import (
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
-	"github.com/kcp-dev/logicalcluster/v2"
-
 	placementoptions "github.com/kcp-dev/edge-mc/cmd/placement/options"
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	edgeindexers "github.com/kcp-dev/edge-mc/pkg/indexers"
 	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
+	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
+	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 func NewPlacementCommand() *cobra.Command {
