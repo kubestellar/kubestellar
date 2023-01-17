@@ -19,12 +19,11 @@ package placement
 import (
 	"context"
 
-	"github.com/kcp-dev/logicalcluster/v2"
-
 	corev1 "k8s.io/api/core/v1"
 	utilserrors "k8s.io/apimachinery/pkg/util/errors"
 
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 type reconcileStatus int

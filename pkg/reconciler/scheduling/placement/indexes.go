@@ -19,11 +19,10 @@ package placement
 import (
 	"fmt"
 
-	logicalcluster "github.com/kcp-dev/logicalcluster/v2"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
+	logicalcluster "github.com/kcp-dev/logicalcluster/v2"
 )
 
 func indexByWorkspace(obj interface{}) ([]string, error) {

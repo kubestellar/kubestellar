@@ -204,7 +204,7 @@ $(OPENSHIFT_GOIMPORTS):
 
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
-	$(OPENSHIFT_GOIMPORTS) -m github.com/kcp-dev/edge-mc
+	$(OPENSHIFT_GOIMPORTS) -m github.com/kcp-dev
 
 $(TOOLS_DIR)/verify_boilerplate.py:
 	mkdir -p $(TOOLS_DIR)
