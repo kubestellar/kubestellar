@@ -388,6 +388,8 @@ github.com/kcp-dev/apimachinery v0.0.0-20220912132244-efe716c18e43 h1:vPv81j3mT5
 github.com/kcp-dev/apimachinery v0.0.0-20220912132244-efe716c18e43/go.mod h1:qnvUHkdxOrNzX17yX+z8r81CZEBuFdveNzWqFlwZ55w=
 github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0 h1:fb+3CdDlxvnK+o1wm3IcDbD+MJndMUa17EUGqYORsvg=
 github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0/go.mod h1:dn1hXHMY9E6JbyOGa0qXt1Dq4akd/jHMZOpFhJoX7q4=
+github.com/kcp-dev/client-go v0.0.0-20230112161950-ed70a87bb0c8 h1:8v5hI+oqMcTuDwnfWouM2yeQCRpJc2T+vvAQAuT+iE0=
+github.com/kcp-dev/client-go v0.0.0-20230112161950-ed70a87bb0c8/go.mod h1:sj0r6sAHNsfEpA37uLTVGZj9TMQQWjBXk4rbpcIDZ7U=
 github.com/kcp-dev/kcp v0.5.0-alpha.0/go.mod h1:OjxpPNevOemXK8dNXaDQYxg51Q9HVd26A/YupCBAApY=
 github.com/kcp-dev/kcp v0.9.1 h1:XA6OpCWRrYMqtTzRFFFGDhGFYWTRy/DLptYlcLePuBc=
 github.com/kcp-dev/kcp v0.9.1/go.mod h1:AJOr9fzaWBjlrB13e0ibSHEg8rwmtxzgy5hmjicbSYQ=
@@ -430,6 +432,8 @@ github.com/kcp-dev/logicalcluster v1.0.0/go.mod h1:M0CBFkJTW29XtIP5XIkDfhYQ8LU6H
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.1/go.mod h1:lfWJL764jKFJxZWOGuFuT3PCCLPo6lV5Cl8P7u9T05g=
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.3 h1:+DwIG/loh2nDB9c/FqNvLzFFq/YtBliLxAfw/uWNzyE=
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.3/go.mod h1:lfWJL764jKFJxZWOGuFuT3PCCLPo6lV5Cl8P7u9T05g=
+github.com/kcp-dev/logicalcluster/v3 v3.0.0 h1:tH6M2NuA11eLMsxii9IDOGo64X8B+P3e3pC6W2oEsx8=
+github.com/kcp-dev/logicalcluster/v3 v3.0.0/go.mod h1:6rb68Tntup98cRr9+50rvSDxUbfqrC1yQ/T6RiZcSgA=
 github.com/kcp-dev/logicalcluster/v3 v3.0.4 h1:q7KngML/QM7sWl8aVzmfZF0TPMnBwYNxsPKfwUvvBvU=
 github.com/kcp-dev/logicalcluster/v3 v3.0.4/go.mod h1:EWBUBxdr49fUB1cLMO4nOdBWmYifLbP1LfoL20KkXYY=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
