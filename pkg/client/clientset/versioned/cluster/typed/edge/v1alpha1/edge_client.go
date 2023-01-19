@@ -27,8 +27,9 @@ import (
 	"k8s.io/client-go/rest"
 
 	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v2"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
 type EdgeV1alpha1ClusterInterface interface {

@@ -21,8 +21,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
 
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v2"
+
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 )
 
 const (

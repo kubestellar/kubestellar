@@ -28,8 +28,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v2"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 type GenericClusterInformer interface {

@@ -30,12 +30,13 @@ import (
 
 	kcpkubernetesinformers "github.com/kcp-dev/client-go/informers"
 	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	placementoptions "github.com/kcp-dev/edge-mc/cmd/placement/options"
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
-	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
+
+	placementoptions "github.com/kcp-dev/edge-mc/cmd/placement/options"
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
+	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
 )
 
 func NewPlacementCommand() *cobra.Command {

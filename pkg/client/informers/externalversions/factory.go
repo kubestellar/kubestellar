@@ -32,11 +32,12 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
+	"github.com/kcp-dev/logicalcluster/v2"
+
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.

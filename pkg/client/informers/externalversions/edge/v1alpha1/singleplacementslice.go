@@ -32,12 +32,13 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
 	kcpinformers "github.com/kcp-dev/apimachinery/third_party/informers"
+	"github.com/kcp-dev/logicalcluster/v2"
+
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // SinglePlacementSliceClusterInformer provides access to a shared informer and lister for
