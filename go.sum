@@ -299,11 +299,9 @@ github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8
 github.com/kcp-dev/apimachinery v0.0.0-20221019133255-9e1e13940519/go.mod h1:qnvUHkdxOrNzX17yX+z8r81CZEBuFdveNzWqFlwZ55w=
 github.com/kcp-dev/apimachinery v0.0.0-20221102195355-d65878bc16be h1:2uDzJ896+ojtzgr9HJL8+tZEoqhq8blwymGinWFrQ6E=
 github.com/kcp-dev/apimachinery v0.0.0-20221102195355-d65878bc16be/go.mod h1:qnvUHkdxOrNzX17yX+z8r81CZEBuFdveNzWqFlwZ55w=
-github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0 h1:fb+3CdDlxvnK+o1wm3IcDbD+MJndMUa17EUGqYORsvg=
-github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0/go.mod h1:dn1hXHMY9E6JbyOGa0qXt1Dq4akd/jHMZOpFhJoX7q4=
 github.com/kcp-dev/client-go v0.0.0-20221025140308-a18ccea074a6/go.mod h1:Qmq1OxUOSdVQ8YIGnjbya5Xt04KMJ5fN41QvErl/XnI=
-github.com/kcp-dev/client-go v0.0.0-20230112161950-ed70a87bb0c8 h1:8v5hI+oqMcTuDwnfWouM2yeQCRpJc2T+vvAQAuT+iE0=
-github.com/kcp-dev/client-go v0.0.0-20230112161950-ed70a87bb0c8/go.mod h1:sj0r6sAHNsfEpA37uLTVGZj9TMQQWjBXk4rbpcIDZ7U=
+github.com/kcp-dev/client-go v0.0.0-20221116175613-517d8c8ead79 h1:WnOX7t4wjM/b0A24BEwrOfc4GpkqH1rI9T+l6fyhc/g=
+github.com/kcp-dev/client-go v0.0.0-20221116175613-517d8c8ead79/go.mod h1:M1KBevWifitzA15pZmJ9wslAtpljNfHzZZLLVYS6XHA=
 github.com/kcp-dev/kcp v0.10.0 h1:suhH0jZMCPx9WUGOwNuowon0ryEHRYG+FhTMcGLxUts=
 github.com/kcp-dev/kcp v0.10.0/go.mod h1:6cIdP28Kg28ktW6RA6hs4HEAHTR9aqBy6gmEEJh0J4M=
 github.com/kcp-dev/kcp/pkg/apis v0.10.0 h1:4ko7c5u9fTaA3R2+O7ebndtPAx76llToXMiUJqPr3TI=
@@ -325,8 +323,6 @@ github.com/kcp-dev/kubernetes/staging/src/k8s.io/component-base v0.0.0-202212081
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.1/go.mod h1:lfWJL764jKFJxZWOGuFuT3PCCLPo6lV5Cl8P7u9T05g=
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.4 h1:lHolbAfXXJDdcOO0bgQHtu0r4gq5Lt3/ueF0YGliIBc=
 github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.4/go.mod h1:lfWJL764jKFJxZWOGuFuT3PCCLPo6lV5Cl8P7u9T05g=
-github.com/kcp-dev/logicalcluster/v3 v3.0.0 h1:tH6M2NuA11eLMsxii9IDOGo64X8B+P3e3pC6W2oEsx8=
-github.com/kcp-dev/logicalcluster/v3 v3.0.0/go.mod h1:6rb68Tntup98cRr9+50rvSDxUbfqrC1yQ/T6RiZcSgA=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
