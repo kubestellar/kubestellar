@@ -33,7 +33,7 @@ import (
 	fakeedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
 	clientscheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -45,7 +45,7 @@ func NewSimpleClientset(objects ...runtime.Object) *ClusterClientset {
 	o.AddAll(objects...)
 
 	cs := &ClusterClientset{Fake: &kcptesting.Fake{}, tracker: o}
-	cs.discovery = &kcpfakediscovery.FakeDiscovery{Fake: cs.Fake, ClusterPath: logicalcluster.Wildcard}
+	cs.discovery = &kcpfakediscovery.FakeDiscovery{Fake: cs.Fake, Cluster: logicalcluster.Wildcard}
 	cs.AddReactor("*", "*", kcptesting.ObjectReaction(o))
 	cs.AddWatchReactor("*", kcptesting.WatchReaction(o))
 
@@ -76,15 +76,15 @@ func (c *ClusterClientset) EdgeV1alpha1() kcpedgev1alpha1.EdgeV1alpha1ClusterInt
 }
 
 // Cluster scopes this clientset to one cluster.
-func (c *ClusterClientset) Cluster(clusterPath logicalcluster.Path) client.Interface {
-	if clusterPath == logicalcluster.Wildcard {
+func (c *ClusterClientset) Cluster(cluster logicalcluster.Name) client.Interface {
+	if cluster == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 	return &Clientset{
-		Fake:        c.Fake,
-		discovery:   &kcpfakediscovery.FakeDiscovery{Fake: c.Fake, ClusterPath: clusterPath},
-		tracker:     c.tracker.Cluster(clusterPath),
-		clusterPath: clusterPath,
+		Fake:      c.Fake,
+		discovery: &kcpfakediscovery.FakeDiscovery{Fake: c.Fake, Cluster: cluster},
+		tracker:   c.tracker.Cluster(cluster),
+		cluster:   cluster,
 	}
 }
 
@@ -93,9 +93,9 @@ var _ client.Interface = (*Clientset)(nil)
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*kcptesting.Fake
-	discovery   *kcpfakediscovery.FakeDiscovery
-	tracker     kcptesting.ScopedObjectTracker
-	clusterPath logicalcluster.Path
+	discovery *kcpfakediscovery.FakeDiscovery
+	tracker   kcptesting.ScopedObjectTracker
+	cluster   logicalcluster.Name
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -109,5 +109,5 @@ func (c *Clientset) Tracker() kcptesting.ScopedObjectTracker {
 
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client.
 func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
-	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
+	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, Cluster: c.cluster}
 }

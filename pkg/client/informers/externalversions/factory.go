@@ -31,12 +31,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
@@ -188,16 +188,16 @@ func (f *sharedInformerFactory) Edge() edgeinformers.ClusterInterface {
 	return edgeinformers.New(f, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Cluster(clusterName logicalcluster.Name) ScopedDynamicSharedInformerFactory {
+func (f *sharedInformerFactory) Cluster(cluster logicalcluster.Name) ScopedDynamicSharedInformerFactory {
 	return &scopedDynamicSharedInformerFactory{
 		sharedInformerFactory: f,
-		clusterName:           clusterName,
+		cluster:               cluster,
 	}
 }
 
 type scopedDynamicSharedInformerFactory struct {
 	*sharedInformerFactory
-	clusterName logicalcluster.Name
+	cluster logicalcluster.Name
 }
 
 func (f *scopedDynamicSharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
@@ -205,7 +205,7 @@ func (f *scopedDynamicSharedInformerFactory) ForResource(resource schema.GroupVe
 	if err != nil {
 		return nil, err
 	}
-	return clusterInformer.Cluster(f.clusterName), nil
+	return clusterInformer.Cluster(f.cluster), nil
 }
 
 func (f *scopedDynamicSharedInformerFactory) Start(stopCh <-chan struct{}) {

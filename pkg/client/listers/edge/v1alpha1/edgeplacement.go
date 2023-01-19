@@ -26,9 +26,9 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // EdgePlacementClusterLister can list EdgePlacements across all workspaces, or scope down to a EdgePlacementLister for one workspace.
@@ -38,7 +38,7 @@ type EdgePlacementClusterLister interface {
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*edgev1alpha1.EdgePlacement, err error)
 	// Cluster returns a lister that can list and get EdgePlacements in one workspace.
-	Cluster(clusterName logicalcluster.Name) EdgePlacementLister
+	Cluster(cluster logicalcluster.Name) EdgePlacementLister
 	EdgePlacementClusterListerExpansion
 }
 
@@ -64,8 +64,8 @@ func (s *edgePlacementClusterLister) List(selector labels.Selector) (ret []*edge
 }
 
 // Cluster scopes the lister to one workspace, allowing users to list and get EdgePlacements.
-func (s *edgePlacementClusterLister) Cluster(clusterName logicalcluster.Name) EdgePlacementLister {
-	return &edgePlacementLister{indexer: s.indexer, clusterName: clusterName}
+func (s *edgePlacementClusterLister) Cluster(cluster logicalcluster.Name) EdgePlacementLister {
+	return &edgePlacementLister{indexer: s.indexer, cluster: cluster}
 }
 
 // EdgePlacementLister can list all EdgePlacements, or get one in particular.
@@ -82,13 +82,13 @@ type EdgePlacementLister interface {
 
 // edgePlacementLister can list all EdgePlacements inside a workspace.
 type edgePlacementLister struct {
-	indexer     cache.Indexer
-	clusterName logicalcluster.Name
+	indexer cache.Indexer
+	cluster logicalcluster.Name
 }
 
 // List lists all EdgePlacements in the indexer for a workspace.
 func (s *edgePlacementLister) List(selector labels.Selector) (ret []*edgev1alpha1.EdgePlacement, err error) {
-	err = kcpcache.ListAllByCluster(s.indexer, s.clusterName, selector, func(i interface{}) {
+	err = kcpcache.ListAllByCluster(s.indexer, s.cluster, selector, func(i interface{}) {
 		ret = append(ret, i.(*edgev1alpha1.EdgePlacement))
 	})
 	return ret, err
@@ -96,7 +96,7 @@ func (s *edgePlacementLister) List(selector labels.Selector) (ret []*edgev1alpha
 
 // Get retrieves the EdgePlacement from the indexer for a given workspace and name.
 func (s *edgePlacementLister) Get(name string) (*edgev1alpha1.EdgePlacement, error) {
-	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), "", name)
+	key := kcpcache.ToClusterAwareKey(s.cluster.String(), "", name)
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err

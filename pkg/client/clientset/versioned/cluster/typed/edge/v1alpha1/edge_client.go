@@ -26,9 +26,9 @@ import (
 
 	"k8s.io/client-go/rest"
 
-	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
+	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 type EdgeV1alpha1ClusterInterface interface {
@@ -38,18 +38,18 @@ type EdgeV1alpha1ClusterInterface interface {
 }
 
 type EdgeV1alpha1ClusterScoper interface {
-	Cluster(logicalcluster.Path) edgev1alpha1.EdgeV1alpha1Interface
+	Cluster(logicalcluster.Name) edgev1alpha1.EdgeV1alpha1Interface
 }
 
 type EdgeV1alpha1ClusterClient struct {
 	clientCache kcpclient.Cache[*edgev1alpha1.EdgeV1alpha1Client]
 }
 
-func (c *EdgeV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) edgev1alpha1.EdgeV1alpha1Interface {
-	if clusterPath == logicalcluster.Wildcard {
+func (c *EdgeV1alpha1ClusterClient) Cluster(name logicalcluster.Name) edgev1alpha1.EdgeV1alpha1Interface {
+	if name == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
-	return c.clientCache.ClusterOrDie(clusterPath)
+	return c.clientCache.ClusterOrDie(name)
 }
 
 func (c *EdgeV1alpha1ClusterClient) EdgePlacements() EdgePlacementClusterInterface {
@@ -77,7 +77,7 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*EdgeV1alpha1Cluster
 	cache := kcpclient.NewCache(c, h, &kcpclient.Constructor[*edgev1alpha1.EdgeV1alpha1Client]{
 		NewForConfigAndClient: edgev1alpha1.NewForConfigAndClient,
 	})
-	if _, err := cache.Cluster(logicalcluster.Name("root").Path()); err != nil {
+	if _, err := cache.Cluster(logicalcluster.New("root")); err != nil {
 		return nil, err
 	}
 	return &EdgeV1alpha1ClusterClient{clientCache: cache}, nil

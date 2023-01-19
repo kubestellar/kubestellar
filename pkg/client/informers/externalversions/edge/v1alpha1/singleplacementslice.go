@@ -30,14 +30,14 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
+	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
+	kcpinformers "github.com/kcp-dev/apimachinery/third_party/informers"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // SinglePlacementSliceClusterInformer provides access to a shared informer and lister for
@@ -108,10 +108,10 @@ type SinglePlacementSliceInformer interface {
 	Lister() edgev1alpha1listers.SinglePlacementSliceLister
 }
 
-func (f *singlePlacementSliceClusterInformer) Cluster(clusterName logicalcluster.Name) SinglePlacementSliceInformer {
+func (f *singlePlacementSliceClusterInformer) Cluster(cluster logicalcluster.Name) SinglePlacementSliceInformer {
 	return &singlePlacementSliceInformer{
-		informer: f.Informer().Cluster(clusterName),
-		lister:   f.Lister().Cluster(clusterName),
+		informer: f.Informer().Cluster(cluster),
+		lister:   f.Lister().Cluster(cluster),
 	}
 }
 
