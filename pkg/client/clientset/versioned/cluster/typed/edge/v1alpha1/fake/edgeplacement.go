@@ -34,7 +34,7 @@ import (
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 var edgePlacementsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "edgeplacements"}
@@ -45,12 +45,12 @@ type edgePlacementsClusterClient struct {
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *edgePlacementsClusterClient) Cluster(clusterPath logicalcluster.Path) edgev1alpha1client.EdgePlacementInterface {
-	if clusterPath == logicalcluster.Wildcard {
+func (c *edgePlacementsClusterClient) Cluster(cluster logicalcluster.Name) edgev1alpha1client.EdgePlacementInterface {
+	if cluster == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 
-	return &edgePlacementsClient{Fake: c.Fake, ClusterPath: clusterPath}
+	return &edgePlacementsClient{Fake: c.Fake, Cluster: cluster}
 }
 
 // List takes label and field selectors, and returns the list of EdgePlacements that match those selectors across all clusters.
@@ -80,11 +80,11 @@ func (c *edgePlacementsClusterClient) Watch(ctx context.Context, opts metav1.Lis
 
 type edgePlacementsClient struct {
 	*kcptesting.Fake
-	ClusterPath logicalcluster.Path
+	Cluster logicalcluster.Name
 }
 
 func (c *edgePlacementsClient) Create(ctx context.Context, edgePlacement *edgev1alpha1.EdgePlacement, opts metav1.CreateOptions) (*edgev1alpha1.EdgePlacement, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootCreateAction(edgePlacementsResource, c.ClusterPath, edgePlacement), &edgev1alpha1.EdgePlacement{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootCreateAction(edgePlacementsResource, c.Cluster, edgePlacement), &edgev1alpha1.EdgePlacement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *edgePlacementsClient) Create(ctx context.Context, edgePlacement *edgev1
 }
 
 func (c *edgePlacementsClient) Update(ctx context.Context, edgePlacement *edgev1alpha1.EdgePlacement, opts metav1.UpdateOptions) (*edgev1alpha1.EdgePlacement, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateAction(edgePlacementsResource, c.ClusterPath, edgePlacement), &edgev1alpha1.EdgePlacement{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateAction(edgePlacementsResource, c.Cluster, edgePlacement), &edgev1alpha1.EdgePlacement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *edgePlacementsClient) Update(ctx context.Context, edgePlacement *edgev1
 }
 
 func (c *edgePlacementsClient) UpdateStatus(ctx context.Context, edgePlacement *edgev1alpha1.EdgePlacement, opts metav1.UpdateOptions) (*edgev1alpha1.EdgePlacement, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateSubresourceAction(edgePlacementsResource, c.ClusterPath, "status", edgePlacement), &edgev1alpha1.EdgePlacement{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateSubresourceAction(edgePlacementsResource, c.Cluster, "status", edgePlacement), &edgev1alpha1.EdgePlacement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -108,19 +108,19 @@ func (c *edgePlacementsClient) UpdateStatus(ctx context.Context, edgePlacement *
 }
 
 func (c *edgePlacementsClient) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	_, err := c.Fake.Invokes(kcptesting.NewRootDeleteActionWithOptions(edgePlacementsResource, c.ClusterPath, name, opts), &edgev1alpha1.EdgePlacement{})
+	_, err := c.Fake.Invokes(kcptesting.NewRootDeleteActionWithOptions(edgePlacementsResource, c.Cluster, name, opts), &edgev1alpha1.EdgePlacement{})
 	return err
 }
 
 func (c *edgePlacementsClient) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
-	action := kcptesting.NewRootDeleteCollectionAction(edgePlacementsResource, c.ClusterPath, listOpts)
+	action := kcptesting.NewRootDeleteCollectionAction(edgePlacementsResource, c.Cluster, listOpts)
 
 	_, err := c.Fake.Invokes(action, &edgev1alpha1.EdgePlacementList{})
 	return err
 }
 
 func (c *edgePlacementsClient) Get(ctx context.Context, name string, options metav1.GetOptions) (*edgev1alpha1.EdgePlacement, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootGetAction(edgePlacementsResource, c.ClusterPath, name), &edgev1alpha1.EdgePlacement{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootGetAction(edgePlacementsResource, c.Cluster, name), &edgev1alpha1.EdgePlacement{})
 	if obj == nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (c *edgePlacementsClient) Get(ctx context.Context, name string, options met
 
 // List takes label and field selectors, and returns the list of EdgePlacements that match those selectors.
 func (c *edgePlacementsClient) List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.EdgePlacementList, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(edgePlacementsResource, edgePlacementsKind, c.ClusterPath, opts), &edgev1alpha1.EdgePlacementList{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(edgePlacementsResource, edgePlacementsKind, c.Cluster, opts), &edgev1alpha1.EdgePlacementList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -148,11 +148,11 @@ func (c *edgePlacementsClient) List(ctx context.Context, opts metav1.ListOptions
 }
 
 func (c *edgePlacementsClient) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(edgePlacementsResource, c.ClusterPath, opts))
+	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(edgePlacementsResource, c.Cluster, opts))
 }
 
 func (c *edgePlacementsClient) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*edgev1alpha1.EdgePlacement, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootPatchSubresourceAction(edgePlacementsResource, c.ClusterPath, name, pt, data, subresources...), &edgev1alpha1.EdgePlacement{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootPatchSubresourceAction(edgePlacementsResource, c.Cluster, name, pt, data, subresources...), &edgev1alpha1.EdgePlacement{})
 	if obj == nil {
 		return nil, err
 	}

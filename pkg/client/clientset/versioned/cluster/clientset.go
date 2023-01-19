@@ -29,14 +29,14 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/flowcontrol"
 
-	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
+	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
 	client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 type ClusterInterface interface {
-	Cluster(logicalcluster.Path) client.Interface
+	Cluster(logicalcluster.Name) client.Interface
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface
 }
@@ -62,11 +62,11 @@ func (c *ClusterClientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterf
 }
 
 // Cluster scopes this clientset to one cluster.
-func (c *ClusterClientset) Cluster(clusterPath logicalcluster.Path) client.Interface {
-	if clusterPath == logicalcluster.Wildcard {
+func (c *ClusterClientset) Cluster(name logicalcluster.Name) client.Interface {
+	if name == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
-	return c.clientCache.ClusterOrDie(clusterPath)
+	return c.clientCache.ClusterOrDie(name)
 }
 
 // NewForConfig creates a new ClusterClientset for the given config.
@@ -106,7 +106,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*ClusterCli
 	cache := kcpclient.NewCache(c, httpClient, &kcpclient.Constructor[*client.Clientset]{
 		NewForConfigAndClient: client.NewForConfigAndClient,
 	})
-	if _, err := cache.Cluster(logicalcluster.Name("root").Path()); err != nil {
+	if _, err := cache.Cluster(logicalcluster.New("root")); err != nil {
 		return nil, err
 	}
 
