@@ -1,6 +1,6 @@
 This is the kcp-scheduling-placement controller separated from kcp-dev/kcp.
 The purpose of this work is documented in the Summary of [this PR](https://github.com/kcp-dev/edge-mc/pull/58).
-It works with kcp v0.10.0.
+It works with [this snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5) of kcp.
 
 #### Run the controller
 Two steps should be taken to run the controller.
@@ -33,24 +33,33 @@ go run cmd/placement/main.go --kcp-kubeconfig=<path to kcp admin.kubeconfig> -v 
 #### A short demo
 The short demo shows the Placement State Machine described in this [document](https://docs.google.com/document/d/1AzyjuyjNIDVAXEGHslaggltIQ9Cs8pLCzc9Ma_RBmuM/edit#heading=h.vmt32rdidje6), or in this [code block](https://github.com/kcp-dev/kcp/blob/fb4d4a42373ea4da001b8c88396eabaf6f825be1/pkg/apis/scheduling/v1alpha1/types_placement.go#L123-L134).
 
-In a user's workspace, say `root:my-org:dev`, create Placement `dev`:
+In the `root:compute` workspace, create Location `foo`:
+```console
+kubectl create -f config/samples/location_foo.yaml
+```
+
+Switch to a user's workspace, say `root:my-org:dev`, create Placement `dev`:
 ```console
 kubectl create -f config/samples/placement_dev.yaml
 ```
 The status of Placement `dev` should show `phase: Pending`.
 
-Switch to the `root:compute` workspace, create Location `foo`:
-```console
-kubectl create -f config/samples/location_foo.yaml
-```
+`kubectl edit` the `spec.locationSelectors` of the Placement `dev`, from `env: prod` to `env: dev`.
 The status of Placement `dev` should show (1) `phase: Unbound`, (2) the `foo` Location selected by Placement `dev`.
 
-Back to the user's workspace, label namespace `default`:
+Label namespace `default` in the user's workspace:
 ```
 kubectl label ns default env=dev
 ```
 The status of the placement should show `phase: Bound`.
 
-Remove the `env=dev` label on the default namespace, then delete Location `foo`, the state machine should transit to `Unbound`, then back to `Pending`.
+Remove the `env=dev` label from the `default` namespace, the state machine should transit to `Unbound`.
 
-Delete the Placement `dev` so that everything is cleaned up.
+Revert the edits of the Placement `dev`:
+```console
+kubectl apply -f config/samples/placement_dev.yaml
+```
+The state machines should transit back to `Pending`.
+
+Delete the Placement `dev` from the user's workspace,
+and delete the Location `foo` in the `root:compute` workspace.

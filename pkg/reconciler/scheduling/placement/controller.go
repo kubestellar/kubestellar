@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -37,7 +38,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	kcpcorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	corev1listers "github.com/kcp-dev/client-go/listers/core/v1"
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
@@ -45,14 +46,12 @@ import (
 	schedulingv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
-	"github.com/kcp-dev/logicalcluster/v2"
 
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
+	"github.com/kcp-dev/edge-mc/pkg/indexers"
 )
 
 const (
 	ControllerName      = "kcp-scheduling-placement"
-	byWorkspace         = ControllerName + "-byWorkspace" // will go away with scoping
 	byLocationWorkspace = ControllerName + "-byLocationWorkspace"
 )
 
@@ -69,13 +68,16 @@ func NewController(
 	c := &controller{
 		queue: queue,
 		enqueueAfter: func(ns *corev1.Namespace, duration time.Duration) {
-			key := edgeclient.ToClusterAwareKey(logicalcluster.From(ns), ns.Name)
+			key, err := kcpcache.MetaClusterNamespaceKeyFunc(ns)
+			if err != nil {
+				runtime.HandleError(err)
+				return
+			}
 			queue.AddAfter(key, duration)
 		},
 		kcpClusterClient: kcpClusterClient,
 
-		namespaceLister:  namespaceInformer.Lister(),
-		namespaceIndexer: namespaceInformer.Informer().GetIndexer(),
+		namespaceLister: namespaceInformer.Lister(),
 
 		locationLister:  locationInformer.Lister(),
 		locationIndexer: locationInformer.Informer().GetIndexer(),
@@ -84,24 +86,15 @@ func NewController(
 		placementIndexer: placementInformer.Informer().GetIndexer(),
 	}
 
-	if err := locationInformer.Informer().AddIndexers(cache.Indexers{
-		byWorkspace: indexByWorkspace,
-	}); err != nil {
-		return nil, err
-	}
-
 	if err := placementInformer.Informer().AddIndexers(cache.Indexers{
-		byWorkspace:         indexByWorkspace,
 		byLocationWorkspace: indexByLocationWorkspace,
 	}); err != nil {
 		return nil, err
 	}
 
-	if err := namespaceInformer.Informer().AddIndexers(cache.Indexers{
-		byWorkspace: indexByWorkspace,
-	}); err != nil {
-		return nil, err
-	}
+	indexers.AddIfNotPresentOrDie(locationInformer.Informer().GetIndexer(), cache.Indexers{
+		indexers.ByLogicalClusterPath: indexers.IndexByLogicalClusterPath,
+	})
 
 	// namespaceBlocklist holds a set of namespaces that should never be synced from kcp to physical clusters.
 	var namespaceBlocklist = sets.NewString("kube-system", "kube-public", "kube-node-lease")
@@ -153,15 +146,14 @@ func NewController(
 	return c, nil
 }
 
-// controller
+// controller.
 type controller struct {
 	queue        workqueue.RateLimitingInterface
 	enqueueAfter func(*corev1.Namespace, time.Duration)
 
 	kcpClusterClient kcpclientset.ClusterInterface
 
-	namespaceLister  corev1listers.NamespaceClusterLister
-	namespaceIndexer cache.Indexer
+	namespaceLister corev1listers.NamespaceClusterLister
 
 	locationLister  schedulingv1alpha1listers.LocationClusterLister
 	locationIndexer cache.Indexer
@@ -196,16 +188,19 @@ func (c *controller) enqueueNamespace(obj interface{}) {
 		return
 	}
 
-	placements, err := c.placementIndexer.ByIndex(byWorkspace, clusterName.String())
+	placements, err := c.placementLister.Cluster(clusterName).List(labels.Everything())
 	if err != nil {
 		runtime.HandleError(err)
 		return
 	}
 
-	for _, obj := range placements {
-		placement := obj.(*schedulingv1alpha1.Placement)
+	for _, placement := range placements {
 		namespaceKey := key
-		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
+		key, err := kcpcache.MetaClusterNamespaceKeyFunc(placement)
+		if err != nil {
+			runtime.HandleError(err)
+			continue
+		}
 		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Namespace changed", "namespace", namespaceKey)
 		c.queue.Add(key)
 	}
@@ -233,7 +228,11 @@ func (c *controller) enqueueLocation(obj interface{}) {
 	for _, obj := range placements {
 		placement := obj.(*schedulingv1alpha1.Placement)
 		locationKey := key
-		key := edgeclient.ToClusterAwareKey(logicalcluster.From(placement), placement.Name)
+		key, err := kcpcache.MetaClusterNamespaceKeyFunc(placement)
+		if err != nil {
+			runtime.HandleError(err)
+			continue
+		}
 		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Location changed", "location", locationKey)
 		c.queue.Add(key)
 	}
@@ -294,7 +293,7 @@ func (c *controller) process(ctx context.Context, key string) error {
 		return nil
 	}
 
-	obj, err := c.placementLister.Cluster(clusterName).Get(name) // TODO: clients need a way to scope down the lister per-cluster
+	obj, err := c.placementLister.Cluster(clusterName).Get(name)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return nil // object deleted before we handled it
@@ -334,7 +333,7 @@ func (c *controller) process(ctx context.Context, key string) error {
 			return fmt.Errorf("failed to create patch for LocationDomain %s|%s: %w", clusterName, name, err)
 		}
 		logger.V(2).Info("patching placement", "patch", string(patchBytes))
-		_, uerr := c.kcpClusterClient.Cluster(clusterName).SchedulingV1alpha1().Placements().Patch(logicalcluster.WithCluster(ctx, clusterName), obj.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}, "status")
+		_, uerr := c.kcpClusterClient.Cluster(clusterName.Path()).SchedulingV1alpha1().Placements().Patch(ctx, obj.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}, "status")
 		return uerr
 	}
 

@@ -22,7 +22,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-const SchedulingAPIExportVirtualWorkspacePath string = "services/apiexport/root/scheduling.kcp.dev"
+const SchedulingAPIExportVirtualWorkspacePath string = "services/apiexport/root/scheduling.kcp.io"
 
 func ConfigForScheduling(cfg *rest.Config) {
 	url, _ := url.Parse(cfg.Host)

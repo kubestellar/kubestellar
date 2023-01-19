@@ -19,21 +19,9 @@ package placement
 import (
 	"fmt"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	logicalcluster "github.com/kcp-dev/logicalcluster/v2"
+	"github.com/kcp-dev/logicalcluster/v3"
 )
-
-func indexByWorkspace(obj interface{}) ([]string, error) {
-	metaObj, ok := obj.(metav1.Object)
-	if !ok {
-		return []string{}, fmt.Errorf("obj is supposed to be a metav1.Object, but is %T", obj)
-	}
-
-	lcluster := logicalcluster.From(metaObj)
-	return []string{lcluster.String()}, nil
-}
 
 func indexByLocationWorkspace(obj interface{}) ([]string, error) {
 	placement, ok := obj.(*schedulingv1alpha1.Placement)
