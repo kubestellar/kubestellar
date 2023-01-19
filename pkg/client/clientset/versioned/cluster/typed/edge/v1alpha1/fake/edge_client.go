@@ -25,9 +25,10 @@ import (
 	"k8s.io/client-go/rest"
 
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
+	"github.com/kcp-dev/logicalcluster/v2"
+
 	kcpedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 var _ kcpedgev1alpha1.EdgeV1alpha1ClusterInterface = (*EdgeV1alpha1ClusterClient)(nil)

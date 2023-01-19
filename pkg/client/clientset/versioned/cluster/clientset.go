@@ -30,9 +30,10 @@ import (
 	"k8s.io/client-go/util/flowcontrol"
 
 	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
+	"github.com/kcp-dev/logicalcluster/v2"
+
 	client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 type ClusterInterface interface {

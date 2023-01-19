@@ -28,9 +28,10 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 
 	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
+	"github.com/kcp-dev/logicalcluster/v2"
+
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v2"
 )
 
 // SinglePlacementSlicesClusterGetter has a method to return a SinglePlacementSliceClusterInterface.
