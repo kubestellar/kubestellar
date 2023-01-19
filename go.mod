@@ -4,11 +4,8 @@ go 1.19
 
 require (
 	github.com/evanphx/json-patch v5.6.0+incompatible
-	github.com/kcp-dev/apimachinery v0.0.0-20221102195355-d65878bc16be
-	github.com/kcp-dev/client-go v0.0.0-20221116175613-517d8c8ead79
-	github.com/kcp-dev/kcp v0.10.0
-	github.com/kcp-dev/kcp/pkg/apis v0.10.0
-	github.com/kcp-dev/logicalcluster/v2 v2.0.0-alpha.4
+	github.com/kcp-dev/kcp v0.10.1-0.20230119143945-4506fdc06406
+	github.com/kcp-dev/kcp/pkg/apis v0.10.1-0.20230119143945-4506fdc06406
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.25.0
@@ -17,6 +14,12 @@ require (
 	k8s.io/component-base v0.24.3
 	k8s.io/klog/v2 v2.70.1
 	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42
+)
+
+require (
+	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0 // indirect
+	github.com/kcp-dev/client-go v0.0.0-20221215092857-c1e5154a9825 // indirect
+	github.com/kcp-dev/logicalcluster/v3 v3.0.2 // indirect
 )
 
 require (
