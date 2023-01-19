@@ -401,6 +401,7 @@ github.com/kcp-dev/client-go v0.0.0-20221215092857-c1e5154a9825/go.mod h1:sj0r6s
 github.com/kcp-dev/kcp v0.5.0-alpha.0/go.mod h1:OjxpPNevOemXK8dNXaDQYxg51Q9HVd26A/YupCBAApY=
 github.com/kcp-dev/kcp v0.10.0 h1:suhH0jZMCPx9WUGOwNuowon0ryEHRYG+FhTMcGLxUts=
 github.com/kcp-dev/kcp v0.10.0/go.mod h1:6cIdP28Kg28ktW6RA6hs4HEAHTR9aqBy6gmEEJh0J4M=
+github.com/kcp-dev/kcp v0.10.1-0.20230119143945-4506fdc06406/go.mod h1:qgtSDSb1pIUwCVwf7nA70loJHlwl5NB+WgFd7l7Y3FI=
 github.com/kcp-dev/kcp/pkg/apis v0.10.0 h1:4ko7c5u9fTaA3R2+O7ebndtPAx76llToXMiUJqPr3TI=
 github.com/kcp-dev/kcp/pkg/apis v0.10.0/go.mod h1:E0lPoX0Kv8N72Lx8JsHmVdoDIO4OJz0GmQAV96HYkOk=
 github.com/kcp-dev/kcp/pkg/apis v0.10.1-0.20230119143945-4506fdc06406 h1:LfJ0mhMHA6//y6vsw6ZKFnPbC4MmiOWwgoCEW4/3Vn0=

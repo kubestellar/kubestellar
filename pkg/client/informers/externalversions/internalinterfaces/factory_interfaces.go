@@ -28,7 +28,7 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"

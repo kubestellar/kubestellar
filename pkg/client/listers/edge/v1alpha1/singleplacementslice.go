@@ -26,8 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
-	"github.com/kcp-dev/logicalcluster/v2"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
@@ -39,7 +39,7 @@ type SinglePlacementSliceClusterLister interface {
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*edgev1alpha1.SinglePlacementSlice, err error)
 	// Cluster returns a lister that can list and get SinglePlacementSlices in one workspace.
-	Cluster(cluster logicalcluster.Name) SinglePlacementSliceLister
+	Cluster(clusterName logicalcluster.Name) SinglePlacementSliceLister
 	SinglePlacementSliceClusterListerExpansion
 }
 
@@ -65,8 +65,8 @@ func (s *singlePlacementSliceClusterLister) List(selector labels.Selector) (ret 
 }
 
 // Cluster scopes the lister to one workspace, allowing users to list and get SinglePlacementSlices.
-func (s *singlePlacementSliceClusterLister) Cluster(cluster logicalcluster.Name) SinglePlacementSliceLister {
-	return &singlePlacementSliceLister{indexer: s.indexer, cluster: cluster}
+func (s *singlePlacementSliceClusterLister) Cluster(clusterName logicalcluster.Name) SinglePlacementSliceLister {
+	return &singlePlacementSliceLister{indexer: s.indexer, clusterName: clusterName}
 }
 
 // SinglePlacementSliceLister can list all SinglePlacementSlices, or get one in particular.
@@ -83,13 +83,13 @@ type SinglePlacementSliceLister interface {
 
 // singlePlacementSliceLister can list all SinglePlacementSlices inside a workspace.
 type singlePlacementSliceLister struct {
-	indexer cache.Indexer
-	cluster logicalcluster.Name
+	indexer     cache.Indexer
+	clusterName logicalcluster.Name
 }
 
 // List lists all SinglePlacementSlices in the indexer for a workspace.
 func (s *singlePlacementSliceLister) List(selector labels.Selector) (ret []*edgev1alpha1.SinglePlacementSlice, err error) {
-	err = kcpcache.ListAllByCluster(s.indexer, s.cluster, selector, func(i interface{}) {
+	err = kcpcache.ListAllByCluster(s.indexer, s.clusterName, selector, func(i interface{}) {
 		ret = append(ret, i.(*edgev1alpha1.SinglePlacementSlice))
 	})
 	return ret, err
@@ -97,7 +97,7 @@ func (s *singlePlacementSliceLister) List(selector labels.Selector) (ret []*edge
 
 // Get retrieves the SinglePlacementSlice from the indexer for a given workspace and name.
 func (s *singlePlacementSliceLister) Get(name string) (*edgev1alpha1.SinglePlacementSlice, error) {
-	key := kcpcache.ToClusterAwareKey(s.cluster.String(), "", name)
+	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), "", name)
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
