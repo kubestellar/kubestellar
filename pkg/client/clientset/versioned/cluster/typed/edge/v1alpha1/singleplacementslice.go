@@ -27,8 +27,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 
-	kcpclient "github.com/kcp-dev/apimachinery/pkg/client"
-	"github.com/kcp-dev/logicalcluster/v2"
+	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
@@ -43,7 +43,7 @@ type SinglePlacementSlicesClusterGetter interface {
 // SinglePlacementSliceClusterInterface can operate on SinglePlacementSlices across all clusters,
 // or scope down to one cluster and return a edgev1alpha1client.SinglePlacementSliceInterface.
 type SinglePlacementSliceClusterInterface interface {
-	Cluster(logicalcluster.Name) edgev1alpha1client.SinglePlacementSliceInterface
+	Cluster(logicalcluster.Path) edgev1alpha1client.SinglePlacementSliceInterface
 	List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.SinglePlacementSliceList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 }
@@ -53,12 +53,12 @@ type singlePlacementSlicesClusterInterface struct {
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *singlePlacementSlicesClusterInterface) Cluster(name logicalcluster.Name) edgev1alpha1client.SinglePlacementSliceInterface {
-	if name == logicalcluster.Wildcard {
+func (c *singlePlacementSlicesClusterInterface) Cluster(clusterPath logicalcluster.Path) edgev1alpha1client.SinglePlacementSliceInterface {
+	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 
-	return c.clientCache.ClusterOrDie(name).SinglePlacementSlices()
+	return c.clientCache.ClusterOrDie(clusterPath).SinglePlacementSlices()
 }
 
 // List returns the entire collection of all SinglePlacementSlices across all clusters.

@@ -32,7 +32,7 @@ import (
 	"k8s.io/client-go/testing"
 
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
-	"github.com/kcp-dev/logicalcluster/v2"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
@@ -46,12 +46,12 @@ type singlePlacementSlicesClusterClient struct {
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *singlePlacementSlicesClusterClient) Cluster(cluster logicalcluster.Name) edgev1alpha1client.SinglePlacementSliceInterface {
-	if cluster == logicalcluster.Wildcard {
+func (c *singlePlacementSlicesClusterClient) Cluster(clusterPath logicalcluster.Path) edgev1alpha1client.SinglePlacementSliceInterface {
+	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 
-	return &singlePlacementSlicesClient{Fake: c.Fake, Cluster: cluster}
+	return &singlePlacementSlicesClient{Fake: c.Fake, ClusterPath: clusterPath}
 }
 
 // List takes label and field selectors, and returns the list of SinglePlacementSlices that match those selectors across all clusters.
@@ -81,11 +81,11 @@ func (c *singlePlacementSlicesClusterClient) Watch(ctx context.Context, opts met
 
 type singlePlacementSlicesClient struct {
 	*kcptesting.Fake
-	Cluster logicalcluster.Name
+	ClusterPath logicalcluster.Path
 }
 
 func (c *singlePlacementSlicesClient) Create(ctx context.Context, singlePlacementSlice *edgev1alpha1.SinglePlacementSlice, opts metav1.CreateOptions) (*edgev1alpha1.SinglePlacementSlice, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootCreateAction(singlePlacementSlicesResource, c.Cluster, singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootCreateAction(singlePlacementSlicesResource, c.ClusterPath, singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
 	if obj == nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *singlePlacementSlicesClient) Create(ctx context.Context, singlePlacemen
 }
 
 func (c *singlePlacementSlicesClient) Update(ctx context.Context, singlePlacementSlice *edgev1alpha1.SinglePlacementSlice, opts metav1.UpdateOptions) (*edgev1alpha1.SinglePlacementSlice, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateAction(singlePlacementSlicesResource, c.Cluster, singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateAction(singlePlacementSlicesResource, c.ClusterPath, singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
 	if obj == nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *singlePlacementSlicesClient) Update(ctx context.Context, singlePlacemen
 }
 
 func (c *singlePlacementSlicesClient) UpdateStatus(ctx context.Context, singlePlacementSlice *edgev1alpha1.SinglePlacementSlice, opts metav1.UpdateOptions) (*edgev1alpha1.SinglePlacementSlice, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateSubresourceAction(singlePlacementSlicesResource, c.Cluster, "status", singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateSubresourceAction(singlePlacementSlicesResource, c.ClusterPath, "status", singlePlacementSlice), &edgev1alpha1.SinglePlacementSlice{})
 	if obj == nil {
 		return nil, err
 	}
@@ -109,19 +109,19 @@ func (c *singlePlacementSlicesClient) UpdateStatus(ctx context.Context, singlePl
 }
 
 func (c *singlePlacementSlicesClient) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	_, err := c.Fake.Invokes(kcptesting.NewRootDeleteActionWithOptions(singlePlacementSlicesResource, c.Cluster, name, opts), &edgev1alpha1.SinglePlacementSlice{})
+	_, err := c.Fake.Invokes(kcptesting.NewRootDeleteActionWithOptions(singlePlacementSlicesResource, c.ClusterPath, name, opts), &edgev1alpha1.SinglePlacementSlice{})
 	return err
 }
 
 func (c *singlePlacementSlicesClient) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
-	action := kcptesting.NewRootDeleteCollectionAction(singlePlacementSlicesResource, c.Cluster, listOpts)
+	action := kcptesting.NewRootDeleteCollectionAction(singlePlacementSlicesResource, c.ClusterPath, listOpts)
 
 	_, err := c.Fake.Invokes(action, &edgev1alpha1.SinglePlacementSliceList{})
 	return err
 }
 
 func (c *singlePlacementSlicesClient) Get(ctx context.Context, name string, options metav1.GetOptions) (*edgev1alpha1.SinglePlacementSlice, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootGetAction(singlePlacementSlicesResource, c.Cluster, name), &edgev1alpha1.SinglePlacementSlice{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootGetAction(singlePlacementSlicesResource, c.ClusterPath, name), &edgev1alpha1.SinglePlacementSlice{})
 	if obj == nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *singlePlacementSlicesClient) Get(ctx context.Context, name string, opti
 
 // List takes label and field selectors, and returns the list of SinglePlacementSlices that match those selectors.
 func (c *singlePlacementSlicesClient) List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.SinglePlacementSliceList, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(singlePlacementSlicesResource, singlePlacementSlicesKind, c.Cluster, opts), &edgev1alpha1.SinglePlacementSliceList{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(singlePlacementSlicesResource, singlePlacementSlicesKind, c.ClusterPath, opts), &edgev1alpha1.SinglePlacementSliceList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -149,11 +149,11 @@ func (c *singlePlacementSlicesClient) List(ctx context.Context, opts metav1.List
 }
 
 func (c *singlePlacementSlicesClient) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(singlePlacementSlicesResource, c.Cluster, opts))
+	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(singlePlacementSlicesResource, c.ClusterPath, opts))
 }
 
 func (c *singlePlacementSlicesClient) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*edgev1alpha1.SinglePlacementSlice, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootPatchSubresourceAction(singlePlacementSlicesResource, c.Cluster, name, pt, data, subresources...), &edgev1alpha1.SinglePlacementSlice{})
+	obj, err := c.Fake.Invokes(kcptesting.NewRootPatchSubresourceAction(singlePlacementSlicesResource, c.ClusterPath, name, pt, data, subresources...), &edgev1alpha1.SinglePlacementSlice{})
 	if obj == nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ import (
 
 	kcpfakediscovery "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/discovery/fake"
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
-	"github.com/kcp-dev/logicalcluster/v2"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	kcpclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
@@ -46,7 +46,7 @@ func NewSimpleClientset(objects ...runtime.Object) *ClusterClientset {
 	o.AddAll(objects...)
 
 	cs := &ClusterClientset{Fake: &kcptesting.Fake{}, tracker: o}
-	cs.discovery = &kcpfakediscovery.FakeDiscovery{Fake: cs.Fake, Cluster: logicalcluster.Wildcard}
+	cs.discovery = &kcpfakediscovery.FakeDiscovery{Fake: cs.Fake, ClusterPath: logicalcluster.Wildcard}
 	cs.AddReactor("*", "*", kcptesting.ObjectReaction(o))
 	cs.AddWatchReactor("*", kcptesting.WatchReaction(o))
 
@@ -77,15 +77,15 @@ func (c *ClusterClientset) EdgeV1alpha1() kcpedgev1alpha1.EdgeV1alpha1ClusterInt
 }
 
 // Cluster scopes this clientset to one cluster.
-func (c *ClusterClientset) Cluster(cluster logicalcluster.Name) client.Interface {
-	if cluster == logicalcluster.Wildcard {
+func (c *ClusterClientset) Cluster(clusterPath logicalcluster.Path) client.Interface {
+	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 	return &Clientset{
-		Fake:      c.Fake,
-		discovery: &kcpfakediscovery.FakeDiscovery{Fake: c.Fake, Cluster: cluster},
-		tracker:   c.tracker.Cluster(cluster),
-		cluster:   cluster,
+		Fake:        c.Fake,
+		discovery:   &kcpfakediscovery.FakeDiscovery{Fake: c.Fake, ClusterPath: clusterPath},
+		tracker:     c.tracker.Cluster(clusterPath),
+		clusterPath: clusterPath,
 	}
 }
 
@@ -94,9 +94,9 @@ var _ client.Interface = (*Clientset)(nil)
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*kcptesting.Fake
-	discovery *kcpfakediscovery.FakeDiscovery
-	tracker   kcptesting.ScopedObjectTracker
-	cluster   logicalcluster.Name
+	discovery   *kcpfakediscovery.FakeDiscovery
+	tracker     kcptesting.ScopedObjectTracker
+	clusterPath logicalcluster.Path
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -110,5 +110,5 @@ func (c *Clientset) Tracker() kcptesting.ScopedObjectTracker {
 
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client.
 func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
-	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, Cluster: c.cluster}
+	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
 }

@@ -20,10 +20,13 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	utilserrors "k8s.io/apimachinery/pkg/util/errors"
 
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v2"
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	"github.com/kcp-dev/edge-mc/pkg/indexers"
 )
 
 type reconcileStatus int
@@ -40,7 +43,7 @@ type reconciler interface {
 func (c *controller) reconcile(ctx context.Context, placement *schedulingv1alpha1.Placement) error {
 	reconcilers := []reconciler{
 		&placementReconciler{
-			listLocations: c.listLocations,
+			listLocationsByPath: c.listLocationsByPath,
 		},
 		&placementNamespaceReconciler{
 			listNamespacesWithAnnotation: c.listNamespacesWithAnnotation,
@@ -64,26 +67,25 @@ func (c *controller) reconcile(ctx context.Context, placement *schedulingv1alpha
 	return utilserrors.NewAggregate(errs)
 }
 
-func (c *controller) listLocations(clusterName logicalcluster.Name) ([]*schedulingv1alpha1.Location, error) {
-	items, err := c.locationIndexer.ByIndex(byWorkspace, clusterName.String())
+func (c *controller) listLocationsByPath(path logicalcluster.Path) ([]*schedulingv1alpha1.Location, error) {
+	objs, err := c.locationIndexer.ByIndex(indexers.ByLogicalClusterPath, path.String())
 	if err != nil {
 		return nil, err
 	}
-	ret := make([]*schedulingv1alpha1.Location, 0, len(items))
-	for _, item := range items {
-		ret = append(ret, item.(*schedulingv1alpha1.Location))
+	ret := make([]*schedulingv1alpha1.Location, 0, len(objs))
+	for _, obj := range objs {
+		ret = append(ret, obj.(*schedulingv1alpha1.Location))
 	}
 	return ret, nil
 }
 
 func (c *controller) listNamespacesWithAnnotation(clusterName logicalcluster.Name) ([]*corev1.Namespace, error) {
-	items, err := c.namespaceIndexer.ByIndex(byWorkspace, clusterName.String())
+	items, err := c.namespaceLister.Cluster(clusterName).List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
 	ret := make([]*corev1.Namespace, 0, len(items))
-	for _, item := range items {
-		ns := item.(*corev1.Namespace)
+	for _, ns := range items {
 		_, foundPlacement := ns.Annotations[schedulingv1alpha1.PlacementAnnotationKey]
 		if foundPlacement {
 			ret = append(ret, ns)

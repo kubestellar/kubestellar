@@ -25,7 +25,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
-	"github.com/kcp-dev/logicalcluster/v2"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	kcpedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
@@ -37,11 +37,11 @@ type EdgeV1alpha1ClusterClient struct {
 	*kcptesting.Fake
 }
 
-func (c *EdgeV1alpha1ClusterClient) Cluster(cluster logicalcluster.Name) edgev1alpha1.EdgeV1alpha1Interface {
-	if cluster == logicalcluster.Wildcard {
+func (c *EdgeV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) edgev1alpha1.EdgeV1alpha1Interface {
+	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
-	return &EdgeV1alpha1Client{Fake: c.Fake, Cluster: cluster}
+	return &EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: clusterPath}
 }
 
 func (c *EdgeV1alpha1ClusterClient) EdgePlacements() kcpedgev1alpha1.EdgePlacementClusterInterface {
@@ -56,7 +56,7 @@ var _ edgev1alpha1.EdgeV1alpha1Interface = (*EdgeV1alpha1Client)(nil)
 
 type EdgeV1alpha1Client struct {
 	*kcptesting.Fake
-	Cluster logicalcluster.Name
+	ClusterPath logicalcluster.Path
 }
 
 func (c *EdgeV1alpha1Client) RESTClient() rest.Interface {
@@ -65,9 +65,9 @@ func (c *EdgeV1alpha1Client) RESTClient() rest.Interface {
 }
 
 func (c *EdgeV1alpha1Client) EdgePlacements() edgev1alpha1.EdgePlacementInterface {
-	return &edgePlacementsClient{Fake: c.Fake, Cluster: c.Cluster}
+	return &edgePlacementsClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
 
 func (c *EdgeV1alpha1Client) SinglePlacementSlices() edgev1alpha1.SinglePlacementSliceInterface {
-	return &singlePlacementSlicesClient{Fake: c.Fake, Cluster: c.Cluster}
+	return &singlePlacementSlicesClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }

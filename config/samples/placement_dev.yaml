@@ -1,16 +1,16 @@
 ---
-apiVersion: scheduling.kcp.dev/v1alpha1
+apiVersion: scheduling.kcp.io/v1alpha1
 kind: Placement
 metadata:
   name: dev
 spec:
   locationResource:
-    group: workload.kcp.dev
+    group: workload.kcp.io
     resource: synctargets
     version: v1alpha1
   locationSelectors:
   - matchLabels:
-      env: dev
+      env: prod
   locationWorkspace: root:compute
   namespaceSelector:
     matchLabels:

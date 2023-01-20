@@ -30,9 +30,9 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 
-	kcpcache "github.com/kcp-dev/apimachinery/pkg/cache"
-	kcpinformers "github.com/kcp-dev/apimachinery/third_party/informers"
-	"github.com/kcp-dev/logicalcluster/v2"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
@@ -109,10 +109,10 @@ type EdgePlacementInformer interface {
 	Lister() edgev1alpha1listers.EdgePlacementLister
 }
 
-func (f *edgePlacementClusterInformer) Cluster(cluster logicalcluster.Name) EdgePlacementInformer {
+func (f *edgePlacementClusterInformer) Cluster(clusterName logicalcluster.Name) EdgePlacementInformer {
 	return &edgePlacementInformer{
-		informer: f.Informer().Cluster(cluster),
-		lister:   f.Lister().Cluster(cluster),
+		informer: f.Informer().Cluster(clusterName),
+		lister:   f.Lister().Cluster(clusterName),
 	}
 }
 
