@@ -38,7 +38,26 @@ In the `root:compute` workspace, create Location `foo`:
 kubectl create -f config/samples/location_foo.yaml
 ```
 
-Switch to a user's workspace, say `root:my-org:dev`, create Placement `dev`:
+Note: in the tested kcp [snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5), the `kubectl-workspace` binary prints some hash-like strings for the workspace names.
+```
+👉 edge-mc $ kubectl ws root
+Current workspace is "root".
+👉 edge-mc $ kubectl ws tree
+.
+└── root
+    ├── 2uctu097ej9hv9kv
+    └── 31xvmeuhuk8tykwy
+        └── 1ssldk2xdtia9an1
+```
+However, we can still access the workspaces by their human-readable names, as long as we know the names and their structure.
+```
+👉 edge-mc $ kubectl ws root:compute
+Current workspace is "root:compute".
+👉 edge-mc $ kubectl ws root:my-org:dev
+Current workspace is "root:my-org:dev".
+```
+
+Switch to another workspace, say `root:my-org:dev`, then create Placement `dev`:
 ```console
 kubectl create -f config/samples/placement_dev.yaml
 ```
@@ -47,7 +66,7 @@ The status of Placement `dev` should show `phase: Pending`.
 `kubectl edit` the `spec.locationSelectors` of the Placement `dev`, from `env: prod` to `env: dev`.
 The status of Placement `dev` should show (1) `phase: Unbound`, (2) the `foo` Location selected by Placement `dev`.
 
-Label namespace `default` in the user's workspace:
+Label namespace `default` in the `root:my-org:dev` workspace:
 ```
 kubectl label ns default env=dev
 ```
@@ -61,5 +80,5 @@ kubectl apply -f config/samples/placement_dev.yaml
 ```
 The state machines should transit back to `Pending`.
 
-Delete the Placement `dev` from the user's workspace,
-and delete the Location `foo` in the `root:compute` workspace.
+Delete the Placement `dev` from the `root:my-org:dev` workspace,
+and delete the Location `foo` from the `root:compute` workspace.
