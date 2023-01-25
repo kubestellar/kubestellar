@@ -37,7 +37,7 @@ cd "${REPO_ROOT}/pkg/apis"
     rbac:roleName=manager-role \
     webhook \
     paths="./..." \
-    output:crd:artifacts:config="${REPO_ROOT}"config/crds
+    output:crd:artifacts:config="${REPO_ROOT}"/config/crds
 
 for CRD in "${REPO_ROOT}"/config/crds/*.yaml; do
     if [ -f "${CRD}-patch" ]; then
