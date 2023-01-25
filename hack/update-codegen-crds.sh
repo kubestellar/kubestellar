@@ -31,15 +31,13 @@ fi
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
 # Update generated CRD YAML
-(
-    cd "${REPO_ROOT}/pkg/apis"
-    "../../${CONTROLLER_GEN}" \
-        crd \
-        rbac:roleName=manager-role \
-        webhook \
-        paths="./..." \
-        output:crd:artifacts:config="${REPO_ROOT}"config/crds
-)
+cd "${REPO_ROOT}/pkg/apis"
+"../../${CONTROLLER_GEN}" \
+    crd \
+    rbac:roleName=manager-role \
+    webhook \
+    paths="./..." \
+    output:crd:artifacts:config="${REPO_ROOT}"config/crds
 
 for CRD in "${REPO_ROOT}"/config/crds/*.yaml; do
     if [ -f "${CRD}-patch" ]; then
