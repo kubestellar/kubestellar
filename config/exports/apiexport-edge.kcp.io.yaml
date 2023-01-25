@@ -1,0 +1,10 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: edge.kcp.io
+spec:
+  latestResourceSchemas:
+  - v230125-b6052f8.edgeplacements.edge.kcp.io
+  - v230125-b6052f8.singleplacementslice.edge.kcp.io
+status: {}
