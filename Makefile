@@ -376,7 +376,6 @@ verify-go-versions:
 modules: ## Run go mod tidy to ensure modules are up to date
 	go mod tidy
 	cd pkg/apis; go mod tidy
-# hack/update-go-modules.sh
 
 .PHONY: verify-modules
 verify-modules: modules  ## Verify go modules are up to date
@@ -384,7 +383,6 @@ verify-modules: modules  ## Verify go modules are up to date
 		git diff; \
 		echo "go module files are out of date"; exit 1; \
 	fi
-# hack/verify-go-modules.sh
 
 .PHONY: help
 help: ## Show this help.
