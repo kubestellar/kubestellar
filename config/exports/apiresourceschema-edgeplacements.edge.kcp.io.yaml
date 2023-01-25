@@ -1,0 +1,298 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIResourceSchema
+metadata:
+  creationTimestamp: null
+  name: v230125-2d50c47.edgeplacements.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: EdgePlacement
+    listKind: EdgePlacementList
+    plural: edgeplacements
+    singular: edgeplacement
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      description: "EdgePlacement binds a collection of (a) Namespaces and non-namespaced
+        objects to (b) a collection of Locations. An EdgePlacement object appears
+        in the center and directs all the syncable objects in the selected Namespaces
+        and all the selected non-namespaced objects to propagate to _all_ of the selected
+        Locations (one SyncTarget in each such Location). This is not entirely unrelated
+        to a TMC Placement, which directs the selected Namespaces to propagate to
+        _one_ of the selected Locations. \n Overlap between EdgePlacements is allowed:
+        two different EdgePlacement objects may select intersecting Location sets
+        and/or intersecting Namespace sets. This is not problematic because: - propagation
+        _into_ a destination is additive; - propagation _from_ a source is additive;
+        - two directives to propagate the same object to the same destination are
+        simply redundant (they, by design, can not conflict)."
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: '`spec` describes a desired binding between workload and Locations.
+            Unlike a TMC Placement, there is an inherent multiplicity and dynamicity
+            in the set of Locations that will be synced to and this field never shifts
+            into immutability.'
+          properties:
+            locationSelectors:
+              description: '`locationSelectors` identifies the relevant Location objects
+                in terms of their labels. A Location is relevant if and only if it
+                passes any of the LabelSelectors in this field.'
+              items:
+                description: A label selector is a label query over a set of resources.
+                  The result of matchLabels and matchExpressions are ANDed. An empty
+                  label selector matches all objects. A null label selector matches
+                  no objects.
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: A label selector requirement is a selector that
+                        contains values, a key, and an operator that relates the key
+                        and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: operator represents a key's relationship to
+                            a set of values. Valid operators are In, NotIn, Exists
+                            and DoesNotExist.
+                          type: string
+                        values:
+                          description: values is an array of string values. If the
+                            operator is In or NotIn, the values array must be non-empty.
+                            If the operator is Exists or DoesNotExist, the values
+                            array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: matchLabels is a map of {key,value} pairs. A single
+                      {key,value} in the matchLabels map is equivalent to an element
+                      of matchExpressions, whose key field is "key", the operator
+                      is "In", and the values array contains only "value". The requirements
+                      are ANDed.
+                    type: object
+                type: object
+                x-kubernetes-map-type: atomic
+              type: array
+            locationWorkspaceSelector:
+              description: '`locationWorkspaceSelector` identifies the workspaces
+                in which to look for Location objects, in terms of labels on the Workspace
+                objects.'
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+              x-kubernetes-map-type: atomic
+            namespaceSelector:
+              description: '`namespaceSelector` identifies the relevant Namespace
+                objects in terms of their labels.'
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+              x-kubernetes-map-type: atomic
+            nonNamespacedObjects:
+              description: '`nonNamespacedObjects` defines the non-namespaced objects
+                to bind with the selected Locations.'
+              items:
+                description: 'NonNamespacedObjectReferenceSet specifies a set of non-namespaced
+                  objects from one particular API group. An object is in this set
+                  if: - its API group is the one listed; - its resource (lowercase
+                  plural form of object type) is one of those listed; and - EITHER
+                  its name is listed OR its labels match one of the label selectors.'
+                properties:
+                  apiGroup:
+                    description: '`apiGroup` is the API group of the referenced object,
+                      empty string for the core API group.'
+                    type: string
+                  labelSelectors:
+                    description: '`labelSelectors` allows matching objects by a rule
+                      rather than listing individuals.'
+                    items:
+                      description: A label selector is a label query over a set of
+                        resources. The result of matchLabels and matchExpressions
+                        are ANDed. An empty label selector matches all objects. A
+                        null label selector matches no objects.
+                      properties:
+                        matchExpressions:
+                          description: matchExpressions is a list of label selector
+                            requirements. The requirements are ANDed.
+                          items:
+                            description: A label selector requirement is a selector
+                              that contains values, a key, and an operator that relates
+                              the key and values.
+                            properties:
+                              key:
+                                description: key is the label key that the selector
+                                  applies to.
+                                type: string
+                              operator:
+                                description: operator represents a key's relationship
+                                  to a set of values. Valid operators are In, NotIn,
+                                  Exists and DoesNotExist.
+                                type: string
+                              values:
+                                description: values is an array of string values.
+                                  If the operator is In or NotIn, the values array
+                                  must be non-empty. If the operator is Exists or
+                                  DoesNotExist, the values array must be empty. This
+                                  array is replaced during a strategic merge patch.
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                            - key
+                            - operator
+                            type: object
+                          type: array
+                        matchLabels:
+                          additionalProperties:
+                            type: string
+                          description: matchLabels is a map of {key,value} pairs.
+                            A single {key,value} in the matchLabels map is equivalent
+                            to an element of matchExpressions, whose key field is
+                            "key", the operator is "In", and the values array contains
+                            only "value". The requirements are ANDed.
+                          type: object
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                  resourceNames:
+                    description: '`resourceNames` is a list of objects that match
+                      by name. An entry of `"*"` means that all match. Empty list
+                      means nothing matches.'
+                    items:
+                      type: string
+                    type: array
+                  resources:
+                    description: '`resources` is a list of lowercase plural names
+                      for the sorts of objects to match. An entry of `"*"` means that
+                      all match. Empty list means nothing matches.'
+                    items:
+                      type: string
+                    type: array
+                required:
+                - resources
+                type: object
+              type: array
+          type: object
+        status:
+          description: '`status` describes the status of the process of binding workload
+            to Locations.'
+          properties:
+            matchingLocationCount:
+              description: '`matchingLocationCount` is the number of Locations that
+                satisfy the spec''s `locationSelectors`.'
+              format: int32
+              type: integer
+            specGeneration:
+              description: '`specGeneration` identifies the generation of the spec
+                that this is the status for. Zero means that no status has yet been
+                written here.'
+              format: int32
+              type: integer
+          required:
+          - matchingLocationCount
+          type: object
+      type: object
+    served: true
+    storage: true
+    subresources: {}
