@@ -54,4 +54,4 @@ done
 #     paths="${REPO_ROOT}/test/e2e/reconciler/cluster/..." \
 #     output:crd:artifacts:config="${REPO_ROOT}"/test/e2e/reconciler/cluster/
 
-"${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
+"${REPO_ROOT}/${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports

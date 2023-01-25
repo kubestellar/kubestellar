@@ -180,7 +180,7 @@ $(YAML_PATCH):
 $(GOTESTSUM):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) gotest.tools/gotestsum $(GOTESTSUM_BIN) $(GOTESTSUM_VER)
 
-crds: $(CONTROLLER_GEN) $(YAML_PATCH)
+crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
 	./hack/update-codegen-crds.sh
 .PHONY: crds
 
