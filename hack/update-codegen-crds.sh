@@ -20,7 +20,11 @@ set -o pipefail
 set -o xtrace
 
 if [[ -z "${CONTROLLER_GEN:-}" ]]; then
-    echo "You must either set CONTROLLER_GEN to the path to controller-gen or invoke via make"
+    echo "$CONTROLLER_GEN must be defined to refer to the right binary, e.g. as is done in the Makefile"
+    exit 1
+fi
+if [[ -z "${API_GEN:-}" ]]; then
+    echo "$API_GEN must be defined to refer to the right binary, e.g. as is done in the Makefile"
     exit 1
 fi
 
@@ -52,4 +56,4 @@ done
 #     paths="${REPO_ROOT}/test/e2e/reconciler/cluster/..." \
 #     output:crd:artifacts:config="${REPO_ROOT}"/test/e2e/reconciler/cluster/
 
-"${REPO_ROOT}"/hack/tools/apigen --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
+"${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
