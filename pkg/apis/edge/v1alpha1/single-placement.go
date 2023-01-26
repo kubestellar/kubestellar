@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -53,11 +52,16 @@ type SinglePlacementSlice struct {
 // SinglePlacement describes one Location that matches the relevant EdgePlacement.
 type SinglePlacement struct {
 	// `location` refers to the relevant Location.
-	// TODO: add identification of the Location's workspace
-	Location corev1.ObjectReference `json:"location"`
+	Location ExternalName `json:"location"`
 
 	// `syncTargetName` identifies the relevant SyncTarget at the Location
 	SyncTargetName string `json:"syncTargetName,omitempty"`
+}
+
+// ExternalName refers to an non-namespaced object that may not be in the same server.
+type ExternalName struct {
+	Workspace string `json:"workspace"`
+	Name      string `json:"name"`
 }
 
 // SinglePlacementSliceList is the API type for a list of SinglePlacementSlice

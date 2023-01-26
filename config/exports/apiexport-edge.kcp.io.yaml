@@ -6,5 +6,5 @@ metadata:
 spec:
   latestResourceSchemas:
   - v230126-0a8bf97.edgeplacements.edge.kcp.io
-  - v230126-0a8bf97.singleplacementslice.edge.kcp.io
+  - v230207-d7d166d.singleplacementslice.edge.kcp.io
 status: {}
