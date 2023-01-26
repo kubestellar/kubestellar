@@ -5,6 +5,6 @@ metadata:
   name: edge.kcp.io
 spec:
   latestResourceSchemas:
-  - v230125-b6052f8.edgeplacements.edge.kcp.io
-  - v230125-b6052f8.singleplacementslice.edge.kcp.io
+  - v230126-0a8bf97.edgeplacements.edge.kcp.io
+  - v230126-0a8bf97.singleplacementslice.edge.kcp.io
 status: {}
