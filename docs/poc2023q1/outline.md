@@ -24,10 +24,14 @@ multi-cluster.  It is intended to demonstrate the following points.
 
 Some important things that are not attempted in this PoC include the following.
 
-- An implementation that supports intermittent connectivity.
 - An implementation that supports a large number of edge clusters.
 - More than one SyncTarget per Location.
 - A hierarchy with more than two levels.
+
+It is TBD whether the implementation will support intermittent
+connectivity.  This depends on whether we can quickly and easily get a
+syncer that creates the appropriately independent targets and itself
+tolerates intermittent connectivity.
 
 Also: initially this PoC will not transport non-namespaced objects.
 CustomResourceDefinitions are thus among the objects that will not be
@@ -84,9 +88,11 @@ service provider workspace.
 
 This controller monitors the EdgePlacement, Location, and SyncTarget
 objects and maintains the results of matching.  For each EdgePlacement
-object this controller maintains an adjacent collection of
+object this controller maintains an associated collection of
 SinglePlacementSlice objects holding the matches for that
-EdgePlacement.
+EdgePlacement.  These SinglePlacementSlice objects appear in the same
+namespace as the corresponding EdgePlacement; the remainder of how
+they are linked is TBD.
 
 ## Placement Translator
 
