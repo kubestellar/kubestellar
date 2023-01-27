@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -27,12 +28,21 @@ import (
 	"github.com/spf13/pflag"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
+
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that they can be used.
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apiserver/pkg/server/mux"
+	"k8s.io/apiserver/pkg/server/routes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/component-base/metrics/legacyregistry"
+	_ "k8s.io/component-base/metrics/prometheus/clientgo" // for client metric registration
 	"k8s.io/klog/v2"
+	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
@@ -58,9 +68,11 @@ type mbCtl struct {
 func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
+	serverBindAddress := ":10203"
 	fs := pflag.NewFlagSet("mailbox-controller", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
+	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 
@@ -81,6 +93,21 @@ func main() {
 	ctx := context.Background()
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
+
+	fs.VisitAll(func(flg *pflag.Flag) {
+		logger.V(1).Info("Command line flag", flg.Name, flg.Value)
+	})
+
+	mymux := mux.NewPathRecorderMux("mailbox-controller")
+	mymux.Handle("/metrics", legacyregistry.Handler())
+	routes.Profiling{}.Install(mymux)
+	go func() {
+		err := http.ListenAndServe(serverBindAddress, mymux)
+		if err != nil {
+			logger.Error(err, "Failure in web serving")
+			panic(err)
+		}
+	}()
 
 	// create config for accessing TMC service provider workspace
 	inventoryClientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(inventoryLoadingRules, inventoryConfigOverrides)

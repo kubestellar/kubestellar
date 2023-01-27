@@ -11,6 +11,7 @@ The command line flags, beyond the basics, are as follows.
       --concurrency int                  number of syncs to run in parallel (default 4)
       --inventory-context string         current-context override for inventory-kubeconfig (default "root")
       --inventory-kubeconfig string      pathname of kubeconfig file for inventory service provider workspace
+      --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)
       --workload-context string          current-context override for workload-kubeconfig
       --workload-kubeconfig string       pathname of kubeconfig file for edge workload service provider workspace
 ```
