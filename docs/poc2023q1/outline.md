@@ -91,7 +91,7 @@ objects and maintains the results of matching.  For each EdgePlacement
 object this controller maintains an associated collection of
 SinglePlacementSlice objects holding the matches for that
 EdgePlacement.  These SinglePlacementSlice objects appear in the same
-namespace as the corresponding EdgePlacement; the remainder of how
+workspace as the corresponding EdgePlacement; the remainder of how
 they are linked is TBD.
 
 ## Placement Translator
