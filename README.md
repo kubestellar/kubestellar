@@ -1,4 +1,4 @@
-# edge-mc: code repository for SIG KCP-Edge
+# edge-mc: code repository for KCP-Edge
 
 ## Overview
 edge-mc is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
@@ -45,7 +45,7 @@ There are several ways to communicate with us:
     - [kcp-users](https://groups.google.com/g/kcp-users) for discussions among users and potential users
 - Subscribe to the [community calendar](https://calendar.google.com/calendar/embed?src=ujjomvk4fa9fgdaem32afgl7g0%40group.calendar.google.com) for community meetings and events
     - The kcp-dev mailing list is subscribed to this calendar
-- See recordings of past SIG KCP-Edge community meetings on [YouTube](https://www.youtube.com/playlist?list=PL1ALKGr_qZKc9jyv1EfOFNfoAJo9Q6Ebd)
+- See recordings of past KCP-Edge community meetings on [YouTube](https://www.youtube.com/playlist?list=PL1ALKGr_qZKc9jyv1EfOFNfoAJo9Q6Ebd)
 - See [upcoming](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1FN7AZ_Q1CQor6eK0gpuKwdGFNwYI517M?usp=sharing) to share design docs, notes, etc.
     - Members of the kcp-dev mailing list can view this drive
