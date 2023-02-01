@@ -55,6 +55,24 @@ TMC](https://github.com/kcp-dev/kcp/tree/main/pkg/apis), and that one
 view can be used to read those Location objects and one view can be
 used to read those SyncTarget objects.
 
+To enable the workload management layer to manipulate each edge
+cluster, that cluster's SyncTarget has an annotation that refers to a
+Secret that holds a kubeconfig that can be used to maintain the syncer
+and workload in that edge cluster.  These annotations and Secrets are
+created by the inventory management layer for use by the workload
+management layer.
+
+To complete the plumbing of the syncers, for each SyncTarget the
+mailbox controller creates the following needed accompanying items in
+that SyncTarget's workspace (which must authorize the mailbox
+controller to do this).
+
+1. A ServiceAccount that the syncer will authenticate as.
+2. A ClusterRole manipulating that SyncTarget and the
+   APIResourceImports (what are these?).
+3. A ClusterRoleBinding that links that ServiceAccount with that
+   ClusterRole.
+
 ## Edge Service Provider workspace
 
 The edge multi-cluster service is provided by one workspace that
@@ -69,6 +87,7 @@ includes the following things.
 The users of edge multi-cluster primarily maintain these.  Each one
 contains the following things.
 
+- APIBindings to the APIExports of workload object types.
 - A workload spec.  That is, some namespaces containing namespaced
   workload objects --- and possibly later on some non-namespaced
   workload objects.  Initially the workload objects must be of types
@@ -76,6 +95,42 @@ contains the following things.
   (because extension by user CRDs is not supported yet).
 - EMC interface objects: EdgePlacement, SinglePlacementSlice, those
   for customization and summarization.
+
+## Mailbox workspaces
+
+The mailbox controller maintains one mailbox workspace for each
+SyncTarget.  A mailbox workspace acts as a workload source for TMC,
+prescribing the workload to go to the corresponding edge pcluster and
+holding the corresponding TMC Placement object.
+
+A mailbox workspace contains the following items.
+
+1. APIBindings (maintained by the mailbox controller) to APIExports of
+   workload object types.
+2. Workload namespaces holding workload objects, post customization.
+3. A TMC Placement object.
+
+## Edge cluster
+
+Also called edge pcluster.
+
+One of these contains the following items, maintained by the ??? in
+the workload management layer.
+
+- A namespace that holds the syncer and associated objects.
+- A ServiceAccount that the syncer authenticates as when accessing the
+  views of the center and when accessing the edge cluster.
+- A Secret holding that ServiceAccount's authorization token.
+- A ClusterRole listing the non-namespaced privileges that the
+  syncer will use in the edge cluster.
+- A ClusterRoleBinding linking the syncer's ServiceAccount and ClusterRole.
+- A Role listing the namespaced privileges that the syncer will use in
+  the edge cluster.
+- A RoleBinding linking the syncer's ServiceAccount and Role.
+- A Secret holding the kubeconfig that the syncer will use to access
+  the edge cluster.
+- A Deployment of the syncer.
+
 
 ## Mailbox Controller
 
@@ -101,10 +156,6 @@ of TMC Placement objects and corresponding related objects.  For each
 matching SinglePlacement, the placement translator maintains a TMC
 Placement object and copy of the workload namespaces and their
 contents --- customized as directed.
-
-## Syncers
-
-Open question: what maintains them?
 
 ## Status Summarizer
 
