@@ -9,8 +9,8 @@ For a given SyncTarget T, the mailbox controller currently chooses the
 name of the corresponding workspace to be the concatenation of the
 following.
 
-- the name (_not_ ID) of the workspace containing T
-- "-w-"
+- the ID of the logical cluster containing T
+- the string "-w-"
 - T's name
 
 This is ambiguous and subject to name length overflows.  Later
