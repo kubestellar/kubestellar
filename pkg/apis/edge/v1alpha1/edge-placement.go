@@ -66,10 +66,6 @@ type EdgePlacement struct {
 // EdgePlacementSpec holds a desired binding between (a) Namespaces and non-namespaced objects
 // and (b) Locations.
 type EdgePlacementSpec struct {
-	// `locationWorkspaceSelector` identifies the workspaces in which to look for Location
-	// objects, in terms of labels on the Workspace objects.
-	LocationWorkspaceSelector metav1.LabelSelector `json:"locationWorkspaceSelector,omitempty"`
-
 	// `locationSelectors` identifies the relevant Location objects in terms of their labels.
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
 	LocationSelectors []metav1.LabelSelector `json:"locationSelectors,omitempty"`
