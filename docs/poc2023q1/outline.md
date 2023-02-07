@@ -21,12 +21,17 @@ multi-cluster.  It is intended to demonstrate the following points.
 - Rule-based customization of desired state.
 - Propagation of reported state from edge to center.
 - Summarization of reported state in the center.
+- The edge opens connections to the center, not vice-versa.
 
 Some important things that are not attempted in this PoC include the following.
 
 - An implementation that supports a large number of edge clusters.
 - More than one SyncTarget per Location.
+- Return or summarization of status from associated objects (e.g.,
+  ReplicaSet or Pod objects associated with a given Deployment
+  object).
 - A hierarchy with more than two levels.
+- More than basic security.
 
 It is TBD whether the implementation will support intermittent
 connectivity.  This depends on whether we can quickly and easily get a
@@ -37,6 +42,18 @@ Also: initially this PoC will not transport non-namespaced objects.
 CustomResourceDefinitions are thus among the objects that will not be
 transported.  Transport of non-namespaced objects may be added after
 the other goals are achieved.
+
+As further matters of roadmapping development of this PoC:
+customization may be omitted at first, and summarization may start
+with only a limited subset of the implicit functionality.
+
+This PoC builds on TMC and makes some compromises to accommodate that.
+The implementation involves workload components (syncers) writing
+status information to inventory objects (SyncTargets).
+
+This PoC compromises on the connection initiative constraint in one
+place: the bootstrap step where central automation connects to edge
+clusters to install EMC machinery.
 
 ## Design overview
 
@@ -161,3 +178,70 @@ contents --- customized as directed.
 
 For each EdgePlacement object and related objects this controller
 maintains the directed status summary objects.
+
+## Usage Scenario
+
+The usage scenario breaks, at the highest level, into two parts:
+inventory and workload.
+
+### Inventory Usage
+
+A user with infrastructure authority creates one or more inventory
+management workspaces.  Each such workspace needs to have the
+following items, which that user will create if they are not
+pre-populated by the workspace type.
+
+- An APIBinding to the `workload.kcp.io` APIExport to get
+  `SyncTarget`.
+- An APIBinding to the `scheduling.kcp.io` APIExport to get
+  `Location`.
+- A ServiceAccount (with associated token-bearing Secret) (details
+  TBD) that the mailbox controller authenticates as.
+- A ClusterRole and ClusterRoleBinding that authorize said
+  ServiceAccount to do what the mailbox controller needs to do.
+
+This user also creates one or more edge clusters.
+
+For each of those edge clusters, this user creates the following.
+
+- a corresponding SyncTarget, with an annotation referring to the
+  following Secret object, in one of those inventory management
+  workspaces;
+- a Secret, in the same workspace, holding a kubeconfig that the
+  central automation will use to install the syncer in the edge
+  cluster;
+- a Location, in the same workspace, that matches only that
+  SyncTarget.
+
+### Workload usage
+
+A user with workload authority starts by creating one or more workload
+management workspaces.  Each needs to have the following, which that
+user creates if the workload type did not already provide.
+
+- An APIBinding to the APIExport of `edge.kcp.io` from the edge
+  service provider workspace.
+- For each of the Edge Scheduler, the Placement Translator, and the
+  Status Summarizer:
+  - A ServiceAccount for that controller to authenticate as;
+  - A ClusterRole granting the privileges needed by that controller;
+  - A ClusterRoleBinding that binds those two.
+
+This user also creates one or more namespaces containing specs of
+desired state of workload.
+
+This user creates one or more EdgePlacement objects to say which
+workload goes where.  These may be accompanied by API objects that
+specify rule-baesd customization, specify how status is to be
+summarized.
+
+The edge-mc implementation propagates the desired state from center to
+edge and collects the specified information from edge to center.
+
+The edge user monitors status summary objects in their workload
+management workspaces.
+
+The status summaries may include limited-length lists of broken
+objects.
+
+Full status from the edge is available in the mailbox workspaces.
