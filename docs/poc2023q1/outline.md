@@ -31,12 +31,13 @@ Some important things that are not attempted in this PoC include the following.
   ReplicaSet or Pod objects associated with a given Deployment
   object).
 - A hierarchy with more than two levels.
-- More than basic security.
+- More than baseline security (e.g., HTTPS, Secret objects, bearer
+  token based service authorization).
 
 It is TBD whether the implementation will support intermittent
 connectivity.  This depends on whether we can quickly and easily get a
-syncer that creates the appropriately independent targets and itself
-tolerates intermittent connectivity.
+syncer that creates the appropriately independent objects in the edge
+cluster and itself tolerates intermittent connectivity.
 
 Also: initially this PoC will not transport non-namespaced objects.
 CustomResourceDefinitions are thus among the objects that will not be
@@ -74,10 +75,10 @@ used to read those SyncTarget objects.
 
 To enable the workload management layer to manipulate each edge
 cluster, that cluster's SyncTarget has an annotation that refers to a
-Secret that holds a kubeconfig that can be used to maintain the syncer
-and workload in that edge cluster.  These annotations and Secrets are
-created by the inventory management layer for use by the workload
-management layer.
+Secret that holds a kubeconfig that can be used by the Bootstrapper to
+install the edge-mc machinery in the edge cluster.  These annotations
+and Secrets are created by the inventory management layer for use by
+the workload management layer.
 
 To complete the plumbing of the syncers, for each SyncTarget the
 mailbox controller creates the following needed accompanying items in
@@ -90,14 +91,17 @@ controller to do this).
 3. A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.
 
+FYI, those are the things that `kubectl kcp workload sync` directly
+creates besides the SyncTarget.
+
 ## Edge Service Provider workspace
 
 The edge multi-cluster service is provided by one workspace that
 includes the following things.
 
 - An APIExport of the edge API group.
-- The edge controllers: scheduler, placement translator, mailbox
-  controller, and status sumarizer.
+- The edge controllers: scheduler, placement translator, bootstrapper,
+  mailbox controller, and status sumarizer.
 
 ## Workload Management workspaces
 
@@ -131,8 +135,9 @@ A mailbox workspace contains the following items.
 
 Also called edge pcluster.
 
-One of these contains the following items, maintained by the ??? in
-the workload management layer.
+One of these contains the following items, maintained by the
+Bootstrapper in the workload management layer.  These are the things
+in the YAML output by `kubectl kcp workload sync`.
 
 - A namespace that holds the syncer and associated objects.
 - A ServiceAccount that the syncer authenticates as when accessing the
@@ -148,13 +153,18 @@ the workload management layer.
   the edge cluster.
 - A Deployment of the syncer.
 
-
 ## Mailbox Controller
 
 This controller maintains one mailbox workspace per SyncTarget.  Each
 of these mailbox workspaces is used for a distinct TMC problem (e.g.,
 Placement object).  These workspaces are all children of the edge
 service provider workspace.
+
+## Bootstrapper
+
+The bootstrapper is a controller that maintains the needed workload
+management machinery (the items enumerated above in the description of
+the edge clusters) in each edge cluster.
 
 ## Edge Scheduler
 
