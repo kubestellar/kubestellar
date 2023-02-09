@@ -48,6 +48,9 @@ Congratulations! Your pull request has been successfully merged! 👏
 
 If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
 
+## Testing Locally
+Check out our [QUICKSTART](quickstart.md) guide to install a local KCP server and install the KCP-Edge components
+
 ## Licensing
 KCP-Edge is [Apache 2.0 licensed](LICENSE) and we accept contributions via
 GitHub pull requests.
