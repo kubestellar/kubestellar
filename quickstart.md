@@ -1,8 +1,7 @@
-# KCP-Edge
+# KCP-Edge Quickstart
 
 This document provides instructions on how to build and run kcp-edge locally.
 
-## Quickstart
 To use components from KCP-Edge you must:
 1. Install and configure KCP to create a working KCP environment
 2. Build KCP-Edge
@@ -150,6 +149,12 @@ $ KUBECONFIG=</path/to/kind/kubeconfig> kubectl --namespace kcp-26zq2mc2yajx log
 ```
 
 ## 2. Build and Install KCP-Edge
+To build and install KCP-Edge components:
+- clone the latest KCP-Edge [repository](https://github.com/kcp-dev/edge-mc)
+- make tools
+- make build
+- make install
+
 The [Makefile](Makefile) provides a set of targets to help simplify the build
 tasks.
 
