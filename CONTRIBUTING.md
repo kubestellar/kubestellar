@@ -1,7 +1,7 @@
 # Contributing to KCP-Edge
 Greetings! We are grateful for your interest in joining the KCP-Edge community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on Slack.
+To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C021U8WSAFK).
 
 We can't wait to collaborate with you!
 
