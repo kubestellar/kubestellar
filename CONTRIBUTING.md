@@ -6,6 +6,11 @@ To get started, kindly read through this document and familiarize yourself with 
 We can't wait to collaborate with you!
 
 ## Contributing Code
+
+### Prerequisites
+
+[Install Go](https://golang.org/doc/install) 1.19+.
+
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
 
@@ -23,8 +28,25 @@ We encourage all contributors to adopt best practices in git commit management t
 A recommended format for final commit messages is as follows:
 
 ```
-{Type}: {Short Title}: {Problem this commit is solving and any important contextual information}
+{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 ```
+### Pull Requests
+When submitting a pull request, clear communication is appreciated. This can be achieved by providing the following information:
+
+- Detailed description of the problem you are trying to solve, along with links to related GitHub issues
+- Explanation of your solution, including links to any design documentation and discussions
+- Information on how you tested and validated your solution
+- Updates to relevant documentation and examples, if applicable
+
+The pull request template has been designed to assist you in communicating this information effectively.
+
+Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
+
+Approvers will review your PR within 24-hours or less. Two approvers must review and approve a PR before a merge can take place. The first approver will mark the PR with "/lgtm" and the second approver will mark the PR as "/approve." Automation will then squash the commits in your PR and add it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available.
+
+Congratulations! Your pull request has been successfully merged! 👏
+
+If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
 
 ## Licensing
 KCP-Edge is [Apache 2.0 licensed](LICENSE) and we accept contributions via
@@ -39,6 +61,3 @@ Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
 contribution. See the [DCO](DCO) file for details.
 
-## Prerequisites
-
-[Install Go](https://golang.org/doc/install) 1.19+.
