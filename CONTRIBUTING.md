@@ -23,7 +23,7 @@ Your assistance in improving documentation is highly valued, regardless of your 
 To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.
 
 ### Committing
-We encourage all contributors to adopt best practices in git commit management to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.
+We encourage all contributors to adopt [best practices in git commit management](https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history) to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.
 
 A recommended format for final commit messages is as follows:
 
