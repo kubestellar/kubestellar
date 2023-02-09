@@ -3,11 +3,11 @@
 This document provides instructions on how to build and run kcp-edge locally.
 
 ## Quickstart
-To use components from KCP-Edge you must have a working KCP environment.
-- Install and configure KCP
+To use components from KCP-Edge you must:
+- Install and configure KCP to create a working KCP environment
 - Build KCP-Edge
 
-## KCP
+## Install and Configure KCP
 ### Prerequisites
 
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
@@ -149,7 +149,25 @@ $ KUBECONFIG=</path/to/kind/kubeconfig> kubectl --namespace kcp-26zq2mc2yajx log
   "debug-sitedata-dir": "./sitedata",
 ```
 
-## KCP-Edge
+## Build KCP-Edge
+The [Makefile](Makefile) provides a set of targets to help simplify the build
+tasks.
+
+
+```sh
+make build
+```
+
+The following targets can be used to lint, test and build the KCP-Edge controllers:
+```sh
+make golint
+
+make test
+
+make install
+```
+
+
 
 ## Next steps
 
