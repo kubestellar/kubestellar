@@ -22,17 +22,24 @@ multi-cluster.  It is intended to demonstrate the following points.
 - Propagation of reported state from edge to center.
 - Summarization of reported state in the center.
 - The edge opens connections to the center, not vice-versa.
+- An edge computing platform "product" that can be deployed (as
+  opposed to a service that is used).
 
 Some important things that are not attempted in this PoC include the following.
 
-- An implementation that supports a large number of edge clusters.
+- An implementation that supports a large number of edge clusters or
+  any other thing that requires sharding for scale.
 - More than one SyncTarget per Location.
 - Return or summarization of status from associated objects (e.g.,
   ReplicaSet or Pod objects associated with a given Deployment
   object).
 - A hierarchy with more than two levels.
-- More than baseline security (e.g., HTTPS, Secret objects, bearer
-  token based service authorization).
+- More than baseline security (baseline being, e.g., HTTPS, Secret
+  objects, non-rotating bearer token based service authentication).
+- A good design for bootstrapping the workload management in the edge
+  clusters.
+- Very strong isolation between tenants in the edge computing
+  platform.
 
 It is TBD whether the implementation will support intermittent
 connectivity.  This depends on whether we can quickly and easily get a
@@ -52,9 +59,15 @@ This PoC builds on TMC and makes some compromises to accommodate that.
 The implementation involves workload components (syncers) writing
 status information to inventory objects (SyncTargets).
 
-This PoC compromises on the connection initiative constraint in one
-place: the bootstrap step where central automation connects to edge
-clusters to install EMC machinery.
+## Roles and Responsibilities
+
+### Developers/deployers/admins/users of the inventory management layer
+
+### Developers of the workload management layer
+
+### Deployers/admins of the workload management layer
+
+### Users of the workload management layer
 
 ## Design overview
 
@@ -72,13 +85,6 @@ objects as defined in [kcp
 TMC](https://github.com/kcp-dev/kcp/tree/main/pkg/apis), and that one
 view can be used to read those Location objects and one view can be
 used to read those SyncTarget objects.
-
-To enable the workload management layer to manipulate each edge
-cluster, that cluster's SyncTarget has an annotation that refers to a
-Secret that holds a kubeconfig that can be used by the Bootstrapper to
-install the edge-mc machinery in the edge cluster.  These annotations
-and Secrets are created by the inventory management layer for use by
-the workload management layer.
 
 To complete the plumbing of the syncers, for each SyncTarget the
 mailbox controller creates the following needed accompanying items in
@@ -100,8 +106,8 @@ The edge multi-cluster service is provided by one workspace that
 includes the following things.
 
 - An APIExport of the edge API group.
-- The edge controllers: scheduler, placement translator, bootstrapper,
-  mailbox controller, and status sumarizer.
+- The edge controllers: scheduler, placement translator, mailbox
+  controller, and status sumarizer.
 
 ## Workload Management workspaces
 
@@ -135,9 +141,11 @@ A mailbox workspace contains the following items.
 
 Also called edge pcluster.
 
-One of these contains the following items, maintained by the
-Bootstrapper in the workload management layer.  These are the things
-in the YAML output by `kubectl kcp workload sync`.
+One of these contains the following items.  FYI, these are the things
+in the YAML output by `kubectl kcp workload sync`.  The responsibility
+for creating and maintaining these objects is called the problem of
+bootstrapping the workload management layer and is not among the
+things that this PoC takes a position on.
 
 - A namespace that holds the syncer and associated objects.
 - A ServiceAccount that the syncer authenticates as when accessing the
@@ -159,12 +167,6 @@ This controller maintains one mailbox workspace per SyncTarget.  Each
 of these mailbox workspaces is used for a distinct TMC problem (e.g.,
 Placement object).  These workspaces are all children of the edge
 service provider workspace.
-
-## Bootstrapper
-
-The bootstrapper is a controller that maintains the needed workload
-management machinery (the items enumerated above in the description of
-the edge clusters) in each edge cluster.
 
 ## Edge Scheduler
 
