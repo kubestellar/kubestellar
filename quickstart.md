@@ -1,6 +1,5 @@
 # KCP-Edge
 
-## Build
 This document provides instructions on how to build and run kcp-edge locally.
 
 ## Quickstart
