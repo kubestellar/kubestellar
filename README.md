@@ -1,4 +1,4 @@
-<img alt="Logo" width="600px" align="left" src="./contrib/logo/kcp-edge-4.png"></img>
+<img alt="Logo" width="600px" align="left" src="./contrib/logo/kcp-edge-5.png"></img>
 <br><br><br><br>
 # KCP-Edge
 <br><br><br><br><br><br>
