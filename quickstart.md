@@ -12,12 +12,71 @@ To use components from KCP-Edge you must:
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - A Kubernetes cluster (for local testing, consider [kind](http://kind.sigs.k8s.io))
 
+#### Example (Centos)
+
+##### install git, install go version 1.20, set environment variables 
+```
+dnf install git
+wget https://golang.org/dl/go1.20.linux-amd64.tar.gz
+sudo tar -zxvf go1.20.linux-amd64.tar.gz -C /usr/local
+echo export GOROOT=/usr/local/go | sudo tee -a /etc/profile
+echo export PATH=$PATH:/usr/local/go/bin | sudo tee -a /etc/profile
+source /etc/profile
+go version
+```
+
+##### download kubectl, verify signature, install kubectl
+```
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version
+```
+
+##### download and install kind, create a cluster, get namespaces 
+``` 
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
+>> % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+>>                              Dload  Upload   Total   Spent    Left  Speed
+>> 100    97  100    97    0     0    154      0 --:--:-- --:--:-- --:--:--   154
+>> 0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+>> 100 6766k  100 6766k    0     0   587k      0  0:00:11  0:00:11 --:--:-- 1670k
+chmod +x ./kind
+mv ./kind /usr/local/bin
+which kind
+>> /usr/local/bin/kind
+kind version
+>> kind v0.17.0 go1.19.2 linux/amd64
+kind create cluster --name rf-test-cluster
+kubectl cluster-info --context kind-rf-test-cluster
+>> Kubernetes control plane is running at https://127.0.0.1:46237
+>> CoreDNS is running at https://127.0.0.1:46237/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+kubectl get namespaces
+>> NAME                 STATUS   AGE
+>> default              Active   20m
+>> kube-node-lease      Active   20m
+>> kube-public          Active   20m
+>> kube-system          Active   20m
+>> local-path-storage   Active   20m
+```
+
 ### Download kcp
 
 Visit our [latest release page](https://github.com/kcp-dev/kcp/releases/latest) and download `kcp`
 and `kubectl-kcp-plugin` that match your operating system and architecture.
 
 Extract `kcp` and `kubectl-kcp-plugin` and place all the files in the `bin` directories somewhere in your `$PATH`.
+
+#### Example (Centos)
+##### clone kcp git hub, checkout build, set environment variables 
+```
+git clone https://github.com/kcp-dev/kcp.git
+cd kcp
+git checkout 4506fdc06406
+export GOBIN=/usr/local/go/bin
+go install ./cmd/kcp ./cmd/kubectl-*
+```
 
 ### Start kcp
 
