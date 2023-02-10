@@ -2,6 +2,8 @@
 
 # KCP-Edge
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ## Overview
 kcp is a Kubernetes-like control plane focusing on:
 
