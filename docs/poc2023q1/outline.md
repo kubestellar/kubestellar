@@ -46,11 +46,6 @@ connectivity.  This depends on whether we can quickly and easily get a
 syncer that creates the appropriately independent objects in the edge
 cluster and itself tolerates intermittent connectivity.
 
-Also: initially this PoC will not transport non-namespaced objects.
-CustomResourceDefinitions are thus among the objects that will not be
-transported.  Transport of non-namespaced objects may be added after
-the other goals are achieved.
-
 As further matters of roadmapping development of this PoC:
 customization may be omitted at first, and summarization may start
 with only a limited subset of the implicit functionality.
@@ -111,17 +106,154 @@ includes the following things.
 
 ## Workload Management workspaces
 
-The users of edge multi-cluster primarily maintain these.  Each one
-contains the following things.
+The users of edge multi-cluster primarily maintain these.  Each one of
+these has both control (API objects that direct the behavior of the
+edge computing platform) and data (API objects that hold workload
+desired and reported state).
+
+### Data objects
+
+The workload desired state is represented by kube-style API objects,
+in the way that is usual in the Kubernetes milieu.  For edge computing
+we need to support both cluster-scoped (AKA non-namespaced) kinds as
+well as namespaced kinds of objects.
+
+The use of a workspace as a mere container presents a challenge,
+because some kinds of kubernetes API objects at not merely data but
+also modify the behavior of the apiserver holding them.  To resolve
+this dilemma, the edge users of such a workspace will use a special
+view of the workspace that holds only data objects.  The ones that
+modify apiserver behavior will be translated by the view into
+"denatured" versions of those objects in the actual workspace so that
+they have no effect on it.  And for these objects, the transport from
+center-to-edge will do the inverse: translate the denatured versions
+into the regular ("natured"?) versions for appearance in the edge
+cluster.  Furthermore, for some kinds of objects that modify apiserver
+behavior we want them "natured" at both center and edge.  There are
+thus several categories of kinds of objects.  Following is a listing,
+with with the particular kinds that appear in kcp or plain kubernetes.
+
+#### Needs to be denatured in center, natured in edge
+
+For these kinds of objects, clients of the real workspace can
+manipulate such objects and they will modify the behavior of the
+workspace, while clients of the edge computing view will manipulate
+distinct objects that have no effect on the behavior of the workspace.
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| admissionregistration.k8s.io/v1 | MutatingWebhookConfiguration | false |
+| admissionregistration.k8s.io/v1 | ValidatingWebhookConfiguration | false |
+| flowcontrol.apiserver.k8s.io/v1beta2 | FlowSchema | false |
+| flowcontrol.apiserver.k8s.io/v1beta2 | PriorityLevelConfiguration | false |
+| rbac.authorization.k8s.io/v1 | ClusterRole | false |
+| rbac.authorization.k8s.io/v1 | ClusterRoleBinding | false |
+| rbac.authorization.k8s.io/v1 | Role | true |
+| rbac.authorization.k8s.io/v1 | RoleBinding | true |
+| v1 | LimitRange | true |
+| v1 | ResourceQuota | true |
+| v1 | ServiceAccount | true |
+
+#### Needs to be natured in center and edge
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apiextensions.k8s.io/v1 | CustomResourceDefinition | false |
+| v1 | Namespace | false |
+
+
+#### Do not care in center, natured in edge
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apiregistration.k8s.io/v1 | APIService | false |
+
+#### Not sure
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apiresource.kcp.io/v1alpha1 | APIResourceImport | false |
+| apiresource.kcp.io/v1alpha1 | NegotiatedAPIResource | false |
+| apis.kcp.io/v1alpha1 | APIBinding | false |
+| apis.kcp.io/v1alpha1 | APIConversion | false |
+
+#### Not destined for edge
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apis.kcp.io/v1alpha1 | APIExport | false |
+| apis.kcp.io/v1alpha1 | APIExportEndpointSlice | false |
+| apis.kcp.io/v1alpha1 | APIResourceSchema | false |
+| apps/v1 | ControllerRevision | true |
+| authentication.k8s.io/v1 | TokenReview | false |
+| authorization.k8s.io/v1 | LocalSubjectAccessReview | true |
+| authorization.k8s.io/v1 | SelfSubjectAccessReview | false |
+| authorization.k8s.io/v1 | SelfSubjectRulesReview | false |
+| authorization.k8s.io/v1 | SubjectAccessReview | false |
+| certificates.k8s.io/v1 | CertificateSigningRequest | false |
+| coordination.k8s.io/v1 | Lease | true |
+| core.kcp.io/v1alpha1 | LogicalCluster | false |
+| core.kcp.io/v1alpha1 | Shard | false |
+| discovery.k8s.io/v1 | EndpointSlice | true |
+| events.k8s.io/v1 | Event | true |
+| scheduling.kcp.io/v1alpha1 | Location | false |
+| scheduling.kcp.io/v1alpha1 | Placement | false |
+| tenancy.kcp.io/v1alpha1 | ClusterWorkspace | false |
+| tenancy.kcp.io/v1alpha1 | Workspace | false |
+| tenancy.kcp.io/v1alpha1 | WorkspaceType | false |
+| topology.kcp.io/v1alpha1 | Partition | false |
+| topology.kcp.io/v1alpha1 | PartitionSet | false |
+| v1 | Binding | true |
+| v1 | ComponentStatus | false |
+| v1 | Event | true |
+| v1 | Node | false |
+
+### Already denatured in center, want natured in edge
+
+These are kinds of objects that kcp already gives no interpretation
+to.
+
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apps/v1 | DaemonSet | true |
+| apps/v1 | Deployment | true |
+| apps/v1 | ReplicaSet | true |
+| apps/v1 | StatefulSet | true |
+| autoscaling/v2 | HorizontalPodAutoscaler | true |
+| batch/v1 | CronJob | true |
+| batch/v1 | Job | true |
+| networking.k8s.io/v1 | Ingress | true |
+| networking.k8s.io/v1 | IngressClass | false |
+| networking.k8s.io/v1 | NetworkPolicy | true |
+| node.k8s.io/v1 | RuntimeClass | false |
+| policy/v1 | PodDisruptionBudget | true |
+| scheduling.k8s.io/v1 | PriorityClass | false |
+| storage.k8s.io/v1 | CSIDriver | false |
+| storage.k8s.io/v1 | CSINode | false |
+| storage.k8s.io/v1 | CSIStorageCapacity | true |
+| storage.k8s.io/v1 | StorageClass | false |
+| storage.k8s.io/v1 | VolumeAttachment | false |
+| v1 | ConfigMap | true |
+| v1 | Endpoints | true |
+| v1 | PersistentVolume | false |
+| v1 | PersistentVolumeClaim | true |
+| v1 | Pod | true |
+| v1 | PodTemplate | true |
+| v1 | ReplicationController | true |
+| v1 | Secret | true |
+| v1 | Service | true |
+
+### Plumbing
+
+Each workload management workspace contains the following things.
 
 - APIBindings to the APIExports of workload object types.
-- A workload spec.  That is, some namespaces containing namespaced
-  workload objects --- and possibly later on some non-namespaced
-  workload objects.  Initially the workload objects must be of types
-  drawn from a list of those supported by the EMC implementation
-  (because extension by user CRDs is not supported yet).
-- EMC interface objects: EdgePlacement, SinglePlacementSlice, those
-  for customization and summarization.
+
+### Control objects
+
+These are the EdgePlacement objects, their associated
+SinglePlacementSlice objects, and the objects that direct
+customization and summarization.
 
 ## Mailbox workspaces
 
