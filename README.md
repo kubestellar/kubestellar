@@ -1,5 +1,6 @@
 <img alt="Logo" width="500px" align="left" src="./contrib/logo/kcp-edge-5.png"></img>
-# KCP-Edge: consistent, heterogeneous, and scalable edge configuration management
+# KCP-Edge
+##consistent, heterogeneous, and scalable edge configuration management
 
 ## Overview
 KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
