@@ -34,10 +34,14 @@ Some important things that are not attempted in this PoC include the following.
   ReplicaSet or Pod objects associated with a given Deployment
   object).
 - A hierarchy with more than two levels.
+- User control over ordering of propagation from center to edge,
+  either among destinations or kinds of objects.
 - More than baseline security (baseline being, e.g., HTTPS, Secret
   objects, non-rotating bearer token based service authentication).
 - A good design for bootstrapping the workload management in the edge
   clusters.
+- Support for workload object types that are not either built into kcp
+  or imported via a kcp APIBinding.
 - Very strong isolation between tenants in the edge computing
   platform.
 
@@ -81,19 +85,18 @@ TMC](https://github.com/kcp-dev/kcp/tree/main/pkg/apis), and that one
 view can be used to read those Location objects and one view can be
 used to read those SyncTarget objects.
 
-To complete the plumbing of the syncers, for each SyncTarget the
-mailbox controller creates the following needed accompanying items in
-that SyncTarget's workspace (which must authorize the mailbox
-controller to do this).
+To complete the plumbing of the syncers, each inventory workspace that
+contains a SyncTarget needs to also contain the following associated
+objects.  FYI, these are the things that `kubectl kcp workload sync`
+directly creates besides the SyncTarget.  Ensuring their presence is
+part of the problem of bootstrapping the workload management layer and
+is not among the things that this PoC takes a position on.
 
 1. A ServiceAccount that the syncer will authenticate as.
 2. A ClusterRole manipulating that SyncTarget and the
    APIResourceImports (what are these?).
 3. A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.
-
-FYI, those are the things that `kubectl kcp workload sync` directly
-creates besides the SyncTarget.
 
 ## Edge Service Provider workspace
 
@@ -130,7 +133,7 @@ center-to-edge will do the inverse: translate the denatured versions
 into the regular ("natured"?) versions for appearance in the edge
 cluster.  Furthermore, for some kinds of objects that modify apiserver
 behavior we want them "natured" at both center and edge.  There are
-thus several categories of kinds of objects.  Following is a listing,
+thus a few categories of kinds of objects.  Following is a listing,
 with with the particular kinds that appear in kcp or plain kubernetes.
 
 #### Needs to be denatured in center, natured in edge
@@ -156,28 +159,54 @@ distinct objects that have no effect on the behavior of the workspace.
 
 #### Needs to be natured in center and edge
 
+These should have their usual effect in both center and edge; they
+need no distinct treatment.
+
+Note, however, that they _do_ have some sequencing implications.  They
+have to be created before any dependent objects, deleted after all
+dependent objects.
+
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
 | apiextensions.k8s.io/v1 | CustomResourceDefinition | false |
 | v1 | Namespace | false |
 
+### Needs to be natured in center, not destined for edge
 
-#### Do not care in center, natured in edge
+| APIVERSION | KIND | NAMESPACED |
+| ---------- | ---- | ---------- |
+| apis.kcp.io/v1alpha1 | APIBinding | false |
+
+A workload management workspace generally has APIBindings to workload
+APIs.  These bindings cause corresponding CRDs to be created in the
+same workspace.  The CRDs propagate to the edge, the APIBindings do
+not.
+
+#### For features not supported
+
+These are part of k8s or kcp APIs that are not supported by the edge
+computing platform.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
 | apiregistration.k8s.io/v1 | APIService | false |
-
-#### Not sure
-
-| APIVERSION | KIND | NAMESPACED |
-| ---------- | ---- | ---------- |
 | apiresource.kcp.io/v1alpha1 | APIResourceImport | false |
 | apiresource.kcp.io/v1alpha1 | NegotiatedAPIResource | false |
-| apis.kcp.io/v1alpha1 | APIBinding | false |
 | apis.kcp.io/v1alpha1 | APIConversion | false |
 
+The APIService objects are of two sorts: (a) those that are built-in
+and describe object types built into the apiserver and (b) those that
+are added by admins to add API groups served by custom external
+servers.  Sort (b) is not supported because this PoC does not support
+custom external servers in the edge clusters.  Sort (a) is not
+programmable in this PoC, but it might be inspectable.
+
 #### Not destined for edge
+
+These kinds of objects are concerned with either (a) TMC control or
+(b) workload data that should only exist in the edge clusters.  These
+will not be available in the view used by edge clients to maintain
+their workload desired and reported state.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -194,7 +223,6 @@ distinct objects that have no effect on the behavior of the workspace.
 | coordination.k8s.io/v1 | Lease | true |
 | core.kcp.io/v1alpha1 | LogicalCluster | false |
 | core.kcp.io/v1alpha1 | Shard | false |
-| discovery.k8s.io/v1 | EndpointSlice | true |
 | events.k8s.io/v1 | Event | true |
 | scheduling.kcp.io/v1alpha1 | Location | false |
 | scheduling.kcp.io/v1alpha1 | Placement | false |
@@ -207,11 +235,17 @@ distinct objects that have no effect on the behavior of the workspace.
 | v1 | ComponentStatus | false |
 | v1 | Event | true |
 | v1 | Node | false |
+| workload.kcp.io/v1alpha1 | SyncTarget | false |
 
 ### Already denatured in center, want natured in edge
 
 These are kinds of objects that kcp already gives no interpretation
 to.
+
+This is the default category of kind of object --- any kind of data
+object not specifically listed in another category is implicitly in
+this category.  Following are the kinds from k8s and kcp that fall in
+this category.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -243,12 +277,6 @@ to.
 | v1 | Secret | true |
 | v1 | Service | true |
 
-### Plumbing
-
-Each workload management workspace contains the following things.
-
-- APIBindings to the APIExports of workload object types.
-
 ### Control objects
 
 These are the EdgePlacement objects, their associated
@@ -275,7 +303,7 @@ Also called edge pcluster.
 
 One of these contains the following items.  FYI, these are the things
 in the YAML output by `kubectl kcp workload sync`.  The responsibility
-for creating and maintaining these objects is called the problem of
+for creating and maintaining these objects is part of the problem of
 bootstrapping the workload management layer and is not among the
 things that this PoC takes a position on.
 
@@ -315,8 +343,20 @@ they are linked is TBD.
 This controller translates each EdgePlacement object into a collection
 of TMC Placement objects and corresponding related objects.  For each
 matching SinglePlacement, the placement translator maintains a TMC
-Placement object and copy of the workload namespaces and their
-contents --- customized as directed.
+Placement object and copy of the workload --- customized as directed.
+Note that this involves sequencing constraints: CRDs and namespaces
+have to be created before anything that uses them, and deleted after
+everything that uses them.  Note also that everything that has to be
+denatured in the workload management workspace also has to be
+denatured in the mailbox workspace.
+
+## Syncers
+
+This design nominally uses TMC and its syncers, but that can not be
+exactly true because these syncers need to translate between denatured
+objects in the mailbox workspace and natured objects in the edge
+cluster.  Or perhaps not, if there is an additional controller in the
+edge cluster that handles the denatured-natured relationship.
 
 ## Status Summarizer
 
@@ -371,8 +411,8 @@ user creates if the workload type did not already provide.
   - A ClusterRole granting the privileges needed by that controller;
   - A ClusterRoleBinding that binds those two.
 
-This user also creates one or more namespaces containing specs of
-desired state of workload.
+This user also uses the edge-workspace-as-container view of each such
+workspace to describe the workload desired state.
 
 This user creates one or more EdgePlacement objects to say which
 workload goes where.  These may be accompanied by API objects that
