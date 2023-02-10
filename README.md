@@ -1,10 +1,10 @@
 <img alt="Logo" width="600px" align="left" src="./contrib/logo/kcp-edge.png"></img>
 
 # KCP-Edge
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 ## Overview
+
 kcp is a Kubernetes-like control plane focusing on:
 
 - A **control plane** for many independent, **isolated** “clusters” known as **workspaces**
