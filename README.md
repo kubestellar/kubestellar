@@ -1,19 +1,7 @@
 <img alt="Logo" width="600px" align="left" src="./contrib/logo/kcp-edge-5.png"></img>
 <br><br><br><br>
-# KCP-Edge
+# KCP-Edge - heterogenous, consistent, and scalable
 <br><br><br><br><br><br>
-## Overview
-
-kcp is a Kubernetes-like control plane focusing on:
-
-- A **control plane** for many independent, **isolated** “clusters” known as **workspaces**
-- Enabling API service providers to **offer APIs centrally** using **multi-tenant operators**
-- Easy **API consumption** for users in their workspaces
-- Flexible **scheduling** of workloads to physical clusters
-- **Transparent movement** of workloads among compatible physical clusters
-- **Advanced deployment strategies** for scenarios such as affinity/anti-affinity, geographic replication, cross-cloud
-  replication, etc.
-
 
 ## Overview
 KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
