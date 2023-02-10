@@ -1,8 +1,7 @@
 <img alt="Logo" width="600px" align="left" src="./contrib/logo/kcp-edge.png"></img>
 
 # KCP-Edge
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
+<br><br><br><br><br>
 ## Overview
 
 kcp is a Kubernetes-like control plane focusing on:
