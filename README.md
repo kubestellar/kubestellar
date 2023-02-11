@@ -28,7 +28,7 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 
 ## Quickstart
 
-TBD :building_construction:
+Checkout our [Quickstart Guide](quickstart.md)
 
 ## Next Steps
 
