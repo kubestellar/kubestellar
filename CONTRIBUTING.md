@@ -11,7 +11,7 @@ We can't wait to collaborate with you!
 
 [Install Go](https://golang.org/doc/install) 1.19+.
 
-[Check out our Quickstart Guide](quickstart.md)
+Check out our [Quickstart Guide](quickstart.md)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
