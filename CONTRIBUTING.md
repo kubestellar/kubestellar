@@ -10,6 +10,7 @@ We can't wait to collaborate with you!
 ### Prerequisites
 
 [Install Go](https://golang.org/doc/install) 1.19+.
+
 [Check out our Quickstart Guide](quickstart.md)
 
 ### Issues
