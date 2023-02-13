@@ -1,0 +1,6 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: test-1
+spec:
+  locationSelectors: [{}]

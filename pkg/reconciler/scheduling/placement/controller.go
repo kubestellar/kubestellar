@@ -18,19 +18,13 @@ package placement
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
 
-	jsonpatch "github.com/evanphx/json-patch"
-
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -47,11 +41,13 @@ import (
 	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
 
+	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/indexers"
 )
 
 const (
-	ControllerName      = "kcp-scheduling-placement"
+	ControllerName      = "edge-scheduler"
 	byLocationWorkspace = ControllerName + "-byLocationWorkspace"
 )
 
@@ -62,6 +58,7 @@ func NewController(
 	namespaceInformer kcpcorev1informers.NamespaceClusterInformer,
 	locationInformer schedulingv1alpha1informers.LocationClusterInformer,
 	placementInformer schedulingv1alpha1informers.PlacementClusterInformer,
+	edgePlacementInformer edgev1alpha1informers.EdgePlacementClusterInformer,
 ) (*controller, error) {
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
@@ -84,6 +81,9 @@ func NewController(
 
 		placementLister:  placementInformer.Lister(),
 		placementIndexer: placementInformer.Informer().GetIndexer(),
+
+		edgePlacementLister:  edgePlacementInformer.Lister(),
+		edgePlacementIndexer: edgePlacementInformer.Informer().GetIndexer(),
 	}
 
 	if err := placementInformer.Informer().AddIndexers(cache.Indexers{
@@ -143,6 +143,12 @@ func NewController(
 		DeleteFunc: c.enqueuePlacement,
 	})
 
+	edgePlacementInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    c.enqueuePlacement,
+		UpdateFunc: func(_, newObj interface{}) { c.enqueuePlacement(newObj) },
+		DeleteFunc: c.enqueuePlacement,
+	})
+
 	return c, nil
 }
 
@@ -160,6 +166,9 @@ type controller struct {
 
 	placementLister  schedulingv1alpha1listers.PlacementClusterLister
 	placementIndexer cache.Indexer
+
+	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
+	edgePlacementIndexer cache.Indexer
 }
 
 func (c *controller) enqueuePlacement(obj interface{}) {
@@ -170,7 +179,7 @@ func (c *controller) enqueuePlacement(obj interface{}) {
 	}
 
 	logger := logging.WithQueueKey(logging.WithReconciler(klog.Background(), ControllerName), key)
-	logger.V(2).Info("queueing Placement")
+	logger.V(2).Info("queueing EdgePlacement")
 	c.queue.Add(key)
 }
 
@@ -293,14 +302,14 @@ func (c *controller) process(ctx context.Context, key string) error {
 		return nil
 	}
 
-	obj, err := c.placementLister.Cluster(clusterName).Get(name)
+	obj, err := c.edgePlacementLister.Cluster(clusterName).Get(name)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return nil // object deleted before we handled it
+			logger.Info("object deleted before handled")
+			return nil
 		}
 		return err
 	}
-	old := obj
 	obj = obj.DeepCopy()
 
 	logger = logging.WithObject(logger, obj)
@@ -308,34 +317,6 @@ func (c *controller) process(ctx context.Context, key string) error {
 
 	reconcileErr := c.reconcile(ctx, obj)
 
-	// If the object being reconciled changed as a result, update it.
-	if !equality.Semantic.DeepEqual(old.Status, obj.Status) {
-		oldData, err := json.Marshal(schedulingv1alpha1.Placement{
-			Status: old.Status,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to Marshal old data for placement %s|%s: %w", clusterName, name, err)
-		}
-
-		newData, err := json.Marshal(schedulingv1alpha1.Placement{
-			ObjectMeta: metav1.ObjectMeta{
-				UID:             old.UID,
-				ResourceVersion: old.ResourceVersion,
-			}, // to ensure they appear in the patch as preconditions
-			Status: obj.Status,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to Marshal new data for LocationDomain %s|%s: %w", clusterName, name, err)
-		}
-
-		patchBytes, err := jsonpatch.CreateMergePatch(oldData, newData)
-		if err != nil {
-			return fmt.Errorf("failed to create patch for LocationDomain %s|%s: %w", clusterName, name, err)
-		}
-		logger.V(2).Info("patching placement", "patch", string(patchBytes))
-		_, uerr := c.kcpClusterClient.Cluster(clusterName.Path()).SchedulingV1alpha1().Placements().Patch(ctx, obj.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}, "status")
-		return uerr
-	}
-
+	// TODO: If the object being reconciled changed as a result, update it.
 	return reconcileErr
 }
