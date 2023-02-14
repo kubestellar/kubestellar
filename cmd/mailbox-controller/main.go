@@ -16,6 +16,13 @@ limitations under the License.
 
 package main
 
+// Import of k8s.io/client-go/plugin/pkg/client/auth ensures
+// that all in-tree Kubernetes client auth plugins
+// (e.g. Azure, GCP, OIDC, etc.)  are available.
+//
+// Import of k8s.io/component-base/metrics/prometheus/clientgo
+// makes the k8s client library produce Prometheus metrics.
+
 import (
 	"context"
 	"flag"
@@ -31,13 +38,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
-
-	// Import of k8s.io/client-go/plugin/pkg/client/auth ensures
-	// that all in-tree Kubernetes client auth plugins
-	// (e.g. Azure, GCP, OIDC, etc.)  are available.
-	//
-	// Import of k8s.io/component-base/metrics/prometheus/clientgo
-	// makes the k8s client library produce Prometheus metrics.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
