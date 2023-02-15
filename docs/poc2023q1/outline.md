@@ -237,7 +237,7 @@ their workload desired and reported state.
 | v1 | Node | false |
 | workload.kcp.io/v1alpha1 | SyncTarget | false |
 
-### Already denatured in center, want natured in edge
+#### Already denatured in center, want natured in edge
 
 These are kinds of objects that kcp already gives no interpretation
 to.
