@@ -1,6 +1,7 @@
 title: KCP-Edge Documentation
 navbar-text-col: "#FFFFFF"
 avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
+theme: minima
 plugins:
   - jekyll-relative-links
 relative_links:
