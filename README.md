@@ -3,7 +3,7 @@
 
 <br/>
 
-# KCP-Edge2
+# KCP-Edge
 ## consistent, heterogeneous, and scalable edge configuration management
 <br/><br/>
 ## Overview
