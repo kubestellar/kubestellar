@@ -1,4 +1,3 @@
-<link rel="icon" href="./contrib/logo/kcp-edge-square_ico32.ico/" type="image/x-icon" />
 <img alt="KCP-Edge" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
 
 <br/>
