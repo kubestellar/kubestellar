@@ -1,4 +1,4 @@
-![KCP-Edge](./contrib/logo/kcp-edge-5.png)
+![KCP-Edge](./contrib/logo/kcp-edge-5.png | width=500)
 <br/>
 # KCP-Edge
 ## consistent, heterogeneous, and scalable edge configuration management
