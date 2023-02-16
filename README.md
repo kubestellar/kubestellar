@@ -1,4 +1,4 @@
-<img alt="Logo" width="500px" align="left" src="./contrib/logo/kcp-edge-5.png">
+<img alt="Logo" width="500px" align="left" src="./contrib/logo/kcp-edge-5.png"/>
 <br>
 # KCP-Edge
 ## consistent, heterogeneous, and scalable edge configuration management
