@@ -1,4 +1,5 @@
 title: KCP-Edge Documentation
+avatar: "./contrib/logo/kcp-edge-5.png"
 plugins:
   - jekyll-relative-links
 relative_links:
