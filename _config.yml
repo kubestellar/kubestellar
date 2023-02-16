@@ -1,6 +1,6 @@
 title: KCP-Edge Documentation
 navbar-text-col: "#FFFFFF"
-avatar: "./contrib/logo/kcp-edge-5.png"
+avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
 plugins:
   - jekyll-relative-links
 relative_links:
