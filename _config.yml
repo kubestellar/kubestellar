@@ -4,6 +4,8 @@ avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
 theme: minima
 plugins:
   - jekyll-relative-links
+  - jekyll-feed
+  - jekyll-seo-tag
 relative_links:
   enabled: true
   collections: true
