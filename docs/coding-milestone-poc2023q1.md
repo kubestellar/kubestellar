@@ -1,4 +1,4 @@
-#Coding Milestone PoC2023q1
+# Coding Milestone PoC2023q1
 
 Dear Contributors
 
@@ -19,4 +19,4 @@ The coding sprint will be dedicated to completing the following workload managem
 
 In addition to workload management, we will also be working on inventory management for the demo, as well as designing various demo scenarios, including a baseline demo with kubectl, demos with ArgoCD, FluxCD, and the European Space Agency (ESA). To support the engineers and demonstrations we will also need to automate the process of creating infrastructure, deploying demo pieces and instrumentation, bootstrapping, running scenarios, and collecting data.
 
-If you are interested in joining us for this exciting coding sprint, please slack me @Andy Anderson so I can connect you with others in your area of interest.  There is a place for every skillset to contribute. Not quite sure?  You can join our bi-weekly community meetings to watch our progress."
+If you are interested in joining us for this exciting coding sprint, please slack me [@Andy Anderson](https://kubernetes.slack.com/team/U0462LN24QJ) so I can connect you with others in your area of interest.  There is a place for every skillset to contribute. Not quite sure?  You can join our bi-weekly community meetings to watch our progress."
