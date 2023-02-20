@@ -140,12 +140,12 @@ func Run(ctx context.Context, options *placementoptions.Options) error {
 		logger.Error(err, "failed to create config for view of edge exports")
 		return err
 	}
-	edgeClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for view of edge exports")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClusterClientset, resyncPeriod)
+	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
 	// create the edge-scheduler
 	controllerConfig := rest.CopyConfig(cfg)
@@ -154,8 +154,14 @@ func Run(ctx context.Context, options *placementoptions.Options) error {
 		logger.Error(err, "failed to create kcp clientset for controller")
 		return err
 	}
+	edgeClusterClientset, err := edgeclientset.NewForConfig(controllerConfig)
+	if err != nil {
+		logger.Error(err, "failed to create edge clientset for controller")
+		return err
+	}
 	c, err := edgeplacement.NewController(
 		kcpClusterClientset,
+		edgeClusterClientset,
 		kubeSharedInformerFactory.Core().V1().Namespaces(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Placements(),

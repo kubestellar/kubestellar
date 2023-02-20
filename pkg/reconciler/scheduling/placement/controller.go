@@ -24,6 +24,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -40,7 +41,10 @@ import (
 	schedulingv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
+	"github.com/kcp-dev/logicalcluster/v3"
 
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/indexers"
@@ -55,6 +59,7 @@ const (
 // a placement annotation..
 func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
+	edgeClusterClient edgeclientset.ClusterInterface,
 	namespaceInformer kcpcorev1informers.NamespaceClusterInformer,
 	locationInformer schedulingv1alpha1informers.LocationClusterInformer,
 	placementInformer schedulingv1alpha1informers.PlacementClusterInformer,
@@ -72,7 +77,8 @@ func NewController(
 			}
 			queue.AddAfter(key, duration)
 		},
-		kcpClusterClient: kcpClusterClient,
+		kcpClusterClient:  kcpClusterClient,
+		edgeClusterClient: edgeClusterClient,
 
 		namespaceLister: namespaceInformer.Lister(),
 
@@ -157,7 +163,8 @@ type controller struct {
 	queue        workqueue.RateLimitingInterface
 	enqueueAfter func(*corev1.Namespace, time.Duration)
 
-	kcpClusterClient kcpclientset.ClusterInterface
+	kcpClusterClient  kcpclientset.ClusterInterface
+	edgeClusterClient edgeclientset.ClusterInterface
 
 	namespaceLister corev1listers.NamespaceClusterLister
 
@@ -316,6 +323,37 @@ func (c *controller) process(ctx context.Context, key string) error {
 	ctx = klog.NewContext(ctx, logger)
 
 	reconcileErr := c.reconcile(ctx, obj)
+
+	ws := logicalcluster.From(obj)
+
+	sps := &edgev1alpha1.SinglePlacementSlice{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "hardcoded",
+		},
+		Destinations: []edgev1alpha1.SinglePlacement{},
+	}
+	_, err = c.edgeClusterClient.Cluster(ws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+	if err != nil {
+		logger.Error(err, "failed creating singlePlacementSlice")
+	} else {
+		logger.Info("created SinglePlacementSlice", "name", sps.Name, "workspace", ws.String())
+	}
+
+	ep := &edgev1alpha1.EdgePlacement{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "hardcoded",
+		},
+		Spec: edgev1alpha1.EdgePlacementSpec{
+			LocationSelectors: []metav1.LabelSelector{},
+			NamespaceSelector: metav1.LabelSelector{},
+		},
+	}
+	_, err = c.edgeClusterClient.Cluster(ws.Path()).EdgeV1alpha1().EdgePlacements().Create(ctx, ep, metav1.CreateOptions{})
+	if err != nil {
+		logger.Error(err, "failed creating EdgePlacement")
+	} else {
+		logger.Info("created EdgePlacement", "name", sps.Name, "workspace", ws.String())
+	}
 
 	// TODO: If the object being reconciled changed as a result, update it.
 	return reconcileErr
