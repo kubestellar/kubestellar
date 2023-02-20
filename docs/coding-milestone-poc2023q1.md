@@ -1,4 +1,3 @@
-# Coding Milestone PoC2023q1
 
 Dear Contributors
 
