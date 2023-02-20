@@ -7,6 +7,7 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 include:
+  - coding-milestone-poc2023q1.md
   - CONTRIBUTING.md
   - README.md
   - LICENSE.md
