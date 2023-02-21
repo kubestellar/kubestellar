@@ -5,13 +5,13 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: singleplacementslice.edge.kcp.io
+  name: singleplacementslices.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
     kind: SinglePlacementSlice
     listKind: SinglePlacementSliceList
-    plural: singleplacementslice
+    plural: singleplacementslices
     singular: singleplacementslice
   scope: Cluster
   versions:
