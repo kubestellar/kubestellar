@@ -9,9 +9,6 @@ plugins:
   - jekyll-relative-links
   - jekyll-feed
   - jekyll-seo-tag
-header_pages:
-  - quickstart.md
-  - CONTRIBUTING.md
 relative_links:
   enabled: true
   collections: true
