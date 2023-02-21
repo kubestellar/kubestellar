@@ -10,10 +10,9 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 header_pages:
-  - README.md
   - quickstart.md
   - CONTRIBUTING.md
-  - docs/coding-milestone-poc2023q1.md
+  - coding-milestone-poc2023q1.md
 relative_links:
   enabled: true
   collections: true
