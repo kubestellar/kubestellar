@@ -5,7 +5,7 @@ author:
 navbar-text-col: "#FFFFFF"
 avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
 theme: just-the-docs
-url: https://kcp-edge.github.io
+url: https://docs.kcp-edge.io
 plugins:
   - jekyll-relative-links
   - jekyll-feed
