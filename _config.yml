@@ -1,4 +1,7 @@
 title: KCP-Edge Documentation
+author:
+  name: Andy Anderson
+  email: "andy@clubanderson.com"
 navbar-text-col: "#FFFFFF"
 avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
 theme: minima
