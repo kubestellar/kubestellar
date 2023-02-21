@@ -9,16 +9,11 @@ plugins:
   - jekyll-relative-links
   - jekyll-feed
   - jekyll-seo-tag
-include:
-  - docs/coding-milestone-poc2023q1.md
-  - CONTRIBUTING.md
+header_pages:
   - README.md
-  - LICENSE.md
-  - COPYING.md
-  - CODE_OF_CONDUCT.md
+  - quickstart.md
   - CONTRIBUTING.md
-  - ISSUE_TEMPLATE.md
-  - PULL_REQUEST_TEMPLATE.md
+  - docs/coding-milestone-poc2023q1.md
 relative_links:
   enabled: true
   collections: true
