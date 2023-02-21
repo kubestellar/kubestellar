@@ -7,6 +7,7 @@ avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
 remote_theme: daattali/beautiful-jekyll
 url: https://docs.kcp-edge.io
 plugins:
+  - jekyll-default-layout
   - jekyll-relative-links
   - jekyll-feed
   - jekyll-seo-tag
