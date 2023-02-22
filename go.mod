@@ -3,16 +3,15 @@ module github.com/kcp-dev/edge-mc
 go 1.19
 
 require (
-	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0
 	github.com/kcp-dev/client-go v0.0.0-20221215092857-c1e5154a9825
 	github.com/kcp-dev/kcp v0.10.1-0.20230119143945-4506fdc06406
 	github.com/kcp-dev/kcp/pkg/apis v0.10.1-0.20230119143945-4506fdc06406
 	github.com/kcp-dev/logicalcluster/v3 v3.0.2
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
-	k8s.io/api v0.25.0
-	k8s.io/apimachinery v0.25.0
-	k8s.io/client-go v0.25.0
+	k8s.io/api v0.24.3
+	k8s.io/apimachinery v0.24.3
+	k8s.io/client-go v0.24.4
 	k8s.io/code-generator v0.24.3
 	k8s.io/component-base v0.24.3
 	k8s.io/klog/v2 v2.70.1
@@ -31,6 +30,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
