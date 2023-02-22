@@ -1,5 +1,10 @@
 # 2023q1 PoC
 
+## Status of this memo
+
+This summarizes the current state of design work that is still in
+progress.
+
 ## Introduction
 
 This is a quick demo of a fragment of what we think is needed for edge
@@ -30,8 +35,8 @@ Some important things that are not attempted in this PoC include the following.
 - An implementation that supports a large number of edge clusters or
   any other thing that requires sharding for scale.
 - More than one SyncTarget per Location.
-- Return or summarization of status from associated objects (e.g.,
-  ReplicaSet or Pod objects associated with a given Deployment
+- Return or summarization of reported state from associated objects
+  (e.g., ReplicaSet or Pod objects associated with a given Deployment
   object).
 - A hierarchy with more than two levels.
 - User control over ordering of propagation from center to edge,
@@ -350,13 +355,25 @@ everything that uses them.  Note also that everything that has to be
 denatured in the workload management workspace also has to be
 denatured in the mailbox workspace.
 
+The job of the placement translator can be broken down into the
+following four parts.
+
+- Resolve each EdgePlacement's "what" part to a list of particular
+  workspace items (namespaces and non-namespaced objects).
+- Maintain the association between the resolved "where" from the edge
+  scheduler and the resolved what.
+- Maintain the copies, with customization, of the workload objects
+  from source workspace to mailbox workspaces.
+- Maintain the TMC Placement objects that derive from the
+  EdgePlacement objects.
+
 ## Syncers
 
 This design nominally uses TMC and its syncers, but that can not be
 exactly true because these syncers need to translate between denatured
 objects in the mailbox workspace and natured objects in the edge
 cluster.  Or perhaps not, if there is an additional controller in the
-edge cluster that handles the denatured-natured relationship.
+edge cluster that handles the denatured-natured relation.
 
 ## Status Summarizer
 
