@@ -44,7 +44,7 @@ The pull request template has been designed to assist you in communicating this 
 
 Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.
 
-Approvers will review your PR within 24-hours or less. Two approvers must review and approve a PR before a merge can take place. The first approver will mark the PR with "/lgtm" and the second approver will mark the PR as "/approve." Automation will then squash the commits in your PR and add it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available.
+Approvers will review your PR within a business day. A PR requires both an /lgtm and then an /approve in order to get merged. You may /approve your own PR but you may not /lgtm it. Automation will add the PR it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available.
 
 Congratulations! Your pull request has been successfully merged! 👏
 
