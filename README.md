@@ -32,10 +32,6 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 
 Checkout our [Quickstart Guide](quickstart.md)
 
-## Next Steps
-
-TBD :building_construction:
-
 ## Contributing
 
 We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md) guide.
