@@ -3,11 +3,11 @@ author: Andy Anderson
 email: andy@clubanderson.com
 navbar-text-col: "#FFFFFF"
 avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
-remote_theme: jekyll/minima
+remote_theme: pages-themes/leap-day@v0.2.0
 plugins:
+  - jekyll-remote-theme
   - jekyll-feed
   - jekyll-seo-tag
-  - jekyll-remote-theme
 relative_links:
   enabled: true
   collections: true
