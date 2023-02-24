@@ -1,9 +1,8 @@
 title: KCP-Edge Documentation
-author: Andy Anderson
-email: andy@clubanderson.com
+author: KCP-Edge
 navbar-text-col: "#FFFFFF"
 avatar: "./contrib/logo/kcp-edge-square_ico32.ico"
-remote_theme: just-the-docs/just-the-docs
+theme: minima
 plugins:
   - jekyll-remote-theme
   - jekyll-feed
