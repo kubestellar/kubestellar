@@ -288,9 +288,9 @@ An edge cluster has some built-in resources (i.e, kinds of objects)
 and namespaces.  A resource may be built-in by any of several ways: it
 can be built-in to the apiserver, it can be defined by a CRD, its API
 group can be delegated by an APIService to a custom external server
-(both of the latter two are sometimes called "aggregation").  Note
-also that a resourece may be defined in edge clusters one way (e.g.,
-by being built into kube-apiserver) and in the workload management
+(each of the latter two is sometimes called "aggregation").  Note also
+that a resourece may be defined in edge clusters one way (e.g., by
+being built into kube-apiserver) and in the workload management
 workspace another way (e.g., by a CustomResourceDefinition).
 
 In this PoC, all edge clusters are considered to have the same
@@ -333,20 +333,63 @@ not conflict in those adverbs.
 
 However, another sort of conflict remains possible.  This is because
 the user controls the IDs --- that is, the names --- of the parts of
-the workload.  Two different workload descriptions can use the same
-names (i.e., if they appear in different workspaces) for the same kind
-of object.  When multiple workload objects with the same APIGroup,
-Kind, namespace (if namespaced), and name are directed to the same
-edge cluster, they are merged with conflicts handled by (a) a rule for
-resolution and (b) creation of a Kubernetes Event that reports the
-conflict and its resolution.
+the workload.  In full, a Kubernetes API object is identified by API
+group, API major version, Kind (equivalently, resource name),
+namespace if relevant, and name.  For simplicity in this PoC we will
+not worry about differences in API major version; each API group in
+Kubernetes and/or kcp currently has only one major version.
+
+Two different workload descriptions can have objects with the same ID
+(i.e., if they appear in different workspaces).  These objects, when
+rendered to the same API version, might have different values.  And
+the objects may be available in different API versions in different
+source workspaces.  See
+[client-go](https://github.com/kubernetes/client-go/blob/release-1.24/discovery/discovery_client.go#L89)
+for what an API server says about which versions it can serve for a
+given API group, and
+[meta/v1](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1045)
+for the supporting details on an APIGroup struct.
+
+When multiple workload objects with the same APIGroup, Kind, namespace
+(if namespaced), and name are directed to the same edge cluster, they
+are merged with conflicts handled by (a) a rule for resolution and (b)
+reporting via both error logging and Kubernetes Event creation.  These
+conflicts are serious matters: they mean user expectations are not
+being met (because they are inconsistent); this is why the placement
+translator tries hard to make the user aware.
+
+The first part of merging a set of objects is to read them all at the
+same API version.  The placement translator solves the problem of
+picking API version at the level of API groups rather than
+object-by-object.  The API version for an given API group is chosen as
+follows.  First, take the intersection of [the supported
+versions](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1050)
+from the various sources.  If this intersection is empty then this is
+a conflict.  It is resolved by throwing out the APIGroup with the
+lowest version and repeating with the reduced set of APIGroup structs.
+Next, take the union of [the preferred
+versions](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1054).
+If this union has a non-empty intersection with the intersection of
+the supported versions, take the following steps with this
+intersection; otherwise proceed with just the intersection of the
+supported versions.  When first (since process startup) presented with
+an instance of this problem, the placement translator picks the
+highest version from this intersection.  Subsequently for the same API
+group, the placement translator sticks with its previous decision as
+long as that is still in the intersection.  If the previous choice is
+no longer avaiable, the highest version is picked.  This preference
+for highest version is based on the expectation that rolling forward
+will be more common than rolling back; using the intersection ensures
+that both work (as long as the collection of sources has an overlap in
+supported versions, which is basic sanity).
 
 A workload prescription object that is in the process of graceful
 deletion (i.e., with `DeletionTimestamp` set to something) is
 considered here to already be gone.
 
-Merging of multiple objects is done as follows.  Different parts of
-the object are handled differently.
+Once they have been read at a consistent API version, merging of
+multiple objects is done as follows.  Different parts of the object
+are handled differently.
 
 - **TypeMeta**.  This can not conflict because it is part of what
   identifies an object.
@@ -393,12 +436,14 @@ will remain possible (although, hopefully, unlikely).
 
 There is special handling for Namespace objects.  When a workload
 includes namespaced objects, the propagation has to include ensuring
-that the corresponding Namespace object exists in the destination.
-The "what" predicate MAY fail to match a relevant Namespace object.
-This is taken to mean that the user is not requesting propagation of
-the details (Spec, labels, etc.) of that Namespace object but only
-expects propagation to implicitly create needed Namespace objects in
-the destination with default values.
+that the corresponding Namespace object exists in the destination.  An
+EdgePlacement's "what" predicate MAY fail to match a relevant
+Namespace object.  This is taken to mean that this EdgePlacement is
+not requesting propagation of the details (Spec, labels, etc.) of that
+Namespace object but only expects propagation to somehow ensure that
+the namespace exists.  When merging overlapping workloads that have
+namespaces in common, only the Namespace objects that come from
+matching a "what" predicate need to be merged.
 
 ## Mailbox workspaces
 
