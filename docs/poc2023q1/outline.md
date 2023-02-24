@@ -282,11 +282,123 @@ this category.
 | v1 | Secret | true |
 | v1 | Service | true |
 
+### Built-in resources and objects
+
+An edge cluster has some built-in resources (i.e, kinds of objects)
+and namespaces.  A resource may be built-in by any of several ways: it
+can be built-in to the apiserver, it can be defined by a CRD, its API
+group can be delegated by an APIService to a custom external server
+(both of the latter two are sometimes called "aggregation").  Note
+also that a resourece may be defined in edge clusters one way (e.g.,
+by being built into kube-apiserver) and in the workload management
+workspace another way (e.g., by a CustomResourceDefinition).
+
+In this PoC, all edge clusters are considered to have the same
+built-in resources and namespaces.
+
+At deployment time the workload management platform is configured with
+lists of resources and namespaces built into the edge clusters.
+
+Propagation from center to edge does not attempt to manage the
+resource and namespace definitions that are built into the edge
+clusters.
+
+The mailbox workspaces will have built-in resources and namespaces
+that are a subset of those built into the edge clusters.  The
+propagation from workload management workspace to mailbox workspace
+does not attempt to manage the resource and namespace definitions that
+are built into the mailbox workspaces.
+
 ### Control objects
 
 These are the EdgePlacement objects, their associated
 SinglePlacementSlice objects, and the objects that direct
 customization and summarization.
+
+#### EdgePlacement objects
+
+One of these is a binding between a "what" predicate and a "where"
+predicate.
+
+Overlaps between EdgePlacement objects are explicitly allowed.  Two
+EdgePlacement objects may have "where" predicates that both match some
+of the same destinations.  Two EdgePlacement objects may have "what"
+predicates that match some of the same workload descriptions.  Two
+EdgePlacement objects may overlap in both ways.
+
+An EdgePlacement object deliberately _only_ binds "what" and "where",
+without any adverbs (such as prescriptions of customization or
+summarization).  This means that overlapping EdgePlacement objects can
+not conflict in those adverbs.
+
+However, another sort of conflict remains possible.  This is because
+the user controls the IDs --- that is, the names --- of the parts of
+the workload.  Two different workload descriptions can use the same
+names (i.e., if they appear in different workspaces) for the same kind
+of object.  When multiple workload objects with the same APIGroup,
+Kind, namespace (if namespaced), and name are directed to the same
+edge cluster, they are merged with conflicts handled by (a) a rule for
+resolution and (b) creation of a Kubernetes Event that reports the
+conflict and its resolution.
+
+A workload prescription object that is in the process of graceful
+deletion (i.e., with `DeletionTimestamp` set to something) is
+considered here to already be gone.
+
+Merging of multiple objects is done as follows.  Different parts of
+the object are handled differently.
+
+- **TypeMeta**.  This can not conflict because it is part of what
+  identifies an object.
+- **ObjectMeta**.
+  - **Labels and Annotations**.  These are handled on a key-by-key
+    basis.  Distinct keys do not conflict.  When multiple objects have
+    a label or annotation with the same key, the corresponding value
+    in the result is the value from the most recently updated of those
+    objects.
+  - **OwnerReferences**.  This is handled analogously to labels and
+    annotations.  The key is the combination of APIVersion, Kind, and
+    Name.
+  - **Finalizers**.  This is simply a set of strings.  The result of
+    merging is the union of the sets.
+  - **ManagedFields**.  This is metadata that is not propagated.
+- **Spec**.  Beyond TypeMeta and ObjectMeta, the remaining object
+  fields are specific to the kind of object.  Many have a field named
+  "Spec" in the Go language source, "spec" in the JSON representation.
+  For objects that have Spec fields, merging has a conflict if those
+  field values are not all equal when considered as JSON data, and the
+  resolution is to take the value from the most recently updated
+  object.
+- **Status**.  Status is handled analogously to Spec.  For both, we
+  consider a missing field to be the same as a field with a value of
+  `nil`.  That is expected to be the common case for the Status of
+  these workload prescription objects.
+- **Other fields**.  If all the values are maps (objects in
+  JavaScript) then they are merged key-by-key, as for labels and
+  annotations.  Otherwise they are treated as monoliths, as for Spec
+  and Status.
+
+For the above, the most recently updated object is determined by
+parsing the ResourceVersion as an `int64` and picking the highest
+value.  This is meaningful under the assumption that all the source
+workspaces are from the same kcp server --- which will be true for
+this PoC but is not a resaonble assumption in general.  Also:
+interpreting ResourceVersion breaks a rule for Kubernetes clients ---
+but this is dismayingly common.  Beyond this PoC we could hope to do
+better by looking at the ManagedFields.  But currently kcp does not
+include https://github.com/kubernetes/kubernetes/pull/110058 so the
+ManagedFields often do not properly reflect the update times.  Even
+so, those timestamps have only 1-second precision --- so conflicts
+will remain possible (although, hopefully, unlikely).
+
+There is special handling for Namespace objects.  When a workload
+includes namespaced objects, the propagation has to include ensuring
+that the corresponding Namespace object exists in the destination.
+The "what" predicate MAY fail to match a relevant Namespace object.
+This is taken to mean that the user is not requesting propagation of
+the details (Spec, labels, etc.) of that Namespace object but only
+expects propagation to implicitly create needed Namespace objects in
+the destination with default values.
 
 ## Mailbox workspaces
 
