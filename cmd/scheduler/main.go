@@ -22,11 +22,11 @@ import (
 	"k8s.io/component-base/cli"
 	_ "k8s.io/component-base/logs/json/register"
 
-	"github.com/kcp-dev/edge-mc/cmd/placement/cmd"
+	"github.com/kcp-dev/edge-mc/cmd/scheduler/cmd"
 )
 
 func main() {
-	placementCommand := cmd.NewPlacementCommand()
+	placementCommand := cmd.NewSchedulerCommand()
 	code := cli.Run(placementCommand)
 	os.Exit(code)
 }
