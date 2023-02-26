@@ -88,7 +88,7 @@ func (tu *testUIDer) TweakNAndWait(rng *rand.Rand, n int) func() {
 	}
 }
 
-func (tu *testUIDer) GetUID(en edgeapi.ExternalName) apimachtypes.UID {
+func (tu *testUIDer) Get(en edgeapi.ExternalName) apimachtypes.UID {
 	tu.Lock()
 	defer tu.Unlock()
 	if uid, ok := tu.lookupLocked(en); ok {
@@ -122,7 +122,7 @@ func (tu *testUIDer) lookupLocked(en edgeapi.ExternalName) (apimachtypes.UID, bo
 	return "", false
 }
 
-func (tu *testUIDer) SetUID(en edgeapi.ExternalName, uid apimachtypes.UID) {
+func (tu *testUIDer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
 	tu.Lock()
 	defer tu.Unlock()
 	found := false

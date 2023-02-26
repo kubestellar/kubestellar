@@ -60,7 +60,7 @@ func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
 	spsr.enhanced = NewSinglePlacementSet()
 	enumerateSinglePlacementSlices(newSlices, func(apiSP edgeapi.SinglePlacement) {
 		syncTargetID := edgeapi.ExternalName{Workspace: apiSP.Location.Workspace, Name: apiSP.SyncTargetName}
-		syncTargetUID := spsr.uider.GetUID(syncTargetID)
+		syncTargetUID := spsr.uider.Get(syncTargetID)
 		syncTargetDetails := SinglePlacementDetails{
 			LocationName:  apiSP.Location.Name,
 			SyncTargetUID: syncTargetUID,

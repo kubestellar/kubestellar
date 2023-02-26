@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -120,7 +120,7 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	locRef1 := edgeapi.ExternalName{Workspace: "ws-a", Name: "loc-a"}
 	asp1 := edgeapi.SinglePlacement{Location: locRef1, SyncTargetName: "st-a"}
 	sp1 := SinglePlacement{asp1, "u-a"}
-	testUIDer.SetUID(sp1.SyncTargetRef(), sp1.SyncTargetUID)
+	testUIDer.Set(sp1.SyncTargetRef(), sp1.SyncTargetUID)
 	rw1 := ResolvedWhere{&edgeapi.SinglePlacementSlice{
 		Destinations: []edgeapi.SinglePlacement{asp1},
 	}}
@@ -132,7 +132,7 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 		t.Errorf("Wrong details after first Set: actual=%#v, expected=%#v", actual, expected)
 	}
 	sp1a := SinglePlacement{asp1, "u-aa"}
-	testUIDer.SetUID(sp1.SyncTargetRef(), sp1a.SyncTargetUID)
+	testUIDer.Set(sp1.SyncTargetRef(), sp1a.SyncTargetUID)
 	wg.Wait()
 	if actual, expected := len(testConsumer), 1; actual != expected {
 		t.Errorf("Wrong size after first tweak: actual=%d, expected=%d", actual, expected)
