@@ -1,3 +1,23 @@
+# Table of Contents
+
+- [KCP-Edge Quickstart](#kcp-edge-quickstart)
+  * [Install and Configure KCP](#1-install-and-configure-kcp)
+    + [Prerequisites](#prerequisites)
+    + [Download kcp](#download-kcp)
+    + [Start kcp](#start-kcp)
+    + [Set your KUBECONFIG](#set-your-kubeconfig)
+    + [Configure kcp to sync to your cluster](#configure-kcp-to-sync-to-your-cluster)
+    + [Bind to workload APIs and create default placement](#bind-to-workload-apis-and-create-default-placement)
+    + [Create a deployment in kcp](#create-a-deployment-in-kcp)
+  * [Build and Install KCP-Edge](#2-build-and-install-kcp-edge)
+  * [Next steps](#next-steps)
+    + [KCP](#kcp)
+    + [KCP-Edge](#kcp-edge)
+  * [Contributing](#contributing)
+  * [Getting in touch](#getting-in-touch)
+  * [Additional references](#additional-references)
+
+
 # KCP-Edge Quickstart
 
 This document provides instructions on how to build and run kcp-edge locally.
@@ -191,7 +211,7 @@ documentation:
 - [Virtual workspaces](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/virtual-workspaces.md) - details on kcp's mechanism for virtual views of workspace content
 
 ### KCP-Edge
-TBD
+- [Edge scheduler](https://github.com/kcp-dev/edge-mc/blob/main/docs/poc2023q1/edge-scheduler.md) - demo of edge scheduler functionality
 
 ## Contributing
 
