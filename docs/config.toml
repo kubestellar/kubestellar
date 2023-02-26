@@ -1,5 +1,5 @@
-baseURL = "https://docs.kcp-edge.io"
-publishDir = "site"
+baseURL = "https://docs.kcp-edge.io/public"
+publishDir = "public"
 title = "KCP-Edge"
 
 # Language settings
