@@ -1,4 +1,4 @@
-baseURL = "https://docs.kcp-edge.io/public"
+baseURL = "https://docs.kcp-edge.io"
 publishDir = "public"
 title = "KCP-Edge"
 
