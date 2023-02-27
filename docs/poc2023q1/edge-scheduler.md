@@ -35,7 +35,7 @@ kubectl apply -f config/samples/edgeplacement_test-1.yaml
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
-go run cmd/placement/main.go --kcp-kubeconfig=<path to kcp admin kubeconfig> -v <verbosity (default 2)>
+go run cmd/scheduler/main.go --kcp-kubeconfig=<path to kcp admin kubeconfig> -v <verbosity (default 2)>
 ```
 
 The outputs from the edge scheduler should be similar to:
