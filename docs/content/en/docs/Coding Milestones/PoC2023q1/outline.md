@@ -11,6 +11,8 @@ Status of this memo: This summarizes the current state of design work that is st
 progress.
 {{% /pageinfo %}}
 
+<img alt="poc2023q1 architecture" width="500px" align="left" src="/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1.svg" />
+
 ## Introduction
 
 This is a quick demo of a fragment of what we think is needed for edge
