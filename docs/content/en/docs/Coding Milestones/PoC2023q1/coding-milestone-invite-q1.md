@@ -6,7 +6,7 @@ linkTitle: "Invitation"
 weight: 2
 ---
 
-Dear Contributors
+Dear Contributors,
 
 We are excited to invite you to join the first [KCP-Edge opensource community](https://github.com/kcp-dev/edge-mc) coding sprint. We will be focus on several key projects that are critical to the development of state-based edge solutions. Our collective work will be showcased to the opensource community on Thursday, March 30th.
 
