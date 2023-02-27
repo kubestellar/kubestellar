@@ -1,0 +1,66 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: customizers.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: Customizer
+    listKind: CustomizerList
+    plural: customizers
+    singular: customizer
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: "Customizer defines modifications to make to the relevant objects
+          as they propagate from center to edge. \n The relevant objects are those
+          with an annotation whose key is \"edge.kcp.io/customizer\" and whose value
+          refers to this object as explained above. \n If this object is marked as
+          being subject to parameter expansion then the parameter-expanded version
+          of this object is what gets applied to a relevant object as it propagates
+          to a destination."
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          replacements:
+            description: '`replacements` defines modifications to do to an object.'
+            items:
+              description: Replacement represents one modification to an object. Such
+                a replacement is conceptually done on the JSON representation of that
+                object.
+              properties:
+                path:
+                  description: '`path` is a JSON Path identifying the part of the
+                    object to replace/inject.'
+                  type: string
+                value:
+                  description: '`value` supplies the new value to put where the path
+                    points, in JSON.'
+                  type: string
+              required:
+              - path
+              - value
+              type: object
+            type: array
+            x-kubernetes-list-map-keys:
+            - path
+            x-kubernetes-list-type: map
+        type: object
+    served: true
+    storage: true
