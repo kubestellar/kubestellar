@@ -30,7 +30,7 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 
 ## Quickstart
 
-Checkout our [Quickstart Guide](quickstart.md)
+Checkout our [Quickstart Guide](https://docs.kcp-edge.io/docs/getting-started/quickstart/)
 
 ## Contributing
 
