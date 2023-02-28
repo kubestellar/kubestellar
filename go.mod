@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0
-	github.com/kcp-dev/client-go v0.0.0-20221215092857-c1e5154a9825
-	github.com/kcp-dev/kcp v0.10.1-0.20230119143945-4506fdc06406
-	github.com/kcp-dev/kcp/pkg/apis v0.10.1-0.20230119143945-4506fdc06406
+	github.com/kcp-dev/client-go v0.0.0-20230126185145-aeff170a288b
+	github.com/kcp-dev/kcp v0.11.0
+	github.com/kcp-dev/kcp/pkg/apis v0.11.0
 	github.com/kcp-dev/logicalcluster/v3 v3.0.2
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	k8s.io/api v0.24.3
@@ -15,7 +15,6 @@ require (
 	k8s.io/code-generator v0.24.3
 	k8s.io/component-base v0.24.3
 	k8s.io/klog/v2 v2.70.1
-	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42
 	k8s.io/kubernetes v1.24.3
 )
 
@@ -39,6 +38,7 @@ require (
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
+	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42 // indirect
 )
 
 require (
