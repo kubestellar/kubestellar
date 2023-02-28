@@ -37,3 +37,8 @@ type DynamicMapConsumer[Key comparable, Val any] interface {
 type Client[T any] interface {
 	SetProvider(T)
 }
+
+type DynamicValueProducer[Val any] interface {
+	AddConsumer(func(Val))
+	Get() Val
+}
