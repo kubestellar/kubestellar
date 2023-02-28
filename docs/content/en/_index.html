@@ -4,27 +4,38 @@ linkTitle = "KCP-Edge Documentation"
 
 +++
 
-{{< blocks/cover title="KCP-Edge" image_anchor="top" height="full" color="orange" >}}
+{{< blocks/cover image_anchor="top" height="50%" color="black" >}}
 <div class="mx-auto">
+	<p class="lead mt-2" style="color:black;font-size: 40px;font-weight: 700;text-shadow: 1px 1px 2px white;">KCP-Edge</p>
+</br>
+
 	<a class="btn btn-lg btn-primary mr-3 mb-4" href="{{< relref "/docs" >}}">
 		Learn More <i class="fas fa-arrow-alt-circle-right ml-2"></i>
 	</a>
 	<a class="btn btn-lg btn-secondary mr-3 mb-4" href="https://github.com/kcp-dev/edge-mc">
 		Download <i class="fab fa-github ml-2 "></i>
 	</a>
-<p class="lead mt-5">Consistent, Heterogeneous, and Scalable Edge Configuration Management</p>
-	{{< blocks/link-down color="info" >}}
+</br>
+</br>
+<p class="lead mt-2" style="color:black;font-weight: 700;text-shadow: 1px 1px 2px white;">Consistent, Heterogeneous, and Scalable Edge Configuration Management</p>
+</br>
+{{< blocks/link-down color="info" >}}
 </div>
 {{< /blocks/cover >}}
 
 
 {{% blocks/lead color="primary" %}}
-KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
+<div class="mx-auto">
+	<p align="left" class="lead mt-2" style="color:white;font-size: 22px;font-weight: 400;">KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:</p>
+	<ul>
+		<li align="left">Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues</li>
+		<li align="left">Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations</li>
+		<li align="left">Non-namespaced objects: need general support</li>
+		<li align="left">Cardinality of destinations: A source object may propagate to many thousands of destinations</li>
+	</ul>
+</div>
 
-- Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
-- Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
-- Non-namespaced objects: need general support
-- Cardinality of destinations: A source object may propagate to many thousands of destinations. ​
+
 {{% /blocks/lead %}}
 
 {{< blocks/section color="dark" >}}
@@ -44,5 +55,3 @@ For blogs from our communuty.
 
 
 {{< /blocks/section >}}
-
-	
