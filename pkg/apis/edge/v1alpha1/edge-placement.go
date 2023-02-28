@@ -41,7 +41,7 @@ import (
 // +crd
 // +genclient
 // +genclient:nonNamespaced
-// +kubebuilder:resource:scope=Cluster
+// +kubebuilder:resource:scope=Cluster,shortName=epl
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type EdgePlacement struct {
 	metav1.TypeMeta `json:",inline"`
