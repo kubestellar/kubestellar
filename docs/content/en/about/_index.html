@@ -8,19 +8,17 @@ menu:
 ---
 {{< blocks/cover title="" image_anchor="bottom" height="min" >}}
 <div class="mx-auto">
+  </br>
 	<p class="lead mt-2" style="color:black;font-size: 50px;font-weight: 700;text-shadow: 1px 1px 2px white;">About KCP-Edge</p>
 </br>
   <p class="lead mt-2" style="color:black;font-weight: 700;text-shadow: 1px 1px 2px white;">Consistent, Heterogeneous, and Scalable Edge Configuration Management</p>
 </div>
 </p>
-
 {{< /blocks/cover >}}
-
-
-
-{{< blocks/section >}}
+{{< blocks/section color="gray">}}
 <div class="col-12">
 <h2 class="text-center">KCP-Edge focuses on edge multicluster use cases challenged by:</h2>
+</br>
 {{% blocks/section %}}
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations
@@ -28,22 +26,20 @@ menu:
 - Cardinality of destinations: A source object may propagate to many thousands of destinations.
 {{% /blocks/section %}}
 </div>
-{{< /blocks/section >}}
-
-{{< blocks/section >}}
 <div class="col-12">
-<h2 class="text-center">Goals</h2>
+</br>
+</br><h2 class="text-center">Goals</h2>
+</br>
 {{% blocks/section %}}
 - collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, and etc.)
 - Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
 - Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
 {{% /blocks/section %}}
-</div>
-{{< /blocks/section >}}
-
-{{< blocks/section >}}
 <div class="col-12">
+</br>
+</br>
 <h2 class="text-center">Areas of Exploration</h1>
+</br>
 {{% blocks/section %}}
 - Desired placement expression: Need a way for one center object to express large number of desired copies
 - Scheduling/syncing interface: Need something that scales to large number of destinations
@@ -53,4 +49,5 @@ menu:
 - Status summarization: Client needs a way to say how statuses from edge copies are processed/reduced along the way from edge to center
 {{% /blocks/section %}}
 </div>
+
 {{< /blocks/section >}}
