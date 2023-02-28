@@ -176,7 +176,7 @@ dependent objects.
 | apiextensions.k8s.io/v1 | CustomResourceDefinition | false |
 | v1 | Namespace | false |
 
-### Needs to be natured in center, not destined for edge
+#### Needs to be natured in center, not destined for edge
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
