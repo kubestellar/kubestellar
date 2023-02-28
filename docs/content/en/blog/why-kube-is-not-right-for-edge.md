@@ -1,6 +1,6 @@
 ---
-title: "Why Kubernetes is not right for the Edge"
-linkTitle: "Why Kubernetes is not right for the Edge"
+title: "Debate whether Kubernetes is right for the Edge"
+linkTitle: "Debate whether Kubernetes is right for the Edge"
 weight: 100
 date: 2023-02-27
 description: >-
