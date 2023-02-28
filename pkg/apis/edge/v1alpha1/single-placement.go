@@ -36,7 +36,7 @@ const SourcePlacementLabelKey string = "edge.kcp.io/source-placement"
 // +crd
 // +genclient
 // +genclient:nonNamespaced
-// +kubebuilder:resource:scope=Cluster,path=singleplacementslices
+// +kubebuilder:resource:scope=Cluster,shortName=sps,path=singleplacementslices
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type SinglePlacementSlice struct {
 	metav1.TypeMeta `json:",inline"`

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package placement
+package edgeplacement
 
 import (
 	"context"
@@ -24,40 +24,37 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	kcpcorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	corev1listers "github.com/kcp-dev/client-go/listers/core/v1"
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	schedulingv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/logging"
 
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/indexers"
 )
 
 const (
-	ControllerName      = "edge-scheduler"
-	byLocationWorkspace = ControllerName + "-byLocationWorkspace"
+	ControllerName = "edge-scheduler"
 )
 
 // NewController returns a new controller placing namespaces onto locations by create
 // a placement annotation..
 func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
-	namespaceInformer kcpcorev1informers.NamespaceClusterInformer,
+	edgeClusterClient edgeclientset.ClusterInterface,
 	locationInformer schedulingv1alpha1informers.LocationClusterInformer,
-	placementInformer schedulingv1alpha1informers.PlacementClusterInformer,
 	edgePlacementInformer edgev1alpha1informers.EdgePlacementClusterInformer,
 ) (*controller, error) {
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
@@ -72,55 +69,18 @@ func NewController(
 			}
 			queue.AddAfter(key, duration)
 		},
-		kcpClusterClient: kcpClusterClient,
-
-		namespaceLister: namespaceInformer.Lister(),
+		kcpClusterClient:  kcpClusterClient,
+		edgeClusterClient: edgeClusterClient,
 
 		locationLister:  locationInformer.Lister(),
 		locationIndexer: locationInformer.Informer().GetIndexer(),
-
-		placementLister:  placementInformer.Lister(),
-		placementIndexer: placementInformer.Informer().GetIndexer(),
 
 		edgePlacementLister:  edgePlacementInformer.Lister(),
 		edgePlacementIndexer: edgePlacementInformer.Informer().GetIndexer(),
 	}
 
-	if err := placementInformer.Informer().AddIndexers(cache.Indexers{
-		byLocationWorkspace: indexByLocationWorkspace,
-	}); err != nil {
-		return nil, err
-	}
-
 	indexers.AddIfNotPresentOrDie(locationInformer.Informer().GetIndexer(), cache.Indexers{
 		indexers.ByLogicalClusterPath: indexers.IndexByLogicalClusterPath,
-	})
-
-	// namespaceBlocklist holds a set of namespaces that should never be synced from kcp to physical clusters.
-	var namespaceBlocklist = sets.NewString("kube-system", "kube-public", "kube-node-lease")
-	namespaceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: func(obj interface{}) bool {
-			switch ns := obj.(type) {
-			case *corev1.Namespace:
-				return !namespaceBlocklist.Has(ns.Name)
-			case cache.DeletedFinalStateUnknown:
-				return true
-			default:
-				return false
-			}
-		},
-		Handler: cache.ResourceEventHandlerFuncs{
-			AddFunc: c.enqueueNamespace,
-			UpdateFunc: func(old, obj interface{}) {
-				oldNs := old.(*corev1.Namespace)
-				newNs := obj.(*corev1.Namespace)
-
-				if !reflect.DeepEqual(oldNs.Annotations, newNs.Annotations) {
-					c.enqueueNamespace(obj)
-				}
-			},
-			DeleteFunc: c.enqueueNamespace,
-		},
 	})
 
 	locationInformer.Informer().AddEventHandler(
@@ -137,12 +97,6 @@ func NewController(
 		},
 	)
 
-	placementInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    c.enqueuePlacement,
-		UpdateFunc: func(_, obj interface{}) { c.enqueuePlacement(obj) },
-		DeleteFunc: c.enqueuePlacement,
-	})
-
 	edgePlacementInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    c.enqueuePlacement,
 		UpdateFunc: func(_, newObj interface{}) { c.enqueuePlacement(newObj) },
@@ -157,15 +111,11 @@ type controller struct {
 	queue        workqueue.RateLimitingInterface
 	enqueueAfter func(*corev1.Namespace, time.Duration)
 
-	kcpClusterClient kcpclientset.ClusterInterface
-
-	namespaceLister corev1listers.NamespaceClusterLister
+	kcpClusterClient  kcpclientset.ClusterInterface
+	edgeClusterClient edgeclientset.ClusterInterface
 
 	locationLister  schedulingv1alpha1listers.LocationClusterLister
 	locationIndexer cache.Indexer
-
-	placementLister  schedulingv1alpha1listers.PlacementClusterLister
-	placementIndexer cache.Indexer
 
 	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
 	edgePlacementIndexer cache.Indexer
@@ -183,68 +133,20 @@ func (c *controller) enqueuePlacement(obj interface{}) {
 	c.queue.Add(key)
 }
 
-// enqueueNamespace enqueues all placements for the namespace.
-func (c *controller) enqueueNamespace(obj interface{}) {
-	logger := logging.WithReconciler(klog.Background(), ControllerName)
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-	clusterName, _, _, err := kcpcache.SplitMetaClusterNamespaceKey(key)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-
-	placements, err := c.placementLister.Cluster(clusterName).List(labels.Everything())
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-
-	for _, placement := range placements {
-		namespaceKey := key
-		key, err := kcpcache.MetaClusterNamespaceKeyFunc(placement)
-		if err != nil {
-			runtime.HandleError(err)
-			continue
-		}
-		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Namespace changed", "namespace", namespaceKey)
-		c.queue.Add(key)
-	}
-}
-
 func (c *controller) enqueueLocation(obj interface{}) {
-	logger := logging.WithReconciler(klog.Background(), ControllerName)
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-	clusterName, _, _, err := kcpcache.SplitMetaClusterNamespaceKey(key)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
+	// logger := logging.WithReconciler(klog.Background(), ControllerName)
+	// key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
+	// if err != nil {
+	// 	runtime.HandleError(err)
+	// 	return
+	// }
+	// clusterName, _, _, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	// if err != nil {
+	// 	runtime.HandleError(err)
+	// 	return
+	// }
 
-	placements, err := c.placementIndexer.ByIndex(byLocationWorkspace, clusterName.String())
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-
-	for _, obj := range placements {
-		placement := obj.(*schedulingv1alpha1.Placement)
-		locationKey := key
-		key, err := kcpcache.MetaClusterNamespaceKeyFunc(placement)
-		if err != nil {
-			runtime.HandleError(err)
-			continue
-		}
-		logging.WithQueueKey(logger, key).V(2).Info("queueing Placement because Location changed", "location", locationKey)
-		c.queue.Add(key)
-	}
+	// TODO: We need to enqueue edgeplacements because of changes from locations.
 }
 
 // Start starts the controller, which stops when ctx.Done() is closed.
@@ -305,7 +207,7 @@ func (c *controller) process(ctx context.Context, key string) error {
 	obj, err := c.edgePlacementLister.Cluster(clusterName).Get(name)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.Info("object deleted before handled")
+			logger.V(3).Info("object deleted before handled")
 			return nil
 		}
 		return err
@@ -316,6 +218,36 @@ func (c *controller) process(ctx context.Context, key string) error {
 	ctx = klog.NewContext(ctx, logger)
 
 	reconcileErr := c.reconcile(ctx, obj)
+
+	// TODO: find a better place for this logic
+	_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(clusterName.Path()).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.V(2).Info("creating SinglePlacementSlice", "workspace", clusterName.String(), "name", name)
+			sps := &edgev1alpha1.SinglePlacementSlice{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: obj.Name,
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: edgev1alpha1.SchemeGroupVersion.String(),
+							Kind:       "EdgePlacement",
+							Name:       obj.Name,
+							UID:        obj.UID,
+						},
+					},
+				},
+				Destinations: []edgev1alpha1.SinglePlacement{},
+			}
+			_, err = c.edgeClusterClient.Cluster(clusterName.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			if err != nil {
+				logger.Error(err, "failed creating singlePlacementSlice", "workspace", clusterName.String(), "name", sps.Name)
+			} else {
+				logger.V(2).Info("created SinglePlacementSlice", "workspace", clusterName.String(), "name", sps.Name)
+			}
+		} else {
+			logger.Error(err, "failed getting SinglePlacementSlice for EdgePlacement", "workspace", clusterName.String(), "name", name)
+		}
+	}
 
 	// TODO: If the object being reconciled changed as a result, update it.
 	return reconcileErr

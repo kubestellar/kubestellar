@@ -3,7 +3,6 @@ title: "Overview"
 linkTitle: "Overview"
 weight: 1
 description: >
-  Here's where your user finds out if your project is for them.
 ---
 
 <!-- {{% pageinfo %}}
@@ -43,7 +42,7 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 
 ## Quickstart
 
-Checkout our [Quickstart Guide](https://github.com/kcp-dev/edge-mc/blob/main/quickstart.md)
+Checkout our [Quickstart Guide](https://docs.kcp-edge.io/docs/getting-started/quickstart/)
 
 ## Contributing
 

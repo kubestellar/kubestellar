@@ -2,13 +2,15 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230126-0a8bf97.edgeplacements.edge.kcp.io
+  name: v230228-7fe2c02.edgeplacements.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
     kind: EdgePlacement
     listKind: EdgePlacementList
     plural: edgeplacements
+    shortNames:
+    - epl
     singular: edgeplacement
   scope: Cluster
   versions:

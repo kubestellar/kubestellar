@@ -40,15 +40,15 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
-	placementoptions "github.com/kcp-dev/edge-mc/cmd/placement/options"
+	scheduleroptions "github.com/kcp-dev/edge-mc/cmd/scheduler/options"
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/placement"
+	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/edgeplacement"
 )
 
-func NewPlacementCommand() *cobra.Command {
-	options := placementoptions.NewOptions()
+func NewSchedulerCommand() *cobra.Command {
+	options := scheduleroptions.NewOptions()
 	placementCommand := &cobra.Command{
 		Use:   "placement",
 		Short: "Reconciles edge placement API objects",
@@ -86,7 +86,7 @@ func NewPlacementCommand() *cobra.Command {
 	return placementCommand
 }
 
-func Run(ctx context.Context, options *placementoptions.Options) error {
+func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	const resyncPeriod = 10 * time.Hour
 
 	logger := klog.FromContext(ctx)
@@ -140,12 +140,12 @@ func Run(ctx context.Context, options *placementoptions.Options) error {
 		logger.Error(err, "failed to create config for view of edge exports")
 		return err
 	}
-	edgeClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for view of edge exports")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClusterClientset, resyncPeriod)
+	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
 	// create the edge-scheduler
 	controllerConfig := rest.CopyConfig(cfg)
@@ -154,11 +154,15 @@ func Run(ctx context.Context, options *placementoptions.Options) error {
 		logger.Error(err, "failed to create kcp clientset for controller")
 		return err
 	}
+	edgeClusterClientset, err := edgeclientset.NewForConfig(controllerConfig)
+	if err != nil {
+		logger.Error(err, "failed to create edge clientset for controller")
+		return err
+	}
 	c, err := edgeplacement.NewController(
 		kcpClusterClientset,
-		kubeSharedInformerFactory.Core().V1().Namespaces(),
+		edgeClusterClientset,
 		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
-		kcpSharedInformerFactory.Scheduling().V1alpha1().Placements(),
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
 	)
 	if err != nil {

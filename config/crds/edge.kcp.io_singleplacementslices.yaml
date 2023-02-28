@@ -12,6 +12,8 @@ spec:
     kind: SinglePlacementSlice
     listKind: SinglePlacementSliceList
     plural: singleplacementslices
+    shortNames:
+    - sps
     singular: singleplacementslice
   scope: Cluster
   versions:
