@@ -12,6 +12,8 @@ spec:
     kind: EdgePlacement
     listKind: EdgePlacementList
     plural: edgeplacements
+    shortNames:
+    - epl
     singular: edgeplacement
   scope: Cluster
   versions:

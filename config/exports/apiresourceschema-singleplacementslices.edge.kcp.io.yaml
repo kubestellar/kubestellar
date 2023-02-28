@@ -2,13 +2,15 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230221-fa5dc39.singleplacementslices.edge.kcp.io
+  name: v230228-0f548e5.singleplacementslices.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
     kind: SinglePlacementSlice
     listKind: SinglePlacementSliceList
     plural: singleplacementslices
+    shortNames:
+    - sps
     singular: singleplacementslice
   scope: Cluster
   versions:
