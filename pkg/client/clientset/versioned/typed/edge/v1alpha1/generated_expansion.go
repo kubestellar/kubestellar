@@ -18,6 +18,8 @@ limitations under the License.
 
 package v1alpha1
 
+type CustomizerExpansion interface{}
+
 type EdgePlacementExpansion interface{}
 
 type SinglePlacementSliceExpansion interface{}

@@ -1,1 +1,1 @@
-/cmd/mailbox-controller/main.go:98:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/cmd/mailbox-controller/main.go:102:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.

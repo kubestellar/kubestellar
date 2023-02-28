@@ -29,6 +29,10 @@ type FakeEdgeV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeEdgeV1alpha1) Customizers(namespace string) v1alpha1.CustomizerInterface {
+	return &FakeCustomizers{c, namespace}
+}
+
 func (c *FakeEdgeV1alpha1) EdgePlacements() v1alpha1.EdgePlacementInterface {
 	return &FakeEdgePlacements{c}
 }
