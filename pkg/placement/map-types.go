@@ -23,16 +23,39 @@ type DynamicMapProducer[Key comparable, Val any] interface {
 	// of the map and following changes.
 	// Note that if this producer is safe for concurrent use then
 	// the consumer can not expect to be able to call Get.
+	// The producer precedes each consumer in the locking order.
 	AddConsumer(func(Key, Val))
 
-	// Get queries the current map state, and does not count
-	// as notifying any consumer.
-	Get(Key) Val
+	// Get invokes the given function on the value corresponding to the key.
+	// This does not count as informing any particular consumer.
+	// The producer precedes the function in the locking order.
+	Get(Key, func(Val))
+}
+
+// DynamicMapProducerGet does a non-CPS Get.
+// In situations with concurrency, regular consumers (as in AddConsumer)
+// get timing splinters if they use this.
+func DynamicMapProducerGet[Key comparable, Val any](prod DynamicMapProducer[Key, Val], key Key) Val {
+	var ans Val
+	prod.Get(key, func(val Val) { ans = val })
+	return ans
+}
+
+type DynamicMapProducerWithDelete[Key comparable, Val any] interface {
+	DynamicMapProducer[Key, Val]
+
+	// MaybeDelete invokes the given function on the value corresponding to the
+	// given key and deletes the indicated entry if the function returns true.
+	MaybeDelete(Key, func(Val) bool)
 }
 
 type DynamicMapConsumer[Key comparable, Val any] interface {
 	Set(Key, Val)
 }
+
+type DynamicMapConsumerFunc[Key comparable, Val any] func(Key, Val)
+
+func (cf DynamicMapConsumerFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 
 type Client[T any] interface {
 	SetProvider(T)
@@ -42,3 +65,5 @@ type DynamicValueProducer[Val any] interface {
 	AddConsumer(func(Val))
 	Get() Val
 }
+
+type Empty struct{}

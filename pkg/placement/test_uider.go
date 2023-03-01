@@ -88,11 +88,12 @@ func (tu *testUIDer) TweakNAndWait(rng *rand.Rand, n int) func() {
 	}
 }
 
-func (tu *testUIDer) Get(en edgeapi.ExternalName) apimachtypes.UID {
+func (tu *testUIDer) Get(en edgeapi.ExternalName, kont func(apimachtypes.UID)) {
 	tu.Lock()
 	defer tu.Unlock()
 	if uid, ok := tu.lookupLocked(en); ok {
-		return uid
+		kont(uid)
+		return
 	}
 	ans := apimachtypes.UID(fmt.Sprintf("u%d", tu.rng.Intn(1000000000)))
 	tu.current = append(tu.current, UIDPair{en, ans})
@@ -110,7 +111,7 @@ func (tu *testUIDer) Get(en edgeapi.ExternalName) apimachtypes.UID {
 			consumer(en, uid)
 		}
 	}()
-	return ans
+	kont(ans)
 }
 
 func (tu *testUIDer) lookupLocked(en edgeapi.ExternalName) (apimachtypes.UID, bool) {

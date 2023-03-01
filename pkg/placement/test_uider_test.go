@@ -37,16 +37,16 @@ func TestTestUIDer(t *testing.T) {
 	uider.AddConsumer(testConsumer.Note)
 	en1 := edgeapi.ExternalName{Workspace: "ws1", Name: "n1"}
 	en2 := edgeapi.ExternalName{Workspace: "ws1", Name: "n2"}
-	uid1 := uider.Get(en1)
-	uid2 := uider.Get(en2)
+	uid1 := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en1)
+	uid2 := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en2)
 	wg.Wait()
 	if len(testConsumer.current) != 2 {
 		t.Errorf("Insufficient mappings: %v", testConsumer.current)
 	}
-	if actual, expected := uider.Get(en1), uid1; actual != expected {
+	if actual, expected := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
-	if actual, expected := uider.Get(en2), uid2; actual != expected {
+	if actual, expected := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en2), uid2; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
 }
