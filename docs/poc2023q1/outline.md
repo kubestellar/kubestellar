@@ -289,12 +289,17 @@ and namespaces.  A resource may be built-in by any of several ways: it
 can be built-in to the apiserver, it can be defined by a CRD, its API
 group can be delegated by an APIService to a custom external server
 (each of the latter two is sometimes called "aggregation").  Note also
-that a resourece may be defined in edge clusters one way (e.g., by
+that a resource may be defined in edge clusters one way (e.g., by
 being built into kube-apiserver) and in the workload management
 workspace another way (e.g., by a CustomResourceDefinition).
 
 In this PoC, all edge clusters are considered to have the same
 built-in resources and namespaces.
+
+As a matter of scoping the work here, it is also assumed that each API
+group built into the edge clusters supports the API versions chosen by
+the conflict resolution rules below when they are applied to the
+workload sources.
 
 At deployment time the workload management platform is configured with
 lists of resources and namespaces built into the edge clusters.
@@ -444,6 +449,12 @@ Namespace object but only expects propagation to somehow ensure that
 the namespace exists.  When merging overlapping workloads that have
 namespaces in common, only the Namespace objects that come from
 matching a "what" predicate need to be merged.
+
+The above also provide an answer to the question of what version is
+used when writing to the mailbox workspace and edge cluster.  The
+version used for that is the version chosen above.  In the case of no
+conflicts, this means that the writes are done using the preferred
+version from the API group from the workload management workspace.
 
 ## Mailbox workspaces
 
