@@ -7,8 +7,7 @@ weight: 2
 ---
 
 {{% pageinfo %}}
-Status of this memo: This summarizes the current state of design work that is still in
-progress.
+Want to get involved - check out our [good-first-issue list](https://github.com/orgs/kcp-dev/projects/12/views/4).
 {{% /pageinfo %}}
 
 <img alt="poc2023q1 architecture" align="center" src="/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1.svg" />
