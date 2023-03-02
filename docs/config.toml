@@ -121,7 +121,7 @@ github_subdir = "docs"
 github_branch= "main"
 
 # Google Custom Search Engine ID. Remove or comment out to disable search.
-gcs_engine_id = "043ef720e3ca24741"
+#gcs_engine_id = "043ef720e3ca24741"
 
 # Enable Algolia DocSearch
 algolia_docsearch = false
