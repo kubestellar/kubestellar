@@ -33,7 +33,9 @@ multi-cluster.  It is intended to demonstrate the following points.
 Some important things that are not attempted in this PoC include the following.
 
 - An implementation that supports a large number of edge clusters or
-  any other thing that requires sharding for scale.
+  any other thing that requires sharding for scale. In this PoC we
+  will use a single kcp server to hold all the workspaces, and will
+  not shard any controller.
 - More than one SyncTarget per Location.
 - Return or summarization of reported state from associated objects
   (e.g., ReplicaSet or Pod objects associated with a given Deployment
@@ -143,10 +145,17 @@ with with the particular kinds that appear in kcp or plain kubernetes.
 
 #### Needs to be denatured in center, natured in edge
 
-For these kinds of objects, clients of the real workspace can
-manipulate such objects and they will modify the behavior of the
-workspace, while clients of the edge computing view will manipulate
-distinct objects that have no effect on the behavior of the workspace.
+For these kinds of objects: clients of the real workload management
+workspace can manipulate some such objects that will modify the
+behavior of the workspace, while clients of the edge computing view
+will manipulate distinct objects that have no effect on the behavior
+of the workspace.  These are kinds of objects to which kcp normally
+associates some behavior.  To be fully precise, the concern here is
+with behavior that is externally visible (including externally visible
+behavior of the server itself); we do not care to dissociate
+server-internal behavior such as storing encrypted at rest.  The edge
+computing platform will have to implement that view which dissociates
+the normal kcp behavior.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -245,7 +254,7 @@ their workload desired and reported state.
 #### Already denatured in center, want natured in edge
 
 These are kinds of objects that kcp already gives no interpretation
-to.
+to, and that is what edge-mc needs from the center workspaces.
 
 This is the default category of kind of object --- any kind of data
 object not specifically listed in another category is implicitly in
