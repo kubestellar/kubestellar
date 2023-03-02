@@ -231,4 +231,4 @@ enable = false
 [sitemap]
 ChangeFreq = ""
 Filename = "sitemap.xml"
-Priority = "-1" 
+Priority = "1" 
