@@ -17,8 +17,6 @@ limitations under the License.
 package placement
 
 import (
-	"sync"
-
 	"github.com/kcp-dev/logicalcluster/v3"
 )
 
@@ -31,56 +29,51 @@ import (
 // - the baseProducer precedes this TestAPIMapProducer
 // - this TestAPIMapProducer precedes each of its Clients
 type TestAPIMapProducer struct {
-	// baseProducer precedes this TestAPIMapProducer in the locking order
 	baseProducer BaseAPIMapProducer
 
-	sync.Mutex
+	// No mutex needed here because of expected exclusivity of callbacks from baseProducer
 
-	clusters map[logicalcluster.Name]ClientTracker[ScopedAPIProducer]
+	clusters map[logicalcluster.Name]*ClientTracker[ScopedAPIProducer]
 }
 
-type BaseAPIMapProducer DynamicMapProducerWithDelete[logicalcluster.Name, ScopedAPIProducer]
+// BaseAPIMapProducer is a source of API information.
+// It is expected to hold a mutex while calling into this client.
+type BaseAPIMapProducer DynamicMapProducerWithRelease[logicalcluster.Name, ScopedAPIProducer]
 
 var _ APIMapProvider = &TestAPIMapProducer{}
 
-func (tamp *TestAPIMapProducer) noteProducer(cluster logicalcluster.Name, producer ScopedAPIProducer) {
-	tamp.Lock()
-	defer tamp.Unlock()
+func NewTestAPIMapProducer(baseProducer BaseAPIMapProducer) *TestAPIMapProducer {
+	ans := &TestAPIMapProducer{
+		baseProducer: baseProducer,
+		clusters:     map[logicalcluster.Name]*ClientTracker[ScopedAPIProducer]{},
+	}
+	baseProducer.AddConsumer(TestAPIMapProducerAsConsumer{ans}, false)
+	return ans
+}
+
+type TestAPIMapProducerAsConsumer struct{ *TestAPIMapProducer }
+
+func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, producer ScopedAPIProducer) {
 	clusterData, found := tamp.clusters[cluster]
 	if !found {
 		return
 	}
 	clusterData.SetProvider(producer)
-	tamp.clusters[cluster] = clusterData
-}
-
-func NewTestAPIMapProducer(baseProducer BaseAPIMapProducer) *TestAPIMapProducer {
-	ans := &TestAPIMapProducer{
-		baseProducer: baseProducer,
-		clusters:     map[logicalcluster.Name]ClientTracker[ScopedAPIProducer]{},
-	}
-	baseProducer.AddConsumer(ans.noteProducer)
-	return ans
 }
 
 func (tamp *TestAPIMapProducer) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer]) {
 	tamp.baseProducer.Get(cluster, func(producer ScopedAPIProducer) {
-		tamp.Lock()
-		defer tamp.Unlock()
 		clusterData, found := tamp.clusters[cluster]
 		if !found {
 			clusterData = NewClientTracker[ScopedAPIProducer]()
+			clusterData.SetProvider(producer)
 		}
 		clusterData.AddClient(client)
-		client.SetProvider(producer)
-		tamp.clusters[cluster] = clusterData
 	})
 }
 
 func (tamp *TestAPIMapProducer) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer]) {
-	tamp.baseProducer.MaybeDelete(cluster, func(ScopedAPIProducer) bool {
-		tamp.Lock()
-		defer tamp.Unlock()
+	tamp.baseProducer.MaybeRelease(cluster, func(ScopedAPIProducer) bool {
 		clusterData, found := tamp.clusters[cluster]
 		if !found {
 			return true

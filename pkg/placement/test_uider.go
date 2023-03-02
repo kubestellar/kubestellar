@@ -34,7 +34,7 @@ type testUIDer struct {
 	sync.Mutex
 	rng       *rand.Rand
 	current   []UIDPair
-	consumers []func(edgeapi.ExternalName, apimachtypes.UID)
+	consumers []DynamicMapConsumer[edgeapi.ExternalName, apimachtypes.UID]
 }
 
 type UIDPair struct {
@@ -52,10 +52,15 @@ func NewTestUIDer(rng *rand.Rand, wg *sync.WaitGroup) *testUIDer {
 	}
 }
 
-func (tu *testUIDer) AddConsumer(consumer func(edgeapi.ExternalName, apimachtypes.UID)) {
+func (tu *testUIDer) AddConsumer(consumer DynamicMapConsumer[edgeapi.ExternalName, apimachtypes.UID], notifyCurrent bool) {
 	tu.Lock()
 	defer tu.Unlock()
 	tu.consumers = append(tu.consumers, consumer)
+	if notifyCurrent {
+		for _, pair := range tu.current {
+			consumer.Set(pair.en, pair.uid)
+		}
+	}
 }
 
 func (tu *testUIDer) TweakOne(rng *rand.Rand) {
@@ -75,7 +80,7 @@ func (tu *testUIDer) TweakOne(rng *rand.Rand) {
 		en = tu.current[which].en
 	}
 	for _, consumer := range tu.consumers {
-		consumer(en, newUID)
+		consumer.Set(en, newUID)
 	}
 }
 
@@ -108,7 +113,7 @@ func (tu *testUIDer) Get(en edgeapi.ExternalName, kont func(apimachtypes.UID)) {
 			panic(tu)
 		}
 		for _, consumer := range tu.consumers {
-			consumer(en, uid)
+			consumer.Set(en, uid)
 		}
 	}()
 	kont(ans)
@@ -138,6 +143,6 @@ func (tu *testUIDer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
 		tu.current = append(tu.current, UIDPair{en, uid})
 	}
 	for _, consumer := range tu.consumers {
-		consumer(en, uid)
+		consumer.Set(en, uid)
 	}
 }

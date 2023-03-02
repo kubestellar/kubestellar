@@ -26,6 +26,11 @@ import (
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
+// exerciseSinglePlacementSliceSetReducer tests a given SinglePlacementSliceSetReducer.
+// For a given SinglePlacementSliceSetReducer implementation Foo,
+// do the following in TestFoo (or whatever you call it):
+// - construct a Foo using a SinglePlacementSet as the consumer
+// - call exerciseSinglePlacementSliceSetReducer on the Foo, its UIDer, and that consumer.
 func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, uider UIDer, consumer SinglePlacementSet) func(*testing.T) {
 	return func(t *testing.T) {
 		input := initialWhere

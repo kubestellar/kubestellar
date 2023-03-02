@@ -25,20 +25,24 @@ import (
 // to contain a projection of the values in the map.
 
 type relayMap[Key comparable, OuterVal any, InnerVal any] struct {
-	project func(OuterVal) InnerVal
+	dedupConsumers bool
+	project        func(OuterVal) InnerVal
 	sync.Mutex
 	theMap    map[Key]OuterVal
-	consumers []func(Key, InnerVal)
+	consumers []DynamicMapConsumer[Key, InnerVal]
 }
 
-func NewRelayMap[Key comparable, Val any]() DynamicMapProducerWithDelete[Key, Val] {
-	return NewRelayAndProjectMap[Key, Val, Val](func(x Val) Val { return x })
+var _ DynamicMapProducerWithRelease[string, func()] = &relayMap[string, func(), func()]{}
+
+func NewRelayMap[Key comparable, Val any](dedupConsumers bool) *relayMap[Key, Val, Val] {
+	return NewRelayAndProjectMap[Key, Val, Val](dedupConsumers, func(x Val) Val { return x })
 }
 
-func NewRelayAndProjectMap[Key comparable, OuterVal any, InnerVal any](project func(OuterVal) InnerVal) DynamicMapProducerWithDelete[Key, InnerVal] {
+func NewRelayAndProjectMap[Key comparable, OuterVal any, InnerVal any](dedupConsumers bool, project func(OuterVal) InnerVal) *relayMap[Key, OuterVal, InnerVal] {
 	return &relayMap[Key, OuterVal, InnerVal]{
-		project: project,
-		theMap:  map[Key]OuterVal{},
+		dedupConsumers: dedupConsumers,
+		project:        project,
+		theMap:         map[Key]OuterVal{},
 	}
 }
 
@@ -48,24 +52,37 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) Get(key Key, kont func(InnerVal)) {
 	kont(rm.project(rm.theMap[key]))
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeDelete(key Key, shouldDelete func(InnerVal) bool) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeRelease(key Key, shouldRelease func(InnerVal) bool) {
 	rm.Lock()
 	defer rm.Unlock()
 	innerVal := rm.project(rm.theMap[key])
-	if shouldDelete(innerVal) {
-		delete(rm.theMap, key)
+	if !shouldRelease(innerVal) {
+		return
 	}
+	delete(rm.theMap, key)
+	var outerVal OuterVal
+	innerVal = rm.project(outerVal)
 	for _, consumer := range rm.consumers {
-		consumer(key, innerVal)
+		consumer.Set(key, innerVal)
 	}
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) AddConsumer(consumer func(Key, InnerVal)) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) AddConsumer(consumer DynamicMapConsumer[Key, InnerVal], notifyCurrent bool) {
 	rm.Lock()
 	defer rm.Unlock()
+	if rm.dedupConsumers {
+		for _, existing := range rm.consumers {
+			if existing == consumer {
+				return
+			}
+		}
+	}
 	rm.consumers = append(rm.consumers, consumer)
+	if !notifyCurrent {
+		return
+	}
 	for key, outerVal := range rm.theMap {
-		consumer(key, rm.project(outerVal))
+		consumer.Set(key, rm.project(outerVal))
 	}
 }
 
@@ -75,10 +92,10 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) Set(key Key, outerVal OuterVal) {
 	defer rm.Unlock()
 	rm.theMap[key] = outerVal
 	for _, consumer := range rm.consumers {
-		consumer(key, innerVal)
+		consumer.Set(key, innerVal)
 	}
 }
 
 func (rm *relayMap[Key, OuterVal, InnerVal]) Remove(key Key) {
-	rm.MaybeDelete(key, func(InnerVal) bool { return true })
+	rm.MaybeRelease(key, func(InnerVal) bool { return true })
 }

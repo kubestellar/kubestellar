@@ -24,8 +24,8 @@ type ClientTracker[Provider any] struct {
 	clients  map[Client[Provider]]Empty
 }
 
-func NewClientTracker[Provider any]() ClientTracker[Provider] {
-	return ClientTracker[Provider]{
+func NewClientTracker[Provider any]() *ClientTracker[Provider] {
+	return &ClientTracker[Provider]{
 		clients: map[Client[Provider]]Empty{},
 	}
 }

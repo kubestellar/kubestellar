@@ -19,12 +19,13 @@ package placement
 // DynamicMapProducer holds a mutable map and keeps consumers appraised of it.
 // The zero value of Val signals a missing entry in the map.
 type DynamicMapProducer[Key comparable, Val any] interface {
-	// AddConsumer notifies the consumer of the current contents
-	// of the map and following changes.
-	// Note that if this producer is safe for concurrent use then
-	// the consumer can not expect to be able to call Get.
+	// AddConsumer causes the given consumer to be notified of following
+	// changes and, if notifyCurrent, the current map contents.
+	// If consumers are comparable: depending on the implementation,
+	// successive adds of the same consumer have no more effect than
+	// the first add, or lead to duplicated callbacks to the consumer.
 	// The producer precedes each consumer in the locking order.
-	AddConsumer(func(Key, Val))
+	AddConsumer(consumer DynamicMapConsumer[Key, Val], notifyCurrent bool)
 
 	// Get invokes the given function on the value corresponding to the key.
 	// This does not count as informing any particular consumer.
@@ -41,18 +42,24 @@ func DynamicMapProducerGet[Key comparable, Val any](prod DynamicMapProducer[Key,
 	return ans
 }
 
-type DynamicMapProducerWithDelete[Key comparable, Val any] interface {
+type DynamicMapProducerWithRelease[Key comparable, Val any] interface {
 	DynamicMapProducer[Key, Val]
 
-	// MaybeDelete invokes the given function on the value corresponding to the
-	// given key and deletes the indicated entry if the function returns true.
-	MaybeDelete(Key, func(Val) bool)
+	// MaybeRelease invokes the given function on the value corresponding to the
+	// given key and, if the function returns true, may release some internal resources
+	// associated with that key.
+	// The producer precedes the given function in the locking order.
+	MaybeRelease(Key, func(Val) bool)
 }
 
+// DynamicMapConsumer is given map entries by a DynamicMapProducer.
+// Some DynamicMapProducer implementations require consumers to be comparable.
 type DynamicMapConsumer[Key comparable, Val any] interface {
 	Set(Key, Val)
 }
 
+// DynamicMapConsumerFunc is a func value that implements DynamicMapConsumer.
+// Remember that func values are not comparable.
 type DynamicMapConsumerFunc[Key comparable, Val any] func(Key, Val)
 
 func (cf DynamicMapConsumerFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }

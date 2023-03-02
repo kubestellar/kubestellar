@@ -43,6 +43,20 @@ import (
 // - a PlacementProjector that maintains the TMC Placement objects that
 //   correspond to the EdgePlacement objects.
 
+// We are talking here about an assembly of several components, each
+// of which likely has private data protected by a mutex.
+// We thus must pay attention to avoiding deadlock.
+// We do that by declaring and respecting a partial order among mutexes.
+// When we say that mutex A precedes B in the locking order, this means that
+// it is forbidden for a goroutine to invoke `A.Lock()` while holding B locked.
+// Stated in a positive but little less precise way: a goroutine that is
+// going to lock both A and B must lock A first.
+
+// The particular locking order chosen here generally follows the pattern
+// that components that drive activity precede components that get driven,
+// so that this relationship can be synchronous.  For example, providers
+// of maps generally precede consumers of maps.
+
 // WhereResolver is responsible for keeping given consumers eventually
 // consistent with the resolution of the "where" predicate for each EdgePlacement
 // (identified by cluster and name).
@@ -74,6 +88,16 @@ type WorkloadProjector Client[ProjectionMapProducer]
 // objects that cause propagation between mailbox workspace and edge cluster.
 type PlacementProjector Client[ProjectionMapProducer]
 
+func GetNamespacesBuiltIntoEdgeClusters() k8ssets.String {
+	// TODO: Make this configurable
+	return k8ssets.NewString("default")
+}
+
+func GetNamespacesBuiltIntoMailboxes() k8ssets.String {
+	// TODO: see if more need to go here
+	return k8ssets.NewString("default")
+}
+
 // AssemplePlacementTranslator puts together the top-level pieces.
 func AssemplePlacementTranslator(
 	whatResolver WhatResolver,
@@ -82,8 +106,8 @@ func AssemplePlacementTranslator(
 	workloadProjector WorkloadProjector,
 	placementProjector PlacementProjector,
 ) {
-	whatResolver.AddConsumer(setBinder.AsWhatConsumer().Set)
-	whereResolver.AddConsumer(setBinder.AsWhereConsumer().Set)
+	whatResolver.AddConsumer(setBinder.AsWhatConsumer(), true)
+	whereResolver.AddConsumer(setBinder.AsWhereConsumer(), true)
 	workloadProjector.SetProvider(setBinder)
 	placementProjector.SetProvider(setBinder)
 }
@@ -145,26 +169,24 @@ type WorkloadPart struct {
 // organized into three levels.
 type ProjectionMapProducer DynamicMapProducer[ProjectionKey, *ProjectionPerCluster]
 
-// ProjectionKey identifies a source/kind/destination relationship
+// ProjectionKey identifies the topmost level of organization,
+// the combinatin of the destination and the API group and resource.
 type ProjectionKey struct {
 	metav1.GroupResource
 	Destination SinglePlacement
 }
 
-// SinglePlacement extends the API struct with the UID of the SyncTarget.
-type SinglePlacement struct {
-	edgeapi.SinglePlacement
-	SyncTargetUID apimachtypes.UID
-}
-
-func (sp SinglePlacement) SyncTargetRef() edgeapi.ExternalName {
-	return edgeapi.ExternalName{Workspace: sp.Location.Workspace, Name: sp.SyncTargetName}
-}
-
+// ProjectionPerCluster is the second level of organization.
+// It identifies the API version to use currently and holds
+// the map provider that gets to the lowest level of organization.
 type ProjectionPerCluster struct {
 	// APIVersion is the version to read.  Just the version, no group included
 	APIVersion string
 
+	// PerSourceCluster drives awareness of the relevant logical clusters
+	// and the work to do for each.
+	// This provider (a) requires consumers to be comparable and (b) deduplicates
+	// additions of consumers.
 	PerSourceCluster DynamicMapProducer[logicalcluster.Name, ProjectionDetails]
 }
 
@@ -178,6 +200,16 @@ type ProjectionDetails struct {
 	// For non-namespaced objects, Names can optionally be non-nil to restrict
 	// the objects handled.
 	Names *k8ssets.String
+}
+
+// SinglePlacement extends the API struct with the UID of the SyncTarget.
+type SinglePlacement struct {
+	edgeapi.SinglePlacement
+	SyncTargetUID apimachtypes.UID
+}
+
+func (sp SinglePlacement) SyncTargetRef() edgeapi.ExternalName {
+	return edgeapi.ExternalName{Workspace: sp.Location.Workspace, Name: sp.SyncTargetName}
 }
 
 // BindingOrganizer produces a SingleBinder and a corresponding map producer

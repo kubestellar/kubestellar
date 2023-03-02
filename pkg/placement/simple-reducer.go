@@ -40,8 +40,29 @@ func NewSimplePlacementSliceSetReducer(uider UIDer, consumers ...SinglePlacement
 		consumers: consumers,
 		enhanced:  NewSinglePlacementSet(),
 	}
-	uider.AddConsumer(ans.noteUID)
+	uider.AddConsumer(SimplePlacementSliceSetReducerAsUIDConsumer{ans}, false)
 	return ans
+}
+
+// SimplePlacementSliceSetReducerAsUIDConsumer adds the Set method that
+// SimplePlacementSliceSetReducer needs in order to implement
+// DynamicMapConsumer to receive UID information.
+type SimplePlacementSliceSetReducerAsUIDConsumer struct {
+	*SimplePlacementSliceSetReducer
+}
+
+func (spsr SimplePlacementSliceSetReducerAsUIDConsumer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
+	spsr.Lock()
+	defer spsr.Unlock()
+	if details, ok := spsr.enhanced[en]; ok {
+		details.SyncTargetUID = uid
+		spsr.enhanced[en] = details
+		fullSP := details.Complete(en)
+		for _, consumer := range spsr.consumers {
+			consumer.Add(fullSP)
+		}
+
+	}
 }
 
 func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
@@ -71,20 +92,6 @@ func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
 			consumer.Add(fullSP)
 		}
 	})
-}
-
-func (spsr *SimplePlacementSliceSetReducer) noteUID(en edgeapi.ExternalName, uid apimachtypes.UID) {
-	spsr.Lock()
-	defer spsr.Unlock()
-	if details, ok := spsr.enhanced[en]; ok {
-		details.SyncTargetUID = uid
-		spsr.enhanced[en] = details
-		fullSP := details.Complete(en)
-		for _, consumer := range spsr.consumers {
-			consumer.Add(fullSP)
-		}
-
-	}
 }
 
 func enumerateSinglePlacementSlices(slices []*edgeapi.SinglePlacementSlice, consumer func(edgeapi.SinglePlacement)) {

@@ -34,7 +34,7 @@ func TestTestUIDer(t *testing.T) {
 	testConsumer := &testUIDConsumer{
 		current: map[edgeapi.ExternalName]apimachtypes.UID{},
 	}
-	uider.AddConsumer(testConsumer.Note)
+	uider.AddConsumer(testConsumer, false)
 	en1 := edgeapi.ExternalName{Workspace: "ws1", Name: "n1"}
 	en2 := edgeapi.ExternalName{Workspace: "ws1", Name: "n2"}
 	uid1 := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en1)
@@ -56,7 +56,7 @@ type testUIDConsumer struct {
 	current map[edgeapi.ExternalName]apimachtypes.UID
 }
 
-func (tc *testUIDConsumer) Note(en edgeapi.ExternalName, uid apimachtypes.UID) {
+func (tc *testUIDConsumer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
 	tc.Lock()
 	defer tc.Unlock()
 	tc.current[en] = uid
