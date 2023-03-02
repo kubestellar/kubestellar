@@ -17,12 +17,19 @@ enableGitInfo = true
 # Comment out to enable taxonomies in Docsy
 # disableKinds = ["taxonomy", "taxonomyTerm"]
 
-[[menu.main]]
+[menu.main]
     name = "GitHub"
     weight = 30
     url = "https://github.com/kcp-dev/edge-mc"
     pre = "<i class="fa-brands fa-github"></i>"
-    #post = "<span class='alert'>New!</span>"
+[menu.main]
+    name = "Blog"
+    weight = 30
+    url = "https://kcp-edge.medium.com/list/reading-list"
+    pre = "<i class="fa-brands fa-medium"></i>"
+
+
+#post = "<span class='alert'>New!</span>"
     
     
 # You can add your own taxonomies
