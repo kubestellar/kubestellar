@@ -1,6 +1,6 @@
 ---
 title: "KCP-Edge Blog"
-linkTitle: "Blog"
+linkTitle: "Blogs"
 menu:
   main:
     weight: 30
