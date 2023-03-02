@@ -5,9 +5,9 @@ weight: 1
 description: >
 ---
 
-<!-- {{% pageinfo %}}
-This is a placeholder page that shows you how to use this template site.
-{{% /pageinfo %}} -->
+{{% pageinfo %}}
+Want to get involved - check out our [good-first-issue list](https://github.com/orgs/kcp-dev/projects/12/views/4).
+{{% /pageinfo %}}
 
 
 <img alt="KCP-Edge" width="500px" align="left" src="https://github.com/kcp-dev/edge-mc/raw/main/contrib/logo/kcp-edge-5-white.png" />
