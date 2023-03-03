@@ -27,6 +27,11 @@ enableGitInfo = true
     weight = 30
     url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
     pre = "<i class='fa-brands fa-medium'></i>"
+[[menu.main]]
+    name = "Documentation"
+    weight = 30
+    url = "/docs/"
+    pre = "<i class='fas fa-book pr-2'></i>"
 
 #post = "<span class='alert'>New!</span>"
     
