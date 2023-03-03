@@ -81,7 +81,7 @@ status information to inventory objects (SyncTargets).
 In very brief: the design is to reduce each edge placement problem to
 many instances of kcp's TMC problem.
 
-See [the overview picture](Edge-PoC-2023q1.svg) for an overview
+See [the overview picture](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1.svg) for an overview
 picture.
 
 ## Inventory Management workspaces
