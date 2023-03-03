@@ -1,7 +1,8 @@
-[![github pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)
 <img alt="KCP-Edge" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
 
+
 <br/>
+[![github pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)
 
 # KCP-Edge
 ## consistent, heterogeneous, and scalable edge configuration management
