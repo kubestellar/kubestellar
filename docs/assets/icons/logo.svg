@@ -4,10 +4,10 @@
 <g enable-background="new">
 <mask id="ma0">
 <g transform="matrix(1.3888888,0,0,1.3888888,0,0)">
-<use xlink:href="#im1" x="0" y="0" width="180" height="180"/>
+<use xlink:href="#im1" x="0" y="0" width="150" height="150"/>
 </g>
 </mask>
-<symbol id="im1" viewBox="0 0 180 180">
+<symbol id="im1" viewBox="0 0 150 150">
 <image width="180" height="180" xlink:href="data:image/png;base64,
 iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAAAAAAYplnuAAAACXBIWXMAAA7EAAAO
 xAGVKw4bAAADxklEQVR4nO3c63qDIAwGYLn/i3aPtd08BHIghC+d+bFWCPCWx7ZO
