@@ -54,4 +54,4 @@ There are several ways to communicate with us:
     - Members of the kcp-dev mailing list can view this drive
 - Follow us on:
    - LinkedIn - [#kcpedge](https://www.linkedin.com/feed/hashtag/?keywords=kcpedge)
-   - Medium - [kcp-edge.medium.com](https://kcp-edge.medium.com)
+   - Medium - [kcp-edge.medium.com](https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST)
