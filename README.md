@@ -4,7 +4,7 @@
 
 # KCP-Edge
 ## consistent, heterogeneous, and scalable edge configuration management
-<br/><br/>
+<br/><br/><br/>
 [![github pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)
 ## Overview
 KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
