@@ -36,6 +36,7 @@ import (
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachtypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -66,8 +67,18 @@ type mbCtl struct {
 	synctargetLister workloadlisters.SyncTargetClusterLister
 	workspaceLister  tenancylisters.WorkspaceLister
 	workspaceClient  tenancyclient.WorkspaceInterface
-	queue            workqueue.RateLimitingInterface
+	queue            workqueue.RateLimitingInterface // of syncTargetRef
 }
+
+type syncTargetRef struct {
+	cluster logicalcluster.Name
+	name    string
+	uid     apimachtypes.UID
+}
+
+// SyncTargetNameAnnotationKey identifies the annotation on a mailbox Workspace
+// that points to the corresponding SyncTarget.
+const SyncTargetNameAnnotationKey = "edge.kcp.io/sync-target-name"
 
 func main() {
 	resyncPeriod := time.Duration(0)
@@ -255,23 +266,36 @@ func (ctl *mbCtl) enqueue(obj any) {
 	logger := klog.FromContext(ctl.context)
 	switch typed := obj.(type) {
 	case *tenancyv1alpha1.Workspace:
-		logger.V(4).Info("Enqueuing reference due to workspace", "reference", typed.Name)
-		ctl.queue.Add(typed.Name)
+		nameParts := strings.Split(typed.Name, wsNameSep)
+		if len(nameParts) != 2 {
+			logger.V(3).Info("Ignoring workspace with malformed name", "workspace", typed.Name)
+			return
+		}
+		syncTargetName := typed.GetAnnotations()[SyncTargetNameAnnotationKey]
+		ref := syncTargetRef{
+			cluster: logicalcluster.Name(nameParts[0]),
+			name:    syncTargetName,
+			uid:     apimachtypes.UID(nameParts[1]),
+		}
+		logger.V(4).Info("Enqueuing reference due to workspace", "cluster", ref.cluster, "name", ref.name, "uid", ref.uid)
+		ctl.queue.Add(ref)
 	case *workloadv1alpha1.SyncTarget:
-		cluster := logicalcluster.From(typed)
-		ns := typed.Namespace
-		name := typed.Name
-		logger.V(4).Info("Enqueuing reference due to SyncTarget", "cluster", cluster, "ns", ns, "name", name)
-		ctl.queue.Add(wsNameForTarget(cluster, name))
+		ref := syncTargetRef{
+			cluster: logicalcluster.From(typed),
+			name:    typed.Name,
+			uid:     typed.UID,
+		}
+		logger.V(4).Info("Enqueuing reference due to SyncTarget", "cluster", ref.cluster, "name", ref.name, "uid", ref.uid)
+		ctl.queue.Add(ref)
 	default:
 		logger.Error(nil, "Notified of object of unexpected type", "object", obj, "type", fmt.Sprintf("%T", obj))
 	}
 }
 
-const wsNameSep = "-w-"
+const wsNameSep = "-mb-"
 
-func wsNameForTarget(cluster logicalcluster.Name, name string) string {
-	return cluster.String() + wsNameSep + name
+func (ref syncTargetRef) mailboxWSName() string {
+	return ref.cluster.String() + wsNameSep + string(ref.uid)
 }
 
 func (ctl *mbCtl) syncLoop(ctx context.Context, worker int) {
@@ -308,65 +332,65 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 	}
 }
 
-func (ctl *mbCtl) sync(ctx context.Context, ref any) bool {
+func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
-	wsName, ok := ref.(string)
+	ref, ok := refany.(syncTargetRef)
 	if !ok {
-		logger.Error(nil, "Sync expected a string", "ref", ref, "type", fmt.Sprintf("%T", ref))
+		logger.Error(nil, "Sync expected a syncTargetRef", "ref", refany, "type", fmt.Sprintf("%T", refany))
 		return false
 	}
-	wsNameParts := strings.Split(wsName, wsNameSep)
-	if len(wsNameParts) != 2 {
-		logger.Error(nil, "Sync expected a string with 2 parts", "ref", ref, "wsNameParts", wsNameParts)
-		return false
-	}
-	cluster := logicalcluster.Name(wsNameParts[0])
-	targetName := wsNameParts[1]
+	cluster := ref.cluster
+	targetName := ref.name
 	syncTarget, err := ctl.synctargetLister.Cluster(cluster).Get(targetName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Unable to Get referenced SyncTarget", "wsNameParts", wsNameParts)
+		logger.Error(err, "Unable to Get referenced SyncTarget", "ref", ref)
 		return true
 	}
+	wsName := ref.mailboxWSName()
 	workspace, err := ctl.workspaceLister.Get(wsName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Unable to Get referenced Workspace", "wsName", wsName)
+		logger.Error(err, "Unable to Get referenced Workspace", "ref", ref, "wsName", wsName)
 		return true
 	}
 	if syncTarget == nil || syncTarget.DeletionTimestamp != nil {
 		if workspace == nil || workspace.DeletionTimestamp != nil {
-			logger.V(3).Info("Both absent or deleting, nothing to do", "wsName", wsName)
+			logger.V(3).Info("Both absent or deleting, nothing to do", "ref", ref)
 			return false
 		}
 		err := ctl.workspaceClient.Delete(ctx, wsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &workspace.UID}})
 		if err == nil || k8sapierrors.IsNotFound(err) {
-			logger.V(2).Info("Deleted unwanted workspace", "wsName", wsName)
+			logger.V(2).Info("Deleted unwanted workspace", "ref", ref)
 			return false
 		}
-		logger.Error(err, "Failed to delete unwanted workspace", "wsName", wsName)
+		logger.Error(err, "Failed to delete unwanted workspace", "ref", ref)
 		return true
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
 	if workspace == nil {
 		ws := &tenancyv1alpha1.Workspace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: wsName,
+				Annotations: map[string]string{SyncTargetNameAnnotationKey: ref.name},
+				Name:        wsName,
 			},
 			Spec: tenancyv1alpha1.WorkspaceSpec{},
 		}
 		_, err := ctl.workspaceClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
-		if err != nil {
-			logger.Error(err, "Failed to create workspace", "wsName", wsName)
-			return true
+		if err == nil {
+			logger.V(2).Info("Created missing workspace", "ref", ref)
+			return false
 		}
-		logger.V(2).Info("Created missing workspace", "wsName", wsName)
-		return false
-
-	}
-	if workspace.DeletionTimestamp != nil {
-		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "wsName", wsName)
+		if k8sapierrors.IsAlreadyExists(err) {
+			logger.V(3).Info("Missing workspace was created concurrently", "ref", ref)
+			return false
+		}
+		logger.Error(err, "Failed to create workspace", "ref", ref)
 		return true
 	}
-	logger.V(3).Info("Both exist and are not being deleted, nothing to do", "wsName", wsName)
+	if workspace.DeletionTimestamp != nil {
+		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "ref", ref)
+		return true
+	}
+	logger.V(3).Info("Both exist and are not being deleted, nothing to do", "ref", ref)
 	return false
 
 }
