@@ -7,9 +7,9 @@ date: 2023-02-25
 description: >
 ---
 
-<!-- {{% pageinfo %}}
-This document provides instructions on how to build and run KCP-Edge locally.
-{{% /pageinfo %}} -->
+{{% pageinfo %}}
+Checkout [this blog post](https://medium.com/@dettori/toward-building-a-kubernetes-control-plane-for-the-edge-a79eaada5750) for a step-by-step guide to configuring kcp
+{{% /pageinfo %}}
 
 To use components from KCP-Edge you must:
 1. Install and configure KCP to create a working KCP environment
