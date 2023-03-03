@@ -26,12 +26,14 @@ linkTitle = "KCP-Edge Documentation"
 
 {{% blocks/lead color="primary" %}}
 <div class="mx-auto">
-	<p align="left" class="lead mt-2" style="color:white;font-size: 22px;font-weight: 400;">KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:</p>
+	<p align="left" class="lead mt-2" style="color:white;font-size: 22px;font-weight: 400;">KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicloud use cases and the difficulties associated with using Kubernetes to address them:</p>
 	<ul>
-		<li align="left">Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues</li>
-		<li align="left">Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations</li>
-		<li align="left">Non-namespaced objects: need general support</li>
-		<li align="left">Cardinality of destinations: A source object may propagate to many thousands of destinations</li>
+		<li align="left">Desired placement expression: Need a way for one center object to express a large number of desired copies</li>
+		<li align="left">Scheduling/syncing interface: Need something that scales to large number of destinations</li>
+		<li align="left">Rollout control: Client needs programmatic control of rollout, possibly including domain-specific logic</li>
+		<li align="left">Customization: Need a way for one pattern in the center to express how to customize for all the desired destinations</li>
+		<li align="left">Status from many destinations: Center clients may need a way to access status from individual edge copies</li>
+		<li align="left">Status summarization: Client needs a way to say how statuses from edge copies are processed/reduced along the way from edge to center</li>
 	</ul>
 </div>
 
