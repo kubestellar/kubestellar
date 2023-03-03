@@ -23,7 +23,7 @@ enableGitInfo = true
     url = "https://github.com/kcp-dev/edge-mc"
     pre = "<i class='fa-brands fa-github'></i>"
 [[menu.main]]
-    name = "Blogs"
+    name = "Blog"
     weight = 30
     url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
     pre = "<i class='fa-brands fa-medium'></i>"
