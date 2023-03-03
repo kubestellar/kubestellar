@@ -52,6 +52,10 @@ type DynamicMapProducerWithRelease[Key comparable, Val any] interface {
 	MaybeRelease(Key, func(Val) bool)
 }
 
+func DynamicMapProducerRelease[Key comparable, Val any](prod DynamicMapProducerWithRelease[Key, Val], key Key) {
+	prod.MaybeRelease(key, func(Val) bool { return true })
+}
+
 // DynamicMapConsumer is given map entries by a DynamicMapProducer.
 // Some DynamicMapProducer implementations require consumers to be comparable.
 type DynamicMapConsumer[Key comparable, Val any] interface {

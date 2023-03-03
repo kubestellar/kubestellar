@@ -70,8 +70,8 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	whereProvider.AddConsumer(binder.AsWhereConsumer(), true)
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)
 	binder.AddConsumer(projectionTracker, true)
-	if len(projectionTracker.theMap) != 1 {
-		t.Errorf("Wrong amount of stuff in projectionTracker.theMap: %#+v", projectionTracker.theMap)
+	if projectionTracker.Len() != 1 {
+		t.Errorf("Wrong amount of stuff in projectionTracker.theMap: %#+v", projectionTracker)
 	}
 	pk1 := ProjectionKey{gr1, sp1}
 	ppc1 := DynamicMapProducerGet[ProjectionKey, *ProjectionPerCluster](projectionTracker, pk1)
@@ -84,8 +84,8 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	}
 	pcTracker := NewRelayMap[logicalcluster.Name, ProjectionDetails](false)
 	ppc1.PerSourceCluster.AddConsumer(pcTracker, true)
-	if len(pcTracker.theMap) != 1 {
-		t.Errorf("Wrong amount of stuff in pcTracker.theMap: %#+v", pcTracker.theMap)
+	if pcTracker.Len() != 1 {
+		t.Errorf("Wrong amount of stuff in pcTracker.theMap: %#+v", pcTracker)
 	}
 	pd1 := DynamicMapProducerGet[logicalcluster.Name, ProjectionDetails](pcTracker, sc1)
 	if pd1.Namespaces != nil {
