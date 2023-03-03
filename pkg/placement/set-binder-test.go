@@ -23,8 +23,9 @@ import (
 	apimachtypes "k8s.io/apimachinery/pkg/types"
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
+
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // exerciseSetBinder tests a given SetBinder.

@@ -17,8 +17,9 @@ limitations under the License.
 package placement
 
 import (
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
+
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 func RelayWhatResolver() RelayMap[edgeapi.ExternalName, WorkloadParts] {

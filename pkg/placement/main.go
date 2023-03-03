@@ -19,9 +19,8 @@ package placement
 import (
 	"context"
 
-	"k8s.io/klog/v2"
-
 	k8scache "k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 )
 
 func NewPlacementTranslator(

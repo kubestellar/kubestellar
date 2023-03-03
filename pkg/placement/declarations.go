@@ -20,11 +20,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kcp-dev/logicalcluster/v3"
 	k8sevents "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )

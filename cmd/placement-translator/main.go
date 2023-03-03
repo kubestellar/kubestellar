@@ -46,13 +46,13 @@ import (
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 
+	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
+	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/edge-mc/pkg/placement"
 )
 

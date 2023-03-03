@@ -19,8 +19,9 @@ package placement
 import (
 	"sync"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
+
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // SimplePlacementSliceSetReducer is the simplest possible
