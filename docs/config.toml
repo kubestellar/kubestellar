@@ -25,7 +25,7 @@ enableGitInfo = true
 [[menu.main]]
     name = "Blogs"
     weight = 30
-    url = "https://kcp-edge.medium.com/list/reading-list"
+    url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
     pre = "<i class='fa-brands fa-medium'></i>"
 
 #post = "<span class='alert'>New!</span>"
