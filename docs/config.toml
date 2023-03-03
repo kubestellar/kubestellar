@@ -30,7 +30,6 @@ enableGitInfo = true
 
 #post = "<span class='alert'>New!</span>"
     
-    
 # You can add your own taxonomies
 [taxonomies]
 tag = "tags"
