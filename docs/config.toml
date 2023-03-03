@@ -200,7 +200,7 @@ enable = false
   desc = "View recordings of past KCP-Edge community meetings"
 [[params.links.user]]
   name = "Medium Blog Series"
-  url = "https://kcp-edge.medium.com/"
+  url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
   icon = "fab fa-medium"
   desc = "Follow us on Medium to read about community developments"
 [[params.links.user]]
