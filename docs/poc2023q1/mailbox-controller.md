@@ -10,7 +10,7 @@ name of the corresponding workspace to be the concatenation of the
 following.
 
 - the ID of the logical cluster containing T
-- the string "-w-"
+- the string "-mb-"
 - T's UID
 
 The mailbox workspace gets an annotation whose key is
@@ -48,43 +48,40 @@ After that, a run of the controller should look like the following.
 
 ```shell
 (base) mspreitz@mjs12 edge-mc % go run ./cmd/mailbox-controller -v=2
-I0127 00:21:48.876022   24503 main.go:206] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
-I0127 00:21:48.877965   24503 shared_informer.go:255] Waiting for caches to sync for mailbox-controller
-I0127 00:21:48.978352   24503 shared_informer.go:262] Caches are synced for mailbox-controller
-I0127 00:21:48.978414   24503 main.go:169] "Informers synced"
-I0303 16:45:52.528677   62289 main.go:113] "Command line flag" add_dir_header="false"
-I0303 16:45:52.528859   62289 main.go:113] "Command line flag" alsologtostderr="false"
-I0303 16:45:52.528865   62289 main.go:113] "Command line flag" concurrency="4"
-I0303 16:45:52.528869   62289 main.go:113] "Command line flag" inventory-context="root"
-I0303 16:45:52.528872   62289 main.go:113] "Command line flag" inventory-kubeconfig=""
-I0303 16:45:52.528876   62289 main.go:113] "Command line flag" log_backtrace_at=":0"
-I0303 16:45:52.528880   62289 main.go:113] "Command line flag" log_dir=""
-I0303 16:45:52.528883   62289 main.go:113] "Command line flag" log_file=""
-I0303 16:45:52.528886   62289 main.go:113] "Command line flag" log_file_max_size="1800"
-I0303 16:45:52.528890   62289 main.go:113] "Command line flag" logtostderr="true"
-I0303 16:45:52.528893   62289 main.go:113] "Command line flag" one_output="false"
-I0303 16:45:52.528897   62289 main.go:113] "Command line flag" server-bind-address=":10203"
-I0303 16:45:52.528900   62289 main.go:113] "Command line flag" skip_headers="false"
-I0303 16:45:52.528904   62289 main.go:113] "Command line flag" skip_log_headers="false"
-I0303 16:45:52.528907   62289 main.go:113] "Command line flag" stderrthreshold="2"
-I0303 16:45:52.528911   62289 main.go:113] "Command line flag" v="2"
-I0303 16:45:52.528914   62289 main.go:113] "Command line flag" vmodule=""
-I0303 16:45:52.528918   62289 main.go:113] "Command line flag" workload-context=""
-I0303 16:45:52.528921   62289 main.go:113] "Command line flag" workload-kubeconfig=""
-I0303 16:45:52.552450   62289 main.go:248] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
-I0303 16:45:52.554741   62289 shared_informer.go:282] Waiting for caches to sync for mailbox-controller
-I0303 16:45:52.654988   62289 shared_informer.go:289] Caches are synced for mailbox-controller
-I0303 16:45:52.655018   62289 main.go:211] "Informers synced"
+I0305 18:06:20.046741   85556 main.go:110] "Command line flag" add_dir_header="false"
+I0305 18:06:20.046954   85556 main.go:110] "Command line flag" alsologtostderr="false"
+I0305 18:06:20.046960   85556 main.go:110] "Command line flag" concurrency="4"
+I0305 18:06:20.046965   85556 main.go:110] "Command line flag" inventory-context="root"
+I0305 18:06:20.046971   85556 main.go:110] "Command line flag" inventory-kubeconfig=""
+I0305 18:06:20.046976   85556 main.go:110] "Command line flag" log_backtrace_at=":0"
+I0305 18:06:20.046980   85556 main.go:110] "Command line flag" log_dir=""
+I0305 18:06:20.046985   85556 main.go:110] "Command line flag" log_file=""
+I0305 18:06:20.046989   85556 main.go:110] "Command line flag" log_file_max_size="1800"
+I0305 18:06:20.046993   85556 main.go:110] "Command line flag" logtostderr="true"
+I0305 18:06:20.046997   85556 main.go:110] "Command line flag" one_output="false"
+I0305 18:06:20.047002   85556 main.go:110] "Command line flag" server-bind-address=":10203"
+I0305 18:06:20.047006   85556 main.go:110] "Command line flag" skip_headers="false"
+I0305 18:06:20.047011   85556 main.go:110] "Command line flag" skip_log_headers="false"
+I0305 18:06:20.047015   85556 main.go:110] "Command line flag" stderrthreshold="2"
+I0305 18:06:20.047019   85556 main.go:110] "Command line flag" v="2"
+I0305 18:06:20.047023   85556 main.go:110] "Command line flag" vmodule=""
+I0305 18:06:20.047027   85556 main.go:110] "Command line flag" workload-context=""
+I0305 18:06:20.047031   85556 main.go:110] "Command line flag" workload-kubeconfig=""
+I0305 18:06:20.070071   85556 main.go:247] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
+I0305 18:06:20.072088   85556 shared_informer.go:282] Waiting for caches to sync for mailbox-controller
+I0305 18:06:20.172169   85556 shared_informer.go:289] Caches are synced for mailbox-controller
+I0305 18:06:20.172196   85556 main.go:210] "Informers synced"
 ```
 
-In a separate shell, make a workload management workspace as follows.
+In a separate shell, make a inventory management workspace as follows.
 
 ```
 kubectl ws \~
-kubectl ws create work1 --enter
+kubectl ws create inv1 --enter
 ```
 
-Then in that workspace, `kubectl create` the following object.
+Then in that workspace, `kubectl create` the following `SyncTarget`
+object.
 
 ```yaml
 apiVersion: workload.kcp.io/v1alpha1
@@ -99,7 +96,7 @@ spec:
 That should provoke logging like the following from the mailbox controller.
 
 ```
-I0303 16:47:45.921037   62289 main.go:379] "Created missing workspace" worker=1 ref={cluster:2sqxqu9zxhpsgtm4 name:stest1 uid:05c38f36-3c03-4a21-a67f-6056bfca5b05}
+I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
 And you can verify that like so.
@@ -110,19 +107,19 @@ Current workspace is "root:edge".
 
 (base) mspreitz@mjs12 ~ % kubectl get Workspace
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
-2sqxqu9zxhpsgtm4-mb-05c38f36-3c03-4a21-a67f-6056bfca5b05   universal            Ready   https://192.168.58.123:6443/clusters/30l2suw35h3kwg2z   55s
+niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 ```
 
 Next, `kubectl delete` that Workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.
 
 ```
-I0303 16:50:04.477565   62289 main.go:379] "Created missing workspace" worker=0 ref={cluster:2sqxqu9zxhpsgtm4 name:stest1 uid:05c38f36-3c03-4a21-a67f-6056bfca5b05}
+I0305 18:08:15.428884   85556 main.go:369] "Created missing workspace" worker=2 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
-Finally, go back to your workload workspace and `kubectl delete
+Finally, go back to your inventory workspace and `kubectl delete
 SyncTarget stest1` and watch the mailbox controller react as follows.
 
 ```
-I0303 16:51:09.136632   62289 main.go:362] "Deleted unwanted workspace" worker=2 ref={cluster:2sqxqu9zxhpsgtm4 name:stest1 uid:05c38f36-3c03-4a21-a67f-6056bfca5b05}
+I0305 18:08:44.380421   85556 main.go:352] "Deleted unwanted workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
