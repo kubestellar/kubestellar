@@ -6,7 +6,7 @@ description: >
 ---
 
 {{% pageinfo %}}
-Want to get involved? Check out our ['good first issue' list](https://github.com/orgs/kcp-dev/projects/12/views/4).
+Want to get involved? Check out our ['good first issue' list](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 {{% /pageinfo %}}
 
 
