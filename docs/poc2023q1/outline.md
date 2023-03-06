@@ -33,7 +33,9 @@ multi-cluster.  It is intended to demonstrate the following points.
 Some important things that are not attempted in this PoC include the following.
 
 - An implementation that supports a large number of edge clusters or
-  any other thing that requires sharding for scale.
+  any other thing that requires sharding for scale. In this PoC we
+  will use a single kcp server to hold all the workspaces, and will
+  not shard any controller.
 - More than one SyncTarget per Location.
 - Return or summarization of reported state from associated objects
   (e.g., ReplicaSet or Pod objects associated with a given Deployment
@@ -143,10 +145,17 @@ with with the particular kinds that appear in kcp or plain kubernetes.
 
 #### Needs to be denatured in center, natured in edge
 
-For these kinds of objects, clients of the real workspace can
-manipulate such objects and they will modify the behavior of the
-workspace, while clients of the edge computing view will manipulate
-distinct objects that have no effect on the behavior of the workspace.
+For these kinds of objects: clients of the real workload management
+workspace can manipulate some such objects that will modify the
+behavior of the workspace, while clients of the edge computing view
+will manipulate distinct objects that have no effect on the behavior
+of the workspace.  These are kinds of objects to which kcp normally
+associates some behavior.  To be fully precise, the concern here is
+with behavior that is externally visible (including externally visible
+behavior of the server itself); we do not care to dissociate
+server-internal behavior such as storing encrypted at rest.  The edge
+computing platform will have to implement that view which dissociates
+the normal kcp behavior.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -176,7 +185,7 @@ dependent objects.
 | apiextensions.k8s.io/v1 | CustomResourceDefinition | false |
 | v1 | Namespace | false |
 
-### Needs to be natured in center, not destined for edge
+#### Needs to be natured in center, not destined for edge
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -245,7 +254,7 @@ their workload desired and reported state.
 #### Already denatured in center, want natured in edge
 
 These are kinds of objects that kcp already gives no interpretation
-to.
+to, and that is what edge-mc needs from the center workspaces.
 
 This is the default category of kind of object --- any kind of data
 object not specifically listed in another category is implicitly in
@@ -282,11 +291,179 @@ this category.
 | v1 | Secret | true |
 | v1 | Service | true |
 
+### Built-in resources and objects
+
+An edge cluster has some built-in resources (i.e, kinds of objects)
+and namespaces.  A resource may be built-in by any of several ways: it
+can be built-in to the apiserver, it can be defined by a CRD, its API
+group can be delegated by an APIService to a custom external server
+(each of the latter two is sometimes called "aggregation").  Note also
+that a resource may be defined in edge clusters one way (e.g., by
+being built into kube-apiserver) and in the workload management
+workspace another way (e.g., by a CustomResourceDefinition).
+
+In this PoC, all edge clusters are considered to have the same
+built-in resources and namespaces.
+
+As a matter of scoping the work here, it is also assumed that each API
+group built into the edge clusters supports the API versions chosen by
+the conflict resolution rules below when they are applied to the
+workload sources.
+
+At deployment time the workload management platform is configured with
+lists of resources and namespaces built into the edge clusters.
+
+Propagation from center to edge does not attempt to manage the
+resource and namespace definitions that are built into the edge
+clusters.
+
+The mailbox workspaces will have built-in resources and namespaces
+that are a subset of those built into the edge clusters.  The
+propagation from workload management workspace to mailbox workspace
+does not attempt to manage the resource and namespace definitions that
+are built into the mailbox workspaces.
+
 ### Control objects
 
 These are the EdgePlacement objects, their associated
 SinglePlacementSlice objects, and the objects that direct
 customization and summarization.
+
+#### EdgePlacement objects
+
+One of these is a binding between a "what" predicate and a "where"
+predicate.
+
+Overlaps between EdgePlacement objects are explicitly allowed.  Two
+EdgePlacement objects may have "where" predicates that both match some
+of the same destinations.  Two EdgePlacement objects may have "what"
+predicates that match some of the same workload descriptions.  Two
+EdgePlacement objects may overlap in both ways.
+
+An EdgePlacement object deliberately _only_ binds "what" and "where",
+without any adverbs (such as prescriptions of customization or
+summarization).  This means that overlapping EdgePlacement objects can
+not conflict in those adverbs.
+
+However, another sort of conflict remains possible.  This is because
+the user controls the IDs --- that is, the names --- of the parts of
+the workload.  In full, a Kubernetes API object is identified by API
+group, API major version, Kind (equivalently, resource name),
+namespace if relevant, and name.  For simplicity in this PoC we will
+not worry about differences in API major version; each API group in
+Kubernetes and/or kcp currently has only one major version.
+
+Two different workload descriptions can have objects with the same ID
+(i.e., if they appear in different workspaces).  These objects, when
+rendered to the same API version, might have different values.  And
+the objects may be available in different API versions in different
+source workspaces.  See
+[client-go](https://github.com/kubernetes/client-go/blob/release-1.24/discovery/discovery_client.go#L89)
+for what an API server says about which versions it can serve for a
+given API group, and
+[meta/v1](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1045)
+for the supporting details on an APIGroup struct.
+
+When multiple workload objects with the same APIGroup, Kind, namespace
+(if namespaced), and name are directed to the same edge cluster, they
+are merged with conflicts handled by (a) a rule for resolution and (b)
+reporting via both error logging and Kubernetes Event creation.  These
+conflicts are serious matters: they mean user expectations are not
+being met (because they are inconsistent); this is why the placement
+translator tries hard to make the user aware.
+
+The first part of merging a set of objects is to read them all at the
+same API version.  The placement translator solves the problem of
+picking API version at the level of API groups rather than
+object-by-object.  The API version for an given API group is chosen as
+follows.  First, take the intersection of [the supported
+versions](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1050)
+from the various sources.  If this intersection is empty then this is
+a conflict.  It is resolved by throwing out the APIGroup with the
+lowest version and repeating with the reduced set of APIGroup structs.
+Next, take the union of [the preferred
+versions](https://github.com/kubernetes/apimachinery/blob/release-1.24/pkg/apis/meta/v1/types.go#L1054).
+If this union has a non-empty intersection with the intersection of
+the supported versions, take the following steps with this
+intersection; otherwise proceed with just the intersection of the
+supported versions.  When first (since process startup) presented with
+an instance of this problem, the placement translator picks the
+highest version from this intersection.  Subsequently for the same API
+group, the placement translator sticks with its previous decision as
+long as that is still in the intersection.  If the previous choice is
+no longer avaiable, the highest version is picked.  This preference
+for highest version is based on the expectation that rolling forward
+will be more common than rolling back; using the intersection ensures
+that both work (as long as the collection of sources has an overlap in
+supported versions, which is basic sanity).
+
+A workload prescription object that is in the process of graceful
+deletion (i.e., with `DeletionTimestamp` set to something) is
+considered here to already be gone.
+
+Once they have been read at a consistent API version, merging of
+multiple objects is done as follows.  Different parts of the object
+are handled differently.
+
+- **TypeMeta**.  This can not conflict because it is part of what
+  identifies an object.
+- **ObjectMeta**.
+  - **Labels and Annotations**.  These are handled on a key-by-key
+    basis.  Distinct keys do not conflict.  When multiple objects have
+    a label or annotation with the same key, the corresponding value
+    in the result is the value from the most recently updated of those
+    objects.
+  - **OwnerReferences**.  This is handled analogously to labels and
+    annotations.  The key is the combination of APIVersion, Kind, and
+    Name.
+  - **Finalizers**.  This is simply a set of strings.  The result of
+    merging is the union of the sets.
+  - **ManagedFields**.  This is metadata that is not propagated.
+- **Spec**.  Beyond TypeMeta and ObjectMeta, the remaining object
+  fields are specific to the kind of object.  Many have a field named
+  "Spec" in the Go language source, "spec" in the JSON representation.
+  For objects that have Spec fields, merging has a conflict if those
+  field values are not all equal when considered as JSON data, and the
+  resolution is to take the value from the most recently updated
+  object.
+- **Status**.  Status is handled analogously to Spec.  For both, we
+  consider a missing field to be the same as a field with a value of
+  `nil`.  That is expected to be the common case for the Status of
+  these workload prescription objects.
+- **Other fields**.  If all the values are maps (objects in
+  JavaScript) then they are merged key-by-key, as for labels and
+  annotations.  Otherwise they are treated as monoliths, as for Spec
+  and Status.
+
+For the above, the most recently updated object is determined by
+parsing the ResourceVersion as an `int64` and picking the highest
+value.  This is meaningful under the assumption that all the source
+workspaces are from the same kcp server --- which will be true for
+this PoC but is not a resaonble assumption in general.  Also:
+interpreting ResourceVersion breaks a rule for Kubernetes clients ---
+but this is dismayingly common.  Beyond this PoC we could hope to do
+better by looking at the ManagedFields.  But currently kcp does not
+include https://github.com/kubernetes/kubernetes/pull/110058 so the
+ManagedFields often do not properly reflect the update times.  Even
+so, those timestamps have only 1-second precision --- so conflicts
+will remain possible (although, hopefully, unlikely).
+
+There is special handling for Namespace objects.  When a workload
+includes namespaced objects, the propagation has to include ensuring
+that the corresponding Namespace object exists in the destination.  An
+EdgePlacement's "what" predicate MAY fail to match a relevant
+Namespace object.  This is taken to mean that this EdgePlacement is
+not requesting propagation of the details (Spec, labels, etc.) of that
+Namespace object but only expects propagation to somehow ensure that
+the namespace exists.  When merging overlapping workloads that have
+namespaces in common, only the Namespace objects that come from
+matching a "what" predicate need to be merged.
+
+The above also provide an answer to the question of what version is
+used when writing to the mailbox workspace and edge cluster.  The
+version used for that is the version chosen above.  In the case of no
+conflicts, this means that the writes are done using the preferred
+version from the API group from the workload management workspace.
 
 ## Mailbox workspaces
 
