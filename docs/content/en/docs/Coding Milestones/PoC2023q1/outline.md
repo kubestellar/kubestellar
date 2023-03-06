@@ -7,7 +7,7 @@ weight: 2
 ---
 
 {{% pageinfo %}}
-Want to get involved? Check out our [good-first-issue list](https://github.com/orgs/kcp-dev/projects/12/views/4).
+Want to get involved? Check out our [good-first-issue list](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 {{% /pageinfo %}}
 
 <img alt="poc2023q1 architecture" align="center" src="/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1.svg" />
