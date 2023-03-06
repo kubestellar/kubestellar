@@ -18,6 +18,7 @@ To use components from KCP-Edge you must:
 ## 1. Install and Configure KCP
 ### Prerequisites
 
+- go (download from https://golang.org/dl/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - A Kubernetes cluster (for local testing, consider [kind](http://kind.sigs.k8s.io))
 
