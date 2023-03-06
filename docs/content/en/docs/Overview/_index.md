@@ -6,7 +6,7 @@ description: >
 ---
 
 {{% pageinfo %}}
-Want to get involved? Check out our [good-first-issue list](https://github.com/orgs/kcp-dev/projects/12/views/4).
+Want to get involved? Check out our ['good first issue' list](https://github.com/orgs/kcp-dev/projects/12/views/4).
 {{% /pageinfo %}}
 
 
