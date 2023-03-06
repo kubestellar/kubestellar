@@ -28,7 +28,7 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 - Rollout control​: Client needs programmatic control of rollout, possibly including domain-specific logic​
 - Customization: Need a way for one pattern in the center to express how to customize for all the desired destinations​
 - Status from many destinations​: Center clients may need a way to access status from individual edge copies
-- Status summarization​: Client needs a way to say how statuses from edge copies are processed/reduced along the way from edge to center​.
+- Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
 ## Quickstart
 
