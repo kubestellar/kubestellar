@@ -8,7 +8,7 @@ description: >
 ---
 
 {{% pageinfo %}}
-Checkout [this blog post](https://medium.com/@dettori/toward-building-a-kubernetes-control-plane-for-the-edge-a79eaada5750) for a step-by-step guide to configuring kcp
+This page is under construction - please checkout [this blog post](https://medium.com/@dettori/toward-building-a-kubernetes-control-plane-for-the-edge-a79eaada5750) for a step-by-step guide to configuring kcp to operate as kcp-edge will work by default in the near future.
 {{% /pageinfo %}}
 
 To use components from KCP-Edge you must:
