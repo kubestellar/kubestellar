@@ -23,8 +23,6 @@ import (
 	"time"
 
 	apimachtypes "k8s.io/apimachinery/pkg/types"
-
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 func TestTestUIDer(t *testing.T) {
@@ -32,31 +30,31 @@ func TestTestUIDer(t *testing.T) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	uider := NewTestUIDer(rng, &wg)
 	testConsumer := &testUIDConsumer{
-		current: map[edgeapi.ExternalName]apimachtypes.UID{},
+		current: map[ExternalName]apimachtypes.UID{},
 	}
 	uider.AddConsumer(testConsumer, false)
-	en1 := edgeapi.ExternalName{Workspace: "ws1", Name: "n1"}
-	en2 := edgeapi.ExternalName{Workspace: "ws1", Name: "n2"}
-	uid1 := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en1)
-	uid2 := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en2)
+	en1 := ExternalName{Cluster: "ws1", Name: "n1"}
+	en2 := ExternalName{Cluster: "ws1", Name: "n2"}
+	uid1 := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en1)
+	uid2 := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en2)
 	wg.Wait()
 	if len(testConsumer.current) != 2 {
 		t.Errorf("Insufficient mappings: %v", testConsumer.current)
 	}
-	if actual, expected := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
+	if actual, expected := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
-	if actual, expected := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](uider, en2), uid2; actual != expected {
+	if actual, expected := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en2), uid2; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
 }
 
 type testUIDConsumer struct {
 	sync.Mutex
-	current map[edgeapi.ExternalName]apimachtypes.UID
+	current map[ExternalName]apimachtypes.UID
 }
 
-func (tc *testUIDConsumer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
+func (tc *testUIDConsumer) Set(en ExternalName, uid apimachtypes.UID) {
 	tc.Lock()
 	defer tc.Unlock()
 	tc.current[en] = uid

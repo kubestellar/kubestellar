@@ -61,12 +61,12 @@ import (
 // WhereResolver is responsible for keeping given consumers eventually
 // consistent with the resolution of the "where" predicate for each EdgePlacement
 // (identified by cluster and name).
-type WhereResolver DynamicMapProducer[edgeapi.ExternalName, ResolvedWhere]
+type WhereResolver DynamicMapProducer[ExternalName, ResolvedWhere]
 
 // WhatResolver is responsible for keeping its consumers eventually consistent
 // with the resolution of the "what" predicate of each EdgePlacement
 // (identified by cluster ane name).
-type WhatResolver DynamicMapProducer[edgeapi.ExternalName, WorkloadParts]
+type WhatResolver DynamicMapProducer[ExternalName, WorkloadParts]
 
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
@@ -75,8 +75,8 @@ type WhatResolver DynamicMapProducer[edgeapi.ExternalName, WorkloadParts]
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMapProducer behavior.
 type SetBinder interface {
-	AsWhatConsumer() DynamicMapConsumer[edgeapi.ExternalName, WorkloadParts]
-	AsWhereConsumer() DynamicMapConsumer[edgeapi.ExternalName, ResolvedWhere]
+	AsWhatConsumer() DynamicMapConsumer[ExternalName, WorkloadParts]
+	AsWhereConsumer() DynamicMapConsumer[ExternalName, ResolvedWhere]
 	ProjectionMapProducer
 }
 
@@ -174,7 +174,7 @@ type ProjectionMapProducer DynamicMapProducer[ProjectionKey, *ProjectionPerClust
 // the combinatin of the destination and the API group and resource.
 type ProjectionKey struct {
 	metav1.GroupResource
-	Destination SinglePlacement
+	Destination edgeapi.SinglePlacement
 }
 
 // ProjectionPerCluster is the second level of organization.
@@ -203,16 +203,6 @@ type ProjectionDetails struct {
 	Names *k8ssets.String
 }
 
-// SinglePlacement extends the API struct with the UID of the SyncTarget.
-type SinglePlacement struct {
-	edgeapi.SinglePlacement
-	SyncTargetUID apimachtypes.UID
-}
-
-func (sp SinglePlacement) SyncTargetRef() edgeapi.ExternalName {
-	return edgeapi.ExternalName{Workspace: sp.Location.Workspace, Name: sp.SyncTargetName}
-}
-
 // BindingOrganizer produces a SingleBinder and a corresponding map producer
 // that reflects the result of combining the single bindings and resolving
 // the API group version issue.
@@ -233,8 +223,8 @@ type SingleBinder interface {
 }
 
 type SingleBindingOps interface {
-	AddBinding(what WorkloadPart, where SinglePlacement)
-	RemoveBinding(what WorkloadPart, where SinglePlacement)
+	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement)
+	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement)
 }
 
 // SinglePlacementSliceSetReducer keeps track of a ResolvedWhere.
@@ -249,10 +239,10 @@ type SinglePlacementSliceSetReducer interface {
 }
 
 // SinglePlacementSetChangeConsumer is something that is kept
-// incrementally appraised of a set of SinglePlacement values.
+// incrementally appraised of a set of edgeapi.SinglePlacement values.
 type SinglePlacementSetChangeConsumer interface {
-	Add(SinglePlacement)
-	Remove(SinglePlacement)
+	Add(edgeapi.SinglePlacement)
+	Remove(edgeapi.SinglePlacement)
 }
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
@@ -360,10 +350,10 @@ const (
 // UIDer is a source of mapping from object name to UID.
 // One of these is specific to one kind of object,
 // which is not namespaced.
-type UIDer DynamicMapProducer[edgeapi.ExternalName, apimachtypes.UID]
+type UIDer DynamicMapProducer[ExternalName, apimachtypes.UID]
 
-func (sp *SinglePlacement) MailboxWorkspaceName() string {
-	return sp.Location.Workspace + WSNameSep + string(sp.SyncTargetUID)
+func SPMailboxWorkspaceName(sp edgeapi.SinglePlacement) string {
+	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
 }
 
 const WSNameSep = "-mb-"

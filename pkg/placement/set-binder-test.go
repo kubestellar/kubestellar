@@ -50,22 +50,21 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		WorkloadPartDetails{APIVersion: "v1"},
 	}
 	what1 := WorkloadParts{workloadPart1.WorkloadPartID: workloadPart1.WorkloadPartDetails}
-	whatProvider := NewRelayMap[edgeapi.ExternalName, WorkloadParts](false)
+	whatProvider := NewRelayMap[ExternalName, WorkloadParts](false)
 	sc1 := logicalcluster.Name("wm1")
-	ep1Ref := edgeapi.ExternalName{Workspace: sc1.String(), Name: "ep1"}
+	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
 	whatProvider.Set(ep1Ref, what1)
-	sp1 := SinglePlacement{
-		edgeapi.SinglePlacement{
-			Location:       edgeapi.ExternalName{Workspace: "inv1", Name: "loc1"},
-			SyncTargetName: "st1",
-		},
-		apimachtypes.UID("uid1"),
+	sp1 := edgeapi.SinglePlacement{
+		Cluster:        "inv1",
+		LocationName:   "loc1",
+		SyncTargetName: "st1",
+		SyncTargetUID:  apimachtypes.UID("uid1"),
 	}
 	sps1 := &edgeapi.SinglePlacementSlice{
-		Destinations: []edgeapi.SinglePlacement{sp1.SinglePlacement},
+		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
 	where1 := ResolvedWhere{sps1}
-	whereProvider := NewRelayMap[edgeapi.ExternalName, ResolvedWhere](false)
+	whereProvider := NewRelayMap[ExternalName, ResolvedWhere](false)
 	whereProvider.Set(ep1Ref, where1)
 	whatProvider.AddConsumer(binder.AsWhatConsumer(), true)
 	whereProvider.AddConsumer(binder.AsWhereConsumer(), true)

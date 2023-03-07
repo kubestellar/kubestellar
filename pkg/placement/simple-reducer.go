@@ -27,7 +27,6 @@ import (
 // SimplePlacementSliceSetReducer is the simplest possible
 // implementation of SinglePlacementSliceSetReducer.
 type SimplePlacementSliceSetReducer struct {
-	uider UIDer
 	sync.Mutex
 	consumers []SinglePlacementSetChangeConsumer
 	enhanced  SinglePlacementSet
@@ -35,13 +34,11 @@ type SimplePlacementSliceSetReducer struct {
 
 var _ SinglePlacementSliceSetReducer = &SimplePlacementSliceSetReducer{}
 
-func NewSimplePlacementSliceSetReducer(uider UIDer, consumers ...SinglePlacementSetChangeConsumer) *SimplePlacementSliceSetReducer {
+func NewSimplePlacementSliceSetReducer(consumers ...SinglePlacementSetChangeConsumer) *SimplePlacementSliceSetReducer {
 	ans := &SimplePlacementSliceSetReducer{
-		uider:     uider,
 		consumers: consumers,
 		enhanced:  NewSinglePlacementSet(),
 	}
-	uider.AddConsumer(SimplePlacementSliceSetReducerAsUIDConsumer{ans}, false)
 	return ans
 }
 
@@ -52,7 +49,7 @@ type SimplePlacementSliceSetReducerAsUIDConsumer struct {
 	*SimplePlacementSliceSetReducer
 }
 
-func (spsr SimplePlacementSliceSetReducerAsUIDConsumer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
+func (spsr SimplePlacementSliceSetReducerAsUIDConsumer) Set(en ExternalName, uid apimachtypes.UID) {
 	spsr.Lock()
 	defer spsr.Unlock()
 	if details, ok := spsr.enhanced[en]; ok {
@@ -81,16 +78,14 @@ func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
 func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
 	spsr.enhanced = NewSinglePlacementSet()
 	enumerateSinglePlacementSlices(newSlices, func(apiSP edgeapi.SinglePlacement) {
-		syncTargetID := edgeapi.ExternalName{Workspace: apiSP.Location.Workspace, Name: apiSP.SyncTargetName}
-		syncTargetUID := DynamicMapProducerGet[edgeapi.ExternalName, apimachtypes.UID](spsr.uider, syncTargetID)
+		syncTargetID := ExternalName{}.OfSPTarget(apiSP)
 		syncTargetDetails := SinglePlacementDetails{
-			LocationName:  apiSP.Location.Name,
-			SyncTargetUID: syncTargetUID,
+			LocationName:  apiSP.LocationName,
+			SyncTargetUID: apiSP.SyncTargetUID,
 		}
 		spsr.enhanced[syncTargetID] = syncTargetDetails
-		fullSP := SinglePlacement{SinglePlacement: apiSP, SyncTargetUID: syncTargetUID}
 		for _, consumer := range spsr.consumers {
-			consumer.Add(fullSP)
+			consumer.Add(apiSP)
 		}
 	})
 }

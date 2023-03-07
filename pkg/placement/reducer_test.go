@@ -24,6 +24,7 @@ import (
 	"time"
 
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	apimachtypes "k8s.io/apimachinery/pkg/types"
 )
 
 // exerciseSinglePlacementSliceSetReducer tests a given SinglePlacementSliceSetReducer.
@@ -31,7 +32,7 @@ import (
 // do the following in TestFoo (or whatever you call it):
 // - construct a Foo using a SinglePlacementSet as the consumer
 // - call exerciseSinglePlacementSliceSetReducer on the Foo, its UIDer, and that consumer.
-func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, uider UIDer, consumer SinglePlacementSet) func(*testing.T) {
+func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, consumer SinglePlacementSet) func(*testing.T) {
 	return func(t *testing.T) {
 		input := initialWhere
 		for iteration := 1; iteration <= iterations; iteration++ {
@@ -42,7 +43,7 @@ func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere Resolve
 			reducer.Set(input)
 			extraPerIteration()
 			checker := NewSinglePlacementSet()
-			reference := NewSimplePlacementSliceSetReducer(uider, checker)
+			reference := NewSimplePlacementSliceSetReducer(checker)
 			reference.Set(input)
 			if consumer.Equals(checker) {
 				continue
@@ -94,24 +95,25 @@ func reviseSinglePlacementSliceSlice(rng *rand.Rand, slices ResolvedWhere) Resol
 }
 
 func reviseSinglePlacement(rng *rand.Rand, sp edgeapi.SinglePlacement) edgeapi.SinglePlacement {
-	switch rng.Intn(3) {
+	switch rng.Intn(4) {
 	case 0:
-		sp.Location.Workspace = fmt.Sprintf("ws%d", rng.Intn(1000))
+		sp.Cluster = fmt.Sprintf("ws%d", rng.Intn(1000))
 	case 1:
-		sp.Location.Name = fmt.Sprintf("loc%d", rng.Intn(1000))
-	default:
+		sp.LocationName = fmt.Sprintf("loc%d", rng.Intn(1000))
+	case 2:
 		sp.SyncTargetName = fmt.Sprintf("st%d", rng.Intn(1000))
+	default:
+		sp.SyncTargetUID = apimachtypes.UID(fmt.Sprintf("uid%d", rng.Intn(1000000)))
 	}
 	return sp
 }
 
 func genSinglePlacement(rng *rand.Rand) edgeapi.SinglePlacement {
 	return edgeapi.SinglePlacement{
-		Location: edgeapi.ExternalName{
-			Workspace: fmt.Sprintf("ws%d", rng.Intn(1000)),
-			Name:      fmt.Sprintf("loc%d", rng.Intn(1000)),
-		},
+		Cluster:        fmt.Sprintf("ws%d", rng.Intn(1000)),
+		LocationName:   fmt.Sprintf("loc%d", rng.Intn(1000)),
 		SyncTargetName: fmt.Sprintf("st%d", rng.Intn(1000)),
+		SyncTargetUID:  apimachtypes.UID(fmt.Sprintf("uid%d", rng.Intn(1000000))),
 	}
 }
 
@@ -119,31 +121,28 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	rs := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(rs)
 	var wg sync.WaitGroup
-	testUIDer := NewTestUIDer(rng, &wg)
 	testConsumer := NewSinglePlacementSet()
-	testReducer := NewSimplePlacementSliceSetReducer(testUIDer, testConsumer)
-	locRef1 := edgeapi.ExternalName{Workspace: "ws-a", Name: "loc-a"}
-	asp1 := edgeapi.SinglePlacement{Location: locRef1, SyncTargetName: "st-a"}
-	sp1 := SinglePlacement{asp1, "u-a"}
-	testUIDer.Set(sp1.SyncTargetRef(), sp1.SyncTargetUID)
+	testReducer := NewSimplePlacementSliceSetReducer(testConsumer)
+	sp1 := edgeapi.SinglePlacement{Cluster: "ws-a", LocationName: "loc-a",
+		SyncTargetName: "st-a", SyncTargetUID: "u-a"}
 	rw1 := ResolvedWhere{&edgeapi.SinglePlacementSlice{
-		Destinations: []edgeapi.SinglePlacement{asp1},
+		Destinations: []edgeapi.SinglePlacement{sp1},
 	}}
 	testReducer.Set(rw1)
 	if actual, expected := len(testConsumer), 1; actual != expected {
 		t.Errorf("Wrong size after first Set: actual=%d, expected=%d", actual, expected)
 	}
-	if actual, expected := testConsumer[sp1.SyncTargetRef()], sp1.Details(); actual != expected {
+	if actual, expected := testConsumer[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1); actual != expected {
 		t.Errorf("Wrong details after first Set: actual=%#v, expected=%#v", actual, expected)
 	}
-	sp1a := SinglePlacement{asp1, "u-aa"}
-	testUIDer.Set(sp1.SyncTargetRef(), sp1a.SyncTargetUID)
+	sp1a := sp1
+	sp1a.SyncTargetUID = "u-aa"
 	wg.Wait()
 	if actual, expected := len(testConsumer), 1; actual != expected {
 		t.Errorf("Wrong size after first tweak: actual=%d, expected=%d", actual, expected)
 	}
-	if actual, expected := testConsumer[sp1.SyncTargetRef()], sp1a.Details(); actual != expected {
+	if actual, expected := testConsumer[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1a); actual != expected {
 		t.Errorf("Wrong details after first tweak: actual=%#v, expected=%#v", actual, expected)
 	}
-	exerciseSinglePlacementSliceSetReducer(rng, rw1, 20, 10, testUIDer.TweakNAndWait(rng, 4), testReducer, testUIDer, testConsumer)(t)
+	exerciseSinglePlacementSliceSetReducer(rng, rw1, 20, 10, func() {}, testReducer, testConsumer)(t)
 }

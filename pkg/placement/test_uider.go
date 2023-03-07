@@ -21,9 +21,8 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/kcp-dev/logicalcluster/v3"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
-
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // testUIDer is a UIDer that makes up an association whenever asked
@@ -34,11 +33,11 @@ type testUIDer struct {
 	sync.Mutex
 	rng       *rand.Rand
 	current   []UIDPair
-	consumers []DynamicMapConsumer[edgeapi.ExternalName, apimachtypes.UID]
+	consumers []DynamicMapConsumer[ExternalName, apimachtypes.UID]
 }
 
 type UIDPair struct {
-	en  edgeapi.ExternalName
+	en  ExternalName
 	uid apimachtypes.UID
 }
 
@@ -52,7 +51,7 @@ func NewTestUIDer(rng *rand.Rand, wg *sync.WaitGroup) *testUIDer {
 	}
 }
 
-func (tu *testUIDer) AddConsumer(consumer DynamicMapConsumer[edgeapi.ExternalName, apimachtypes.UID], notifyCurrent bool) {
+func (tu *testUIDer) AddConsumer(consumer DynamicMapConsumer[ExternalName, apimachtypes.UID], notifyCurrent bool) {
 	tu.Lock()
 	defer tu.Unlock()
 	tu.consumers = append(tu.consumers, consumer)
@@ -66,12 +65,12 @@ func (tu *testUIDer) AddConsumer(consumer DynamicMapConsumer[edgeapi.ExternalNam
 func (tu *testUIDer) TweakOne(rng *rand.Rand) {
 	tu.Lock()
 	defer tu.Unlock()
-	var en edgeapi.ExternalName
+	var en ExternalName
 	newUID := apimachtypes.UID(fmt.Sprintf("u%d", tu.rng.Intn(1000000000)))
 	if len(tu.current) == 0 || rng.Intn(3) == 0 { // add a new one
-		en = edgeapi.ExternalName{
-			Workspace: fmt.Sprintf("ws%d", tu.rng.Intn(1000)),
-			Name:      fmt.Sprintf("n%d", tu.rng.Intn(1000)),
+		en = ExternalName{
+			Cluster: logicalcluster.Name(fmt.Sprintf("ws%d", tu.rng.Intn(1000))),
+			Name:    fmt.Sprintf("n%d", tu.rng.Intn(1000)),
 		}
 		tu.current = append(tu.current, UIDPair{en, newUID})
 	} else { // modify an existing one
@@ -93,7 +92,7 @@ func (tu *testUIDer) TweakNAndWait(rng *rand.Rand, n int) func() {
 	}
 }
 
-func (tu *testUIDer) Get(en edgeapi.ExternalName, kont func(apimachtypes.UID)) {
+func (tu *testUIDer) Get(en ExternalName, kont func(apimachtypes.UID)) {
 	tu.Lock()
 	defer tu.Unlock()
 	if uid, ok := tu.lookupLocked(en); ok {
@@ -119,7 +118,7 @@ func (tu *testUIDer) Get(en edgeapi.ExternalName, kont func(apimachtypes.UID)) {
 	kont(ans)
 }
 
-func (tu *testUIDer) lookupLocked(en edgeapi.ExternalName) (apimachtypes.UID, bool) {
+func (tu *testUIDer) lookupLocked(en ExternalName) (apimachtypes.UID, bool) {
 	for _, pair := range tu.current {
 		if pair.en == en {
 			return pair.uid, true
@@ -128,7 +127,7 @@ func (tu *testUIDer) lookupLocked(en edgeapi.ExternalName) (apimachtypes.UID, bo
 	return "", false
 }
 
-func (tu *testUIDer) Set(en edgeapi.ExternalName, uid apimachtypes.UID) {
+func (tu *testUIDer) Set(en ExternalName, uid apimachtypes.UID) {
 	tu.Lock()
 	defer tu.Unlock()
 	found := false

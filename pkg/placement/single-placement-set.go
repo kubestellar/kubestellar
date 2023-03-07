@@ -27,29 +27,22 @@ type SinglePlacementDetails struct {
 	SyncTargetUID apimachtypes.UID
 }
 
-func (sp SinglePlacement) Details() SinglePlacementDetails {
-	return SinglePlacementDetails{LocationName: sp.Location.Name, SyncTargetUID: sp.SyncTargetUID}
+func SPDetails(sp edgeapi.SinglePlacement) SinglePlacementDetails {
+	return SinglePlacementDetails{LocationName: sp.LocationName, SyncTargetUID: sp.SyncTargetUID}
 }
 
-func (spd SinglePlacementDetails) Complete(en edgeapi.ExternalName) SinglePlacement {
-	return SinglePlacement{
-		SinglePlacement: spd.ToAPI(en),
-		SyncTargetUID:   spd.SyncTargetUID,
-	}
-}
-
-func (spd SinglePlacementDetails) ToAPI(en edgeapi.ExternalName) edgeapi.SinglePlacement {
+func (spd SinglePlacementDetails) Complete(en ExternalName) edgeapi.SinglePlacement {
 	return edgeapi.SinglePlacement{
-		Location: edgeapi.ExternalName{
-			Workspace: en.Workspace,
-			Name:      spd.LocationName},
+		Cluster:        en.Cluster.String(),
+		LocationName:   spd.LocationName,
 		SyncTargetName: en.Name,
+		SyncTargetUID:  spd.SyncTargetUID,
 	}
 }
 
 // SinglePlacementSet maps ID of SyncTarget to the rest of the information
-// in each SinglePlacement.
-type SinglePlacementSet map[edgeapi.ExternalName]SinglePlacementDetails
+// in each edgeapi.SinglePlacement.
+type SinglePlacementSet map[ExternalName]SinglePlacementDetails
 
 var _ SinglePlacementSetChangeConsumer = NewSinglePlacementSet()
 
@@ -57,13 +50,13 @@ func NewSinglePlacementSet() SinglePlacementSet {
 	return SinglePlacementSet{}
 }
 
-func (sps SinglePlacementSet) Add(sp SinglePlacement) {
-	key := sp.SyncTargetRef()
-	sps[key] = sp.Details()
+func (sps SinglePlacementSet) Add(sp edgeapi.SinglePlacement) {
+	key := ExternalName{}.OfSPTarget(sp)
+	sps[key] = SPDetails(sp)
 }
 
-func (sps SinglePlacementSet) Remove(sp SinglePlacement) {
-	key := sp.SyncTargetRef()
+func (sps SinglePlacementSet) Remove(sp edgeapi.SinglePlacement) {
+	key := ExternalName{}.OfSPTarget(sp)
 	delete(sps, key)
 }
 

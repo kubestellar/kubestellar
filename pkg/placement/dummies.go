@@ -18,16 +18,14 @@ package placement
 
 import (
 	"github.com/kcp-dev/logicalcluster/v3"
-
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
-func RelayWhatResolver() RelayMap[edgeapi.ExternalName, WorkloadParts] {
-	return NewRelayMap[edgeapi.ExternalName, WorkloadParts](true)
+func RelayWhatResolver() RelayMap[ExternalName, WorkloadParts] {
+	return NewRelayMap[ExternalName, WorkloadParts](true)
 }
 
-func RelayWhereResolver() RelayMap[edgeapi.ExternalName, ResolvedWhere] {
-	return NewRelayMap[edgeapi.ExternalName, ResolvedWhere](true)
+func RelayWhereResolver() RelayMap[ExternalName, ResolvedWhere] {
+	return NewRelayMap[ExternalName, ResolvedWhere](true)
 }
 
 func NewDummySetBinder() SetBinder {
@@ -38,11 +36,11 @@ type dummySetBinder struct {
 	DynamicMapProducer[ProjectionKey, *ProjectionPerCluster]
 }
 
-func (dummySetBinder) AsWhatConsumer() DynamicMapConsumer[edgeapi.ExternalName, WorkloadParts] {
+func (dummySetBinder) AsWhatConsumer() DynamicMapConsumer[ExternalName, WorkloadParts] {
 	return RelayWhatResolver()
 }
 
-func (dummySetBinder) AsWhereConsumer() DynamicMapConsumer[edgeapi.ExternalName, ResolvedWhere] {
+func (dummySetBinder) AsWhereConsumer() DynamicMapConsumer[ExternalName, ResolvedWhere] {
 	return RelayWhereResolver()
 }
 
