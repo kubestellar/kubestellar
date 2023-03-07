@@ -4,8 +4,6 @@ description = "Consistent, Heterogeneous, and Scalable Edge Configuration Manage
 
 enableRobotsTXT = true
 
-theme = ["docsy"]
-
 publishDir = "public"
 
 ###############################################################################
