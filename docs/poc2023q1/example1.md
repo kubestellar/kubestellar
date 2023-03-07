@@ -3,6 +3,10 @@
 This doc attempts to show a simple example usage of the 2023q1 PoC.
 This doc is a work in progress.
 
+This example involves two edge clusters and two workloads.  One
+workload goes on both edge clusters and one workload goes on only one
+edge cluster.  Nothing changes after the initial activity.
+
 This example is presented in stages.  The controllers involved are
 always maintaining relationships.  This document focuses on changes as
 they appear in this example.
