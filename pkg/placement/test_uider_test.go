@@ -32,19 +32,19 @@ func TestTestUIDer(t *testing.T) {
 	testConsumer := &testUIDConsumer{
 		current: map[ExternalName]apimachtypes.UID{},
 	}
-	uider.AddConsumer(testConsumer, false)
+	uider.AddReceiver(testConsumer, false)
 	en1 := ExternalName{Cluster: "ws1", Name: "n1"}
 	en2 := ExternalName{Cluster: "ws1", Name: "n2"}
-	uid1 := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en1)
-	uid2 := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en2)
+	uid1 := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en1)
+	uid2 := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en2)
 	wg.Wait()
 	if len(testConsumer.current) != 2 {
 		t.Errorf("Insufficient mappings: %v", testConsumer.current)
 	}
-	if actual, expected := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
+	if actual, expected := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
-	if actual, expected := DynamicMapProducerGet[ExternalName, apimachtypes.UID](uider, en2), uid2; actual != expected {
+	if actual, expected := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en2), uid2; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
 	}
 }

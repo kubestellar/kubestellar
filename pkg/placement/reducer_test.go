@@ -19,7 +19,6 @@ package placement
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"testing"
 	"time"
 
@@ -120,7 +119,6 @@ func genSinglePlacement(rng *rand.Rand) edgeapi.SinglePlacement {
 func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	rs := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(rs)
-	var wg sync.WaitGroup
 	testConsumer := NewSinglePlacementSet()
 	testReducer := NewSimplePlacementSliceSetReducer(testConsumer)
 	sp1 := edgeapi.SinglePlacement{Cluster: "ws-a", LocationName: "loc-a",
@@ -137,7 +135,10 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	}
 	sp1a := sp1
 	sp1a.SyncTargetUID = "u-aa"
-	wg.Wait()
+	rw1a := ResolvedWhere{&edgeapi.SinglePlacementSlice{
+		Destinations: []edgeapi.SinglePlacement{sp1a},
+	}}
+	testReducer.Set(rw1a)
 	if actual, expected := len(testConsumer), 1; actual != expected {
 		t.Errorf("Wrong size after first tweak: actual=%d, expected=%d", actual, expected)
 	}

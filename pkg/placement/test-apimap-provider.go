@@ -33,27 +33,27 @@ type TestAPIMapProducer struct {
 
 	// No mutex needed here because of expected exclusivity of callbacks from baseProducer
 
-	clusters map[logicalcluster.Name]*ClientTracker[ScopedAPIProducer]
+	clusters map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]
 }
 
 // BaseAPIMapProducer is a source of API information.
 // It is expected to hold a mutex while calling into this client.
-type BaseAPIMapProducer DynamicMapProducerWithRelease[logicalcluster.Name, ScopedAPIProducer]
+type BaseAPIMapProducer DynamicMapProviderWithRelease[logicalcluster.Name, ScopedAPIProvider]
 
 var _ APIMapProvider = &TestAPIMapProducer{}
 
 func NewTestAPIMapProducer(baseProducer BaseAPIMapProducer) *TestAPIMapProducer {
 	ans := &TestAPIMapProducer{
 		baseProducer: baseProducer,
-		clusters:     map[logicalcluster.Name]*ClientTracker[ScopedAPIProducer]{},
+		clusters:     map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]{},
 	}
-	baseProducer.AddConsumer(TestAPIMapProducerAsConsumer{ans}, false)
+	baseProducer.AddReceiver(TestAPIMapProducerAsConsumer{ans}, false)
 	return ans
 }
 
 type TestAPIMapProducerAsConsumer struct{ *TestAPIMapProducer }
 
-func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, producer ScopedAPIProducer) {
+func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, producer ScopedAPIProvider) {
 	clusterData, found := tamp.clusters[cluster]
 	if !found {
 		return
@@ -61,19 +61,19 @@ func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, produc
 	clusterData.SetProvider(producer)
 }
 
-func (tamp *TestAPIMapProducer) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer]) {
-	tamp.baseProducer.Get(cluster, func(producer ScopedAPIProducer) {
+func (tamp *TestAPIMapProducer) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
+	tamp.baseProducer.Get(cluster, func(producer ScopedAPIProvider) {
 		clusterData, found := tamp.clusters[cluster]
 		if !found {
-			clusterData = NewClientTracker[ScopedAPIProducer]()
+			clusterData = NewClientTracker[ScopedAPIProvider]()
 			clusterData.SetProvider(producer)
 		}
 		clusterData.AddClient(client)
 	})
 }
 
-func (tamp *TestAPIMapProducer) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer]) {
-	tamp.baseProducer.MaybeRelease(cluster, func(ScopedAPIProducer) bool {
+func (tamp *TestAPIMapProducer) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
+	tamp.baseProducer.MaybeRelease(cluster, func(ScopedAPIProvider) bool {
 		clusterData, found := tamp.clusters[cluster]
 		if !found {
 			return true

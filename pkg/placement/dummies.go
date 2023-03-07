@@ -33,14 +33,14 @@ func NewDummySetBinder() SetBinder {
 }
 
 type dummySetBinder struct {
-	DynamicMapProducer[ProjectionKey, *ProjectionPerCluster]
+	DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
 }
 
-func (dummySetBinder) AsWhatConsumer() DynamicMapConsumer[ExternalName, WorkloadParts] {
+func (dummySetBinder) AsWhatConsumer() MappingReceiver[ExternalName, WorkloadParts] {
 	return RelayWhatResolver()
 }
 
-func (dummySetBinder) AsWhereConsumer() DynamicMapConsumer[ExternalName, ResolvedWhere] {
+func (dummySetBinder) AsWhereConsumer() MappingReceiver[ExternalName, ResolvedWhere] {
 	return RelayWhereResolver()
 }
 
@@ -50,6 +50,6 @@ var _ Client[float64] = dummyClient[float64]{}
 
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
-func NewDummyWorkloadProjector(mailboxPathToName DynamicMapProducer[string, logicalcluster.Name]) WorkloadProjector {
-	return dummyClient[ProjectionMapProducer]{}
+func NewDummyWorkloadProjector(mailboxPathToName DynamicMapProvider[string, logicalcluster.Name]) WorkloadProjector {
+	return dummyClient[ProjectionMapProvider]{}
 }

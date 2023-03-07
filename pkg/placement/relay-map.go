@@ -30,19 +30,19 @@ type relayMap[Key comparable, OuterVal any, InnerVal any] struct {
 	transform      func(OuterVal) InnerVal
 	sync.Mutex
 	theMap    map[Key]OuterVal
-	consumers []DynamicMapConsumer[Key, InnerVal]
+	consumers []MappingReceiver[Key, InnerVal]
 }
 
 type TransformingRelayMap[Key comparable, OuterVal any, InnerVal any] interface {
-	DynamicMapConsumer[Key, OuterVal]
-	DynamicMapProducerWithRelease[Key, InnerVal]
+	MappingReceiver[Key, OuterVal]
+	DynamicMapProviderWithRelease[Key, InnerVal]
 	Len() int
 	Remove(Key)
 }
 
 type RelayMap[Key comparable, Val any] TransformingRelayMap[Key, Val, Val]
 
-var _ DynamicMapProducerWithRelease[string, func()] = &relayMap[string, int64, func()]{}
+var _ DynamicMapProviderWithRelease[string, func()] = &relayMap[string, int64, func()]{}
 
 func NewRelayMap[Key comparable, Val any](dedupConsumers bool) RelayMap[Key, Val] {
 	return NewRelayAndProjectMap[Key, Val, Val](dedupConsumers, func(x Val) Val { return x })
@@ -77,7 +77,7 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeRelease(key Key, shouldRelease
 	}
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) AddConsumer(consumer DynamicMapConsumer[Key, InnerVal], notifyCurrent bool) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(consumer MappingReceiver[Key, InnerVal], notifyCurrent bool) {
 	rm.Lock()
 	defer rm.Unlock()
 	if rm.dedupConsumers {

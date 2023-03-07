@@ -66,15 +66,15 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	where1 := ResolvedWhere{sps1}
 	whereProvider := NewRelayMap[ExternalName, ResolvedWhere](false)
 	whereProvider.Set(ep1Ref, where1)
-	whatProvider.AddConsumer(binder.AsWhatConsumer(), true)
-	whereProvider.AddConsumer(binder.AsWhereConsumer(), true)
+	whatProvider.AddReceiver(binder.AsWhatConsumer(), true)
+	whereProvider.AddReceiver(binder.AsWhereConsumer(), true)
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)
-	binder.AddConsumer(projectionTracker, true)
+	binder.AddReceiver(projectionTracker, true)
 	if projectionTracker.Len() != 1 {
 		t.Errorf("Wrong amount of stuff in projectionTracker.theMap: %#+v", projectionTracker)
 	}
 	pk1 := ProjectionKey{gr1, sp1}
-	ppc1 := DynamicMapProducerGet[ProjectionKey, *ProjectionPerCluster](projectionTracker, pk1)
+	ppc1 := DynamicMapProviderGet[ProjectionKey, *ProjectionPerCluster](projectionTracker, pk1)
 	if ppc1 == nil {
 		t.Errorf("Missing ProjectionPerCluster")
 		return // to stop linter from complaining about possible nil pointer below
@@ -83,11 +83,11 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		t.Errorf("Wrong API version: got %q, expected %q", ppc1.APIVersion, gvr1.Version)
 	}
 	pcTracker := NewRelayMap[logicalcluster.Name, ProjectionDetails](false)
-	ppc1.PerSourceCluster.AddConsumer(pcTracker, true)
+	ppc1.PerSourceCluster.AddReceiver(pcTracker, true)
 	if pcTracker.Len() != 1 {
 		t.Errorf("Wrong amount of stuff in pcTracker.theMap: %#+v", pcTracker)
 	}
-	pd1 := DynamicMapProducerGet[logicalcluster.Name, ProjectionDetails](pcTracker, sc1)
+	pd1 := DynamicMapProviderGet[logicalcluster.Name, ProjectionDetails](pcTracker, sc1)
 	if pd1.Namespaces != nil {
 		t.Errorf("Expected no namespaces but got %#+v", *pd1.Namespaces)
 	}

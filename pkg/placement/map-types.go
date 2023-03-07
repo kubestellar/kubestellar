@@ -16,16 +16,28 @@ limitations under the License.
 
 package placement
 
-// DynamicMapProducer holds a mutable map and keeps consumers appraised of it.
+// This file defines some generic types that embody common patterns.
+
+// These types use the following terminology conventions.
+//
+// "ThingProducer" actively produces a series of Things.
+// "ThingSupplier" passively produces a series of Things.
+// "ThingProvider" passively provides the service of a Thing.
+// "ThingConsumer" actively pulls for things.
+// "ThingReceiver" passively receives Things.
+// "Mapping" is a single key-value pair or other such association
+// "Map" is a complete set of pairs
+
+// DynamicMapProvider holds a mutable map and keeps consumers appraised of it.
 // The zero value of Val signals a missing entry in the map.
-type DynamicMapProducer[Key comparable, Val any] interface {
-	// AddConsumer causes the given consumer to be notified of following
+type DynamicMapProvider[Key comparable, Val any] interface {
+	// AddReceiver causes the given receiver to be notified of following
 	// changes and, if notifyCurrent, the current map contents.
-	// If consumers are comparable: depending on the implementation,
-	// successive adds of the same consumer have no more effect than
-	// the first add, or lead to duplicated callbacks to the consumer.
-	// The producer precedes each consumer in the locking order.
-	AddConsumer(consumer DynamicMapConsumer[Key, Val], notifyCurrent bool)
+	// If receivers are comparable: depending on the implementation,
+	// successive adds of the same receiver have no more effect than
+	// the first add, or lead to duplicated callbacks to the receiver.
+	// The producer precedes each receiver in the locking order.
+	AddReceiver(receiver MappingReceiver[Key, Val], notifyCurrent bool)
 
 	// Get invokes the given function on the value corresponding to the key.
 	// This does not count as informing any particular consumer.
@@ -33,17 +45,17 @@ type DynamicMapProducer[Key comparable, Val any] interface {
 	Get(Key, func(Val))
 }
 
-// DynamicMapProducerGet does a non-CPS Get.
-// In situations with concurrency, regular consumers (as in AddConsumer)
+// DynamicMapProviderGet does a non-CPS Get.
+// In situations with concurrency, regular consumers (as in AddReceiver)
 // get timing splinters if they use this.
-func DynamicMapProducerGet[Key comparable, Val any](prod DynamicMapProducer[Key, Val], key Key) Val {
+func DynamicMapProviderGet[Key comparable, Val any](prod DynamicMapProvider[Key, Val], key Key) Val {
 	var ans Val
 	prod.Get(key, func(val Val) { ans = val })
 	return ans
 }
 
-type DynamicMapProducerWithRelease[Key comparable, Val any] interface {
-	DynamicMapProducer[Key, Val]
+type DynamicMapProviderWithRelease[Key comparable, Val any] interface {
+	DynamicMapProvider[Key, Val]
 
 	// MaybeRelease invokes the given function on the value corresponding to the
 	// given key and, if the function returns true, may release some internal resources
@@ -52,28 +64,28 @@ type DynamicMapProducerWithRelease[Key comparable, Val any] interface {
 	MaybeRelease(Key, func(Val) bool)
 }
 
-func DynamicMapProducerRelease[Key comparable, Val any](prod DynamicMapProducerWithRelease[Key, Val], key Key) {
+func DynamicMapProviderRelease[Key comparable, Val any](prod DynamicMapProviderWithRelease[Key, Val], key Key) {
 	prod.MaybeRelease(key, func(Val) bool { return true })
 }
 
-// DynamicMapConsumer is given map entries by a DynamicMapProducer.
-// Some DynamicMapProducer implementations require consumers to be comparable.
-type DynamicMapConsumer[Key comparable, Val any] interface {
+// MappingReceiver is given map entries by a DynamicMapProvider.
+// Some DynamicMapProvider implementations require consumers to be comparable.
+type MappingReceiver[Key comparable, Val any] interface {
 	Set(Key, Val)
 }
 
-// DynamicMapConsumerFunc is a func value that implements DynamicMapConsumer.
+// MappingReceiverFunc is a func value that implements MappingReceiver.
 // Remember that func values are not comparable.
-type DynamicMapConsumerFunc[Key comparable, Val any] func(Key, Val)
+type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
 
-func (cf DynamicMapConsumerFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
+func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 
 type Client[T any] interface {
 	SetProvider(T)
 }
 
-type DynamicValueProducer[Val any] interface {
-	AddConsumer(func(Val))
+type DynamicValueProvider[Val any] interface {
+	AddReceiver(func(Val))
 	Get() Val
 }
 

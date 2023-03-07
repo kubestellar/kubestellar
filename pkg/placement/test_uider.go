@@ -33,7 +33,7 @@ type testUIDer struct {
 	sync.Mutex
 	rng       *rand.Rand
 	current   []UIDPair
-	consumers []DynamicMapConsumer[ExternalName, apimachtypes.UID]
+	consumers []MappingReceiver[ExternalName, apimachtypes.UID]
 }
 
 type UIDPair struct {
@@ -51,7 +51,7 @@ func NewTestUIDer(rng *rand.Rand, wg *sync.WaitGroup) *testUIDer {
 	}
 }
 
-func (tu *testUIDer) AddConsumer(consumer DynamicMapConsumer[ExternalName, apimachtypes.UID], notifyCurrent bool) {
+func (tu *testUIDer) AddReceiver(consumer MappingReceiver[ExternalName, apimachtypes.UID], notifyCurrent bool) {
 	tu.Lock()
 	defer tu.Unlock()
 	tu.consumers = append(tu.consumers, consumer)

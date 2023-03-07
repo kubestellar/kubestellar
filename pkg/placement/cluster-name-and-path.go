@@ -33,8 +33,8 @@ type NameAndPathBinder struct {
 const PathKey = "kcp.io/path"
 
 func NewNameAndPath(logger klog.Logger, informer k8scache.SharedInformer, dedupConsumers bool) (
-	nameToPath DynamicMapProducer[logicalcluster.Name, string],
-	pathToName DynamicMapProducer[string, logicalcluster.Name]) {
+	nameToPath DynamicMapProvider[logicalcluster.Name, string],
+	pathToName DynamicMapProvider[string, logicalcluster.Name]) {
 	nap := &NameAndPathBinder{
 		logger:     logger,
 		nameToPath: NewRelayMap[logicalcluster.Name, string](dedupConsumers),

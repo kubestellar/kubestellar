@@ -44,7 +44,7 @@ func NewSimplePlacementSliceSetReducer(consumers ...SinglePlacementSetChangeCons
 
 // SimplePlacementSliceSetReducerAsUIDConsumer adds the Set method that
 // SimplePlacementSliceSetReducer needs in order to implement
-// DynamicMapConsumer to receive UID information.
+// MappingReceiver to receive UID information.
 type SimplePlacementSliceSetReducerAsUIDConsumer struct {
 	*SimplePlacementSliceSetReducer
 }

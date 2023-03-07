@@ -61,33 +61,33 @@ import (
 // WhereResolver is responsible for keeping given consumers eventually
 // consistent with the resolution of the "where" predicate for each EdgePlacement
 // (identified by cluster and name).
-type WhereResolver DynamicMapProducer[ExternalName, ResolvedWhere]
+type WhereResolver DynamicMapProvider[ExternalName, ResolvedWhere]
 
 // WhatResolver is responsible for keeping its consumers eventually consistent
 // with the resolution of the "what" predicate of each EdgePlacement
 // (identified by cluster ane name).
-type WhatResolver DynamicMapProducer[ExternalName, WorkloadParts]
+type WhatResolver DynamicMapProvider[ExternalName, WorkloadParts]
 
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
 // workload projector and the placement projector.
 // The implementation may atomize the resolved "where" using a SinglePlacementSliceSetReducer.
 // The implementation may use a BindingOrganizer to get from the atomized
-// "what" and "where" to the ProjectionMapProducer behavior.
+// "what" and "where" to the ProjectionMapProvider behavior.
 type SetBinder interface {
-	AsWhatConsumer() DynamicMapConsumer[ExternalName, WorkloadParts]
-	AsWhereConsumer() DynamicMapConsumer[ExternalName, ResolvedWhere]
-	ProjectionMapProducer
+	AsWhatConsumer() MappingReceiver[ExternalName, WorkloadParts]
+	AsWhereConsumer() MappingReceiver[ExternalName, ResolvedWhere]
+	ProjectionMapProvider
 }
 
 // WorkloadProjector is kept appraised of what goes where
 // and is responsible for maintaining the customized workload
 // copies in the mailbox workspaces.
-type WorkloadProjector Client[ProjectionMapProducer]
+type WorkloadProjector Client[ProjectionMapProvider]
 
 // PlacementProjector is responsible for maintaining the TMC Placement
 // objects that cause propagation between mailbox workspace and edge cluster.
-type PlacementProjector Client[ProjectionMapProducer]
+type PlacementProjector Client[ProjectionMapProvider]
 
 func GetNamespacesBuiltIntoEdgeClusters() k8ssets.String {
 	// TODO: Make this configurable
@@ -107,8 +107,8 @@ func AssemplePlacementTranslator(
 	workloadProjector WorkloadProjector,
 	placementProjector PlacementProjector,
 ) {
-	whatResolver.AddConsumer(setBinder.AsWhatConsumer(), true)
-	whereResolver.AddConsumer(setBinder.AsWhereConsumer(), true)
+	whatResolver.AddReceiver(setBinder.AsWhatConsumer(), true)
+	whereResolver.AddReceiver(setBinder.AsWhereConsumer(), true)
 	workloadProjector.SetProvider(setBinder)
 	placementProjector.SetProvider(setBinder)
 }
@@ -166,9 +166,9 @@ type WorkloadPart struct {
 	WorkloadPartDetails
 }
 
-// ProjectionMapProducer tells the consumers what to project,
+// ProjectionMapProvider tells the consumers what to project,
 // organized into three levels.
-type ProjectionMapProducer DynamicMapProducer[ProjectionKey, *ProjectionPerCluster]
+type ProjectionMapProvider DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
 
 // ProjectionKey identifies the topmost level of organization,
 // the combinatin of the destination and the API group and resource.
@@ -188,7 +188,7 @@ type ProjectionPerCluster struct {
 	// and the work to do for each.
 	// This provider (a) requires consumers to be comparable and (b) deduplicates
 	// additions of consumers.
-	PerSourceCluster DynamicMapProducer[logicalcluster.Name, ProjectionDetails]
+	PerSourceCluster DynamicMapProvider[logicalcluster.Name, ProjectionDetails]
 }
 
 // ProjectionDetails modulates projection
@@ -203,15 +203,15 @@ type ProjectionDetails struct {
 	Names *k8ssets.String
 }
 
-// BindingOrganizer produces a SingleBinder and a corresponding map producer
+// BindingOrganizer produces a SingleBinder and a corresponding map provider
 // that reflects the result of combining the single bindings and resolving
 // the API group version issue.
 // A SetBinder implementation will likely use one of these to provide its
-// ProjectionMapProducer producer, feeding the SingleBinder atomized changes
+// ProjectionMapProvider provider, feeding the SingleBinder atomized changes
 // from the incoming ResolvedWhat and ResolvedWhere values.
 // The given EventHandler is given events that the organizer produces
 // and publishes them somewhere.
-type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler) (SingleBinder, ProjectionMapProducer)
+type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler) (SingleBinder, ProjectionMapProvider)
 
 // SingleBinder is appraised of individual bindings and unbindings,
 // but they may come in batches.
@@ -228,8 +228,7 @@ type SingleBindingOps interface {
 }
 
 // SinglePlacementSliceSetReducer keeps track of a ResolvedWhere.
-// Typically one of these has a UIDer and
-// a SinglePlacementSetChangeConsumer that is kept
+// Typically one of these has a SinglePlacementSetChangeConsumer that is kept
 // appraised of the set of values in those slices, extended by the
 // SyncTarget UIDs.
 // A SetBinder will likely use a SinglePlacementSliceSetReducer
@@ -251,24 +250,24 @@ type SinglePlacementSetChangeConsumer interface {
 // of the clusters.
 type APIMapProvider interface {
 	// AddClient adds a client for a cluster.
-	// All clients for the same cluster get the same producer.
-	AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer])
+	// All clients for the same cluster get the same provider.
+	AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 
 	// RemoveClient removes a client for a cluster.
 	// Clients must be comparable.
 	// Removing the last client for a given cluster causes release of
 	// internal computational resources.
-	RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProducer])
+	RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 }
 
 // ScopedAPIGroupVersioner is specific to one logical cluster and
 // provides a map from API group name to details about it in that cluster.
 // A nil pointer means that the group is not defined in the cluster.
-type ScopedAPIProducer DynamicMapProducer[string, *APIGroupInfo]
+type ScopedAPIProvider DynamicMapProvider[string, *APIGroupInfo]
 
 type APIGroupInfo struct {
-	Versions  DynamicValueProducer[APIGroupVersions]
-	Resources APIResourceDetailsProducer
+	Versions  DynamicValueProvider[APIGroupVersions]
+	Resources APIResourceDetailsProvider
 }
 
 // APIGroupVersions tells about the versions available for the group.
@@ -280,11 +279,11 @@ type APIGroupVersions struct {
 	PreferredVersion metav1.GroupVersionForDiscovery
 }
 
-// APIResourceDetailsProducer reveals details about the resoureces in a
+// APIResourceDetailsProvider reveals details about the resoureces in a
 // given API group in a given cluster.
 // A resource is identified in the usual way, the lowercase plural.
 // A nil pointer means the resource is not defined there.
-type APIResourceDetailsProducer DynamicMapProducer[string, *ResourceDetails]
+type APIResourceDetailsProvider DynamicMapProvider[string, *ResourceDetails]
 
 // ResourceDetails holds the information needed here about a resource
 type ResourceDetails struct {
@@ -350,7 +349,7 @@ const (
 // UIDer is a source of mapping from object name to UID.
 // One of these is specific to one kind of object,
 // which is not namespaced.
-type UIDer DynamicMapProducer[ExternalName, apimachtypes.UID]
+type UIDer DynamicMapProvider[ExternalName, apimachtypes.UID]
 
 func SPMailboxWorkspaceName(sp edgeapi.SinglePlacement) string {
 	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
