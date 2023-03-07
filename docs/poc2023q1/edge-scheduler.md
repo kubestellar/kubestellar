@@ -1,12 +1,8 @@
 ### Edge scheduler
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 
-It starts from the kcp-scheduling-placement controller forked from kcp-dev/kcp, now being refactored towards the goal above.
-
-It works with [this snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5) of kcp.
-
 #### A short demo
-Start a kcp server with [this snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5).
+Start a kcp server, with the version of `"github.com/kcp-dev/kcp"` listed in the `require` directive of go.mod.
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
 
@@ -65,7 +61,7 @@ singleplacementslice.edge.kcp.io/test-1   5m54s
 ```
 
 Edit then delete the EdgePlacement.
-```
+```console
 kubectl edit edgeplacement test-1
 kubectl delete edgeplacement test-1
 ```
