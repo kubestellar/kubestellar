@@ -23,9 +23,11 @@ linkTitle = "KCP-Edge Documentation"
 </div>
 {{< /blocks/cover >}}
 
-
 {{% blocks/lead color="primary" %}}
-<div class="mx-auto">
+<div id="overview">
+  <div class="contain">
+    <h4 class="section-head">What is KCP-Edge?</h4>
+    <div class="mx-auto">
 	<p align="left" class="lead mt-2" style="color:white;font-size: 20px;font-weight: 400;">KCP-Edge is a subproject of kcp (a small, Kubernetes-like control plane for workloads on many clusters) focusing on concerns arising from edge multicloud use cases and the difficulties associated with using Kubernetes to address them:</p>
 	<ul>
 		<li align="left">Desired placement expression: Need a way for one center object to express a large number of desired copies</li>
@@ -35,7 +37,11 @@ linkTitle = "KCP-Edge Documentation"
 		<li align="left">Status from many destinations: Need a way to access status from individual edge copies</li>
 		<li align="left">Status summarization: Need a way to say how statuses from edge copies are processed/reduced along the way from edge to center</li>
 	</ul>
+    </div>   
+  </div>
 </div>
+	
+
 
 
 {{% /blocks/lead %}}
