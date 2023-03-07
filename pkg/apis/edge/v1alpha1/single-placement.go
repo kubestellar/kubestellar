@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachtypes "k8s.io/apimachinery/pkg/types"
 )
 
 // SourcePlacementLabelKey is the key of the label used in a SinglePlacementSlice
@@ -51,17 +52,16 @@ type SinglePlacementSlice struct {
 
 // SinglePlacement describes one Location that matches the relevant EdgePlacement.
 type SinglePlacement struct {
-	// `location` refers to the relevant Location.
-	Location ExternalName `json:"location"`
+	// Cluster is the logicacluster.Name of the logical cluster that contains
+	// both the Location and the SyncTarget.
+	Cluster string `json:"cluster"`
+
+	LocationName string `json:"locationName"`
 
 	// `syncTargetName` identifies the relevant SyncTarget at the Location
-	SyncTargetName string `json:"syncTargetName,omitempty"`
-}
+	SyncTargetName string `json:"syncTargetName"`
 
-// ExternalName refers to an non-namespaced object that may not be in the same server.
-type ExternalName struct {
-	Workspace string `json:"workspace"`
-	Name      string `json:"name"`
+	SyncTargetUID apimachtypes.UID `json:"syncTargetUID"`
 }
 
 // SinglePlacementSliceList is the API type for a list of SinglePlacementSlice

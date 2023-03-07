@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230228-0f548e5.singleplacementslices.edge.kcp.io
+  name: v230303-6f7f2fe.singleplacementslices.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -34,23 +34,27 @@ spec:
             description: SinglePlacement describes one Location that matches the relevant
               EdgePlacement.
             properties:
-              location:
-                description: '`location` refers to the relevant Location.'
-                properties:
-                  name:
-                    type: string
-                  workspace:
-                    type: string
-                required:
-                - name
-                - workspace
-                type: object
+              cluster:
+                description: Cluster is the logicacluster.Name of the logical cluster
+                  that contains both the Location and the SyncTarget.
+                type: string
+              locationName:
+                type: string
               syncTargetName:
                 description: '`syncTargetName` identifies the relevant SyncTarget
                   at the Location'
                 type: string
+              syncTargetUID:
+                description: UID is a type that holds unique ID values, including
+                  UUIDs.  Because we don't ONLY use UUIDs, this is an alias to string.  Being
+                  a type captures intent and helps make sure that UIDs and names do
+                  not get conflated.
+                type: string
             required:
-            - location
+            - cluster
+            - locationName
+            - syncTargetName
+            - syncTargetUID
             type: object
           type: array
         kind:
