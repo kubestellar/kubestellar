@@ -31,6 +31,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
 )
 
 type GenericClusterInformer interface {
@@ -93,6 +94,9 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().EdgePlacements().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("singleplacementslices"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SinglePlacementSlices().Informer()}, nil
+	// Group=meta.kcp.io, Version=V1alpha1
+	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Meta().V1alpha1().APIResources().Informer()}, nil
 	}
 
 	return nil, fmt.Errorf("no informer found for %v", resource)
@@ -111,6 +115,10 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("singleplacementslices"):
 		informer := f.Edge().V1alpha1().SinglePlacementSlices().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	// Group=meta.kcp.io, Version=V1alpha1
+	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
+		informer := f.Meta().V1alpha1().APIResources().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	}
 

@@ -34,12 +34,14 @@ import (
 
 	client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
+	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
 )
 
 type ClusterInterface interface {
 	Cluster(logicalcluster.Path) client.Interface
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface
+	MetaV1alpha1() metav1alpha1.MetaV1alpha1ClusterInterface
 }
 
 // ClusterClientset contains the clients for groups.
@@ -47,6 +49,7 @@ type ClusterClientset struct {
 	*discovery.DiscoveryClient
 	clientCache  kcpclient.Cache[*client.Clientset]
 	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1ClusterClient
+	metaV1alpha1 *metav1alpha1.MetaV1alpha1ClusterClient
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -60,6 +63,11 @@ func (c *ClusterClientset) Discovery() discovery.DiscoveryInterface {
 // EdgeV1alpha1 retrieves the EdgeV1alpha1ClusterClient.
 func (c *ClusterClientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface {
 	return c.edgeV1alpha1
+}
+
+// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
+func (c *ClusterClientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1ClusterInterface {
+	return c.metaV1alpha1
 }
 
 // Cluster scopes this clientset to one cluster.
@@ -115,6 +123,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*ClusterCli
 	cs.clientCache = cache
 	var err error
 	cs.edgeV1alpha1, err = edgev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
+	cs.metaV1alpha1, err = metav1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
