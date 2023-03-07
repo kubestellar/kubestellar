@@ -97,7 +97,7 @@ Use `kubectl` to create the folloing SyncTarget object.
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: florin
+  name: sync-target-f
   labels:
     example: yes
     extended: no
@@ -114,7 +114,7 @@ Use `kubectl` to create the folloing Location object.
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: florin
+  name: location-f
   annotations:
     env: prod
 spec:
@@ -131,7 +131,7 @@ Use `kubectl` to create the folloing SyncTarget object.
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: guilder
+  name: sync-target-g
   labels:
     example: yes
     extended: yes
@@ -148,7 +148,7 @@ Use `kubectl` to create the folloing Location object.
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: kind3
+  name: location-g
   annotations:
     env: prod
     extended: yes
@@ -219,6 +219,7 @@ those Kubernetes APIs.
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
+  name: bind-kube
 spec:
   reference:
     export:
@@ -288,6 +289,7 @@ following APIBinding object --- which enables use of the edge API.
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
+  name: bind-edge
 spec:
   reference:
     export:
@@ -330,6 +332,7 @@ those Kubernetes APIs.
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
+  name: bind-kube
 spec:
   reference:
     export:
@@ -396,6 +399,7 @@ following APIBinding object --- which enables use of the edge API.
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
+  name: bind-edge
 spec:
   reference:
     export:
@@ -433,8 +437,12 @@ following resolutions of the "where" predicates.
 Check out the SinglePlacementSlice objects as follows.
 
 ```shell
+$ kubectl ws root:work-c
 $ kubectl get SinglePlacementSlice
-(TODO: show what they look like)
+(TODO: show what it looks like)
+$ kubectl ws root:work-s
+$ kubectl get SinglePlacementSlice
+(TODO: show what it looks like)
 ```
 
 ## Stage 3
@@ -476,7 +484,8 @@ $ kubectl get Deployment -A
 
 ![TMC kicks in](Edge-PoC-2023q1-Scenario-1-stage-4.svg "Stage 4 summary")
 
-In Stage 4, TMC does its thing.
+In Stage 4, TMC does its thing.  You can check that the workloads are
+running in the edge clusters as they should be.
 
 TMC does its thing between the florin cluster and its mailbox
 workspace.  This is driven by the one TMC Placement object in that
@@ -487,9 +496,70 @@ workspace.  This is driven by the two TMC Placement objects in that
 mailbox workspace, one for the common workload and one for the special
 workload.
 
-## Stage 5
+Using the kubeconfig that `kind` modified, examine the florin cluster.
+Find just the `commonstuff` namespace and the `commond` Deployment.
 
-![Summarization for special](Edge-PoC-2023q1-Scenario-1-stage-5g.svg "Status summarization for special")
+```shell
+$ kubectl get --context kind-florin ns | grep stuff         
+commonstuff          Active   8h
+
+$ kubectl get --context kind-florin Deployment -n commonstuff
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+commond   1/1     1            1           8h
+```
+
+Examine the guilder cluster.  Find both workload namespaces and both
+Deployments.
+
+```shell
+$ kubectl get --context kind-guilder ns | grep stuff
+commonstuff          Active   8h
+specialstuff         Active   8h
+
+$ kubectl get --context kind-guilder Deployment -A | grep stuff
+commonstuff          commond                  1/1     1            1           8h
+specialstuff         speciald                 1/1     1            1           8h
+```
+
+Check that the common workload on the florin cluster is working.
+
+```shell
+$ curl http://localhost:8081
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a common web site.
+  </body>
+</html>
+```
+
+Check that the special workload on the guilder cluster is working.
+
+```shell
+$ curl http://localhost:8082
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a special web site.
+  </body>
+</html>
+```
+
+Check that the common workload on the guilder cluster is working.
+
+```shell
+$ curl http://localhost:8083
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a common web site.
+  </body>
+</html>
+```
+
+## Stage 6
+
+![Summarization for special](Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
 
 The status summarizer, driven by the EdgePlacement and
 SinglePlacementSlice for the special workload, creates a status
@@ -498,7 +568,7 @@ workspace holding a summary of the corresponding Deployment objects.
 In this case there is just one such object, in the mailbox workspace
 for the guilder cluster.
 
-![Summarization for common](Edge-PoC-2023q1-Scenario-1-stage-5b.svg "Status summarization for common")
+![Summarization for common](Edge-PoC-2023q1-Scenario-1-stage-5c.svg "Status summarization for common")
 
 The status summarizer, driven by the EdgePlacement and
 SinglePlacementSlice for the common workload, creates a status summary
