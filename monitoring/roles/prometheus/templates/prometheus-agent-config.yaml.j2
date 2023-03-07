@@ -1,0 +1,11 @@
+# my global config
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s 
+scrape_configs:
+  - job_name: "prometheus-agent"
+
+    static_configs:
+      - targets: ["{{ ansible_default_ipv4.address }}:8080"]
+remote_write:
+  - url: "http://<prometheus-server-ip-address>:<port_number>/api/v1/write"

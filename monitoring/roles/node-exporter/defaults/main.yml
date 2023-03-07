@@ -1,0 +1,7 @@
+---
+# defaults file for roles/node-exporter
+node_exporter_version: "1.5.0"
+node_exporter_bin: /usr/local/bin/node_exporter
+node_exporter_user: node-exporter
+node_exporter_group: "{{ node_exporter_user }}"
+node_exporter_dir_conf: /etc/node_exporter

@@ -1,0 +1,29 @@
+global:
+  evaluation_interval: 5s
+  external_labels:
+    env: dev
+  scrape_interval: 30s
+scrape_configs:
+- job_name: mailbox-controller
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - '<host-ipAddress>:10203'
+
+- job_name: node
+  scrape_interval: 15s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - '<host-ipAddress>:9100'
+
+- job_name: kcp
+  scrape_interval: 15s
+  scheme: https
+  metrics_path: /metrics
+  tls_config:
+    insecure_skip_verify: true
+  static_configs:
+  - targets:
+    - '<host-ipAddress>:6443'
