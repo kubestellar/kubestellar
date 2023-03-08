@@ -62,12 +62,20 @@ import (
 )
 
 type mbCtl struct {
-	context          context.Context
-	synctargetLister workloadlisters.SyncTargetClusterLister
-	workspaceLister  tenancylisters.WorkspaceLister
-	workspaceClient  tenancyclient.WorkspaceInterface
-	queue            workqueue.RateLimitingInterface
+	context           context.Context
+	synctargetLister  workloadlisters.SyncTargetClusterLister
+	syncTargetIndexer cache.Indexer
+	workspaceLister   tenancylisters.WorkspaceLister
+	workspaceClient   tenancyclient.WorkspaceInterface
+	queue             workqueue.RateLimitingInterface // of mailbox workspace Name
 }
+
+// This identifies an index in the SyncTarget informer
+const mbwsNameIndexKey = "mbwsName"
+
+// SyncTargetNameAnnotationKey identifies the annotation on a mailbox Workspace
+// that points to the corresponding SyncTarget.
+const SyncTargetNameAnnotationKey = "edge.kcp.io/sync-target-name"
 
 func main() {
 	resyncPeriod := time.Duration(0)
@@ -139,6 +147,7 @@ func main() {
 	tmcInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(tmcClusterClientset, resyncPeriod)
 	syncTargetsPreInformer := tmcInformerFactory.Workload().V1alpha1().SyncTargets()
 	syncTargetsInformer := syncTargetsPreInformer.Informer()
+	syncTargetsInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: mbwsNameOfObj})
 
 	// create config for accessing TMC service provider workspace
 	workspacesClientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(workloadLoadingRules, workloadConfigOverrides)
@@ -160,11 +169,12 @@ func main() {
 	workspacesInformer := workspacesPreInformer.Informer()
 
 	ctl := &mbCtl{
-		context:          ctx,
-		synctargetLister: syncTargetsPreInformer.Lister(),
-		workspaceLister:  workspacesPreInformer.Lister(),
-		workspaceClient:  workspacesClientset.TenancyV1alpha1().Workspaces(),
-		queue:            workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
+		context:           ctx,
+		synctargetLister:  syncTargetsPreInformer.Lister(),
+		syncTargetIndexer: syncTargetsInformer.GetIndexer(),
+		workspaceLister:   workspacesPreInformer.Lister(),
+		workspaceClient:   workspacesClientset.TenancyV1alpha1().Workspaces(),
+		queue:             workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
 
 	onAdd := func(obj any) {
@@ -255,24 +265,18 @@ func (ctl *mbCtl) enqueue(obj any) {
 	logger := klog.FromContext(ctl.context)
 	switch typed := obj.(type) {
 	case *tenancyv1alpha1.Workspace:
-		logger.V(4).Info("Enqueuing reference due to workspace", "reference", typed.Name)
+		logger.V(4).Info("Enqueuing reference due to workspace", "wsName", typed.Name)
 		ctl.queue.Add(typed.Name)
 	case *workloadv1alpha1.SyncTarget:
-		cluster := logicalcluster.From(typed)
-		ns := typed.Namespace
-		name := typed.Name
-		logger.V(4).Info("Enqueuing reference due to SyncTarget", "cluster", cluster, "ns", ns, "name", name)
-		ctl.queue.Add(wsNameForTarget(cluster, name))
+		mbwsName := mbwsNameOfSynctarget(typed)
+		logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
+		ctl.queue.Add(mbwsName)
 	default:
 		logger.Error(nil, "Notified of object of unexpected type", "object", obj, "type", fmt.Sprintf("%T", obj))
 	}
 }
 
-const wsNameSep = "-w-"
-
-func wsNameForTarget(cluster logicalcluster.Name, name string) string {
-	return cluster.String() + wsNameSep + name
-}
+const wsNameSep = "-mb-"
 
 func (ctl *mbCtl) syncLoop(ctx context.Context, worker int) {
 	doneCh := ctx.Done()
@@ -308,65 +312,88 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 	}
 }
 
-func (ctl *mbCtl) sync(ctx context.Context, ref any) bool {
+func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
-	wsName, ok := ref.(string)
+	mbwsName, ok := refany.(string)
 	if !ok {
-		logger.Error(nil, "Sync expected a string", "ref", ref, "type", fmt.Sprintf("%T", ref))
+		logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
 		return false
 	}
-	wsNameParts := strings.Split(wsName, wsNameSep)
-	if len(wsNameParts) != 2 {
-		logger.Error(nil, "Sync expected a string with 2 parts", "ref", ref, "wsNameParts", wsNameParts)
+	parts := strings.Split(mbwsName, wsNameSep)
+	if len(parts) != 2 {
+		logger.V(3).Info("Ignoring non-mailbox workspace name", "wsName", mbwsName)
 		return false
 	}
-	cluster := logicalcluster.Name(wsNameParts[0])
-	targetName := wsNameParts[1]
-	syncTarget, err := ctl.synctargetLister.Cluster(cluster).Get(targetName)
-	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Unable to Get referenced SyncTarget", "wsNameParts", wsNameParts)
-		return true
+	byIndex, err := ctl.syncTargetIndexer.ByIndex(mbwsNameIndexKey, mbwsName)
+	if err != nil {
+		logger.Error(err, "Failed to lookup SyncTargets by mailbox workspace name", "mbwsName", mbwsName)
+		return false
 	}
-	workspace, err := ctl.workspaceLister.Get(wsName)
+	var syncTarget *workloadv1alpha1.SyncTarget
+	if len(byIndex) == 0 {
+	} else {
+		syncTarget = byIndex[0].(*workloadv1alpha1.SyncTarget)
+		if len(byIndex) > 1 {
+			logger.Error(nil, "Impossible: more than one SyncTarget fetched from index; using the first", "mbwsName", mbwsName, "fetched", byIndex)
+		}
+	}
+	workspace, err := ctl.workspaceLister.Get(mbwsName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Unable to Get referenced Workspace", "wsName", wsName)
+		logger.Error(err, "Unable to Get referenced Workspace", "mbwsName", mbwsName)
 		return true
 	}
 	if syncTarget == nil || syncTarget.DeletionTimestamp != nil {
 		if workspace == nil || workspace.DeletionTimestamp != nil {
-			logger.V(3).Info("Both absent or deleting, nothing to do", "wsName", wsName)
+			logger.V(3).Info("Both SyncTarget and Workspace are absent or deleting, nothing to do", "mbwsName", mbwsName)
 			return false
 		}
-		err := ctl.workspaceClient.Delete(ctx, wsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &workspace.UID}})
+		err := ctl.workspaceClient.Delete(ctx, mbwsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &workspace.UID}})
 		if err == nil || k8sapierrors.IsNotFound(err) {
-			logger.V(2).Info("Deleted unwanted workspace", "wsName", wsName)
+			logger.V(2).Info("Deleted unwanted workspace", "mbwsName", mbwsName)
 			return false
 		}
-		logger.Error(err, "Failed to delete unwanted workspace", "wsName", wsName)
+		logger.Error(err, "Failed to delete unwanted workspace", "mbwsName", mbwsName)
 		return true
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
 	if workspace == nil {
 		ws := &tenancyv1alpha1.Workspace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: wsName,
+				Annotations: map[string]string{SyncTargetNameAnnotationKey: syncTarget.Name},
+				Name:        mbwsName,
 			},
 			Spec: tenancyv1alpha1.WorkspaceSpec{},
 		}
 		_, err := ctl.workspaceClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
-		if err != nil {
-			logger.Error(err, "Failed to create workspace", "wsName", wsName)
-			return true
+		if err == nil {
+			logger.V(2).Info("Created missing workspace", "mbwsName", mbwsName)
+			return false
 		}
-		logger.V(2).Info("Created missing workspace", "wsName", wsName)
-		return false
-
-	}
-	if workspace.DeletionTimestamp != nil {
-		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "wsName", wsName)
+		if k8sapierrors.IsAlreadyExists(err) {
+			logger.V(3).Info("Missing workspace was created concurrently", "mbwsName", mbwsName)
+			return false
+		}
+		logger.Error(err, "Failed to create workspace", "mbwsName", mbwsName)
 		return true
 	}
-	logger.V(3).Info("Both exist and are not being deleted, nothing to do", "wsName", wsName)
+	if workspace.DeletionTimestamp != nil {
+		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "mbwsName", mbwsName)
+		return true
+	}
+	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, nothing to do", "mbwsName", mbwsName)
 	return false
 
+}
+
+func mbwsNameOfSynctarget(st *workloadv1alpha1.SyncTarget) string {
+	cluster := logicalcluster.From(st)
+	return cluster.String() + wsNameSep + string(st.UID)
+}
+
+func mbwsNameOfObj(obj any) ([]string, error) {
+	st, ok := obj.(*workloadv1alpha1.SyncTarget)
+	if !ok {
+		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
+	}
+	return []string{mbwsNameOfSynctarget(st)}, nil
 }
