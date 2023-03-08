@@ -20,17 +20,17 @@ import (
 	"sync"
 )
 
-// relayMap is both a map consumer and producer.
+// relayMap is both a mapping receiver and a map provider.
 // It caches what it has been given in a local map, and provides that map.
 // It can be configured at creation time with a transform from
 // the values it is given to the values that it provides.
-// It can be configured at creation time to deduplicate consumers.
+// It can be configured at creation time to deduplicate receivers.
 type relayMap[Key comparable, OuterVal any, InnerVal any] struct {
-	dedupConsumers bool
+	dedupReceivers bool
 	transform      func(OuterVal) InnerVal
 	sync.Mutex
 	theMap    map[Key]OuterVal
-	consumers []MappingReceiver[Key, InnerVal]
+	receivers []MappingReceiver[Key, InnerVal]
 }
 
 type TransformingRelayMap[Key comparable, OuterVal any, InnerVal any] interface {
@@ -44,13 +44,13 @@ type RelayMap[Key comparable, Val any] TransformingRelayMap[Key, Val, Val]
 
 var _ DynamicMapProviderWithRelease[string, func()] = &relayMap[string, int64, func()]{}
 
-func NewRelayMap[Key comparable, Val any](dedupConsumers bool) RelayMap[Key, Val] {
-	return NewRelayAndProjectMap[Key, Val, Val](dedupConsumers, func(x Val) Val { return x })
+func NewRelayMap[Key comparable, Val any](dedupReceivers bool) RelayMap[Key, Val] {
+	return NewRelayAndProjectMap[Key, Val, Val](dedupReceivers, func(x Val) Val { return x })
 }
 
-func NewRelayAndProjectMap[Key comparable, OuterVal any, InnerVal any](dedupConsumers bool, transform func(OuterVal) InnerVal) TransformingRelayMap[Key, OuterVal, InnerVal] {
+func NewRelayAndProjectMap[Key comparable, OuterVal any, InnerVal any](dedupReceivers bool, transform func(OuterVal) InnerVal) TransformingRelayMap[Key, OuterVal, InnerVal] {
 	return &relayMap[Key, OuterVal, InnerVal]{
-		dedupConsumers: dedupConsumers,
+		dedupReceivers: dedupReceivers,
 		transform:      transform,
 		theMap:         map[Key]OuterVal{},
 	}
@@ -72,27 +72,27 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeRelease(key Key, shouldRelease
 	delete(rm.theMap, key)
 	var outerVal OuterVal
 	innerVal = rm.transform(outerVal)
-	for _, consumer := range rm.consumers {
-		consumer.Set(key, innerVal)
+	for _, receiver := range rm.receivers {
+		receiver.Set(key, innerVal)
 	}
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(consumer MappingReceiver[Key, InnerVal], notifyCurrent bool) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(receiver MappingReceiver[Key, InnerVal], notifyCurrent bool) {
 	rm.Lock()
 	defer rm.Unlock()
-	if rm.dedupConsumers {
-		for _, existing := range rm.consumers {
-			if existing == consumer {
+	if rm.dedupReceivers {
+		for _, existing := range rm.receivers {
+			if existing == receiver {
 				return
 			}
 		}
 	}
-	rm.consumers = append(rm.consumers, consumer)
+	rm.receivers = append(rm.receivers, receiver)
 	if !notifyCurrent {
 		return
 	}
 	for key, outerVal := range rm.theMap {
-		consumer.Set(key, rm.transform(outerVal))
+		receiver.Set(key, rm.transform(outerVal))
 	}
 }
 
@@ -101,8 +101,8 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) Set(key Key, outerVal OuterVal) {
 	rm.Lock()
 	defer rm.Unlock()
 	rm.theMap[key] = outerVal
-	for _, consumer := range rm.consumers {
-		consumer.Set(key, innerVal)
+	for _, receiver := range rm.receivers {
+		receiver.Set(key, innerVal)
 	}
 }
 

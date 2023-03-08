@@ -56,14 +56,14 @@ import (
 // The particular locking order chosen here generally follows the pattern
 // that components that drive activity precede components that get driven,
 // so that this relationship can be synchronous.  For example, providers
-// of maps generally precede consumers of maps.
+// of maps generally precede clients of those maps.
 
-// WhereResolver is responsible for keeping given consumers eventually
+// WhereResolver is responsible for keeping given receivers eventually
 // consistent with the resolution of the "where" predicate for each EdgePlacement
 // (identified by cluster and name).
 type WhereResolver DynamicMapProvider[ExternalName, ResolvedWhere]
 
-// WhatResolver is responsible for keeping its consumers eventually consistent
+// WhatResolver is responsible for keeping its receivers eventually consistent
 // with the resolution of the "what" predicate of each EdgePlacement
 // (identified by cluster ane name).
 type WhatResolver DynamicMapProvider[ExternalName, WorkloadParts]
@@ -75,8 +75,8 @@ type WhatResolver DynamicMapProvider[ExternalName, WorkloadParts]
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMapProvider behavior.
 type SetBinder interface {
-	AsWhatConsumer() MappingReceiver[ExternalName, WorkloadParts]
-	AsWhereConsumer() MappingReceiver[ExternalName, ResolvedWhere]
+	AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts]
+	AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere]
 	ProjectionMapProvider
 }
 
@@ -107,8 +107,8 @@ func AssemplePlacementTranslator(
 	workloadProjector WorkloadProjector,
 	placementProjector PlacementProjector,
 ) {
-	whatResolver.AddReceiver(setBinder.AsWhatConsumer(), true)
-	whereResolver.AddReceiver(setBinder.AsWhereConsumer(), true)
+	whatResolver.AddReceiver(setBinder.AsWhatReceiver(), true)
+	whereResolver.AddReceiver(setBinder.AsWhereReceiver(), true)
 	workloadProjector.SetProvider(setBinder)
 	placementProjector.SetProvider(setBinder)
 }
@@ -166,7 +166,7 @@ type WorkloadPart struct {
 	WorkloadPartDetails
 }
 
-// ProjectionMapProvider tells the consumers what to project,
+// ProjectionMapProvider tells the clients what to project,
 // organized into three levels.
 type ProjectionMapProvider DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
 
@@ -186,8 +186,8 @@ type ProjectionPerCluster struct {
 
 	// PerSourceCluster drives awareness of the relevant logical clusters
 	// and the work to do for each.
-	// This provider (a) requires consumers to be comparable and (b) deduplicates
-	// additions of consumers.
+	// This provider (a) requires receivers to be comparable and (b) deduplicates
+	// additions of receivers.
 	PerSourceCluster DynamicMapProvider[logicalcluster.Name, ProjectionDetails]
 }
 
@@ -228,7 +228,7 @@ type SingleBindingOps interface {
 }
 
 // SinglePlacementSliceSetReducer keeps track of a ResolvedWhere.
-// Typically one of these has a SinglePlacementSetChangeConsumer that is kept
+// Typically one of these has a SinglePlacementSetChangeReceiver that is kept
 // appraised of the set of values in those slices, extended by the
 // SyncTarget UIDs.
 // A SetBinder will likely use a SinglePlacementSliceSetReducer
@@ -237,9 +237,9 @@ type SinglePlacementSliceSetReducer interface {
 	Set(ResolvedWhere)
 }
 
-// SinglePlacementSetChangeConsumer is something that is kept
+// SinglePlacementSetChangeReceiver is something that is kept
 // incrementally appraised of a set of edgeapi.SinglePlacement values.
-type SinglePlacementSetChangeConsumer interface {
+type SinglePlacementSetChangeReceiver interface {
 	Add(edgeapi.SinglePlacement)
 	Remove(edgeapi.SinglePlacement)
 }

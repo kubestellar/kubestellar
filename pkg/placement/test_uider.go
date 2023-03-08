@@ -33,7 +33,7 @@ type testUIDer struct {
 	sync.Mutex
 	rng       *rand.Rand
 	current   []UIDPair
-	consumers []MappingReceiver[ExternalName, apimachtypes.UID]
+	receivers []MappingReceiver[ExternalName, apimachtypes.UID]
 }
 
 type UIDPair struct {
@@ -51,13 +51,13 @@ func NewTestUIDer(rng *rand.Rand, wg *sync.WaitGroup) *testUIDer {
 	}
 }
 
-func (tu *testUIDer) AddReceiver(consumer MappingReceiver[ExternalName, apimachtypes.UID], notifyCurrent bool) {
+func (tu *testUIDer) AddReceiver(receiver MappingReceiver[ExternalName, apimachtypes.UID], notifyCurrent bool) {
 	tu.Lock()
 	defer tu.Unlock()
-	tu.consumers = append(tu.consumers, consumer)
+	tu.receivers = append(tu.receivers, receiver)
 	if notifyCurrent {
 		for _, pair := range tu.current {
-			consumer.Set(pair.en, pair.uid)
+			receiver.Set(pair.en, pair.uid)
 		}
 	}
 }
@@ -78,8 +78,8 @@ func (tu *testUIDer) TweakOne(rng *rand.Rand) {
 		tu.current[which].uid = newUID
 		en = tu.current[which].en
 	}
-	for _, consumer := range tu.consumers {
-		consumer.Set(en, newUID)
+	for _, receiver := range tu.receivers {
+		receiver.Set(en, newUID)
 	}
 }
 
@@ -101,7 +101,7 @@ func (tu *testUIDer) Get(en ExternalName, kont func(apimachtypes.UID)) {
 	}
 	ans := apimachtypes.UID(fmt.Sprintf("u%d", tu.rng.Intn(1000000000)))
 	tu.current = append(tu.current, UIDPair{en, ans})
-	// Notify asynchronously in case GetUID was called while some consumer is locked
+	// Notify asynchronously in case GetUID was called while some receiver is locked
 	tu.wg.Add(1)
 	go func() {
 		defer tu.wg.Add(-1)
@@ -111,8 +111,8 @@ func (tu *testUIDer) Get(en ExternalName, kont func(apimachtypes.UID)) {
 		if !ok {
 			panic(tu)
 		}
-		for _, consumer := range tu.consumers {
-			consumer.Set(en, uid)
+		for _, receiver := range tu.receivers {
+			receiver.Set(en, uid)
 		}
 	}()
 	kont(ans)
@@ -141,7 +141,7 @@ func (tu *testUIDer) Set(en ExternalName, uid apimachtypes.UID) {
 	if !found {
 		tu.current = append(tu.current, UIDPair{en, uid})
 	}
-	for _, consumer := range tu.consumers {
-		consumer.Set(en, uid)
+	for _, receiver := range tu.receivers {
+		receiver.Set(en, uid)
 	}
 }

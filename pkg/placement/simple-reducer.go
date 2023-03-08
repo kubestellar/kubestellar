@@ -28,36 +28,36 @@ import (
 // implementation of SinglePlacementSliceSetReducer.
 type SimplePlacementSliceSetReducer struct {
 	sync.Mutex
-	consumers []SinglePlacementSetChangeConsumer
+	receivers []SinglePlacementSetChangeReceiver
 	enhanced  SinglePlacementSet
 }
 
 var _ SinglePlacementSliceSetReducer = &SimplePlacementSliceSetReducer{}
 
-func NewSimplePlacementSliceSetReducer(consumers ...SinglePlacementSetChangeConsumer) *SimplePlacementSliceSetReducer {
+func NewSimplePlacementSliceSetReducer(receivers ...SinglePlacementSetChangeReceiver) *SimplePlacementSliceSetReducer {
 	ans := &SimplePlacementSliceSetReducer{
-		consumers: consumers,
+		receivers: receivers,
 		enhanced:  NewSinglePlacementSet(),
 	}
 	return ans
 }
 
-// SimplePlacementSliceSetReducerAsUIDConsumer adds the Set method that
+// SimplePlacementSliceSetReducerAsUIDreceiver adds the Set method that
 // SimplePlacementSliceSetReducer needs in order to implement
 // MappingReceiver to receive UID information.
-type SimplePlacementSliceSetReducerAsUIDConsumer struct {
+type SimplePlacementSliceSetReducerAsUIDreceiver struct {
 	*SimplePlacementSliceSetReducer
 }
 
-func (spsr SimplePlacementSliceSetReducerAsUIDConsumer) Set(en ExternalName, uid apimachtypes.UID) {
+func (spsr SimplePlacementSliceSetReducerAsUIDreceiver) Set(en ExternalName, uid apimachtypes.UID) {
 	spsr.Lock()
 	defer spsr.Unlock()
 	if details, ok := spsr.enhanced[en]; ok {
 		details.SyncTargetUID = uid
 		spsr.enhanced[en] = details
 		fullSP := details.Complete(en)
-		for _, consumer := range spsr.consumers {
-			consumer.Add(fullSP)
+		for _, receiver := range spsr.receivers {
+			receiver.Add(fullSP)
 		}
 
 	}
@@ -68,8 +68,8 @@ func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
 	defer spsr.Unlock()
 	for key, val := range spsr.enhanced {
 		sp := val.Complete(key)
-		for _, consumer := range spsr.consumers {
-			consumer.Remove(sp)
+		for _, receiver := range spsr.receivers {
+			receiver.Remove(sp)
 		}
 	}
 	spsr.setLocked(newSlices)
@@ -84,17 +84,17 @@ func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
 			SyncTargetUID: apiSP.SyncTargetUID,
 		}
 		spsr.enhanced[syncTargetID] = syncTargetDetails
-		for _, consumer := range spsr.consumers {
-			consumer.Add(apiSP)
+		for _, receiver := range spsr.receivers {
+			receiver.Add(apiSP)
 		}
 	})
 }
 
-func enumerateSinglePlacementSlices(slices []*edgeapi.SinglePlacementSlice, consumer func(edgeapi.SinglePlacement)) {
+func enumerateSinglePlacementSlices(slices []*edgeapi.SinglePlacementSlice, receiver func(edgeapi.SinglePlacement)) {
 	for _, slice := range slices {
 		if slice != nil {
 			for _, sp := range slice.Destinations {
-				consumer(sp)
+				receiver(sp)
 			}
 		}
 	}

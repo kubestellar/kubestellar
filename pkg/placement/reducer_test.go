@@ -29,9 +29,9 @@ import (
 // exerciseSinglePlacementSliceSetReducer tests a given SinglePlacementSliceSetReducer.
 // For a given SinglePlacementSliceSetReducer implementation Foo,
 // do the following in TestFoo (or whatever you call it):
-// - construct a Foo using a SinglePlacementSet as the consumer
-// - call exerciseSinglePlacementSliceSetReducer on the Foo, its UIDer, and that consumer.
-func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, consumer SinglePlacementSet) func(*testing.T) {
+// - construct a Foo using a SinglePlacementSet as the receiver
+// - call exerciseSinglePlacementSliceSetReducer on the Foo and that receiver.
+func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, receiver SinglePlacementSet) func(*testing.T) {
 	return func(t *testing.T) {
 		input := initialWhere
 		for iteration := 1; iteration <= iterations; iteration++ {
@@ -44,10 +44,10 @@ func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere Resolve
 			checker := NewSinglePlacementSet()
 			reference := NewSimplePlacementSliceSetReducer(checker)
 			reference.Set(input)
-			if consumer.Equals(checker) {
+			if receiver.Equals(checker) {
 				continue
 			}
-			t.Errorf("Unexpected result: excess=%v, missing=%v, iteration=%d, prevInput=%v, input=%v", consumer.Sub(checker), checker.Sub(consumer), iteration, prevInput, input)
+			t.Errorf("Unexpected result: excess=%v, missing=%v, iteration=%d, prevInput=%v, input=%v", receiver.Sub(checker), checker.Sub(receiver), iteration, prevInput, input)
 		}
 	}
 }
@@ -119,18 +119,18 @@ func genSinglePlacement(rng *rand.Rand) edgeapi.SinglePlacement {
 func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	rs := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(rs)
-	testConsumer := NewSinglePlacementSet()
-	testReducer := NewSimplePlacementSliceSetReducer(testConsumer)
+	testReceiver := NewSinglePlacementSet()
+	testReducer := NewSimplePlacementSliceSetReducer(testReceiver)
 	sp1 := edgeapi.SinglePlacement{Cluster: "ws-a", LocationName: "loc-a",
 		SyncTargetName: "st-a", SyncTargetUID: "u-a"}
 	rw1 := ResolvedWhere{&edgeapi.SinglePlacementSlice{
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}}
 	testReducer.Set(rw1)
-	if actual, expected := len(testConsumer), 1; actual != expected {
+	if actual, expected := len(testReceiver), 1; actual != expected {
 		t.Errorf("Wrong size after first Set: actual=%d, expected=%d", actual, expected)
 	}
-	if actual, expected := testConsumer[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1); actual != expected {
+	if actual, expected := testReceiver[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1); actual != expected {
 		t.Errorf("Wrong details after first Set: actual=%#v, expected=%#v", actual, expected)
 	}
 	sp1a := sp1
@@ -139,11 +139,11 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 		Destinations: []edgeapi.SinglePlacement{sp1a},
 	}}
 	testReducer.Set(rw1a)
-	if actual, expected := len(testConsumer), 1; actual != expected {
+	if actual, expected := len(testReceiver), 1; actual != expected {
 		t.Errorf("Wrong size after first tweak: actual=%d, expected=%d", actual, expected)
 	}
-	if actual, expected := testConsumer[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1a); actual != expected {
+	if actual, expected := testReceiver[ExternalName{}.OfSPTarget(sp1)], SPDetails(sp1a); actual != expected {
 		t.Errorf("Wrong details after first tweak: actual=%#v, expected=%#v", actual, expected)
 	}
-	exerciseSinglePlacementSliceSetReducer(rng, rw1, 20, 10, func() {}, testReducer, testConsumer)(t)
+	exerciseSinglePlacementSliceSetReducer(rng, rw1, 20, 10, func() {}, testReducer, testReceiver)(t)
 }

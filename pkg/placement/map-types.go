@@ -22,13 +22,13 @@ package placement
 //
 // "ThingProducer" actively produces a series of Things.
 // "ThingSupplier" passively produces a series of Things.
-// "ThingProvider" passively provides the service of a Thing.
 // "ThingConsumer" actively pulls for things.
 // "ThingReceiver" passively receives Things.
+// "ThingProvider" provides the Thing service, which may have active and/or passive aspects.
 // "Mapping" is a single key-value pair or other such association
 // "Map" is a complete set of pairs
 
-// DynamicMapProvider holds a mutable map and keeps consumers appraised of it.
+// DynamicMapProvider holds a mutable map and keeps clients appraised of it.
 // The zero value of Val signals a missing entry in the map.
 type DynamicMapProvider[Key comparable, Val any] interface {
 	// AddReceiver causes the given receiver to be notified of following
@@ -40,13 +40,13 @@ type DynamicMapProvider[Key comparable, Val any] interface {
 	AddReceiver(receiver MappingReceiver[Key, Val], notifyCurrent bool)
 
 	// Get invokes the given function on the value corresponding to the key.
-	// This does not count as informing any particular consumer.
+	// This does not count as informing any particular receiver.
 	// The producer precedes the function in the locking order.
 	Get(Key, func(Val))
 }
 
 // DynamicMapProviderGet does a non-CPS Get.
-// In situations with concurrency, regular consumers (as in AddReceiver)
+// In situations with concurrency, regular clients (as in AddReceiver)
 // get timing splinters if they use this.
 func DynamicMapProviderGet[Key comparable, Val any](prod DynamicMapProvider[Key, Val], key Key) Val {
 	var ans Val
@@ -69,7 +69,7 @@ func DynamicMapProviderRelease[Key comparable, Val any](prod DynamicMapProviderW
 }
 
 // MappingReceiver is given map entries by a DynamicMapProvider.
-// Some DynamicMapProvider implementations require consumers to be comparable.
+// Some DynamicMapProvider implementations require receivers to be comparable.
 type MappingReceiver[Key comparable, Val any] interface {
 	Set(Key, Val)
 }

@@ -20,40 +20,40 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 )
 
-// TestAPIMapProducer is a simple implementation of APIMapProvider.
+// TestAPIMapProvider is a simple implementation of APIMapProvider.
 // It relies on a base map provider and caches the mappings,
 // and deletes unneeded entries from the base map provider.
 // In the locking order:
-// - callers of the TestAPIMapProducer methods precede the baseProducer
-// - callers of NewTestAPIMapProducer precede the baseProducer
-// - the baseProducer precedes this TestAPIMapProducer
-// - this TestAPIMapProducer precedes each of its Clients
-type TestAPIMapProducer struct {
-	baseProducer BaseAPIMapProducer
+// - callers of the TestAPIMapProvider methods precede the baseProducer
+// - callers of NewTestAPIMapProvider precede the baseProducer
+// - the baseProducer precedes this TestAPIMapProvider
+// - this TestAPIMapProvider precedes each of its Clients
+type TestAPIMapProvider struct {
+	baseProducer BaseAPIMapProvider
 
 	// No mutex needed here because of expected exclusivity of callbacks from baseProducer
 
 	clusters map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]
 }
 
-// BaseAPIMapProducer is a source of API information.
+// BaseAPIMapProvider is a source of API information.
 // It is expected to hold a mutex while calling into this client.
-type BaseAPIMapProducer DynamicMapProviderWithRelease[logicalcluster.Name, ScopedAPIProvider]
+type BaseAPIMapProvider DynamicMapProviderWithRelease[logicalcluster.Name, ScopedAPIProvider]
 
-var _ APIMapProvider = &TestAPIMapProducer{}
+var _ APIMapProvider = &TestAPIMapProvider{}
 
-func NewTestAPIMapProducer(baseProducer BaseAPIMapProducer) *TestAPIMapProducer {
-	ans := &TestAPIMapProducer{
+func NewTestAPIMapProvider(baseProducer BaseAPIMapProvider) *TestAPIMapProvider {
+	ans := &TestAPIMapProvider{
 		baseProducer: baseProducer,
 		clusters:     map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]{},
 	}
-	baseProducer.AddReceiver(TestAPIMapProducerAsConsumer{ans}, false)
+	baseProducer.AddReceiver(TestAPIMapProviderAsreceiver{ans}, false)
 	return ans
 }
 
-type TestAPIMapProducerAsConsumer struct{ *TestAPIMapProducer }
+type TestAPIMapProviderAsreceiver struct{ *TestAPIMapProvider }
 
-func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, producer ScopedAPIProvider) {
+func (tamp TestAPIMapProviderAsreceiver) Set(cluster logicalcluster.Name, producer ScopedAPIProvider) {
 	clusterData, found := tamp.clusters[cluster]
 	if !found {
 		return
@@ -61,7 +61,7 @@ func (tamp TestAPIMapProducerAsConsumer) Set(cluster logicalcluster.Name, produc
 	clusterData.SetProvider(producer)
 }
 
-func (tamp *TestAPIMapProducer) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
+func (tamp *TestAPIMapProvider) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
 	tamp.baseProducer.Get(cluster, func(producer ScopedAPIProvider) {
 		clusterData, found := tamp.clusters[cluster]
 		if !found {
@@ -72,7 +72,7 @@ func (tamp *TestAPIMapProducer) AddClient(cluster logicalcluster.Name, client Cl
 	})
 }
 
-func (tamp *TestAPIMapProducer) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
+func (tamp *TestAPIMapProvider) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
 	tamp.baseProducer.MaybeRelease(cluster, func(ScopedAPIProvider) bool {
 		clusterData, found := tamp.clusters[cluster]
 		if !found {

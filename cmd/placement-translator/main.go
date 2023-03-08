@@ -145,13 +145,13 @@ func main() {
 		os.Exit(4)
 	}
 
-	edgelusterClientset, err := edgeclusterclientset.NewForConfig(edgeViewConfig)
+	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
 		os.Exit(6)
 	}
 
-	edgeInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgelusterClientset, resyncPeriod)
+	edgeInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClusterClientset, resyncPeriod)
 	spsPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 	spsClusterInformer := spsPreInformer.Informer()
 

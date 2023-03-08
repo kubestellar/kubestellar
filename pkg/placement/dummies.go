@@ -36,11 +36,11 @@ type dummySetBinder struct {
 	DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
 }
 
-func (dummySetBinder) AsWhatConsumer() MappingReceiver[ExternalName, WorkloadParts] {
+func (dummySetBinder) AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts] {
 	return RelayWhatResolver()
 }
 
-func (dummySetBinder) AsWhereConsumer() MappingReceiver[ExternalName, ResolvedWhere] {
+func (dummySetBinder) AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere] {
 	return RelayWhereResolver()
 }
 

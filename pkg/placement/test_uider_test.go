@@ -29,17 +29,17 @@ func TestTestUIDer(t *testing.T) {
 	var wg sync.WaitGroup
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	uider := NewTestUIDer(rng, &wg)
-	testConsumer := &testUIDConsumer{
+	testReceiver := &testUIDReceiver{
 		current: map[ExternalName]apimachtypes.UID{},
 	}
-	uider.AddReceiver(testConsumer, false)
+	uider.AddReceiver(testReceiver, false)
 	en1 := ExternalName{Cluster: "ws1", Name: "n1"}
 	en2 := ExternalName{Cluster: "ws1", Name: "n2"}
 	uid1 := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en1)
 	uid2 := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en2)
 	wg.Wait()
-	if len(testConsumer.current) != 2 {
-		t.Errorf("Insufficient mappings: %v", testConsumer.current)
+	if len(testReceiver.current) != 2 {
+		t.Errorf("Insufficient mappings: %v", testReceiver.current)
 	}
 	if actual, expected := DynamicMapProviderGet[ExternalName, apimachtypes.UID](uider, en1), uid1; actual != expected {
 		t.Errorf("Got %q instead of %q", actual, expected)
@@ -49,12 +49,12 @@ func TestTestUIDer(t *testing.T) {
 	}
 }
 
-type testUIDConsumer struct {
+type testUIDReceiver struct {
 	sync.Mutex
 	current map[ExternalName]apimachtypes.UID
 }
 
-func (tc *testUIDConsumer) Set(en ExternalName, uid apimachtypes.UID) {
+func (tc *testUIDReceiver) Set(en ExternalName, uid apimachtypes.UID) {
 	tc.Lock()
 	defer tc.Unlock()
 	tc.current[en] = uid

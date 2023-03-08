@@ -44,7 +44,7 @@ func (spd SinglePlacementDetails) Complete(en ExternalName) edgeapi.SinglePlacem
 // in each edgeapi.SinglePlacement.
 type SinglePlacementSet map[ExternalName]SinglePlacementDetails
 
-var _ SinglePlacementSetChangeConsumer = NewSinglePlacementSet()
+var _ SinglePlacementSetChangeReceiver = NewSinglePlacementSet()
 
 func NewSinglePlacementSet() SinglePlacementSet {
 	return SinglePlacementSet{}
