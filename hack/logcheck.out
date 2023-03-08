@@ -1,3 +1,4 @@
 /cmd/cluster-watchall/main.go:101:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/kcp-watchall/main.go:103:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/mailbox-controller/main.go:102:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/cmd/placement-translator/main.go:99:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
