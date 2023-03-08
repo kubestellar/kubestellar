@@ -455,8 +455,10 @@ $ kubectl get SinglePlacementSlice
 3 summary")
 
 In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
-objects, the placement translator will copy the workloads into the
-mailbox workspaces and create TMC placement objects there.
+objects, the placement translator will copy the workload prescriptions
+into the mailbox workspaces and create TMC placement objects there.
+
+TODO later: add customization
 
 The florin cluster gets only the common workload.  Examine florin's TMC
 Placement object and common workload as follows.
