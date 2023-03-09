@@ -58,7 +58,7 @@ func (tu *testUIDer) AddReceiver(receiver MappingReceiver[ExternalName, apimacht
 	tu.receivers = append(tu.receivers, receiver)
 	if notifyCurrent {
 		for _, pair := range tu.current {
-			receiver.Set(pair.en, pair.uid)
+			receiver.Receive(pair.en, pair.uid)
 		}
 	}
 }
@@ -80,7 +80,7 @@ func (tu *testUIDer) TweakOne(rng *rand.Rand) {
 		en = tu.current[which].en
 	}
 	for _, receiver := range tu.receivers {
-		receiver.Set(en, newUID)
+		receiver.Receive(en, newUID)
 	}
 }
 
@@ -113,7 +113,7 @@ func (tu *testUIDer) Get(en ExternalName, kont func(apimachtypes.UID)) {
 			panic(tu)
 		}
 		for _, receiver := range tu.receivers {
-			receiver.Set(en, uid)
+			receiver.Receive(en, uid)
 		}
 	}()
 	kont(ans)
@@ -143,6 +143,6 @@ func (tu *testUIDer) Set(en ExternalName, uid apimachtypes.UID) {
 		tu.current = append(tu.current, UIDPair{en, uid})
 	}
 	for _, receiver := range tu.receivers {
-		receiver.Set(en, uid)
+		receiver.Receive(en, uid)
 	}
 }

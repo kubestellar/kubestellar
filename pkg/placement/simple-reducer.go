@@ -19,8 +19,6 @@ package placement
 import (
 	"sync"
 
-	apimachtypes "k8s.io/apimachinery/pkg/types"
-
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
@@ -28,42 +26,21 @@ import (
 // implementation of SinglePlacementSliceSetReducer.
 type SimplePlacementSliceSetReducer struct {
 	sync.Mutex
-	receivers []SinglePlacementSetChangeReceiver
+	receivers []SetChangeReceiver[edgeapi.SinglePlacement]
 	enhanced  SinglePlacementSet
 }
 
-var _ SinglePlacementSliceSetReducer = &SimplePlacementSliceSetReducer{}
+var _ Receiver[ResolvedWhere] = &SimplePlacementSliceSetReducer{}
 
-func NewSimplePlacementSliceSetReducer(receivers ...SinglePlacementSetChangeReceiver) *SimplePlacementSliceSetReducer {
+func NewSimplePlacementSliceSetReducer(receiver SetChangeReceiver[edgeapi.SinglePlacement]) *SimplePlacementSliceSetReducer {
 	ans := &SimplePlacementSliceSetReducer{
-		receivers: receivers,
+		receivers: []SetChangeReceiver[edgeapi.SinglePlacement]{receiver},
 		enhanced:  NewSinglePlacementSet(),
 	}
 	return ans
 }
 
-// SimplePlacementSliceSetReducerAsUIDreceiver adds the Set method that
-// SimplePlacementSliceSetReducer needs in order to implement
-// MappingReceiver to receive UID information.
-type SimplePlacementSliceSetReducerAsUIDreceiver struct {
-	*SimplePlacementSliceSetReducer
-}
-
-func (spsr SimplePlacementSliceSetReducerAsUIDreceiver) Set(en ExternalName, uid apimachtypes.UID) {
-	spsr.Lock()
-	defer spsr.Unlock()
-	if details, ok := spsr.enhanced[en]; ok {
-		details.SyncTargetUID = uid
-		spsr.enhanced[en] = details
-		fullSP := details.Complete(en)
-		for _, receiver := range spsr.receivers {
-			receiver.Add(fullSP)
-		}
-
-	}
-}
-
-func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
+func (spsr *SimplePlacementSliceSetReducer) Receive(newSlices ResolvedWhere) {
 	spsr.Lock()
 	defer spsr.Unlock()
 	for key, val := range spsr.enhanced {
