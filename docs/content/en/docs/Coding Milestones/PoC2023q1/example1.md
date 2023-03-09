@@ -21,7 +21,7 @@ they appear in this example.
 
 ## Stage 1
 
-![Boxes and arrows. Two kind clusters exist, named kind1 and kind3. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoD controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
+![Boxes and arrows. Two kind clusters exist, named kind1 and kind3. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoD controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
 
 Stage 1 creates the infrastructure and the edge service provider
 workspace and lets that react to the inventory.  It has the following
