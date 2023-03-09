@@ -200,7 +200,7 @@ niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a   universal            
 
 ## Stage 2
 
-![Placement and scheduling](Edge-PoC-2023q1-Scenario-1-stage-2.svg
+![Placement and scheduling](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-2.svg
 "Stage 2 summary")
 
 Stage 2 creates two workloads, called "common" and "special", and lets
@@ -459,7 +459,7 @@ $ kubectl get SinglePlacementSlice
 
 ## Stage 3
 
-![Placement translation](Edge-PoC-2023q1-Scenario-1-stage-3.svg "Stage
+![Placement translation](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-3.svg "Stage
 3 summary")
 
 In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
@@ -496,7 +496,7 @@ $ kubectl get Deployment -A
 
 ## Stage 4
 
-![TMC kicks in](Edge-PoC-2023q1-Scenario-1-stage-4.svg "Stage 4 summary")
+![TMC kicks in](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg "Stage 4 summary")
 
 In Stage 4, TMC does its thing.  You can check that the workloads are
 running in the edge clusters as they should be.
@@ -573,7 +573,7 @@ $ curl http://localhost:8083
 
 ## Stage 6
 
-![Summarization for special](Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
+![Summarization for special](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
 
 The status summarizer, driven by the EdgePlacement and
 SinglePlacementSlice for the special workload, creates a status
@@ -582,7 +582,7 @@ workspace holding a summary of the corresponding Deployment objects.
 In this case there is just one such object, in the mailbox workspace
 for the guilder cluster.
 
-![Summarization for common](Edge-PoC-2023q1-Scenario-1-stage-5c.svg "Status summarization for common")
+![Summarization for common](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-5c.svg "Status summarization for common")
 
 The status summarizer, driven by the EdgePlacement and
 SinglePlacementSlice for the common workload, creates a status summary
