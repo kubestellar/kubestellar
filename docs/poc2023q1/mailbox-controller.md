@@ -22,7 +22,7 @@ provider workspace).
 
 The command line flags, beyond the basics, are as follows.
 
-```
+```console
       --concurrency int                  number of syncs to run in parallel (default 4)
       --inventory-context string         current-context override for inventory-kubeconfig (default "root")
       --inventory-kubeconfig string      pathname of kubeconfig file for inventory service provider workspace
@@ -46,8 +46,8 @@ kubectl ws create edge --enter
 
 After that, a run of the controller should look like the following.
 
-```shell
-(base) mspreitz@mjs12 edge-mc % go run ./cmd/mailbox-controller -v=2
+```console
+$ go run ./cmd/mailbox-controller -v=2
 I0305 18:06:20.046741   85556 main.go:110] "Command line flag" add_dir_header="false"
 I0305 18:06:20.046954   85556 main.go:110] "Command line flag" alsologtostderr="false"
 I0305 18:06:20.046960   85556 main.go:110] "Command line flag" concurrency="4"
@@ -75,7 +75,7 @@ I0305 18:06:20.172196   85556 main.go:210] "Informers synced"
 
 In a separate shell, make a inventory management workspace as follows.
 
-```
+```shell
 kubectl ws \~
 kubectl ws create inv1 --enter
 ```
@@ -95,17 +95,17 @@ spec:
 
 That should provoke logging like the following from the mailbox controller.
 
-```
+```console
 I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
 And you can verify that like so.
 
-```shell
-(base) mspreitz@mjs12 ~ % kubectl ws root:edge
+```console
+$ kubectl ws root:edge
 Current workspace is "root:edge".
 
-(base) mspreitz@mjs12 ~ % kubectl get Workspace
+$ kubectl get Workspace
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 ```
@@ -113,13 +113,13 @@ niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            
 Next, `kubectl delete` that Workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.
 
-```
+```console
 I0305 18:08:15.428884   85556 main.go:369] "Created missing workspace" worker=2 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
 Finally, go back to your inventory workspace and `kubectl delete
 SyncTarget stest1` and watch the mailbox controller react as follows.
 
-```
+```console
 I0305 18:08:44.380421   85556 main.go:352] "Deleted unwanted workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
