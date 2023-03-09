@@ -7,12 +7,10 @@ description: >
 
 {{% pageinfo %}}
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
-It starts from the kcp-scheduling-placement controller forked from kcp-dev/kcp, now being refactored towards the goal above.
-It works with [this snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5) of kcp.
 {{% /pageinfo %}}
 
 #### A short demo
-Start a kcp server with [this snapshot](https://github.com/kcp-dev/kcp/tree/4506fdc064060b3fe82e1082533f9798b36ba7a5).
+Start a kcp server, with the version of `"github.com/kcp-dev/kcp"` listed in the `require` directive of go.mod.
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
 
@@ -41,31 +39,46 @@ kubectl apply -f config/samples/edgeplacement_test-1.yaml
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
-go run cmd/placement/main.go --kcp-kubeconfig=<path to kcp admin kubeconfig> -v <verbosity (default 2)>
+go run cmd/scheduler/main.go --kcp-kubeconfig=<path to kcp admin kubeconfig> -v <verbosity (default 2)>
 ```
 
 The outputs from the edge scheduler should be similar to:
 ```console
-I0214 17:09:54.739592   50397 placement.go:207] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/21rzp91t9ife44tq/edge.kcp.io"
-I0214 17:09:54.755028   50397 controller.go:182] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0214 17:09:54.841368   50397 controller.go:257] "Starting controller" reconciler="edge-scheduler"
-I0214 17:09:54.841492   50397 controller.go:282] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:28:38.595692   96096 scheduler.go:211] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/wmtp3o8lb1n1c5uj/edge.kcp.io"
+I0302 11:28:38.601037   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:28:38.697604   96096 controller.go:159] "Starting controller" reconciler="edge-scheduler"
+I0302 11:28:38.697723   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
 reconciling EdgePlacement test-1 in Workspace kvdk2spgmbix
+I0302 11:28:38.807572   96096 controller.go:226] "creating SinglePlacementSlice" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1" edgeplacement.workspace="kvdk2spgmbix" edgeplacement.namespace="" edgeplacement.name="test-1" edgeplacement.apiVersion="edge.kcp.io/v1alpha1" workspace="kvdk2spgmbix" name="test-1"
+I0302 11:28:38.813981   96096 controller.go:245] "created SinglePlacementSlice" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1" edgeplacement.workspace="kvdk2spgmbix" edgeplacement.namespace="" edgeplacement.name="test-1" edgeplacement.apiVersion="edge.kcp.io/v1alpha1" workspace="kvdk2spgmbix" name="test-1"
 ```
 
-Go to `\~` and edit or delete the EdgePlacement.
-```
+The edge scheduler ensures the existence of a SinglePlacementSlice for an EdgePlacement in the same workspace.
+```console
 kubectl ws \~
+kubectl get epl,sps
+```
+
+The outputs of `kubectl get epl,sps` should be similar to:
+```console
+NAME                               AGE
+edgeplacement.edge.kcp.io/test-1   7m10s
+
+NAME                                      AGE
+singleplacementslice.edge.kcp.io/test-1   5m54s
+```
+
+Edit then delete the EdgePlacement.
+```console
 kubectl edit edgeplacement test-1
 kubectl delete edgeplacement test-1
 ```
 
 Additional outputs from the edge scheduler should be similar to:
 ```console
-I0214 17:10:12.404611   50397 controller.go:182] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0214 17:10:12.404634   50397 controller.go:282] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:38:21.224376   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:38:21.224423   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
 reconciling EdgePlacement test-1 in Workspace kvdk2spgmbix
-I0214 17:11:21.744670   50397 controller.go:182] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0214 17:11:21.744695   50397 controller.go:282] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0214 17:11:21.744722   50397 controller.go:308] "object deleted before handled" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:38:35.956562   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+I0302 11:38:35.956586   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
 ```
