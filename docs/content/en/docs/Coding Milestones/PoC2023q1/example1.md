@@ -6,8 +6,6 @@ description: >-
   
 ---
 
-# 2023q1 PoC Example 1
-
 This doc attempts to show a simple example usage of the 2023q1 PoC.
 This doc is a work in progress.
 
