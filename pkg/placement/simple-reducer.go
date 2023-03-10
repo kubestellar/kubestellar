@@ -23,19 +23,21 @@ import (
 )
 
 // SimplePlacementSliceSetReducer is the simplest possible
-// implementation of SinglePlacementSliceSetReducer.
+// set differencer for ResolvedWhere
 type SimplePlacementSliceSetReducer struct {
 	sync.Mutex
 	receivers []SetChangeReceiver[edgeapi.SinglePlacement]
-	enhanced  SinglePlacementSet
+	current   SinglePlacementSet
 }
 
 var _ Receiver[ResolvedWhere] = &SimplePlacementSliceSetReducer{}
 
-func NewSimplePlacementSliceSetReducer(receiver SetChangeReceiver[edgeapi.SinglePlacement]) *SimplePlacementSliceSetReducer {
+var _ ResolvedWhereDifferencerConstructor = NewSimplePlacementSliceSetReducer
+
+func NewSimplePlacementSliceSetReducer(receiver SetChangeReceiver[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
 	ans := &SimplePlacementSliceSetReducer{
 		receivers: []SetChangeReceiver[edgeapi.SinglePlacement]{receiver},
-		enhanced:  NewSinglePlacementSet(),
+		current:   NewSinglePlacementSet(),
 	}
 	return ans
 }
@@ -43,7 +45,7 @@ func NewSimplePlacementSliceSetReducer(receiver SetChangeReceiver[edgeapi.Single
 func (spsr *SimplePlacementSliceSetReducer) Receive(newSlices ResolvedWhere) {
 	spsr.Lock()
 	defer spsr.Unlock()
-	for key, val := range spsr.enhanced {
+	for key, val := range spsr.current {
 		sp := val.Complete(key)
 		for _, receiver := range spsr.receivers {
 			receiver.Remove(sp)
@@ -53,14 +55,11 @@ func (spsr *SimplePlacementSliceSetReducer) Receive(newSlices ResolvedWhere) {
 }
 
 func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
-	spsr.enhanced = NewSinglePlacementSet()
+	spsr.current = NewSinglePlacementSet()
 	enumerateSinglePlacementSlices(newSlices, func(apiSP edgeapi.SinglePlacement) {
 		syncTargetID := ExternalName{}.OfSPTarget(apiSP)
-		syncTargetDetails := SinglePlacementDetails{
-			LocationName:  apiSP.LocationName,
-			SyncTargetUID: apiSP.SyncTargetUID,
-		}
-		spsr.enhanced[syncTargetID] = syncTargetDetails
+		syncTargetDetails := SPDetails(apiSP)
+		spsr.current[syncTargetID] = syncTargetDetails
 		for _, receiver := range spsr.receivers {
 			receiver.Add(apiSP)
 		}
