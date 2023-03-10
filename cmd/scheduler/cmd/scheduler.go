@@ -44,7 +44,7 @@ import (
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	edgeplacement "github.com/kcp-dev/edge-mc/pkg/reconciler/scheduling/edgeplacement"
+	"github.com/kcp-dev/edge-mc/pkg/scheduler"
 )
 
 func NewSchedulerCommand() *cobra.Command {
@@ -147,7 +147,30 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
-	// create the edge-scheduler
+	// create workloadSharedInformerFactory
+	// solely for SyncTarget because "kcpSharedInformerFactory.Workload().V1alpha1().SyncTargets()" doens't work (why?)
+	workloadConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{
+			Context: clientcmdapi.Context{
+				Cluster:  "root",
+				AuthInfo: "kcp-admin",
+			},
+		},
+	).ClientConfig()
+	workloadViewConfig, err := configForViewOfExport(ctx, workloadConfig, "workload.kcp.io")
+	if err != nil {
+		logger.Error(err, "failed to create config for view of workload exports")
+		return err
+	}
+	workloadViewClusterClientset, err := kcpclientset.NewForConfig(workloadViewConfig)
+	if err != nil {
+		logger.Error(err, "failed to create clientset for view of workload exports")
+		return err
+	}
+	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
+
+	// create edge-scheduler
 	controllerConfig := rest.CopyConfig(cfg)
 	kcpClusterClientset, err := kcpclientset.NewForConfig(controllerConfig)
 	if err != nil {
@@ -159,25 +182,30 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
 	}
-	c, err := edgeplacement.NewController(
+	es, err := scheduler.NewController(
+		ctx,
 		kcpClusterClientset,
 		edgeClusterClientset,
-		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
+		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
+		workloadSharedInformerFactory.Workload().V1alpha1().SyncTargets(),
 	)
 	if err != nil {
-		logger.Error(err, "Failed to create controller")
+		logger.Error(err, "failed to create controller", "name", scheduler.ControllerName)
 		return err
 	}
 
 	// run the edge-scheduler
-	kubeSharedInformerFactory.Start(ctx.Done())
-	kcpSharedInformerFactory.Start(ctx.Done())
-	edgeSharedInformerFactory.Start(ctx.Done())
-	kubeSharedInformerFactory.WaitForCacheSync(ctx.Done())
-	kcpSharedInformerFactory.WaitForCacheSync(ctx.Done())
-	edgeSharedInformerFactory.WaitForCacheSync(ctx.Done())
-	c.Start(ctx, 1)
+	doneCh := ctx.Done()
+	kubeSharedInformerFactory.Start(doneCh)
+	kcpSharedInformerFactory.Start(doneCh)
+	edgeSharedInformerFactory.Start(doneCh)
+	workloadSharedInformerFactory.Start(doneCh)
+	kubeSharedInformerFactory.WaitForCacheSync(doneCh)
+	kcpSharedInformerFactory.WaitForCacheSync(doneCh)
+	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
+	workloadSharedInformerFactory.WaitForCacheSync(doneCh)
+	es.Run(1)
 
 	return nil
 }

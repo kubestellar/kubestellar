@@ -14,21 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgeplacement
+package scheduler
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"k8s.io/klog/v2"
 )
 
-type edgePlacementReconciler struct{}
+func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) error {
+	logger := klog.FromContext(ctx)
 
-func (r *edgePlacementReconciler) reconcile(ctx context.Context, ep *edgev1alpha1.EdgePlacement) (reconcileStatus, *edgev1alpha1.EdgePlacement, error) {
-	ws := logicalcluster.From(ep)
-	fmt.Printf("reconciling EdgePlacement %s in Workspace %s\n", ep.Name, ws.String())
-	return reconcileStatusContinue, ep, nil
+	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	if err != nil {
+		logger.Error(err, "invalid key")
+		return err
+	}
+	logger.Info("reconciling triggered by SyncTarget", "name", name, "workspace", ws)
+
+	return nil
 }

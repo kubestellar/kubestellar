@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The KCP Authors.
+Copyright 2023 The KCP Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package scheduler
 
 import (
-	"os"
+	"context"
 
-	"k8s.io/component-base/cli"
-	_ "k8s.io/component-base/logs/json/register"
-
-	"github.com/kcp-dev/edge-mc/cmd/scheduler/cmd"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"k8s.io/klog/v2"
 )
 
-func main() {
-	schedulerCommand := cmd.NewSchedulerCommand()
-	code := cli.Run(schedulerCommand)
-	os.Exit(code)
+func (c *controller) reconcileOnLocation(ctx context.Context, key string) error {
+	logger := klog.FromContext(ctx)
+
+	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	if err != nil {
+		logger.Error(err, "invalid key")
+		return err
+	}
+	logger.Info("reconciling triggered by Location", "name", name, "workspace", ws)
+
+	return nil
 }
