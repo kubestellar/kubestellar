@@ -34,5 +34,19 @@ func (c *controller) reconcileOnLocation(ctx context.Context, key string) error 
 	logger = logger.WithValues("workspace", ws, "location", name)
 	logger.V(2).Info("reconciling")
 
+	/*
+		On location change:
+		- find all its st(s)
+		- compose all sp(s)
+
+		- find all its ep(s)
+		- for each of its obsolete ep, remove all sp(s)
+		- for each of its ongoing ep, update all sp(s)
+		- for each of its new ep, add all sp(s)
+
+		Need data structure:
+		- map from a location to its eps, say 'epSelectLoc'
+	*/
+
 	return nil
 }

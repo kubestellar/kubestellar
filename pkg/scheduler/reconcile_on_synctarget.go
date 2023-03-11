@@ -34,5 +34,20 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) erro
 	logger = logger.WithValues("workspace", ws, "syncTarget", name)
 	logger.V(2).Info("reconciling")
 
+	/*
+		On synctarget change:
+		- find all its loc(s)
+		- compose all sp(s)
+
+		- find all its ep(s)
+		- for each of its obsolete ep, remove all sp(s)
+		- for each of its ongoing ep, update all sp(s)
+		- for each of its new ep, add all sp(s)
+
+		Need data structure:
+		- map from a synctarget to its locations, say 'locSelectSt'
+		- map from a synctarget to its eps, say 'epSelectSt'
+	*/
+
 	return nil
 }

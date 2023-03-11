@@ -81,5 +81,18 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) e
 		}
 	}
 
+	/*
+		On EdgePlacement change:
+		- find all its loc(s)
+
+		- for each of the found loc, find all its st(s)
+		- for each of the found loc, compose all sp(s)
+
+		- remove all obsolete sp(s)
+		- keep all ongoing sp(s)
+		- add all new sp(s)
+
+		Need data structure: none.
+	*/
 	return nil
 }
