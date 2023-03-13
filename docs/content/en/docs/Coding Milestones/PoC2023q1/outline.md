@@ -607,6 +607,7 @@ ways.
 
 - Create self-sufficient edge clusters.
 - Re-nature objects that edge-mc forcibly denatures at the center.
+- The kinds of objects to be synced are not bounded at development time.
 - Return reported state from associated objects.
 
 ## Status Summarizer
