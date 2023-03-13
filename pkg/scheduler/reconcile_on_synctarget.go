@@ -31,7 +31,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) erro
 		logger.Error(err, "invalid key")
 		return err
 	}
-	logger.Info("reconciling triggered by SyncTarget", "name", name, "workspace", ws)
+	logger.Info("reconciling", "name", name, "workspace", ws)
 
 	return nil
 }

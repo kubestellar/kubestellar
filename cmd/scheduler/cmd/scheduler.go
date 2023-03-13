@@ -89,7 +89,8 @@ func NewSchedulerCommand() *cobra.Command {
 func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	const resyncPeriod = 10 * time.Hour
 
-	logger := klog.FromContext(ctx)
+	logger := klog.Background()
+	ctx = klog.NewContext(ctx, logger)
 
 	// create cfg
 	loadingRules := clientcmd.ClientConfigLoadingRules{ExplicitPath: options.KcpKubeconfig}

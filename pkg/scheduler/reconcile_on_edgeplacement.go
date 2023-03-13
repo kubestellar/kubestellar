@@ -35,7 +35,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) e
 		logger.Error(err, "invalid key")
 		return err
 	}
-	logger.Info("reconciling triggered by EdgePlacement", "name", name, "workspace", ws)
+	logger.Info("reconciling", "name", name, "workspace", ws)
 
 	// TODO(waltforme): should I use a client to bother the apiserver or use local store?
 	ep, err := c.edgeClusterClient.EdgeV1alpha1().EdgePlacements().Cluster(ws.Path()).Get(ctx, name, metav1.GetOptions{})

@@ -85,7 +85,7 @@ func NewController(
 	locationAccess schedulingv1alpha1informers.LocationClusterInformer,
 	syncTargetAccess workloadv1alpha1informers.SyncTargetClusterInformer,
 ) (*controller, error) {
-	context = klog.NewContext(context, klog.Background().WithValues("controller", ControllerName))
+	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
 	c := &controller{
@@ -220,7 +220,8 @@ func (c *controller) processNextWorkItem(ctx context.Context) bool {
 	item := i.(queueItem)
 	key := item.key
 
-	klog.FromContext(ctx).V(1).Info("processing key", "triggeringKind", item.triggeringKind, "key", key)
+	ctx = klog.NewContext(ctx, klog.FromContext(ctx).WithValues("triggeringKind", item.triggeringKind, "key", key))
+	klog.FromContext(ctx).V(1).Info("processing queueItem")
 
 	// No matter what, tell the queue we're done with this key, to unblock
 	// other workers.

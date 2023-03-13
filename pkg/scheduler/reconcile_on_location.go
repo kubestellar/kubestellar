@@ -31,7 +31,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, key string) error 
 		logger.Error(err, "invalid key")
 		return err
 	}
-	logger.Info("reconciling triggered by Location", "name", name, "workspace", ws)
+	logger.Info("reconciling", "name", name, "workspace", ws)
 
 	return nil
 }
