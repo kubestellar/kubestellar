@@ -200,13 +200,13 @@ func (c *controller) Run(numThreads int) {
 	defer logger.Info("shutting down controller")
 
 	for i := 0; i < numThreads; i++ {
-		go wait.UntilWithContext(c.context, c.startWorker, time.Second)
+		go wait.UntilWithContext(c.context, c.runWorker, time.Second)
 	}
 
 	<-c.context.Done()
 }
 
-func (c *controller) startWorker(ctx context.Context) {
+func (c *controller) runWorker(ctx context.Context) {
 	for c.processNextWorkItem(ctx) {
 	}
 }

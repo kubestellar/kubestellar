@@ -48,9 +48,9 @@ import (
 
 func NewSchedulerCommand() *cobra.Command {
 	options := scheduleroptions.NewOptions()
-	placementCommand := &cobra.Command{
-		Use:   "placement",
-		Short: "Reconciles edge placement API objects",
+	schedulerCommand := &cobra.Command{
+		Use:   "scheduler",
+		Short: "Reconciles SinglePlacementSlice API objects",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := options.Logs.ValidateAndApply(kcpfeatures.DefaultFeatureGate); err != nil {
 				return err
@@ -74,15 +74,15 @@ func NewSchedulerCommand() *cobra.Command {
 		},
 	}
 
-	options.AddFlags(placementCommand.Flags())
+	options.AddFlags(schedulerCommand.Flags())
 
 	if v := version.Get().String(); len(v) == 0 {
-		placementCommand.Version = "<unknown>"
+		schedulerCommand.Version = "<unknown>"
 	} else {
-		placementCommand.Version = v
+		schedulerCommand.Version = v
 	}
 
-	return placementCommand
+	return schedulerCommand
 }
 
 func Run(ctx context.Context, options *scheduleroptions.Options) error {
@@ -203,7 +203,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		return err
 	}
 
-	// run the edge-scheduler
+	// run edge-scheduler
 	doneCh := ctx.Done()
 
 	kubeSharedInformerFactory.Start(doneCh)
