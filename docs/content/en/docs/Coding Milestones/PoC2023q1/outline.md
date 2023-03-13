@@ -38,6 +38,9 @@ multi-cluster.  It is intended to demonstrate the following points.
 - Rule-based customization of desired state.
 - Propagation of reported state from edge to center.
 - Summarization of reported state in the center.
+- Return and/or summarization of reported state from associated
+  objects (e.g., ReplicaSet or Pod objects associated with a given
+  Deployment object).
 - The edge opens connections to the center, not vice-versa.
 - An edge computing platform "product" that can be deployed (as
   opposed to a service that is used).
@@ -49,9 +52,6 @@ Some important things that are not attempted in this PoC include the following.
   will use a single kcp server to hold all the workspaces, and will
   not shard any controller.
 - More than one SyncTarget per Location.
-- Return or summarization of reported state from associated objects
-  (e.g., ReplicaSet or Pod objects associated with a given Deployment
-  object).
 - A hierarchy with more than two levels.
 - User control over ordering of propagation from center to edge,
   either among destinations or kinds of objects.
@@ -114,6 +114,13 @@ it is only used for workloads that need no customization.
 ### Summarization
 
 We can omit summarization at first.
+
+### Return and/or summarization of reported state from associated objects
+
+This will involve both defining a scalable interface for declaring
+what should be returned as well as implementing it.  This will
+certainly affect the syncer between mailbox workspace and edge
+cluster, and the summarization part will affect the status summarizer.
 
 ## Roles and Responsibilities
 
@@ -593,11 +600,14 @@ following four parts.
 
 ## Syncers
 
-This design nominally uses TMC and its syncers, but that can not be
-exactly true because these syncers need to translate between denatured
-objects in the mailbox workspace and natured objects in the edge
-cluster.  Or perhaps not, if there is an additional controller in the
-edge cluster that handles the denatured-natured relation.
+While the first milestone in the roadmap uses the TMC syncers, that
+will not achieve all that this PoC aims for.  Eventually this PoC will
+need EMC syncers that differ from the TMC syncers in the following
+ways.
+
+- Create self-sufficient edge clusters.
+- Re-nature objects that edge-mc forcibly denatures at the center.
+- Return reported state from associated objects.
 
 ## Status Summarizer
 
