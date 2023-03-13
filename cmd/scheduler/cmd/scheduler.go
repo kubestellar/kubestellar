@@ -41,7 +41,6 @@ import (
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
 	scheduleroptions "github.com/kcp-dev/edge-mc/cmd/scheduler/options"
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client"
 	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/edge-mc/pkg/scheduler"
@@ -118,25 +117,12 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		resyncPeriod,
 	)
 
-	// create kcpSharedInformerFactory
-	kcpConfig := rest.CopyConfig(cfg)
-	edgeclient.ConfigForScheduling(kcpConfig)
-	kcpClusterClient, err := kcpclientset.NewForConfig(kcpConfig)
-	if err != nil {
-		logger.Error(err, "failed to create kcp cluster client")
-		return err
-	}
-	kcpSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(
-		kcpClusterClient,
-		resyncPeriod,
-	)
-
 	// create edgeSharedInformerFactory
-	providerConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+	edgeConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{},
 	).ClientConfig()
-	edgeViewConfig, err := configForViewOfExport(ctx, providerConfig, "edge.kcp.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, edgeConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of edge exports")
 		return err
@@ -148,8 +134,29 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
+	// create schedulingSharedInformerFactory
+	schedulingConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{
+			Context: clientcmdapi.Context{
+				Cluster:  "root",
+				AuthInfo: "kcp-admin",
+			},
+		},
+	).ClientConfig()
+	schedulingViewConfig, err := configForViewOfExport(ctx, schedulingConfig, "scheduling.kcp.io")
+	if err != nil {
+		logger.Error(err, "failed to create config for view of scheduling exports")
+		return err
+	}
+	schedulingViewClusterClientset, err := kcpclientset.NewForConfig(schedulingViewConfig)
+	if err != nil {
+		logger.Error(err, "failed to create clientset for view of scheduling exports")
+		return err
+	}
+	schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
+
 	// create workloadSharedInformerFactory
-	// solely for SyncTarget because "kcpSharedInformerFactory.Workload().V1alpha1().SyncTargets()" doens't work (why?)
 	workloadConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{
@@ -188,7 +195,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		kcpClusterClientset,
 		edgeClusterClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
-		kcpSharedInformerFactory.Scheduling().V1alpha1().Locations(),
+		schedulingSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		workloadSharedInformerFactory.Workload().V1alpha1().SyncTargets(),
 	)
 	if err != nil {
@@ -198,13 +205,15 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 
 	// run the edge-scheduler
 	doneCh := ctx.Done()
+
 	kubeSharedInformerFactory.Start(doneCh)
-	kcpSharedInformerFactory.Start(doneCh)
 	edgeSharedInformerFactory.Start(doneCh)
+	schedulingSharedInformerFactory.Start(doneCh)
 	workloadSharedInformerFactory.Start(doneCh)
+
 	kubeSharedInformerFactory.WaitForCacheSync(doneCh)
-	kcpSharedInformerFactory.WaitForCacheSync(doneCh)
 	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
+	schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
 	workloadSharedInformerFactory.WaitForCacheSync(doneCh)
 	es.Run(1)
 
