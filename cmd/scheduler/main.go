@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	placementCommand := cmd.NewSchedulerCommand()
-	code := cli.Run(placementCommand)
+	schedulerCommand := cmd.NewSchedulerCommand()
+	code := cli.Run(schedulerCommand)
 	os.Exit(code)
 }

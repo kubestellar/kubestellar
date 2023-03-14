@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The KCP Authors.
+Copyright 2023 The KCP Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package client
+package scheduler
 
 import (
-	"net/url"
+	"context"
 
-	"k8s.io/client-go/rest"
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"k8s.io/klog/v2"
 )
 
-const SchedulingAPIExportVirtualWorkspacePath string = "services/apiexport/root/scheduling.kcp.io"
+func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) error {
+	logger := klog.FromContext(ctx)
 
-func ConfigForScheduling(cfg *rest.Config) {
-	url, _ := url.Parse(cfg.Host)
-	url.Path = SchedulingAPIExportVirtualWorkspacePath
-	cfg.Host = url.String()
+	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	if err != nil {
+		logger.Error(err, "invalid key")
+		return err
+	}
+	logger.Info("reconciling", "name", name, "workspace", ws)
+
+	return nil
 }
