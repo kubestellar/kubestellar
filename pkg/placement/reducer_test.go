@@ -22,8 +22,9 @@ import (
 	"testing"
 	"time"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
+
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // exerciseSinglePlacementSliceSetReducer tests a given SinglePlacementSliceSetReducer.

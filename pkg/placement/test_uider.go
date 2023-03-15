@@ -21,8 +21,9 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/kcp-dev/logicalcluster/v3"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
+
+	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 // testUIDer is a UIDer that makes up an association whenever asked
