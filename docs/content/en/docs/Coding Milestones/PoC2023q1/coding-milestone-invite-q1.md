@@ -18,8 +18,8 @@ The coding sprint will be dedicated to completing the following workload managem
 - Incorporating existing customization API into the [KCP-Edge repo](https://github.com/kcp-dev/edge-mc),
 - Investigating implementation of a status summarizer, starting with basic implicit status, and later adding programmed summarization,
 - Updating summarization API and integrating it into the [KCP-Edge repo](https://github.com/kcp-dev/edge-mc),
+- Defining the API for identifying associated objects and its interaction with summarization, and implementing these,
 - Streamlining the creation of workload management workspaces,
-- Completing our existing implementation of a mailbox controller,
 - Examining the use of Postgresql through Kine instead of etcd for scalability,
 - Revising the milestone outline with regards to defining bootstrapping and support for cluster-scoped resources.
 
