@@ -49,6 +49,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&EdgePlacementList{},
 		&SinglePlacementSlice{},
 		&SinglePlacementSliceList{},
+		&Customizer{},
+		&CustomizerList{},
+		&Associator{},
+		&AssociatorList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

@@ -29,6 +29,10 @@ type FakeEdgeV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeEdgeV1alpha1) Associators(namespace string) v1alpha1.AssociatorInterface {
+	return &FakeAssociators{c, namespace}
+}
+
 func (c *FakeEdgeV1alpha1) Customizers(namespace string) v1alpha1.CustomizerInterface {
 	return &FakeCustomizers{c, namespace}
 }

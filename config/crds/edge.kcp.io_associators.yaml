@@ -1,0 +1,107 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: associators.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: Associator
+    listKind: AssociatorList
+    plural: associators
+    shortNames:
+    - assoc
+    singular: associator
+  scope: Namespace
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Associator specifies how the associated objects of a primary
+          object are identified. A primary object is one that is specified in the
+          center and propagated to the edge. An associated object is one that first
+          appears at the edge and then propagates to the center. An Associator has
+          a collection of ways that associated objects are identified.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AssociatorSpec lists the ways that associated objects are
+              identified. Object X is an associated object if it satisfies any of
+              the listed rules here.
+            properties:
+              rules:
+                items:
+                  description: AssociationRule identifies some associated objects.
+                    This rule associates object A with primary object P if and only
+                    if both (a) A matches an item in `resources` and (b) A refers
+                    to P as described by `reference`.
+                  properties:
+                    reference:
+                      description: ReferenceRule describes a way for an associated
+                        object A to refer to a primary object P.  There are four possible
+                        ways enumerated here, and two of them have additional details.
+                      properties:
+                        label:
+                          description: '`label` is a label key, and the corresponding
+                            value is the name of P'
+                          type: string
+                        ownerReference:
+                          description: '`ownerReference` can supply an additional
+                            restriction'
+                          properties:
+                            controller:
+                              description: '`controller`, if specified, is the value
+                                that the `controller` field of the OwnerReference
+                                must have.'
+                              type: boolean
+                          type: object
+                        type:
+                          description: ReferenceType identifies one of the ways that
+                            an associated object can refer to a primary object
+                          type: string
+                      required:
+                      - type
+                      type: object
+                    resources:
+                      items:
+                        description: ResourceGroup identifies a set of resources in
+                          one particular API group
+                        properties:
+                          apiGroup:
+                            type: string
+                          resources:
+                            items:
+                              type: string
+                            type: array
+                        required:
+                        - apiGroup
+                        - resources
+                        type: object
+                      type: array
+                  required:
+                  - reference
+                  - resources
+                  type: object
+                type: array
+            required:
+            - rules
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true

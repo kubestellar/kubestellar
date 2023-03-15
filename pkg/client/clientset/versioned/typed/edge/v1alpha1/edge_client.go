@@ -29,6 +29,7 @@ import (
 
 type EdgeV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	AssociatorsGetter
 	CustomizersGetter
 	EdgePlacementsGetter
 	SinglePlacementSlicesGetter
@@ -37,6 +38,10 @@ type EdgeV1alpha1Interface interface {
 // EdgeV1alpha1Client is used to interact with features provided by the edge.kcp.io group.
 type EdgeV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *EdgeV1alpha1Client) Associators(namespace string) AssociatorInterface {
+	return newAssociators(c, namespace)
 }
 
 func (c *EdgeV1alpha1Client) Customizers(namespace string) CustomizerInterface {
