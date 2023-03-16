@@ -19,8 +19,9 @@ package scheduler
 import (
 	"context"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"k8s.io/klog/v2"
+
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 )
 
 func (c *controller) reconcileOnLocation(ctx context.Context, key string) error {

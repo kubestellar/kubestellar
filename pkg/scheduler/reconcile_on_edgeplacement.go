@@ -19,10 +19,11 @@ package scheduler
 import (
 	"context"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
+
+	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
