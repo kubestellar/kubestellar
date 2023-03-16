@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230228-7fe2c02.edgeplacements.edge.kcp.io
+  name: v230317-d43d2d5.edgeplacements.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -16,15 +16,20 @@ spec:
   versions:
   - name: v1alpha1
     schema:
-      description: "EdgePlacement binds a collection of (a) Namespaces and non-namespaced
-        objects to (b) a collection of Locations. An EdgePlacement object appears
-        in the center and directs all the syncable objects in the selected Namespaces
-        and all the selected non-namespaced objects to propagate to _all_ of the selected
-        Locations (one SyncTarget in each such Location). This is not entirely unrelated
-        to a TMC Placement, which directs the selected Namespaces to propagate to
-        _one_ of the selected Locations. \n Overlap between EdgePlacements is allowed:
-        two different EdgePlacement objects may select intersecting Location sets
-        and/or intersecting Namespace sets. This is not problematic because: - propagation
+      description: "EdgePlacement exists in the center and binds (a) a collection
+        of Locations with (b) both (b1) objects in the center to downsync (propagate
+        desired state from center to edge and return reported state from edge toward
+        center), and (b2) a way of identifying objects (in edge clusters) to upsync
+        (propagate from edge toward center). Both downsyncing and upsyncing are with
+        all of the Locations.  This is not entirely unrelated to a TMC Placement,
+        which directs the selected Namespaces to propagate to _one_ of the selected
+        Locations. \n The objects to downsync are those in selected namespaces plus
+        selected non-namespaced objects. \n For upsync, the matching objects originate
+        in the edge clusters and propagate to the corresponding mailbox workspaces
+        while summaries of them go to the workload management workspace (as prescribed
+        by the summarization API). \n Overlap between EdgePlacements is allowed: two
+        different EdgePlacement objects may select intersecting Location sets and/or
+        intersecting Namespace sets. This is not problematic because: - propagation
         _into_ a destination is additive; - propagation _from_ a source is additive;
         - two directives to propagate the same object to the same destination are
         simply redundant (they, by design, can not conflict)."
@@ -215,6 +220,46 @@ spec:
                     description: '`resourceNames` is a list of objects that match
                       by name. An entry of `"*"` means that all match. Empty list
                       means nothing matches.'
+                    items:
+                      type: string
+                    type: array
+                  resources:
+                    description: '`resources` is a list of lowercase plural names
+                      for the sorts of objects to match. An entry of `"*"` means that
+                      all match. Empty list means nothing matches.'
+                    items:
+                      type: string
+                    type: array
+                required:
+                - resources
+                type: object
+              type: array
+            upsync:
+              description: '`upsync` identifies objects to upsync. An object matches
+                `upsync` if and only if it matches at least one member of `upsync`.'
+              items:
+                description: 'UpsyncSet specifies a set of objects, which may be namespaced
+                  or cluster-scoped, from one particular API group. An object is in
+                  this set if: - its API group is the one listed; - its resource (lowercase
+                  plural form of object type) is one of those listed; - EITHER the
+                  resource is cluster-scoped OR the object''s namespace matches `namespaces`;
+                  and - the object''s name matches `names`.'
+                properties:
+                  apiGroup:
+                    description: '`apiGroup` is the API group of the referenced object,
+                      empty string for the core API group.'
+                    type: string
+                  names:
+                    description: '`Names` is a list of objects that match by name.
+                      An entry of `"*"` means that all match. Empty list means nothing
+                      matches (you probably never want an empty list).'
+                    items:
+                      type: string
+                    type: array
+                  namespaces:
+                    description: '`namespaces` is a list of acceptable namespaces.
+                      An entry of `"*"` means that all match. Empty list means nothing
+                      matches (you probably do not want this for namespaced resources).'
                     items:
                       type: string
                     type: array
