@@ -6,8 +6,6 @@ description: >-
   
 ---
 
-## Code Of Conduct
-
 The Code of Conduct serves as a set of rules used by the KCP-Edge community to establish a safe, respectful and inclusive environment.
 
 ## KCP-Edge Community Code of Conduct
