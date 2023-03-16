@@ -40,7 +40,6 @@ import (
 	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/indexers"
 )
 
 const (
@@ -67,6 +66,9 @@ type controller struct {
 	kcpClusterClient  kcpclientset.ClusterInterface
 	edgeClusterClient edgeclientset.ClusterInterface
 
+	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
+	singlePlacementSliceIndexer cache.Indexer
+
 	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
 	edgePlacementIndexer cache.Indexer
 
@@ -82,6 +84,7 @@ func NewController(
 	kcpClusterClient kcpclientset.ClusterInterface,
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
+	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
 	locationAccess schedulingv1alpha1informers.LocationClusterInformer,
 	syncTargetAccess workloadv1alpha1informers.SyncTargetClusterInformer,
 ) (*controller, error) {
@@ -98,16 +101,15 @@ func NewController(
 		edgePlacementLister:  edgePlacementAccess.Lister(),
 		edgePlacementIndexer: edgePlacementAccess.Informer().GetIndexer(),
 
+		singlePlacementSliceLister:  singlePlacementSliceAccess.Lister(),
+		singlePlacementSliceIndexer: singlePlacementSliceAccess.Informer().GetIndexer(),
+
 		locationLister:  locationAccess.Lister(),
 		locationIndexer: locationAccess.Informer().GetIndexer(),
 
 		synctargetLister:  syncTargetAccess.Lister(),
 		synctargetIndexer: syncTargetAccess.Informer().GetIndexer(),
 	}
-
-	indexers.AddIfNotPresentOrDie(locationAccess.Informer().GetIndexer(), cache.Indexers{
-		indexers.ByLogicalClusterPath: indexers.IndexByLogicalClusterPath,
-	})
 
 	edgePlacementAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    c.enqueueEdgePlacement,
@@ -221,7 +223,7 @@ func (c *controller) processNextWorkItem(ctx context.Context) bool {
 	key := item.key
 
 	ctx = klog.NewContext(ctx, klog.FromContext(ctx).WithValues("triggeringKind", item.triggeringKind, "key", key))
-	klog.FromContext(ctx).V(1).Info("processing queueItem")
+	klog.FromContext(ctx).V(2).Info("processing queueItem")
 
 	// No matter what, tell the queue we're done with this key, to unblock
 	// other workers.
@@ -229,6 +231,7 @@ func (c *controller) processNextWorkItem(ctx context.Context) bool {
 
 	if err := c.process(ctx, item); err != nil {
 		runtime.HandleError(fmt.Errorf("%q controller didn't sync %q, err: %w", ControllerName, key, err))
+		c.queue.AddRateLimited(i)
 		return true
 	}
 	c.queue.Forget(i)

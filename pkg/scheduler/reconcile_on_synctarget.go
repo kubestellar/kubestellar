@@ -26,13 +26,13 @@ import (
 
 func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) error {
 	logger := klog.FromContext(ctx)
-
 	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
 	if err != nil {
 		logger.Error(err, "invalid key")
 		return err
 	}
-	logger.Info("reconciling", "name", name, "workspace", ws)
+	logger = logger.WithValues("workspace", ws, "syncTarget", name)
+	logger.V(2).Info("reconciling")
 
 	return nil
 }
