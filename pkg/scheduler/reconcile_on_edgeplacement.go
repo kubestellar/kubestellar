@@ -30,24 +30,28 @@ import (
 
 func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) error {
 	logger := klog.FromContext(ctx)
-
 	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
 	if err != nil {
 		logger.Error(err, "invalid key")
 		return err
 	}
-	logger.Info("reconciling", "name", name, "workspace", ws)
+	logger = logger.WithValues("workspace", ws, "edgePlacement", name)
+	ctx = klog.NewContext(ctx, logger)
+	logger.V(2).Info("reconciling")
 
 	// TODO(waltforme): should I use a client to bother the apiserver or use local store?
 	ep, err := c.edgeClusterClient.EdgeV1alpha1().EdgePlacements().Cluster(ws.Path()).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil
+		}
 		return err
 	}
 
 	_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.V(2).Info("creating SinglePlacementSlice", "workspace", ws.String(), "name", name)
+			logger.V(1).Info("creating SinglePlacementSlice")
 			sps := &edgev1alpha1.SinglePlacementSlice{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: name,
@@ -64,12 +68,16 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) e
 			}
 			_, err = c.edgeClusterClient.Cluster(ws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
 			if err != nil {
-				logger.Error(err, "failed creating singlePlacementSlice", "workspace", ws.String(), "name", sps.Name)
+				if !errors.IsAlreadyExists(err) {
+					logger.Error(err, "failed creating singlePlacementSlice")
+					return err
+				}
 			} else {
-				logger.V(2).Info("created SinglePlacementSlice", "workspace", ws.String(), "name", sps.Name)
+				logger.V(1).Info("created SinglePlacementSlice")
 			}
 		} else {
-			logger.Error(err, "failed getting SinglePlacementSlice for EdgePlacement", "workspace", ws.String(), "name", name)
+			logger.Error(err, "failed getting SinglePlacementSlice for EdgePlacement")
+			return err
 		}
 	}
 

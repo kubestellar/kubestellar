@@ -157,15 +157,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
 
 	// create workloadSharedInformerFactory
-	workloadConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{
-			Context: clientcmdapi.Context{
-				Cluster:  "root",
-				AuthInfo: "kcp-admin",
-			},
-		},
-	).ClientConfig()
+	workloadConfig := schedulingConfig
 	workloadViewConfig, err := configForViewOfExport(ctx, workloadConfig, "workload.kcp.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of workload exports")
@@ -195,6 +187,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		kcpClusterClientset,
 		edgeClusterClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
+		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
 		schedulingSharedInformerFactory.Scheduling().V1alpha1().Locations(),
 		workloadSharedInformerFactory.Workload().V1alpha1().SyncTargets(),
 	)
