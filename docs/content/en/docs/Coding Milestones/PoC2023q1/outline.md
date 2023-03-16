@@ -245,10 +245,15 @@ dependent objects.
 | ---------- | ---- | ---------- |
 | apis.kcp.io/v1alpha1 | APIBinding | false |
 
-A workload management workspace generally has APIBindings to workload
-APIs.  These bindings cause corresponding CRDs to be created in the
-same workspace.  The CRDs propagate to the edge, the APIBindings do
-not.
+A workload management workspace needs an APIBinding to the APIExport
+of the API group `edge.kcp.io` from the edge service provider
+workspace, in order to be able to contain EdgePlacement and related
+objects.  These are not destined for the edge clusters.
+
+While kcp core supports APIBindings to APIExports of workload API
+groups, because the edge clusters are not (generally) based on kcp
+servers these other APIBindings can not propagate to the edge clusters
+and can not be used to define workload resources for use in edge-mc.
 
 #### For features not supported
 
