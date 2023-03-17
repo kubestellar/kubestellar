@@ -28,11 +28,11 @@ import (
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
-func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) error {
+func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string) error {
 	logger := klog.FromContext(ctx)
-	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(epKey)
 	if err != nil {
-		logger.Error(err, "invalid key")
+		logger.Error(err, "invalid EdgePlacement key")
 		return err
 	}
 	logger = logger.WithValues("workspace", ws, "edgePlacement", name)
@@ -94,5 +94,6 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, key string) e
 
 		Need data structure: none.
 	*/
+
 	return nil
 }

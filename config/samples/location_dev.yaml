@@ -2,7 +2,7 @@
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: foo
+  name: dev
   labels:
     env: dev
 spec:

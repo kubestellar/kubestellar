@@ -1,0 +1,7 @@
+apiVersion: workload.kcp.io/v1alpha1
+kind: SyncTarget
+metadata:
+  name: prod
+  labels:
+    env: prod
+spec:

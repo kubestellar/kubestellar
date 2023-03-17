@@ -1,0 +1,8 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: dev
+spec:
+  locationSelectors:
+  - matchLabels:
+      env: dev
