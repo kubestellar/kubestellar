@@ -10,6 +10,11 @@ We can't wait to collaborate with you!
 ### Prerequisites
 
 [Install Go](https://golang.org/doc/install) 1.19+.
+  Please note that the go language version numbers in these three files must exactly agree:
+       1) ./ci-operator.yaml, 2) ./Dockerfile, and 3) your local go/go.mod.
+    In ./ci-operator.yaml the go version is indicated by the "tag" attribute.
+    In ./Dockerfile it is indicated by the "golang" attribute
+    In go.mod it is indicated by the "go" directive.
 
 Check out our [Quickstart Guide](quickstart.md)
 
