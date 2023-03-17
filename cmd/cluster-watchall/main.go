@@ -58,8 +58,7 @@ import (
 )
 
 /* This program is a kcp client that monitors all LogicalClusters and,
-   for each one of those, all objects in that cluster of kinds that
-   existed when its monitoring began.
+   for each one of those, all objects in that cluster.
 */
 
 type ClientOpts struct {

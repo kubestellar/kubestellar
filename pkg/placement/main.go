@@ -43,10 +43,14 @@ type placementTranslator struct {
 	crdClusterInformer     kcpcache.ScopeableSharedIndexInformer
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
+
+	whatResolverLauncher func() *whatResolver
 }
 
 func NewPlacementTranslator(
 	ctx context.Context,
+	// pre-informer on all SinglePlacementSlice objects, cross-workspace
+	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	spsClusterPreInformer edgev1a1informers.SinglePlacementSliceClusterInformer,
 	// pre-informer on Workspaces objects in the ESPW
@@ -74,15 +78,16 @@ func NewPlacementTranslator(
 		crdClusterInformer:     crdClusterPreInformer.Informer(),
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
+		whatResolverLauncher: NewWhatResolverLauncher(ctx, epClusterPreInformer, discoveryClusterClient,
+			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, 4),
 	}
-
 	return pt
 }
 
 func (pt *placementTranslator) Run() {
 	ctx := pt.context
 	doneCh := ctx.Done()
-	if !k8scache.WaitForNamedCacheSync("mailbox-controller", doneCh,
+	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
 		pt.spsClusterInformer.HasSynced, pt.mbwsInformer.HasSynced,
 		pt.crdClusterInformer.HasSynced, pt.crdClusterInformer.HasSynced,
 	) {
@@ -94,10 +99,22 @@ func (pt *placementTranslator) Run() {
 	// TODO: make all the other needed infrastructure
 
 	// TODO: replace all these dummies
-	whatResolver := RelayWhatResolver()
+	whatResolver := pt.whatResolverLauncher()
+	whatResolver.AddReceiver(LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, true) // debugging
 	whereResolver := RelayWhereResolver()
 	setBinder := NewDummySetBinder()
 	workloadProjector := NewDummyWorkloadProjector(mbPathToName)
 	placementProjector := NewDummyWorkloadProjector(mbPathToName)
 	AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
+	<-doneCh
+}
+
+type LoggingMappingReceiver[Key comparable, Val any] struct {
+	logger klog.Logger
+}
+
+var _ MappingReceiver[string, []any] = &LoggingMappingReceiver[string, []any]{}
+
+func (lmr LoggingMappingReceiver[Key, Val]) Receive(key Key, val Val) {
+	lmr.logger.Info("Receive", "key", key, "val", val)
 }
