@@ -1,5 +1,5 @@
 ---
-categories: ["Coding", "Sprints", "Milesones", "PoC"]
+categories: ["Coding", "Sprints", "Milestones", "PoC"]
 tags: ["code","milestone","poc2023q1"] 
 title: "Possible Roadmaps for Particular Use Cases"
 linkTitle: "Details"
@@ -12,13 +12,13 @@ This document outlines thoughts about how soon some particular use cases can wor
 
 ## Background
 
-The outline [mentions features that need not be implemente at
+The outline [mentions features that need not be implement at
 first](outline/#development-roadmap).  In the following sections we
 consider some particular use cases.
 
 ## MVI
 
-MVI needs customization.  We can demo an MVI sceario without:
+MVI needs customization.  We can demo an MVI scenario without:
 self-sufficient edge clusters, summarization, upsync (Return and/or
 summarization of reported state from associated objects),
 sophisticated handling of workload conflicts.
@@ -36,7 +36,7 @@ possibilities.  They vary in two dimensions.
 
 As outlined in [PR 241](https://github.com/kcp-dev/edge-mc/pull/241):
 - the C2P team maintains CRDs, APIResourceSchemas, and an APIExport for
-  the policy and report resourcess;
+  the policy and report resources;
 - the workload management workspace has an APIBinding to that APIExport;
 - the EdgePlacement selects that APIBinding for downsync;
 - the APIBinding goes to the mailbox workspace but not the edge cluster;
@@ -89,7 +89,7 @@ in the center can open connections to a Service at the edge.
 
 #### Pre-deploy controllers and resources on edge clusters
 
-In this scenario, the PVP/PEP is predeployed on the edge clusters, and
+In this scenario, the PVP/PEP is pre-deployed on the edge clusters, and
 the policy and report resources (which are cluster-scoped) are
 predefined there too.  This scenario would continue to use the TMC
 syncer, but only need it to downsync the policies and upsync the
