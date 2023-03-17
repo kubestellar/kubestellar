@@ -19,6 +19,11 @@ To use components from KCP-Edge you must:
 ### Prerequisites
 
 - go (download from https://golang.org/dl/)
+     Please note that the go language version numbers in these three files must agree:
+     ./ci-operator.yaml, ./Dockerfile, and your local go/go.mod.
+     In ./ci-operator.yaml the go version is indicated by the "tag" attribute.
+     In ./Dockerfile it is indicated by the "golang" attribute
+     In go.mod it is indicated by the "go" directive.
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - A Kubernetes cluster (for local testing, consider [kind](http://kind.sigs.k8s.io))
 
