@@ -216,7 +216,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 	discoveryScopedClient := acw.discoveryClusterClient.Cluster(clusterName.Path())
 	crdInformer := acw.crdClusterInformer.Cluster(clusterName).Informer()
 	bindingInformer := acw.bindingClusterInformer.Cluster(clusterName).Informer()
-	resourceInformer, _ := apiwatch.NewAPIResourceInformer(context.Background(), clusterName.String(), discoveryScopedClient,
+	resourceInformer, _, _ := apiwatch.NewAPIResourceInformer(context.Background(), clusterName.String(), discoveryScopedClient,
 		crdInformer, bindingInformer)
 	cw := &clusterWatcher{
 		watcherBase:      acw.watcherBase,
