@@ -10,7 +10,7 @@
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 <a href="https://app.slack.com/client/T09NY5SBT/C021U8WSAFK"> 
-    <img alt="Join Slack" src="https://img.shields.io/badge/kcp-dev-Join%20Slack-blue?logo=slack">
+    <img alt="Join Slack" src="https://img.shields.io/badge/KCP--Edge-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
 KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
