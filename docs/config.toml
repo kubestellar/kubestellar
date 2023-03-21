@@ -51,13 +51,14 @@ category = "categories"
 
 [params.taxonomy]
 # set taxonomyCloud = [] to hide taxonomy clouds
-taxonomyCloud = ["tags", "categories"] 
+#taxonomyCloud = ["tags", "categories"] 
+taxonomyCloud = [] 
 
 # If used, must have same length as taxonomyCloud
-taxonomyCloudTitle = ["Tag Cloud", "Categories"] 
+#taxonomyCloudTitle = ["Tag Cloud", "Categories"] 
 
 # set taxonomyPageHeader = [] to hide taxonomies on the page headers
-taxonomyPageHeader = ["tags", "categories"] 
+#taxonomyPageHeader = ["tags", "categories"] 
 
 
 # Highlighting config
