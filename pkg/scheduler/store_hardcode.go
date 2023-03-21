@@ -26,10 +26,9 @@ func (s *internalData) show() {
 	fmt.Println("----")
 	fmt.Println("epsBySelectedLoc", s.epsBySelectedLoc)
 	fmt.Println("locsBySelectedSt", s.locsBySelectedSt)
-	fmt.Println("epsByUsedSt", s.epsByUsedSt)
 	fmt.Println("----")
 }
 
 func (s *internalData) manuallyFillIn() {
-	s.epsBySelectedLoc["qg6uhayltmxxfong|dev"] = []string{"kvdk2spgmbix|dev"} // ~|dev selects root:compute|dev
+	s.epsBySelectedLoc["2xqrexu0m11o2m6o|dev"] = map[string]empty{"kvdk2spgmbix|dev": {}} // ~|dev selects root:compute|dev
 }

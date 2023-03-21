@@ -38,50 +38,58 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 		logger.Error(err, "invalid SyncTarget key")
 		return err
 	}
-	logger = logger.WithValues("workspace", stws, "syncTarget", stName)
+	logger = logger.WithValues("syncTargetWorkspace", stws, "syncTarget", stName)
 	logger.V(2).Info("reconciling")
 
 	/*
 		On synctarget change:
-		1) find all its loc(s), and update store
+		1a) find all ep(s) that used st
 
-		2a) find all its ep(s), and update store
-		2b) for each of its obsolete ep, remove all sp(s) that has st
-		2c) for each of its ongoing ep, update sp(s)
-		2d) for each of its new ep, add sp(s)
+		2a) find all loc(s) that selecting st, and update store
+		2b) find all ep(s) that using st
+
+		3a) for each of its obsolete ep, remove all sp(s) that has st
+		3b) for each of its ongoing ep, update sp(s)
+		3c) for each of its new ep, add sp(s)
 
 		Need data structure:
 		- map from a synctarget to its locations, say 'locsBySelectedSt'
-		- map from a synctarget to its eps, say 'epsByUsedSt'
 	*/
 
-	st, _ := c.synctargetLister.Cluster(stws).Get(stName) // TODO: handle err
+	st, err := c.synctargetLister.Cluster(stws).Get(stName)
+	if err != nil {
+		logger.Error(err, "syncTarget not found in local cache")
+		return nil
+	}
 
-	// 1)
-	locsColocating, _ := c.locationLister.Cluster(stws).List(labels.NewSelector()) // TOOD: handle err
-	locsSelectingSt, _ := filterLocsBySt(locsColocating, st)                       // TODO: handle err
-
-	locKeys := extractLocKeys(locsSelectingSt)
-	// locsSelectedSt := store.locsBySelectedSt[stKey]
-	store.locsBySelectedSt[stKey] = locKeys
+	// 1a)
+	epsUsedSt := store.findEpsUsedSt(stKey)
 
 	// 2a)
-	epsUsingSt := []string{}
-	for _, loc := range locsSelectingSt {
-		locKey := kcpcache.ToClusterAwareKey(string(logicalcluster.From(loc)), loc.GetNamespace(), loc.GetName())
-		eps := store.epsBySelectedLoc[locKey]
-		epsUsingSt = append(epsUsingSt, eps...)
+	locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
+	if err != nil {
+		logger.Error(err, "failed to list Locations")
+		return err
 	}
-	epsUsingSt, usingSet := dedupAndHash(epsUsingSt)
+	locsSelectingSt, err := filterLocsBySt(locsInStws, st)
+	if err != nil {
+		logger.Error(err, "failed to find Locations for SyncTarget")
+		return err
+	}
 
-	epsUsedSt := store.epsByUsedSt[stKey]
-	store.epsByUsedSt[stKey] = epsUsingSt
+	store.locsBySelectedSt[stKey] = packLocKeys(locsSelectingSt)
 
-	epsUsedSt, usedSet := dedupAndHash(epsUsedSt)
+	// 2b)
+	epsUsingSt := map[string]empty{}
+	for _, loc := range locsSelectingSt {
+		locKey, _ := kcpcache.MetaClusterNamespaceKeyFunc(loc)
+		eps := store.epsBySelectedLoc[locKey]
+		epsUsingSt = unionTwo(epsUsingSt, eps)
+	}
 
-	for _, ep := range epsUsedSt {
-		if _, ok := usingSet[ep]; !ok {
-			// 2b)
+	for ep := range epsUsedSt {
+		if _, ok := epsUsingSt[ep]; !ok {
+			// 3a)
 			// for an (obsolite) ep in epsUsedSt but not in epsUsingSt
 			// remove all relevant sp(s) from that ep, so that that ep doesn't use st
 			// an obsolite ep doesn't use st anymore because its locs don't select the st anymore
@@ -91,11 +99,18 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, _ := c.singlePlacementSliceLister.Cluster(ws).Get(name) // TODO: handle err
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
-			c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{}) // TODO: handle err
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
 		} else {
-			// 2c)
+			// 3b)
 			// for an (ongoing) ep in both epsUsedSt and epsUsingSt
 			// the ep continues to use this st,
 			// because at least one locs selected the st, AND at least one locs are selecting the st
@@ -107,41 +122,67 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, _ := c.singlePlacementSliceLister.Cluster(ws).Get(name) // TODO: handle err
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
 
-			// TODO(waltforme): Maybe I can improve this by making epsBySelectedLoc's value be a map instead of a slice
-			// But the improvements should be marginal because I have to access the apiserver (to update sps) anyway
-			epObj, _ := c.edgePlacementLister.Cluster(ws).Get(name)
-			locsSelectedByEp, _ := filterLocsByEp(locsSelectingSt, epObj)      // TODO: handle err
-			additionalSingles, _ := makeSinglePlacements(locsSelectedByEp, st) // TODO: handle err
+			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
+				return err
+			}
+			locsSelectedByEp, err := filterLocsByEp(locsSelectingSt, epObj)
+			if err != nil {
+				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
+				return err
+			}
+			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{}) // TODO: handle err
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
 		}
 	}
 
-	// 2d)
-	// for a (new) ep in epsUsingSt but not in epsUsedSt
-	// insert composed sp(s) into the ep's sps
-	for _, ep := range epsUsingSt {
-		if _, ok := usedSet[ep]; !ok {
+	for ep := range epsUsingSt {
+		if _, ok := epsUsedSt[ep]; !ok {
+			// 3c)
+			// for a (new) ep in epsUsingSt but not in epsUsedSt
+			// insert composed sp(s) into the ep's sps
 			logger.V(1).Info("begin to use SyncTarget", "edgePlacement", ep)
 			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, _ := c.singlePlacementSliceLister.Cluster(ws).Get(name) // TODO: handle err
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
 
-			// TODO(waltforme): Maybe I can improve this by making epsBySelectedLoc's value be a map instead of a slice
-			// But the improvements should be marginal because I have to access the apiserver (to update sps) anyway
-			epObj, _ := c.edgePlacementLister.Cluster(ws).Get(name)
-			locsSelectedByEp, _ := filterLocsByEp(locsSelectingSt, epObj)      // TODO: handle err
-			additionalSingles, _ := makeSinglePlacements(locsSelectedByEp, st) // TODO: handle err
+			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
+				return err
+			}
+			locsSelectedByEp, err := filterLocsByEp(locsSelectingSt, epObj)
+			if err != nil {
+				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
+				return err
+			}
+			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
 			nextSPS := extendSPS(currentSPS, additionalSingles)
 
-			c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{}) // TODO: handle err
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
 		}
 	}
 
@@ -185,7 +226,7 @@ func filterLocsByEp(locs []*schedulingv1alpha1.Location, ep *edgev1alpha1.EdgePl
 	return filtered, nil
 }
 
-func makeSinglePlacements(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) ([]edgev1alpha1.SinglePlacement, error) {
+func makeSinglePlacements(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
 	ws := logicalcluster.From(st).String()
 	made := []edgev1alpha1.SinglePlacement{}
 	for _, loc := range locsSelectingSt {
@@ -197,25 +238,15 @@ func makeSinglePlacements(locsSelectingSt []*schedulingv1alpha1.Location, st *wo
 		}
 		made = append(made, sp)
 	}
-	return made, nil
+	return made
 }
 
-func dedupAndHash(s []string) ([]string, map[string]struct{}) {
-	t, hash := []string{}, map[string]struct{}{}
-	for _, k := range s {
-		if _, ok := hash[k]; !ok {
-			t = append(t, k)
-			hash[k] = struct{}{}
-		}
-	}
-	return t, hash
-}
-
-func extractLocKeys(locs []*schedulingv1alpha1.Location) []string {
-	keys := []string{}
+// packLocKeys extracts keys from given Locations and put the keys in a map
+func packLocKeys(locs []*schedulingv1alpha1.Location) map[string]empty {
+	keys := map[string]empty{}
 	for _, l := range locs {
-		key := kcpcache.ToClusterAwareKey(string(logicalcluster.From(l)), l.GetNamespace(), l.GetName())
-		keys = append(keys, key)
+		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(l)
+		keys[key] = empty{}
 	}
 	return keys
 }

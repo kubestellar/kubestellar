@@ -33,17 +33,16 @@ or in other words,
 
 	ep <- loc
 	loc <- st
-	ep <- st
 
 */
+
+type empty struct{}
 
 type internalData struct {
 	l sync.Mutex
 
-	// TODO(waltforme): should these map values be slices or maps?
-	epsBySelectedLoc map[string][]string // ep <- loc
-	locsBySelectedSt map[string][]string // loc <- st
-	epsByUsedSt      map[string][]string // ep <- st
+	epsBySelectedLoc map[string]map[string]empty // ep <- loc
+	locsBySelectedSt map[string]map[string]empty // loc <- st
 }
 
 var store internalData
@@ -51,10 +50,29 @@ var store internalData
 func init() {
 	store = internalData{
 		l:                sync.Mutex{},
-		epsBySelectedLoc: map[string][]string{},
-		locsBySelectedSt: map[string][]string{},
-		epsByUsedSt:      map[string][]string{},
+		epsBySelectedLoc: map[string]map[string]empty{},
+		locsBySelectedSt: map[string]map[string]empty{},
 	}
 
 	store.manuallyFillIn()
+}
+
+func unionTwo(a, b map[string]empty) map[string]empty {
+	u := map[string]empty{}
+	for k, v := range a {
+		u[k] = v
+	}
+	for k, v := range b {
+		u[k] = v
+	}
+	return u
+}
+
+func (d *internalData) findEpsUsedSt(st string) map[string]empty {
+	eps := map[string]empty{}
+	locs := d.locsBySelectedSt[st]
+	for l := range locs {
+		eps = unionTwo(eps, d.epsBySelectedLoc[l])
+	}
+	return eps
 }
