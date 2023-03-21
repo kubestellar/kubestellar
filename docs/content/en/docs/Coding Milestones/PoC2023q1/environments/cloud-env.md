@@ -16,7 +16,7 @@ description: >-
 
 # Monitoring Tools for KCP-Edge (Prometheus, Grafana and Node Exporter)
 
-<img src="kcp-edge-architecture-aws.png" width="200%" height="200%" title="kcp-edge-architecture-aws">
+<img src="/docs/coding-milestones/poc2023q1/environments/kcp-edge-architecture-aws.png" width="200%" height="200%" title="kcp-edge-architecture-aws">
 
 
 ### Description
