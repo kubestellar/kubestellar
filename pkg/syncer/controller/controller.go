@@ -8,11 +8,14 @@ import (
 	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/typed/edge/v1alpha1"
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
@@ -30,13 +33,17 @@ func NewSyncConfigController(
 	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
 	syncConfigUID types.UID,
 	syncConfigName string,
+	downstreamDynamicClient dynamic.Interface,
+	downstreamSyncerDiscoveryClient discovery.DiscoveryInterface,
 ) (*controller, error) {
 	c := &controller{
-		queue:                       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-		syncConfigUID:               syncConfigUID,
-		syncConfigLister:            syncConfigInformer.Lister(),
-		syncConfigInformerHasSynced: syncConfigInformer.Informer().HasSynced,
-		syncConfigClient:            syncConfigClient,
+		queue:                           workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
+		syncConfigUID:                   syncConfigUID,
+		syncConfigLister:                syncConfigInformer.Lister(),
+		syncConfigInformerHasSynced:     syncConfigInformer.Informer().HasSynced,
+		syncConfigClient:                syncConfigClient,
+		downstreamDynamicClient:         downstreamDynamicClient,
+		downstreamSyncerDiscoveryClient: downstreamSyncerDiscoveryClient,
 	}
 	syncConfigInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
@@ -62,11 +69,13 @@ func NewSyncConfigController(
 
 // controller is a control loop that watches EdgeSyncConfig.
 type controller struct {
-	queue                       workqueue.RateLimitingInterface
-	syncConfigUID               types.UID
-	syncConfigLister            edgev1alpha1listers.EdgeSyncConfigLister
-	syncConfigInformerHasSynced cache.InformerSynced
-	syncConfigClient            edgev1alpha1typed.EdgeSyncConfigInterface
+	queue                           workqueue.RateLimitingInterface
+	syncConfigUID                   types.UID
+	syncConfigLister                edgev1alpha1listers.EdgeSyncConfigLister
+	syncConfigInformerHasSynced     cache.InformerSynced
+	syncConfigClient                edgev1alpha1typed.EdgeSyncConfigInterface
+	downstreamDynamicClient         dynamic.Interface
+	downstreamSyncerDiscoveryClient discovery.DiscoveryInterface
 }
 
 // Ready returns true if the controller is ready to return the GVRs to sync.
@@ -82,8 +91,7 @@ func (c *controller) enqueueSyncConfig(obj interface{}, logger klog.Logger) {
 		return
 	}
 
-	logger.WithValues("key", key).V(2).Info("queueing SyncConfig")
-
+	shared.WithQueueKey(logger, key).V(2).Info("queueing SyncConfig")
 	c.queue.Add(key)
 }
 
@@ -92,7 +100,7 @@ func (c *controller) Start(ctx context.Context, numThreads int) {
 	defer runtime.HandleCrash()
 	defer c.queue.ShutDown()
 
-	logger := klog.FromContext(ctx).WithValues("reconciler", controllerName)
+	logger := shared.WithReconciler(klog.FromContext(ctx), controllerName)
 	ctx = klog.NewContext(ctx, logger)
 	logger.Info("Starting controller")
 	defer logger.Info("Shutting down controller")

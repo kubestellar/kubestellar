@@ -4,13 +4,18 @@ import (
 	"context"
 	"time"
 
+	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
 	kcpclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/logicalcluster/v3"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/version"
 	"k8s.io/client-go/rest"
@@ -53,13 +58,14 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int, i
 	bootstrapConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
 
-	syncConfigClient, err := kcpclientset.NewForConfig(bootstrapConfig)
+	syncConfigClientSet, err := kcpclientset.NewForConfig(bootstrapConfig)
 	if err != nil {
 		return err
 	}
+	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
 
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
-	syncConfigInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClient, resyncPeriod, kcpinformers.WithTweakListOptions(
+	syncConfigInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod, kcpinformers.WithTweakListOptions(
 		func(listOptions *metav1.ListOptions) {
 			listOptions.FieldSelector = fields.OneTermEqualSelector("metadata.name", cfg.SyncTargetName).String()
 		},
@@ -68,10 +74,32 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int, i
 	syncConfigInformerFactory.Start(ctx.Done())
 	syncConfigInformerFactory.WaitForCacheSync(ctx.Done())
 
+	syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
+
 	upstreamConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(upstreamConfig, "edge-mc#syncer/"+kcpVersion)
+	upstreamSyncerClusterClient, err := kcpdynamic.NewForConfig(upstreamConfig)
+	if err != nil {
+		return err
+	}
+	_ = upstreamSyncerClusterClient
+
 	downstreamConfig := rest.CopyConfig(cfg.DownstreamConfig)
 	rest.AddUserAgent(downstreamConfig, "edge-mc#syncer/"+kcpVersion)
+	downstreamDynamicClient, err := dynamic.NewForConfig(downstreamConfig)
+	if err != nil {
+		return err
+	}
+	downstreamKubeClient, err := kubernetes.NewForConfig(downstreamConfig)
+	if err != nil {
+		return err
+	}
+	downstreamSyncerDiscoveryClient := discovery.NewDiscoveryClient(downstreamKubeClient.RESTClient())
 
+	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, types.UID(cfg.SyncTargetUID), cfg.SyncTargetName, downstreamDynamicClient, downstreamSyncerDiscoveryClient)
+	if err != nil {
+		return err
+	}
+	_ = controller
 	return nil
 }
