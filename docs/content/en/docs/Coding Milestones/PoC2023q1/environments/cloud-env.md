@@ -1,12 +1,4 @@
 ---
-title: "Cloud-Env"
-linkTitle: "Cloud-Env"
-weight: 100
-description: >-
-    
----
-
----
 title: "Cloud-Environment"
 linkTitle: "Cloud-Environment"
 weight: 100
