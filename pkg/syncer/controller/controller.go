@@ -9,13 +9,11 @@ import (
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
@@ -31,19 +29,18 @@ func NewSyncConfigController(
 	logger klog.Logger,
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,
 	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
-	syncConfigUID types.UID,
 	syncConfigName string,
-	downstreamDynamicClient dynamic.Interface,
-	downstreamSyncerDiscoveryClient discovery.DiscoveryInterface,
+	upSyncer syncers.SyncerInterface,
+	downSyncer syncers.SyncerInterface,
 ) (*controller, error) {
+	rateLimitter := workqueue.NewItemFastSlowRateLimiter(5*time.Second, 30*time.Second, 1000)
 	c := &controller{
-		queue:                           workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-		syncConfigUID:                   syncConfigUID,
-		syncConfigLister:                syncConfigInformer.Lister(),
-		syncConfigInformerHasSynced:     syncConfigInformer.Informer().HasSynced,
-		syncConfigClient:                syncConfigClient,
-		downstreamDynamicClient:         downstreamDynamicClient,
-		downstreamSyncerDiscoveryClient: downstreamSyncerDiscoveryClient,
+		queue:                       workqueue.NewNamedRateLimitingQueue(rateLimitter, controllerName),
+		syncConfigLister:            syncConfigInformer.Lister(),
+		syncConfigInformerHasSynced: syncConfigInformer.Informer().HasSynced,
+		syncConfigClient:            syncConfigClient,
+		upSyncer:                    upSyncer,
+		downSyncer:                  downSyncer,
 	}
 	syncConfigInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
@@ -69,13 +66,12 @@ func NewSyncConfigController(
 
 // controller is a control loop that watches EdgeSyncConfig.
 type controller struct {
-	queue                           workqueue.RateLimitingInterface
-	syncConfigUID                   types.UID
-	syncConfigLister                edgev1alpha1listers.EdgeSyncConfigLister
-	syncConfigInformerHasSynced     cache.InformerSynced
-	syncConfigClient                edgev1alpha1typed.EdgeSyncConfigInterface
-	downstreamDynamicClient         dynamic.Interface
-	downstreamSyncerDiscoveryClient discovery.DiscoveryInterface
+	queue                       workqueue.RateLimitingInterface
+	syncConfigLister            edgev1alpha1listers.EdgeSyncConfigLister
+	syncConfigInformerHasSynced cache.InformerSynced
+	syncConfigClient            edgev1alpha1typed.EdgeSyncConfigInterface
+	upSyncer                    syncers.SyncerInterface
+	downSyncer                  syncers.SyncerInterface
 }
 
 // Ready returns true if the controller is ready to return the GVRs to sync.
@@ -160,9 +156,15 @@ func (c *controller) process(ctx context.Context, key string) error {
 		return err
 	}
 
-	if syncConfig.GetUID() != c.syncConfigUID {
-		return nil
-	}
+	downsyncerError := c.downSyncer.ReInitializeClients(syncConfig.Spec.DownSyncedResources)
+	upSyncerError := c.upSyncer.ReInitializeClients(syncConfig.Spec.UpSyncedResources)
 
+	if downsyncerError != nil && upSyncerError != nil {
+		return fmt.Errorf("failed to reinitialize downsyncer and upsyncer")
+	} else if downsyncerError != nil && upSyncerError == nil {
+		return fmt.Errorf("failed to reinitialize downsyncer")
+	} else if downsyncerError == nil && upSyncerError != nil {
+		return fmt.Errorf("failed to reinitialize upsyncer")
+	}
 	return nil
 }

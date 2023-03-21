@@ -7,7 +7,6 @@ import (
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
 	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/fake"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,6 +30,22 @@ func init() {
 	_ = appsv1.AddToScheme(scheme)
 }
 
+type FakeSyncer struct {
+	t *testing.T
+}
+
+func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfigResource) error {
+	return nil
+}
+
+func (s *FakeSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+	return nil
+}
+
+func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+	return nil
+}
+
 func TestSyncConfig(t *testing.T) {
 	tests := map[string]struct {
 		syncConfig *edgev1alpha1.EdgeSyncConfig
@@ -50,7 +65,7 @@ func TestSyncConfig(t *testing.T) {
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
 			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, tc.syncConfig.UID, tc.syncConfig.Name, nil, nil)
+			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, tc.syncConfig.Name, &FakeSyncer{t: t}, &FakeSyncer{t: t})
 			require.NoError(t, err)
 
 			syncConfigInformerFactory.Start(ctx.Done())
@@ -70,7 +85,12 @@ func TestSyncConfig(t *testing.T) {
 			}, wait.ForeverTestTimeout, 1*time.Second)
 			assert.NoError(t, err)
 
-			err = controller.process(ctx, tc.syncConfig.Name)
+			controller.Start(ctx, 1)
+			require.Eventually(t, func() bool {
+				return false
+			}, wait.ForeverTestTimeout, 1*time.Second)
+			// err = controller.process(ctx, tc.syncConfig.Name)
+			_ = controller
 			require.NoError(t, err)
 		})
 	}
@@ -81,25 +101,6 @@ func syncConfig(name string, uid types.UID) *edgev1alpha1.EdgeSyncConfig {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 			UID:  uid,
-		},
-	}
-}
-
-func deployment(name, namespace, clusterName string, labels, annotations map[string]string, finalizers []string) *appsv1.Deployment {
-	if clusterName != "" {
-		if annotations == nil {
-			annotations = make(map[string]string)
-		}
-		annotations[logicalcluster.AnnotationKey] = clusterName
-	}
-
-	return &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        name,
-			Namespace:   namespace,
-			Labels:      labels,
-			Annotations: annotations,
-			Finalizers:  finalizers,
 		},
 	}
 }
