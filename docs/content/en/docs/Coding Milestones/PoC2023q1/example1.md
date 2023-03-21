@@ -109,8 +109,8 @@ kind: SyncTarget
 metadata:
   name: sync-target-f
   labels:
-    example: yes
-    extended: no
+    example: si
+    extended: non
 spec:
   cells:
     foo: bar
@@ -130,7 +130,7 @@ metadata:
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {"example":"yes", "extended":"no"}
+    matchLabels: {"example":"si", "extended":"non"}
 ```
 
 ### Create a SyncTarget object describing the guilder cluster
@@ -143,8 +143,8 @@ kind: SyncTarget
 metadata:
   name: sync-target-g
   labels:
-    example: yes
-    extended: yes
+    example: si
+    extended: si
 spec:
   cells:
     bar: baz
@@ -161,11 +161,11 @@ metadata:
   name: location-g
   annotations:
     env: prod
-    extended: yes
+    extended: si
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {"example":"yes", "extended":"yes"}
+    matchLabels: {"example":"si", "extended":"si"}
 ```
 
 ### Create the edge service provider workspace
@@ -233,6 +233,7 @@ metadata:
 spec:
   reference:
     export:
+      path: "root:compute"
       name: kubernetes
 ```
 
@@ -246,7 +247,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: commonstuff
-  labels: {common: "yes"}
+  labels: {common: "si"}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -320,7 +321,8 @@ metadata:
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod"}
-  namespaceSelector: {"common":"yes"}
+  namespaceSelector:
+    matchLabels: {"common":"si"}
 ```
 
 ### Create and populate the workload management workspace for the special workload
@@ -346,6 +348,7 @@ metadata:
 spec:
   reference:
     export:
+      path: "root:compute"
       name: kubernetes
 ```
 
@@ -356,7 +359,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: specialstuff
-  labels: {special: "yes"}
+  labels: {special: "si"}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -429,8 +432,9 @@ metadata:
   name: edge-placement-s
 spec:
   locationSelectors:
-    matchLabels: {"env":"prod","extended":"yes"}
-  namespaceSelector: {"special":"yes"}
+  - matchLabels: {"env":"prod","extended":"si"}
+  namespaceSelector: 
+    matchLabels: {"special":"si"}
 ```
 
 ### Edge scheduling
