@@ -220,13 +220,14 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 			continue
 		}
 		for _, rsc := range group.APIResources {
-			ans.Items = append(ans.Items, urmetav1a1.APIResource{
+			ar := urmetav1a1.APIResource{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "APIResource",
 					APIVersion: urmetav1a1.SchemeGroupVersion.String(),
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:            group.GroupVersion + ":" + rsc.Name,
+					// The normal syntax has a slash, which confuses the usual Store
+					Name:            gv.Group + ":" + gv.Version + ":" + rsc.Name,
 					ResourceVersion: resourceVersionS,
 				},
 				Spec: urmetav1a1.APIResourceSpec{
@@ -238,7 +239,9 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 					Kind:         rsc.Kind,
 					Verbs:        rsc.Verbs,
 				},
-			})
+			}
+			// rlw.logger.V(4).Info("Producing an APIResource", "ar", ar)
+			ans.Items = append(ans.Items, ar)
 		}
 	}
 	return &ans, nil
@@ -260,9 +263,13 @@ func (rl resourceLister) List(selector labels.Selector) (ret []*urmetav1a1.APIRe
 }
 
 func (rl resourceLister) Get(name string) (*urmetav1a1.APIResource, error) {
-	obj, _, err := rl.store.GetByKey(name)
+	obj, exists, err := rl.store.GetByKey(name)
 	if err != nil {
 		return nil, err
+	}
+	if !exists {
+		gr := schema.GroupResource{Group: urmetav1a1.SchemeGroupVersion.Group, Resource: "apiresources"}
+		return nil, apierrors.NewNotFound(gr, name)
 	}
 	return obj.(*urmetav1a1.APIResource), nil
 }
