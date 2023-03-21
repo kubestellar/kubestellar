@@ -63,20 +63,27 @@ import (
 )
 
 type ClientOpts struct {
+	which        string
+	description  string
 	loadingRules *clientcmd.ClientConfigLoadingRules
 	overrides    clientcmd.ConfigOverrides
 }
 
-func NewClientOpts() *ClientOpts {
+func NewClientOpts(which, description string) *ClientOpts {
 	return &ClientOpts{
+		which:        which,
+		description:  description,
 		loadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 		overrides:    clientcmd.ConfigOverrides{},
 	}
 }
 
 func (opts *ClientOpts) AddFlags(flags *pflag.FlagSet) {
-	flags.StringVar(&opts.loadingRules.ExplicitPath, "kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for CLI requests")
-	flags.StringVar(&opts.overrides.CurrentContext, "context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use")
+	flags.StringVar(&opts.loadingRules.ExplicitPath, opts.which+"-kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for "+opts.description)
+	flags.StringVar(&opts.overrides.CurrentContext, opts.which+"-context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use for "+opts.description)
+	flags.StringVar(&opts.overrides.Context.AuthInfo, opts.which+"-user", opts.overrides.Context.AuthInfo, "The name of the kubeconfig user to use for "+opts.description)
+	flags.StringVar(&opts.overrides.Context.Cluster, opts.which+"-cluster", opts.overrides.Context.Cluster, "The name of the kubeconfig cluster to use for "+opts.description)
+
 }
 
 func (opts *ClientOpts) ToRESTConfig() (*rest.Config, error) {
@@ -93,8 +100,11 @@ func main() {
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	cliOpts := NewClientOpts()
-	cliOpts.AddFlags(fs)
+	espwClientOpts := NewClientOpts("espw", "edge service provider workspace")
+	espwClientOpts.AddFlags(fs)
+	baseClientOpts := NewClientOpts("allclusters", "all clusters")
+	baseClientOpts.overrides.CurrentContext = "system:admin"
+	baseClientOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -104,18 +114,6 @@ func main() {
 	fs.VisitAll(func(flg *pflag.Flag) {
 		logger.V(1).Info("Command line flag", flg.Name, flg.Value)
 	})
-
-	inventoryLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	inventoryConfigOverrides := &clientcmd.ConfigOverrides{}
-
-	fs.StringVar(&inventoryLoadingRules.ExplicitPath, "inventory-kubeconfig", inventoryLoadingRules.ExplicitPath, "pathname of kubeconfig file for inventory service provider workspace")
-	fs.StringVar(&inventoryConfigOverrides.CurrentContext, "inventory-context", "root", "current-context override for inventory-kubeconfig")
-
-	workloadLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	workloadConfigOverrides := &clientcmd.ConfigOverrides{}
-
-	fs.StringVar(&workloadLoadingRules.ExplicitPath, "workload-kubeconfig", workloadLoadingRules.ExplicitPath, "pathname of kubeconfig file for edge workload service provider workspace")
-	fs.StringVar(&workloadConfigOverrides.CurrentContext, "workload-context", workloadConfigOverrides.CurrentContext, "current-context override for workload-kubeconfig")
 
 	mymux := mux.NewPathRecorderMux("placement-translator")
 	mymux.Handle("/metrics", legacyregistry.Handler())
@@ -128,14 +126,20 @@ func main() {
 		}
 	}()
 
-	restConfig, err := cliOpts.ToRESTConfig()
+	espwRestConfig, err := espwClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to build config from flags")
+		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
+		os.Exit(10)
+	}
+
+	baseRestConfig, err := baseClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "Failed to build config from flags", "which", baseClientOpts.which)
 		os.Exit(10)
 	}
 
 	// Get client config for view of SyncTarget objects
-	edgeViewConfig, err := configForViewOfExport(ctx, restConfig, "edge.kcp.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of edge APIExport")
 		os.Exit(4)
@@ -148,10 +152,11 @@ func main() {
 	}
 
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
 	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
-	espwClientset, err := kcpscopedclientset.NewForConfig(restConfig)
+	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for edge service provider workspace")
 		os.Exit(8)
@@ -161,19 +166,19 @@ func main() {
 	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
-	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(restConfig)
+	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
 		os.Exit(10)
 	}
 
-	discoveryClusterClient, err := clusterdiscovery.NewForConfig(restConfig)
+	discoveryClusterClient, err := clusterdiscovery.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster discovery client")
 		os.Exit(20)
 	}
 
-	dynamicClusterClient, err := clusterdynamic.NewForConfig(restConfig)
+	dynamicClusterClient, err := clusterdynamic.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster dynamic client")
 		os.Exit(30)
@@ -186,7 +191,7 @@ func main() {
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(ctx, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
+	pt := placement.NewPlacementTranslator(ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
