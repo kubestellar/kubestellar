@@ -56,8 +56,8 @@ func (nap *NameAndPathBinder) OnAdd(obj any) {
 		nap.logger.Error(nil, "No logicalcluster Path", "obj", obj)
 		return
 	}
-	nap.nameToPath.Set(name, path)
-	nap.pathToName.Set(path, name)
+	nap.nameToPath.Receive(name, path)
+	nap.pathToName.Receive(path, name)
 }
 
 func (nap *NameAndPathBinder) OnUpdate(oldObj, newObj any) {

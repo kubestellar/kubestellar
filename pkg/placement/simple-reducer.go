@@ -19,54 +19,33 @@ package placement
 import (
 	"sync"
 
-	apimachtypes "k8s.io/apimachinery/pkg/types"
-
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // SimplePlacementSliceSetReducer is the simplest possible
-// implementation of SinglePlacementSliceSetReducer.
+// set differencer for ResolvedWhere
 type SimplePlacementSliceSetReducer struct {
 	sync.Mutex
-	receivers []SinglePlacementSetChangeReceiver
-	enhanced  SinglePlacementSet
+	receivers []SetChangeReceiver[edgeapi.SinglePlacement]
+	current   SinglePlacementSet
 }
 
-var _ SinglePlacementSliceSetReducer = &SimplePlacementSliceSetReducer{}
+var _ Receiver[ResolvedWhere] = &SimplePlacementSliceSetReducer{}
 
-func NewSimplePlacementSliceSetReducer(receivers ...SinglePlacementSetChangeReceiver) *SimplePlacementSliceSetReducer {
+var _ ResolvedWhereDifferencerConstructor = NewSimplePlacementSliceSetReducer
+
+func NewSimplePlacementSliceSetReducer(receiver SetChangeReceiver[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
 	ans := &SimplePlacementSliceSetReducer{
-		receivers: receivers,
-		enhanced:  NewSinglePlacementSet(),
+		receivers: []SetChangeReceiver[edgeapi.SinglePlacement]{receiver},
+		current:   NewSinglePlacementSet(),
 	}
 	return ans
 }
 
-// SimplePlacementSliceSetReducerAsUIDreceiver adds the Set method that
-// SimplePlacementSliceSetReducer needs in order to implement
-// MappingReceiver to receive UID information.
-type SimplePlacementSliceSetReducerAsUIDreceiver struct {
-	*SimplePlacementSliceSetReducer
-}
-
-func (spsr SimplePlacementSliceSetReducerAsUIDreceiver) Set(en ExternalName, uid apimachtypes.UID) {
+func (spsr *SimplePlacementSliceSetReducer) Receive(newSlices ResolvedWhere) {
 	spsr.Lock()
 	defer spsr.Unlock()
-	if details, ok := spsr.enhanced[en]; ok {
-		details.SyncTargetUID = uid
-		spsr.enhanced[en] = details
-		fullSP := details.Complete(en)
-		for _, receiver := range spsr.receivers {
-			receiver.Add(fullSP)
-		}
-
-	}
-}
-
-func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
-	spsr.Lock()
-	defer spsr.Unlock()
-	for key, val := range spsr.enhanced {
+	for key, val := range spsr.current {
 		sp := val.Complete(key)
 		for _, receiver := range spsr.receivers {
 			receiver.Remove(sp)
@@ -76,14 +55,11 @@ func (spsr *SimplePlacementSliceSetReducer) Set(newSlices ResolvedWhere) {
 }
 
 func (spsr *SimplePlacementSliceSetReducer) setLocked(newSlices ResolvedWhere) {
-	spsr.enhanced = NewSinglePlacementSet()
+	spsr.current = NewSinglePlacementSet()
 	enumerateSinglePlacementSlices(newSlices, func(apiSP edgeapi.SinglePlacement) {
 		syncTargetID := ExternalName{}.OfSPTarget(apiSP)
-		syncTargetDetails := SinglePlacementDetails{
-			LocationName:  apiSP.LocationName,
-			SyncTargetUID: apiSP.SyncTargetUID,
-		}
-		spsr.enhanced[syncTargetID] = syncTargetDetails
+		syncTargetDetails := SPDetails(apiSP)
+		spsr.current[syncTargetID] = syncTargetDetails
 		for _, receiver := range spsr.receivers {
 			receiver.Add(apiSP)
 		}

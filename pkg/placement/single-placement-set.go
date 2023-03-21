@@ -40,11 +40,12 @@ func (spd SinglePlacementDetails) Complete(en ExternalName) edgeapi.SinglePlacem
 	}
 }
 
-// SinglePlacementSet maps ID of SyncTarget to the rest of the information
+// SinglePlacementSet is an alaternate representation of "resolved where";
+// it maps ID of SyncTarget to the rest of the information
 // in each edgeapi.SinglePlacement.
 type SinglePlacementSet map[ExternalName]SinglePlacementDetails
 
-var _ SinglePlacementSetChangeReceiver = NewSinglePlacementSet()
+var _ SetChangeReceiver[edgeapi.SinglePlacement] = NewSinglePlacementSet()
 
 func NewSinglePlacementSet() SinglePlacementSet {
 	return SinglePlacementSet{}

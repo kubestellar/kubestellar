@@ -33,26 +33,32 @@ import (
 
 	"github.com/spf13/pflag"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
+	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
+	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
+	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
+	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
-	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
+	emcclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
+	emcinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
+	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/placement"
 )
 
@@ -128,16 +134,6 @@ func main() {
 		os.Exit(10)
 	}
 
-	// create config for accessing TMC service provider workspace
-	inventoryClientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(inventoryLoadingRules, inventoryConfigOverrides)
-	inventoryConfig, err := inventoryClientConfig.ClientConfig()
-	if err != nil {
-		logger.Error(err, "failed to make inventory config")
-		os.Exit(2)
-	}
-
-	inventoryConfig.UserAgent = "mailbox-controller"
-
 	// Get client config for view of SyncTarget objects
 	edgeViewConfig, err := configForViewOfExport(ctx, restConfig, "edge.kcp.io")
 	if err != nil {
@@ -145,35 +141,56 @@ func main() {
 		os.Exit(4)
 	}
 
-	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(edgeViewConfig)
+	edgeViewClusterClientset, err := emcclusterclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
+		logger.Error(err, "Failed to create cluster clientset for view of edge APIExport")
 		os.Exit(6)
 	}
 
-	edgeInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClusterClientset, resyncPeriod)
-	spsPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
-	spsClusterInformer := spsPreInformer.Informer()
+	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
+	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
-	workspacesScopedClientset, err := kcpscopedclientset.NewForConfig(restConfig)
+	espwClientset, err := kcpscopedclientset.NewForConfig(restConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for workspaces")
+		logger.Error(err, "Failed to create clientset for edge service provider workspace")
+		os.Exit(8)
 	}
 
-	workspacesScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspacesScopedClientset, resyncPeriod)
-	workspacesScopedPreInformer := workspacesScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
-	workspacesScopedInformer := workspacesScopedPreInformer.Informer()
+	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
+	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
+	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
+
+	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(restConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
+		os.Exit(10)
+	}
+
+	discoveryClusterClient, err := clusterdiscovery.NewForConfig(restConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create all-cluster discovery client")
+		os.Exit(20)
+	}
+
+	dynamicClusterClient, err := clusterdynamic.NewForConfig(restConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create all-cluster dynamic client")
+		os.Exit(30)
+	}
+
+	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
+
+	crdClusterInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	bindingClusterInformer := dynamicClusterInformerFactory.ForResource(apisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
 
 	doneCh := ctx.Done()
-	edgeInformerFactory.Start(doneCh)
-	workspacesScopedInformerFactory.Start(doneCh)
-	if !cache.WaitForNamedCacheSync("mailbox-controller", doneCh, spsClusterInformer.HasSynced, workspacesScopedInformer.HasSynced) {
-		logger.Error(nil, "Informer syncs not achieved")
-		os.Exit(100)
-	}
 	// TODO: more
-	placement.NewPlacementTranslator(ctx, workspacesScopedInformer)
-	<-doneCh
+	pt := placement.NewPlacementTranslator(ctx, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
+	edgeInformerFactory.Start(doneCh)
+	espwInformerFactory.Start(doneCh)
+	dynamicClusterInformerFactory.Start(doneCh)
+	pt.Run()
 	logger.Info("Time to stop")
 }
 

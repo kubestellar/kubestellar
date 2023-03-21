@@ -32,7 +32,7 @@ import (
 // do the following in TestFoo (or whatever you call it):
 // - construct a Foo using a SinglePlacementSet as the receiver
 // - call exerciseSinglePlacementSliceSetReducer on the Foo and that receiver.
-func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer SinglePlacementSliceSetReducer, receiver SinglePlacementSet) func(*testing.T) {
+func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere ResolvedWhere, iterations int, changesPerIteration int, extraPerIteration func(), reducer Receiver[ResolvedWhere], receiver SinglePlacementSet) func(*testing.T) {
 	return func(t *testing.T) {
 		input := initialWhere
 		for iteration := 1; iteration <= iterations; iteration++ {
@@ -40,11 +40,11 @@ func exerciseSinglePlacementSliceSetReducer(rng *rand.Rand, initialWhere Resolve
 			for change := 1; change <= changesPerIteration; change++ {
 				input = reviseSinglePlacementSliceSlice(rng, input)
 			}
-			reducer.Set(input)
+			reducer.Receive(input)
 			extraPerIteration()
 			checker := NewSinglePlacementSet()
 			reference := NewSimplePlacementSliceSetReducer(checker)
-			reference.Set(input)
+			reference.Receive(input)
 			if receiver.Equals(checker) {
 				continue
 			}
@@ -127,7 +127,7 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	rw1 := ResolvedWhere{&edgeapi.SinglePlacementSlice{
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}}
-	testReducer.Set(rw1)
+	testReducer.Receive(rw1)
 	if actual, expected := len(testReceiver), 1; actual != expected {
 		t.Errorf("Wrong size after first Set: actual=%d, expected=%d", actual, expected)
 	}
@@ -139,7 +139,7 @@ func TestSimplePlacementSliceSetReducer(t *testing.T) {
 	rw1a := ResolvedWhere{&edgeapi.SinglePlacementSlice{
 		Destinations: []edgeapi.SinglePlacement{sp1a},
 	}}
-	testReducer.Set(rw1a)
+	testReducer.Receive(rw1a)
 	if actual, expected := len(testReceiver), 1; actual != expected {
 		t.Errorf("Wrong size after first tweak: actual=%d, expected=%d", actual, expected)
 	}

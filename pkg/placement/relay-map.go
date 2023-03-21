@@ -73,7 +73,7 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeRelease(key Key, shouldRelease
 	var outerVal OuterVal
 	innerVal = rm.transform(outerVal)
 	for _, receiver := range rm.receivers {
-		receiver.Set(key, innerVal)
+		receiver.Receive(key, innerVal)
 	}
 }
 
@@ -92,17 +92,17 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(receiver MappingReceive
 		return
 	}
 	for key, outerVal := range rm.theMap {
-		receiver.Set(key, rm.transform(outerVal))
+		receiver.Receive(key, rm.transform(outerVal))
 	}
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) Set(key Key, outerVal OuterVal) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) Receive(key Key, outerVal OuterVal) {
 	innerVal := rm.transform(outerVal)
 	rm.Lock()
 	defer rm.Unlock()
 	rm.theMap[key] = outerVal
 	for _, receiver := range rm.receivers {
-		receiver.Set(key, innerVal)
+		receiver.Receive(key, innerVal)
 	}
 }
 

@@ -71,7 +71,8 @@ type WhatResolver DynamicMapProvider[ExternalName, WorkloadParts]
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
 // workload projector and the placement projector.
-// The implementation may atomize the resolved "where" using a SinglePlacementSliceSetReducer.
+// The implementation may atomize the resolved "what" and "where"
+// using differencers constructed by a SetDifferencerConstructor.
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMapProvider behavior.
 type SetBinder interface {
@@ -203,6 +204,35 @@ type ProjectionDetails struct {
 	Names *k8ssets.String
 }
 
+// SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
+// The two set differencer constructors will be called to create set differencers
+// that translate new whole values of ResolvedWhat and ResolvedWhere into
+// elemental differences.
+// The BindingOrganizer produces a pipe stage that is given those elemental
+// differences and re-organizes them and solves the workload conflicts to
+// implement ProjectionMapProvider.
+type SetBinderConstructor func(
+	resolvedWhatDifferencerConstructor ResolvedWhatDifferencerConstructor,
+	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor,
+	bindingOrganizer BindingOrganizer,
+) SetBinder
+
+// SetDifferencerConstructor is a function that is given a receiver of set
+// differences and returns a receiver of sets that keeps track of the latest
+// set and keeps the difference receiver informed of differences as they arrive.
+// The set differencer precedes the set difference receiver in the locking order.
+type SetDifferencerConstructor[Set any, Element any] func(SetChangeReceiver[Element]) Receiver[Set]
+
+type ResolvedWhatDifferencerConstructor = SetDifferencerConstructor[WorkloadParts, WorkloadPart]
+
+type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
+
+// SetChangeReceiver is kept appraised of changes in a set of T
+type SetChangeReceiver[T any] interface {
+	Add(T)
+	Remove(T)
+}
+
 // BindingOrganizer produces a SingleBinder and a corresponding map provider
 // that reflects the result of combining the single bindings and resolving
 // the API group version issue.
@@ -225,23 +255,6 @@ type SingleBinder interface {
 type SingleBindingOps interface {
 	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement)
 	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement)
-}
-
-// SinglePlacementSliceSetReducer keeps track of a ResolvedWhere.
-// Typically one of these has a SinglePlacementSetChangeReceiver that is kept
-// appraised of the set of values in those slices, extended by the
-// SyncTarget UIDs.
-// A SetBinder will likely use a SinglePlacementSliceSetReducer
-// to atomize its incoming ResolvedWhere values.
-type SinglePlacementSliceSetReducer interface {
-	Set(ResolvedWhere)
-}
-
-// SinglePlacementSetChangeReceiver is something that is kept
-// incrementally appraised of a set of edgeapi.SinglePlacement values.
-type SinglePlacementSetChangeReceiver interface {
-	Add(edgeapi.SinglePlacement)
-	Remove(edgeapi.SinglePlacement)
 }
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,

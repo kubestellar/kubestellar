@@ -25,6 +25,7 @@ package placement
 // "ThingConsumer" actively pulls for things.
 // "ThingReceiver" passively receives Things.
 // "ThingProvider" provides the Thing service, which may have active and/or passive aspects.
+// "Client[Thing]" is a user of an implementation of Thing
 // "Mapping" is a single key-value pair or other such association
 // "Map" is a complete set of pairs
 
@@ -71,7 +72,7 @@ func DynamicMapProviderRelease[Key comparable, Val any](prod DynamicMapProviderW
 // MappingReceiver is given map entries by a DynamicMapProvider.
 // Some DynamicMapProvider implementations require receivers to be comparable.
 type MappingReceiver[Key comparable, Val any] interface {
-	Set(Key, Val)
+	Receive(Key, Val)
 }
 
 // MappingReceiverFunc is a func value that implements MappingReceiver.
@@ -85,8 +86,12 @@ type Client[T any] interface {
 }
 
 type DynamicValueProvider[Val any] interface {
-	AddReceiver(func(Val))
-	Get() Val
+	AddReceiver(Receiver[Val])
+	Get(func(Val))
+}
+
+type Receiver[Val any] interface {
+	Receive(Val)
 }
 
 type Empty struct{}

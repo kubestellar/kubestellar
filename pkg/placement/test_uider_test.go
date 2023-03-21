@@ -54,7 +54,7 @@ type testUIDReceiver struct {
 	current map[ExternalName]apimachtypes.UID
 }
 
-func (tc *testUIDReceiver) Set(en ExternalName, uid apimachtypes.UID) {
+func (tc *testUIDReceiver) Receive(en ExternalName, uid apimachtypes.UID) {
 	tc.Lock()
 	defer tc.Unlock()
 	tc.current[en] = uid
