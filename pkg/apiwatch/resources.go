@@ -25,6 +25,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
@@ -48,6 +49,17 @@ type ObjectNotifier interface {
 	AddEventHandler(handler upstreamcache.ResourceEventHandler)
 }
 
+// APIResourceLister helps list APIResources.
+// All objects returned here must be treated as read-only.
+type APIResourceLister interface {
+	// List lists all APIResources in the informer.
+	// Objects returned here must be treated as read-only.
+	List(selector labels.Selector) (ret []*urmetav1a1.APIResource, err error)
+	// Get retrieves the APIResource having the given name.
+	// Objects returned here must be treated as read-only.
+	Get(name string) (*urmetav1a1.APIResource, error)
+}
+
 // NewAPIResourceInformer creates an informer on the API resources
 // revealed by the given client.  The objects delivered by the
 // informer are of type `*urmetav1a1.APIResource`.
@@ -60,7 +72,7 @@ type ObjectNotifier interface {
 // is delayed by a few decaseconds (with Nagling) to support
 // invalidations based on events that merely trigger some process of
 // changing the set of API resources.
-func NewAPIResourceInformer(ctx context.Context, clusterName string, client upstreamdiscovery.DiscoveryInterface, invalidationNotifiers ...ObjectNotifier) (upstreamcache.SharedInformer, Invalidatable) {
+func NewAPIResourceInformer(ctx context.Context, clusterName string, client upstreamdiscovery.DiscoveryInterface, invalidationNotifiers ...ObjectNotifier) (upstreamcache.SharedInformer, APIResourceLister, Invalidatable) {
 	logger := klog.FromContext(ctx).WithValues("cluster", clusterName)
 	ctx = klog.NewContext(ctx, logger)
 	rlw := &resourcesListWatcher{
@@ -112,7 +124,8 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 			},
 		})
 	}
-	return upstreamcache.NewSharedInformer(rlw, &urmetav1a1.APIResource{}, 0), rlw
+	inf := upstreamcache.NewSharedInformer(rlw, &urmetav1a1.APIResource{}, 0)
+	return inf, resourceLister{inf.GetStore()}, rlw
 }
 
 type resourcesListWatcher struct {
@@ -207,13 +220,14 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 			continue
 		}
 		for _, rsc := range group.APIResources {
-			ans.Items = append(ans.Items, urmetav1a1.APIResource{
+			ar := urmetav1a1.APIResource{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "APIResource",
 					APIVersion: urmetav1a1.SchemeGroupVersion.String(),
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:            group.GroupVersion + ":" + rsc.Name,
+					// The normal syntax has a slash, which confuses the usual Store
+					Name:            gv.Group + ":" + gv.Version + ":" + rsc.Name,
 					ResourceVersion: resourceVersionS,
 				},
 				Spec: urmetav1a1.APIResourceSpec{
@@ -225,8 +239,37 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 					Kind:         rsc.Kind,
 					Verbs:        rsc.Verbs,
 				},
-			})
+			}
+			// rlw.logger.V(4).Info("Producing an APIResource", "ar", ar)
+			ans.Items = append(ans.Items, ar)
 		}
 	}
 	return &ans, nil
+}
+
+type resourceLister struct {
+	store upstreamcache.Store
+}
+
+func (rl resourceLister) List(selector labels.Selector) (ret []*urmetav1a1.APIResource, err error) {
+	allObjs := rl.store.List()
+	for _, obj := range allObjs {
+		ar := obj.(*urmetav1a1.APIResource)
+		if selector.Matches(labels.Set(ar.Labels)) {
+			ret = append(ret, ar)
+		}
+	}
+	return
+}
+
+func (rl resourceLister) Get(name string) (*urmetav1a1.APIResource, error) {
+	obj, exists, err := rl.store.GetByKey(name)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		gr := schema.GroupResource{Group: urmetav1a1.SchemeGroupVersion.Group, Resource: "apiresources"}
+		return nil, apierrors.NewNotFound(gr, name)
+	}
+	return obj.(*urmetav1a1.APIResource), nil
 }
