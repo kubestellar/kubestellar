@@ -22,9 +22,9 @@ progress.
 This is a quick demo of a fragment of what we think is needed for edge
 multi-cluster.  It is intended to demonstrate the following points.
 
-- Separation of inventory and workload management.
+- Separation of infrastructure and workload management.
 - The focus here is on workload management, and that strictly reads
-  inventory.
+  an inventory of infrastructure.
 - What passes from inventory to workload management is kcp TMC
   Location and SyncTarget objects.
 - Use of a kcp workspace as the container for the central spec of a workload.
@@ -152,7 +152,7 @@ future, and then those resources will join the previous category.
 
 ## Roles and Responsibilities
 
-### Developers/deployers/admins/users of the inventory management layer
+### Developers/deployers/admins/users of the infrastructure management layer
 
 ### Developers of the workload management layer
 
@@ -163,16 +163,37 @@ future, and then those resources will join the previous category.
 ## Design overview
 
 In very brief: the design is to reduce each edge placement problem to
-many instances of kcp's TMC problem.
+many instances of kcp's TMC problem.  Part of making many instances of
+the TMC problem is to maintain a unique _mailbox workspace_ in the
+center for each edge cluster.
+
+However: to fully realize the goals of this PoC we will have to use a
+modified version of TMC, which differs from today's TMC in ways
+summarized below in the [Syncers](#syncers) section.
+
+As in TMC, in this design we have _downsync_ and _upsync_ --- but they
+are a little more complicated here.  Downsync involves propagation of
+desired state from workload management workspace through mailbox
+workspaces to edge and return/summarization of reported state.  Upsync
+involves return/summarization of desired and reported state of objects
+born on the edge clusters.  On the inward path, the reported or full
+state goes from edge to the mailbox workspace and then is summarized
+to the workload management workspace.  State propagation is maintained
+in an eventually consistent way, it is not just one-and-done.
 
 ## Inventory Management workspaces
 
-This design takes as a given that something maintains some kcp
-workspaces that contain dynamic collections of Location and SyncTarget
-objects as defined in [kcp
-TMC](https://github.com/kcp-dev/kcp/tree/main/pkg/apis), and that one
-view can be used to read those Location objects and one view can be
-used to read those SyncTarget objects.
+In this design the primary interface between infrastructure management
+and workload management is API objects in _inventory management_
+workspaces.  We abuse the `Location` and `SyncTarget` object types
+from [kcp TMC](https://github.com/kcp-dev/kcp/tree/main/pkg/apis) for
+this purpose.  The people doing infrastructure management are
+responsible for creating the inventory management workspaces and
+populating them with `Location` and `SyncTarget` objects, one
+`Location` and one `SyncTarget` per edge cluster.  These inventory
+management workspaces need to use APIBindings to APIExports defining
+`Location` and `SyncTarget` so that the workload management layer can
+use one APIExport view for each API group to read those objects.
 
 To complete the plumbing of the syncers, each inventory workspace that
 contains a SyncTarget needs to also contain the following associated
@@ -662,14 +683,21 @@ following four parts.
 
 ## Syncers
 
-While the first milestone in the roadmap uses the TMC syncers, that
-will not achieve all that this PoC aims for.  Eventually this PoC will
-need EMC syncers that differ from the TMC syncers in the following
-ways.
+While the first milestone in the roadmap uses plain unspoiled TMC,
+that will not achieve all that this PoC aims for.  Eventually this PoC
+will need something that is like TMC but differs in a few ways.
+Following is a list of differences, stated in terms of syncer behavior
+--- but remember that this is not necessarily limited to just the
+syncer.
+
+The EMC syncers will differ from the plain unspoiled TMC syncers in
+the following ways.
 
 - Create self-sufficient edge clusters.
 - Re-nature objects that edge-mc forcibly denatures at the center.
 - Return reported state from associated objects.
+- (Maybe) not require the SyncTarget to identify all the resources
+  involved.
 
 ## Status Summarizer
 
