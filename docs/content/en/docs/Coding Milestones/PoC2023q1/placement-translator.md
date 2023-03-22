@@ -46,7 +46,7 @@ command line parameters, then `$KUBECONFIG`, then `~/.kube/config`.
 ## Try It
 
 The nascent placement translator can be exercised following the
-scenario in [example1](example1).  You do not need the scheduler nor
+scenario in [example1](../example1).  You do not need the scheduler nor
 the mailbox controller.
 
 When you get to the step of "Populate the edge service provider
