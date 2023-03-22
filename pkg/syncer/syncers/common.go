@@ -3,8 +3,10 @@ package syncers
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 )
@@ -20,59 +22,112 @@ func initializeClients(
 	downstreamClientFactory ClientFactory,
 	upstreamClients map[schema.GroupKind]*Client,
 	downstreamClients map[schema.GroupKind]*Client,
+	conversions []edgev1alpha1.EdgeSynConversion,
 ) error {
 	logger.V(3).Info("initialize clients")
 	for _, syncResource := range syncResources {
 		logger.V(3).Info(fmt.Sprintf("  setup ResourceClient for '%s'", resourceToString(syncResource)))
 
-		group := syncResource.Group
-		kind := syncResource.Kind
-		gk := schema.GroupKind{
-			Group: group,
-			Kind:  kind,
+		syncResourceForUpstream := convertToUpstream(syncResource, conversions)
+
+		groupForUp := syncResourceForUpstream.Group
+		kindForUp := syncResourceForUpstream.Kind
+		gkForUp := schema.GroupKind{
+			Group: groupForUp,
+			Kind:  kindForUp,
 		}
-		_, ok := upstreamClients[gk]
+		_, ok := upstreamClients[gkForUp]
 		if ok {
-			logger.V(3).Info(fmt.Sprintf("  skip since upstreamClientFactory is already setup for '%s'", resourceToString(syncResource)))
+			logger.V(3).Info(fmt.Sprintf("  skip since upstreamClientFactory is already setup for '%s'", resourceToString(syncResourceForUpstream)))
 		} else {
-			logger.V(3).Info(fmt.Sprintf("  create upstreamClientFactory for '%s'", resourceToString(syncResource)))
-			upstreamClient, err := upstreamClientFactory.GetResourceClient(group, kind)
+			logger.V(3).Info(fmt.Sprintf("  create upstreamClientFactory for '%s'", resourceToString(syncResourceForUpstream)))
+			upstreamClient, err := upstreamClientFactory.GetResourceClient(groupForUp, kindForUp)
 			if err != nil {
-				logger.Error(err, fmt.Sprintf("failed to create kcpResourceClient '%s.%s'", group, kind))
+				logger.Error(err, fmt.Sprintf("failed to create kcpResourceClient '%s.%s'", groupForUp, kindForUp))
 				return err
 			}
-			upstreamClients[gk] = &upstreamClient
+			upstreamClients[gkForUp] = &upstreamClient
 		}
 
-		_, ok = downstreamClients[gk]
+		syncResourceForDownstream := convertToDownstream(syncResource, conversions)
+		groupForDown := syncResourceForDownstream.Group
+		kindForDown := syncResourceForDownstream.Kind
+		gkForDown := schema.GroupKind{
+			Group: groupForDown,
+			Kind:  kindForDown,
+		}
+
+		_, ok = downstreamClients[gkForDown]
 		if ok {
-			logger.V(3).Info(fmt.Sprintf("  skip since downstreamClientFactory is already setup for '%s'", resourceToString(syncResource)))
+			logger.V(3).Info(fmt.Sprintf("  skip since downstreamClientFactory is already setup for '%s'", resourceToString(syncResourceForDownstream)))
 		} else {
-			logger.V(3).Info(fmt.Sprintf("  create downstreamClientFactory for '%s'", resourceToString(syncResource)))
-			k8sClient, err := downstreamClientFactory.GetResourceClient(group, kind)
+			logger.V(3).Info(fmt.Sprintf("  create downstreamClientFactory for '%s'", resourceToString(syncResourceForDownstream)))
+			k8sClient, err := downstreamClientFactory.GetResourceClient(groupForDown, kindForDown)
 			if err != nil {
-				logger.Error(err, fmt.Sprintf("failed to create k8sResourceClient '%s.%s'", group, kind))
+				logger.Error(err, fmt.Sprintf("failed to create k8sResourceClient '%s.%s'", groupForDown, kindForDown))
 				return err
 			}
-			downstreamClients[gk] = &k8sClient
+			downstreamClients[gkForDown] = &k8sClient
 		}
 	}
 	return nil
 }
 
-func getClients(resource edgev1alpha1.EdgeSyncConfigResource, upstreamClients map[schema.GroupKind]*Client, downstreamClients map[schema.GroupKind]*Client) (*Client, *Client, error) {
-	gk := schema.GroupKind{
-		Group: resource.Group,
-		Kind:  resource.Kind,
+func convertToUpstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+	for _, conversion := range conversions {
+		if conversion.Downstream.Group == resource.Group && conversion.Downstream.Kind == resource.Kind && conversion.Downstream.Name == resource.Name {
+			resource.Group = conversion.Upstream.Group
+			resource.Kind = conversion.Upstream.Kind
+			resource.Name = conversion.Upstream.Name
+			return resource
+		}
 	}
-	upstreamClient, ok := upstreamClients[gk]
+	return resource
+}
+
+func convertToDownstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+	for _, conversion := range conversions {
+		if conversion.Upstream.Group == resource.Group && conversion.Upstream.Kind == resource.Kind && conversion.Upstream.Name == resource.Name {
+			resource.Group = conversion.Downstream.Group
+			resource.Kind = conversion.Downstream.Kind
+			resource.Name = conversion.Downstream.Name
+			return resource
+		}
+	}
+	return resource
+}
+
+func applyConversion(source *unstructured.Unstructured, target edgev1alpha1.EdgeSyncConfigResource) {
+	source.SetAPIVersion(target.Group + "/" + target.Version)
+	source.SetKind(target.Kind)
+	source.SetName(target.Name)
+	// CRD restricts the CRD name to be same as group
+	if target.Kind == "CustomResourceDefinition" {
+		names := strings.Split(target.Name, ".")[1:]
+		unstructured.SetNestedField(source.Object, strings.Join(names, "."), "spec", "group")
+	}
+}
+
+func getClients(resource edgev1alpha1.EdgeSyncConfigResource, upstreamClients map[schema.GroupKind]*Client, downstreamClients map[schema.GroupKind]*Client, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+	upstreamResource := convertToUpstream(resource, conversions)
+	upstreamGk := schema.GroupKind{
+		Group: upstreamResource.Group,
+		Kind:  upstreamResource.Kind,
+	}
+	upstreamClient, ok := upstreamClients[upstreamGk]
 	if !ok {
-		msg := fmt.Sprintf("upstreamClient for '%s.%s' is not registered", resource.Group, resource.Kind)
+		msg := fmt.Sprintf("upstreamClient for '%s.%s' is not registered", upstreamResource.Group, upstreamResource.Kind)
 		return nil, nil, errors.New(msg)
 	}
-	downstreamClient, ok := downstreamClients[gk]
+
+	downstreamResource := convertToDownstream(resource, conversions)
+	downstreamGk := schema.GroupKind{
+		Group: downstreamResource.Group,
+		Kind:  downstreamResource.Kind,
+	}
+	downstreamClient, ok := downstreamClients[downstreamGk]
 	if !ok {
-		msg := fmt.Sprintf("downstreamClient for '%s.%s' is not registered", resource.Group, resource.Kind)
+		msg := fmt.Sprintf("downstreamClient for '%s.%s' is not registered", downstreamResource.Group, downstreamResource.Kind)
 		return nil, nil, errors.New(msg)
 	}
 	return upstreamClient, downstreamClient, nil

@@ -19,14 +19,14 @@ type UpSyncer struct {
 	downstreamClients       map[schema.GroupKind]*Client
 }
 
-func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downstreamClientFactory ClientFactory, syncedResources []edgev1alpha1.EdgeSyncConfigResource) (*UpSyncer, error) {
+func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downstreamClientFactory ClientFactory, syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*UpSyncer, error) {
 
 	upSyncer := UpSyncer{
 		logger:                  logger,
 		upstreamClientFactory:   upstreamClientFactory,
 		downstreamClientFactory: downstreamClientFactory,
 	}
-	if err := upSyncer.initializeClients(syncedResources); err != nil {
+	if err := upSyncer.initializeClients(syncedResources, conversions); err != nil {
 		logger.Error(err, "failed to initialize clients")
 		return &upSyncer, err
 	}
@@ -34,56 +34,58 @@ func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downst
 	return &upSyncer, nil
 }
 
-func (us *UpSyncer) initializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource) error {
+func (us *UpSyncer) initializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	us.upstreamClients = map[schema.GroupKind]*Client{}
 	us.downstreamClients = map[schema.GroupKind]*Client{}
 
-	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients)
+	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) ReInitializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource) error {
-	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients)
+func (us *UpSyncer) ReInitializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource) (*Client, *Client, error) {
-	return getClients(resource, us.upstreamClients, us.downstreamClients)
+func (us *UpSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+	return getClients(resource, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	us.logger.V(3).Info(fmt.Sprintf("upsync '%s'", resourceToString(resource)))
-
-	upstreamClient, k8sClient, err := us.getClients(resource)
+	upstreamClient, k8sClient, err := us.getClients(resource, conversions)
 	if err != nil {
 		us.logger.Error(err, fmt.Sprintf("failed to get client '%s'", resourceToString(resource)))
 		return err
 	}
-	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from downstream", resourceToString(resource)))
-	downstreamResource, err := k8sClient.Get(resource)
+	resourceForDown := convertToUpstream(resource, conversions)
+	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from downstream", resourceToString(resourceForDown)))
+	downstreamResource, err := k8sClient.Get(resourceForDown)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			us.logger.V(3).Info(fmt.Sprintf("  not found '%s' in downstream", resourceToString(resource)))
-			us.logger.V(3).Info(fmt.Sprintf("  skip upsync '%s'", resourceToString(resource)))
+			us.logger.V(3).Info(fmt.Sprintf("  not found '%s' in downstream", resourceToString(resourceForDown)))
+			us.logger.V(3).Info(fmt.Sprintf("  skip upsync '%s'", resourceToString(resourceForDown)))
 			return nil
 		} else {
-			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resource)))
+			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForDown)))
 			return err
 		}
 	}
 
-	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from upstream", resourceToString(resource)))
-	upstreamResource, err := upstreamClient.Get(resource)
+	resourceForUp := convertToUpstream(resource, conversions)
+	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from upstream", resourceToString(resourceForUp)))
+	upstreamResource, err := upstreamClient.Get(resourceForUp)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			// create
-			us.logger.V(3).Info(fmt.Sprintf("  create '%s' in upstream since it's not found", resourceToString(resource)))
+			us.logger.V(3).Info(fmt.Sprintf("  create '%s' in upstream since it's not found", resourceToString(resourceForUp)))
 			downstreamResource.SetResourceVersion("")
 			downstreamResource.SetUID("")
-			if _, err := upstreamClient.Create(resource, downstreamResource); err != nil {
-				us.logger.Error(err, fmt.Sprintf("failed to create resource to upstream '%s'", resourceToString(resource)))
+			applyConversion(downstreamResource, resourceForUp)
+			if _, err := upstreamClient.Create(resourceForUp, downstreamResource); err != nil {
+				us.logger.Error(err, fmt.Sprintf("failed to create resource to upstream '%s'", resourceToString(resourceForUp)))
 				return err
 			}
 		} else {
-			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resource)))
+			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForUp)))
 			return err
 		}
 	} else {
@@ -91,9 +93,10 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource) error 
 			// update
 			downstreamResource.SetResourceVersion(upstreamResource.GetResourceVersion())
 			downstreamResource.SetUID(upstreamResource.GetUID())
-			us.logger.V(3).Info(fmt.Sprintf("  update '%s' in upstream since it's found", resourceToString(resource)))
-			if _, err := upstreamClient.Update(resource, downstreamResource); err != nil {
-				us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream '%s'", resourceToString(resource)))
+			applyConversion(downstreamResource, resourceForUp)
+			us.logger.V(3).Info(fmt.Sprintf("  update '%s' in upstream since it's found", resourceToString(resourceForUp)))
+			if _, err := upstreamClient.Update(resourceForUp, downstreamResource); err != nil {
+				us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream '%s'", resourceToString(resourceForUp)))
 				return err
 			}
 		} else {
@@ -104,6 +107,6 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource) error 
 	return nil
 }
 
-func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	return nil
 }

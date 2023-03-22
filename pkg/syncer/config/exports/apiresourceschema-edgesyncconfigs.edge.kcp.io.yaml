@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230322-88adba1.edgesyncconfigs.edge.kcp.io
+  name: v230322-06f3c92.edgesyncconfigs.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -32,6 +32,53 @@ spec:
         spec:
           description: EdgeSyncConfigSpec defines the desired state of EdgeSyncConfig
           properties:
+            conversions:
+              description: Conversions
+              items:
+                description: Resource to be renatured
+                properties:
+                  downstream:
+                    description: Resource representation in downstream
+                    properties:
+                      group:
+                        description: Group of down/up synced resource
+                        type: string
+                      kind:
+                        description: Kind of down/up synced resource
+                        type: string
+                      name:
+                        description: Name of down/up synced resource
+                        type: string
+                      namespace:
+                        description: Namespace of down/up synced resource if it's
+                          not cluster scoped resource
+                        type: string
+                      version:
+                        description: Version of down/up synced resource
+                        type: string
+                    type: object
+                  upstream:
+                    description: Resource representation in upstream
+                    properties:
+                      group:
+                        description: Group of down/up synced resource
+                        type: string
+                      kind:
+                        description: Kind of down/up synced resource
+                        type: string
+                      name:
+                        description: Name of down/up synced resource
+                        type: string
+                      namespace:
+                        description: Namespace of down/up synced resource if it's
+                          not cluster scoped resource
+                        type: string
+                      version:
+                        description: Version of down/up synced resource
+                        type: string
+                    type: object
+                type: object
+              type: array
             downSyncedResources:
               description: Downsncyed resource list
               items:

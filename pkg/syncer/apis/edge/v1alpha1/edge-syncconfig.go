@@ -26,6 +26,9 @@ type EdgeSyncConfigSpec struct {
 
 	// Upsncyed resource list
 	UpSyncedResources []EdgeSyncConfigResource `json:"upSyncedResources,omitempty"`
+
+	// Conversions
+	Conversions []EdgeSynConversion `json:"conversions,omitempty"`
 }
 
 // Resource specifies down/up synced resource with exact GVK and name (and namespace if not cluster scoped resource)
@@ -45,6 +48,14 @@ type EdgeSyncConfigResource struct {
 	// Namespace of down/up synced resource if it's not cluster scoped resource
 	// +optional
 	Namespace string `json:"namespace,omitempty"`
+}
+
+// Resource to be renatured
+type EdgeSynConversion struct {
+	// Resource representation in upstream
+	Upstream EdgeSyncConfigResource `json:"upstream,omitempty"`
+	// Resource representation in downstream
+	Downstream EdgeSyncConfigResource `json:"downstream,omitempty"`
 }
 
 // EdgeSyncConfigStatus defines the observed state of EdgeSyncConfig

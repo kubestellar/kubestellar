@@ -87,11 +87,11 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) e
 		return err
 	}
 
-	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{})
+	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
-	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{})
+	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
@@ -119,15 +119,15 @@ func startSync(ctx context.Context, logger klog.Logger, cfg *SyncerConfig, syncC
 				logger.Error(err, "failed to get syncConfig")
 			} else {
 				for _, resource := range syncConfig.Spec.DownSyncedResources {
-					if err := downSyncer.SyncOne(resource); err != nil {
+					if err := downSyncer.SyncOne(resource, syncConfig.Spec.Conversions); err != nil {
 						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}
-					if err := downSyncer.BackStatusOne(resource); err != nil {
+					if err := downSyncer.BackStatusOne(resource, syncConfig.Spec.Conversions); err != nil {
 						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}
 				}
 				for _, resource := range syncConfig.Spec.UpSyncedResources {
-					if err := upSyncer.SyncOne(resource); err != nil {
+					if err := upSyncer.SyncOne(resource, syncConfig.Spec.Conversions); err != nil {
 						logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}
 				}

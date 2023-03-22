@@ -156,8 +156,8 @@ func (c *controller) process(ctx context.Context, key string) error {
 		return err
 	}
 
-	downsyncerError := c.downSyncer.ReInitializeClients(syncConfig.Spec.DownSyncedResources)
-	upSyncerError := c.upSyncer.ReInitializeClients(syncConfig.Spec.UpSyncedResources)
+	downsyncerError := c.downSyncer.ReInitializeClients(syncConfig.Spec.DownSyncedResources, syncConfig.Spec.Conversions)
+	upSyncerError := c.upSyncer.ReInitializeClients(syncConfig.Spec.UpSyncedResources, syncConfig.Spec.Conversions)
 
 	if downsyncerError != nil && upSyncerError != nil {
 		return fmt.Errorf("failed to reinitialize downsyncer and upsyncer")

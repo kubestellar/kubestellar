@@ -34,15 +34,15 @@ type FakeSyncer struct {
 	t *testing.T
 }
 
-func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfigResource) error {
+func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	return nil
 }
 
-func (s *FakeSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+func (s *FakeSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	return nil
 }
 
-func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource) error {
+func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	return nil
 }
 
