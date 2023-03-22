@@ -19,6 +19,7 @@ package scheduler
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog/v2"
@@ -43,7 +44,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 
 	/*
 		On synctarget change:
-		1a) find all ep(s) that used st
+		1) find all ep(s) that used st
 
 		2a) find all loc(s) that selecting st, and update store
 		2b) find all ep(s) that using st
@@ -54,18 +55,23 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 
 		Need data structure:
 		- map from a synctarget to its locations, say 'locsBySelectedSt'
+
+		TODO(waltforme): Maybe I can merge 3b) and 3c)
 	*/
 
 	st, err := c.synctargetLister.Cluster(stws).Get(stName)
 	if err != nil {
-		logger.Error(err, "syncTarget not found in local cache")
-		return nil
+		if errors.IsNotFound(err) {
+			return nil
+		}
+		logger.Error(err, "failed to get SyncTarget")
+		return err
 	}
 
 	store.l.Lock()
 	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
 
-	// 1a)
+	// 1)
 	epsUsedSt := store.findEpsUsedSt(stKey)
 
 	// 2a)
@@ -142,7 +148,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
 				return err
 			}
-			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
+			additionalSingles := makeSinglePlacementsForSt(locsSelectedByEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
 			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
@@ -156,7 +162,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 		if _, ok := epsUsedSt[ep]; !ok {
 			// 3c)
 			// for a (new) ep in epsUsingSt but not in epsUsedSt
-			// insert composed sp(s) into the ep's sps
+			// ensure the existence of sp(s) in the ep's sps
 			logger.V(1).Info("begin to use SyncTarget", "edgePlacement", ep)
 			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
 			if err != nil {
@@ -168,6 +174,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
 				return err
 			}
+			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
 
 			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
 			if err != nil {
@@ -179,8 +186,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
 				return err
 			}
-			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
-			nextSPS := extendSPS(currentSPS, additionalSingles)
+			additionalSingles := makeSinglePlacementsForSt(locsSelectedByEp, st)
+			nextSPS = extendSPS(nextSPS, additionalSingles)
 
 			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
@@ -229,7 +236,7 @@ func filterLocsByEp(locs []*schedulingv1alpha1.Location, ep *edgev1alpha1.EdgePl
 	return filtered, nil
 }
 
-func makeSinglePlacements(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
+func makeSinglePlacementsForSt(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
 	ws := logicalcluster.From(st).String()
 	made := []edgev1alpha1.SinglePlacement{}
 	for _, loc := range locsSelectingSt {
