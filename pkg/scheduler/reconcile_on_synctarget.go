@@ -62,6 +62,9 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 		return nil
 	}
 
+	store.l.Lock()
+	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
+
 	// 1a)
 	epsUsedSt := store.findEpsUsedSt(stKey)
 
