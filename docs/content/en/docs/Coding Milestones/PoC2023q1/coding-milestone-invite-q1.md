@@ -8,7 +8,7 @@ weight: 2
 
 Dear Contributors,
 
-We are excited to invite you to join the first [KCP-Edge opensource community](https://github.com/kcp-dev/edge-mc) coding sprint. We will be focus on several key projects that are critical to the development of state-based edge solutions. Our collective work will be showcased to the opensource community on Thursday, March 30th.
+We are excited to invite you to join the first [KCP-Edge opensource community](https://github.com/kcp-dev/edge-mc) coding sprint. We will be focus on several key projects that are critical to the development of state-based edge solutions. Our collective work will be showcased to the opensource community on Thursday, April 27th.
 
 This coding sprint will provide a great opportunity for you to showcase your skills, learn new techniques, and collaborate with other experienced engineers in the KCP-Edge community. We believe that your contributions will be invaluable in helping us achieve our goals and making a lasting impact in the field of state-based edge technology.
 
