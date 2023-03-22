@@ -162,9 +162,11 @@ future, and then those resources will join the previous category.
 
 ## Design overview
 
-In very brief: the design is to reduce each edge placement problem to
-many instances of kcp's TMC problem.  Part of making many instances of
-the TMC problem is to maintain a unique _mailbox workspace_ in the
+In very brief: the design is to reduce the edge placement problem to
+kcp's TMC problem, using as many "anycast" TMC Placement objects (each
+constrained to effectively be "unicast") as are needed to achieve the
+"multicast" semantics of an EdgePlacement object.  A central idea of
+the reduction is to maintain a unique _mailbox workspace_ in the
 center for each edge cluster.
 
 However: to fully realize the goals of this PoC we will have to use a
