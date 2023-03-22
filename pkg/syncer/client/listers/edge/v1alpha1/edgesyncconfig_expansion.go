@@ -26,6 +26,3 @@ type EdgeSyncConfigClusterListerExpansion interface{}
 
 // EdgeSyncConfigListerExpansion allows custom methods to be added to EdgeSyncConfigLister.
 type EdgeSyncConfigListerExpansion interface{}
-
-// EdgeSyncConfigNamespaceListerExpansion allows custom methods to be added to EdgeSyncConfigNamespaceLister.
-type EdgeSyncConfigNamespaceListerExpansion interface{}

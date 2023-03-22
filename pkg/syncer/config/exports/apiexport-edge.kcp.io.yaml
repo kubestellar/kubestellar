@@ -5,5 +5,5 @@ metadata:
   name: edge.kcp.io
 spec:
   latestResourceSchemas:
-  - v230320-77fc936.edgesyncconfigs.edge.kcp.io
+  - v230322-88adba1.edgesyncconfigs.edge.kcp.io
 status: {}

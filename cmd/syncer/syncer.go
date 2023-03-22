@@ -7,12 +7,15 @@ import (
 	"os/signal"
 	"syscall"
 
-	synceroptions "github.com/kcp-dev/edge-mc/cmd/syncer/options"
-	"github.com/kcp-dev/edge-mc/pkg/syncer"
-	"github.com/kcp-dev/logicalcluster/v3"
 	"github.com/spf13/pflag"
+
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	synceroptions "github.com/kcp-dev/edge-mc/cmd/syncer/options"
+	"github.com/kcp-dev/edge-mc/pkg/syncer"
 )
 
 func main() {

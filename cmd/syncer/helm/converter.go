@@ -8,14 +8,16 @@ import (
 	"io/ioutil"
 	"os"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	k8syaml "k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/klog/v2"
 	sigyaml "sigs.k8s.io/yaml"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
 )
 
 func main() {
