@@ -87,6 +87,7 @@ func NewSchedulerCommand() *cobra.Command {
 
 func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	const resyncPeriod = 10 * time.Hour
+	const numThreads = 2
 
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
@@ -208,7 +209,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
 	schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
 	workloadSharedInformerFactory.WaitForCacheSync(doneCh)
-	es.Run(1)
+	es.Run(numThreads)
 
 	return nil
 }

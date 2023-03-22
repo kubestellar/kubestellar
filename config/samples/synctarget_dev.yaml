@@ -1,7 +1,7 @@
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: foo
+  name: dev
   labels:
     env: dev
 spec:

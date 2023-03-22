@@ -19,20 +19,254 @@ package scheduler
 import (
 	"context"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
+	workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
-func (c *controller) reconcileOnSyncTarget(ctx context.Context, key string) error {
+func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) error {
 	logger := klog.FromContext(ctx)
-	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	stws, _, stName, err := kcpcache.SplitMetaClusterNamespaceKey(stKey)
 	if err != nil {
-		logger.Error(err, "invalid key")
+		logger.Error(err, "invalid SyncTarget key")
 		return err
 	}
-	logger = logger.WithValues("workspace", ws, "syncTarget", name)
+	logger = logger.WithValues("syncTargetWorkspace", stws, "syncTarget", stName)
 	logger.V(2).Info("reconciling")
 
+	/*
+		On synctarget change:
+		1a) find all ep(s) that used st
+
+		2a) find all loc(s) that selecting st, and update store
+		2b) find all ep(s) that using st
+
+		3a) for each of its obsolete ep, remove all sp(s) that has st
+		3b) for each of its ongoing ep, update sp(s)
+		3c) for each of its new ep, add sp(s)
+
+		Need data structure:
+		- map from a synctarget to its locations, say 'locsBySelectedSt'
+	*/
+
+	st, err := c.synctargetLister.Cluster(stws).Get(stName)
+	if err != nil {
+		logger.Error(err, "syncTarget not found in local cache")
+		return nil
+	}
+
+	store.l.Lock()
+	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
+
+	// 1a)
+	epsUsedSt := store.findEpsUsedSt(stKey)
+
+	// 2a)
+	locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
+	if err != nil {
+		logger.Error(err, "failed to list Locations")
+		return err
+	}
+	locsSelectingSt, err := filterLocsBySt(locsInStws, st)
+	if err != nil {
+		logger.Error(err, "failed to find Locations for SyncTarget")
+		return err
+	}
+
+	store.locsBySelectedSt[stKey] = packLocKeys(locsSelectingSt)
+
+	// 2b)
+	epsUsingSt := map[string]empty{}
+	for _, loc := range locsSelectingSt {
+		locKey, _ := kcpcache.MetaClusterNamespaceKeyFunc(loc)
+		eps := store.epsBySelectedLoc[locKey]
+		epsUsingSt = unionTwo(epsUsingSt, eps)
+	}
+
+	for ep := range epsUsedSt {
+		if _, ok := epsUsingSt[ep]; !ok {
+			// 3a)
+			// for an (obsolite) ep in epsUsedSt but not in epsUsingSt
+			// remove all relevant sp(s) from that ep, so that that ep doesn't use st
+			// an obsolite ep doesn't use st anymore because its locs don't select the st anymore
+			logger.V(1).Info("stop to use SyncTarget", "edgePlacement", ep)
+			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			if err != nil {
+				logger.Error(err, "invalid EdgePlacement key")
+				return err
+			}
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
+			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
+		} else {
+			// 3b)
+			// for an (ongoing) ep in both epsUsedSt and epsUsingSt
+			// the ep continues to use this st,
+			// because at least one locs selected the st, AND at least one locs are selecting the st
+			// but the two sets of locs may or may not overlap
+			// thus, we need to clean then extend the corresponding sps
+			logger.V(1).Info("continue to use SyncTarget", "edgePlacement", ep)
+			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			if err != nil {
+				logger.Error(err, "invalid EdgePlacement key")
+				return err
+			}
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
+			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
+
+			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
+				return err
+			}
+			locsSelectedByEp, err := filterLocsByEp(locsSelectingSt, epObj)
+			if err != nil {
+				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
+				return err
+			}
+			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
+			nextSPS = extendSPS(nextSPS, additionalSingles)
+
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
+		}
+	}
+
+	for ep := range epsUsingSt {
+		if _, ok := epsUsedSt[ep]; !ok {
+			// 3c)
+			// for a (new) ep in epsUsingSt but not in epsUsedSt
+			// insert composed sp(s) into the ep's sps
+			logger.V(1).Info("begin to use SyncTarget", "edgePlacement", ep)
+			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			if err != nil {
+				logger.Error(err, "invalid EdgePlacement key")
+				return err
+			}
+			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				return err
+			}
+
+			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			if err != nil {
+				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
+				return err
+			}
+			locsSelectedByEp, err := filterLocsByEp(locsSelectingSt, epObj)
+			if err != nil {
+				logger.Error(err, "failed to find Locations selected by EdgePlacement", "edgePlacement", epObj.Name)
+				return err
+			}
+			additionalSingles := makeSinglePlacements(locsSelectedByEp, st)
+			nextSPS := extendSPS(currentSPS, additionalSingles)
+
+			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			if err != nil {
+				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+			}
+		}
+	}
+
+	// dev-time tests
+	store.show()
+
 	return nil
+}
+
+// filterLocsBySt returns those Locations that select the SyncTarget
+func filterLocsBySt(locs []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) ([]*schedulingv1alpha1.Location, error) {
+	filtered := []*schedulingv1alpha1.Location{}
+	for _, l := range locs {
+		s := l.Spec.InstanceSelector
+		selector, err := metav1.LabelSelectorAsSelector(s)
+		if err != nil {
+			return filtered, err
+		}
+		if selector.Matches(labels.Set(st.Labels)) {
+			filtered = append(filtered, l)
+		}
+	}
+	return filtered, nil
+}
+
+// filterLocsByEp returns those Locations that are selected by the EdgePlacement
+func filterLocsByEp(locs []*schedulingv1alpha1.Location, ep *edgev1alpha1.EdgePlacement) ([]*schedulingv1alpha1.Location, error) {
+	filtered := []*schedulingv1alpha1.Location{}
+	for _, l := range locs {
+		for _, s := range ep.Spec.LocationSelectors {
+			selector, err := metav1.LabelSelectorAsSelector(&s)
+			if err != nil {
+				return filtered, err
+			}
+			if selector.Matches(labels.Set(l.Labels)) {
+				filtered = append(filtered, l)
+				break
+			}
+		}
+	}
+	return filtered, nil
+}
+
+func makeSinglePlacements(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
+	ws := logicalcluster.From(st).String()
+	made := []edgev1alpha1.SinglePlacement{}
+	for _, loc := range locsSelectingSt {
+		sp := edgev1alpha1.SinglePlacement{
+			Cluster:        ws,
+			LocationName:   loc.Name,
+			SyncTargetName: st.Name,
+			SyncTargetUID:  st.UID,
+		}
+		made = append(made, sp)
+	}
+	return made
+}
+
+// packLocKeys extracts keys from given Locations and put the keys in a map
+func packLocKeys(locs []*schedulingv1alpha1.Location) map[string]empty {
+	keys := map[string]empty{}
+	for _, l := range locs {
+		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(l)
+		keys[key] = empty{}
+	}
+	return keys
+}
+
+// cleanSPSBySt removes all singleplacements that has the specified synctarget, from a singleplacementslice
+func cleanSPSBySt(sps *edgev1alpha1.SinglePlacementSlice, stws, stName string) *edgev1alpha1.SinglePlacementSlice {
+	nextDests := []edgev1alpha1.SinglePlacement{}
+	for _, sp := range sps.Destinations {
+		if sp.Cluster != stws || sp.SyncTargetName != stName {
+			nextDests = append(nextDests, sp)
+		}
+	}
+	sps.Destinations = nextDests
+	return sps
+}
+
+func extendSPS(sps *edgev1alpha1.SinglePlacementSlice, singles []edgev1alpha1.SinglePlacement) *edgev1alpha1.SinglePlacementSlice {
+	sps.Destinations = append(sps.Destinations, singles...)
+	return sps
 }
