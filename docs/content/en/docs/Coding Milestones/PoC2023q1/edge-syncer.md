@@ -20,7 +20,7 @@ Edge-syncer can be deployed on p-cluster easily by the following steps.
 2. Use command to register edge-syncer
    ```console
    kubectl ws <mb-ws name>
-   kcp workload edge-sync <EM Sync Target name> --image <EM Syncer Image> -o edge-syncer.yaml
+   kubectl kcp workload edge-sync <EM Sync Target name> --image <EM Syncer Image> -o edge-syncer.yaml
    ```
 3. Deploy edge-syncer on p-cluster.
 
@@ -32,8 +32,8 @@ To deploy resources to p-clusters, create the following in workload management w
 - workload objects
   - Some objects are denatured if needed.
   - Other objects are as it is
-- APIExport/API Schema corresponding to CRD
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace.
+- APIExport/API Schema corresponding to CRD such as Kubernetes [ClusterPolicyReport](https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml).
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt [here](https://github.com/kcp-dev/edge-mc/blob/main/hack/update-codegen-crds.sh#L57)). 
 - EdgeSyncConfig (This is going to be replaced with EdgePlacement spec) 
 
 ![edge-syncer deploy](./images/edge-syncer-deploy.png)
@@ -43,18 +43,22 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - API Binding (to API Export on the workload management workspace)
 - EdgeSyncConfig CR
 
-**TODO**: This is something we should clarify..e.g. which existing controller(s) in edge-mc will cover, or just create a new controller to handle uncovered one. 
+
+
+**TODO**: This is something we should clarify..e.g. which existing controller(s) in edge-mc will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
+  - The placement transformer will put the workload objects and syncer config into the mailbox workspaces.
+  - The placement translator will create syncer config based on the EdgePlacement objects and what they match.
+  - The mailbox controller willput API Binding into the mailbox workspace.
 
 #### EdgeSyncConfig
-- The example is [here](https://gist.github.com/yuji-watanabe-jp/dfa9cdf35b06f612818446c2c3eb7969).
+- The example of EdgeSycnerConfig CR is [here](https://github.com/yana1205/edge-mc/blob/edge-syncer/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here](https://github.com/yana1205/edge-mc/blob/edge-syncer/pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
 - The CR here is used from edge syncer. 
 - The CR is placed at mb-ws to define
   - object selector
   - need of renaturing
-  - need of status upsync for downsyncing
+  - need of returning reported states of downsynced objects
   - need of delete propagation for downsyncing
-  - Interval of downsyncing/upsyncing
-- The CR is managed by edge-mc
+- The CR is managed by edge-mc (placement transformer).
   - At the initial implementation before edge-mc side controller become ready, we assume EdgeSyncConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
@@ -68,6 +72,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - Cover cluster-scope objects and CRD
   - CRD needs to be denatured if downsyncing is required.
 - Renaturing is applied if required (specified in EdgeSyncConfig).
+- Current implementation is using polling to detect changes on mailbox workspace, but will be changed to use Informers. 
 
 #### Renaturing
 - Edge syncer does renaturing, which converts workload objects to different forms of objects on a p-cluster. 
@@ -75,10 +80,10 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - Some objects need to be denatured. 
   - CRD needs to be denatured when conflicting with APIBinding.
 
-#### Status Upsyncing
-- Edge syncer does upsyncing status of downsynced objects at p-cluster to the status of objects on the mailbox workspace periodically. 
-  - TODO: Failing status upsync in some resources (e.g. deployment and service). Need more investigation. 
-- Status upsyncing on/off is configurable in EdgeSyncConfig. (default is on)
+#### Return of reported state
+- Edge syncer return the reported state of downsynced objects at p-cluster to the status of objects on the mailbox workspace periodically. 
+  - TODO: Failing to returning reported state of some resources (e.g. deployment and service). Need more investigation. 
+- reported state returning on/off is configurable in EdgeSyncConfig. (default is on)
 
 #### Resource Upsyncing
 - Edge syncer does upsyncing resources at p-cluster to the corresponding mailbox workspace periodically. 
