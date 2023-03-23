@@ -72,7 +72,7 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 		us.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
 		return err
 	}
-	resourceForDown := convertToUpstream(resource, conversions)
+	resourceForDown := convertToDownstream(resource, conversions)
 	us.logger.V(3).Info(fmt.Sprintf("  get %q from downstream", resourceToString(resourceForDown)))
 	downstreamResource, err := k8sClient.Get(resourceForDown)
 	if err != nil {
