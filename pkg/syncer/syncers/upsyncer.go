@@ -66,42 +66,42 @@ func (us *UpSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, con
 }
 
 func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
-	us.logger.V(3).Info(fmt.Sprintf("upsync '%s'", resourceToString(resource)))
+	us.logger.V(3).Info(fmt.Sprintf("upsync %q", resourceToString(resource)))
 	upstreamClient, k8sClient, err := us.getClients(resource, conversions)
 	if err != nil {
-		us.logger.Error(err, fmt.Sprintf("failed to get client '%s'", resourceToString(resource)))
+		us.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
 		return err
 	}
 	resourceForDown := convertToUpstream(resource, conversions)
-	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from downstream", resourceToString(resourceForDown)))
+	us.logger.V(3).Info(fmt.Sprintf("  get %q from downstream", resourceToString(resourceForDown)))
 	downstreamResource, err := k8sClient.Get(resourceForDown)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			us.logger.V(3).Info(fmt.Sprintf("  not found '%s' in downstream", resourceToString(resourceForDown)))
-			us.logger.V(3).Info(fmt.Sprintf("  skip upsync '%s'", resourceToString(resourceForDown)))
+			us.logger.V(3).Info(fmt.Sprintf("  not found %q in downstream", resourceToString(resourceForDown)))
+			us.logger.V(3).Info(fmt.Sprintf("  skip upsync %q", resourceToString(resourceForDown)))
 			return nil
 		} else {
-			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForDown)))
+			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForDown)))
 			return err
 		}
 	}
 
 	resourceForUp := convertToUpstream(resource, conversions)
-	us.logger.V(3).Info(fmt.Sprintf("  get '%s' from upstream", resourceToString(resourceForUp)))
+	us.logger.V(3).Info(fmt.Sprintf("  get %q from upstream", resourceToString(resourceForUp)))
 	upstreamResource, err := upstreamClient.Get(resourceForUp)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			// create
-			us.logger.V(3).Info(fmt.Sprintf("  create '%s' in upstream since it's not found", resourceToString(resourceForUp)))
+			us.logger.V(3).Info(fmt.Sprintf("  create %q in upstream since it's not found", resourceToString(resourceForUp)))
 			downstreamResource.SetResourceVersion("")
 			downstreamResource.SetUID("")
 			applyConversion(downstreamResource, resourceForUp)
 			if _, err := upstreamClient.Create(resourceForUp, downstreamResource); err != nil {
-				us.logger.Error(err, fmt.Sprintf("failed to create resource to upstream '%s'", resourceToString(resourceForUp)))
+				us.logger.Error(err, fmt.Sprintf("failed to create resource to upstream %q", resourceToString(resourceForUp)))
 				return err
 			}
 		} else {
-			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForUp)))
+			us.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForUp)))
 			return err
 		}
 	} else {
@@ -110,13 +110,13 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 			downstreamResource.SetResourceVersion(upstreamResource.GetResourceVersion())
 			downstreamResource.SetUID(upstreamResource.GetUID())
 			applyConversion(downstreamResource, resourceForUp)
-			us.logger.V(3).Info(fmt.Sprintf("  update '%s' in upstream since it's found", resourceToString(resourceForUp)))
+			us.logger.V(3).Info(fmt.Sprintf("  update %q in upstream since it's found", resourceToString(resourceForUp)))
 			if _, err := upstreamClient.Update(resourceForUp, downstreamResource); err != nil {
-				us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream '%s'", resourceToString(resourceForUp)))
+				us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
 				return err
 			}
 		} else {
-			msg := fmt.Sprintf("upstream resource is nil even if there is no error '%s'", resourceToString(resource))
+			msg := fmt.Sprintf("upstream resource is nil even if there is no error %q", resourceToString(resource))
 			return errors.New(msg)
 		}
 	}

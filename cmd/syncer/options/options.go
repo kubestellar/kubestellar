@@ -53,7 +53,7 @@ func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&options.ToKubeconfig, "to-kubeconfig", options.ToKubeconfig, "Kubeconfig file for -to cluster. If not set, the InCluster configuration will be used.")
 	fs.StringVar(&options.ToContext, "to-context", options.ToContext, "Context to use in the Kubeconfig file for -to cluster, instead of the current context.")
 	fs.StringVar(&options.SyncTargetName, "sync-target-name", options.SyncTargetName,
-		fmt.Sprintf("ID of the -to cluster. Resources with this ID set in the '%s' label will be synced.", workloadv1alpha1.ClusterResourceStateLabelPrefix+"<ClusterID>"))
+		fmt.Sprintf("ID of the -to cluster. Resources with this ID set in the %q label will be synced.", workloadv1alpha1.ClusterResourceStateLabelPrefix+"<ClusterID>"))
 	fs.StringVar(&options.SyncTargetUID, "sync-target-uid", options.SyncTargetUID, "The UID from the SyncTarget resource in KCP.")
 }
 

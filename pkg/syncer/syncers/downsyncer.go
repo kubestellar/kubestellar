@@ -67,58 +67,58 @@ func (ds *DownSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, c
 }
 
 func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
-	ds.logger.V(3).Info(fmt.Sprintf("downsync '%s'", resourceToString(resource)))
+	ds.logger.V(3).Info(fmt.Sprintf("downsync %q", resourceToString(resource)))
 	upstreamClient, downstreamClient, err := ds.getClients(resource, conversions)
 	if err != nil {
-		ds.logger.Error(err, fmt.Sprintf("failed to get client '%s'", resourceToString(resource)))
+		ds.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
 		return err
 	}
 	resourceForUp := convertToUpstream(resource, conversions)
-	ds.logger.V(3).Info(fmt.Sprintf("  get '%s' from upstream", resourceToString(resourceForUp)))
+	ds.logger.V(3).Info(fmt.Sprintf("  get %q from upstream", resourceToString(resourceForUp)))
 	upstreamResource, err := upstreamClient.Get(resourceForUp)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			ds.logger.V(3).Info(fmt.Sprintf("  not found '%s' in upstream", resourceToString(resourceForUp)))
-			ds.logger.V(3).Info(fmt.Sprintf("  skip downsync '%s'", resourceToString(resourceForUp)))
+			ds.logger.V(3).Info(fmt.Sprintf("  not found %q in upstream", resourceToString(resourceForUp)))
+			ds.logger.V(3).Info(fmt.Sprintf("  skip downsync %q", resourceToString(resourceForUp)))
 			return nil
 		} else {
-			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForUp)))
+			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForUp)))
 			return err
 		}
 	}
 
 	resourceForDown := convertToDownstream(resource, conversions)
-	ds.logger.V(3).Info(fmt.Sprintf("  get '%s' from downstream", resourceToString(resourceForDown)))
+	ds.logger.V(3).Info(fmt.Sprintf("  get %q from downstream", resourceToString(resourceForDown)))
 	downstreamResource, err := downstreamClient.Get(resourceForDown)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			// create
-			ds.logger.V(3).Info(fmt.Sprintf("  create '%s' in upstream since it's not found", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  create %q in upstream since it's not found", resourceToString(resourceForDown)))
 			upstreamResource.SetResourceVersion("")
 			upstreamResource.SetUID("")
 			applyConversion(upstreamResource, resourceForDown)
 			if _, err := downstreamClient.Create(resourceForDown, upstreamResource); err != nil {
-				ds.logger.Error(err, fmt.Sprintf("failed to create resource to downstream '%s'", resourceToString(resourceForDown)))
+				ds.logger.Error(err, fmt.Sprintf("failed to create resource to downstream %q", resourceToString(resourceForDown)))
 				return err
 			}
 		} else {
-			ds.logger.Error(err, fmt.Sprintf("failed to get resource from downstream '%s'", resourceToString(resourceForDown)))
+			ds.logger.Error(err, fmt.Sprintf("failed to get resource from downstream %q", resourceToString(resourceForDown)))
 			return err
 		}
 	} else {
 		if downstreamResource != nil {
 			// update
-			ds.logger.V(3).Info(fmt.Sprintf("  update '%s' in upstream since it's found", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  update %q in upstream since it's found", resourceToString(resourceForDown)))
 			upstreamResource.SetResourceVersion("")
 			upstreamResource.SetUID("")
 			upstreamResource.SetManagedFields(nil)
 			applyConversion(upstreamResource, resourceForDown)
 			if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
-				ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream '%s'", resourceToString(resourceForDown)))
+				ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
 				return err
 			}
 		} else {
-			msg := fmt.Sprintf("downstream resource is nil even if there is no error '%s'", resourceToString(resourceForDown))
+			msg := fmt.Sprintf("downstream resource is nil even if there is no error %q", resourceToString(resourceForDown))
 			return errors.New(msg)
 		}
 	}
@@ -128,44 +128,44 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	upstreamClient, downstreamClient, err := ds.getClients(resource, conversions)
 	if err != nil {
-		ds.logger.Error(err, fmt.Sprintf("failed to get client '%s'", resourceToString(resource)))
+		ds.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
 		return err
 	}
 	resourceForDown := convertToDownstream(resource, conversions)
 	downstreamResource, err := downstreamClient.Get(resourceForDown)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			ds.logger.V(3).Info(fmt.Sprintf("  not found '%s' in downstream", resourceToString(resourceForDown)))
-			ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync '%s'", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  not found %q in downstream", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync %q", resourceToString(resourceForDown)))
 			return nil
 		} else {
-			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForDown)))
+			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForDown)))
 			return err
 		}
 	}
 	status, found, err := unstructured.NestedMap(downstreamResource.Object, "status")
 	if err != nil {
-		ds.logger.Error(err, fmt.Sprintf("failed to extract status from downstream object '%s'", resourceToString(resourceForDown)))
+		ds.logger.Error(err, fmt.Sprintf("failed to extract status from downstream object %q", resourceToString(resourceForDown)))
 		return err
 	} else if !found {
-		ds.logger.Info(fmt.Sprintf("no status field downstream object '%s'", resourceToString(resourceForDown)))
+		ds.logger.Info(fmt.Sprintf("no status field downstream object %q", resourceToString(resourceForDown)))
 		return nil
 	}
 	resourceForUp := convertToUpstream(resource, conversions)
 	upstreamResource, err := upstreamClient.Get(resourceForUp)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			ds.logger.V(3).Info(fmt.Sprintf("  not found '%s' in upstream", resourceToString(resourceForUp)))
-			ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync '%s'", resourceToString(resourceForUp)))
+			ds.logger.V(3).Info(fmt.Sprintf("  not found %q in upstream", resourceToString(resourceForUp)))
+			ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync %q", resourceToString(resourceForUp)))
 			return nil
 		} else {
-			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream '%s'", resourceToString(resourceForUp)))
+			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForUp)))
 			return err
 		}
 	}
 	_, found, err = unstructured.NestedMap(upstreamResource.Object, "status")
 	if err != nil {
-		ds.logger.Error(err, fmt.Sprintf("failed to extract status from upstream object '%s'", resourceToString(resourceForUp)))
+		ds.logger.Error(err, fmt.Sprintf("failed to extract status from upstream object %q", resourceToString(resourceForUp)))
 		return err
 	}
 	upstreamResource.Object["status"] = status
@@ -174,7 +174,7 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 	}
 	applyConversion(upstreamResource, resourceForUp)
 	if _, err := upstreamClient.UpdateStatus(resourceForUp, &updatedResource); err != nil {
-		ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream '%s'", resourceToString(resourceForUp)))
+		ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
 		return err
 	}
 	return nil

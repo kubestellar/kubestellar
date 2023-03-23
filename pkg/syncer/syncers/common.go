@@ -42,7 +42,7 @@ func initializeClients(
 ) error {
 	logger.V(3).Info("initialize clients")
 	for _, syncResource := range syncResources {
-		logger.V(3).Info(fmt.Sprintf("  setup ResourceClient for '%s'", resourceToString(syncResource)))
+		logger.V(3).Info(fmt.Sprintf("  setup ResourceClient for %q", resourceToString(syncResource)))
 
 		syncResourceForUpstream := convertToUpstream(syncResource, conversions)
 
@@ -54,9 +54,9 @@ func initializeClients(
 		}
 		_, ok := upstreamClients[gkForUp]
 		if ok {
-			logger.V(3).Info(fmt.Sprintf("  skip since upstreamClientFactory is already setup for '%s'", resourceToString(syncResourceForUpstream)))
+			logger.V(3).Info(fmt.Sprintf("  skip since upstreamClientFactory is already setup for %q", resourceToString(syncResourceForUpstream)))
 		} else {
-			logger.V(3).Info(fmt.Sprintf("  create upstreamClientFactory for '%s'", resourceToString(syncResourceForUpstream)))
+			logger.V(3).Info(fmt.Sprintf("  create upstreamClientFactory for %q", resourceToString(syncResourceForUpstream)))
 			upstreamClient, err := upstreamClientFactory.GetResourceClient(groupForUp, kindForUp)
 			if err != nil {
 				logger.Error(err, fmt.Sprintf("failed to create kcpResourceClient '%s.%s'", groupForUp, kindForUp))
@@ -75,9 +75,9 @@ func initializeClients(
 
 		_, ok = downstreamClients[gkForDown]
 		if ok {
-			logger.V(3).Info(fmt.Sprintf("  skip since downstreamClientFactory is already setup for '%s'", resourceToString(syncResourceForDownstream)))
+			logger.V(3).Info(fmt.Sprintf("  skip since downstreamClientFactory is already setup for %q", resourceToString(syncResourceForDownstream)))
 		} else {
-			logger.V(3).Info(fmt.Sprintf("  create downstreamClientFactory for '%s'", resourceToString(syncResourceForDownstream)))
+			logger.V(3).Info(fmt.Sprintf("  create downstreamClientFactory for %q", resourceToString(syncResourceForDownstream)))
 			k8sClient, err := downstreamClientFactory.GetResourceClient(groupForDown, kindForDown)
 			if err != nil {
 				logger.Error(err, fmt.Sprintf("failed to create k8sResourceClient '%s.%s'", groupForDown, kindForDown))

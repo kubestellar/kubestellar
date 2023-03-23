@@ -162,7 +162,7 @@
     $ kubectl kcp ws root:edge
     Current workspace is "root:edge".
     ```
-1. Create APIResourceSchema and APIExpose for PolicyReport CRD
+1. Create APIResourceSchema and APIExport for PolicyReport CRD
     ```
     $ kubectl apply -f /tmp/kyverno/apischema.policyreports.yaml /tmp/kyverno/apiexport.policyreports.yaml
     apiresourceschema.apis.kcp.io/v0-0-1.policyreports.wgpolicyk8s.io created
@@ -185,11 +185,9 @@
           name: policy-report
     EOL
     ```
-1. Denature PolicyReport CRD in Kyverno Helm chart
-    ```
-    Name of CRD: policyreports.wgpolicyk8s.io => policyreports.wgpolicyk8s.io.denatured
-    Group in CRD: wgpolicyk8s.io.denatured => wgpolicyk8s.io
-    ```
+1. Denature PolicyReport CRD in Kyverno Helm chart by replacing following field's value in CustomResourceDefinition for `policyreports` resource definition:
+  1. Replace `metadata.name: policyreports.wgpolicyk8s.io` with `metadata.name: policyreports.wgpolicyk8s.io.denatured`
+  1. Replace `spec.group: wgpolicyk8s.io` with `spec.group: wgpolicyk8s.io.denatured`
 1. Deploy the Kyverno Helm yaml manifests
     ```
     kubectl create -f /tmp/kyverno/helm-install.denatured.yaml
