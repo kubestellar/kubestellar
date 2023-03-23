@@ -82,7 +82,7 @@ func main() {
 	}
 
 	ctx := setupSignalContext()
-	if err := syncer.StartSyncer(ctx, syncerConfig, 1); err != nil {
+	if err := syncer.RunSyncer(ctx, syncerConfig, 1); err != nil {
 		panic(err)
 	}
 

@@ -22,8 +22,8 @@ import (
 	"time"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	kcpclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
+	syncerclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
+	syncerinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -52,7 +52,7 @@ const (
 	resyncPeriod = 10 * time.Hour
 )
 
-func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) error {
+func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) error {
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("syncTarget.name", cfg.SyncTargetName)
 	logger.V(2).Info("starting edge-mc syncer")
@@ -61,44 +61,44 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) e
 	bootstrapConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
 
-	syncConfigClientSet, err := kcpclientset.NewForConfig(bootstrapConfig)
+	syncConfigClientSet, err := syncerclientset.NewForConfig(bootstrapConfig)
 	if err != nil {
 		return err
 	}
 	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
-	syncConfigInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod, kcpinformers.WithTweakListOptions(
+	syncConfigInformerFactory := syncerinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod, syncerinformers.WithTweakListOptions(
 		func(listOptions *metav1.ListOptions) {
 			listOptions.FieldSelector = fields.OneTermEqualSelector("metadata.name", cfg.SyncTargetName).String()
 		},
 	))
-	syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
+	syncConfigAccess := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-	syncConfigInformer.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
+	syncConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
 
 	syncConfigInformerFactory.Start(ctx.Done())
 	syncConfigInformerFactory.WaitForCacheSync(ctx.Done())
 
 	upstreamConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(upstreamConfig, "edge-mc#syncer/"+kcpVersion)
-	upstreamDyClient, err := dynamic.NewForConfig(upstreamConfig)
+	upstreamDynamicClient, err := dynamic.NewForConfig(upstreamConfig)
 	if err != nil {
 		return err
 	}
 	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
-	upstreamClientFactory, err := syncers.NewClientFactory(logger, upstreamDyClient, upstreamDiscoveryClient)
+	upstreamClientFactory, err := syncers.NewClientFactory(logger, upstreamDynamicClient, upstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
 
 	downstreamConfig := rest.CopyConfig(cfg.DownstreamConfig)
 	rest.AddUserAgent(downstreamConfig, "edge-mc#syncer/"+kcpVersion)
-	downstreamDyClient, err := dynamic.NewForConfig(downstreamConfig)
+	downstreamDynamicClient, err := dynamic.NewForConfig(downstreamConfig)
 	if err != nil {
 		return err
 	}
 	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
-	downstreamClientFactory, err := syncers.NewClientFactory(logger, downstreamDyClient, downstreamDiscoveryClient)
+	downstreamClientFactory, err := syncers.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
@@ -112,17 +112,17 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) e
 		return err
 	}
 
-	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, cfg.SyncTargetName, upSyncer, downSyncer, 5*time.Second)
+	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigAccess, cfg.SyncTargetName, upSyncer, downSyncer, 5*time.Second)
 	if err != nil {
 		return err
 	}
 
 	go controller.Run(ctx, numSyncerThreads)
-	startSync(ctx, logger, cfg, syncConfigInformer.Lister(), upSyncer, downSyncer)
+	runSync(ctx, logger, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
 	return nil
 }
 
-func startSync(ctx context.Context, logger klog.Logger, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, logger klog.Logger, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger.V(2).Info("Start sync")
 	for {
 		select {
