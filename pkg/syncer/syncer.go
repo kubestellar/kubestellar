@@ -117,7 +117,7 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) e
 		return err
 	}
 
-	go controller.Start(ctx, numSyncerThreads)
+	go controller.Run(ctx, numSyncerThreads)
 	startSync(ctx, logger, cfg, syncConfigInformer.Lister(), upSyncer, downSyncer)
 	return nil
 }

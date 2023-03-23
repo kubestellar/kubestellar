@@ -107,8 +107,8 @@ func (c *controller) enqueueSyncConfig(obj interface{}, logger klog.Logger) {
 	c.queue.Add(key)
 }
 
-// Start starts the controller workers.
-func (c *controller) Start(ctx context.Context, numThreads int) {
+// Run the controller workers.
+func (c *controller) Run(ctx context.Context, numThreads int) {
 	defer runtime.HandleCrash()
 	defer c.queue.ShutDown()
 
@@ -118,13 +118,13 @@ func (c *controller) Start(ctx context.Context, numThreads int) {
 	defer logger.Info("Shutting down controller")
 
 	for i := 0; i < numThreads; i++ {
-		go wait.UntilWithContext(ctx, c.startWorker, time.Second)
+		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
 	}
 
 	<-ctx.Done()
 }
 
-func (c *controller) startWorker(ctx context.Context) {
+func (c *controller) runWorker(ctx context.Context) {
 	for c.processNextWorkItem(ctx) {
 	}
 }

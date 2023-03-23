@@ -101,7 +101,7 @@ func TestSyncConfig(t *testing.T) {
 			}, wait.ForeverTestTimeout, 1*time.Second)
 			assert.NoError(t, err)
 
-			controller.Start(ctx, 1)
+			controller.Run(ctx, 1)
 			require.Eventually(t, func() bool {
 				return false
 			}, wait.ForeverTestTimeout, 1*time.Second)
