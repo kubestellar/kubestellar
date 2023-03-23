@@ -20,14 +20,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EdgePlacement binds a collection of (a) Namespaces and non-namespaced objects
-// to (b) a collection of Locations.
-// An EdgePlacement object appears in the center and directs all the syncable
-// objects in the selected Namespaces and all the selected non-namespaced objects
-// to propagate to _all_ of the selected Locations
-// (one SyncTarget in each such Location).
-// This is not entirely unrelated to a TMC Placement, which directs the selected
-// Namespaces to propagate to _one_ of the selected Locations.
+// EdgePlacement exists in the center and binds (a) a collection of
+// Locations with (b) both (b1) objects in the center to downsync
+// (propagate desired state from center to edge and return reported
+// state from edge toward center), and (b2) a way of identifying objects
+// (in edge clusters) to upsync (propagate from edge toward center).
+// Both downsyncing and upsyncing are with all of the Locations.  This
+// is not entirely unrelated to a TMC Placement, which directs the
+// selected Namespaces to propagate to _one_ of the selected
+// Locations.
+//
+// The objects to downsync are those in selected namespaces plus
+// selected non-namespaced objects.
+//
+// For upsync, the matching objects originate in the edge clusters and
+// propagate to the corresponding mailbox workspaces while summaries
+// of them go to the workload management workspace (as prescribed by
+// the summarization API).
 //
 // Overlap between EdgePlacements is allowed:
 // two different EdgePlacement objects may select intersecting Location sets
@@ -63,8 +72,8 @@ type EdgePlacement struct {
 	Status EdgePlacementStatus `json:"status,omitempty"`
 }
 
-// EdgePlacementSpec holds a desired binding between (a) Namespaces and non-namespaced objects
-// and (b) Locations.
+// EdgePlacementSpec holds a desired binding between (a) a set of Locations and
+// (b) a set of objects to downsync and a way of identifying objects to upsync.
 type EdgePlacementSpec struct {
 	// `locationSelectors` identifies the relevant Location objects in terms of their labels.
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
@@ -76,6 +85,11 @@ type EdgePlacementSpec struct {
 	// `nonNamespacedObjects` defines the non-namespaced objects to bind with the selected Locations.
 	// +optional
 	NonNamespacedObjects []NonNamespacedObjectReferenceSet `json:"nonNamespacedObjects,omitempty"`
+
+	// `upsync` identifies objects to upsync.
+	// An object matches `upsync` if and only if it matches at least one member of `upsync`.
+	// +optional
+	Upsync []UpsyncSet `json:"upsync,omitempty"`
 }
 
 // NonNamespacedObjectReferenceSet specifies a set of non-namespaced objects
@@ -100,6 +114,35 @@ type NonNamespacedObjectReferenceSet struct {
 
 	// `labelSelectors` allows matching objects by a rule rather than listing individuals.
 	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
+}
+
+// UpsyncSet specifies a set of objects,
+// which may be namespaced or cluster-scoped,
+// from one particular API group.
+// An object is in this set if:
+// - its API group is the one listed;
+// - its resource (lowercase plural form of object type) is one of those listed;
+// - EITHER the resource is cluster-scoped OR the object's namespace matches `namespaces`; and
+// - the object's name matches `names`.
+type UpsyncSet struct {
+	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
+	APIGroup string `json:"apiGroup,omitempty"`
+
+	// `resources` is a list of lowercase plural names for the sorts of objects to match.
+	// An entry of `"*"` means that all match.
+	// Empty list means nothing matches.
+	Resources []string `json:"resources"`
+
+	// `namespaces` is a list of acceptable namespaces.
+	// An entry of `"*"` means that all match.
+	// Empty list means nothing matches (you probably do not want this
+	// for namespaced resources).
+	Namespaces []string `json:"namespaces,omitempty"`
+
+	// `Names` is a list of objects that match by name.
+	// An entry of `"*"` means that all match.
+	// Empty list means nothing matches (you probably never want an empty list).
+	Names []string `json:"names,omitempty"`
 }
 
 type EdgePlacementStatus struct {
