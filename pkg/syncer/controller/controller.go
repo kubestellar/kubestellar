@@ -48,8 +48,9 @@ func NewSyncConfigController(
 	syncConfigName string,
 	upSyncer syncers.SyncerInterface,
 	downSyncer syncers.SyncerInterface,
+	reconcileInterval time.Duration,
 ) (*controller, error) {
-	rateLimitter := workqueue.NewItemFastSlowRateLimiter(5*time.Second, 30*time.Second, 1000)
+	rateLimitter := workqueue.NewItemFastSlowRateLimiter(reconcileInterval, reconcileInterval*5, 1000)
 	c := &controller{
 		queue:                       workqueue.NewNamedRateLimitingQueue(rateLimitter, controllerName),
 		syncConfigLister:            syncConfigInformer.Lister(),
@@ -176,11 +177,11 @@ func (c *controller) process(ctx context.Context, key string) error {
 	upSyncerError := c.upSyncer.ReInitializeClients(syncConfig.Spec.UpSyncedResources, syncConfig.Spec.Conversions)
 
 	if downsyncerError != nil && upSyncerError != nil {
-		return fmt.Errorf("failed to reinitialize downsyncer and upsyncer")
+		return fmt.Errorf("failed to reinitialize downsyncer (%w) and upsyncer (%w)", downsyncerError, upSyncerError)
 	} else if downsyncerError != nil && upSyncerError == nil {
-		return fmt.Errorf("failed to reinitialize downsyncer")
+		return fmt.Errorf("failed to reinitialize downsyncer (%w)", downsyncerError)
 	} else if downsyncerError == nil && upSyncerError != nil {
-		return fmt.Errorf("failed to reinitialize upsyncer")
+		return fmt.Errorf("failed to reinitialize upsyncer (%w)", upSyncerError)
 	}
 	return nil
 }

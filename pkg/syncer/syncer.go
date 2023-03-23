@@ -112,7 +112,7 @@ func StartSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) e
 		return err
 	}
 
-	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, cfg.SyncTargetName, upSyncer, downSyncer)
+	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, cfg.SyncTargetName, upSyncer, downSyncer, 5*time.Second)
 	if err != nil {
 		return err
 	}

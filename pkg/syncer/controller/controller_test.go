@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
@@ -47,11 +48,18 @@ func init() {
 }
 
 type FakeSyncer struct {
-	t *testing.T
+	t                           *testing.T
+	reInitializedCount          int
+	reInitializeClientsCallback func(FakeSyncer) error
 }
 
 func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
-	return nil
+	s.reInitializedCount++
+	if s.reInitializeClientsCallback != nil {
+		return s.reInitializeClientsCallback(*s)
+	} else {
+		return nil
+	}
 }
 
 func (s *FakeSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
@@ -62,12 +70,31 @@ func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource,
 	return nil
 }
 
+func reInitializeClientsCallback(s FakeSyncer) error {
+	if s.reInitializedCount > 2 {
+		return nil
+	}
+	return fmt.Errorf("")
+}
+
 func TestSyncConfig(t *testing.T) {
 	tests := map[string]struct {
-		syncConfig *edgev1alpha1.EdgeSyncConfig
+		syncConfig         *edgev1alpha1.EdgeSyncConfig
+		reInitializedCount int
+		upSyncer           FakeSyncer
+		downSyncer         FakeSyncer
 	}{
 		"Syncer updates downsyncer/upsyncer following to syncConfig": {
-			syncConfig: syncConfig("test-sync-config", types.UID("uid")),
+			syncConfig:         syncConfig("test-sync-config", types.UID("uid")),
+			reInitializedCount: 1,
+			upSyncer:           FakeSyncer{t: t},
+			downSyncer:         FakeSyncer{t: t},
+		},
+		"Syncer does reconsiliation loop until the process succeeds or timeout": {
+			syncConfig:         syncConfig("test-sync-config-for-error-case", types.UID("uid")),
+			reInitializedCount: 2,
+			upSyncer:           FakeSyncer{t: t, reInitializeClientsCallback: reInitializeClientsCallback},
+			downSyncer:         FakeSyncer{t: t, reInitializeClientsCallback: reInitializeClientsCallback},
 		},
 	}
 	for name, tc := range tests {
@@ -81,7 +108,7 @@ func TestSyncConfig(t *testing.T) {
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
 			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, tc.syncConfig.Name, &FakeSyncer{t: t}, &FakeSyncer{t: t})
+			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, tc.syncConfig.Name, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
 			require.NoError(t, err)
 
 			syncConfigInformerFactory.Start(ctx.Done())
@@ -101,13 +128,10 @@ func TestSyncConfig(t *testing.T) {
 			}, wait.ForeverTestTimeout, 1*time.Second)
 			assert.NoError(t, err)
 
-			controller.Run(ctx, 1)
+			go controller.Run(ctx, 1)
 			require.Eventually(t, func() bool {
-				return false
+				return tc.upSyncer.reInitializedCount == tc.reInitializedCount && tc.downSyncer.reInitializedCount == tc.reInitializedCount
 			}, wait.ForeverTestTimeout, 1*time.Second)
-			// err = controller.process(ctx, tc.syncConfig.Name)
-			_ = controller
-			require.NoError(t, err)
 		})
 	}
 }
