@@ -1,12 +1,12 @@
 ---
-title: "Edge Syncer"
+title: "KCP-Edge Syncer"
 date: 2023-03-22
 weight: 4
 description: >
 ---
 
 {{% pageinfo %}}
-Edge syncer is a new syncer working with mailbox workspace in edge-mc. 
+Edge syncer is a new syncer working with mailbox workspace in KCP-Edge. 
 {{% /pageinfo %}}
 
 ![edge-syncer drawio](/docs/Coding%20Milestones/PoC2023q1/images/edge-syncer-overview.png)
