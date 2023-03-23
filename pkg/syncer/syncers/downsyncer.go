@@ -93,7 +93,7 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			// create
-			ds.logger.V(3).Info(fmt.Sprintf("  create %q in upstream since it's not found", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  create %q in downstream since it's not found", resourceToString(resourceForDown)))
 			upstreamResource.SetResourceVersion("")
 			upstreamResource.SetUID("")
 			applyConversion(upstreamResource, resourceForDown)
@@ -108,7 +108,7 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 	} else {
 		if downstreamResource != nil {
 			// update
-			ds.logger.V(3).Info(fmt.Sprintf("  update %q in upstream since it's found", resourceToString(resourceForDown)))
+			ds.logger.V(3).Info(fmt.Sprintf("  update %q in downstream since it's found", resourceToString(resourceForDown)))
 			upstreamResource.SetResourceVersion("")
 			upstreamResource.SetUID("")
 			upstreamResource.SetManagedFields(nil)
@@ -139,7 +139,7 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 			ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync %q", resourceToString(resourceForDown)))
 			return nil
 		} else {
-			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForDown)))
+			ds.logger.Error(err, fmt.Sprintf("failed to get resource from downstream %q", resourceToString(resourceForDown)))
 			return err
 		}
 	}
@@ -148,7 +148,7 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 		ds.logger.Error(err, fmt.Sprintf("failed to extract status from downstream object %q", resourceToString(resourceForDown)))
 		return err
 	} else if !found {
-		ds.logger.Info(fmt.Sprintf("no status field downstream object %q", resourceToString(resourceForDown)))
+		ds.logger.V(3).Info(fmt.Sprintf("  skip status upsync %q since no status field in it", resourceToString(resourceForDown)))
 		return nil
 	}
 	resourceForUp := convertToUpstream(resource, conversions)
@@ -169,11 +169,8 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 		return err
 	}
 	upstreamResource.Object["status"] = status
-	updatedResource := unstructured.Unstructured{
-		Object: upstreamResource.Object,
-	}
 	applyConversion(upstreamResource, resourceForUp)
-	if _, err := upstreamClient.UpdateStatus(resourceForUp, &updatedResource); err != nil {
+	if _, err := upstreamClient.UpdateStatus(resourceForUp, upstreamResource); err != nil {
 		ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
 		return err
 	}
