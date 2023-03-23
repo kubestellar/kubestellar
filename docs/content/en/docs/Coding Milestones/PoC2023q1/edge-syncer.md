@@ -9,7 +9,7 @@ description: >
 Edge syncer is a new syncer working with mailbox workspace in edge-mc. 
 {{% /pageinfo %}}
 
-![edge-syncer drawio](./images/edge-syncer-overview.png)
+![edge-syncer drawio](/docs/Coding%20Milestones/PoC2023q1/images/edge-syncer-overview.png)
 
 #### Registering Edge Syncer on a p-cluster
 
