@@ -21,26 +21,39 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string) error {
 	logger := klog.FromContext(ctx)
-	ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(epKey)
+	epws, _, epName, err := kcpcache.SplitMetaClusterNamespaceKey(epKey)
 	if err != nil {
 		logger.Error(err, "invalid EdgePlacement key")
 		return err
 	}
-	logger = logger.WithValues("workspace", ws, "edgePlacement", name)
+	logger = logger.WithValues("workspace", epws, "edgePlacement", epName)
 	ctx = klog.NewContext(ctx, logger)
 	logger.V(2).Info("reconciling")
 
-	// TODO(waltforme): should I use a client to bother the apiserver or use local store?
-	ep, err := c.edgeClusterClient.EdgeV1alpha1().EdgePlacements().Cluster(ws.Path()).Get(ctx, name, metav1.GetOptions{})
+	/*
+		On EdgePlacement change:
+		1) find all its loc(s), and optionally update store --- how to get its previous loc(s)?
+
+		2a) for each of the found loc, find all its st(s)
+		2b) for each of the found loc, compose all sp(s)
+
+		3) ensure the existence of correct sps
+
+		Need data structure: none.
+	*/
+
+	ep, err := c.edgePlacementLister.Cluster(epws).Get(epName)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return nil
@@ -48,52 +61,83 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 		return err
 	}
 
-	_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Get(ctx, name, metav1.GetOptions{})
+	// 1)
+	locsAll, err := c.locationLister.List(labels.Everything())
 	if err != nil {
-		if errors.IsNotFound(err) {
+		logger.Error(err, "failed to list Locations in all workspaces")
+		return err
+	}
+
+	locsFilteredByEp, err := filterLocsByEp(locsAll, ep)
+	if err != nil {
+		logger.Error(err, "failed to find Locations for EdgePlacement")
+	}
+
+	singles := []edgev1alpha1.SinglePlacement{}
+	for _, loc := range locsFilteredByEp {
+		// 2a)
+		lws := logicalcluster.From(loc)
+		stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
+		if err != nil {
+			logger.Error(err, "failed to list SyncTargets in Location workspace", "locationWorkspace", lws.String())
+			return err
+		}
+		stsSelecting, err := filterStsByLoc(stsInLws, loc)
+		if err != nil {
+			logger.Error(err, "failed to find SyncTargets for Location", "locationWorkspace", lws.String(), "location", loc.Name)
+			return err
+		}
+		// 2b)
+		singles = append(singles, makeSinglePlacementsForLoc(loc, stsSelecting)...)
+	}
+
+	// 3)
+	currentSPS, err := c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(epws.Path()).Get(ctx, epName, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) { // create
 			logger.V(1).Info("creating SinglePlacementSlice")
 			sps := &edgev1alpha1.SinglePlacementSlice{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: name,
+					Name: epName,
 					OwnerReferences: []metav1.OwnerReference{
 						{
 							APIVersion: edgev1alpha1.SchemeGroupVersion.String(),
 							Kind:       "EdgePlacement",
-							Name:       name,
+							Name:       epName,
 							UID:        ep.UID,
 						},
 					},
 				},
-				Destinations: []edgev1alpha1.SinglePlacement{},
+				Destinations: singles,
 			}
-			_, err = c.edgeClusterClient.Cluster(ws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
 			if err != nil {
 				if !errors.IsAlreadyExists(err) {
-					logger.Error(err, "failed creating singlePlacementSlice")
+					logger.Error(err, "failed creating SinglePlacementSlice")
 					return err
 				}
 			} else {
 				logger.V(1).Info("created SinglePlacementSlice")
+				return nil
 			}
 		} else {
-			logger.Error(err, "failed getting SinglePlacementSlice for EdgePlacement")
+			logger.Error(err, "failed getting SinglePlacementSlice")
 			return err
+		}
+	} else { // update
+		currentSPS.Destinations = singles
+		_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
+		if err != nil {
+			logger.Error(err, "failed updating SinglePlacementSlice")
+			return err
+		} else {
+			logger.V(1).Info("updated SinglePlacementSlice")
+			return nil
 		}
 	}
 
-	/*
-		On EdgePlacement change:
-		- find all its loc(s), and update store --- how to get its previous loc(s)?
-
-		- for each of the found loc, find all its st(s)
-		- for each of the found loc, compose all sp(s)
-
-		- remove all obsolete sp(s)
-		- keep all ongoing sp(s)
-		- add all new sp(s)
-
-		Need data structure: none.
-	*/
+	// dev-time tests
+	store.show()
 
 	return nil
 }

@@ -46,7 +46,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 		On location change:
 		1) find all ep(s) that selected loc
 
-		2a) find all its st(s), and update store --- how to get its previous st(s)?
+		2a) find all its st(s), and optionally update store --- how to get its previous st(s)?
 		2b) find all ep(s) that selecting loc, and update store
 
 		3a) for each of its obsolete ep, remove all sp(s)
@@ -86,8 +86,6 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 		return err
 	}
 	singles := makeSinglePlacementsForLoc(loc, stsSelecting)
-
-	// TODO: update store
 
 	// 2b)
 	epsAll, err := c.edgePlacementLister.List(labels.Everything())
