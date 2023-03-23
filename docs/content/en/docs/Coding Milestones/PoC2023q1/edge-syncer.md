@@ -24,7 +24,7 @@ Edge-syncer can be deployed on p-cluster easily by the following steps.
    ```
 3. Deploy edge-syncer on p-cluster.
 
-![edge-syncer boot](./images/edge-syncer-boot.png)
+![edge-syncer boot](/docs/Coding%20Milestones/PoC2023q1/images/edge-syncer-boot.png)
 
 #### Deploy workload objects from edge-mc to p-cluster
 
@@ -36,7 +36,7 @@ To deploy resources to p-clusters, create the following in workload management w
   - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt [here](https://github.com/kcp-dev/edge-mc/blob/main/hack/update-codegen-crds.sh#L57)). 
 - EdgeSyncConfig (This is going to be replaced with EdgePlacement spec) 
 
-![edge-syncer deploy](./images/edge-syncer-deploy.png)
+![edge-syncer deploy](/docs/Coding%20Milestones/PoC2023q1/images/edge-syncer-deploy.png)
 
 After this, Edge-mc will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
