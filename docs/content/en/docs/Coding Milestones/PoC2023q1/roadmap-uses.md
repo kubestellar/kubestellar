@@ -32,17 +32,58 @@ possibilities.  They vary in two dimensions.
 
 ### How C2P controller consumes reports
 
-#### Through an APIExport view
+#### Through view of workload APIExport and workload APIBindings
 
 As outlined in [PR 241](https://github.com/kcp-dev/edge-mc/pull/241):
 - the C2P team maintains CRDs, APIResourceSchemas, and an APIExport for
   the policy and report resources;
+- the C2P team puts those APIResourceSchemas and that APIExport in a
+  kcp workspace of their choice;
 - the workload management workspace has an APIBinding to that APIExport;
 - the EdgePlacement selects that APIBinding for downsync;
 - the APIBinding goes to the mailbox workspace but not the edge cluster;
 - those CRDs are pre-installed on the edge clusters;
 - the APIExport's view shows the report objects in the mailbox
   workspaces (as well as anywhere else they exist).
+
+This is not a great choice because of "those CRDs are pre-installed on
+the edge clusters".
+
+It is also not a great choice because it requires the C2P team to
+maintain two copies of the Kyverno resource definitions.
+
+This is a bad choice because it is not consistent with the preferred
+way to demonstrate installation of Kyverno, which is to have Helm
+install Kyverno into the workload managemet workspace.
+
+#### Through a new kind of view
+
+We could define a new kind of view that does what we want.
+
+#### Through view of EMC APIExport and mailbox APIBindings
+
+This approach also uses APIExport and APIBinding objects but in a
+different way than above.  In this approach the placement translator
+maintains one APIExport in the edge service provider workspace and a
+corresponding APIBinding object in each mailbox workspace, and they
+work together as follows.
+
+The APIExport has an empty
+[LatestResourceSchemas](https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/apis/apis/v1alpha1/types_apiexport.go#L108)
+but a large dynamic
+[PermissionClaims](https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/apis/apis/v1alpha1/types_apiexport.go#L165)
+slice.  In particular, there is a PermissionClaim for every resource
+involved in downsync or upsync in any EdgePlacement object.  Some day
+we might try something more granular, but today is not that day.
+
+In each mailbox workspace, the corresponding APIBinding's [list of
+accepted
+PermissionClaims](https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/apis/apis/v1alpha1/types_apibinding.go#L81)
+has an etry for every resource downsynced or upsynced to that
+workspace.
+
+As a consequence, the APIExport's view holds all the objects whose
+kind/resource is defined by those APIBindings.
 
 #### Through an API for consuming from mailboxes
 
@@ -60,6 +101,8 @@ In this scenario:
 - that controller consumes summaries rather than the reports themselves.
 
 ### Mailbox vs. Edge
+
+The latest plan is to [use full EMC](#use-full-emc).
 
 #### Using the current TMC syncer
 
