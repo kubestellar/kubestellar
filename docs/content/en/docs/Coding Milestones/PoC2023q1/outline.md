@@ -122,6 +122,34 @@ what should be returned as well as implementing it.  This will
 certainly affect the syncer between mailbox workspace and edge
 cluster, and the summarization part will affect the status summarizer.
 
+### Good handling of workload conflicts
+
+We could start by handling workload conflicts in a very simple way:
+treating each as an error.  Later development can handle them better,
+as outlined [later](#edgeplacement-objects).
+
+### Denaturing/renaturing
+
+We could start by not doing this.  For some resources, the effect of
+leaving these resources natured in the center is only to add
+authorizations in the center that are not needed and are undesired in
+a well-secured environment but tolerable in early demonstrations ---
+provided that there is not a conflict with an object of the same name
+that is positively desired in the center.  In particular, these are:
+`ClusterRole`, `ClusterRoleBinding`, `Role`, `RoleBinding`,
+`ServiceAccount`.
+
+For some kinds of object, lack of denaturing/renaturing means that
+edge-mc will simply not be able to support workloads that contain such
+objects.  These are: `MutatingWebhookConfiguration`,
+`ValidatingWebhookConfiguration`, `LimitRange`, `ResourceQuota`.
+
+For some resources, the need to denature is only a matter of
+anticipation.  `FlowSchema` and `PriorityLevelConfiguration` currently
+are not interpreted by kcp servers and so are effectively already
+denatured there.  Hopefully they will be given interpretations in the
+future, and then those resources will join the previous category.
+
 ## Roles and Responsibilities
 
 ### Developers/deployers/admins/users of the inventory management layer
@@ -245,10 +273,19 @@ dependent objects.
 | ---------- | ---- | ---------- |
 | apis.kcp.io/v1alpha1 | APIBinding | false |
 
-A workload management workspace generally has APIBindings to workload
-APIs.  These bindings cause corresponding CRDs to be created in the
-same workspace.  The CRDs propagate to the edge, the APIBindings do
-not.
+A workload management workspace needs an APIBinding to the APIExport
+of the API group `edge.kcp.io` from the edge service provider
+workspace, in order to be able to contain EdgePlacement and related
+objects.  These objects and that APIBinding are not destined for the
+edge clusters.
+
+The edge clusters are not presumed to be kcp workspaces, so
+APIBindings do not propagate to the edge clusters.  However, it is
+possible that APIBindings for workload APIs may exist in a workload
+management workspace and be selected for downsync to mailbox
+workspaces while the edge clusters have the same resources defined by
+CRDs (as mentioned later in the discussion of built-in resources and
+namespaces).
 
 #### For features not supported
 
@@ -345,7 +382,7 @@ this category.
 | v1 | Secret | true |
 | v1 | Service | true |
 
-### Built-in resources and objects
+### Built-in resources and namespaces
 
 An edge cluster has some built-in resources (i.e, kinds of objects)
 and namespaces.  A resource may be built-in by any of several ways: it
@@ -376,6 +413,31 @@ that are a subset of those built into the edge clusters.  The
 propagation from workload management workspace to mailbox workspace
 does not attempt to manage the resource and namespace definitions that
 are built into the mailbox workspaces.
+
+The above wording is deliberately restrained, for the sake of
+flexibility regarding resources that are defined one way in the edge
+clusters and another way in workload management workspace.  For
+example, the following scenario is allowed.
+
+- Some central team owns an API group and produces some
+  CustomResourceDefinition (CRD) objects that populate that API group.
+- That team derives APIResourceSchemas from those CRDs and a
+  corresponding APIExport of their API group.
+- That team maintains a kcp workspace holding those APIResourceSchemas
+  and that APIExport.
+- Some workload management workspaces have APIBindings to that
+  APIExport, and EdgePlacement objects that (1) select those
+  APIBinding objects for downsync and (2) select objects of kinds
+  defined through those APIBindings for either downsync or upsync.
+- Those resources are built into the edge clusters by pre-deploying
+  the aforementioned CRDs there.
+- Those resources are _not_ built into the mailbox workspaces.  In
+  this case the APIBindings would propagate from workload management
+  workspace to mailbox workspaces but not edge clusters.
+- As a consequence of those propagated APIBindings, the APIExport's
+  view includes all of the objects (in workload management workspaces,
+  in mailbox workspaces, and in any other workspaces where they
+  appear) whose kind is defined through those APIBindings.
 
 ### Control objects
 
