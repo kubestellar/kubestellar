@@ -42,23 +42,32 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	logger.V(2).Info("reconciling")
 
 	/*
-		On EdgePlacement change:
-		1) find all its loc(s), and optionally update store --- how to get its previous loc(s)?
+		On EdgePlacement 'ep' change:
+		1) from cache, find loc(s) that being selected by ep
 
-		2a) for each of the found loc, find all its st(s)
-		2b) for each of the found loc, compose all sp(s)
+		2) from cache, for each of the found loc, find st(s) that being selected by the loc
 
-		3) ensure the existence of correct sps
+		3) update store, with loc(s) that being selected by ep
+
+		4) update apiserver
 
 		Need data structure: none.
 	*/
 
+	store.l.Lock()
+	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
+
 	ep, err := c.edgePlacementLister.Cluster(epws).Get(epName)
 	if err != nil {
 		if errors.IsNotFound(err) {
+			logger.V(1).Info("EdgePlacement not found")
+			logger.V(3).Info("dropping EdgePlacement from store")
+			store.dropEp(epKey)
 			return nil
+		} else {
+			logger.Error(err, "failed to get EdgePlacement")
+			return err
 		}
-		return err
 	}
 
 	// 1)
@@ -67,15 +76,15 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 		logger.Error(err, "failed to list Locations in all workspaces")
 		return err
 	}
-
 	locsFilteredByEp, err := filterLocsByEp(locsAll, ep)
 	if err != nil {
 		logger.Error(err, "failed to find Locations for EdgePlacement")
 	}
+	locsSelecting := packLocKeys(locsFilteredByEp)
 
 	singles := []edgev1alpha1.SinglePlacement{}
 	for _, loc := range locsFilteredByEp {
-		// 2a)
+		// 2)
 		lws := logicalcluster.From(loc)
 		stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
 		if err != nil {
@@ -87,12 +96,25 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 			logger.Error(err, "failed to find SyncTargets for Location", "locationWorkspace", lws.String(), "location", loc.Name)
 			return err
 		}
-		// 2b)
 		singles = append(singles, makeSinglePlacementsForLoc(loc, stsSelecting)...)
 	}
 
 	// 3)
-	currentSPS, err := c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(epws.Path()).Get(ctx, epName, metav1.GetOptions{})
+	for loc, eps := range store.epsBySelectedLoc {
+		if _, ok := locsSelecting[loc]; !ok {
+			delete(eps, epKey)
+		}
+	}
+	for loc := range locsSelecting {
+		if store.epsBySelectedLoc[loc] == nil {
+			store.epsBySelectedLoc[loc] = map[string]empty{epKey: {}}
+		} else {
+			store.epsBySelectedLoc[loc][epKey] = empty{}
+		}
+	}
+
+	// 4)
+	currentSPS, err := c.singlePlacementSliceLister.Cluster(epws).Get(epName)
 	if err != nil {
 		if errors.IsNotFound(err) { // create
 			logger.V(1).Info("creating SinglePlacementSlice")
@@ -118,7 +140,6 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 				}
 			} else {
 				logger.V(1).Info("created SinglePlacementSlice")
-				return nil
 			}
 		} else {
 			logger.Error(err, "failed getting SinglePlacementSlice")
@@ -132,12 +153,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 			return err
 		} else {
 			logger.V(1).Info("updated SinglePlacementSlice")
-			return nil
 		}
 	}
-
-	// dev-time tests
-	store.show()
 
 	return nil
 }
