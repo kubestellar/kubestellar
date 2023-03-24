@@ -52,7 +52,7 @@ func NewSharedInformer(
 	// At first stage of development, do not take special care when mailbox workspaces arrive or depart,
 	// because objects in them will likely arrive later and depart sooner.
 	// At a later stage of development, do not rely on happy timing.
-	var wrappedListerWatcher upstreamcache.ListerWatcher
+	wrappedListerWatcher := newFilteredListerWatcher(mailboxWorkspacePreInformer, listerWatcher)
 	return kcpinformers.NewSharedIndexInformer(wrappedListerWatcher, exampleObject, defaultEventHandlerResyncPeriod, indexers)
 }
 
