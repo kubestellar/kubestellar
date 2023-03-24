@@ -28,7 +28,3 @@ func (s *internalData) show() {
 	fmt.Println("locsBySelectedSt", s.locsBySelectedSt)
 	fmt.Println("----")
 }
-
-func (s *internalData) manuallyFillIn() {
-	s.epsBySelectedLoc["2xqrexu0m11o2m6o|dev"] = map[string]empty{"kvdk2spgmbix|dev": {}} // ~|dev selects root:compute|dev
-}

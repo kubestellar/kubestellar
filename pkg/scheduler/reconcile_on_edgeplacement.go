@@ -83,7 +83,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 
 	/*
 		On EdgePlacement change:
-		- find all its loc(s)
+		- find all its loc(s), and update store --- how to get its previous loc(s)?
 
 		- for each of the found loc, find all its st(s)
 		- for each of the found loc, compose all sp(s)

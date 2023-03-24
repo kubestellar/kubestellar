@@ -39,8 +39,7 @@ or in other words,
 type empty struct{}
 
 type internalData struct {
-	l sync.Mutex
-
+	l                sync.Mutex
 	epsBySelectedLoc map[string]map[string]empty // ep <- loc
 	locsBySelectedSt map[string]map[string]empty // loc <- st
 }
@@ -53,8 +52,6 @@ func init() {
 		epsBySelectedLoc: map[string]map[string]empty{},
 		locsBySelectedSt: map[string]map[string]empty{},
 	}
-
-	store.manuallyFillIn()
 }
 
 func unionTwo(a, b map[string]empty) map[string]empty {
