@@ -54,7 +54,7 @@ const (
 
 func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) error {
 	logger := klog.FromContext(ctx)
-	logger = logger.WithValues("syncTarget.name", cfg.SyncTargetName)
+	logger = logger.WithValues("syncTargetName", cfg.SyncTargetName)
 	logger.V(2).Info("starting edge-mc syncer")
 	kcpVersion := version.Get().GitVersion
 
@@ -118,11 +118,12 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	}
 
 	go controller.Run(ctx, numSyncerThreads)
-	runSync(ctx, logger, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
+	runSync(ctx, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
 	return nil
 }
 
-func runSync(ctx context.Context, logger klog.Logger, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
 	for {
 		select {

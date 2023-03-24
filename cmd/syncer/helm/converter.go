@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -55,7 +56,7 @@ func main() {
 	ctx = klog.NewContext(ctx, logger)
 	_ = ctx
 	fs.VisitAll(func(flg *pflag.Flag) {
-		logger.V(1).Info("Command line flag", flg.Name, flg.Value)
+		logger.V(1).Info(fmt.Sprintf("Command line flag %s %s", flg.Name, flg.Value))
 	})
 
 	unstObjs, err := loadYaml(pathToHelmTemplate)
