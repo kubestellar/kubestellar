@@ -190,6 +190,16 @@ codegen: crds $(CODE_GENERATOR)
 	$(MAKE) imports
 .PHONY: codegen
 
+syncer-crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
+	./pkg/syncer/scripts/update-codegen-crds.sh
+.PHONY: syncer-crds
+
+syncer-codegen: syncer-crds $(CODE_GENERATOR)
+	go mod download
+	./pkg/syncer/scripts/update-codegen-clients.sh
+	$(MAKE) imports
+.PHONY: syncer-codegen
+
 # Note, running this locally if you have any modified files, even those that are not generated,
 # will result in an error. This target is mostly for CI jobs.
 .PHONY: verify-codegen
@@ -200,6 +210,21 @@ verify-codegen:
 	fi
 
 	$(MAKE) codegen
+
+	if ! git diff --quiet HEAD; then \
+		git diff; \
+		echo "You need to run 'make codegen' to update generated files and commit them"; \
+		exit 1; \
+	fi
+
+.PHONY: verify-syncer-codegen
+verify-syncer-codegen:
+	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
+		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
+	fi
+
+	$(MAKE) syncer-codegen
 
 	if ! git diff --quiet HEAD; then \
 		git diff; \
