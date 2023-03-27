@@ -1,6 +1,6 @@
 ---
 title: "Edge Scheduler"
-date: 2023-02-02
+date: 2023-03-27
 weight: 4
 description: >
 ---
@@ -9,76 +9,144 @@ description: >
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 {{% /pageinfo %}}
 
-#### A short demo
+#### Steps to try the edge scheduler
 Start a kcp server, with the version of `"github.com/kcp-dev/kcp"` listed in the `require` directive of go.mod.
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
 
-Workspace `root:edge` is used as the edge service provider workspace.
+Use workspace `root:edge` as the edge service provider workspace.
 ```console
-kubectl ws root
-kubectl ws create edge --enter
+$ kubectl ws root
+$ kubectl ws create edge --enter
 ```
 
 Install CRDs and APIExport.
 ```console
-kubectl apply -f config/crds/ -f config/exports/
+$ kubectl apply -f config/crds/ -f config/exports/
 ```
 
-User home workspace is used as the workload management workspace.
+Use user home workspace (`~`) as the workload management workspace.
 ```console
-kubectl ws \~
+$ kubectl ws ~
 ```
 
-Bind APIs and create an EdgePlacement CR.
+Bind APIs.
 ```console
-kubectl apply -f config/imports/
-kubectl apply -f config/samples/edgeplacement_test-1.yaml
+$ kubectl apply -f config/imports/
 ```
 
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
-kubectl ws root:edge
+$ kubectl ws root:edge
 go run cmd/scheduler/main.go --kcp-kubeconfig=<path to kcp admin kubeconfig> -v <verbosity (default 2)>
 ```
 
 The outputs from the edge scheduler should be similar to:
 ```console
-I0302 11:28:38.595692   96096 scheduler.go:211] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/wmtp3o8lb1n1c5uj/edge.kcp.io"
-I0302 11:28:38.601037   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0302 11:28:38.697604   96096 controller.go:159] "Starting controller" reconciler="edge-scheduler"
-I0302 11:28:38.697723   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-reconciling EdgePlacement test-1 in Workspace kvdk2spgmbix
-I0302 11:28:38.807572   96096 controller.go:226] "creating SinglePlacementSlice" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1" edgeplacement.workspace="kvdk2spgmbix" edgeplacement.namespace="" edgeplacement.name="test-1" edgeplacement.apiVersion="edge.kcp.io/v1alpha1" workspace="kvdk2spgmbix" name="test-1"
-I0302 11:28:38.813981   96096 controller.go:245] "created SinglePlacementSlice" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1" edgeplacement.workspace="kvdk2spgmbix" edgeplacement.namespace="" edgeplacement.name="test-1" edgeplacement.apiVersion="edge.kcp.io/v1alpha1" workspace="kvdk2spgmbix" name="test-1"
+I0327 17:14:42.222112   51241 scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
+I0327 17:14:42.225075   51241 scheduler.go:243] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io"
+I0327 17:14:42.226954   51241 scheduler.go:243] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/workload.kcp.io"
+I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="edge-scheduler"
 ```
 
-The edge scheduler ensures the existence of a SinglePlacementSlice for an EdgePlacement in the same workspace.
+Use workspace `root:compute` as the inventory management workspace.
 ```console
-kubectl ws \~
-kubectl get epl,sps
+$ kubectl ws root:compute
 ```
 
-The outputs of `kubectl get epl,sps` should be similar to:
+Create two Locations and two SyncTargets.
 ```console
-NAME                               AGE
-edgeplacement.edge.kcp.io/test-1   7m10s
-
-NAME                                      AGE
-singleplacementslice.edge.kcp.io/test-1   5m54s
+$ kubectl create -f config/samples/location_prod.yaml
+$ kubectl create -f config/samples/location_dev.yaml
+$ kubectl create -f config/samples/synctarget_prod.yaml
+$ kubectl create -f config/samples/synctarget_dev.yaml
 ```
 
-Edit then delete the EdgePlacement.
+Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
 ```console
-kubectl edit edgeplacement test-1
-kubectl delete edgeplacement test-1
+$ kubectl get locations,synctargets
+NAME                                 RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
+location.scheduling.kcp.io/default   synctargets   0           2                    2m12s
+location.scheduling.kcp.io/dev       synctargets   0           1                    2m39s
+location.scheduling.kcp.io/prod      synctargets   0           1                    3m13s
+
+NAME                              AGE
+synctarget.workload.kcp.io/dev    110s
+synctarget.workload.kcp.io/prod   2m12s
 ```
 
-Additional outputs from the edge scheduler should be similar to:
+Go to user home workspace, and create an EdgePlacement `test-1`.
 ```console
-I0302 11:38:21.224376   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0302 11:38:21.224423   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-reconciling EdgePlacement test-1 in Workspace kvdk2spgmbix
-I0302 11:38:35.956562   96096 controller.go:132] "queueing EdgePlacement" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
-I0302 11:38:35.956586   96096 controller.go:184] "processing key" reconciler="edge-scheduler" key="kvdk2spgmbix|test-1"
+$ kubectl ws ~
+$ kubectl create -f config/samples/edgeplacement_test-1.yaml
 ```
+
+The edge scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
+```console
+$ kubectl get sps test-1 -oyaml
+apiVersion: edge.kcp.io/v1alpha1
+destinations:
+- cluster: f3il38atqno12hfd
+  locationName: prod
+  syncTargetName: prod
+  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
+- cluster: f3il38atqno12hfd
+  locationName: dev
+  syncTargetName: dev
+  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+- cluster: f3il38atqno12hfd
+  locationName: default
+  syncTargetName: prod
+  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
+- cluster: f3il38atqno12hfd
+  locationName: default
+  syncTargetName: dev
+  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+kind: SinglePlacementSlice
+metadata:
+  annotations:
+    kcp.io/cluster: kvdk2spgmbix
+  creationTimestamp: "2023-03-27T21:37:29Z"
+  generation: 1
+  name: test-1
+  ownerReferences:
+  - apiVersion: edge.kcp.io/v1alpha1
+    kind: EdgePlacement
+    name: test-1
+    uid: 0c68724e-6d11-4cff-bd0a-8fa32c86caa9
+  resourceVersion: "877"
+  uid: 45ec86d7-bdf8-4c2d-bc02-087073a1ac17
+```
+EdgePlacement `test-1` selects all the 3 Locations in `root:compute`.
+
+Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
+```console
+$ kubectl create -f config/samples/edgeplacement_dev.yaml
+```
+
+The corresponding SinglePlacementSlice has a shorter list of `destinations`:
+```console
+$ kubectl get sps dev -oyaml
+apiVersion: edge.kcp.io/v1alpha1
+destinations:
+- cluster: f3il38atqno12hfd
+  locationName: dev
+  syncTargetName: dev
+  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+kind: SinglePlacementSlice
+metadata:
+  annotations:
+    kcp.io/cluster: kvdk2spgmbix
+  creationTimestamp: "2023-03-27T21:40:52Z"
+  generation: 1
+  name: dev
+  ownerReferences:
+  - apiVersion: edge.kcp.io/v1alpha1
+    kind: EdgePlacement
+    name: dev
+    uid: 6e9d608d-12cd-47cc-8887-3695199259ba
+  resourceVersion: "880"
+  uid: 9b8de087-21bc-4585-99cb-e6c03ba0a8ae
+```
+
+Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the edge scheduler reacts.
