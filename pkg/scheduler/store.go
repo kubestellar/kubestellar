@@ -73,3 +73,20 @@ func (d *internalData) findEpsUsedSt(st string) map[string]empty {
 	}
 	return eps
 }
+
+func (d *internalData) dropEp(epKey string) {
+	for _, eps := range d.epsBySelectedLoc {
+		delete(eps, epKey)
+	}
+}
+
+func (d *internalData) dropLoc(locKey string) {
+	delete(d.epsBySelectedLoc, locKey)
+	for _, locs := range d.locsBySelectedSt {
+		delete(locs, locKey)
+	}
+}
+
+func (d *internalData) dropSt(stKey string) {
+	delete(d.locsBySelectedSt, stKey)
+}
