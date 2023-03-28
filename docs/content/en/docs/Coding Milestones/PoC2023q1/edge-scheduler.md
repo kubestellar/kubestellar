@@ -192,3 +192,5 @@ metadata:
 ```
 
 Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the edge scheduler reacts.
+
+Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)
