@@ -10,6 +10,12 @@ The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects 
 {{% /pageinfo %}}
 
 #### Steps to try the edge scheduler
+
+open a terminal window and clone the latest kcp-edge source:
+```console
+git clone https://github.com/kcp-dev/edge-mc
+```
+
 clone the latest kcp source:
 ```console
 git clone https://github.com/kcp-dev/kcp.git
@@ -19,6 +25,7 @@ checkout version 0.11.0 of the kcp codebase
 ```console
 git checkout v0.11.0
 ```
+
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```console
 kcp start
