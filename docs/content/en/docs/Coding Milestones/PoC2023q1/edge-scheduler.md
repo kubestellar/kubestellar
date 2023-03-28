@@ -9,13 +9,15 @@ description: >
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 {{% /pageinfo %}}
 
-Pre-requisite: You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from kcp-edge
+###Pre-requisite: 
+  You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from kcp-edge
 ```console
 brew install go
 ```
 
-#### Steps to try the edge scheduler
+### Steps to try the edge scheduler
 
+#### Pull the kcp and kcp-edge source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest kcp-edge source:
 ```console
 git clone https://github.com/kcp-dev/edge-mc
@@ -42,6 +44,7 @@ run kcp (kcp will spit out tons of information and stay running in this terminal
 kcp start
 ```
 
+#### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
 open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server.
 ```console
 export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
@@ -58,6 +61,7 @@ Install CRDs and APIExport.
 kubectl apply -f ~/edge-mc/config/crds/ -f ~/edge-mc/config/exports/
 ```
 
+#### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
 Use the user home workspace (`~`) as the workload management workspace (WMW).
 ```console
 kubectl ws ~
@@ -68,6 +72,7 @@ Bind APIs.
 kubectl apply -f ~/edge-mc/config/imports/
 ```
 
+#### Run the Edge Scheduler in the ESPW
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
@@ -83,6 +88,7 @@ I0327 17:14:42.226954   51241 scheduler.go:243] "Found APIExport view" exportNam
 I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="edge-scheduler"
 ```
 
+#### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
 open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server.
 ```console
 export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
@@ -115,7 +121,8 @@ synctarget.workload.kcp.io/dev    110s
 synctarget.workload.kcp.io/prod   2m12s
 ```
 
-Go to user home workspace, and create an EdgePlacement `test-1`.
+#### Create some EdgePlacements in the WMW
+Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
 ```console
 kubectl ws ~
 kubectl create -f ~/edge-mc/config/samples/edgeplacement_test-1.yaml
