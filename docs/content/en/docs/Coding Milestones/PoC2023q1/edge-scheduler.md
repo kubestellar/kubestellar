@@ -9,7 +9,7 @@ description: >
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 {{% /pageinfo %}}
 
-###Pre-requisite: 
+### Pre-requisite: 
   You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from kcp-edge
 ```console
 brew install go
