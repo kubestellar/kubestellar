@@ -34,7 +34,8 @@ import (
 // NewSharedInformer constructs a shared index informer on objects of a given kind in mailbox workspaces.
 // It follows the usual pattern for a constructor of informers except for an additional parameter
 // at the front, which it uses to keep appraised of the mailbox workspaces.
-// The ListerWatcher can be constructed using `upstreamcache.NewListWatchFromClient`.
+// The ListerWatcher can be constructed using `NewListerWatcher`, for example
+// as is done in `impl_test.go`.
 func NewSharedInformer(
 	mailboxWorkspacePreInformer tenancyv1a1informers.WorkspaceInformer,
 	listerWatcher upstreamcache.ListerWatcher,
@@ -42,9 +43,6 @@ func NewSharedInformer(
 	defaultEventHandlerResyncPeriod time.Duration,
 	indexers upstreamcache.Indexers,
 ) kcpcache.ScopeableSharedIndexInformer {
-	if true {
-		panic("not implemented yet")
-	}
 	// Implementation outline:
 	// Use the informer on mailbox workspaces to stay appraised of the logicalcluster.Name for
 	// each mailbox workspace qua logical cluster.
