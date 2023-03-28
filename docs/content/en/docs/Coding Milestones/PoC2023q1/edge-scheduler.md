@@ -10,7 +10,11 @@ The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects 
 {{% /pageinfo %}}
 
 #### Steps to try the edge scheduler
-Start a kcp server, with the version of `"github.com/kcp-dev/kcp"` listed in the `require` directive of go.mod.
+clone the latest kcp source:
+```git clone https://github.com/kcp-dev/kcp.git```
+
+checkout version 0.11.0 of the code
+```git checkout v0.11.0```
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
 
