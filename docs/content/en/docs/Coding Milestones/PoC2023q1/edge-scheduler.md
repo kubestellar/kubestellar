@@ -15,7 +15,7 @@ clone the latest kcp source:
 git clone https://github.com/kcp-dev/kcp.git
 ```
 
-checkout version 0.11.0 of the code
+checkout version 0.11.0 of the kcp codebase
 ```console
 git checkout v0.11.0
 ```
