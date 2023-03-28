@@ -25,7 +25,7 @@ git clone https://github.com/kcp-dev/edge-mc
 
 clone the v0.11.0 branch kcp source:
 ```console
-git clone -b v0.11.0 https://github.com/kcp-dev/kcp.git
+git clone -b v0.11.0 https://github.com/kcp-dev/kcp
 ```
 build the kubectl-ws binary
 ```console
