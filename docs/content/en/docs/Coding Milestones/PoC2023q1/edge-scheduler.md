@@ -77,7 +77,7 @@ Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
 cd ~/edge-mc
-go run cmd/scheduler/main.go --kcp-kubeconfig=~/kcp/.kcp/admin.kubeconfig -v 2
+go run cmd/scheduler/main.go -v 2
 ```
 
 The outputs from the edge scheduler should be similar to:

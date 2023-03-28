@@ -17,15 +17,10 @@ limitations under the License.
 package options
 
 import (
-	"errors"
-	"strings"
-
 	"github.com/spf13/pflag"
 
 	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
-
-	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 )
 
 type Options struct {
@@ -44,11 +39,7 @@ func NewOptions() *Options {
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&options.KcpKubeconfig, "kcp-kubeconfig", options.KcpKubeconfig, "Kubeconfig file for -from cluster.")
-	fs.Var(kcpfeatures.NewFlagValue(), "feature-gates", ""+
-		"A set of key=value pairs that describe feature gates for alpha/experimental features. "+
-		"Options are:\n"+strings.Join(kcpfeatures.KnownFeatures(), "\n")) // hide kube-only gates
-
+	fs.StringVar(&options.KcpKubeconfig, "kcp-kubeconfig", options.KcpKubeconfig, "Kubeconfig file for kcp")
 	options.Logs.AddFlags(fs)
 }
 
@@ -57,8 +48,5 @@ func (options *Options) Complete() error {
 }
 
 func (options *Options) Validate() error {
-	if options.KcpKubeconfig == "" {
-		return errors.New("--kcp-kubeconfig is required")
-	}
 	return nil
 }

@@ -31,8 +31,6 @@ import (
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	kcpkubernetesinformers "github.com/kcp-dev/client-go/informers"
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpclientsetnoncluster "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
@@ -92,32 +90,6 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	// create cfg
-	loadingRules := clientcmd.ClientConfigLoadingRules{ExplicitPath: options.KcpKubeconfig}
-	configOverrides := &clientcmd.ConfigOverrides{
-		Context: clientcmdapi.Context{
-			Cluster:  "base",
-			AuthInfo: "shard-admin",
-		},
-	}
-	cfg, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(&loadingRules, configOverrides).ClientConfig()
-	if err != nil {
-		logger.Error(err, "failed to make config, is kcp-kubeconfig correct?")
-		return err
-	}
-
-	// create kubeSharedInformerFactory
-	kubernetesConfig := rest.CopyConfig(cfg)
-	clientgoExternalClient, err := kcpkubernetesclientset.NewForConfig(kubernetesConfig)
-	if err != nil {
-		logger.Error(err, "failed to create kube cluter client")
-		return err
-	}
-	kubeSharedInformerFactory := kcpkubernetesinformers.NewSharedInformerFactory(
-		clientgoExternalClient,
-		resyncPeriod,
-	)
-
 	// create edgeSharedInformerFactory
 	edgeConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
@@ -171,8 +143,22 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	}
 	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
 
+	// create ClientConfig for the controller
+	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	loadingRules.ExplicitPath = options.KcpKubeconfig
+	configOverrides := &clientcmd.ConfigOverrides{
+		Context: clientcmdapi.Context{
+			Cluster:  "base",
+			AuthInfo: "shard-admin",
+		},
+	}
+	controllerConfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides).ClientConfig()
+	if err != nil {
+		logger.Error(err, "failed to make config for the controller")
+		return err
+	}
+
 	// create edge-scheduler
-	controllerConfig := rest.CopyConfig(cfg)
 	kcpClusterClientset, err := kcpclientset.NewForConfig(controllerConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp clientset for controller")
@@ -200,15 +186,14 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	// run edge-scheduler
 	doneCh := ctx.Done()
 
-	kubeSharedInformerFactory.Start(doneCh)
 	edgeSharedInformerFactory.Start(doneCh)
 	schedulingSharedInformerFactory.Start(doneCh)
 	workloadSharedInformerFactory.Start(doneCh)
 
-	kubeSharedInformerFactory.WaitForCacheSync(doneCh)
 	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
 	schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
 	workloadSharedInformerFactory.WaitForCacheSync(doneCh)
+
 	es.Run(numThreads)
 
 	return nil
