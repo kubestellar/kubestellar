@@ -9,6 +9,11 @@ description: >
 The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 {{% /pageinfo %}}
 
+pre-req:
+```console
+brew install go
+```
+
 #### Steps to try the edge scheduler
 
 open a terminal window and clone the latest kcp-edge source:
@@ -19,6 +24,11 @@ git clone https://github.com/kcp-dev/edge-mc
 clone the v0.11.0 branch kcp source:
 ```console
 git clone -b v0.11.0 https://github.com/kcp-dev/kcp.git
+```
+build the kubectl-ws binary
+```console
+cd kcp/cmd/kubectl-workspace
+go build -o main.go
 ```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
