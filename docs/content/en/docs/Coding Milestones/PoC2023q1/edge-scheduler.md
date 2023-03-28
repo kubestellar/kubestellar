@@ -27,8 +27,8 @@ git clone -b v0.11.0 https://github.com/kcp-dev/kcp.git
 ```
 build the kubectl-ws binary
 ```console
-cd kcp/cmd/kubectl-workspace
-go build -o main.go
+cd kcp
+go build -o /usr/local/bin/kubectl-ws cmd/kubectl-workspace/main.go
 ```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
