@@ -31,6 +31,12 @@ cd kcp
 go build -o /usr/local/bin/kubectl-ws cmd/kubectl-workspace/main.go
 ```
 
+check to see if the kubectl-ws binary has been placed in /usr/local/bin
+```console
+ls -alrt /usr/local/bin/kubectl-ws
+-rwxr-xr-x  1 edgeuser  staff  54388112 Mar 28 12:14 /usr/local/bin/kubectl-ws
+```
+
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```console
 kcp start
