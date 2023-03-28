@@ -11,13 +11,19 @@ The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects 
 
 #### Steps to try the edge scheduler
 clone the latest kcp source:
-```git clone https://github.com/kcp-dev/kcp.git```
+```console
+git clone https://github.com/kcp-dev/kcp.git
+```
 
 checkout version 0.11.0 of the code
-```git checkout v0.11.0```
+```console
+git checkout v0.11.0
+```
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
-```export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig```
+```console
+export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
+```
 
 Use workspace `root:edge` as the edge service provider workspace.
 ```console
