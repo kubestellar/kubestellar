@@ -16,14 +16,9 @@ open a terminal window and clone the latest kcp-edge source:
 git clone https://github.com/kcp-dev/edge-mc
 ```
 
-clone the latest kcp source:
+clone the v0.11.0 branch kcp source:
 ```console
-git clone https://github.com/kcp-dev/kcp.git
-```
-
-checkout version 0.11.0 of the kcp codebase
-```console
-git checkout v0.11.0
+git clone -b v0.11.0 https://github.com/kcp-dev/kcp.git
 ```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
