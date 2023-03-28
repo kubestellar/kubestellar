@@ -17,6 +17,7 @@ checkout version 0.11.0 of the code
 ```git checkout v0.11.0```
 
 Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
+```export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig```
 
 Use workspace `root:edge` as the edge service provider workspace.
 ```console
