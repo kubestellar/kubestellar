@@ -19,8 +19,12 @@ checkout version 0.11.0 of the kcp codebase
 ```console
 git checkout v0.11.0
 ```
+run kcp (kcp will spit out tons of information and stay running in this terminal window)
+```console
+kcp start
+```
 
-Point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
+open another terminal window and point `$KUBECONFIG` to the admin kubeconfig for that kcp server.
 ```console
 export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
 ```
