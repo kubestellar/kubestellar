@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -30,17 +31,20 @@ import (
 	machruntime "k8s.io/apimachinery/pkg/runtime"
 	machschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	upstreamcache "k8s.io/client-go/tools/cache"
-	"k8s.io/kubernetes/pkg/apis/apps"
+	"k8s.io/klog/v2"
 
 	kcpk8sfake "github.com/kcp-dev/client-go/kubernetes/fake"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	kcpfake "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
-	kcpscheme "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/scheme"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 )
+
+func TestMain(m *testing.M) {
+	klog.InitFlags(nil)
+	os.Exit(m.Run())
+}
 
 type testObjectTracker struct {
 	sync.Mutex
@@ -128,39 +132,23 @@ func TestMailboxInformer(t *testing.T) {
 	rsGVR := rsGV.WithResource(resource)
 	wsGV := tenancyv1a1.SchemeGroupVersion
 	wsGVK := wsGV.WithKind("Workspace")
-	k8sScheme := k8sscheme.Scheme
-	t.Logf("Dumping k8sScheme %p %q", k8sScheme, k8sScheme.Name())
-	for gvk, ty := range k8sScheme.AllKnownTypes() {
-		t.Logf("k8sScheme entry: gvk=%+v, type=%v", gvk, ty)
-	}
-	t.Logf("k8sScheme.IsGroupRegistered(%q)=%v", rsGV.Group, k8sScheme.IsGroupRegistered(rsGV.Group))
-	t.Logf("k8sScheme.IsVersionRegistered(%+v)=%v", rsGV, k8sScheme.IsVersionRegistered(rsGV))
-	t.Logf("k8sScheme.Recognizes(%+v)=%v", rsGVK, k8sScheme.Recognizes(rsGVK))
-
-	kcpScheme := kcpscheme.Scheme
-	t.Logf("Dumping kcpScheme %p %q", kcpScheme, kcpScheme.Name())
-	for gvk, ty := range kcpScheme.AllKnownTypes() {
-		t.Logf("kcpScheme entry: gvk=%v, type=%v", gvk, ty)
-	}
 	for super := 1; super <= 3; super++ {
 		replicaSets := map[objectName]mrObject{}
 		workspaces := map[objectName]mrObject{}
 		kcpClientset := kcpfake.NewSimpleClientset()
 		kcpTracker := kcpClientset.Tracker()
-		if k8sscheme.Scheme == k8sScheme {
-			t.Log("k8sScheme unchanged")
-		} else {
-			t.Fatal("k8sScheme changed!")
-		}
 		k8sClientset := kcpk8sfake.NewSimpleClientset()
 		k8sTracker := k8sClientset.Tracker()
 		ctx, stop := context.WithCancel(context.Background())
 		actual := NewTestObjectTracker()
 		wsPreInformer := kcpinformers.NewSharedInformerFactory(kcpClientset, 0).Tenancy().V1alpha1().Workspaces()
-		go wsPreInformer.Informer().Run(ctx.Done())
+		go func() {
+			wsPreInformer.Informer().Run(ctx.Done())
+		}()
 		rslw := NewListerWatcher[*k8sapps.ReplicaSetList](ctx, k8sClientset.AppsV1().ReplicaSets())
-		rsInformer := NewSharedInformer(wsPreInformer.Cluster(espwCluster), rslw, &apps.ReplicaSet{}, 0, upstreamcache.Indexers{})
+		rsInformer := NewSharedInformer(wsPreInformer.Cluster(espwCluster), rslw, &k8sapps.ReplicaSet{}, 0, upstreamcache.Indexers{})
 		rsInformer.AddEventHandler(actual)
+		go rsInformer.Run(ctx.Done())
 		for iteration := 1; iteration <= 64; iteration++ {
 			if len(replicaSets) > 0 && rand.Intn(2) == 0 {
 				gonerIndex := rand.Intn(len(replicaSets))
@@ -202,7 +190,7 @@ func TestMailboxInformer(t *testing.T) {
 					workspaces[wsObjName] = workspace
 				}
 				var objName objectName
-				var obj *apps.ReplicaSet
+				var obj *k8sapps.ReplicaSet
 				for {
 					objName = objectName{
 						cluster:   clusterN,
@@ -213,7 +201,7 @@ func TestMailboxInformer(t *testing.T) {
 						break
 					}
 				}
-				obj = &apps.ReplicaSet{
+				obj = &k8sapps.ReplicaSet{
 					TypeMeta: metav1.TypeMeta{
 						Kind:       kind,
 						APIVersion: rsGV.String(),
@@ -226,15 +214,12 @@ func TestMailboxInformer(t *testing.T) {
 						},
 					},
 				}
-				t.Logf("k8sScheme.Recognizes(%+v)=%v", rsGVK, k8sScheme.Recognizes(rsGVK))
-				kinds, isUnversioned, err := k8sScheme.ObjectKinds(obj)
-				t.Logf("k8sScheme.ObjectKinds(obj)=%+v, %v, %v", kinds, isUnversioned, err)
 				scopedTracker := k8sTracker.Cluster(clusterN.Path())
-				err = scopedTracker.Add(obj)
+				err := scopedTracker.Add(obj)
 				if err != nil {
 					t.Fatalf("Failed to add %+v to testing tracker: %v", obj, err)
 				} else {
-					t.Logf("Added to tracker: ReplicaSet %+v", obj)
+					t.Logf("Added to tracker: ReplicaSet named %#v", objName)
 				}
 			}
 			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(wsGVK, workspaces)) != nil {
