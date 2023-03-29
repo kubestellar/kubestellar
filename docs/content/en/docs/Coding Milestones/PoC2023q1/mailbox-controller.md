@@ -41,7 +41,9 @@ The command line flags, beyond the basics, are as follows.
 
 To exercise it, do the following steps.
 
-Start a kcp server.  Do the remaining steps in a separate shell, with
+Start a kcp server. 
+[bla](edge-scheduler.md#steps-to-try-the-edge-scheduler)
+  Do the remaining steps in a separate shell, with
 `$KUBECONFIG` set to the admin config for that kcp server.  This will
 create the edge service provider workspace.
 
@@ -86,10 +88,11 @@ kubectl ws \~
 kubectl ws create inv1 --enter
 ```
 
-Then in that workspace, `kubectl create` the following `SyncTarget`
+Then in that workspace, run the following command to create a `SyncTarget`
 object.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -97,6 +100,7 @@ metadata:
 spec:
   cells:
     foo: bar
+EOF
 ```
 
 That should provoke logging like the following from the mailbox controller.
