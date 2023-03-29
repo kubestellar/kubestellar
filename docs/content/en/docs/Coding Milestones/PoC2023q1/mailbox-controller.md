@@ -21,7 +21,7 @@ following.
 
 The mailbox workspace gets an annotation whose key is
 `edge.kcp.io/sync-target-name` and whose value is the name of the
-Workspace object (as seen in its parent workspace, the edge service
+workspace object (as seen in its parent workspace, the edge service
 provider workspace).
 
 ## Usage
@@ -41,13 +41,17 @@ The command line flags, beyond the basics, are as follows.
 
 To exercise it, do the following steps.
 
-Start a kcp server.  Do the remaining steps in a separate shell, with
-`$KUBECONFIG` set to the admin config for that kcp server.  This will
-create the edge service provider workspace.
+Clone this repo, install kcp (the version for `github.com/kcp-dev/kcp` in `go.mod` is required) 
+and start a kcp server as described [here](edge-scheduler.md#steps-to-try-the-edge-scheduler).
+
+Do the remaining steps in a separate shell, with
+`$KUBECONFIG` set to the admin config for that kcp server.  
+
+Next, create the edge service provider workspace:
 
 ```shell
 kubectl ws root
-kubectl ws create edge --enter
+kubectl ws create espw --enter
 ```
 
 After that, a run of the controller should look like the following.
@@ -83,13 +87,14 @@ In a separate shell, make a inventory management workspace as follows.
 
 ```shell
 kubectl ws \~
-kubectl ws create inv1 --enter
+kubectl ws create imw --enter
 ```
 
-Then in that workspace, `kubectl create` the following `SyncTarget`
+Then in that workspace, run the following command to create a `SyncTarget`
 object.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -97,6 +102,7 @@ metadata:
 spec:
   cells:
     foo: bar
+EOF
 ```
 
 That should provoke logging like the following from the mailbox controller.
@@ -105,26 +111,32 @@ That should provoke logging like the following from the mailbox controller.
 I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
-And you can verify that like so.
+And you can verify that as follows:
 
 ```console
-$ kubectl ws root:edge
-Current workspace is "root:edge".
+$ kubectl ws root:espw
+Current workspace is "root:espw".
 
-$ kubectl get Workspace
+$ kubectl get workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 ```
 
-Next, `kubectl delete` that Workspace, and watch the mailbox
+Next, `kubectl delete` that workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.
 
 ```console
 I0305 18:08:15.428884   85556 main.go:369] "Created missing workspace" worker=2 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
-Finally, go back to your inventory workspace and `kubectl delete
-SyncTarget stest1` and watch the mailbox controller react as follows.
+Finally, go back to your inventory workspace to delete the `SyncTarget`:
+
+```shell
+kubectl ws \~
+kubectl ws imw
+kubectl delete SyncTarget stest1
+```
+and watch the mailbox controller react as follows.
 
 ```console
 I0305 18:08:44.380421   85556 main.go:352] "Deleted unwanted workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
