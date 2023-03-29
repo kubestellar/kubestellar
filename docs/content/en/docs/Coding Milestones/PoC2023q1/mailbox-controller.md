@@ -41,9 +41,10 @@ The command line flags, beyond the basics, are as follows.
 
 To exercise it, do the following steps.
 
-Start a kcp server. 
-[bla](edge-scheduler.md#steps-to-try-the-edge-scheduler)
-  Do the remaining steps in a separate shell, with
+Clone this repo, install kcp (v0.11.0 is suggested) and start a kcp server
+as described [here](edge-scheduler.md#steps-to-try-the-edge-scheduler).
+
+Do the remaining steps in a separate shell, with
 `$KUBECONFIG` set to the admin config for that kcp server.  This will
 create the edge service provider workspace.
 
