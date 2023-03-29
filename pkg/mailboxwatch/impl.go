@@ -87,7 +87,7 @@ func (flw *filteredListerWatcher) setInclusion(obj any, include bool) {
 type myList struct {
 	metav1.TypeMeta
 	metav1.ListMeta
-	items []runtime.Object
+	Items []runtime.Object
 }
 
 var _ upstreamcache.ListerWatcher = &filteredListerWatcher{}
@@ -125,7 +125,7 @@ func (flw *filteredListerWatcher) List(options metav1.ListOptions) (runtime.Obje
 			Continue:           listMeta.GetContinue(),
 			RemainingItemCount: listMeta.GetRemainingItemCount(),
 		},
-		items: filteredSlice,
+		Items: filteredSlice,
 	}, nil
 }
 
@@ -133,10 +133,10 @@ func (ml *myList) DeepCopyObject() runtime.Object {
 	ans := myList{
 		TypeMeta: ml.TypeMeta,
 		ListMeta: *ml.ListMeta.DeepCopy(),
-		items:    make([]runtime.Object, len(ml.items)),
+		Items:    make([]runtime.Object, len(ml.Items)),
 	}
-	for index, obj := range ml.items {
-		ans.items[index] = obj.DeepCopyObject()
+	for index, obj := range ml.Items {
+		ans.Items[index] = obj.DeepCopyObject()
 	}
 	return &ans
 }

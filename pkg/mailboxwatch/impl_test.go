@@ -197,7 +197,7 @@ func TestMailboxInformer(t *testing.T) {
 					if err != nil {
 						t.Fatalf("Failed to add workspace %+v: %v", workspace, err)
 					} else {
-						t.Logf("Added to tracker: Workspace %+v", workspace)
+						t.Logf("Added to tracker: Workspace named %q", workspace.GetName())
 					}
 					workspaces[wsObjName] = workspace
 				}
@@ -228,7 +228,7 @@ func TestMailboxInformer(t *testing.T) {
 				}
 				t.Logf("k8sScheme.Recognizes(%+v)=%v", rsGVK, k8sScheme.Recognizes(rsGVK))
 				kinds, isUnversioned, err := k8sScheme.ObjectKinds(obj)
-				t.Logf("k8sScheme.ObjectKinds(%+v)=%+v, %v, %v", obj, kinds, isUnversioned, err)
+				t.Logf("k8sScheme.ObjectKinds(obj)=%+v, %v, %v", kinds, isUnversioned, err)
 				scopedTracker := k8sTracker.Cluster(clusterN.Path())
 				err = scopedTracker.Add(obj)
 				if err != nil {
