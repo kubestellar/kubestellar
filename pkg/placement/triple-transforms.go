@@ -37,26 +37,26 @@ type VisitableEmptyable[Elt any] interface {
 func NewIndex123by13to2s[ColA comparable, ColB comparable, ColC comparable](inner MappingToVisitableEmptyableReceiver[Pair[ColA, ColC], ColB]) TripleSetChangeReceiver[ColA, ColB, ColC] {
 	return &index123by13to2s[ColA, ColB, ColC]{
 		inner: inner,
-		by13:  map[Pair[ColA, ColC]]mapSet[ColB]{},
+		by13:  map[Pair[ColA, ColC]]MapSet[ColB]{},
 	}
 }
 
 type index123by13to2s[ColA comparable, ColB comparable, ColC comparable] struct {
 	inner MappingToVisitableEmptyableReceiver[Pair[ColA, ColC], ColB]
-	by13  map[Pair[ColA, ColC]]mapSet[ColB]
+	by13  map[Pair[ColA, ColC]]MapSet[ColB]
 }
 
 func (index *index123by13to2s[ColA, ColB, ColC]) Add(first ColA, second ColB, third ColC) {
 	key := Pair[ColA, ColC]{first, third}
 	seconds := index.by13[key]
 	if seconds == nil {
-		seconds = mapSet[ColB]{}
+		seconds = MapSet[ColB]{}
 		index.by13[key] = seconds
 	}
 	had := seconds.Has(second)
 	if !had {
 		wasEmpty := seconds.IsEmpty()
-		seconds.Insert(second)
+		seconds.Add(second)
 		index.inner.Receive(key, seconds, wasEmpty)
 	}
 }

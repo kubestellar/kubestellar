@@ -121,14 +121,14 @@ func (sb *setBinder) ensureCluster(cluster logicalcluster.Name) *setBindingForCl
 	return sbc
 }
 
-func (sbc *setBindingForCluster) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) {
+func (sbc *setBindingForCluster) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	sbc.logger.V(4).Info("Adding joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
-	sbc.singleBindingOps.AddBinding(pair.First, pair.Second)
+	return sbc.singleBindingOps.AddBinding(pair.First, pair.Second)
 }
 
-func (sbc *setBindingForCluster) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) {
+func (sbc *setBindingForCluster) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	sbc.logger.V(4).Info("Removing joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
-	sbc.singleBindingOps.RemoveBinding(pair.First, pair.Second)
+	return sbc.singleBindingOps.RemoveBinding(pair.First, pair.Second)
 }
 
 func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPlacement {
@@ -137,35 +137,15 @@ func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPl
 		sbp = &setBindingForPlacement{
 			setBindingForCluster: sbc,
 		}
-		sbp.resolvedWhatReceiver = sbc.resolvedWhatDifferencerConstructor(sbpAsPartReceiver{sbc, epName})
-		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(sbpAsSPSReceiver{sbc, epName})
+		sbp.resolvedWhatReceiver = sbc.resolvedWhatDifferencerConstructor(&TransformSetChangeReceiver[WorkloadPart, Pair[WorkloadPart, string]]{
+			Transform: AddSecondFunc[WorkloadPart, string](epName),
+			Inner:     sbp.joinXY,
+		})
+		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(&TransformSetChangeReceiver[edgeapi.SinglePlacement, Pair[string, edgeapi.SinglePlacement]]{
+			Transform: AddFirstFunc[string, edgeapi.SinglePlacement](epName),
+			Inner:     sbp.joinYZ,
+		})
 		sbc.perPlacement[epName] = sbp
 	}
 	return sbp
-}
-
-type sbpAsPartReceiver struct {
-	*setBindingForCluster
-	epName string
-}
-
-func (rec sbpAsPartReceiver) Add(part WorkloadPart) {
-	rec.joinXY.Add(Pair[WorkloadPart, string]{part, rec.epName})
-}
-
-func (rec sbpAsPartReceiver) Remove(part WorkloadPart) {
-	rec.joinXY.Remove(Pair[WorkloadPart, string]{part, rec.epName})
-}
-
-type sbpAsSPSReceiver struct {
-	*setBindingForCluster
-	epName string
-}
-
-func (rec sbpAsSPSReceiver) Add(part edgeapi.SinglePlacement) {
-	rec.joinYZ.Add(Pair[string, edgeapi.SinglePlacement]{rec.epName, part})
-}
-
-func (rec sbpAsSPSReceiver) Remove(part edgeapi.SinglePlacement) {
-	rec.joinYZ.Remove(Pair[string, edgeapi.SinglePlacement]{rec.epName, part})
 }

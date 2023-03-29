@@ -86,10 +86,27 @@ type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
 
 func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 
-// PairSetChangeReceiver is given a series of changes to a set of pairs
-type PairSetChangeReceiver[First any, Second any] interface {
-	Add(First, Second)
-	Remove(First, Second)
+// SetChangeReceiver is kept appraised of changes in a set of T
+type SetChangeReceiver[T comparable] interface {
+	Add(T) bool    /* changed */
+	Remove(T) bool /* changed */
+}
+
+type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
+	Transform func(Type1) Type2
+	Inner     SetChangeReceiver[Type2]
+}
+
+var _ SetChangeReceiver[int] = &TransformSetChangeReceiver[int, string]{}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Add(v2)
+}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Remove(v2)
 }
 
 type Pair[First any, Second any] struct {
@@ -105,6 +122,22 @@ func (tup Pair[First, Second]) String() string {
 	ans.WriteString(fmt.Sprintf("%v", tup.Second))
 	ans.WriteRune(')')
 	return ans.String()
+}
+
+func (tup Pair[First, Second]) Reverse() Pair[Second, First] {
+	return Pair[Second, First]{First: tup.Second, Second: tup.First}
+}
+
+func AddFirstFunc[First any, Second any](first First) func(Second) Pair[First, Second] {
+	return func(second Second) Pair[First, Second] {
+		return Pair[First, Second]{First: first, Second: second}
+	}
+}
+
+func AddSecondFunc[First any, Second any](second Second) func(First) Pair[First, Second] {
+	return func(first First) Pair[First, Second] {
+		return Pair[First, Second]{First: first, Second: second}
+	}
 }
 
 type Triple[First any, Second any, Third any] struct {

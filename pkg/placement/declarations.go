@@ -226,17 +226,11 @@ type SetBinderConstructor func(
 // differences and returns a receiver of sets that keeps track of the latest
 // set and keeps the difference receiver informed of differences as they arrive.
 // The set differencer precedes the set difference receiver in the locking order.
-type SetDifferencerConstructor[Set any, Element any] func(SetChangeReceiver[Element]) Receiver[Set]
+type SetDifferencerConstructor[Set any, Element comparable] func(SetChangeReceiver[Element]) Receiver[Set]
 
 type ResolvedWhatDifferencerConstructor = SetDifferencerConstructor[WorkloadParts, WorkloadPart]
 
 type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
-
-// SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[T any] interface {
-	Add(T)
-	Remove(T)
-}
 
 // BindingOrganizer produces a SingleBinder and a corresponding map provider
 // that reflects the result of combining the single bindings and resolving
@@ -258,8 +252,8 @@ type SingleBinder interface {
 }
 
 type SingleBindingOps interface {
-	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement)
-	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement)
+	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement) bool
+	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement) bool
 }
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
