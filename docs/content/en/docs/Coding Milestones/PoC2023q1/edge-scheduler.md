@@ -20,24 +20,20 @@ brew install go
 #### Pull the kcp and kcp-edge source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest kcp-edge source:
 ```console
-git clone https://github.com/kcp-dev/edge-mc
+git clone https://github.com/kcp-dev/edge-mc kcp-edge
 ```
 
 clone the v0.11.0 branch kcp source:
 ```console
-git clone -b v0.11.0 https://github.com/kcp-dev/kcp
+git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
 ```
-build the kubectl-ws binary
+build the kubectl-ws binary and include it in `$PATH`
 ```console
 cd kcp
-go build -o /usr/local/bin/kubectl-ws cmd/kubectl-workspace/main.go
+make build
+export PATH=$(pwd)/bin:$PATH
 ```
 
-check to see if the kubectl-ws binary has been placed in /usr/local/bin
-```console
-ls -alrt /usr/local/bin/kubectl-ws
--rwxr-xr-x  1 edgeuser  staff  54388112 Mar 28 12:14 /usr/local/bin/kubectl-ws
-```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```console
@@ -45,9 +41,10 @@ kcp start
 ```
 
 #### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
-open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server.
+open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
 ```console
-export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
+export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
+export PATH=$(pwd)/bin:$PATH
 ```
 
 Use workspace `root:edge` as the Edge Service Provider Workspace (ESPW).
@@ -58,7 +55,7 @@ kubectl ws create edge --enter
 
 Install CRDs and APIExport.
 ```console
-kubectl apply -f ~/edge-mc/config/crds/ -f ~/edge-mc/config/exports/
+kubectl apply -f ../kcp-edge/config/crds/ -f ../kcp-edge/config/exports/
 ```
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
@@ -69,14 +66,14 @@ kubectl ws ~
 
 Bind APIs.
 ```console
-kubectl apply -f ~/edge-mc/config/imports/
+kubectl apply -f ../kcp-edge/config/imports/
 ```
 
 #### Run the Edge Scheduler in the ESPW
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
-cd ~/edge-mc
+cd ../kcp-edge
 go run cmd/scheduler/main.go -v 2
 ```
 
@@ -91,7 +88,9 @@ I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controlle
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
 open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server.
 ```console
-export KUBECONFIG=~/kcp/.kcp/admin.kubeconfig
+cd ../kcp
+export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
+export PATH=$(pwd)/bin:$PATH
 ```
 
 Use workspace `root:compute` as the Inventory Management Workspace (IMW).
@@ -101,15 +100,15 @@ kubectl ws root:compute
 
 Create two Locations and two SyncTargets.
 ```console
-kubectl create -f ~/edge-mc/config/samples/location_prod.yaml
-kubectl create -f ~/edge-mc/config/samples/location_dev.yaml
-kubectl create -f ~/edge-mc/config/samples/synctarget_prod.yaml
-kubectl create -f ~/edge-mc/config/samples/synctarget_dev.yaml
+kubectl create -f ../kcp-edge/config/samples/location_prod.yaml
+kubectl create -f ../kcp-edge/config/samples/location_dev.yaml
+kubectl create -f ../kcp-edge/config/samples/synctarget_prod.yaml
+kubectl create -f ../kcp-edge/config/samples/synctarget_dev.yaml
 ```
 
 Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
 ```console
-$ kubectl get locations,synctargets
+kubectl get locations,synctargets
 
 NAME                                 RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
 location.scheduling.kcp.io/default   synctargets   0           2                    2m12s
@@ -125,7 +124,7 @@ synctarget.workload.kcp.io/prod   2m12s
 Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
 ```console
 kubectl ws ~
-kubectl create -f ~/edge-mc/config/samples/edgeplacement_test-1.yaml
+kubectl create -f ../kcp-edge/config/samples/edgeplacement_test-1.yaml
 ```
 
 The edge scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
@@ -169,7 +168,7 @@ EdgePlacement `test-1` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```console
-kubectl create -f ~/edge-mc/config/samples/edgeplacement_dev.yaml
+kubectl create -f ../kcp-edge/config/samples/edgeplacement_dev.yaml
 ```
 
 The corresponding SinglePlacementSlice has a shorter list of `destinations`:
