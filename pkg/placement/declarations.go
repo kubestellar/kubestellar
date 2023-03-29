@@ -24,6 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apimachtypes "k8s.io/apimachinery/pkg/types"
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
@@ -212,9 +213,13 @@ type ProjectionDetails struct {
 // differences and re-organizes them and solves the workload conflicts to
 // implement ProjectionMapProvider.
 type SetBinderConstructor func(
+	logger klog.Logger,
 	resolvedWhatDifferencerConstructor ResolvedWhatDifferencerConstructor,
 	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor,
 	bindingOrganizer BindingOrganizer,
+	discovery APIMapProvider,
+	resourceModes ResourceModes,
+	eventHandler EventHandler,
 ) SetBinder
 
 // SetDifferencerConstructor is a function that is given a receiver of set
