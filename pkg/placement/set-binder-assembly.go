@@ -40,7 +40,8 @@ type setBindingForCluster struct {
 	*setBinder
 	cluster          logicalcluster.Name
 	perPlacement     map[string]*setBindingForPlacement
-	join             DynamicJoin[WorkloadPart, string /*epName*/, edgeapi.SinglePlacement]
+	joinXY           PairSetChangeReceiver[WorkloadPart, string /*epName*/]
+	joinYZ           PairSetChangeReceiver[string /*epName*/, edgeapi.SinglePlacement]
 	singleBindingOps SingleBindingOps
 }
 
@@ -114,7 +115,7 @@ func (sb *setBinder) ensureCluster(cluster logicalcluster.Name) *setBindingForCl
 			cluster:      cluster,
 			perPlacement: map[string]*setBindingForPlacement{},
 		}
-		sbc.join = NewDynamicJoin[WorkloadPart, string, edgeapi.SinglePlacement](sb.logger, sbc)
+		sbc.joinXY, sbc.joinYZ = NewDynamicJoin[WorkloadPart, string, edgeapi.SinglePlacement](sb.logger, sbc)
 		sb.perCluster[cluster] = sbc
 	}
 	return sbc
@@ -149,11 +150,11 @@ type sbpAsPartReceiver struct {
 }
 
 func (rec sbpAsPartReceiver) Add(part WorkloadPart) {
-	rec.join.AddXY(part, rec.epName)
+	rec.joinXY.Add(part, rec.epName)
 }
 
 func (rec sbpAsPartReceiver) Remove(part WorkloadPart) {
-	rec.join.RemoveXY(part, rec.epName)
+	rec.joinXY.Remove(part, rec.epName)
 }
 
 type sbpAsSPSReceiver struct {
@@ -162,9 +163,9 @@ type sbpAsSPSReceiver struct {
 }
 
 func (rec sbpAsSPSReceiver) Add(part edgeapi.SinglePlacement) {
-	rec.join.AddYZ(rec.epName, part)
+	rec.joinYZ.Add(rec.epName, part)
 }
 
 func (rec sbpAsSPSReceiver) Remove(part edgeapi.SinglePlacement) {
-	rec.join.RemoveYZ(rec.epName, part)
+	rec.joinYZ.Remove(rec.epName, part)
 }

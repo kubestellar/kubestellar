@@ -20,16 +20,6 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// DynamicJoin maintains the equijoin between two tables, one with columns X and Y
-// and the other with columns Y and Z.
-// Not safe for concurrent access.
-type DynamicJoin[ColX comparable, ColY comparable, ColZ comparable] interface {
-	AddXY(ColX, ColY)
-	RemoveXY(ColX, ColY)
-	AddYZ(ColY, ColZ)
-	RemoveYZ(ColY, ColZ)
-}
-
 // dynamicJoin implements DynamicJoin.
 // For every (x,y): byX[x].zs contains y iff byY[y].xs contains x.
 // For every (z,y): byZ[z].ys contains y iff byY[y].zs contains z.
@@ -50,7 +40,11 @@ type dynamicJoinPerEdge[ColY comparable] struct {
 	ys map[ColY]Empty
 }
 
-func NewDynamicJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver PairSetChangeReceiver[ColX, ColZ]) DynamicJoin[ColX, ColY, ColZ] {
+// NewDynamicJoin constructs a data structure that incrementally maintains an equijoin.
+// Given a receiver of changes to the result of the equijoin between two two-column tables,
+// this function returns receivers of changes to the two tables.
+// Note: the uniformity of the input and output types means that this can be chained.
+func NewDynamicJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver PairSetChangeReceiver[ColX, ColZ]) (PairSetChangeReceiver[ColX, ColY], PairSetChangeReceiver[ColY, ColZ]) {
 	dj := &dynamicJoin[ColX, ColY, ColZ]{
 		logger:   logger,
 		receiver: receiver,
@@ -58,7 +52,7 @@ func NewDynamicJoin[ColX comparable, ColY comparable, ColZ comparable](logger kl
 		byY:      map[ColY]*dynamicJoinPerCenter[ColX, ColZ]{},
 		byZ:      map[ColZ]*dynamicJoinPerEdge[ColY]{},
 	}
-	return dj
+	return dynamicJoinXY[ColX, ColY, ColZ]{dj}, dynamicJoinYZ[ColX, ColY, ColZ]{dj}
 }
 
 func NewDynamicJoinPerEdge[ColY comparable]() *dynamicJoinPerEdge[ColY] {
@@ -173,11 +167,14 @@ func (rce reverseCenterEntry[ColX, ColZ]) VisitRights(visitor func(ColX)) {
 	}
 }
 
-func (dj *dynamicJoin[ColX, ColY, ColZ]) AddXY(x ColX, y ColY) {
+type dynamicJoinXY[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
+type dynamicJoinYZ[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
+
+func (dj dynamicJoinXY[ColX, ColY, ColZ]) Add(x ColX, y ColY) {
 	addABC[ColX, ColY, ColZ](dj.logger, dj.byX, x, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), y, dj.byZ, dj.receiver)
 }
 
-func (dj *dynamicJoin[ColX, ColY, ColZ]) AddYZ(y ColY, z ColZ) {
+func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Add(y ColY, z ColZ) {
 	addABC[ColZ, ColY, ColX](dj.logger, dj.byZ, z, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), y, dj.byX, PairSetChangeReceiverReverse[ColX, ColZ]{dj.receiver})
 }
 
@@ -211,11 +208,11 @@ func addABC[ColA comparable, ColB comparable, ColC comparable](
 	})
 }
 
-func (dj *dynamicJoin[ColX, ColY, ColZ]) RemoveXY(x ColX, y ColY) {
+func (dj dynamicJoinXY[ColX, ColY, ColZ]) Remove(x ColX, y ColY) {
 	removeABC[ColX, ColY, ColZ](dj.logger, dj.byX, x, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), y, dj.byZ, dj.receiver)
 }
 
-func (dj *dynamicJoin[ColX, ColY, ColZ]) RemoveYZ(y ColY, z ColZ) {
+func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Remove(y ColY, z ColZ) {
 	removeABC[ColZ, ColY, ColX](dj.logger, dj.byZ, z, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), y, dj.byX, PairSetChangeReceiverReverse[ColX, ColZ]{dj.receiver})
 }
 
@@ -264,10 +261,4 @@ func (prr PairSetChangeReceiverReverse[First, Second]) Add(second Second, first 
 
 func (prr PairSetChangeReceiverReverse[First, Second]) Remove(second Second, first First) {
 	prr.forward.Remove(first, second)
-}
-
-// PairSetChangeReceiver is given a series of changes to a set of pairs
-type PairSetChangeReceiver[First any, Second any] interface {
-	Add(First, Second)
-	Remove(First, Second)
 }

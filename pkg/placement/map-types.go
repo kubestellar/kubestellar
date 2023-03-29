@@ -81,6 +81,12 @@ type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
 
 func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 
+// PairSetChangeReceiver is given a series of changes to a set of pairs
+type PairSetChangeReceiver[First any, Second any] interface {
+	Add(First, Second)
+	Remove(First, Second)
+}
+
 type Client[T any] interface {
 	SetProvider(T)
 }
