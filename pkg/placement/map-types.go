@@ -16,6 +16,11 @@ limitations under the License.
 
 package placement
 
+import (
+	"fmt"
+	"strings"
+)
+
 // This file defines some generic types that embody common patterns.
 
 // These types use the following terminology conventions.
@@ -85,6 +90,39 @@ func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 type PairSetChangeReceiver[First any, Second any] interface {
 	Add(First, Second)
 	Remove(First, Second)
+}
+
+type Pair[First any, Second any] struct {
+	First  First
+	Second Second
+}
+
+func (tup Pair[First, Second]) String() string {
+	var ans strings.Builder
+	ans.WriteRune('(')
+	ans.WriteString(fmt.Sprintf("%v", tup.First))
+	ans.WriteString(", ")
+	ans.WriteString(fmt.Sprintf("%v", tup.Second))
+	ans.WriteRune(')')
+	return ans.String()
+}
+
+type Triple[First any, Second any, Third any] struct {
+	First  First
+	Second Second
+	Third  Third
+}
+
+func (tup Triple[First, Second, Third]) String() string {
+	var ans strings.Builder
+	ans.WriteRune('(')
+	ans.WriteString(fmt.Sprintf("%v", tup.First))
+	ans.WriteString(", ")
+	ans.WriteString(fmt.Sprintf("%v", tup.Second))
+	ans.WriteString(", ")
+	ans.WriteString(fmt.Sprintf("%v", tup.Third))
+	ans.WriteRune(')')
+	return ans.String()
 }
 
 type Client[T any] interface {

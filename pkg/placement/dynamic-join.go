@@ -23,15 +23,17 @@ import (
 // NewDynamicJoin constructs a data structure that incrementally maintains an equijoin.
 // Given a receiver of changes to the result of the equijoin between two two-column tables,
 // this function returns receivers of changes to the two tables.
+// In other words, this joins the change streams of two tables to produce the change stream
+// of the join of those two tables --- in a passive stance (i.e., is in terms of the stream receivers).
 // Note: the uniformity of the input and output types means that this can be chained.
-func NewDynamicJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver PairSetChangeReceiver[ColX, ColZ]) (PairSetChangeReceiver[ColX, ColY], PairSetChangeReceiver[ColY, ColZ]) {
-	var wrappedReceiver TripleSetChangeReceiver[ColX, JoinMiddleSet[ColY], ColZ] = dropMiddle[ColX, JoinMiddleSet[ColY], ColZ]{receiver}
-	return NewDynamicFullJoin(logger, wrappedReceiver)
+func NewDynamicJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver SetChangeReceiver[Pair[ColX, ColZ]]) (SetChangeReceiver[Pair[ColX, ColY]], SetChangeReceiver[Pair[ColY, ColZ]]) {
+	projector := NewProjectIncremental[Pair[ColX, ColZ], ColY](receiver)
+	indexer := NewIndex123by13to2s(projector)
+	return NewDynamicFullJoin(logger, indexer)
 }
 
-// NewDynamicFullJoin is like NewDynamicJoin but passes along the set of middle values associated with
-// each arriving or departing join pair.
-func NewDynamicFullJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver TripleSetChangeReceiver[ColX, JoinMiddleSet[ColY], ColZ]) (PairSetChangeReceiver[ColX, ColY], PairSetChangeReceiver[ColY, ColZ]) {
+// NewDynamicFullJoin is like NewDynamicJoin but passes along the set of middle values too.
+func NewDynamicFullJoin[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver TripleSetChangeReceiver[ColX, ColY, ColZ]) (SetChangeReceiver[Pair[ColX, ColY]], SetChangeReceiver[Pair[ColY, ColZ]]) {
 	dj := &dynamicJoin[ColX, ColY, ColZ]{
 		logger:   logger,
 		receiver: receiver,
@@ -48,9 +50,21 @@ type TripleSetChangeReceiver[First any, Second any, Third any] interface {
 	Remove(First, Second, Third)
 }
 
-type JoinMiddleSet[Elt comparable] interface {
+// Visitable is a collection that can do an interruptable enumeration of its members.
+// The collection may or may not be mutable.
+// This view of the collection may or may not have a limited scope of validity.
+// This view may or may not have concurrency restrictions.
+type Visitable[Elt any] interface {
 	// Visit calls the given function on every member, aborting on error
 	Visit(func(Elt) error) error
+}
+
+// Emptyable is something that can be tested for emptiness.
+// The thing may or may not be mutable.
+// This view of the thing may or may not have a limited scope of validity.
+// This view may or may not have concurrency restrictions.
+type Emptyable interface {
+	IsEmpty() bool
 }
 
 // dynamicJoin implements DynamicJoin.
@@ -58,7 +72,7 @@ type JoinMiddleSet[Elt comparable] interface {
 // For every (z,y): byZ[z].ys contains y iff byY[y].zs contains z.
 type dynamicJoin[ColX comparable, ColY comparable, ColZ comparable] struct {
 	logger   klog.Logger
-	receiver TripleSetChangeReceiver[ColX, JoinMiddleSet[ColY], ColZ]
+	receiver TripleSetChangeReceiver[ColX, ColY, ColZ]
 	byX      map[ColX]*dynamicJoinPerEdge[ColY]
 	byY      map[ColY]*dynamicJoinPerCenter[ColX, ColZ]
 	byZ      map[ColZ]*dynamicJoinPerEdge[ColY]
@@ -71,18 +85,6 @@ type dynamicJoinPerCenter[ColX comparable, ColZ comparable] struct {
 
 type dynamicJoinPerEdge[ColY comparable] struct {
 	ys map[ColY]Empty
-}
-
-type dropMiddle[ColX any, ColY any, ColZ any] struct {
-	narrow PairSetChangeReceiver[ColX, ColZ]
-}
-
-func (dm dropMiddle[ColX, ColY, ColZ]) Add(x ColX, y ColY, z ColZ) {
-	dm.narrow.Add(x, z)
-}
-
-func (dm dropMiddle[ColX, ColY, ColZ]) Remove(x ColX, y ColY, z ColZ) {
-	dm.narrow.Remove(x, z)
 }
 
 func NewDynamicJoinPerEdge[ColY comparable]() *dynamicJoinPerEdge[ColY] {
@@ -200,12 +202,12 @@ func (rce reverseCenterEntry[ColX, ColZ]) VisitRights(visitor func(ColX)) {
 type dynamicJoinXY[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
 type dynamicJoinYZ[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
 
-func (dj dynamicJoinXY[ColX, ColY, ColZ]) Add(x ColX, y ColY) {
-	addABC[ColX, ColY, ColZ](dj.logger, dj.byX, x, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), y, dj.byZ, dj.receiver)
+func (dj dynamicJoinXY[ColX, ColY, ColZ]) Add(xy Pair[ColX, ColY]) {
+	addABC[ColX, ColY, ColZ](dj.logger, dj.byX, xy.First, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), xy.Second, dj.byZ, dj.receiver)
 }
 
-func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Add(y ColY, z ColZ) {
-	addABC[ColZ, ColY, ColX](dj.logger, dj.byZ, z, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), y, dj.byX, TripleSetChangeReceiverReverse[ColX, JoinMiddleSet[ColY], ColZ]{dj.receiver})
+func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Add(yz Pair[ColY, ColZ]) {
+	addABC[ColZ, ColY, ColX](dj.logger, dj.byZ, yz.Second, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), yz.First, dj.byX, TripleSetChangeReceiverReverse[ColX, ColY, ColZ]{dj.receiver})
 }
 
 func addABC[ColA comparable, ColB comparable, ColC comparable](
@@ -215,7 +217,7 @@ func addABC[ColA comparable, ColB comparable, ColC comparable](
 	byB dynamicJoinCenterIndex[ColA, ColB, ColC],
 	b ColB,
 	byC map[ColC]*dynamicJoinPerEdge[ColB],
-	receiver TripleSetChangeReceiver[ColA, JoinMiddleSet[ColB], ColC],
+	receiver TripleSetChangeReceiver[ColA, ColB, ColC],
 ) {
 	aData, aFound := byA[a]
 	if !aFound {
@@ -234,16 +236,16 @@ func addABC[ColA comparable, ColB comparable, ColC comparable](
 	bData.InsertLeft(a)
 	aData.ys[b] = Empty{}
 	bData.VisitRights(func(c ColC) {
-		receiver.Add(a, mapSet[ColB](aData.ys), c)
+		receiver.Add(a, b, c)
 	})
 }
 
-func (dj dynamicJoinXY[ColX, ColY, ColZ]) Remove(x ColX, y ColY) {
-	removeABC[ColX, ColY, ColZ](dj.logger, dj.byX, x, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), y, dj.byZ, dj.receiver)
+func (dj dynamicJoinXY[ColX, ColY, ColZ]) Remove(xy Pair[ColX, ColY]) {
+	removeABC[ColX, ColY, ColZ](dj.logger, dj.byX, xy.First, dynamicJoinCenterIndexForward[ColX, ColY, ColZ](dj.byY), xy.Second, dj.byZ, dj.receiver)
 }
 
-func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Remove(y ColY, z ColZ) {
-	removeABC[ColZ, ColY, ColX](dj.logger, dj.byZ, z, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), y, dj.byX, TripleSetChangeReceiverReverse[ColX, JoinMiddleSet[ColY], ColZ]{dj.receiver})
+func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Remove(yz Pair[ColY, ColZ]) {
+	removeABC[ColZ, ColY, ColX](dj.logger, dj.byZ, yz.Second, dynamicJoinCenterIndexReverse[ColX, ColY, ColZ](dj.byY), yz.First, dj.byX, TripleSetChangeReceiverReverse[ColX, ColY, ColZ]{dj.receiver})
 }
 
 func removeABC[ColA comparable, ColB comparable, ColC comparable](
@@ -253,7 +255,7 @@ func removeABC[ColA comparable, ColB comparable, ColC comparable](
 	byB dynamicJoinCenterIndex[ColA, ColB, ColC],
 	b ColB,
 	byC map[ColC]*dynamicJoinPerEdge[ColB],
-	receiver TripleSetChangeReceiver[ColA, JoinMiddleSet[ColB], ColC],
+	receiver TripleSetChangeReceiver[ColA, ColB, ColC],
 ) {
 	aData, aFound := byA[a]
 	if !aFound {
@@ -267,11 +269,11 @@ func removeABC[ColA comparable, ColB comparable, ColC comparable](
 		logger.Error(nil, "Impossible inconsistency", "a", a, "b", b, "aForB", aForB, "bForA", bForA)
 		return
 	} else if aForB { // Need to remove
-		bData.VisitRights(func(c ColC) {
-			receiver.Remove(a, mapSet[ColB](aData.ys), c)
-		})
 		delete(aData.ys, b)
 		bData.RemoveLeft(a)
+		bData.VisitRights(func(c ColC) {
+			receiver.Remove(a, b, c)
+		})
 	}
 	if len(aData.ys) == 0 {
 		delete(byA, a)
@@ -295,6 +297,13 @@ func (prr TripleSetChangeReceiverReverse[Left, Middle, Right]) Remove(right Righ
 
 type mapSet[Elt comparable] map[Elt]Empty
 
+func (ms mapSet[Elt]) IsEmpty() bool { return len(ms) == 0 }
+
+func (ms mapSet[Elt]) Has(elt Elt) bool {
+	_, has := ms[elt]
+	return has
+}
+
 func (ms mapSet[Elt]) Visit(visitor func(Elt) error) error {
 	for element := range ms {
 		if err := visitor(element); err != nil {
@@ -302,4 +311,16 @@ func (ms mapSet[Elt]) Visit(visitor func(Elt) error) error {
 		}
 	}
 	return nil
+}
+
+func (ms mapSet[Elt]) Insert(elts ...Elt) {
+	for _, elt := range elts {
+		ms[elt] = Empty{}
+	}
+}
+
+func (ms mapSet[Elt]) Remove(elts ...Elt) {
+	for _, elt := range elts {
+		delete(ms, elt)
+	}
 }

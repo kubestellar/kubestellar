@@ -40,8 +40,8 @@ type setBindingForCluster struct {
 	*setBinder
 	cluster          logicalcluster.Name
 	perPlacement     map[string]*setBindingForPlacement
-	joinXY           PairSetChangeReceiver[WorkloadPart, string /*epName*/]
-	joinYZ           PairSetChangeReceiver[string /*epName*/, edgeapi.SinglePlacement]
+	joinXY           SetChangeReceiver[Pair[WorkloadPart, string /*epName*/]]
+	joinYZ           SetChangeReceiver[Pair[string /*epName*/, edgeapi.SinglePlacement]]
 	singleBindingOps SingleBindingOps
 }
 
@@ -121,14 +121,14 @@ func (sb *setBinder) ensureCluster(cluster logicalcluster.Name) *setBindingForCl
 	return sbc
 }
 
-func (sbc *setBindingForCluster) Add(part WorkloadPart, where edgeapi.SinglePlacement) {
-	sbc.logger.V(4).Info("Adding joined pair", "cluster", sbc.cluster, "part", part, "where", where)
-	sbc.singleBindingOps.AddBinding(part, where)
+func (sbc *setBindingForCluster) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) {
+	sbc.logger.V(4).Info("Adding joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
+	sbc.singleBindingOps.AddBinding(pair.First, pair.Second)
 }
 
-func (sbc *setBindingForCluster) Remove(part WorkloadPart, where edgeapi.SinglePlacement) {
-	sbc.logger.V(4).Info("Removing joined pair", "cluster", sbc.cluster, "part", part, "where", where)
-	sbc.singleBindingOps.RemoveBinding(part, where)
+func (sbc *setBindingForCluster) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) {
+	sbc.logger.V(4).Info("Removing joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
+	sbc.singleBindingOps.RemoveBinding(pair.First, pair.Second)
 }
 
 func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPlacement {
@@ -150,11 +150,11 @@ type sbpAsPartReceiver struct {
 }
 
 func (rec sbpAsPartReceiver) Add(part WorkloadPart) {
-	rec.joinXY.Add(part, rec.epName)
+	rec.joinXY.Add(Pair[WorkloadPart, string]{part, rec.epName})
 }
 
 func (rec sbpAsPartReceiver) Remove(part WorkloadPart) {
-	rec.joinXY.Remove(part, rec.epName)
+	rec.joinXY.Remove(Pair[WorkloadPart, string]{part, rec.epName})
 }
 
 type sbpAsSPSReceiver struct {
@@ -163,9 +163,9 @@ type sbpAsSPSReceiver struct {
 }
 
 func (rec sbpAsSPSReceiver) Add(part edgeapi.SinglePlacement) {
-	rec.joinYZ.Add(rec.epName, part)
+	rec.joinYZ.Add(Pair[string, edgeapi.SinglePlacement]{rec.epName, part})
 }
 
 func (rec sbpAsSPSReceiver) Remove(part edgeapi.SinglePlacement) {
-	rec.joinYZ.Remove(rec.epName, part)
+	rec.joinYZ.Remove(Pair[string, edgeapi.SinglePlacement]{rec.epName, part})
 }
