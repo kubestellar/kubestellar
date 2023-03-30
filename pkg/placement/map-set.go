@@ -18,15 +18,35 @@ package placement
 
 type MapSet[Elt comparable] map[Elt]Empty
 
+var _ MutableSet[string] = MapSet[string]{}
+
 func NewMapSet[Elt comparable](elts ...Elt) MapSet[Elt] {
-	ans := MapSet[Elt]{}
+	ans := NewEmptyMapSet[Elt]()
 	for _, elt := range elts {
 		ans.Add(elt)
 	}
 	return ans
 }
 
-func (ms MapSet[Elt]) IsEmpty() bool { return len(ms) == 0 }
+func NewEmptyMapSet[Elt comparable]() MapSet[Elt] {
+	return MapSet[Elt]{}
+}
+
+func MapSetCopy[Elt comparable](source Visitable[Elt]) MapSet[Elt] {
+	ans := NewEmptyMapSet[Elt]()
+	SetAddAll[Elt](ans, source)
+	return ans
+}
+
+func MapSetCopier[Elt comparable]() Reducer[Elt, MapSet[Elt]] {
+	return StatefulReducer[Elt, MapSet[Elt], MapSet[Elt]](NewEmptyMapSet[Elt], MapSetAddNoResult[Elt], Identity1[MapSet[Elt]])
+}
+
+func MapSetAsVisitable[Elt comparable](ms MapSet[Elt]) Visitable[Elt] { return ms }
+
+func (ms MapSet[Elt]) IsEmpty() bool    { return len(ms) == 0 }
+func (ms MapSet[Elt]) Len() int         { return len(ms) }
+func (ms MapSet[Elt]) LenIsCheap() bool { return true }
 
 func (ms MapSet[Elt]) Has(elt Elt) bool {
 	_, has := ms[elt]
@@ -56,4 +76,46 @@ func (ms MapSet[Elt]) Remove(elt Elt) bool /* change */ {
 		return true
 	}
 	return false
+}
+
+func MapSetAddNoResult[Elt comparable](set MapSet[Elt], elt Elt) {
+	set.Add(elt)
+}
+
+func MapSetSymmetricDifference[Elt comparable](wantLeftMinusRight, wantIntersection, wantRightMinusLeft bool, left, right Set[Elt]) (MapSet[Elt], MapSet[Elt], MapSet[Elt]) {
+	var leftMinusRight, intersection, rightMinusLeft MapSet[Elt]
+	if wantLeftMinusRight {
+		leftMinusRight = NewEmptyMapSet[Elt]()
+	}
+	if wantIntersection {
+		intersection = NewEmptyMapSet[Elt]()
+	}
+	if wantRightMinusLeft {
+		rightMinusLeft = NewEmptyMapSet[Elt]()
+	}
+	if wantLeftMinusRight || wantIntersection && !wantRightMinusLeft {
+		left.Visit(func(leftElt Elt) error {
+			if right.Has(leftElt) {
+				if wantIntersection {
+					intersection.Add(leftElt)
+				}
+			} else if wantLeftMinusRight {
+				leftMinusRight.Add(leftElt)
+			}
+			return nil
+		})
+	}
+	if wantRightMinusLeft || wantIntersection && !wantLeftMinusRight {
+		right.Visit(func(rightElt Elt) error {
+			if left.Has(rightElt) {
+				if wantIntersection && !wantLeftMinusRight {
+					intersection.Add(rightElt)
+				}
+			} else if wantRightMinusLeft {
+				rightMinusLeft.Add(rightElt)
+			}
+			return nil
+		})
+	}
+	return leftMinusRight, intersection, rightMinusLeft
 }

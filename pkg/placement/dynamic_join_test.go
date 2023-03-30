@@ -61,7 +61,7 @@ func TestDynamicJoin(t *testing.T) {
 				}
 			}
 			xzReln := Relation2Equijoin[int, string, float32](xyReln, yzReln)
-			if Relation2Equal[int, float32](xzReceiver, xzReln) {
+			if SetEqual[Pair[int, float32]](xzReceiver, xzReln) {
 				t.Logf("At super=%d, iteration=%d, got correct xz=%v", super, iteration, xzReln)
 			} else {
 				t.Fatalf("At super=%d, iteration=%d, got %v, expected %v", super, iteration, xzReceiver, xzReln)

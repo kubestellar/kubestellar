@@ -51,23 +51,6 @@ type TripleSetChangeReceiver[First any, Second any, Third any] interface {
 	Remove(First, Second, Third)
 }
 
-// Visitable is a collection that can do an interruptable enumeration of its members.
-// The collection may or may not be mutable.
-// This view of the collection may or may not have a limited scope of validity.
-// This view may or may not have concurrency restrictions.
-type Visitable[Elt any] interface {
-	// Visit calls the given function on every member, aborting on error
-	Visit(func(Elt) error) error
-}
-
-// Emptyable is something that can be tested for emptiness.
-// The thing may or may not be mutable.
-// This view of the thing may or may not have a limited scope of validity.
-// This view may or may not have concurrency restrictions.
-type Emptyable interface {
-	IsEmpty() bool
-}
-
 // dynamicJoin implements DynamicJoin.
 // It buffers the two incoming relations and passes on changes.
 type dynamicJoin[ColX comparable, ColY comparable, ColZ comparable] struct {

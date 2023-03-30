@@ -103,12 +103,6 @@ func (scm setChangeReceiverAsMappingReceiver[Key, Val]) Receive(key Key, val Val
 	}
 }
 
-// SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[T comparable] interface {
-	Add(T) bool    /* changed */
-	Remove(T) bool /* changed */
-}
-
 type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
 	Transform func(Type1) Type2
 	Inner     SetChangeReceiver[Type2]

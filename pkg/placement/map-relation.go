@@ -16,57 +16,31 @@ limitations under the License.
 
 package placement
 
-import "errors"
-
 type Relation2[First, Second comparable] interface {
-	IsEmpty() bool
-	Has(Pair[First, Second]) bool
-	Visit(func(Pair[First, Second]) error) error
+	Set[Pair[First, Second]]
 	Visit1to2(First, func(Second) error) error
 	Visit2to1(Second, func(First) error) error
 }
 
 type MutableRelation2[First, Second comparable] interface {
 	Relation2[First, Second]
-	SetChangeReceiver[Pair[First, Second]]
+	MutableSet[Pair[First, Second]]
 }
 
-var errStop = errors.New("it is done")
-
-func Relation2LessOrEqual[First, Second comparable](reln1, reln2 Relation2[First, Second]) bool {
-	return reln1.Visit(func(tup Pair[First, Second]) error {
-		if !reln2.Has(tup) {
-			return errStop
-		}
+func Relation2LenFromVisit[First, Second comparable](reln Relation2[First, Second]) int {
+	var ans int
+	reln.Visit(func(_ Pair[First, Second]) error {
+		ans++
 		return nil
-	}) == nil
+	})
+	return ans
 }
-
-func Relation2Compare[First, Second comparable](reln1, reln2 Relation2[First, Second]) Comparison {
-	return Comparison{
-		LessOrEqual:    Relation2LessOrEqual(reln1, reln2),
-		GreaterOrEqual: Relation2LessOrEqual(reln2, reln1),
-	}
-}
-
-func Relation2Equal[First, Second comparable](reln1, reln2 Relation2[First, Second]) bool {
-	return Relation2Compare[First, Second](reln1, reln2).IsEqual()
-}
-
-type Comparison struct{ LessOrEqual, GreaterOrEqual bool }
-
-func (comp Comparison) Reverse() Comparison {
-	return Comparison{LessOrEqual: comp.GreaterOrEqual, GreaterOrEqual: comp.LessOrEqual}
-}
-
-func (comp Comparison) IsEqual() bool           { return comp.LessOrEqual && comp.GreaterOrEqual }
-func (comp Comparison) IsStrictlyLess() bool    { return comp.LessOrEqual && !comp.GreaterOrEqual }
-func (comp Comparison) IsStrictlyGreater() bool { return comp.GreaterOrEqual && !comp.LessOrEqual }
-func (comp Comparison) IsRelated() bool         { return comp.LessOrEqual || comp.GreaterOrEqual }
 
 func Relation2Reverse[First, Second comparable](forward Relation2[First, Second]) Relation2[Second, First] {
 	return ReverseRelation2[First, Second]{baseReverseRelation2[First, Second]{forward}}
 }
+
+var _ Relation2[int, string] = ReverseRelation2[string, int]{}
 
 type ReverseRelation2[First, Second comparable] struct {
 	baseReverseRelation2[First, Second]
@@ -78,6 +52,14 @@ type baseReverseRelation2[First, Second comparable] struct {
 
 func (rr baseReverseRelation2[First, Second]) IsEmpty() bool {
 	return rr.forward.IsEmpty()
+}
+
+func (rr baseReverseRelation2[First, Second]) LenIsCheap() bool {
+	return rr.forward.LenIsCheap()
+}
+
+func (rr baseReverseRelation2[First, Second]) Len() int {
+	return rr.forward.Len()
 }
 
 func (rr baseReverseRelation2[First, Second]) Has(tup Pair[Second, First]) bool {
@@ -133,6 +115,9 @@ func NewMapRelation2[First comparable, Second comparable](pairs ...Pair[First, S
 func (mr MapRelation2[First, Second]) IsEmpty() bool {
 	return len(mr.by1) == 0
 }
+
+func (mr MapRelation2[First, Second]) LenIsCheap() bool { return false }
+func (mr MapRelation2[First, Second]) Len() int         { return Relation2LenFromVisit[First, Second](mr) }
 
 func (mr MapRelation2[First, Second]) Has(tup Pair[First, Second]) bool {
 	seconds := mr.by1[tup.First]

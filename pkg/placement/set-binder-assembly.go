@@ -51,6 +51,8 @@ type setBindingForPlacement struct {
 	resolvedWhereReceiver Receiver[ResolvedWhere]
 }
 
+var _ SetBinderConstructor = NewSetBinder
+
 func NewSetBinder(
 	logger klog.Logger,
 	resolvedWhatDifferencerConstructor ResolvedWhatDifferencerConstructor,
