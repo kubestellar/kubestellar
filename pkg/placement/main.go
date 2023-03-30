@@ -44,10 +44,12 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 
-	whatResolverLauncher func() *whatResolver
+	whatResolverLauncher  func() *whatResolver
+	whereResolverLauncher func() *whereResolver
 }
 
 func NewPlacementTranslator(
+	numThreads int,
 	ctx context.Context,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
@@ -79,7 +81,8 @@ func NewPlacementTranslator(
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
 		whatResolverLauncher: NewWhatResolverLauncher(ctx, epClusterPreInformer, discoveryClusterClient,
-			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, 4),
+			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
+		whereResolverLauncher: NewWhereResolverLauncher(ctx, spsClusterPreInformer, numThreads),
 	}
 	return pt
 }
@@ -101,7 +104,8 @@ func (pt *placementTranslator) Run() {
 	// TODO: replace all these dummies
 	whatResolver := pt.whatResolverLauncher()
 	whatResolver.AddReceiver(LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, true) // debugging
-	whereResolver := RelayWhereResolver()
+	whereResolver := pt.whereResolverLauncher()
+	whereResolver.AddReceiver(LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, true) // debugging
 	setBinder := NewDummySetBinder()
 	workloadProjector := NewDummyWorkloadProjector(mbPathToName)
 	placementProjector := NewDummyWorkloadProjector(mbPathToName)

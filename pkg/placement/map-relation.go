@@ -201,3 +201,35 @@ func delFromIndex[First, Second comparable](index map[First]MapSet[Second], key 
 	}
 	return change
 }
+
+func Relation2WithObservers[First, Second comparable](inner MutableRelation2[First, Second], observers ...SetChangeReceiver[Pair[First, Second]]) MutableRelation2[First, Second] {
+	return &relation2WithObservers[First, Second]{inner, inner, observers}
+}
+
+type relation2WithObservers[First, Second comparable] struct {
+	Relation2[First, Second]
+	inner     MutableRelation2[First, Second]
+	observers []SetChangeReceiver[Pair[First, Second]]
+}
+
+var _ MutableRelation2[int, string] = &relation2WithObservers[int, string]{}
+
+func (rwo *relation2WithObservers[First, Second]) Add(tup Pair[First, Second]) bool {
+	if rwo.inner.Add(tup) {
+		for _, observer := range rwo.observers {
+			observer.Add(tup)
+		}
+		return true
+	}
+	return false
+}
+
+func (rwo *relation2WithObservers[First, Second]) Remove(tup Pair[First, Second]) bool {
+	if rwo.inner.Remove(tup) {
+		for _, observer := range rwo.observers {
+			observer.Remove(tup)
+		}
+		return true
+	}
+	return false
+}

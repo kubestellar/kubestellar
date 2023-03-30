@@ -100,9 +100,9 @@ func main() {
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	espwClientOpts := NewClientOpts("espw", "edge service provider workspace")
+	espwClientOpts := NewClientOpts("espw", "access to the edge service provider workspace")
 	espwClientOpts.AddFlags(fs)
-	baseClientOpts := NewClientOpts("allclusters", "all clusters")
+	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
@@ -191,7 +191,7 @@ func main() {
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
+	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)

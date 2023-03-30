@@ -86,6 +86,23 @@ type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
 
 func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
 
+func SetChangeReceiverAsMappingReceiver[Key, Val comparable](inner SetChangeReceiver[Pair[Key, Val]]) MappingReceiver[Key, Val] {
+	return setChangeReceiverAsMappingReceiver[Key, Val]{inner}
+}
+
+type setChangeReceiverAsMappingReceiver[Key, Val comparable] struct {
+	inner SetChangeReceiver[Pair[Key, Val]]
+}
+
+func (scm setChangeReceiverAsMappingReceiver[Key, Val]) Receive(key Key, val Val) {
+	var zeroVal Val
+	if val == zeroVal {
+		scm.inner.Remove(Pair[Key, Val]{key, val})
+	} else {
+		scm.inner.Add(Pair[Key, Val]{key, val})
+	}
+}
+
 // SetChangeReceiver is kept appraised of changes in a set of T
 type SetChangeReceiver[T comparable] interface {
 	Add(T) bool    /* changed */

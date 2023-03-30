@@ -40,7 +40,9 @@ func NewDynamicFullJoin[ColX comparable, ColY comparable, ColZ comparable](logge
 		xyReln:   NewMapRelation2[ColX, ColY](),
 		yzReln:   NewMapRelation2[ColY, ColZ](),
 	}
-	return dynamicJoinXY[ColX, ColY, ColZ]{dj}, dynamicJoinYZ[ColX, ColY, ColZ]{dj}
+	dj.xyReln = Relation2WithObservers[ColX, ColY](dj.xyReln, extrapolateFwd[ColX, ColY, ColZ]{dj.yzReln, receiver})
+	dj.yzReln = Relation2WithObservers[ColY, ColZ](dj.yzReln, extrapolateRev[ColX, ColY, ColZ]{dj.xyReln, receiver})
+	return dj.xyReln, dj.yzReln
 }
 
 // TripleSetChangeReceiver is given a series of changes to a set of triples
@@ -71,60 +73,47 @@ type Emptyable interface {
 type dynamicJoin[ColX comparable, ColY comparable, ColZ comparable] struct {
 	logger   klog.Logger
 	receiver TripleSetChangeReceiver[ColX, ColY, ColZ]
-	xyReln   *MapRelation2[ColX, ColY]
-	yzReln   *MapRelation2[ColY, ColZ]
+	xyReln   MutableRelation2[ColX, ColY]
+	yzReln   MutableRelation2[ColY, ColZ]
 }
 
-type dynamicJoinXY[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
-type dynamicJoinYZ[ColX, ColY, ColZ comparable] struct{ *dynamicJoin[ColX, ColY, ColZ] }
-
-func (dj dynamicJoinXY[ColX, ColY, ColZ]) Add(xy Pair[ColX, ColY]) bool {
-	return addXYZ[ColX, ColY, ColZ](dj.logger, dj.xyReln, dj.yzReln, xy, dj.receiver)
+type extrapolateFwd[ColX, ColY, ColZ comparable] struct {
+	yzReln   Relation2[ColY, ColZ]
+	receiver TripleSetChangeReceiver[ColX, ColY, ColZ]
 }
 
-func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Add(yz Pair[ColY, ColZ]) bool {
-	return addXYZ[ColZ, ColY, ColX](dj.logger, MutableRelation2Reverse[ColY, ColZ](dj.yzReln), MutableRelation2Reverse[ColX, ColY](dj.xyReln), yz.Reverse(), TripleSetChangeReceiverReverse[ColX, ColY, ColZ]{dj.receiver})
-}
-
-func addXYZ[ColX, ColY, ColZ comparable](
-	logger klog.Logger,
-	xyReln MutableRelation2[ColX, ColY],
-	yzReln MutableRelation2[ColY, ColZ],
-	xy Pair[ColX, ColY],
-	receiver TripleSetChangeReceiver[ColX, ColY, ColZ],
-) bool {
-	if !xyReln.Add(xy) {
-		return false
-	}
-	yzReln.Visit1to2(xy.Second, func(z ColZ) error {
-		receiver.Add(xy.First, xy.Second, z)
+func (er extrapolateFwd[ColX, ColY, ColZ]) Add(xy Pair[ColX, ColY]) bool {
+	er.yzReln.Visit1to2(xy.Second, func(z ColZ) error {
+		er.receiver.Add(xy.First, xy.Second, z)
 		return nil
 	})
 	return true
 }
 
-func (dj dynamicJoinXY[ColX, ColY, ColZ]) Remove(xy Pair[ColX, ColY]) bool {
-	var xyReln MutableRelation2[ColX, ColY] = dj.xyReln
-	var yzReln MutableRelation2[ColY, ColZ] = dj.yzReln
-	return removeXYZ(dj.logger, xyReln, yzReln, xy, dj.receiver)
+func (er extrapolateFwd[ColX, ColY, ColZ]) Remove(xy Pair[ColX, ColY]) bool {
+	er.yzReln.Visit1to2(xy.Second, func(z ColZ) error {
+		er.receiver.Remove(xy.First, xy.Second, z)
+		return nil
+	})
+	return true
 }
 
-func (dj dynamicJoinYZ[ColX, ColY, ColZ]) Remove(yz Pair[ColY, ColZ]) bool {
-	return removeXYZ[ColZ, ColY, ColX](dj.logger, MutableRelation2Reverse[ColY, ColZ](dj.yzReln), MutableRelation2Reverse[ColX, ColY](dj.xyReln), yz.Reverse(), TripleSetChangeReceiverReverse[ColX, ColY, ColZ]{dj.receiver})
+type extrapolateRev[ColX, ColY, ColZ comparable] struct {
+	xyReln   Relation2[ColX, ColY]
+	receiver TripleSetChangeReceiver[ColX, ColY, ColZ]
 }
 
-func removeXYZ[ColX, ColY, ColZ comparable](
-	logger klog.Logger,
-	xyReln MutableRelation2[ColX, ColY],
-	yzReln MutableRelation2[ColY, ColZ],
-	xy Pair[ColX, ColY],
-	receiver TripleSetChangeReceiver[ColX, ColY, ColZ],
-) bool {
-	if !xyReln.Remove(xy) {
-		return false
-	}
-	yzReln.Visit1to2(xy.Second, func(z ColZ) error {
-		receiver.Remove(xy.First, xy.Second, z)
+func (er extrapolateRev[ColX, ColY, ColZ]) Add(yz Pair[ColY, ColZ]) bool {
+	er.xyReln.Visit2to1(yz.First, func(x ColX) error {
+		er.receiver.Add(x, yz.First, yz.Second)
+		return nil
+	})
+	return true
+}
+
+func (er extrapolateRev[ColX, ColY, ColZ]) Remove(yz Pair[ColY, ColZ]) bool {
+	er.xyReln.Visit2to1(yz.First, func(x ColX) error {
+		er.receiver.Remove(x, yz.First, yz.Second)
 		return nil
 	})
 	return true

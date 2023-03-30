@@ -144,6 +144,10 @@ type queueItem struct {
 	name    string
 }
 
+func (qi queueItem) toExternalName() ExternalName {
+	return ExternalName{Cluster: qi.cluster, Name: qi.name}
+}
+
 type WhatResolverClusterHandler struct {
 	*whatResolver
 	gk schema.GroupKind
