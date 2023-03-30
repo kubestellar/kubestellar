@@ -53,14 +53,15 @@ When you get to the step of "Populate the edge service provider
 workspace", it suffices to do the following.
 
 ```console
-$ kubectl ws root:edge
+$ kubectl ws root:espw
 $ kubectl create -f config/crds
 $ kubectl create -f config/exports
 ```
 
-At the start of Stage 3 of the exercise, just run the placement
-translator from the command line.  It should look something like the
-following.
+Continue to follow the steps until the start of Stage 3 of the exercise.
+First make sure you run `kubectl ws root:espw` to enter the service provider
+workspace, then just run the placement translator from the command line.  
+It should look something like the following.
 
 ```console
 $ go run ./cmd/placement-translator     

@@ -101,9 +101,10 @@ $ kubectl ws create inv1 --enter
 
 ### Create a SyncTarget object to represent the florin cluster
 
-Use `kubectl` to create the folloing SyncTarget object.
+Use `kubectl` to create the following SyncTarget object:
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -114,13 +115,15 @@ metadata:
 spec:
   cells:
     foo: bar
+EOF
 ```
 
 ### Create a Location object describing the florin cluster
 
-Use `kubectl` to create the folloing Location object.
+Use `kubectl` to create the following Location object.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
@@ -131,13 +134,15 @@ spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"example":"si", "extended":"non"}
+EOF
 ```
 
 ### Create a SyncTarget object describing the guilder cluster
 
-Use `kubectl` to create the folloing SyncTarget object.
+Use `kubectl` to create the following SyncTarget object.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -148,13 +153,15 @@ metadata:
 spec:
   cells:
     bar: baz
+EOF
 ```
 
 ### Create a Location object describing the guilder cluster
 
-Use `kubectl` to create the folloing Location object.
+Use `kubectl` to create the following Location object.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
@@ -166,13 +173,14 @@ spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"example":"si", "extended":"si"}
+EOF
 ```
 
 ### Create the edge service provider workspace
 
 ```shell
 $ kubectl ws root
-$ kubectl ws create edge --enter
+$ kubectl ws create espw --enter
 ```
 
 ### Populate the edge service provider workspace
@@ -190,7 +198,7 @@ That is, one for each SyncTarget.  After that is done (TODO: show how),
 check it out as follows.
 
 ```shell
-$ kubectl get Workspace
+$ kubectl get workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a   universal            Ready   https://192.168.58.123:6443/clusters/dead3333beef3333   22s
@@ -225,7 +233,8 @@ this workspace.  TODO: show how.  If they are not then use `kubectl`
 to create the following APIBinding object --- which enables use of
 those Kubernetes APIs.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -235,6 +244,7 @@ spec:
     export:
       path: "root:compute"
       name: kubernetes
+EOF
 ```
 
 Next, use `kubectl` to create the following workload objects in that
@@ -242,7 +252,8 @@ workspace.  The workload in this example in an Apache httpd server
 that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -291,21 +302,24 @@ spec:
         configMap:
           name: httpd-htdocs
           optional: false
+EOF
 ```
 
 Before or after the previous step, use `kubectl` to create the
 following APIBinding object --- which enables use of the edge API.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
-  name: bind-edge
+  name: bind-espw
 spec:
   reference:
     export:
-      path: root:edge
+      path: root:espw
       name: edge.kcp.io
+EOF
 ```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
@@ -313,7 +327,8 @@ Its "where predicate" (the `locationSelectors` array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.
    
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: edge.kcp.io/v1alpha1
 kind: EdgePlacement
 metadata:
@@ -323,6 +338,7 @@ spec:
   - matchLabels: {"env":"prod"}
   namespaceSelector:
     matchLabels: {"common":"si"}
+EOF
 ```
 
 ### Create and populate the workload management workspace for the special workload
@@ -340,7 +356,8 @@ this workspace.  TODO: show how.  If they are not then use `kubectl`
 to create the following APIBinding object --- which enables use of
 those Kubernetes APIs.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -350,11 +367,13 @@ spec:
     export:
       path: "root:compute"
       name: kubernetes
+EOF
 ```
 
 Next, use `kubectl` to create the following workload objects in that workspace.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -403,21 +422,24 @@ spec:
         configMap:
           name: httpd-htdocs
           optional: false
+EOF
 ```
 
 Before or after the previous step, use `kubectl` to create the
 following APIBinding object --- which enables use of the edge API.
 
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
-  name: bind-edge
+  name: bind-espw
 spec:
   reference:
     export:
-      path: root:edge
+      path: root:espw
       name: edge.kcp.io
+EOF
 ```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
@@ -425,7 +447,8 @@ Its "where predicate" (the `locationSelectors` array) has one label
 selector that matches only one of the Location objects created
 earlier, thus directing the special workload to just one edge cluster.
    
-```yaml
+```shell
+cat <<EOF | kubectl apply -f -
 apiVersion: edge.kcp.io/v1alpha1
 kind: EdgePlacement
 metadata:
@@ -435,6 +458,7 @@ spec:
   - matchLabels: {"env":"prod","extended":"si"}
   namespaceSelector: 
     matchLabels: {"special":"si"}
+EOF
 ```
 
 ### Edge scheduling
@@ -474,7 +498,7 @@ The florin cluster gets only the common workload.  Examine florin's TMC
 Placement object and common workload as follows.
 
 ```shell
-$ kubectl ws root:edge:niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368
+$ kubectl ws root:espw:niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368
 $ kubectl get Placement -o yaml
 TODO: show what it looks like
 $ kubectl get ns
@@ -487,7 +511,7 @@ The guilder cluster gets both the common and special workloads.
 Examine guilder's TMC Placement object and workloads as follows.
 
 ```shell
-$ kubectl ws root:edge:niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a
+$ kubectl ws root:espw:niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a
 $ kubectl get Placement -o yaml
 TODO: show what it looks like
 $ kubectl get ns
