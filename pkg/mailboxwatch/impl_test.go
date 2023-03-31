@@ -39,6 +39,8 @@ import (
 	kcpfake "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
+
+	"github.com/kcp-dev/edge-mc/pkg/placement"
 )
 
 func TestMain(m *testing.M) {
@@ -162,9 +164,15 @@ func TestMailboxInformer(t *testing.T) {
 					t.Logf("Removed from tracker: ReplicaSet %+v", gonerRS)
 				}
 			} else {
-				clusterS := fmt.Sprintf("c%d", rand.Intn(int(math.Sqrt(float64(iteration)))))
-				clusterN := logicalcluster.Name(clusterS)
-				wsObjName := objectName{cluster: espwCluster, name: clusterS}
+				invWSNum := rand.Intn(int(math.Sqrt(float64(iteration))))
+				invWSClusterS := fmt.Sprintf("ic%d", invWSNum)
+				syncTargetNum := rand.Intn(int(math.Sqrt(float64(iteration))))
+				syncTargetUID := fmt.Sprintf("beef-%d", syncTargetNum)
+				mbwsName := invWSClusterS + placement.WSNameSep + syncTargetUID
+				mbwsNum := invWSNum*100 + syncTargetNum
+				mbwsClusterS := fmt.Sprintf("mc%d", mbwsNum)
+				mbwsClusterN := logicalcluster.Name(mbwsClusterS)
+				wsObjName := objectName{cluster: espwCluster, name: mbwsName}
 				workspace := workspaces[wsObjName]
 				if workspace == nil {
 					workspace = &tenancyv1a1.Workspace{
@@ -173,11 +181,11 @@ func TestMailboxInformer(t *testing.T) {
 							APIVersion: wsGV.String(),
 						},
 						ObjectMeta: metav1.ObjectMeta{
-							Name:        clusterS,
+							Name:        mbwsName,
 							Annotations: map[string]string{logicalcluster.AnnotationKey: espwCluster.String()},
 						},
 						Spec: tenancyv1a1.WorkspaceSpec{
-							Cluster: clusterS,
+							Cluster: mbwsClusterS,
 						},
 					}
 					scopedTracker := kcpTracker.Cluster(espwCluster.Path())
@@ -193,7 +201,7 @@ func TestMailboxInformer(t *testing.T) {
 				var obj *k8sapps.ReplicaSet
 				for {
 					objName = objectName{
-						cluster:   clusterN,
+						cluster:   mbwsClusterN,
 						namespace: fmt.Sprintf("ns%d", rand.Intn(10000)),
 						name:      fmt.Sprintf("rs%d", rand.Intn(10000)),
 					}
@@ -210,11 +218,11 @@ func TestMailboxInformer(t *testing.T) {
 						Namespace: objName.namespace,
 						Name:      objName.name,
 						Annotations: map[string]string{
-							logicalcluster.AnnotationKey: clusterS,
+							logicalcluster.AnnotationKey: mbwsClusterS,
 						},
 					},
 				}
-				scopedTracker := k8sTracker.Cluster(clusterN.Path())
+				scopedTracker := k8sTracker.Cluster(mbwsClusterN.Path())
 				err := scopedTracker.Add(obj)
 				if err != nil {
 					t.Fatalf("Failed to add %+v to testing tracker: %v", obj, err)
