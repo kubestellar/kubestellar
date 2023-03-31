@@ -33,6 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
+	"github.com/kcp-dev/edge-mc/pkg/placement"
 
 	kcpk8sfake "github.com/kcp-dev/client-go/kubernetes/fake"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
@@ -162,7 +163,7 @@ func TestMailboxInformer(t *testing.T) {
 					t.Logf("Removed from tracker: ReplicaSet %+v", gonerRS)
 				}
 			} else {
-				clusterS := fmt.Sprintf("c%d", rand.Intn(int(math.Sqrt(float64(iteration)))))
+				clusterS := fmt.Sprintf("c%d%stesting", rand.Intn(int(math.Sqrt(float64(iteration)))), placement.WSNameSep)
 				clusterN := logicalcluster.Name(clusterS)
 				wsObjName := objectName{cluster: espwCluster, name: clusterS}
 				workspace := workspaces[wsObjName]
