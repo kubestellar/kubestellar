@@ -128,7 +128,7 @@ apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
   name: location-f
-  annotations:
+  labels:
     env: prod
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
@@ -166,7 +166,7 @@ apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
   name: location-g
-  annotations:
+  labels:
     env: prod
     extended: si
 spec:
