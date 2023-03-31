@@ -205,6 +205,25 @@ type ProjectionDetails struct {
 	Names *k8ssets.String
 }
 
+func (pd ProjectionDetails) String() string {
+	var builder strings.Builder
+	builder.WriteRune('{')
+	if pd.Namespaces != nil {
+		builder.WriteString("Namespaces: ")
+		builder.WriteString(fmt.Sprintf("%v", pd.Namespaces.List()))
+	}
+	if pd.Names != nil {
+		if pd.Namespaces != nil {
+			builder.WriteString(", ")
+		}
+		builder.WriteString("Names: ")
+		builder.WriteString(fmt.Sprintf("%v", pd.Names.List()))
+
+	}
+	builder.WriteRune('}')
+	return builder.String()
+}
+
 // SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
 // The two set differencer constructors will be called to create set differencers
 // that translate new whole values of ResolvedWhat and ResolvedWhere into
@@ -300,18 +319,10 @@ type ResourceDetails struct {
 	SupportsInformers bool
 }
 
-// ResourceModes tells the handling of all the resources that do not
-// get default handling, and maybe some that do.
+// ResourceModes tells the handling of the given resource.
 // This information comes from platform configuration and code.
 // Immutable.
-type ResourceModes map[metav1.GroupResource]ResourceMode
-
-func (modes ResourceModes) Get(gr metav1.GroupResource) ResourceMode {
-	if ans, ok := modes[gr]; ok {
-		return ans
-	}
-	return DefaultResourceMode
-}
+type ResourceModes func(metav1.GroupResource) ResourceMode
 
 // ResourceMode describes how a given resource is handled regarding
 // propagation and denaturing.

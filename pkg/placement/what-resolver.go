@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -683,12 +684,35 @@ func mkgr(group, resource string) schema.GroupResource {
 	return schema.GroupResource{Group: group, Resource: resource}
 }
 
-var GRsNotSupported = NewSet([]schema.GroupResource{
+var GRsForciblyDenatured = NewMapSet(
+	mkgr("admissionregistration.k8s.io", "mutatingwebhookconfigurations"),
+	mkgr("admissionregistration.k8s.io", "validatingwebhookconfigurations"),
+	mkgr("flowcontrol.apiserver.k8s.io", "flowschemas"),
+	mkgr("flowcontrol.apiserver.k8s.io", "prioritylevelconfigurations"),
+	mkgr("rbac.authorization.k8s.io", "clusterroles"),
+	mkgr("rbac.authorization.k8s.io", "clusterrolebindingss"),
+	mkgr("rbac.authorization.k8s.io", "roles"),
+	mkgr("rbac.authorization.k8s.io", "rolebindings"),
+	mkgr("", "limitranges"),
+	mkgr("", "resourcequotas"),
+	mkgr("", "serviceaccounts"),
+)
+
+var GRsNaturedInBoth = NewMapSet(
+	mkgr("apiextensions.k8s.io", "customresourcedefinitions"),
+	mkgr("", "namespaces"),
+)
+
+var NaturedInCenterNoGo = NewMapSet(
+	mkgr("apis.kcp.io", "apibindings"),
+)
+
+var GRsNotSupported = NewMapSet(
 	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
 	mkgr("apis.kcp.io", "apiconversions"),
-})
+)
 
 var GroupsNotForEdge = k8ssets.NewString(
 	"edge.kcp.io",
@@ -698,7 +722,7 @@ var GroupsNotForEdge = k8ssets.NewString(
 	"workload.kcp.io",
 )
 
-var GRsNotForEdge = NewSet([]schema.GroupResource{
+var GRsNotForEdge = NewMapSet(
 	mkgr("apis.kcp.io", "apiexports"),
 	mkgr("apis.kcp.io", "apiexportendpointslices"),
 	mkgr("apis.kcp.io", "apiresourceschemas"),
@@ -716,4 +740,27 @@ var GRsNotForEdge = NewSet([]schema.GroupResource{
 	mkgr("", "componentstatuses"),
 	mkgr("", "events"),
 	mkgr("", "nodes"),
-})
+)
+
+func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
+	sgr := MetaGroupResourceToSchema(mgr)
+	builtin := strings.HasSuffix(sgr.Group, ".k8s.io") || !strings.Contains(sgr.Group, ".")
+	switch {
+	case GRsForciblyDenatured.Has(sgr):
+		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
+	case GRsNaturedInBoth.Has(sgr):
+		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
+	case NaturedInCenterNoGo.Has(sgr):
+		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	case GRsNotSupported.Has(sgr):
+		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
+	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):
+		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	default:
+		return ResourceMode{GoesToEdge, NaturalyDenatured, builtin}
+	}
+}
+
+func MetaGroupResourceToSchema(gr metav1.GroupResource) schema.GroupResource {
+	return schema.GroupResource{Group: gr.Group, Resource: gr.Resource}
+}

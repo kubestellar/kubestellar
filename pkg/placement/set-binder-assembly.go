@@ -67,6 +67,7 @@ func NewSetBinder(
 		logger:                              logger,
 		resolvedWhatDifferencerConstructor:  resolvedWhatDifferencerConstructor,
 		resolvedWhereDifferencerConstructor: resolvedWhereDifferencerConstructor,
+		perCluster:                          map[logicalcluster.Name]*setBindingForCluster{},
 		singleBinder:                        singleBinder,
 		ProjectionMapProvider:               projectionMapProvider,
 	}

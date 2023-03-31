@@ -29,6 +29,7 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 )
@@ -106,8 +107,13 @@ func (pt *placementTranslator) Run() {
 	whatResolver.AddReceiver(LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, true) // debugging
 	whereResolver := pt.whereResolverLauncher()
 	whereResolver.AddReceiver(LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, true) // debugging
-	setBinder := NewDummySetBinder()
-	workloadProjector := NewDummyWorkloadProjector(mbPathToName)
+	dummyBaseAPIProvider := NewRelayMap[logicalcluster.Name, ScopedAPIProvider](false)
+	setBinder := NewSetBinder(pt.logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+		SimpleBindingOrganizer(pt.logger),
+		NewTestAPIMapProvider(dummyBaseAPIProvider),
+		DefaultResourceModes,
+		nil)
+	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
 	placementProjector := NewDummyWorkloadProjector(mbPathToName)
 	AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
 	<-doneCh

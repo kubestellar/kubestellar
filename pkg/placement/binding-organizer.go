@@ -52,19 +52,24 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 	}
 }
 
+// simpleBindingOrganizer is the top-level data structure of the organizer.
+// In the locking order it precedes its discovery and its projectionMapProvider,
+// which in turn precedes each projectionPerClusterImpl.
 type simpleBindingOrganizer struct {
-	logger klog.Logger
-	sync.Mutex
+	logger                klog.Logger
 	discovery             APIMapProvider
 	resourceModes         ResourceModes
 	eventHandler          EventHandler
 	projectionMapProvider TransformingRelayMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster]
+	sync.Mutex
 }
 
 type projectionPerClusterImpl struct {
+	organizer *simpleBindingOrganizer
 	ProjectionPerCluster
-	apiProvider      ScopedAPIProvider
 	perSourceCluster RelayMap[logicalcluster.Name, ProjectionDetails]
+	sync.Mutex
+	apiProvider ScopedAPIProvider
 }
 
 func exportProjectionPerCluster(impl *projectionPerClusterImpl) *ProjectionPerCluster {
@@ -72,21 +77,31 @@ func exportProjectionPerCluster(impl *projectionPerClusterImpl) *ProjectionPerCl
 }
 
 func (pc *projectionPerClusterImpl) SetProvider(apiProvider ScopedAPIProvider) {
+	pc.Lock()
+	defer pc.Unlock()
+	pc.organizer.logger.V(2).Info("Got ScopedAPIProvider")
 	pc.apiProvider = apiProvider
 }
 
 func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps)) {
 	sbo.Lock()
 	defer sbo.Unlock()
-	xn(sbo)
+	sbo.logger.V(3).Info("Begin transaction")
+	xn(sboXnOps{sbo})
+	sbo.logger.V(3).Info("End transaction")
 }
 
-func (sbo *simpleBindingOrganizer) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
+// sboXnOps exposes the Add and Remove methods only in the locked context of a transaction
+type sboXnOps struct{ sbo *simpleBindingOrganizer }
+
+func (sxo sboXnOps) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
+	sbo := sxo.sbo
 	pk := ProjectionKey{}.FromPair(pair.First, pair.Second)
 	if mgrIsNamespace(pk.GroupResource) && !pair.First.IncludeNamespaceObject {
 		// In this case what is needed is to make sbo.projectionMapProvider say
 		// to downsync all the (namespaced) objects in this namespace.
 		// TODO: that
+		sbo.logger.V(3).Info("Not implemented: atomic pair about namespace contents", "workloadPart", pair.First, "sps", pair.Second)
 		return false
 	}
 	cluster := logicalcluster.Name(pair.Second.Cluster)
@@ -94,12 +109,14 @@ func (sbo *simpleBindingOrganizer) Add(pair Pair[WorkloadPart, edgeapi.SinglePla
 	if pc == nil {
 		perSourceCluster := NewRelayMap[logicalcluster.Name, ProjectionDetails](true)
 		pc = &projectionPerClusterImpl{
+			organizer: sbo,
 			ProjectionPerCluster: ProjectionPerCluster{
 				APIVersion:       pair.First.APIVersion,
 				PerSourceCluster: perSourceCluster,
 			},
 			perSourceCluster: perSourceCluster,
 		}
+		sbo.logger.V(2).Info("Adding ProjectionPerCluster", "workloadPart", pair.First, "sps", pair.Second)
 		sbo.discovery.AddClient(cluster, pc)
 		sbo.projectionMapProvider.Receive(pk, pc)
 	}
@@ -113,28 +130,37 @@ func (sbo *simpleBindingOrganizer) Add(pair Pair[WorkloadPart, edgeapi.SinglePla
 		pd.Names.Insert(pair.First.Name)
 	}
 	if change {
+		sbo.logger.V(2).Info("Passing along addition", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
 		pc.perSourceCluster.Receive(cluster, pd)
+	} else {
+		sbo.logger.V(2).Info("No news in addition", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
+
 	}
 	return change
 }
 
-func (sbo *simpleBindingOrganizer) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
+func (sxo sboXnOps) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
+	sbo := sxo.sbo
 	pk := ProjectionKey{}.FromPair(pair.First, pair.Second)
 	if mgrIsNamespace(pk.GroupResource) && !pair.First.IncludeNamespaceObject {
 		// In this case what is needed is to make sbo.projectionMapProvider stop saying
 		// to downsync all the (namespaced) objects in this namespace.
 		// TODO: that
+		sbo.logger.V(3).Info("Not implemented: atomic pair about namespace contents", "workloadPart", pair.First, "sps", pair.Second)
 		return false
 	}
 	cluster := logicalcluster.Name(pair.Second.Cluster)
 	pc := sbo.projectionMapProvider.OuterGet(pk)
 	if pc == nil {
+		sbo.logger.V(2).Info("No cluster data", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster)
 		return false
 	}
 	pd := pc.perSourceCluster.OuterGet(cluster)
 	if pd.Names == nil || !pd.Names.Has(pair.First.Name) {
+		sbo.logger.V(2).Info("Norhing to remove", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
 		return false
 	}
+	sbo.logger.V(2).Info("Removing internal", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
 	pd.Names.Delete(pair.First.Name)
 	pc.perSourceCluster.Receive(cluster, pd)
 	return true
