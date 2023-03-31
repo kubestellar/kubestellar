@@ -125,12 +125,12 @@ func (sb *setBinder) ensureCluster(cluster logicalcluster.Name) *setBindingForCl
 
 func (sbc *setBindingForCluster) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	sbc.logger.V(4).Info("Adding joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
-	return sbc.singleBindingOps.AddBinding(pair.First, pair.Second)
+	return sbc.singleBindingOps.Add(pair)
 }
 
 func (sbc *setBindingForCluster) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	sbc.logger.V(4).Info("Removing joined pair", "cluster", sbc.cluster, "part", pair.First, "where", pair.Second)
-	return sbc.singleBindingOps.RemoveBinding(pair.First, pair.Second)
+	return sbc.singleBindingOps.Remove(pair)
 }
 
 func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPlacement {

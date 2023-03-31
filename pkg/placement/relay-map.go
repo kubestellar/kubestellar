@@ -35,6 +35,7 @@ type relayMap[Key comparable, OuterVal any, InnerVal any] struct {
 
 type TransformingRelayMap[Key comparable, OuterVal any, InnerVal any] interface {
 	MappingReceiver[Key, OuterVal]
+	OuterGet(Key) OuterVal
 	DynamicMapProviderWithRelease[Key, InnerVal]
 	Len() int
 	Remove(Key)
@@ -96,6 +97,12 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(receiver MappingReceive
 	}
 }
 
+func (rm *relayMap[Key, OuterVal, InnerVal]) OuterGet(key Key) OuterVal {
+	rm.Lock()
+	defer rm.Unlock()
+	return rm.theMap[key]
+}
+
 func (rm *relayMap[Key, OuterVal, InnerVal]) Receive(key Key, outerVal OuterVal) {
 	innerVal := rm.transform(outerVal)
 	rm.Lock()
@@ -107,6 +114,8 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) Receive(key Key, outerVal OuterVal)
 }
 
 func (rm *relayMap[Key, OuterVal, InnerVal]) Len() int {
+	rm.Lock()
+	defer rm.Unlock()
 	return len(rm.theMap)
 }
 

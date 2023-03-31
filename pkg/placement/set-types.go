@@ -214,3 +214,7 @@ func (comp Comparison) IsEqual() bool           { return comp.LessOrEqual && com
 func (comp Comparison) IsStrictlyLess() bool    { return comp.LessOrEqual && !comp.GreaterOrEqual }
 func (comp Comparison) IsStrictlyGreater() bool { return comp.GreaterOrEqual && !comp.LessOrEqual }
 func (comp Comparison) IsRelated() bool         { return comp.LessOrEqual || comp.GreaterOrEqual }
+
+func ToHeap[Val any](val Val) *Val {
+	return &val
+}

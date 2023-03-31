@@ -251,10 +251,7 @@ type SingleBinder interface {
 	Transact(func(SingleBindingOps))
 }
 
-type SingleBindingOps interface {
-	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement) bool
-	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement) bool
-}
+type SingleBindingOps SetChangeReceiver[Pair[WorkloadPart, edgeapi.SinglePlacement]]
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
 // as needed by clients.
