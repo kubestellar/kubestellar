@@ -156,9 +156,9 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 		return true // I think these errors are not transient
 	}
 	if err == nil {
-		wr.resolutions.Receive(objName, []*edgeapi.SinglePlacementSlice{sps})
+		wr.resolutions.Put(objName, []*edgeapi.SinglePlacementSlice{sps})
 	} else {
-		wr.resolutions.Remove(objName)
+		wr.resolutions.Delete(objName)
 	}
 	return true
 }

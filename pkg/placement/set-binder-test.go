@@ -53,7 +53,7 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	whatProvider := NewRelayMap[ExternalName, WorkloadParts](false)
 	sc1 := logicalcluster.Name("wm1")
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
-	whatProvider.Receive(ep1Ref, what1)
+	whatProvider.Put(ep1Ref, what1)
 	sp1 := edgeapi.SinglePlacement{
 		Cluster:        "inv1",
 		LocationName:   "loc1",
@@ -65,7 +65,7 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	}
 	where1 := ResolvedWhere{sps1}
 	whereProvider := NewRelayMap[ExternalName, ResolvedWhere](false)
-	whereProvider.Receive(ep1Ref, where1)
+	whereProvider.Put(ep1Ref, where1)
 	whatProvider.AddReceiver(binder.AsWhatReceiver(), true)
 	whereProvider.AddReceiver(binder.AsWhereReceiver(), true)
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)

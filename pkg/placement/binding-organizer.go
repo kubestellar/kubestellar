@@ -118,7 +118,7 @@ func (sxo sboXnOps) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 		}
 		sbo.logger.V(2).Info("Adding ProjectionPerCluster", "workloadPart", pair.First, "sps", pair.Second)
 		sbo.discovery.AddClient(cluster, pc)
-		sbo.projectionMapProvider.Receive(pk, pc)
+		sbo.projectionMapProvider.Put(pk, pc)
 	}
 	pd := pc.perSourceCluster.OuterGet(cluster)
 	var change bool
@@ -131,7 +131,7 @@ func (sxo sboXnOps) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	}
 	if change {
 		sbo.logger.V(2).Info("Passing along addition", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
-		pc.perSourceCluster.Receive(cluster, pd)
+		pc.perSourceCluster.Put(cluster, pd)
 	} else {
 		sbo.logger.V(2).Info("No news in addition", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
 
@@ -162,7 +162,7 @@ func (sxo sboXnOps) Remove(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) boo
 	}
 	sbo.logger.V(2).Info("Removing internal", "workloadPart", pair.First, "sps", pair.Second, "pk", pk, "cluster", cluster, "pd", pd)
 	pd.Names.Delete(pair.First.Name)
-	pc.perSourceCluster.Receive(cluster, pd)
+	pc.perSourceCluster.Put(cluster, pd)
 	return true
 }
 

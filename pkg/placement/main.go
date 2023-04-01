@@ -99,7 +99,6 @@ func (pt *placementTranslator) Run() {
 		os.Exit(100)
 	}
 
-	_, mbPathToName := NewNameAndPath(pt.logger, pt.mbwsInformer, true)
 	// TODO: make all the other needed infrastructure
 
 	// TODO: replace all these dummies
@@ -114,7 +113,7 @@ func (pt *placementTranslator) Run() {
 		DefaultResourceModes,
 		nil)
 	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
-	placementProjector := NewDummyWorkloadProjector(mbPathToName)
+	placementProjector := NewDummyWorkloadProjector()
 	AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
 	<-doneCh
 }
@@ -125,6 +124,10 @@ type LoggingMappingReceiver[Key comparable, Val any] struct {
 
 var _ MappingReceiver[string, []any] = &LoggingMappingReceiver[string, []any]{}
 
-func (lmr LoggingMappingReceiver[Key, Val]) Receive(key Key, val Val) {
-	lmr.logger.Info("Receive", "key", key, "val", val)
+func (lmr LoggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
+	lmr.logger.Info("Put", "key", key, "val", val)
+}
+
+func (lmr LoggingMappingReceiver[Key, Val]) Delete(key Key) {
+	lmr.logger.Info("Delete", "key", key)
 }

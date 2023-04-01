@@ -224,7 +224,7 @@ func (wr *whatResolver) AddReceiver(receiver MappingReceiver[ExternalName, Workl
 	for wldCluster, wsDetails := range wr.workspaceDetails {
 		for epName := range wsDetails.placements {
 			parts := wr.getPartsLocked(wldCluster, epName)
-			receiver.Receive(ExternalName{Cluster: wldCluster, Name: epName}, parts)
+			receiver.Put(ExternalName{Cluster: wldCluster, Name: epName}, parts)
 		}
 	}
 }
@@ -267,7 +267,7 @@ func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName s
 	parts := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
 	for _, receiver := range wr.receivers {
-		receiver.Receive(epRef, parts)
+		receiver.Put(epRef, parts)
 	}
 }
 

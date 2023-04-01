@@ -52,7 +52,7 @@ var _ Client[float64] = dummyClient[float64]{}
 
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
-func NewDummyWorkloadProjector(mailboxPathToName DynamicMapProvider[string, logicalcluster.Name]) WorkloadProjector {
+func NewDummyWorkloadProjector() WorkloadProjector {
 	return dummyClient[ProjectionMapProvider]{}
 }
 
@@ -68,11 +68,15 @@ func (lwp loggingWorkloadProjector) SetProvider(pmp ProjectionMapProvider) {
 	pmp.AddReceiver(lwp, true)
 }
 
-func (lwp loggingWorkloadProjector) Receive(pk ProjectionKey, ppc *ProjectionPerCluster) {
+func (lwp loggingWorkloadProjector) Put(pk ProjectionKey, ppc *ProjectionPerCluster) {
 	lwp.logger.Info("Received outer projection info", "pk", pk, "ppc", ppc)
 	if ppc != nil {
 		ppc.PerSourceCluster.AddReceiver(loggingWorkloadProjectorMid{lwp, pk}, true)
 	}
+}
+
+func (lwp loggingWorkloadProjector) Delete(pk ProjectionKey) {
+	lwp.logger.Info("Received outer projection deletion", "pk", pk)
 }
 
 type loggingWorkloadProjectorMid struct {
@@ -80,6 +84,10 @@ type loggingWorkloadProjectorMid struct {
 	pk ProjectionKey
 }
 
-func (lwpm loggingWorkloadProjectorMid) Receive(cluster logicalcluster.Name, pd ProjectionDetails) {
+func (lwpm loggingWorkloadProjectorMid) Put(cluster logicalcluster.Name, pd ProjectionDetails) {
 	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster, "pd", pd)
+}
+
+func (lwpm loggingWorkloadProjectorMid) Delete(cluster logicalcluster.Name) {
+	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster)
 }

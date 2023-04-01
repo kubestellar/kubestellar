@@ -69,10 +69,31 @@ func DynamicMapProviderRelease[Key comparable, Val any](prod DynamicMapProviderW
 	prod.MaybeRelease(key, func(Val) bool { return true })
 }
 
-// MappingReceiver is given map entries by a DynamicMapProvider.
+// Map is a finite set of (key,value) pairs
+// that has at most one value for any given key.
+// The collection may or may not be mutable.
+// This view of the collection may or may not have a limited scope of validity.
+// This view may or may not have concurrency restrictions.
+type Map[Key comparable, Val any] interface {
+	Emptyable
+	Len() int
+	LenIsCheap() bool
+	Get(Key) (Val, bool)
+	Visitable[Pair[Key, Val]]
+}
+
+// MutableMap is a Map that can be written to.
+type MutableMap[Key comparable, Val any] interface {
+	Map[Key, Val]
+	MappingReceiver[Key, Val]
+}
+
+// MappingReceiver is something that can be given key/value pairs.
+// This is the writable aspect of a Map.
 // Some DynamicMapProvider implementations require receivers to be comparable.
 type MappingReceiver[Key comparable, Val any] interface {
-	Receive(Key, Val)
+	Put(Key, Val)
+	Delete(Key)
 }
 
 // MappingReceiverFunc is a func value that implements MappingReceiver.
@@ -80,23 +101,6 @@ type MappingReceiver[Key comparable, Val any] interface {
 type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
 
 func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
-
-func SetChangeReceiverAsMappingReceiver[Key, Val comparable](inner SetChangeReceiver[Pair[Key, Val]]) MappingReceiver[Key, Val] {
-	return setChangeReceiverAsMappingReceiver[Key, Val]{inner}
-}
-
-type setChangeReceiverAsMappingReceiver[Key, Val comparable] struct {
-	inner SetChangeReceiver[Pair[Key, Val]]
-}
-
-func (scm setChangeReceiverAsMappingReceiver[Key, Val]) Receive(key Key, val Val) {
-	var zeroVal Val
-	if val == zeroVal {
-		scm.inner.Remove(Pair[Key, Val]{key, val})
-	} else {
-		scm.inner.Add(Pair[Key, Val]{key, val})
-	}
-}
 
 type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
 	Transform func(Type1) Type2

@@ -53,12 +53,16 @@ func NewTestAPIMapProvider(baseProducer BaseAPIMapProvider) *TestAPIMapProvider 
 
 type TestAPIMapProviderAsreceiver struct{ *TestAPIMapProvider }
 
-func (tamp TestAPIMapProviderAsreceiver) Receive(cluster logicalcluster.Name, producer ScopedAPIProvider) {
+func (tamp TestAPIMapProviderAsreceiver) Put(cluster logicalcluster.Name, producer ScopedAPIProvider) {
 	clusterData, found := tamp.clusters[cluster]
 	if !found {
 		return
 	}
 	clusterData.SetProvider(producer)
+}
+
+func (tamp TestAPIMapProviderAsreceiver) Delete(cluster logicalcluster.Name) {
+	delete(tamp.clusters, cluster)
 }
 
 func (tamp *TestAPIMapProvider) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {

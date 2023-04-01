@@ -84,10 +84,26 @@ func (sb *setBinder) AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhe
 
 type sbAsResolvedWhatReceiver struct{ *setBinder }
 
-func (sb sbAsResolvedWhatReceiver) Receive(epName ExternalName, resolvedWhat WorkloadParts) {
+func (sb sbAsResolvedWhatReceiver) Put(epName ExternalName, resolvedWhat WorkloadParts) {
 	sb.Lock()
 	defer sb.Unlock()
-	sbc := sb.ensureCluster(epName.Cluster)
+	sbc := sb.getCluster(epName.Cluster, true)
+	sbc.singleBinder.Transact(func(sbo SingleBindingOps) {
+		sbp := sbc.ensurePlacement(epName.Name)
+		sbc.singleBindingOps = sbo
+		sbp.resolvedWhatReceiver.Receive(resolvedWhat)
+		sbc.singleBindingOps = nil
+	})
+}
+
+func (sb sbAsResolvedWhatReceiver) Delete(epName ExternalName) {
+	sb.Lock()
+	defer sb.Unlock()
+	sbc := sb.getCluster(epName.Cluster, false)
+	if sbc == nil {
+		return
+	}
+	var resolvedWhat WorkloadParts
 	sbc.singleBinder.Transact(func(sbo SingleBindingOps) {
 		sbp := sbc.ensurePlacement(epName.Name)
 		sbc.singleBindingOps = sbo
@@ -98,10 +114,10 @@ func (sb sbAsResolvedWhatReceiver) Receive(epName ExternalName, resolvedWhat Wor
 
 type sbAsResolvedWhereReceiver struct{ *setBinder }
 
-func (sb sbAsResolvedWhereReceiver) Receive(epName ExternalName, resolvedWhere ResolvedWhere) {
+func (sb sbAsResolvedWhereReceiver) Put(epName ExternalName, resolvedWhere ResolvedWhere) {
 	sb.Lock()
 	defer sb.Unlock()
-	sbc := sb.ensureCluster(epName.Cluster)
+	sbc := sb.getCluster(epName.Cluster, true)
 	sbc.singleBinder.Transact(func(sbo SingleBindingOps) {
 		sbp := sbc.ensurePlacement(epName.Name)
 		sbc.singleBindingOps = sbo
@@ -110,9 +126,25 @@ func (sb sbAsResolvedWhereReceiver) Receive(epName ExternalName, resolvedWhere R
 	})
 }
 
-func (sb *setBinder) ensureCluster(cluster logicalcluster.Name) *setBindingForCluster {
-	sbc := sb.perCluster[cluster]
+func (sb sbAsResolvedWhereReceiver) Delete(epName ExternalName) {
+	sb.Lock()
+	defer sb.Unlock()
+	sbc := sb.getCluster(epName.Cluster, false)
 	if sbc == nil {
+		return
+	}
+	var resolvedWhere ResolvedWhere
+	sbc.singleBinder.Transact(func(sbo SingleBindingOps) {
+		sbp := sbc.ensurePlacement(epName.Name)
+		sbc.singleBindingOps = sbo
+		sbp.resolvedWhereReceiver.Receive(resolvedWhere)
+		sbc.singleBindingOps = nil
+	})
+}
+
+func (sb *setBinder) getCluster(cluster logicalcluster.Name, want bool) *setBindingForCluster {
+	sbc := sb.perCluster[cluster]
+	if sbc == nil && want {
 		sbc = &setBindingForCluster{
 			setBinder:    sb,
 			cluster:      cluster,

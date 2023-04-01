@@ -71,10 +71,8 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) MaybeRelease(key Key, shouldRelease
 		return
 	}
 	delete(rm.theMap, key)
-	var outerVal OuterVal
-	innerVal = rm.transform(outerVal)
 	for _, receiver := range rm.receivers {
-		receiver.Receive(key, innerVal)
+		receiver.Delete(key)
 	}
 }
 
@@ -93,7 +91,7 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) AddReceiver(receiver MappingReceive
 		return
 	}
 	for key, outerVal := range rm.theMap {
-		receiver.Receive(key, rm.transform(outerVal))
+		receiver.Put(key, rm.transform(outerVal))
 	}
 }
 
@@ -103,13 +101,22 @@ func (rm *relayMap[Key, OuterVal, InnerVal]) OuterGet(key Key) OuterVal {
 	return rm.theMap[key]
 }
 
-func (rm *relayMap[Key, OuterVal, InnerVal]) Receive(key Key, outerVal OuterVal) {
+func (rm *relayMap[Key, OuterVal, InnerVal]) Put(key Key, outerVal OuterVal) {
 	innerVal := rm.transform(outerVal)
 	rm.Lock()
 	defer rm.Unlock()
 	rm.theMap[key] = outerVal
 	for _, receiver := range rm.receivers {
-		receiver.Receive(key, innerVal)
+		receiver.Put(key, innerVal)
+	}
+}
+
+func (rm *relayMap[Key, OuterVal, InnerVal]) Delete(key Key) {
+	rm.Lock()
+	defer rm.Unlock()
+	delete(rm.theMap, key)
+	for _, receiver := range rm.receivers {
+		receiver.Delete(key)
 	}
 }
 
