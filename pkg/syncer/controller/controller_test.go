@@ -19,14 +19,12 @@ package controller
 import (
 	"context"
 	"fmt"
+	"testing"
 	"time"
-
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/fake"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,7 +34,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 
-	"testing"
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
+	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/fake"
+	edgeinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
 )
 
 var scheme *runtime.Scheme
