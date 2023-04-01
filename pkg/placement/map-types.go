@@ -96,6 +96,23 @@ type MappingReceiver[Key comparable, Val any] interface {
 	Delete(Key)
 }
 
+// TransactionalMappingReceiver is one that takes updates in batches
+type TransactionalMappingReceiver[Key comparable, Val any] interface {
+	Transact(func(MappingReceiver[Key, Val]))
+}
+
+func MappingReceiverTrivializeTransactions[Key comparable, Val any](mr MappingReceiver[Key, Val]) TransactionalMappingReceiver[Key, Val] {
+	return mappingReceiverTrivialTransactions[Key, Val]{mr}
+}
+
+type mappingReceiverTrivialTransactions[Key comparable, Val any] struct {
+	inner MappingReceiver[Key, Val]
+}
+
+func (mrtt mappingReceiverTrivialTransactions[Key, Val]) Transact(xn func(MappingReceiver[Key, Val])) {
+	xn(mrtt.inner)
+}
+
 type MappingReceiverFork[Key comparable, Val any] []MappingReceiver[Key, Val]
 
 var _ MappingReceiver[int, func()] = MappingReceiverFork[int, func()]{}

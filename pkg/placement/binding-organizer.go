@@ -42,13 +42,13 @@ func (partID WorkloadPartID) GroupResource() metav1.GroupResource {
 func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 	return func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler, projectionMappingReceiver ProjectionMappingReceiver) SingleBinder {
 		ans := &simpleBindingOrganizer{
-			logger:                logger,
-			discovery:             discovery,
-			resourceModes:         resourceModes,
-			eventHandler:          eventHandler,
-			projectionMapProvider: NewRelayAndProjectMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster](false, exportProjectionPerCluster),
+			logger:                    logger,
+			discovery:                 discovery,
+			resourceModes:             resourceModes,
+			eventHandler:              eventHandler,
+			projectionMapProvider:     NewRelayAndProjectMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster](false, exportProjectionPerCluster),
+			projectionMappingReceiver: projectionMappingReceiver,
 		}
-		ans.projectionMapProvider.AddReceiver(projectionMappingReceiver, false)
 		return ans
 	}
 }
@@ -57,11 +57,12 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 // In the locking order it precedes its discovery and its projectionMapProvider,
 // which in turn precedes each projectionPerClusterImpl.
 type simpleBindingOrganizer struct {
-	logger                klog.Logger
-	discovery             APIMapProvider
-	resourceModes         ResourceModes
-	eventHandler          EventHandler
-	projectionMapProvider TransformingRelayMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster]
+	logger                    klog.Logger
+	discovery                 APIMapProvider
+	resourceModes             ResourceModes
+	eventHandler              EventHandler
+	projectionMapProvider     TransformingRelayMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster]
+	projectionMappingReceiver ProjectionMappingReceiver
 	sync.Mutex
 }
 
@@ -88,12 +89,17 @@ func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps)) {
 	sbo.Lock()
 	defer sbo.Unlock()
 	sbo.logger.V(3).Info("Begin transaction")
-	xn(sboXnOps{sbo})
+	sbo.projectionMappingReceiver.Transact(func(rcv MappingReceiver[ProjectionKey, *ProjectionPerCluster]) {
+		xn(sboXnOps{sbo, rcv})
+	})
 	sbo.logger.V(3).Info("End transaction")
 }
 
 // sboXnOps exposes the Add and Remove methods only in the locked context of a transaction
-type sboXnOps struct{ sbo *simpleBindingOrganizer }
+type sboXnOps struct {
+	sbo *simpleBindingOrganizer
+	rcv MappingReceiver[ProjectionKey, *ProjectionPerCluster]
+}
 
 func (sxo sboXnOps) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 	sbo := sxo.sbo
@@ -120,6 +126,7 @@ func (sxo sboXnOps) Add(pair Pair[WorkloadPart, edgeapi.SinglePlacement]) bool {
 		sbo.logger.V(2).Info("Adding ProjectionPerCluster", "workloadPart", pair.First, "sps", pair.Second)
 		sbo.discovery.AddClient(cluster, pc)
 		sbo.projectionMapProvider.Put(pk, pc)
+		sxo.rcv.Put(pk, exportProjectionPerCluster(pc))
 	}
 	pd := pc.perSourceCluster.OuterGet(cluster)
 	var change bool

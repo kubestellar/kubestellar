@@ -37,11 +37,11 @@ var _ Client[float64] = dummyClient[float64]{}
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
 func NewDummyWorkloadProjector() WorkloadProjector {
-	return MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{}
+	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{})
 }
 
 func NewLoggingWorkloadProjector(logger klog.Logger) WorkloadProjector {
-	return loggingWorkloadProjector{logger}
+	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](loggingWorkloadProjector{logger})
 }
 
 type loggingWorkloadProjector struct {

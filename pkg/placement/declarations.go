@@ -84,7 +84,7 @@ type SetBinder func(workloadReceiver ProjectionMappingReceiver) (
 // copies in the mailbox workspaces and (b) the syncer configuration objects.
 type WorkloadProjector ProjectionMappingReceiver
 
-type ProjectionMappingReceiver MappingReceiver[ProjectionKey, *ProjectionPerCluster]
+type ProjectionMappingReceiver TransactionalMappingReceiver[ProjectionKey, *ProjectionPerCluster]
 
 // Runnable is something that can run until a given context is closed
 type Runnable interface {

@@ -63,7 +63,7 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	}
 	where1 := ResolvedWhere{sps1}
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)
-	whatReceiver, whereReceiver := binder(projectionTracker)
+	whatReceiver, whereReceiver := binder(MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](projectionTracker))
 	whatReceiver.Put(ep1Ref, what1)
 	whereReceiver.Put(ep1Ref, where1)
 	if projectionTracker.Len() != 1 {
