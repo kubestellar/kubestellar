@@ -21,23 +21,23 @@ import (
 	"fmt"
 	"time"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	syncerclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
-	syncerinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-
-	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 	"k8s.io/apimachinery/pkg/fields"
-
-	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
-	"github.com/kcp-dev/logicalcluster/v3"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/pkg/version"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
+
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
+	syncerclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
+	syncerinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
 
 type SyncerConfig struct {

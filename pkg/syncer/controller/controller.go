@@ -21,19 +21,18 @@ import (
 	"fmt"
 	"time"
 
-	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/typed/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
-
 	"k8s.io/klog/v2"
+
+	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/typed/edge/v1alpha1"
+	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/edge/v1alpha1"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
 
 const (
