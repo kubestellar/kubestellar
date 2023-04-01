@@ -2,7 +2,7 @@
 categories: ["Coding", "Sprints", "Milestones", "PoC"]
 tags: ["code","milestone","poc2023q1"] 
 title: "Possible Roadmaps for Particular Use Cases"
-linkTitle: "Details"
+linkTitle: "Roadmap Possibilities"
 weight: 2
 ---
 
