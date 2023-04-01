@@ -61,12 +61,11 @@ func NewSetBinder(
 	resourceModes ResourceModes,
 	eventHandler EventHandler,
 ) SetBinder {
-	return func(workloadReceiver, placementReceiver ProjectionMappingReceiver) (
+	return func(workloadReceiver ProjectionMappingReceiver) (
 		whatReceiver MappingReceiver[ExternalName, WorkloadParts],
 		whereReceiver MappingReceiver[ExternalName, ResolvedWhere],
 	) {
-		uniReceiver := MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{workloadReceiver, placementReceiver}
-		singleBinder := bindingOrganizer(discovery, resourceModes, eventHandler, uniReceiver)
+		singleBinder := bindingOrganizer(discovery, resourceModes, eventHandler, workloadReceiver)
 		sb := &setBinder{
 			logger:                              logger,
 			resolvedWhatDifferencerConstructor:  resolvedWhatDifferencerConstructor,

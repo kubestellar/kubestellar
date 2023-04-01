@@ -117,8 +117,7 @@ func (pt *placementTranslator) Run() {
 		DefaultResourceModes,
 		nil)
 	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
-	placementProjector := NewDummyWorkloadProjector()
-	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
+	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector)
 	// TODO: move all that stuff up before Run
 	runner.Run(ctx)
 }

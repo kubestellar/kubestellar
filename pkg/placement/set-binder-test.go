@@ -62,9 +62,8 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
 	where1 := ResolvedWhere{sps1}
-	projectionDiscarder := MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{}
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)
-	whatReceiver, whereReceiver := binder(projectionTracker, projectionDiscarder)
+	whatReceiver, whereReceiver := binder(projectionTracker)
 	whatReceiver.Put(ep1Ref, what1)
 	whereReceiver.Put(ep1Ref, where1)
 	if projectionTracker.Len() != 1 {

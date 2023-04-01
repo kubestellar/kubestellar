@@ -42,9 +42,7 @@ import (
 // - a SetBinder that keeps track of the bindings between resolved where
 //   and resolved what.
 // - a WorkloadProjector that maintains the customized workload copies
-//   in the mailbox workspaces.
-// - a PlacementProjector that maintains the TMC Placement objects that
-//   correspond to the EdgePlacement objects.
+//   and syncer configuration objects in the mailbox workspaces.
 
 // We are talking here about an assembly of several components, each
 // of which likely has private data protected by a mutex.
@@ -72,23 +70,19 @@ type WhatResolver func(MappingReceiver[ExternalName, WorkloadParts]) Runnable
 
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
-// workload projector and the placement projector.
+// workload projector.
 // The implementation may atomize the resolved "what" and "where"
 // using differencers constructed by a SetDifferencerConstructor.
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMappingReceiver behavior.
-type SetBinder func(workloadReceiver, placementReceiver ProjectionMappingReceiver) (
+type SetBinder func(workloadReceiver ProjectionMappingReceiver) (
 	whatReceiver MappingReceiver[ExternalName, WorkloadParts],
 	whereReceiver MappingReceiver[ExternalName, ResolvedWhere])
 
 // WorkloadProjector is kept appraised of what goes where
-// and is responsible for maintaining the customized workload
-// copies in the mailbox workspaces.
+// and is responsible for maintaining (a) the customized workload
+// copies in the mailbox workspaces and (b) the syncer configuration objects.
 type WorkloadProjector ProjectionMappingReceiver
-
-// PlacementProjector is responsible for maintaining the TMC Placement
-// objects that cause propagation between mailbox workspace and edge cluster.
-type PlacementProjector ProjectionMappingReceiver
 
 type ProjectionMappingReceiver MappingReceiver[ProjectionKey, *ProjectionPerCluster]
 
@@ -130,9 +124,8 @@ func AssemplePlacementTranslator(
 	whereResolver WhereResolver,
 	setBinder SetBinder,
 	workloadProjector WorkloadProjector,
-	placementProjector PlacementProjector,
 ) Runnable {
-	whatReceiver, whereReceiver := setBinder(workloadProjector, placementProjector)
+	whatReceiver, whereReceiver := setBinder(workloadProjector)
 	runWhat := whatResolver(whatReceiver)
 	runWhere := whereResolver(whereReceiver)
 	return RunAll{runWhat, runWhere}
