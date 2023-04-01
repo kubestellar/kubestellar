@@ -96,11 +96,21 @@ type MappingReceiver[Key comparable, Val any] interface {
 	Delete(Key)
 }
 
-// MappingReceiverFunc is a func value that implements MappingReceiver.
-// Remember that func values are not comparable.
-type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
+type MappingReceiverFork[Key comparable, Val any] []MappingReceiver[Key, Val]
 
-func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
+var _ MappingReceiver[int, func()] = MappingReceiverFork[int, func()]{}
+
+func (mrf MappingReceiverFork[Key, Val]) Put(key Key, val Val) {
+	for _, mr := range mrf {
+		mr.Put(key, val)
+	}
+}
+
+func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
+	for _, mr := range mrf {
+		mr.Delete(key)
+	}
+}
 
 type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
 	Transform func(Type1) Type2

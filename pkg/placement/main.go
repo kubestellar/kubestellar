@@ -45,8 +45,8 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 
-	whatResolverLauncher  func() *whatResolver
-	whereResolverLauncher func() *whereResolver
+	whatResolver  WhatResolver
+	whereResolver WhereResolver
 }
 
 func NewPlacementTranslator(
@@ -81,9 +81,9 @@ func NewPlacementTranslator(
 		crdClusterInformer:     crdClusterPreInformer.Informer(),
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
-		whatResolverLauncher: NewWhatResolverLauncher(ctx, epClusterPreInformer, discoveryClusterClient,
+		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
-		whereResolverLauncher: NewWhereResolverLauncher(ctx, spsClusterPreInformer, numThreads),
+		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
 	return pt
 }
@@ -102,10 +102,14 @@ func (pt *placementTranslator) Run() {
 	// TODO: make all the other needed infrastructure
 
 	// TODO: replace all these dummies
-	whatResolver := pt.whatResolverLauncher()
-	whatResolver.AddReceiver(LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, true) // debugging
-	whereResolver := pt.whereResolverLauncher()
-	whereResolver.AddReceiver(LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, true) // debugging
+	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
+		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, mr}
+		return pt.whatResolver(fork)
+	}
+	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
+		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, mr}
+		return pt.whereResolver(fork)
+	}
 	dummyBaseAPIProvider := NewRelayMap[logicalcluster.Name, ScopedAPIProvider](false)
 	setBinder := NewSetBinder(pt.logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
 		SimpleBindingOrganizer(pt.logger),
@@ -114,8 +118,9 @@ func (pt *placementTranslator) Run() {
 		nil)
 	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
 	placementProjector := NewDummyWorkloadProjector()
-	AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
-	<-doneCh
+	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
+	// TODO: move all that stuff up before Run
+	runner.Run(ctx)
 }
 
 type LoggingMappingReceiver[Key comparable, Val any] struct {

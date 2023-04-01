@@ -30,22 +30,6 @@ func RelayWhereResolver() RelayMap[ExternalName, ResolvedWhere] {
 	return NewRelayMap[ExternalName, ResolvedWhere](true)
 }
 
-func NewDummySetBinder() SetBinder {
-	return dummySetBinder{NewRelayMap[ProjectionKey, *ProjectionPerCluster](true)}
-}
-
-type dummySetBinder struct {
-	DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
-}
-
-func (dummySetBinder) AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts] {
-	return RelayWhatResolver()
-}
-
-func (dummySetBinder) AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere] {
-	return RelayWhereResolver()
-}
-
 type dummyClient[Producer any] struct{}
 
 var _ Client[float64] = dummyClient[float64]{}
@@ -53,7 +37,7 @@ var _ Client[float64] = dummyClient[float64]{}
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
 func NewDummyWorkloadProjector() WorkloadProjector {
-	return dummyClient[ProjectionMapProvider]{}
+	return MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{}
 }
 
 func NewLoggingWorkloadProjector(logger klog.Logger) WorkloadProjector {
@@ -62,10 +46,6 @@ func NewLoggingWorkloadProjector(logger klog.Logger) WorkloadProjector {
 
 type loggingWorkloadProjector struct {
 	logger klog.Logger
-}
-
-func (lwp loggingWorkloadProjector) SetProvider(pmp ProjectionMapProvider) {
-	pmp.AddReceiver(lwp, true)
 }
 
 func (lwp loggingWorkloadProjector) Put(pk ProjectionKey, ppc *ProjectionPerCluster) {

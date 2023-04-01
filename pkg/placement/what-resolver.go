@@ -49,11 +49,13 @@ import (
 )
 
 type whatResolver struct {
-	ctx    context.Context
-	logger klog.Logger
-	queue  workqueue.RateLimitingInterface
+	ctx        context.Context
+	logger     klog.Logger
+	numThreads int
+	queue      workqueue.RateLimitingInterface
+	receiver   MappingReceiver[ExternalName, WorkloadParts]
+
 	sync.Mutex
-	receivers []MappingReceiver[ExternalName, WorkloadParts]
 
 	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
 	edgePlacementLister   edgev1alpha1listers.EdgePlacementClusterLister
@@ -96,12 +98,10 @@ type objectDetails struct {
 	placementsWantNamespace k8ssets.String // non-nil only for Namespace objects
 }
 
-var _ WhatResolver = &whatResolver{}
-
-// NewWhatResolverLauncher returns a function that returns a WhatResolver;
+// NewWhatResolver returns a WhatResolver;
 // invoke that function after the namespace informer has synced.
 // TODO: add the other needed pre-informers.
-func NewWhatResolverLauncher(
+func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev1alpha1informers.EdgePlacementClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
@@ -109,13 +109,14 @@ func NewWhatResolverLauncher(
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	numThreads int,
-) func() *whatResolver {
+) WhatResolver {
 	controllerName := "what-resolver"
 	logger := klog.FromContext(ctx).WithValues("part", controllerName)
 	ctx = klog.NewContext(ctx, logger)
 	wr := &whatResolver{
 		ctx:                       ctx,
 		logger:                    logger,
+		numThreads:                numThreads,
 		queue:                     workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		edgePlacementInformer:     edgePlacementPreInformer.Informer(),
 		edgePlacementLister:       edgePlacementPreInformer.Lister(),
@@ -125,18 +126,26 @@ func NewWhatResolverLauncher(
 		dynamicClusterClient:      dynamicClusterClient,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
-	wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
-	return func() *whatResolver {
-		// go wr.edgePlacementInformer.Run(ctx.Done())
-		if upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
-			for i := 0; i < numThreads; i++ {
-				go wait.Until(wr.runWorker, time.Second, ctx.Done())
-			}
-		} else {
+	return func(receiver MappingReceiver[ExternalName, WorkloadParts]) Runnable {
+		wr.receiver = receiver
+		wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
+		if !upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
 			logger.Info("Failed to sync EdgePlacements in time")
 		}
 		return wr
 	}
+}
+
+func (wr *whatResolver) Run(ctx context.Context) {
+	var wg sync.WaitGroup
+	wg.Add(wr.numThreads)
+	for i := 0; i < wr.numThreads; i++ {
+		go func() {
+			wait.Until(wr.runWorker, time.Second, ctx.Done())
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 type queueItem struct {
@@ -214,21 +223,6 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 	wr.queue.Add(item)
 }
 
-func (wr *whatResolver) AddReceiver(receiver MappingReceiver[ExternalName, WorkloadParts], notifyCurrent bool) {
-	wr.Lock()
-	defer wr.Unlock()
-	wr.receivers = append(wr.receivers, receiver)
-	if !notifyCurrent {
-		return
-	}
-	for wldCluster, wsDetails := range wr.workspaceDetails {
-		for epName := range wsDetails.placements {
-			parts := wr.getPartsLocked(wldCluster, epName)
-			receiver.Put(ExternalName{Cluster: wldCluster, Name: epName}, parts)
-		}
-	}
-}
-
 func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
 	wr.Lock()
 	defer wr.Unlock()
@@ -266,9 +260,7 @@ func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name,
 func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName string) {
 	parts := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
-	for _, receiver := range wr.receivers {
-		receiver.Put(epRef, parts)
-	}
+	wr.receiver.Put(epRef, parts)
 }
 
 func (wr *whatResolver) runWorker() {

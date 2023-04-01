@@ -33,7 +33,6 @@ type setBinder struct {
 	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor
 	perCluster                          map[logicalcluster.Name]*setBindingForCluster
 	singleBinder                        SingleBinder
-	ProjectionMapProvider
 }
 
 type setBindingForCluster struct {
@@ -62,24 +61,21 @@ func NewSetBinder(
 	resourceModes ResourceModes,
 	eventHandler EventHandler,
 ) SetBinder {
-	singleBinder, projectionMapProvider := bindingOrganizer(discovery, resourceModes, eventHandler)
-	ans := &setBinder{
-		logger:                              logger,
-		resolvedWhatDifferencerConstructor:  resolvedWhatDifferencerConstructor,
-		resolvedWhereDifferencerConstructor: resolvedWhereDifferencerConstructor,
-		perCluster:                          map[logicalcluster.Name]*setBindingForCluster{},
-		singleBinder:                        singleBinder,
-		ProjectionMapProvider:               projectionMapProvider,
+	return func(workloadReceiver, placementReceiver ProjectionMappingReceiver) (
+		whatReceiver MappingReceiver[ExternalName, WorkloadParts],
+		whereReceiver MappingReceiver[ExternalName, ResolvedWhere],
+	) {
+		uniReceiver := MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{workloadReceiver, placementReceiver}
+		singleBinder := bindingOrganizer(discovery, resourceModes, eventHandler, uniReceiver)
+		sb := &setBinder{
+			logger:                              logger,
+			resolvedWhatDifferencerConstructor:  resolvedWhatDifferencerConstructor,
+			resolvedWhereDifferencerConstructor: resolvedWhereDifferencerConstructor,
+			perCluster:                          map[logicalcluster.Name]*setBindingForCluster{},
+			singleBinder:                        singleBinder,
+		}
+		return sbAsResolvedWhatReceiver{sb}, sbAsResolvedWhereReceiver{sb}
 	}
-	return ans
-}
-
-func (sb *setBinder) AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts] {
-	return sbAsResolvedWhatReceiver{sb}
-}
-
-func (sb *setBinder) AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere] {
-	return sbAsResolvedWhereReceiver{sb}
 }
 
 type sbAsResolvedWhatReceiver struct{ *setBinder }

@@ -40,7 +40,7 @@ func (partID WorkloadPartID) GroupResource() metav1.GroupResource {
 }
 
 func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
-	return func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler) (SingleBinder, ProjectionMapProvider) {
+	return func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler, projectionMappingReceiver ProjectionMappingReceiver) SingleBinder {
 		ans := &simpleBindingOrganizer{
 			logger:                logger,
 			discovery:             discovery,
@@ -48,7 +48,8 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			eventHandler:          eventHandler,
 			projectionMapProvider: NewRelayAndProjectMap[ProjectionKey, *projectionPerClusterImpl, *ProjectionPerCluster](false, exportProjectionPerCluster),
 		}
-		return ans, ans.projectionMapProvider
+		ans.projectionMapProvider.AddReceiver(projectionMappingReceiver, false)
+		return ans
 	}
 }
 

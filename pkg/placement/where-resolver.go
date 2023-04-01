@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -35,9 +36,10 @@ import (
 )
 
 type whereResolver struct {
-	ctx    context.Context
-	logger klog.Logger
-	queue  workqueue.RateLimitingInterface
+	ctx        context.Context
+	logger     klog.Logger
+	numThreads int
+	queue      workqueue.RateLimitingInterface
 
 	spsInformer kcpcache.ScopeableSharedIndexInformer
 	spsLister   edgev1alpha1listers.SinglePlacementSliceClusterLister
@@ -46,36 +48,44 @@ type whereResolver struct {
 	resolutions RelayMap[ExternalName, ResolvedWhere]
 }
 
-var _ WhereResolver = &whereResolver{}
-
-// NewWhereResolverLauncher returns a function that returns a WhereResolver.
-func NewWhereResolverLauncher(
+// NewWhereResolver returns a WhereResolver.
+func NewWhereResolver(
 	ctx context.Context,
 	spsPreInformer edgev1alpha1informers.SinglePlacementSliceClusterInformer,
 	numThreads int,
-) func() *whereResolver {
-	controllerName := "where-resolver"
-	logger := klog.FromContext(ctx).WithValues("part", controllerName)
-	ctx = klog.NewContext(ctx, logger)
-	wr := &whereResolver{
-		ctx:         ctx,
-		logger:      logger,
-		queue:       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-		spsInformer: spsPreInformer.Informer(),
-		spsLister:   spsPreInformer.Lister(),
-		resolutions: NewRelayMap[ExternalName, ResolvedWhere](true),
-	}
-	wr.spsInformer.AddEventHandler(WhereResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "SinglePlacementSlice")})
-	return func() *whereResolver {
-		if upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.spsInformer.HasSynced) {
-			for i := 0; i < numThreads; i++ {
-				go wait.Until(wr.runWorker, time.Second, ctx.Done())
-			}
-		} else {
+) WhereResolver {
+	return func(receiver MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
+		controllerName := "where-resolver"
+		logger := klog.FromContext(ctx).WithValues("part", controllerName)
+		ctx = klog.NewContext(ctx, logger)
+		wr := &whereResolver{
+			ctx:         ctx,
+			logger:      logger,
+			numThreads:  numThreads,
+			queue:       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
+			spsInformer: spsPreInformer.Informer(),
+			spsLister:   spsPreInformer.Lister(),
+			resolutions: NewRelayMap[ExternalName, ResolvedWhere](false),
+		}
+		wr.resolutions.AddReceiver(receiver, false)
+		wr.spsInformer.AddEventHandler(WhereResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "SinglePlacementSlice")})
+		if !upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.spsInformer.HasSynced) {
 			logger.Info("Failed to sync SinglePlacementSlices in time")
 		}
 		return wr
 	}
+}
+
+func (wr *whereResolver) Run(ctx context.Context) {
+	var wg sync.WaitGroup
+	wg.Add(wr.numThreads)
+	for i := 0; i < wr.numThreads; i++ {
+		go func() {
+			wait.Until(wr.runWorker, time.Second, ctx.Done())
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 type WhereResolverClusterHandler struct {
