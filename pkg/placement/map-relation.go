@@ -16,85 +16,6 @@ limitations under the License.
 
 package placement
 
-type Relation2[First, Second comparable] interface {
-	Set[Pair[First, Second]]
-	Visit1to2(First, func(Second) error) error
-	Visit2to1(Second, func(First) error) error
-}
-
-type MutableRelation2[First, Second comparable] interface {
-	Relation2[First, Second]
-	MutableSet[Pair[First, Second]]
-}
-
-func Relation2LenFromVisit[First, Second comparable](reln Relation2[First, Second]) int {
-	var ans int
-	reln.Visit(func(_ Pair[First, Second]) error {
-		ans++
-		return nil
-	})
-	return ans
-}
-
-func Relation2Reverse[First, Second comparable](forward Relation2[First, Second]) Relation2[Second, First] {
-	return ReverseRelation2[First, Second]{baseReverseRelation2[First, Second]{forward}}
-}
-
-var _ Relation2[int, string] = ReverseRelation2[string, int]{}
-
-type ReverseRelation2[First, Second comparable] struct {
-	baseReverseRelation2[First, Second]
-}
-
-type baseReverseRelation2[First, Second comparable] struct {
-	forward Relation2[First, Second]
-}
-
-func (rr baseReverseRelation2[First, Second]) IsEmpty() bool {
-	return rr.forward.IsEmpty()
-}
-
-func (rr baseReverseRelation2[First, Second]) LenIsCheap() bool {
-	return rr.forward.LenIsCheap()
-}
-
-func (rr baseReverseRelation2[First, Second]) Len() int {
-	return rr.forward.Len()
-}
-
-func (rr baseReverseRelation2[First, Second]) Has(tup Pair[Second, First]) bool {
-	return rr.forward.Has(tup.Reverse())
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit(visitor func(Pair[Second, First]) error) error {
-	return rr.forward.Visit(func(tup Pair[First, Second]) error { return visitor(tup.Reverse()) })
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit1to2(second Second, visitor func(First) error) error {
-	return rr.forward.Visit2to1(second, visitor)
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit2to1(first First, visitor func(Second) error) error {
-	return rr.forward.Visit1to2(first, visitor)
-}
-
-type ReverseMutableRelation2[First, Second comparable] struct {
-	baseReverseRelation2[First, Second]
-	forward MutableRelation2[First, Second]
-}
-
-func MutableRelation2Reverse[First, Second comparable](forward MutableRelation2[First, Second]) MutableRelation2[Second, First] {
-	return ReverseMutableRelation2[First, Second]{baseReverseRelation2[First, Second]{forward}, forward}
-}
-
-func (rr ReverseMutableRelation2[First, Second]) Add(tup Pair[Second, First]) bool {
-	return rr.forward.Add(tup.Reverse())
-}
-
-func (rr ReverseMutableRelation2[First, Second]) Remove(tup Pair[Second, First]) bool {
-	return rr.forward.Remove(tup.Reverse())
-}
-
 // MapRelation2 is a relation represented by two map-based indices.
 // It is mutable.
 // It is not safe for concurrent access.
@@ -189,32 +110,4 @@ func delFromIndex[First, Second comparable](index map[First]MapSet[Second], key 
 
 func Relation2WithObservers[First, Second comparable](inner MutableRelation2[First, Second], observers ...SetChangeReceiver[Pair[First, Second]]) MutableRelation2[First, Second] {
 	return &relation2WithObservers[First, Second]{inner, inner, observers}
-}
-
-type relation2WithObservers[First, Second comparable] struct {
-	Relation2[First, Second]
-	inner     MutableRelation2[First, Second]
-	observers []SetChangeReceiver[Pair[First, Second]]
-}
-
-var _ MutableRelation2[int, string] = &relation2WithObservers[int, string]{}
-
-func (rwo *relation2WithObservers[First, Second]) Add(tup Pair[First, Second]) bool {
-	if rwo.inner.Add(tup) {
-		for _, observer := range rwo.observers {
-			observer.Add(tup)
-		}
-		return true
-	}
-	return false
-}
-
-func (rwo *relation2WithObservers[First, Second]) Remove(tup Pair[First, Second]) bool {
-	if rwo.inner.Remove(tup) {
-		for _, observer := range rwo.observers {
-			observer.Remove(tup)
-		}
-		return true
-	}
-	return false
 }

@@ -668,14 +668,6 @@ func gvrIsNamespace(gr schema.GroupVersionResource) bool {
 	return gr.Group == "" && gr.Resource == "namespaces"
 }
 
-func NewSet[Elt comparable](elts []Elt) map[Elt]Empty {
-	ans := map[Elt]Empty{}
-	for _, elt := range elts {
-		ans[elt] = Empty{}
-	}
-	return ans
-}
-
 func mkgk(group, kind string) schema.GroupKind {
 	return schema.GroupKind{Group: group, Kind: kind}
 }

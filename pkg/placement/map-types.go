@@ -16,11 +16,6 @@ limitations under the License.
 
 package placement
 
-import (
-	"fmt"
-	"strings"
-)
-
 // This file defines some generic types that embody common patterns.
 
 // These types use the following terminology conventions.
@@ -118,55 +113,6 @@ func (xr TransformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
 func (xr TransformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Remove(v2)
-}
-
-type Pair[First any, Second any] struct {
-	First  First
-	Second Second
-}
-
-func (tup Pair[First, Second]) String() string {
-	var ans strings.Builder
-	ans.WriteRune('(')
-	ans.WriteString(fmt.Sprintf("%v", tup.First))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Second))
-	ans.WriteRune(')')
-	return ans.String()
-}
-
-func (tup Pair[First, Second]) Reverse() Pair[Second, First] {
-	return Pair[Second, First]{First: tup.Second, Second: tup.First}
-}
-
-func AddFirstFunc[First any, Second any](first First) func(Second) Pair[First, Second] {
-	return func(second Second) Pair[First, Second] {
-		return Pair[First, Second]{First: first, Second: second}
-	}
-}
-
-func AddSecondFunc[First any, Second any](second Second) func(First) Pair[First, Second] {
-	return func(first First) Pair[First, Second] {
-		return Pair[First, Second]{First: first, Second: second}
-	}
-}
-
-type Triple[First any, Second any, Third any] struct {
-	First  First
-	Second Second
-	Third  Third
-}
-
-func (tup Triple[First, Second, Third]) String() string {
-	var ans strings.Builder
-	ans.WriteRune('(')
-	ans.WriteString(fmt.Sprintf("%v", tup.First))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Second))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Third))
-	ans.WriteRune(')')
-	return ans.String()
 }
 
 type Client[T any] interface {

@@ -17,8 +17,9 @@ limitations under the License.
 package placement
 
 import (
-	"github.com/kcp-dev/logicalcluster/v3"
 	"k8s.io/klog/v2"
+
+	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 func RelayWhatResolver() RelayMap[ExternalName, WorkloadParts] {
