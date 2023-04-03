@@ -17,75 +17,78 @@ limitations under the License.
 package placement
 
 import (
+	"sync"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/kcp-dev/logicalcluster/v3"
 )
 
-// TestAPIMapProvider is a simple implementation of APIMapProvider.
-// It relies on a base map provider and caches the mappings,
-// and deletes unneeded entries from the base map provider.
-// In the locking order:
-// - callers of the TestAPIMapProvider methods precede the baseProducer
-// - callers of NewTestAPIMapProvider precede the baseProducer
-// - the baseProducer precedes this TestAPIMapProvider
-// - this TestAPIMapProvider precedes each of its Clients
-type TestAPIMapProvider struct {
-	baseProducer BaseAPIMapProvider
-
-	// No mutex needed here because of expected exclusivity of callbacks from baseProducer
-
-	clusters map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]
+func NewTestAPIMapProvider() *TestAPIMapProvider {
+	return &TestAPIMapProvider{
+		perCluster: NewMapMap[logicalcluster.Name, *TestAPIPerCluster](nil),
+	}
 }
 
-// BaseAPIMapProvider is a source of API information.
-// It is expected to hold a mutex while calling into this client.
-type BaseAPIMapProvider DynamicMapProviderWithRelease[logicalcluster.Name, ScopedAPIProvider]
+// TestAPIMapProvider is a funky APIMapProvider for testing purposes.
+// It is not fully compliant regarding locking.
+// It exposes internals for test functions to examine and manipulate.
+// A test func can modify a cluster's GroupInfo and/or ResourceInfo
+// and the registered receivers will be synchronously updated, but this
+// should only be done while there is no concurrent acess going on.
+// RemoveReceivers will not be implemented until go 1.20 or later is
+// required for this module.
+type TestAPIMapProvider struct {
+	sync.Mutex
+	perCluster MutableMap[logicalcluster.Name, *TestAPIPerCluster]
+}
+
+type TestAPIPerCluster struct {
+	GroupInfo         MutableMap[string /*group name*/, APIGroupInfo]
+	ResourceInfo      MutableMap[metav1.GroupResource, ResourceDetails]
+	groupReceivers    MappingReceiverFork[string /*group name*/, APIGroupInfo]
+	resourceReceivers MappingReceiverFork[metav1.GroupResource, ResourceDetails]
+}
 
 var _ APIMapProvider = &TestAPIMapProvider{}
 
-func NewTestAPIMapProvider(baseProducer BaseAPIMapProvider) *TestAPIMapProvider {
-	ans := &TestAPIMapProvider{
-		baseProducer: baseProducer,
-		clusters:     map[logicalcluster.Name]*ClientTracker[ScopedAPIProvider]{},
-	}
-	baseProducer.AddReceiver(TestAPIMapProviderAsreceiver{ans}, false)
-	return ans
+func (tap *TestAPIMapProvider) AddReceivers(cluster logicalcluster.Name,
+	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
+	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
+	tap.Lock()
+	defer tap.Unlock()
+	tpc := MapGetAdd(tap.perCluster, cluster, true, func(cluster logicalcluster.Name) *TestAPIPerCluster {
+		groupReceivers := MappingReceiverFork[string /*group name*/, APIGroupInfo]{}
+		resourceReceivers := MappingReceiverFork[metav1.GroupResource, ResourceDetails]{}
+		tpc := &TestAPIPerCluster{
+			GroupInfo:         NewMapMap[string /*group name*/, APIGroupInfo](MappingReceiverDiscardsPrevious[string /*group name*/, APIGroupInfo](groupReceivers)),
+			ResourceInfo:      NewMapMap[metav1.GroupResource, ResourceDetails](MappingReceiverDiscardsPrevious[metav1.GroupResource, ResourceDetails](resourceReceivers)),
+			groupReceivers:    groupReceivers,
+			resourceReceivers: resourceReceivers,
+		}
+		return tpc
+	})
+	MapApply[string /*group name*/, APIGroupInfo](tpc.GroupInfo, groupReceiver)
+	MapApply[metav1.GroupResource, ResourceDetails](tpc.ResourceInfo, resourceReceiver)
+	tpc.groupReceivers = append(tpc.groupReceivers, groupReceiver)
+	tpc.resourceReceivers = append(tpc.resourceReceivers, resourceReceiver)
 }
 
-type TestAPIMapProviderAsreceiver struct{ *TestAPIMapProvider }
-
-func (tamp TestAPIMapProviderAsreceiver) Put(cluster logicalcluster.Name, producer ScopedAPIProvider) {
-	clusterData, found := tamp.clusters[cluster]
-	if !found {
+func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
+	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
+	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
+	tap.Lock()
+	defer tap.Unlock()
+	tpc, has := tap.perCluster.Get(cluster)
+	if !has {
 		return
+	} else {
+		// The following statement is only here to stop linters from complaining that tpc is unused.
+		// Remove this statement once the panic is removed.
+		tpc.groupReceivers = MappingReceiverFork[string /*group name*/, APIGroupInfo]{}
 	}
-	clusterData.SetProvider(producer)
-}
-
-func (tamp TestAPIMapProviderAsreceiver) Delete(cluster logicalcluster.Name) {
-	delete(tamp.clusters, cluster)
-}
-
-func (tamp *TestAPIMapProvider) AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
-	tamp.baseProducer.Get(cluster, func(producer ScopedAPIProvider) {
-		clusterData, found := tamp.clusters[cluster]
-		if !found {
-			clusterData = NewClientTracker[ScopedAPIProvider]()
-			clusterData.SetProvider(producer)
-		}
-		clusterData.AddClient(client)
-	})
-}
-
-func (tamp *TestAPIMapProvider) RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider]) {
-	tamp.baseProducer.MaybeRelease(cluster, func(ScopedAPIProvider) bool {
-		clusterData, found := tamp.clusters[cluster]
-		if !found {
-			return true
-		}
-		release := clusterData.RemoveClient(client)
-		if release {
-			delete(tamp.clusters, cluster)
-		}
-		return release
-	})
+	panic("not implemented until go 1.20 is required for this module")
+	// The following requires go 1.20:
+	// tpc.groupReceivers = SliceRemoveFunctional(tpc.groupReceivers, groupReceiver)
+	// tpc.resourceReceivers = SliceRemoveFunctional(tpc.resourceReceivers, resourceReceiver)
 }

@@ -186,12 +186,13 @@ func main() {
 
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
 
-	crdClusterInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	bindingClusterInformer := dynamicClusterInformerFactory.ForResource(apisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	// crdClusterPreInformer.Informer().Cluster()
+	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(apisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterInformer, bindingClusterInformer, dynamicClusterClient)
+	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)

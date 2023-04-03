@@ -476,12 +476,41 @@ Check out the SinglePlacementSlice objects as follows.
 
 ```shell
 $ kubectl ws root:work-c
-$ kubectl get SinglePlacementSlice
-(TODO: show what it looks like)
-$ kubectl ws root:work-s
-$ kubectl get SinglePlacementSlice
-(TODO: show what it looks like)
+$ kubectl get SinglePlacementSlice -o yaml
+apiVersion: v1
+items:
+- apiVersion: edge.kcp.io/v1alpha1
+  destinations:
+  - cluster: y2vvakjnwxns951p
+    locationName: location-g
+    syncTargetName: sync-target-g
+    syncTargetUID: 6be95d47-e85e-474d-9367-bb00e1074718
+  - cluster: y2vvakjnwxns951p
+    locationName: location-f
+    syncTargetName: sync-target-f
+    syncTargetUID: f42b9446-97c5-42a7-a514-0af32350289d
+  kind: SinglePlacementSlice
+  metadata:
+    annotations:
+      kcp.io/cluster: 1em0rxri71aqmd41
+    creationTimestamp: "2023-04-07T02:52:09Z"
+    generation: 11
+    name: edge-placement-c
+    ownerReferences:
+    - apiVersion: edge.kcp.io/v1alpha1
+      kind: EdgePlacement
+      name: edge-placement-c
+      uid: 598bbf90-2487-42f6-bf02-0c9f8511acce
+    resourceVersion: "1154"
+    uid: 4e69bd90-ce13-4d62-8deb-f500216757eb
+kind: List
+metadata:
+  resourceVersion: ""
 ```
+
+Also check out the SinglePlacementSlice objects in `root:work-s`.  It
+should go similarly, but the `destinations` should include only the
+entry for florin.
 
 ## Stage 3
 

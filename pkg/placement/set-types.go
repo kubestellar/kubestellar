@@ -49,9 +49,40 @@ type MutableSet[Elt comparable] interface {
 }
 
 // SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[T comparable] interface {
-	Add(T) bool    /* changed */
-	Remove(T) bool /* changed */
+type SetChangeReceiver[Elt comparable] interface {
+	Add(Elt) bool    /* changed */
+	Remove(Elt) bool /* changed */
+}
+
+// SetChangeReceiverFuncs puts the SetChangeReceiver stamp of approval on a pair of funcs.
+// Either may be `nil“, in which case the corresponding SetChangeReceiver method returns `false`.
+type SetChangeReceiverFuncs[Elt comparable] struct {
+	OnAdd    func(Elt) bool
+	OnRemove func(Elt) bool
+}
+
+var _ SetChangeReceiver[int] = SetChangeReceiverFuncs[int]{}
+
+func (scrf SetChangeReceiverFuncs[Elt]) Add(elt Elt) bool {
+	if scrf.OnAdd != nil {
+		return scrf.OnAdd(elt)
+	}
+	return false
+}
+func (scrf SetChangeReceiverFuncs[Elt]) Remove(elt Elt) bool {
+	if scrf.OnRemove != nil {
+		return scrf.OnRemove(elt)
+	}
+	return false
+}
+
+func VisitableLen[Elt any](visitable Visitable[Elt]) int {
+	var ans int
+	visitable.Visit(func(_ Elt) error {
+		ans++
+		return nil
+	})
+	return ans
 }
 
 func VisitableHas[Elt comparable](set Visitable[Elt], seek Elt) bool {
@@ -61,6 +92,20 @@ func VisitableHas[Elt comparable](set Visitable[Elt], seek Elt) bool {
 		}
 		return nil
 	}) != nil
+}
+
+func VisitableGet[Elt any](seq Visitable[Elt], index int) (Elt, bool) {
+	var ans Elt
+	var currentIndex int
+	res := seq.Visit(func(elt Elt) error {
+		if currentIndex == index {
+			ans = elt
+			return errStop
+		}
+		currentIndex++
+		return nil
+	})
+	return ans, res != nil
 }
 
 func SetAddAll[Elt comparable](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allNew bool) {
@@ -88,6 +133,25 @@ func SetRemoveAll[Elt comparable](set MutableSet[Elt], goners Visitable[Elt]) (s
 	})
 	return
 }
+
+// Func11Compose11 composes two 1-arg 1-result functions
+func Func11Compose11[Type1, Type2, Type3 any](fn1 func(Type1) Type2, fn2 func(Type2) Type3) func(Type1) Type3 {
+	return func(val1 Type1) Type3 {
+		val2 := fn1(val1)
+		return fn2(val2)
+	}
+}
+
+// SetReadonly is a wrapper that removes the ability to write to the set
+type SetReadonly[Elt comparable] struct{ set Set[Elt] }
+
+var _ Set[string] = SetReadonly[string]{}
+
+func (sr SetReadonly[Elt]) IsEmpty() bool                       { return sr.set.IsEmpty() }
+func (sr SetReadonly[Elt]) LenIsCheap() bool                    { return sr.set.LenIsCheap() }
+func (sr SetReadonly[Elt]) Len() int                            { return sr.set.Len() }
+func (sr SetReadonly[Elt]) Has(elt Elt) bool                    { return sr.set.Has(elt) }
+func (sr SetReadonly[Elt]) Visit(visitor func(Elt) error) error { return sr.set.Visit(visitor) }
 
 // SetChangeReceiverReverse returns a receiver that acts in the opposite way as the given receiver.
 // That is, Add and Remove are swapped.
@@ -149,6 +213,23 @@ func (crr setChangeReceiverReverse[Elt]) Remove(elt Elt) bool {
 	return crr.forward.Add(elt)
 }
 
+type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
+	Transform func(Type1) Type2
+	Inner     SetChangeReceiver[Type2]
+}
+
+var _ SetChangeReceiver[int] = &TransformSetChangeReceiver[int, string]{}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Add(v2)
+}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Remove(v2)
+}
+
 // Reducer is something that crunches a collection down into one value
 type Reducer[Elt any, Ans any] func(Visitable[Elt]) Ans
 
@@ -163,9 +244,6 @@ func ValueReducer[Elt any, Accum any, Ans any](initialize func() Accum, add func
 		return finish(accum)
 	}
 }
-
-// Identity1 is useful in reduers where the accumulator has the same type as the result
-func Identity1[Val any](val Val) Val { return val }
 
 // StatefulReducer makes a Reducer that works with a stateful accumulator
 func StatefulReducer[Elt any, Accum any, Ans any](initialize func() Accum, add func(Accum, Elt), finish func(Accum) Ans) Reducer[Elt, Ans] {

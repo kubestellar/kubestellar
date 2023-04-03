@@ -69,15 +69,3 @@ func TestDynamicJoin12with13(t *testing.T) {
 		}
 	}
 }
-
-func Relation2Equijoin12with13[First, Second, Third comparable](left Relation2[First, Second], right Relation2[First, Third]) Relation2[Second, Third] {
-	ans := NewMapRelation2[Second, Third]()
-	left.Visit(func(xy Pair[First, Second]) error {
-		right.Visit1to2(xy.First, func(z Third) error {
-			ans.Add(Pair[Second, Third]{xy.Second, z})
-			return nil
-		})
-		return nil
-	})
-	return ans
-}

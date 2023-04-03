@@ -29,14 +29,13 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 )
 
 type placementTranslator struct {
 	context                context.Context
-	logger                 klog.Logger
+	apiProvider            APIWatchMapProvider
 	spsClusterInformer     kcpcache.ScopeableSharedIndexInformer
 	mbwsInformer           k8scache.SharedIndexInformer
 	kcpClusterClientset    kcpclusterclientset.ClusterInterface
@@ -69,11 +68,11 @@ func NewPlacementTranslator(
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
 	// needed to read and write arbitrary objects
 	dynamicClusterClient clusterdynamic.ClusterInterface,
-	// TODO: add the other needed arguments
 ) *placementTranslator {
+	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	pt := &placementTranslator{
 		context:                ctx,
-		logger:                 klog.FromContext(ctx),
+		apiProvider:            amp,
 		spsClusterInformer:     spsClusterPreInformer.Informer(),
 		mbwsInformer:           mbwsPreInformer.Informer(),
 		kcpClusterClientset:    kcpClusterClientset,
@@ -90,48 +89,65 @@ func NewPlacementTranslator(
 
 func (pt *placementTranslator) Run() {
 	ctx := pt.context
+	logger := klog.FromContext(ctx)
 	doneCh := ctx.Done()
 	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
 		pt.spsClusterInformer.HasSynced, pt.mbwsInformer.HasSynced,
-		pt.crdClusterInformer.HasSynced, pt.crdClusterInformer.HasSynced,
+		pt.crdClusterInformer.HasSynced, pt.bindingClusterInformer.HasSynced,
 	) {
-		pt.logger.Error(nil, "Informer syncs not achieved")
+		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
 	}
 
-	// TODO: make all the other needed infrastructure
-
-	// TODO: replace all these dummies
 	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
-		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, mr}
+		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{"what", logger}, mr}
 		return pt.whatResolver(fork)
 	}
 	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
-		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, mr}
+		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{LoggingMappingReceiver[ExternalName, ResolvedWhere]{"where", logger}, mr}
 		return pt.whereResolver(fork)
 	}
-	dummyBaseAPIProvider := NewRelayMap[logicalcluster.Name, ScopedAPIProvider](false)
-	setBinder := NewSetBinder(pt.logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
-		SimpleBindingOrganizer(pt.logger),
-		NewTestAPIMapProvider(dummyBaseAPIProvider),
-		DefaultResourceModes,
-		nil)
-	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
+	setBinder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+		SimpleBindingOrganizer(logger),
+		pt.apiProvider,
+		DefaultResourceModes, // TODO: replace with configurable
+		nil,                  // TODO: get this right
+	)
+	workloadProjector := NewLoggingWorkloadProjector(logger)
 	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector)
 	// TODO: move all that stuff up before Run
+	go pt.apiProvider.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
 }
 
 type LoggingMappingReceiver[Key comparable, Val any] struct {
-	logger klog.Logger
+	mapName string
+	logger  klog.Logger
 }
 
 var _ MappingReceiver[string, []any] = &LoggingMappingReceiver[string, []any]{}
 
 func (lmr LoggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
-	lmr.logger.Info("Put", "key", key, "val", val)
+	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", val)
 }
 
 func (lmr LoggingMappingReceiver[Key, Val]) Delete(key Key) {
-	lmr.logger.Info("Delete", "key", key)
+	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
+}
+
+type LoggingSetChangeReceiver[Elt comparable] struct {
+	setName string
+	logger  klog.Logger
+}
+
+var _ SetChangeReceiver[int] = LoggingSetChangeReceiver[int]{}
+
+func (lcr LoggingSetChangeReceiver[Elt]) Add(elt Elt) bool {
+	lcr.logger.Info("Add", "set", lcr.setName, "elt", elt)
+	return true
+}
+
+func (lcr LoggingSetChangeReceiver[Elt]) Remove(elt Elt) bool {
+	lcr.logger.Info("Remove", "set", lcr.setName, "elt", elt)
+	return true
 }

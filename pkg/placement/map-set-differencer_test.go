@@ -33,7 +33,7 @@ func TestMapSetDifferencer(t *testing.T) {
 	reportedNew := NewMapSet[int]()
 	reportToGone := SetChangeReceiverReverse[int](reportedGone)
 	checkingReceiver := SetChangeReceiverFork[int](false, reportedNew, reportToGone)
-	differ := NewDifferenceByMapAndEnum[MapSet[int], int](MapSetAsVisitable[int], checkingReceiver)
+	differ := NewSetDifferenceByMapAndEnum[MapSet[int], int](MapSetAsVisitable[int], checkingReceiver)
 	current := NewMapSet[int]()
 	for iteration := 1; iteration < 100; iteration++ {
 		next := genSet()

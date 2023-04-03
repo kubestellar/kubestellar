@@ -220,6 +220,10 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 			continue
 		}
 		for _, rsc := range group.APIResources {
+			rscVersion := rsc.Version
+			if rscVersion == "" {
+				rscVersion = gv.Version
+			}
 			ar := urmetav1a1.APIResource{
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "APIResource",
@@ -235,7 +239,7 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 					SingularName: rsc.SingularName,
 					Namespaced:   rsc.Namespaced,
 					Group:        gv.Group,
-					Version:      gv.Version,
+					Version:      rscVersion,
 					Kind:         rsc.Kind,
 					Verbs:        rsc.Verbs,
 				},

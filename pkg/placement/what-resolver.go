@@ -100,7 +100,6 @@ type objectDetails struct {
 
 // NewWhatResolver returns a WhatResolver;
 // invoke that function after the namespace informer has synced.
-// TODO: add the other needed pre-informers.
 func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev1alpha1informers.EdgePlacementClusterInformer,
@@ -641,15 +640,6 @@ outer:
 	} else {
 		return matches, false
 	}
-}
-
-func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
-	for _, elt := range slice {
-		if elt == seek {
-			return true
-		}
-	}
-	return false
 }
 
 func gkIsNamespace(gk schema.GroupKind) bool {

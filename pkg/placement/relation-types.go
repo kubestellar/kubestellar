@@ -16,15 +16,9 @@ limitations under the License.
 
 package placement
 
-import (
-	"fmt"
-	"strings"
-)
-
 type Relation2[First, Second comparable] interface {
 	Set[Pair[First, Second]]
-	Visit1to2(First, func(Second) error) error
-	Visit2to1(Second, func(First) error) error
+	GetIndex1to2() Index2[First, Second]
 }
 
 type MutableRelation2[First, Second comparable] interface {
@@ -32,121 +26,15 @@ type MutableRelation2[First, Second comparable] interface {
 	MutableSet[Pair[First, Second]]
 }
 
-type Pair[First any, Second any] struct {
-	First  First
-	Second Second
+type Index2[Key, Val comparable] interface {
+	Map[Key, Set[Val]]
+	Visit1to2(Key, func(Val) error) error
 }
 
-func (tup Pair[First, Second]) String() string {
-	var ans strings.Builder
-	ans.WriteRune('(')
-	ans.WriteString(fmt.Sprintf("%v", tup.First))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Second))
-	ans.WriteRune(')')
-	return ans.String()
-}
-
-func (tup Pair[First, Second]) Reverse() Pair[Second, First] {
-	return Pair[Second, First]{First: tup.Second, Second: tup.First}
-}
-
-func AddFirstFunc[First any, Second any](first First) func(Second) Pair[First, Second] {
-	return func(second Second) Pair[First, Second] {
-		return Pair[First, Second]{First: first, Second: second}
-	}
-}
-
-func AddSecondFunc[First any, Second any](second Second) func(First) Pair[First, Second] {
-	return func(first First) Pair[First, Second] {
-		return Pair[First, Second]{First: first, Second: second}
-	}
-}
-
-type Triple[First comparable, Second comparable, Third comparable] struct {
-	First  First
-	Second Second
-	Third  Third
-}
-
-func (tup Triple[First, Second, Third]) String() string {
-	var ans strings.Builder
-	ans.WriteRune('(')
-	ans.WriteString(fmt.Sprintf("%v", tup.First))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Second))
-	ans.WriteString(", ")
-	ans.WriteString(fmt.Sprintf("%v", tup.Third))
-	ans.WriteRune(')')
-	return ans.String()
-}
-
-func Relation2LenFromVisit[First, Second comparable](reln Relation2[First, Second]) int {
-	var ans int
-	reln.Visit(func(_ Pair[First, Second]) error {
-		ans++
-		return nil
-	})
-	return ans
-}
-
-func Relation2Reverse[First, Second comparable](forward Relation2[First, Second]) Relation2[Second, First] {
-	return ReverseRelation2[First, Second]{baseReverseRelation2[First, Second]{forward}}
-}
-
-var _ Relation2[int, string] = ReverseRelation2[string, int]{}
-
-type ReverseRelation2[First, Second comparable] struct {
-	baseReverseRelation2[First, Second]
-}
-
-type baseReverseRelation2[First, Second comparable] struct {
-	forward Relation2[First, Second]
-}
-
-func (rr baseReverseRelation2[First, Second]) IsEmpty() bool {
-	return rr.forward.IsEmpty()
-}
-
-func (rr baseReverseRelation2[First, Second]) LenIsCheap() bool {
-	return rr.forward.LenIsCheap()
-}
-
-func (rr baseReverseRelation2[First, Second]) Len() int {
-	return rr.forward.Len()
-}
-
-func (rr baseReverseRelation2[First, Second]) Has(tup Pair[Second, First]) bool {
-	return rr.forward.Has(tup.Reverse())
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit(visitor func(Pair[Second, First]) error) error {
-	return rr.forward.Visit(func(tup Pair[First, Second]) error { return visitor(tup.Reverse()) })
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit1to2(second Second, visitor func(First) error) error {
-	return rr.forward.Visit2to1(second, visitor)
-}
-
-func (rr baseReverseRelation2[First, Second]) Visit2to1(first First, visitor func(Second) error) error {
-	return rr.forward.Visit1to2(first, visitor)
-}
-
-type ReverseMutableRelation2[First, Second comparable] struct {
-	baseReverseRelation2[First, Second]
-	forward MutableRelation2[First, Second]
-}
-
-func MutableRelation2Reverse[First, Second comparable](forward MutableRelation2[First, Second]) MutableRelation2[Second, First] {
-	return ReverseMutableRelation2[First, Second]{baseReverseRelation2[First, Second]{forward}, forward}
-}
-
-func (rr ReverseMutableRelation2[First, Second]) Add(tup Pair[Second, First]) bool {
-	return rr.forward.Add(tup.Reverse())
-}
-
-func (rr ReverseMutableRelation2[First, Second]) Remove(tup Pair[Second, First]) bool {
-	return rr.forward.Remove(tup.Reverse())
+type MutableIndex2[Key, Val comparable] interface {
+	Index2[Key, Val]
+	Add(Key, Val) bool
+	Remove(Key, Val) bool
 }
 
 type relation2WithObservers[First, Second comparable] struct {
