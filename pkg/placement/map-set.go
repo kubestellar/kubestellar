@@ -93,13 +93,13 @@ func MapSetSymmetricDifference[Elt comparable](wantLeftMinusRight, wantIntersect
 	if wantRightMinusLeft {
 		rightMinusLeft = NewEmptyMapSet[Elt]()
 	}
-	if wantLeftMinusRight || wantIntersection && !wantRightMinusLeft {
+	if wantLeftMinusRight {
 		left.Visit(func(leftElt Elt) error {
 			if right.Has(leftElt) {
 				if wantIntersection {
 					intersection.Add(leftElt)
 				}
-			} else if wantLeftMinusRight {
+			} else {
 				leftMinusRight.Add(leftElt)
 			}
 			return nil

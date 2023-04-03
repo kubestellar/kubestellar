@@ -16,7 +16,7 @@ limitations under the License.
 
 package placement
 
-// MappingToEmptyableReceiver is a mapping receiver specialized to the case
+// MappingToVisitableEmptyableReceiver is a mapping receiver specialized to the case
 // where the value is an collection that is VisitableEmptyable and one bit of
 // history is reported with each change.
 type MappingToVisitableEmptyableReceiver[Key comparable, ValElt any] interface {
@@ -32,7 +32,7 @@ type VisitableEmptyable[Elt any] interface {
 }
 
 // NewIndex123by13to2s maintains an index into a three-column table.
-// The index is keyed by the first and second columns and each entry holds
+// The index is keyed by the first and third columns and each entry holds
 // the set of associated middle column values.
 func NewIndex123by13to2s[ColA comparable, ColB comparable, ColC comparable](inner MappingToVisitableEmptyableReceiver[Pair[ColA, ColC], ColB]) SetChangeReceiver[Triple[ColA, ColB, ColC]] {
 	return &index123by13to2s[ColA, ColB, ColC]{
