@@ -34,7 +34,7 @@ type VisitableEmptyable[Elt any] interface {
 // NewIndex123by13to2s maintains an index into a three-column table.
 // The index is keyed by the first and second columns and each entry holds
 // the set of associated middle column values.
-func NewIndex123by13to2s[ColA comparable, ColB comparable, ColC comparable](inner MappingToVisitableEmptyableReceiver[Pair[ColA, ColC], ColB]) TripleSetChangeReceiver[ColA, ColB, ColC] {
+func NewIndex123by13to2s[ColA comparable, ColB comparable, ColC comparable](inner MappingToVisitableEmptyableReceiver[Pair[ColA, ColC], ColB]) SetChangeReceiver[Triple[ColA, ColB, ColC]] {
 	return &index123by13to2s[ColA, ColB, ColC]{
 		inner: inner,
 		by13:  map[Pair[ColA, ColC]]MapSet[ColB]{},
@@ -46,33 +46,80 @@ type index123by13to2s[ColA comparable, ColB comparable, ColC comparable] struct 
 	by13  map[Pair[ColA, ColC]]MapSet[ColB]
 }
 
-func (index *index123by13to2s[ColA, ColB, ColC]) Add(first ColA, second ColB, third ColC) {
-	key := Pair[ColA, ColC]{first, third}
+func (index *index123by13to2s[ColA, ColB, ColC]) Add(tup Triple[ColA, ColB, ColC]) bool {
+	key := Pair[ColA, ColC]{tup.First, tup.Third}
 	seconds := index.by13[key]
 	if seconds == nil {
 		seconds = MapSet[ColB]{}
 		index.by13[key] = seconds
 	}
-	had := seconds.Has(second)
-	if !had {
-		wasEmpty := seconds.IsEmpty()
-		seconds.Add(second)
+	wasEmpty := seconds.IsEmpty()
+	change := seconds.Add(tup.Second)
+	if change {
 		index.inner.Receive(key, seconds, wasEmpty)
+	}
+	return change
+}
+
+func (index *index123by13to2s[ColA, ColB, ColC]) Remove(tup Triple[ColA, ColB, ColC]) bool {
+	key := Pair[ColA, ColC]{tup.First, tup.Third}
+	seconds := index.by13[key]
+	if seconds == nil {
+		return false
+	}
+	wasEmpty := seconds.IsEmpty()
+	change := seconds.Remove(tup.Second)
+	if change {
+		index.inner.Receive(key, seconds, wasEmpty)
+	}
+	if seconds.IsEmpty() {
+		delete(index.by13, key)
+	}
+	return change
+}
+
+// NewIndex123by23to1s maintains an index into a three-column table.
+// The index is keyed by the first and second columns and each entry holds
+// the set of associated middle column values.
+func NewIndex123by23to1s[ColA comparable, ColB comparable, ColC comparable](inner MappingToVisitableEmptyableReceiver[Pair[ColB, ColC], ColA]) SetChangeReceiver[Triple[ColA, ColB, ColC]] {
+	return &index123by23to1s[ColA, ColB, ColC]{
+		inner: inner,
+		by23:  map[Pair[ColB, ColC]]MapSet[ColA]{},
 	}
 }
 
-func (index *index123by13to2s[ColA, ColB, ColC]) Remove(first ColA, second ColB, third ColC) {
-	key := Pair[ColA, ColC]{first, third}
-	seconds := index.by13[key]
-	if seconds == nil {
-		return
+type index123by23to1s[ColA comparable, ColB comparable, ColC comparable] struct {
+	inner MappingToVisitableEmptyableReceiver[Pair[ColB, ColC], ColA]
+	by23  map[Pair[ColB, ColC]]MapSet[ColA]
+}
+
+func (index *index123by23to1s[ColA, ColB, ColC]) Add(tup Triple[ColA, ColB, ColC]) bool {
+	key := Pair[ColB, ColC]{tup.Second, tup.Third}
+	firsts := index.by23[key]
+	if firsts == nil {
+		firsts = MapSet[ColA]{}
+		index.by23[key] = firsts
 	}
-	had := seconds.Has(second)
-	if had {
-		wasEmpty := seconds.IsEmpty()
-		seconds.Remove(second)
-		index.inner.Receive(key, seconds, wasEmpty)
+	wasEmpty := firsts.IsEmpty()
+	change := firsts.Add(tup.First)
+	if change {
+		index.inner.Receive(key, firsts, wasEmpty)
 	}
+	return change
+}
+
+func (index *index123by23to1s[ColA, ColB, ColC]) Remove(tup Triple[ColA, ColB, ColC]) bool {
+	key := Pair[ColB, ColC]{tup.Second, tup.Third}
+	firsts := index.by23[key]
+	if firsts == nil {
+		return false
+	}
+	wasEmpty := firsts.IsEmpty()
+	change := firsts.Remove(tup.First)
+	if change {
+		index.inner.Receive(key, firsts, wasEmpty)
+	}
+	return change
 }
 
 // NewProjectIncremental maintains the projection from an index to its key set,

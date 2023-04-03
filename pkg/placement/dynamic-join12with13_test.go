@@ -24,14 +24,14 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func TestDynamicJoin(t *testing.T) {
+func TestDynamicJoin12with13(t *testing.T) {
 	logger := klog.Background()
 	for super := 1; super <= 10; super++ {
 		t.Logf("Starting super=%d", super)
-		xzReceiver := NewMapRelation2[int, float32]()
-		xyReceiver, yzReceiver := NewDynamicJoin[int, string, float32](logger, xzReceiver)
+		yzReceiver := NewMapRelation2[string, float32]()
+		xyReceiver, xzReceiver := NewDynamicJoin12with13[int, string, float32](logger, yzReceiver)
 		xyReln := NewMapRelation2[int, string]()
-		yzReln := NewMapRelation2[string, float32]()
+		xzReln := NewMapRelation2[int, float32]()
 		for iteration := 1; iteration <= 100; iteration++ {
 			var change bool
 			switch rand.Intn(2) {
@@ -48,20 +48,20 @@ func TestDynamicJoin(t *testing.T) {
 					t.Logf("Removed xy=%v, change=%v", pair, change)
 				}
 			case 1:
-				pair := Pair[string, float32]{fmt.Sprintf("%d", rand.Intn(3)), float32(1+rand.Intn(3)) / 4.0}
+				pair := Pair[int, float32]{rand.Intn(3), float32(1+rand.Intn(3)) / 4.0}
 				switch rand.Intn(2) {
 				case 0:
-					change = yzReln.Add(pair)
-					yzReceiver.Add(pair)
+					change = xzReln.Add(pair)
+					xzReceiver.Add(pair)
 					t.Logf("Added yz=%v, change=%v", pair, change)
 				case 1:
-					change = yzReln.Remove(pair)
-					yzReceiver.Remove(pair)
+					change = xzReln.Remove(pair)
+					xzReceiver.Remove(pair)
 					t.Logf("Removed yz=%v, change=%v", pair, change)
 				}
 			}
-			xzReln := Relation2Equijoin[int, string, float32](xyReln, yzReln)
-			if SetEqual[Pair[int, float32]](xzReceiver, xzReln) {
+			yzReln := Relation2Equijoin12with13[int, string, float32](xyReln, xzReln)
+			if SetEqual[Pair[string, float32]](yzReceiver, yzReln) {
 				t.Logf("At super=%d, iteration=%d, got correct xz=%v", super, iteration, xzReln)
 			} else {
 				t.Fatalf("At super=%d, iteration=%d, got %v, expected %v", super, iteration, xzReceiver, xzReln)
@@ -70,11 +70,11 @@ func TestDynamicJoin(t *testing.T) {
 	}
 }
 
-func Relation2Equijoin[First, Second, Third comparable](left Relation2[First, Second], right Relation2[Second, Third]) Relation2[First, Third] {
-	ans := NewMapRelation2[First, Third]()
+func Relation2Equijoin12with13[First, Second, Third comparable](left Relation2[First, Second], right Relation2[First, Third]) Relation2[Second, Third] {
+	ans := NewMapRelation2[Second, Third]()
 	left.Visit(func(xy Pair[First, Second]) error {
-		right.Visit1to2(xy.Second, func(z Third) error {
-			ans.Add(Pair[First, Third]{xy.First, z})
+		right.Visit1to2(xy.First, func(z Third) error {
+			ans.Add(Pair[Second, Third]{xy.Second, z})
 			return nil
 		})
 		return nil

@@ -39,8 +39,8 @@ type setBindingForCluster struct {
 	*setBinder
 	cluster          logicalcluster.Name
 	perPlacement     map[string]*setBindingForPlacement
-	joinXY           SetChangeReceiver[Pair[WorkloadPart, string /*epName*/]]
-	joinYZ           SetChangeReceiver[Pair[string /*epName*/, edgeapi.SinglePlacement]]
+	joinXY           SetChangeReceiver[Pair[string /*epName*/, WorkloadPart]]
+	joinXZ           SetChangeReceiver[Pair[string /*epName*/, edgeapi.SinglePlacement]]
 	singleBindingOps SingleBindingOps
 }
 
@@ -145,7 +145,7 @@ func (sb *setBinder) getCluster(cluster logicalcluster.Name, want bool) *setBind
 			cluster:      cluster,
 			perPlacement: map[string]*setBindingForPlacement{},
 		}
-		sbc.joinXY, sbc.joinYZ = NewDynamicJoin[WorkloadPart, string, edgeapi.SinglePlacement](sb.logger, sbc)
+		sbc.joinXY, sbc.joinXZ = NewDynamicJoin12with13[string, WorkloadPart, edgeapi.SinglePlacement](sb.logger, sbc)
 		sb.perCluster[cluster] = sbc
 	}
 	return sbc
@@ -167,13 +167,13 @@ func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPl
 		sbp = &setBindingForPlacement{
 			setBindingForCluster: sbc,
 		}
-		sbp.resolvedWhatReceiver = sbc.resolvedWhatDifferencerConstructor(&TransformSetChangeReceiver[WorkloadPart, Pair[WorkloadPart, string]]{
-			Transform: AddSecondFunc[WorkloadPart, string](epName),
+		sbp.resolvedWhatReceiver = sbc.resolvedWhatDifferencerConstructor(&TransformSetChangeReceiver[WorkloadPart, Pair[string, WorkloadPart]]{
+			Transform: AddFirstFunc[string, WorkloadPart](epName),
 			Inner:     sbp.joinXY,
 		})
 		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(&TransformSetChangeReceiver[edgeapi.SinglePlacement, Pair[string, edgeapi.SinglePlacement]]{
 			Transform: AddFirstFunc[string, edgeapi.SinglePlacement](epName),
-			Inner:     sbp.joinYZ,
+			Inner:     sbp.joinXZ,
 		})
 		sbc.perPlacement[epName] = sbp
 	}

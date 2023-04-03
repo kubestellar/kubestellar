@@ -63,7 +63,7 @@ func AddSecondFunc[First any, Second any](second Second) func(First) Pair[First,
 	}
 }
 
-type Triple[First any, Second any, Third any] struct {
+type Triple[First comparable, Second comparable, Third comparable] struct {
 	First  First
 	Second Second
 	Third  Third
