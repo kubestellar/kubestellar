@@ -69,17 +69,82 @@ func DynamicMapProviderRelease[Key comparable, Val any](prod DynamicMapProviderW
 	prod.MaybeRelease(key, func(Val) bool { return true })
 }
 
-// MappingReceiver is given map entries by a DynamicMapProvider.
-// Some DynamicMapProvider implementations require receivers to be comparable.
-type MappingReceiver[Key comparable, Val any] interface {
-	Receive(Key, Val)
+// Map is a finite set of (key,value) pairs
+// that has at most one value for any given key.
+// The collection may or may not be mutable.
+// This view of the collection may or may not have a limited scope of validity.
+// This view may or may not have concurrency restrictions.
+type Map[Key comparable, Val any] interface {
+	Emptyable
+	Len() int
+	LenIsCheap() bool
+	Get(Key) (Val, bool)
+	Visitable[Pair[Key, Val]]
 }
 
-// MappingReceiverFunc is a func value that implements MappingReceiver.
-// Remember that func values are not comparable.
-type MappingReceiverFunc[Key comparable, Val any] func(Key, Val)
+// MutableMap is a Map that can be written to.
+type MutableMap[Key comparable, Val any] interface {
+	Map[Key, Val]
+	MappingReceiver[Key, Val]
+}
 
-func (cf MappingReceiverFunc[Key, Val]) Set(key Key, val Val) { cf(key, val) }
+// MappingReceiver is something that can be given key/value pairs.
+// This is the writable aspect of a Map.
+// Some DynamicMapProvider implementations require receivers to be comparable.
+type MappingReceiver[Key comparable, Val any] interface {
+	Put(Key, Val)
+	Delete(Key)
+}
+
+// TransactionalMappingReceiver is one that takes updates in batches
+type TransactionalMappingReceiver[Key comparable, Val any] interface {
+	Transact(func(MappingReceiver[Key, Val]))
+}
+
+func MappingReceiverTrivializeTransactions[Key comparable, Val any](mr MappingReceiver[Key, Val]) TransactionalMappingReceiver[Key, Val] {
+	return mappingReceiverTrivialTransactions[Key, Val]{mr}
+}
+
+type mappingReceiverTrivialTransactions[Key comparable, Val any] struct {
+	inner MappingReceiver[Key, Val]
+}
+
+func (mrtt mappingReceiverTrivialTransactions[Key, Val]) Transact(xn func(MappingReceiver[Key, Val])) {
+	xn(mrtt.inner)
+}
+
+type MappingReceiverFork[Key comparable, Val any] []MappingReceiver[Key, Val]
+
+var _ MappingReceiver[int, func()] = MappingReceiverFork[int, func()]{}
+
+func (mrf MappingReceiverFork[Key, Val]) Put(key Key, val Val) {
+	for _, mr := range mrf {
+		mr.Put(key, val)
+	}
+}
+
+func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
+	for _, mr := range mrf {
+		mr.Delete(key)
+	}
+}
+
+type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
+	Transform func(Type1) Type2
+	Inner     SetChangeReceiver[Type2]
+}
+
+var _ SetChangeReceiver[int] = &TransformSetChangeReceiver[int, string]{}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Add(v2)
+}
+
+func (xr TransformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Remove(v2)
+}
 
 type Client[T any] interface {
 	SetProvider(T)

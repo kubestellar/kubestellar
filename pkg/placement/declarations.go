@@ -17,13 +17,15 @@ limitations under the License.
 package placement
 
 import (
+	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	k8sevents "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apimachtypes "k8s.io/apimachinery/pkg/types"
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
@@ -40,9 +42,7 @@ import (
 // - a SetBinder that keeps track of the bindings between resolved where
 //   and resolved what.
 // - a WorkloadProjector that maintains the customized workload copies
-//   in the mailbox workspaces.
-// - a PlacementProjector that maintains the TMC Placement objects that
-//   correspond to the EdgePlacement objects.
+//   and syncer configuration objects in the mailbox workspaces.
 
 // We are talking here about an assembly of several components, each
 // of which likely has private data protected by a mutex.
@@ -58,37 +58,55 @@ import (
 // so that this relationship can be synchronous.  For example, providers
 // of maps generally precede clients of those maps.
 
-// WhereResolver is responsible for keeping given receivers eventually
+// WhereResolver is responsible for keeping given receiver eventually
 // consistent with the resolution of the "where" predicate for each EdgePlacement
 // (identified by cluster and name).
-type WhereResolver DynamicMapProvider[ExternalName, ResolvedWhere]
+type WhereResolver func(MappingReceiver[ExternalName, ResolvedWhere]) Runnable
 
-// WhatResolver is responsible for keeping its receivers eventually consistent
+// WhatResolver is responsible for keeping its receiver eventually consistent
 // with the resolution of the "what" predicate of each EdgePlacement
 // (identified by cluster ane name).
-type WhatResolver DynamicMapProvider[ExternalName, WorkloadParts]
+type WhatResolver func(MappingReceiver[ExternalName, WorkloadParts]) Runnable
 
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
-// workload projector and the placement projector.
+// workload projector.
 // The implementation may atomize the resolved "what" and "where"
 // using differencers constructed by a SetDifferencerConstructor.
 // The implementation may use a BindingOrganizer to get from the atomized
-// "what" and "where" to the ProjectionMapProvider behavior.
-type SetBinder interface {
-	AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts]
-	AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere]
-	ProjectionMapProvider
-}
+// "what" and "where" to the ProjectionMappingReceiver behavior.
+type SetBinder func(workloadReceiver ProjectionMappingReceiver) (
+	whatReceiver MappingReceiver[ExternalName, WorkloadParts],
+	whereReceiver MappingReceiver[ExternalName, ResolvedWhere])
 
 // WorkloadProjector is kept appraised of what goes where
-// and is responsible for maintaining the customized workload
-// copies in the mailbox workspaces.
-type WorkloadProjector Client[ProjectionMapProvider]
+// and is responsible for maintaining (a) the customized workload
+// copies in the mailbox workspaces and (b) the syncer configuration objects.
+type WorkloadProjector ProjectionMappingReceiver
 
-// PlacementProjector is responsible for maintaining the TMC Placement
-// objects that cause propagation between mailbox workspace and edge cluster.
-type PlacementProjector Client[ProjectionMapProvider]
+type ProjectionMappingReceiver TransactionalMappingReceiver[ProjectionKey, *ProjectionPerCluster]
+
+// Runnable is something that can run until a given context is closed
+type Runnable interface {
+	Run(context.Context)
+}
+
+// RunAll is a Runnable that runs all the constituent Runnables
+type RunAll []Runnable
+
+var _ Runnable = RunAll{}
+
+func (ra RunAll) Run(ctx context.Context) {
+	var wg sync.WaitGroup
+	wg.Add(len(ra))
+	for _, runnable := range ra {
+		go func(runnable Runnable) {
+			runnable.Run(ctx)
+			wg.Done()
+		}(runnable)
+	}
+	wg.Wait()
+}
 
 func GetNamespacesBuiltIntoEdgeClusters() k8ssets.String {
 	// TODO: Make this configurable
@@ -106,12 +124,11 @@ func AssemplePlacementTranslator(
 	whereResolver WhereResolver,
 	setBinder SetBinder,
 	workloadProjector WorkloadProjector,
-	placementProjector PlacementProjector,
-) {
-	whatResolver.AddReceiver(setBinder.AsWhatReceiver(), true)
-	whereResolver.AddReceiver(setBinder.AsWhereReceiver(), true)
-	workloadProjector.SetProvider(setBinder)
-	placementProjector.SetProvider(setBinder)
+) Runnable {
+	whatReceiver, whereReceiver := setBinder(workloadProjector)
+	runWhat := whatResolver(whatReceiver)
+	runWhere := whereResolver(whereReceiver)
+	return RunAll{runWhat, runWhere}
 }
 
 // ResolvedWhere identifies the set of SyncTargets that match a certain
@@ -167,10 +184,6 @@ type WorkloadPart struct {
 	WorkloadPartDetails
 }
 
-// ProjectionMapProvider tells the clients what to project,
-// organized into three levels.
-type ProjectionMapProvider DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
-
 // ProjectionKey identifies the topmost level of organization,
 // the combinatin of the destination and the API group and resource.
 type ProjectionKey struct {
@@ -204,44 +217,61 @@ type ProjectionDetails struct {
 	Names *k8ssets.String
 }
 
+func (pd ProjectionDetails) String() string {
+	var builder strings.Builder
+	builder.WriteRune('{')
+	if pd.Namespaces != nil {
+		builder.WriteString("Namespaces: ")
+		builder.WriteString(fmt.Sprintf("%v", pd.Namespaces.List()))
+	}
+	if pd.Names != nil {
+		if pd.Namespaces != nil {
+			builder.WriteString(", ")
+		}
+		builder.WriteString("Names: ")
+		builder.WriteString(fmt.Sprintf("%v", pd.Names.List()))
+
+	}
+	builder.WriteRune('}')
+	return builder.String()
+}
+
 // SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
 // The two set differencer constructors will be called to create set differencers
 // that translate new whole values of ResolvedWhat and ResolvedWhere into
 // elemental differences.
 // The BindingOrganizer produces a pipe stage that is given those elemental
 // differences and re-organizes them and solves the workload conflicts to
-// implement ProjectionMapProvider.
+// supply input to a ProjectionMappingReceiver.
 type SetBinderConstructor func(
+	logger klog.Logger,
 	resolvedWhatDifferencerConstructor ResolvedWhatDifferencerConstructor,
 	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor,
 	bindingOrganizer BindingOrganizer,
+	discovery APIMapProvider,
+	resourceModes ResourceModes,
+	eventHandler EventHandler,
 ) SetBinder
 
 // SetDifferencerConstructor is a function that is given a receiver of set
 // differences and returns a receiver of sets that keeps track of the latest
 // set and keeps the difference receiver informed of differences as they arrive.
 // The set differencer precedes the set difference receiver in the locking order.
-type SetDifferencerConstructor[Set any, Element any] func(SetChangeReceiver[Element]) Receiver[Set]
+type SetDifferencerConstructor[Set any, Element comparable] func(SetChangeReceiver[Element]) Receiver[Set]
 
 type ResolvedWhatDifferencerConstructor = SetDifferencerConstructor[WorkloadParts, WorkloadPart]
 
 type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
 
-// SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[T any] interface {
-	Add(T)
-	Remove(T)
-}
-
-// BindingOrganizer produces a SingleBinder and a corresponding map provider
-// that reflects the result of combining the single bindings and resolving
-// the API group version issue.
-// A SetBinder implementation will likely use one of these to provide its
-// ProjectionMapProvider provider, feeding the SingleBinder atomized changes
+// BindingOrganizer takes a ProjectionMappingReceiver and produces a SingleBinder
+// that takes the atomized bindings and reorganizes them and resolves
+// the API group version issue to feed the ProjectionMappingReceiver.
+// A SetBinder implementation will likely use one of these to drive its
+// ProjectionMappingReceiver, feeding the SingleBinder atomized changes
 // from the incoming ResolvedWhat and ResolvedWhere values.
 // The given EventHandler is given events that the organizer produces
 // and publishes them somewhere.
-type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler) (SingleBinder, ProjectionMapProvider)
+type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler, projectionMappingReceiver ProjectionMappingReceiver) SingleBinder
 
 // SingleBinder is appraised of individual bindings and unbindings,
 // but they may come in batches.
@@ -252,10 +282,7 @@ type SingleBinder interface {
 	Transact(func(SingleBindingOps))
 }
 
-type SingleBindingOps interface {
-	AddBinding(what WorkloadPart, where edgeapi.SinglePlacement)
-	RemoveBinding(what WorkloadPart, where edgeapi.SinglePlacement)
-}
+type SingleBindingOps SetChangeReceiver[Pair[WorkloadPart, edgeapi.SinglePlacement]]
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
 // as needed by clients.
@@ -304,18 +331,10 @@ type ResourceDetails struct {
 	SupportsInformers bool
 }
 
-// ResourceModes tells the handling of all the resources that do not
-// get default handling, and maybe some that do.
+// ResourceModes tells the handling of the given resource.
 // This information comes from platform configuration and code.
 // Immutable.
-type ResourceModes map[metav1.GroupResource]ResourceMode
-
-func (modes ResourceModes) Get(gr metav1.GroupResource) ResourceMode {
-	if ans, ok := modes[gr]; ok {
-		return ans
-	}
-	return DefaultResourceMode
-}
+type ResourceModes func(metav1.GroupResource) ResourceMode
 
 // ResourceMode describes how a given resource is handled regarding
 // propagation and denaturing.
@@ -358,11 +377,6 @@ const (
 	// at the edge).
 	ForciblyDenatured NatureMode = "ForciblyDenatured"
 )
-
-// UIDer is a source of mapping from object name to UID.
-// One of these is specific to one kind of object,
-// which is not namespaced.
-type UIDer DynamicMapProvider[ExternalName, apimachtypes.UID]
 
 func SPMailboxWorkspaceName(sp edgeapi.SinglePlacement) string {
 	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)

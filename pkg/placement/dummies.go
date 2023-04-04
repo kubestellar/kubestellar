@@ -17,6 +17,8 @@ limitations under the License.
 package placement
 
 import (
+	"k8s.io/klog/v2"
+
 	"github.com/kcp-dev/logicalcluster/v3"
 )
 
@@ -28,28 +30,44 @@ func RelayWhereResolver() RelayMap[ExternalName, ResolvedWhere] {
 	return NewRelayMap[ExternalName, ResolvedWhere](true)
 }
 
-func NewDummySetBinder() SetBinder {
-	return dummySetBinder{NewRelayMap[ProjectionKey, *ProjectionPerCluster](true)}
-}
-
-type dummySetBinder struct {
-	DynamicMapProvider[ProjectionKey, *ProjectionPerCluster]
-}
-
-func (dummySetBinder) AsWhatReceiver() MappingReceiver[ExternalName, WorkloadParts] {
-	return RelayWhatResolver()
-}
-
-func (dummySetBinder) AsWhereReceiver() MappingReceiver[ExternalName, ResolvedWhere] {
-	return RelayWhereResolver()
-}
-
 type dummyClient[Producer any] struct{}
 
 var _ Client[float64] = dummyClient[float64]{}
 
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
-func NewDummyWorkloadProjector(mailboxPathToName DynamicMapProvider[string, logicalcluster.Name]) WorkloadProjector {
-	return dummyClient[ProjectionMapProvider]{}
+func NewDummyWorkloadProjector() WorkloadProjector {
+	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{})
+}
+
+func NewLoggingWorkloadProjector(logger klog.Logger) WorkloadProjector {
+	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](loggingWorkloadProjector{logger})
+}
+
+type loggingWorkloadProjector struct {
+	logger klog.Logger
+}
+
+func (lwp loggingWorkloadProjector) Put(pk ProjectionKey, ppc *ProjectionPerCluster) {
+	lwp.logger.Info("Received outer projection info", "pk", pk, "ppc", ppc)
+	if ppc != nil {
+		ppc.PerSourceCluster.AddReceiver(loggingWorkloadProjectorMid{lwp, pk}, true)
+	}
+}
+
+func (lwp loggingWorkloadProjector) Delete(pk ProjectionKey) {
+	lwp.logger.Info("Received outer projection deletion", "pk", pk)
+}
+
+type loggingWorkloadProjectorMid struct {
+	loggingWorkloadProjector
+	pk ProjectionKey
+}
+
+func (lwpm loggingWorkloadProjectorMid) Put(cluster logicalcluster.Name, pd ProjectionDetails) {
+	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster, "pd", pd)
+}
+
+func (lwpm loggingWorkloadProjectorMid) Delete(cluster logicalcluster.Name) {
+	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster)
 }

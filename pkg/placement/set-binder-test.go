@@ -50,10 +50,8 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		WorkloadPartDetails{APIVersion: "v1"},
 	}
 	what1 := WorkloadParts{workloadPart1.WorkloadPartID: workloadPart1.WorkloadPartDetails}
-	whatProvider := NewRelayMap[ExternalName, WorkloadParts](false)
 	sc1 := logicalcluster.Name("wm1")
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
-	whatProvider.Receive(ep1Ref, what1)
 	sp1 := edgeapi.SinglePlacement{
 		Cluster:        "inv1",
 		LocationName:   "loc1",
@@ -64,17 +62,15 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
 	where1 := ResolvedWhere{sps1}
-	whereProvider := NewRelayMap[ExternalName, ResolvedWhere](false)
-	whereProvider.Receive(ep1Ref, where1)
-	whatProvider.AddReceiver(binder.AsWhatReceiver(), true)
-	whereProvider.AddReceiver(binder.AsWhereReceiver(), true)
 	projectionTracker := NewRelayMap[ProjectionKey, *ProjectionPerCluster](false)
-	binder.AddReceiver(projectionTracker, true)
+	whatReceiver, whereReceiver := binder(MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](projectionTracker))
+	whatReceiver.Put(ep1Ref, what1)
+	whereReceiver.Put(ep1Ref, where1)
 	if projectionTracker.Len() != 1 {
 		t.Errorf("Wrong amount of stuff in projectionTracker.theMap: %#+v", projectionTracker)
 	}
 	pk1 := ProjectionKey{gr1, sp1}
-	ppc1 := DynamicMapProviderGet[ProjectionKey, *ProjectionPerCluster](projectionTracker, pk1)
+	ppc1 := projectionTracker.OuterGet(pk1)
 	if ppc1 == nil {
 		t.Errorf("Missing ProjectionPerCluster")
 		return // to stop linter from complaining about possible nil pointer below
@@ -87,7 +83,7 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 	if pcTracker.Len() != 1 {
 		t.Errorf("Wrong amount of stuff in pcTracker.theMap: %#+v", pcTracker)
 	}
-	pd1 := DynamicMapProviderGet[logicalcluster.Name, ProjectionDetails](pcTracker, sc1)
+	pd1 := pcTracker.OuterGet(sc1)
 	if pd1.Namespaces != nil {
 		t.Errorf("Expected no namespaces but got %#+v", *pd1.Namespaces)
 	}

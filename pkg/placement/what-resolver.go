@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -48,11 +49,13 @@ import (
 )
 
 type whatResolver struct {
-	ctx    context.Context
-	logger klog.Logger
-	queue  workqueue.RateLimitingInterface
+	ctx        context.Context
+	logger     klog.Logger
+	numThreads int
+	queue      workqueue.RateLimitingInterface
+	receiver   MappingReceiver[ExternalName, WorkloadParts]
+
 	sync.Mutex
-	receivers []MappingReceiver[ExternalName, WorkloadParts]
 
 	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
 	edgePlacementLister   edgev1alpha1listers.EdgePlacementClusterLister
@@ -95,12 +98,10 @@ type objectDetails struct {
 	placementsWantNamespace k8ssets.String // non-nil only for Namespace objects
 }
 
-var _ WhatResolver = &whatResolver{}
-
-// NewWhatResolverLauncher returns a function that returns a WhatResolver;
+// NewWhatResolver returns a WhatResolver;
 // invoke that function after the namespace informer has synced.
 // TODO: add the other needed pre-informers.
-func NewWhatResolverLauncher(
+func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev1alpha1informers.EdgePlacementClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
@@ -108,13 +109,14 @@ func NewWhatResolverLauncher(
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	numThreads int,
-) func() *whatResolver {
+) WhatResolver {
 	controllerName := "what-resolver"
 	logger := klog.FromContext(ctx).WithValues("part", controllerName)
 	ctx = klog.NewContext(ctx, logger)
 	wr := &whatResolver{
 		ctx:                       ctx,
 		logger:                    logger,
+		numThreads:                numThreads,
 		queue:                     workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		edgePlacementInformer:     edgePlacementPreInformer.Informer(),
 		edgePlacementLister:       edgePlacementPreInformer.Lister(),
@@ -124,24 +126,36 @@ func NewWhatResolverLauncher(
 		dynamicClusterClient:      dynamicClusterClient,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
-	wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
-	return func() *whatResolver {
-		// go wr.edgePlacementInformer.Run(ctx.Done())
-		if upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
-			for i := 0; i < numThreads; i++ {
-				go wait.Until(wr.runWorker, time.Second, ctx.Done())
-			}
-		} else {
+	return func(receiver MappingReceiver[ExternalName, WorkloadParts]) Runnable {
+		wr.receiver = receiver
+		wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
+		if !upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
 			logger.Info("Failed to sync EdgePlacements in time")
 		}
 		return wr
 	}
 }
 
+func (wr *whatResolver) Run(ctx context.Context) {
+	var wg sync.WaitGroup
+	wg.Add(wr.numThreads)
+	for i := 0; i < wr.numThreads; i++ {
+		go func() {
+			wait.Until(wr.runWorker, time.Second, ctx.Done())
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
+
 type queueItem struct {
 	gk      schema.GroupKind
 	cluster logicalcluster.Name
 	name    string
+}
+
+func (qi queueItem) toExternalName() ExternalName {
+	return ExternalName{Cluster: qi.cluster, Name: qi.name}
 }
 
 type WhatResolverClusterHandler struct {
@@ -209,21 +223,6 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 	wr.queue.Add(item)
 }
 
-func (wr *whatResolver) AddReceiver(receiver MappingReceiver[ExternalName, WorkloadParts], notifyCurrent bool) {
-	wr.Lock()
-	defer wr.Unlock()
-	wr.receivers = append(wr.receivers, receiver)
-	if !notifyCurrent {
-		return
-	}
-	for wldCluster, wsDetails := range wr.workspaceDetails {
-		for epName := range wsDetails.placements {
-			parts := wr.getPartsLocked(wldCluster, epName)
-			receiver.Receive(ExternalName{Cluster: wldCluster, Name: epName}, parts)
-		}
-	}
-}
-
 func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
 	wr.Lock()
 	defer wr.Unlock()
@@ -261,9 +260,7 @@ func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name,
 func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName string) {
 	parts := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
-	for _, receiver := range wr.receivers {
-		receiver.Receive(epRef, parts)
-	}
+	wr.receiver.Put(epRef, parts)
 }
 
 func (wr *whatResolver) runWorker() {
@@ -663,14 +660,6 @@ func gvrIsNamespace(gr schema.GroupVersionResource) bool {
 	return gr.Group == "" && gr.Resource == "namespaces"
 }
 
-func NewSet[Elt comparable](elts []Elt) map[Elt]Empty {
-	ans := map[Elt]Empty{}
-	for _, elt := range elts {
-		ans[elt] = Empty{}
-	}
-	return ans
-}
-
 func mkgk(group, kind string) schema.GroupKind {
 	return schema.GroupKind{Group: group, Kind: kind}
 }
@@ -679,12 +668,35 @@ func mkgr(group, resource string) schema.GroupResource {
 	return schema.GroupResource{Group: group, Resource: resource}
 }
 
-var GRsNotSupported = NewSet([]schema.GroupResource{
+var GRsForciblyDenatured = NewMapSet(
+	mkgr("admissionregistration.k8s.io", "mutatingwebhookconfigurations"),
+	mkgr("admissionregistration.k8s.io", "validatingwebhookconfigurations"),
+	mkgr("flowcontrol.apiserver.k8s.io", "flowschemas"),
+	mkgr("flowcontrol.apiserver.k8s.io", "prioritylevelconfigurations"),
+	mkgr("rbac.authorization.k8s.io", "clusterroles"),
+	mkgr("rbac.authorization.k8s.io", "clusterrolebindingss"),
+	mkgr("rbac.authorization.k8s.io", "roles"),
+	mkgr("rbac.authorization.k8s.io", "rolebindings"),
+	mkgr("", "limitranges"),
+	mkgr("", "resourcequotas"),
+	mkgr("", "serviceaccounts"),
+)
+
+var GRsNaturedInBoth = NewMapSet(
+	mkgr("apiextensions.k8s.io", "customresourcedefinitions"),
+	mkgr("", "namespaces"),
+)
+
+var NaturedInCenterNoGo = NewMapSet(
+	mkgr("apis.kcp.io", "apibindings"),
+)
+
+var GRsNotSupported = NewMapSet(
 	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
 	mkgr("apis.kcp.io", "apiconversions"),
-})
+)
 
 var GroupsNotForEdge = k8ssets.NewString(
 	"edge.kcp.io",
@@ -694,7 +706,7 @@ var GroupsNotForEdge = k8ssets.NewString(
 	"workload.kcp.io",
 )
 
-var GRsNotForEdge = NewSet([]schema.GroupResource{
+var GRsNotForEdge = NewMapSet(
 	mkgr("apis.kcp.io", "apiexports"),
 	mkgr("apis.kcp.io", "apiexportendpointslices"),
 	mkgr("apis.kcp.io", "apiresourceschemas"),
@@ -712,4 +724,27 @@ var GRsNotForEdge = NewSet([]schema.GroupResource{
 	mkgr("", "componentstatuses"),
 	mkgr("", "events"),
 	mkgr("", "nodes"),
-})
+)
+
+func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
+	sgr := MetaGroupResourceToSchema(mgr)
+	builtin := strings.HasSuffix(sgr.Group, ".k8s.io") || !strings.Contains(sgr.Group, ".")
+	switch {
+	case GRsForciblyDenatured.Has(sgr):
+		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
+	case GRsNaturedInBoth.Has(sgr):
+		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
+	case NaturedInCenterNoGo.Has(sgr):
+		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	case GRsNotSupported.Has(sgr):
+		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
+	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):
+		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	default:
+		return ResourceMode{GoesToEdge, NaturalyDenatured, builtin}
+	}
+}
+
+func MetaGroupResourceToSchema(gr metav1.GroupResource) schema.GroupResource {
+	return schema.GroupResource{Group: gr.Group, Resource: gr.Resource}
+}

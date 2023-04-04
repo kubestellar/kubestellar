@@ -29,6 +29,7 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 )
@@ -44,10 +45,12 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 
-	whatResolverLauncher func() *whatResolver
+	whatResolver  WhatResolver
+	whereResolver WhereResolver
 }
 
 func NewPlacementTranslator(
+	numThreads int,
 	ctx context.Context,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
@@ -78,8 +81,9 @@ func NewPlacementTranslator(
 		crdClusterInformer:     crdClusterPreInformer.Informer(),
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
-		whatResolverLauncher: NewWhatResolverLauncher(ctx, epClusterPreInformer, discoveryClusterClient,
-			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, 4),
+		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
+			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
+		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
 	return pt
 }
@@ -95,18 +99,27 @@ func (pt *placementTranslator) Run() {
 		os.Exit(100)
 	}
 
-	_, mbPathToName := NewNameAndPath(pt.logger, pt.mbwsInformer, true)
 	// TODO: make all the other needed infrastructure
 
 	// TODO: replace all these dummies
-	whatResolver := pt.whatResolverLauncher()
-	whatResolver.AddReceiver(LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, true) // debugging
-	whereResolver := RelayWhereResolver()
-	setBinder := NewDummySetBinder()
-	workloadProjector := NewDummyWorkloadProjector(mbPathToName)
-	placementProjector := NewDummyWorkloadProjector(mbPathToName)
-	AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector, placementProjector)
-	<-doneCh
+	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
+		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{pt.logger}, mr}
+		return pt.whatResolver(fork)
+	}
+	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
+		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{LoggingMappingReceiver[ExternalName, ResolvedWhere]{pt.logger}, mr}
+		return pt.whereResolver(fork)
+	}
+	dummyBaseAPIProvider := NewRelayMap[logicalcluster.Name, ScopedAPIProvider](false)
+	setBinder := NewSetBinder(pt.logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+		SimpleBindingOrganizer(pt.logger),
+		NewTestAPIMapProvider(dummyBaseAPIProvider),
+		DefaultResourceModes,
+		nil)
+	workloadProjector := NewLoggingWorkloadProjector(pt.logger)
+	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector)
+	// TODO: move all that stuff up before Run
+	runner.Run(ctx)
 }
 
 type LoggingMappingReceiver[Key comparable, Val any] struct {
@@ -115,6 +128,10 @@ type LoggingMappingReceiver[Key comparable, Val any] struct {
 
 var _ MappingReceiver[string, []any] = &LoggingMappingReceiver[string, []any]{}
 
-func (lmr LoggingMappingReceiver[Key, Val]) Receive(key Key, val Val) {
-	lmr.logger.Info("Receive", "key", key, "val", val)
+func (lmr LoggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
+	lmr.logger.Info("Put", "key", key, "val", val)
+}
+
+func (lmr LoggingMappingReceiver[Key, Val]) Delete(key Key) {
+	lmr.logger.Info("Delete", "key", key)
 }
