@@ -18,7 +18,7 @@ Want to get involved? Check out our ['good first issue' list](https://github.com
 ### consistent, heterogeneous, and scalable edge configuration management
 <br/><br/>
 ## Overview
-KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases.  Edge-MC is the name of our opensource community repository.  The following are challenges with existing KCP and Kubernetes we will be tackling, with the KCP-Edge community, in the edge-mc repository, over time:
+KCP-Edge is focused on concerns arising from edge multicluster use cases.  Edge-MC is the name of our opensource community repository.  The following are challenges with Kubernetes we are tackling, with the KCP-Edge community, in the edge-mc repository:
 
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
