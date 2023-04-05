@@ -72,7 +72,6 @@ Thanks go to these wonderful people:
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <
     <td align="center"><a href="https://github.com/waltforme"><img src="https://avatars.githubusercontent.com/u/8633434?v=4" width="100px;" alt=""/><br /><sub><b>Jun Duan</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/issues?q=assignee%3Awaltforme+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/dumb0002"><img src="https://avatars.githubusercontent.com/u/25727844?v=4" width="100px;" alt=""/><br /><sub><b>Braulio Dumba</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/issues?q=assignee%3Adumb0002+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/MikeSpreitzer"><img src="https://avatars.githubusercontent.com/u/14296719?v=4" width="100px;" alt=""/><br /><sub><b>Mike Spreitzer</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/pulls?q=is%3Apr+reviewed-by%3AMikeSpreitzer" title="Reviewed Pull Requests">👀</a></td>
