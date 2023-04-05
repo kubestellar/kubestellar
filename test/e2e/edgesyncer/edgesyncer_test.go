@@ -156,7 +156,7 @@ func TestEdgeSyncer(t *testing.T) {
 			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleDownsyncCRUnst.GetName(), err)
 		}
 		return true, ""
-	}, wait.ForeverTestTimeout*3, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
+	}, wait.ForeverTestTimeout, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
 
 	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleUpsyncCRUnst.GetName(), wsPath.String())
 	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleUpsyncCRUnst, v1.CreateOptions{})
@@ -169,5 +169,5 @@ func TestEdgeSyncer(t *testing.T) {
 			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
 		}
 		return true, ""
-	}, wait.ForeverTestTimeout*3, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
+	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
 }

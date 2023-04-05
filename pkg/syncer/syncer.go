@@ -44,10 +44,13 @@ type SyncerConfig struct {
 	SyncTargetPath   logicalcluster.Path
 	SyncTargetName   string
 	SyncTargetUID    string
+	Interval         time.Duration
 }
 
 const (
-	resyncPeriod = 10 * time.Hour
+	resyncPeriod    = 10 * time.Hour
+	defaultInterval = time.Second * 15
+	minimumInterval = time.Second * 1
 )
 
 func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) error {
@@ -119,11 +122,15 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
+	interval := cfg.Interval
+	if interval < minimumInterval {
+		interval = defaultInterval
+	}
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.Tick(time.Second * 15):
+		case <-time.Tick(interval):
 			logger.V(2).Info("Sync ")
 			for _, resource := range controller.GetDownSyncedResources() {
 				if err := downSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
