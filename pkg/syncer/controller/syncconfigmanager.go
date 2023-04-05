@@ -17,6 +17,7 @@ limitations under the License.
 package controller
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -57,7 +58,7 @@ func newIndexedSyncedResources(resources ...edgev1alpha1.EdgeSyncConfigResource)
 }
 
 var syncConfigManager = _syncConfigManager{
-	logger:                     klog.NewKlogr(),
+	logger:                     klog.FromContext(context.TODO()),
 	syncConfigMap:              map[string]edgev1alpha1.EdgeSyncConfig{},
 	indexedDownSyncedResources: newIndexedSyncedResources(),
 	indexedUpSyncedResources:   newIndexedSyncedResources(),
