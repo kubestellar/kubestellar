@@ -1,0 +1,6 @@
+apiVersion: my.domain/v1alpha1
+kind: Sample
+metadata:
+  name: sample-downsync
+spec:
+  foo: bar downsync
