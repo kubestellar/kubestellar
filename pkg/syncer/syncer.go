@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -67,11 +65,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	}
 	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
-	syncConfigInformerFactory := syncerinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod, syncerinformers.WithTweakListOptions(
-		func(listOptions *metav1.ListOptions) {
-			listOptions.FieldSelector = fields.OneTermEqualSelector("metadata.name", cfg.SyncTargetName).String()
-		},
-	))
+	syncConfigInformerFactory := syncerinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
 	syncConfigAccess := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
 	syncConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
@@ -112,7 +106,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
-	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigAccess, cfg.SyncTargetName, upSyncer, downSyncer, 5*time.Second)
+	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigAccess, upSyncer, downSyncer, 5*time.Second)
 	if err != nil {
 		return err
 	}
@@ -131,22 +125,17 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alph
 			return
 		case <-time.Tick(time.Second * 15):
 			logger.V(2).Info("Sync ")
-			syncConfig, err := syncConfigLister.Get(cfg.SyncTargetName)
-			if err != nil {
-				logger.Error(err, "failed to get syncConfig")
-			} else {
-				for _, resource := range syncConfig.Spec.DownSyncedResources {
-					if err := downSyncer.SyncOne(resource, syncConfig.Spec.Conversions); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-					if err := downSyncer.BackStatusOne(resource, syncConfig.Spec.Conversions); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
+			for _, resource := range controller.GetDownSyncedResources() {
+				if err := downSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
+					logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 				}
-				for _, resource := range syncConfig.Spec.UpSyncedResources {
-					if err := upSyncer.SyncOne(resource, syncConfig.Spec.Conversions); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
+				if err := downSyncer.BackStatusOne(resource, controller.GetConversions()); err != nil {
+					logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+				}
+			}
+			for _, resource := range controller.GetUpSyncedResources() {
+				if err := upSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
+					logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 				}
 			}
 		}

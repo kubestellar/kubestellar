@@ -44,7 +44,6 @@ func NewSyncConfigController(
 	logger klog.Logger,
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,
 	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
-	syncConfigName string,
 	upSyncer syncers.SyncerInterface,
 	downSyncer syncers.SyncerInterface,
 	reconcileInterval time.Duration,
@@ -64,11 +63,8 @@ func NewSyncConfigController(
 			if err != nil {
 				return false
 			}
-			_, name, err := cache.SplitMetaNamespaceKey(key)
-			if err != nil {
-				return false
-			}
-			return name == syncConfigName
+			_, _, err = cache.SplitMetaNamespaceKey(key)
+			return err == nil
 		},
 		Handler: cache.ResourceEventHandlerFuncs{
 			AddFunc:    func(obj interface{}) { c.enqueueSyncConfig(obj, logger) },
@@ -164,23 +160,30 @@ func (c *controller) process(ctx context.Context, key string) error {
 		return nil
 	}
 
+	refresh := func() error {
+		downsyncerError := c.downSyncer.ReInitializeClients(syncConfigManager.getDownSyncedResources(), syncConfigManager.getConversions())
+		upSyncerError := c.upSyncer.ReInitializeClients(syncConfigManager.getUpSyncedResources(), syncConfigManager.getConversions())
+
+		if downsyncerError != nil && upSyncerError != nil {
+			return fmt.Errorf("failed to reinitialize downsyncer (%w) and upsyncer (%w)", downsyncerError, upSyncerError)
+		} else if downsyncerError != nil && upSyncerError == nil {
+			return fmt.Errorf("failed to reinitialize downsyncer (%w)", downsyncerError)
+		} else if downsyncerError == nil && upSyncerError != nil {
+			return fmt.Errorf("failed to reinitialize upsyncer (%w)", upSyncerError)
+		}
+		return nil
+	}
+
 	syncConfig, err := c.syncConfigLister.Get(name)
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return nil // object deleted before we handled it
+		if errors.IsNotFound(err) { // object is deleted
+			syncConfigManager.delete(name)
+			return refresh()
 		}
 		return err
 	}
 
-	downsyncerError := c.downSyncer.ReInitializeClients(syncConfig.Spec.DownSyncedResources, syncConfig.Spec.Conversions)
-	upSyncerError := c.upSyncer.ReInitializeClients(syncConfig.Spec.UpSyncedResources, syncConfig.Spec.Conversions)
+	syncConfigManager.upsert(*syncConfig)
 
-	if downsyncerError != nil && upSyncerError != nil {
-		return fmt.Errorf("failed to reinitialize downsyncer (%w) and upsyncer (%w)", downsyncerError, upSyncerError)
-	} else if downsyncerError != nil && upSyncerError == nil {
-		return fmt.Errorf("failed to reinitialize downsyncer (%w)", downsyncerError)
-	} else if downsyncerError == nil && upSyncerError != nil {
-		return fmt.Errorf("failed to reinitialize upsyncer (%w)", upSyncerError)
-	}
-	return nil
+	return refresh()
 }
