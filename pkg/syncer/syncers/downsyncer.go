@@ -19,6 +19,7 @@ package syncers
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -29,6 +30,7 @@ import (
 )
 
 type DownSyncer struct {
+	sync.Mutex
 	logger                  klog.Logger
 	upstreamClientFactory   ClientFactory
 	downstreamClientFactory ClientFactory
@@ -59,10 +61,14 @@ func (ds *DownSyncer) initializeClients(syncedResources []edgev1alpha1.EdgeSyncC
 }
 
 func (ds *DownSyncer) ReInitializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	ds.Lock()
+	defer ds.Unlock()
 	return initializeClients(ds.logger, syncedResources, ds.upstreamClientFactory, ds.downstreamClientFactory, ds.upstreamClients, ds.downstreamClients, conversions)
 }
 
 func (ds *DownSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+	ds.Lock()
+	defer ds.Unlock()
 	return getClients(resource, ds.upstreamClients, ds.downstreamClients, conversions)
 }
 
