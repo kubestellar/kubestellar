@@ -19,6 +19,7 @@ package syncers
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -28,6 +29,7 @@ import (
 )
 
 type UpSyncer struct {
+	sync.Mutex
 	logger                  klog.Logger
 	upstreamClientFactory   ClientFactory
 	downstreamClientFactory ClientFactory
@@ -58,10 +60,14 @@ func (us *UpSyncer) initializeClients(syncedResources []edgev1alpha1.EdgeSyncCon
 }
 
 func (us *UpSyncer) ReInitializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	us.Lock()
+	defer us.Unlock()
 	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients, conversions)
 }
 
 func (us *UpSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+	us.Lock()
+	defer us.Unlock()
 	return getClients(resource, us.upstreamClients, us.downstreamClients, conversions)
 }
 

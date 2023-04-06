@@ -1,0 +1,26 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgeSyncConfig
+metadata:
+  name: test
+spec:
+  downSyncedResources:
+  - kind: Namespace
+    name: test
+    version: v1
+  - kind: ConfigMap
+    name: test
+    namespace: test
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: samples.my.domain
+    version: v1
+  - group: my.domain
+    kind: Sample
+    name: sample-downsync
+    version: v1alpha1
+  upSyncedResources:
+  - group: my.domain
+    kind: Sample
+    name: sample-upsync
+    version: v1alpha1
