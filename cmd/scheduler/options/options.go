@@ -21,11 +21,15 @@ import (
 
 	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
+
+	"github.com/kcp-dev/edge-mc/pkg/client"
 )
 
 type Options struct {
-	KcpKubeconfig string
-	Logs          *logs.Options
+	EspwClientOpts   client.ClientOpts
+	RootClientOpts   client.ClientOpts
+	SysAdmClientOpts client.ClientOpts
+	Logs             *logs.Options
 }
 
 func NewOptions() *Options {
@@ -34,12 +38,19 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	return &Options{
-		Logs: logs,
+		EspwClientOpts:   *client.NewClientOpts("espw", "access to the edge service provider workspace"),
+		RootClientOpts:   *client.NewClientOpts("root", "access to all clusters"),
+		SysAdmClientOpts: *client.NewClientOpts("sysadm", "access to all clusters as system:admin"),
+		Logs:             logs,
 	}
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&options.KcpKubeconfig, "kcp-kubeconfig", options.KcpKubeconfig, "Kubeconfig file for kcp")
+	options.EspwClientOpts.AddFlags(fs)
+	options.RootClientOpts.OverrideUserAndCluster("kcp-admin", "root")
+	options.RootClientOpts.AddFlags(fs)
+	options.SysAdmClientOpts.OverrideCurrentContext("system:admin")
+	options.SysAdmClientOpts.AddFlags(fs)
 	options.Logs.AddFlags(fs)
 }
 
