@@ -122,7 +122,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			// for an (obsolite) ep in epsUsedSt but not in epsUsingSt
 			// remove all relevant sp(s) from that ep, so that that ep doesn't use st
 			// an obsolite ep doesn't use st anymore because its locs don't select the st anymore
-			logger.V(1).Info("stop to use SyncTarget", "edgePlacement", ep)
+			logger.V(1).Info("stop using SyncTarget", "edgePlacement", ep)
 			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")

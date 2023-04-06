@@ -26,8 +26,6 @@ import (
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
@@ -91,11 +89,12 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	ctx = klog.NewContext(ctx, logger)
 
 	// create edgeSharedInformerFactory
-	edgeConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{},
-	).ClientConfig()
-	edgeViewConfig, err := configForViewOfExport(ctx, edgeConfig, "edge.kcp.io")
+	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to create config from flags")
+		return err
+	}
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of edge exports")
 		return err
@@ -108,16 +107,12 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
 	// create schedulingSharedInformerFactory
-	schedulingConfig, _ := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{
-			Context: clientcmdapi.Context{
-				Cluster:  "root",
-				AuthInfo: "kcp-admin",
-			},
-		},
-	).ClientConfig()
-	schedulingViewConfig, err := configForViewOfExport(ctx, schedulingConfig, "scheduling.kcp.io")
+	rootRestConfig, err := options.RootClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to create config from flags")
+		return err
+	}
+	schedulingViewConfig, err := configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of scheduling exports")
 		return err
@@ -130,8 +125,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
 
 	// create workloadSharedInformerFactory
-	workloadConfig := schedulingConfig
-	workloadViewConfig, err := configForViewOfExport(ctx, workloadConfig, "workload.kcp.io")
+	workloadViewConfig, err := configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of workload exports")
 		return err
@@ -143,28 +137,18 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	}
 	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
 
-	// create ClientConfig for the controller
-	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	loadingRules.ExplicitPath = options.KcpKubeconfig
-	configOverrides := &clientcmd.ConfigOverrides{
-		Context: clientcmdapi.Context{
-			Cluster:  "base",
-			AuthInfo: "shard-admin",
-		},
-	}
-	controllerConfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides).ClientConfig()
+	// create edge-scheduler
+	sysAdmRestConfig, err := options.SysAdmClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to make config for the controller")
+		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-
-	// create edge-scheduler
-	kcpClusterClientset, err := kcpclientset.NewForConfig(controllerConfig)
+	kcpClusterClientset, err := kcpclientset.NewForConfig(sysAdmRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create kcp clientset for controller")
 		return err
 	}
-	edgeClusterClientset, err := edgeclientset.NewForConfig(controllerConfig)
+	edgeClusterClientset, err := edgeclientset.NewForConfig(sysAdmRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err

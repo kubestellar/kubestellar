@@ -144,7 +144,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			// 4a)
 			// an (obsolete) ep doesn't select loc anymore
 			// we need to remove all relevant sp(s) from the corresponding sps where 'relevant' means an sp has loc
-			logger.V(1).Info("stop to select Location", "edgePlacement", ep)
+			logger.V(1).Info("stop selecting Location", "edgePlacement", ep)
 			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")
