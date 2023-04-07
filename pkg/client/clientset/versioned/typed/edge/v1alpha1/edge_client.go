@@ -32,6 +32,7 @@ type EdgeV1alpha1Interface interface {
 	CustomizersGetter
 	EdgePlacementsGetter
 	SinglePlacementSlicesGetter
+	SyncerConfigsGetter
 }
 
 // EdgeV1alpha1Client is used to interact with features provided by the edge.kcp.io group.
@@ -49,6 +50,10 @@ func (c *EdgeV1alpha1Client) EdgePlacements() EdgePlacementInterface {
 
 func (c *EdgeV1alpha1Client) SinglePlacementSlices() SinglePlacementSliceInterface {
 	return newSinglePlacementSlices(c)
+}
+
+func (c *EdgeV1alpha1Client) SyncerConfigs() SyncerConfigInterface {
+	return newSyncerConfigs(c)
 }
 
 // NewForConfig creates a new EdgeV1alpha1Client for the given config.

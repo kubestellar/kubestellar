@@ -23,18 +23,20 @@ import (
 	"testing"
 	"time"
 
-	corev1 "k8s.io/api/core/v1"
-
-	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
-	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/stretchr/testify/require"
+
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
+
+	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
+	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
+	"github.com/kcp-dev/kcp/test/e2e/framework"
+
+	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
 //go:embed testdata/*

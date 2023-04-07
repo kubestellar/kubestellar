@@ -41,6 +41,10 @@ func (c *FakeEdgeV1alpha1) SinglePlacementSlices() v1alpha1.SinglePlacementSlice
 	return &FakeSinglePlacementSlices{c}
 }
 
+func (c *FakeEdgeV1alpha1) SyncerConfigs() v1alpha1.SyncerConfigInterface {
+	return &FakeSyncerConfigs{c}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeEdgeV1alpha1) RESTClient() rest.Interface {
