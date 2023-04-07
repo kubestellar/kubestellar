@@ -62,7 +62,12 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - At the initial implementation before edge-mc side controller become ready, we assume EdgeSyncConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
-
+- One CR is initially created by the command for Edge Syncer enablement in mb-ws (`kubectl kcp workload edge-syncer <name>`)
+  - The CR name is `<name>` and the contents are empty.
+  - This name is registered in the bootstrap manifests for Edge Syncer install and Edge Syncer is told to watch the CR of this name.
+- Currently Edge Syncer watches all CRs in the workspace
+  - Edge Syncer merges them and decides which resources are down/up synced based on the merged information. 
+  - This behavior may be changed to only watching the default CR once Placement Translater is to be the component that generates the CR from EdgePlacement: [related issue](https://github.com/kcp-dev/edge-mc/pull/284#pullrequestreview-1375667129)
 #### Downsyncing
 
 - Edge syncer does downsyncing, which copy workload objects on mailbox workspace to p-cluster
