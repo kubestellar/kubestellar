@@ -51,6 +51,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&SinglePlacementSliceList{},
 		&Customizer{},
 		&CustomizerList{},
+		&SyncerConfig{},
+		&SyncerConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
