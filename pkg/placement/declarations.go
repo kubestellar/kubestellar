@@ -87,18 +87,20 @@ type WorkloadProjector interface {
 // WorkloadProjectionSections is given, incrementally, instructions
 // for what goes where how, organized for consumption by syncers.
 // The FooDistributions are proper sets, while the
-// FooModes add dependent information for each set member.
+// FooModes add dependent information for set members.
 type WorkloadProjectionSections struct {
-	NamespacedDistributions    SetChangeReceiver[NamespacedDistributionTuple]
-	NamespacedModes            MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedDistributions SetChangeReceiver[NonNamespacedDistributionTuple]
-	NonNamespacedModes         MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NamespaceDistributions          SetChangeReceiver[NamespaceDistributionTuple]
+	NamespacedResourceDistributions SetChangeReceiver[NamespacedResourceDistributionTuple]
+	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NonNamespacedDistributions      SetChangeReceiver[NonNamespacedDistributionTuple]
+	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
 }
 
-type NamespacedDistributionTuple struct {
+type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, edgeapi.SinglePlacement]
+
+type NamespacedResourceDistributionTuple struct {
 	SourceCluster logicalcluster.Name
 	ProjectionModeKey
-	NamespaceName
 }
 
 type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of downsynced object*/]
@@ -281,31 +283,13 @@ type APIMapProvider interface {
 	//RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 }
 
-// ScopedAPIGroupVersioner is specific to one logical cluster and
-// provides a map from API group name to details about it in that cluster.
-// A nil pointer means that the group is not defined in the cluster.
-type ScopedAPIProvider DynamicMapProvider[string, *APIGroupInfo]
-
 type APIGroupInfo struct {
-	//	Versions  DynamicValueProvider[APIGroupVersions]
-	//	Resources APIResourceDetailsProvider
-	//}
-
-	// APIGroupVersions tells about the versions available for the group.
-	//type APIGroupVersions struct {
-
 	// Versions are ordered as semantic versions.
 	// This slice is immutable.
 	Versions []metav1.GroupVersionForDiscovery
 
 	PreferredVersion metav1.GroupVersionForDiscovery
 }
-
-// APIResourceDetailsProvider reveals details about the resoureces in a
-// given API group in a given cluster.
-// A resource is identified in the usual way, the lowercase plural.
-// A nil pointer means the resource is not defined there.
-type APIResourceDetailsProvider DynamicMapProvider[string, *ResourceDetails]
 
 // ResourceDetails holds the information needed here about a resource
 type ResourceDetails struct {

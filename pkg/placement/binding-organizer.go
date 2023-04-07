@@ -40,15 +40,22 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			workloadProjector: workloadProjector,
 			perSourceCluster:  NewMapMap[logicalcluster.Name, *simpleBindingPerCluster](nil),
 		}
-		pickVersionForEP := func(versions MutableMap[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
-			var version ProjectionModeVal
-			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
-				version = pair.Second
-				return errStop
-			}) == nil {
-				return version, false
-			}
-			return version, true
+		namespaceDistributionsRelay := SetChangeReceiverFuncs[NamespaceDistributionTuple]{
+			OnAdd: func(tup NamespaceDistributionTuple) bool {
+				return sbo.workloadProjectionSections.NamespaceDistributions.Add(tup)
+			},
+			OnRemove: func(tup NamespaceDistributionTuple) bool {
+				return sbo.workloadProjectionSections.NamespaceDistributions.Remove(tup)
+			}}
+		namespacedResourceDistributionRelay := SetChangeReceiverFuncs[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]]{
+			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
+				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
+				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Add(dist)
+			},
+			OnRemove: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
+				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
+				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Remove(dist)
+			},
 		}
 		namespacedModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
@@ -58,38 +65,31 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 				sbo.workloadProjectionSections.NamespacedModes.Delete(mk)
 			},
 		}
-		ntSansNS := NewFactoredMapMapAggregator[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name, ProjectionModeVal, ProjectionModeVal](
+
+		nsToAggregate := NewFactoredMapMapAggregator[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement],
+			ProjectionModeKey, logicalcluster.Name, ProjectionModeVal, ProjectionModeVal](
 			factorNamespacedJoinKeyLessNS,
 			nil,
 			nil,
-			pickThe1[ProjectionModeKey, logicalcluster.Name](sbo, "Not implemented yet: handling version conflicts for namespaced resources"),
+			pickThe1[ProjectionModeKey, logicalcluster.Name](sbo, "Should not happen: version difference between namespaces"),
 			namespacedModesReceiver,
 		)
-		nsProjector := NewFactoredMapMapAggregator[NamespacedJoinKey, NamespacedJoinKeyLessnS, NamespaceName, ProjectionModeVal, ProjectionModeVal](
-			factorNamespacedJoinKey,
-			nil,
-			nil,
-			pickThe1[NamespacedJoinKeyLessnS, NamespaceName](sbo, "Should not happen: version difference between namespaces"),
-			ntSansNS,
-		)
-		namespacedDistributionRelay := MappingReceiverFuncs[NamespacedJoinKey, ProjectionModeVal]{
-			OnPut: func(key NamespacedJoinKey, val ProjectionModeVal) {
-				dist := NamespacedJoinKeyToDistribution(key)
-				sbo.workloadProjectionSections.NamespacedDistributions.Add(dist)
-			},
-			OnDelete: func(key NamespacedJoinKey) {
-				dist := NamespacedJoinKeyToDistribution(key)
-				sbo.workloadProjectionSections.NamespacedDistributions.Remove(dist)
-			},
-		}
-		nsCommon := MappingReceiverFork[NamespacedJoinKey, ProjectionModeVal]{namespacedDistributionRelay, nsProjector}
 
-		rscDisco, ntSansEPName := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, NamespaceAndDestination, ProjectionModeVal](
+		nsCommon := MappingReceiverFork[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal]{
+			MapKeySetReceiverLossy[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal](namespacedResourceDistributionRelay),
+			nsToAggregate}
+
+		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement, ProjectionModeVal](
 			logger, nsCommon)
 		sbo.resourceDiscoveryReceiver = rscDisco
 
-		sbo.namespacedWhatWhereFull = NewSetChangeProjector[NamespacedWhatWhereFullKey, Pair[logicalcluster.Name, NamespaceAndDestination], string /*epName*/](
-			factorNamespacedWhatWhereFullKey, ntSansEPName)
+		nsToGoLoseNamespace := NewSetChangeProjector[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
+			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement](), nsSrcAndDest)
+
+		nsToGo := SetChangeReceiverFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
+
+		sbo.namespacedWhatWhereFull = NewSetChangeProjector[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/](
+			factorNamespacedWhatWhereFullKey, nsToGo)
 
 		clusterDistributionsReceiver := SetChangeReceiverFuncs[NonNamespacedDistributionTuple]{
 			OnAdd: func(nnd NonNamespacedDistributionTuple) bool {
@@ -122,6 +122,16 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			MapKeySetReceiver[NonNamespacedDistributionTuple, ProjectionModeVal](clusterDistributionsReceiver),
 			MappingReceiverDiscardsPrevious[NonNamespacedDistributionTuple, ProjectionModeVal](aggregateForCluster),
 		}
+		pickVersionForEP := func(versions MutableMap[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
+			var version ProjectionModeVal
+			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
+				version = pair.Second
+				return errStop
+			}) == nil {
+				return version, false
+			}
+			return version, true
+		}
 		// clusterChangeReceiver receives the change stream of the full map and projects out the EdgePlacement
 		// object name to feed to sansEPName.
 		// This is relatively simple because the API version does not vary for a given resource and source cluster.
@@ -152,8 +162,6 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 	}
 }
 
-// type SingleBindingOps MappingReceiver[Triple[ExternalName /* of EdgePlacement object */, WorkloadPartID, edgeapi.SinglePlacement], WorkloadPartDetails]
-
 // simpleBindingOrganizer is the top-level data structure of the organizer.
 // In the locking order it precedes its discovery and its projectionMapProvider,
 // which in turn precedes each projectionPerClusterImpl.
@@ -170,24 +178,24 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 // - WhatWheres: set of ((epCluster,epName),(namespace,destination))
 // - DiscoG: map of (epCluster,APIGroup) -> APIVersionInfo
 // - DiscoR: map of (epCluster,GroupResource) -> APIVersion (the preferred one)
-// and produces change streams for the following two relations:
-// - set of NamespacedDistributionTuple (epCluster,GroupResource,(namespace,destionation))
+// and produces change streams for the following three relations:
+// - nsToGo: set of NamespaceDistributionTuple (epCluster,namespace,destination)
+// - set of NamespacedResourceDistributionTuple (epCluster,GroupResource,destionation)
 // - map of ProjectionModeKey (GroupResource,destionation) -> ProjectionModeVal (APIVersion).
 //
 // As a relational expression, the desired computation is as follows.
-// common = DiscoR.Equijoin(WhatWhere.ProjectOut(epName))
-// (that's a map (epCluster,GroupResource,(namespace,destination)) -> APIVesion)
-// NamespacedDistributionTuples = common.Keys()
-// ProjectionsModes = common.ProjectOut(namespace)
-// .GroupBy(GroupResource,destination)
-// .Aggregate(PickVersion)
+// nsToGo = WhatWhere.ProjectOut(epName)
+// nsCommon = DiscoR.Equijoin(nsToGo.ProjectOut(namespace))
+// (that's a map (epCluster,GroupResource,destination) -> APIVesion)
+// NamespacedResourceDistributionTuples = nsCommon.Keys()
+// ProjectionsModes = nsCommon.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
-// namespacedModesReceiver <- ntSansNS.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// ntSansNS <- nsCommon.ProjectOut(namespace)
-// NamespacedDistributionTuples <- nsCommon.Keys()
-// nsCommon <- Equijoin(DiscoR, ntSansEPName)
-// ntSansEPName <- WhatWheres.ProjectOut(epName)
+// nsModesReceiver <- nsCommon.GroupBy(GroupResource,destination).Aggregate(PickVersion)
+// NamespacedResourceDistributionTuples <- nsCommon.Keys()
+// nsCommon <- Equijoin(DiscoR, nsSrcAndDest)
+// nsSrcAndDest <- nsToGo.ProjectOut(namespace)
+// nsToGo <- WhatWheres.ProjectOut(epName)
 //
 // For the cluster-scoped resources, as a SingleBinder this organizer
 // is given the stream of change to following relations:
@@ -233,40 +241,13 @@ type simpleBindingOrganizer struct {
 
 type NamespaceName string
 
-type NamespaceAndDestination struct {
-	NamespaceName
-	Destination edgeapi.SinglePlacement
-}
+type NamespaceAndDestination = Pair[NamespaceName, edgeapi.SinglePlacement]
+
+type SourceAndDestination = Pair[logicalcluster.Name, edgeapi.SinglePlacement]
 
 type NamespacedJoinKey = Triple[logicalcluster.Name, metav1.GroupResource, NamespaceAndDestination]
 
-func NamespacedJoinKeyToDistribution(njk NamespacedJoinKey) NamespacedDistributionTuple {
-	return NamespacedDistributionTuple{
-		SourceCluster: njk.First,
-		ProjectionModeKey: ProjectionModeKey{
-			GroupResource: njk.Second,
-			Destination:   njk.Third.Destination},
-		NamespaceName: njk.Third.NamespaceName}
-}
-
 type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]
-
-var factorNamespacedJoinKey = Factorer[NamespacedJoinKey, NamespacedJoinKeyLessnS, NamespaceName]{
-	First: func(whole NamespacedJoinKey) Pair[NamespacedJoinKeyLessnS, NamespaceName] {
-		return Pair[NamespacedJoinKeyLessnS, NamespaceName]{
-			First: NamespacedJoinKeyLessnS{
-				First:  whole.First,
-				Second: whole.Second,
-				Third:  whole.Third.Destination},
-			Second: whole.Third.NamespaceName}
-	},
-	Second: func(parts Pair[NamespacedJoinKeyLessnS, NamespaceName]) NamespacedJoinKey {
-		return NamespacedJoinKey{
-			First:  parts.First.First,
-			Second: parts.First.Second,
-			Third:  NamespaceAndDestination{parts.Second, parts.First.Third}}
-	},
-}
 
 var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name]{
 	First: func(whole NamespacedJoinKeyLessnS) Pair[ProjectionModeKey, logicalcluster.Name] {
@@ -298,21 +279,20 @@ func pickThe1[KeyPartA, KeyPartB comparable](sbo *simpleBindingOrganizer, errmsg
 	}
 }
 
-var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, Pair[logicalcluster.Name, NamespaceAndDestination], string /*epName*/]{
-	First: func(nfk NamespacedWhatWhereFullKey) Pair[Pair[logicalcluster.Name, NamespaceAndDestination], string /*epName*/] {
-		return Pair[Pair[logicalcluster.Name, NamespaceAndDestination], string /*epName*/]{
-			First: Pair[logicalcluster.Name, NamespaceAndDestination]{
-				First: nfk.First.Cluster,
-				Second: NamespaceAndDestination{
-					NamespaceName: nfk.Second,
-					Destination:   nfk.Third}},
+var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/]{
+	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespaceDistributionTuple, string /*epName*/] {
+		return Pair[NamespaceDistributionTuple, string /*epName*/]{
+			First: Triple[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement]{
+				nfk.First.Cluster,
+				nfk.Second,
+				nfk.Third},
 			Second: nfk.First.Name}
 	},
-	Second: func(parts Pair[Pair[logicalcluster.Name, NamespaceAndDestination], string /*epName*/]) NamespacedWhatWhereFullKey {
+	Second: func(parts Pair[NamespaceDistributionTuple, string /*epName*/]) NamespacedWhatWhereFullKey {
 		return NamespacedWhatWhereFullKey{
 			First:  ExternalName{parts.First.First, parts.Second},
-			Second: parts.First.Second.NamespaceName,
-			Third:  parts.First.Second.Destination}
+			Second: parts.First.Second,
+			Third:  parts.First.Third}
 	},
 }
 
@@ -344,10 +324,10 @@ var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespa
 
 type ResourceDiscoveryKey = Pair[logicalcluster.Name /*wmw*/, metav1.GroupResource]
 
-type NamespacedWhatWhereFullKey Triple[ExternalName, NamespaceName, edgeapi.SinglePlacement]
+type NamespacedWhatWhereFullKey = Triple[ExternalName, NamespaceName, edgeapi.SinglePlacement]
 
 // ClusterWhatWhereFullKey is (EdgePlacement id, (resource, object name), destination)
-type ClusterWhatWhereFullKey Triple[ExternalName, Pair[metav1.GroupResource, string], edgeapi.SinglePlacement]
+type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], edgeapi.SinglePlacement]
 
 func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps)) {
 	sbo.Lock()
@@ -405,7 +385,6 @@ func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name,
 			cluster:                cluster,
 		}
 		sbo.perSourceCluster.Put(cluster, sbc)
-		// sbo.discovery.AddClient(cluster, sbc)
 		sbo.discovery.AddReceivers(cluster, sbcGroupReceiver{sbc}, sbcResourceReceiver{sbc})
 	}
 	return sbc

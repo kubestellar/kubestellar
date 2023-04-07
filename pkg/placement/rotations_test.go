@@ -54,7 +54,7 @@ func TestFactorers(t *testing.T) {
 	gen := generator{}
 	t.Run("factorNamespacedWhatWhereFullKey", exerciseFactorer(factorNamespacedWhatWhereFullKey,
 		gen.NamespacedWhatWhereFullKey(),
-		Pair[logicalcluster.Name, NamespaceAndDestination]{gen.ClusterName(), gen.NamespaceAndDestination()},
+		gen.NamespaceDistributionTuple(),
 		gen.String()))
 	t.Run("factorClusterWhatWhereFullKey", exerciseFactorer(factorClusterWhatWhereFullKey,
 		gen.ClusterWhatWhereFullKey(),
@@ -69,11 +69,11 @@ func TestFactorers(t *testing.T) {
 		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
 		Pair[string, float32]{gen.String(), rand.Float32()},
 		rand.Intn(100)-100))
-	t.Run("factorNamespacedJoinKey", exerciseFactorer[NamespacedJoinKey, NamespacedJoinKeyLessnS, NamespaceName](
-		factorNamespacedJoinKey,
-		gen.NamespacedJoinKey(),
-		gen.NamespacedJoinKeyLessnS(),
-		gen.NamespaceName()))
+	t.Run("TripleFactorTo13and2", exerciseFactorer(
+		TripleFactorerTo13and2[int, string, float32](),
+		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
+		Pair[int, float32]{rand.Intn(100) - 200, rand.Float32()},
+		gen.String()))
 	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name](
 		factorNamespacedJoinKeyLessNS,
 		gen.NamespacedJoinKeyLessnS(),
@@ -122,8 +122,8 @@ func (gen generator) SinglePlacement() edgeapi.SinglePlacement {
 
 func (gen generator) NamespaceAndDestination() NamespaceAndDestination {
 	return NamespaceAndDestination{
-		NamespaceName: gen.NamespaceName(),
-		Destination:   gen.SinglePlacement()}
+		First:  gen.NamespaceName(),
+		Second: gen.SinglePlacement()}
 }
 
 func (gen generator) NamespacedWhatWhereFullKey() NamespacedWhatWhereFullKey {
@@ -151,6 +151,13 @@ func (gen generator) NamespacedJoinKey() NamespacedJoinKey {
 		First:  gen.ClusterName(),
 		Second: gen.GroupResource(),
 		Third:  NamespaceAndDestination{gen.NamespaceName(), gen.SinglePlacement()}}
+}
+
+func (gen generator) NamespaceDistributionTuple() NamespaceDistributionTuple {
+	return NamespaceDistributionTuple{
+		First:  gen.ClusterName(),
+		Second: gen.NamespaceName(),
+		Third:  gen.SinglePlacement()}
 }
 
 func (gen generator) NamespacedJoinKeyLessnS() NamespacedJoinKeyLessnS {

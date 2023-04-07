@@ -32,7 +32,7 @@ import (
 // invoke this from TestFoo (or whatever).
 // At the current state of development, the test is utterly simple.
 // TODO: make this test harder.
-func exerciseSetBinder(t *testing.T, binder SetBinder) {
+func exerciseSetBinder(t *testing.T, resourceDiscoveryReceiver MappingReceiver[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails], binder SetBinder) {
 	gr1 := metav1.GroupResource{
 		Group:    "group1.test",
 		Resource: "customresourcedefinitions"}
@@ -47,6 +47,20 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		Name:     "crd1",
 	}
 	what1 := WorkloadParts{workloadPartID1: workloadPartDetails1}
+	gr2 := metav1.GroupResource{
+		Group:    "",
+		Resource: "namespaces"}
+	workloadPartDetails2 := WorkloadPartDetails{APIVersion: "v1"}
+	gvr2 := metav1.GroupVersionResource{
+		Group:    gr2.Group,
+		Version:  workloadPartDetails2.APIVersion,
+		Resource: gr2.Resource}
+	workloadPartID2 := WorkloadPartID{
+		APIGroup: gvr2.Group,
+		Resource: gvr2.Resource,
+		Name:     "ns-a",
+	}
+	what2 := WorkloadParts{workloadPartID2: workloadPartDetails2}
 	sc1 := logicalcluster.Name("wm1")
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
 	sp1 := edgeapi.SinglePlacement{
@@ -59,15 +73,17 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
 	where1 := ResolvedWhere{sps1}
-	NamespacedDistributions := NewMapSet[NamespacedDistributionTuple]()
+	NamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
+	NamespacedResourceDistributions := NewMapSet[NamespacedResourceDistributionTuple]()
 	NamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	NonNamespacedDistributions := NewMapSet[NonNamespacedDistributionTuple]()
 	NonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	projectionTracker := WorkloadProjectionSections{
-		NamespacedDistributions:    NamespacedDistributions,
-		NamespacedModes:            NamespacedModes,
-		NonNamespacedDistributions: NonNamespacedDistributions,
-		NonNamespacedModes:         NonNamespacedModes,
+		NamespaceDistributions:          NamespaceDistributions,
+		NamespacedResourceDistributions: NamespacedResourceDistributions,
+		NamespacedModes:                 NamespacedModes,
+		NonNamespacedDistributions:      NonNamespacedDistributions,
+		NonNamespacedModes:              NonNamespacedModes,
 	}
 	whatReceiver, whereReceiver := binder(TrivialTransactor[WorkloadProjectionSections]{projectionTracker})
 	whatReceiver.Put(ep1Ref, what1)
@@ -96,6 +112,42 @@ func exerciseSetBinder(t *testing.T, binder SetBinder) {
 			},
 			OnDelete: func(key ProjectionModeKey, val ProjectionModeVal) {
 				t.Fatalf("Extra entry in NonNamespacedModes; key=%v, val=%v", key, val)
+			},
+		})
+	expectedNamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
+	expectedNamespacedResourceDistributions := NewMapSet[NamespacedResourceDistributionTuple]()
+	expectedNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
+	whatReceiver.Put(ep1Ref, what2)
+	rd2 := ResourceDetails{Namespaced: true, SupportsInformers: true, PreferredVersion: workloadPartDetails2.APIVersion}
+	resourceDiscoveryReceiver.Put(Pair[logicalcluster.Name, metav1.GroupResource]{sc1, gr2}, rd2)
+	ndt2 := NamespaceDistributionTuple{sc1, NamespaceName(workloadPartID2.Name), sp1}
+	pmk2 := ProjectionModeKey{
+		GroupResource: gr2,
+		Destination:   sp1,
+	}
+	pmv2 := ProjectionModeVal{workloadPartDetails2.APIVersion}
+	expectedNamespaceDistributions.Add(ndt2)
+	expectedNamespacedResourceDistributions.Add(NamespacedResourceDistributionTuple{sc1, pmk2})
+	expectedNamespacedModes.Put(pmk2, pmv2)
+	if !SetEqual[NonNamespacedDistributionTuple](expectedNonNamespacedDistributions, NonNamespacedDistributions) {
+		t.Fatalf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedDistributions, NonNamespacedDistributions)
+	}
+	if !SetEqual[NamespacedResourceDistributionTuple](expectedNamespacedResourceDistributions, NamespacedResourceDistributions) {
+		t.Fatalf("Wrong NamespacedResourceDistributions; expected=%v, got=%v", expectedNamespacedResourceDistributions, NamespacedResourceDistributions)
+	}
+	if !SetEqual[NamespaceDistributionTuple](expectedNamespaceDistributions, NamespaceDistributions) {
+		t.Fatalf("Wrong NamespaceDistributions; expected=%v, got=%v", expectedNamespaceDistributions, NamespaceDistributions)
+	}
+	MapEnumerateDifferences[ProjectionModeKey, ProjectionModeVal](expectedNamespacedModes, NamespacedModes,
+		MapChangeReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
+			OnCreate: func(key ProjectionModeKey, val ProjectionModeVal) {
+				t.Fatalf("Missing entry in NamespacedModes; key=%v, val=%v", key, val)
+			},
+			OnUpdate: func(key ProjectionModeKey, goodVal, badVal ProjectionModeVal) {
+				t.Fatalf("Wrong entry in NamespacedModes; key=%v, expected=%v, got=%v", key, goodVal, badVal)
+			},
+			OnDelete: func(key ProjectionModeKey, val ProjectionModeVal) {
+				t.Fatalf("Extra entry in NamespacedModes; key=%v, val=%v", key, val)
 			},
 		})
 }

@@ -17,17 +17,22 @@ limitations under the License.
 package placement
 
 import (
+	"fmt"
 	"sync"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog/v2"
 
 	"github.com/kcp-dev/logicalcluster/v3"
 )
 
-func NewTestAPIMapProvider() *TestAPIMapProvider {
-	return &TestAPIMapProvider{
+func NewTestAPIMapProvider(logger klog.Logger) *TestAPIMapProvider {
+	tap := &TestAPIMapProvider{
+		logger:     logger,
 		perCluster: NewMapMap[logicalcluster.Name, *TestAPIPerCluster](nil),
 	}
+	logger.Info("NewTestAPIMapProvider", "tap", fmt.Sprintf("%p", tap))
+	return tap
 }
 
 // TestAPIMapProvider is a funky APIMapProvider for testing purposes.
@@ -39,6 +44,7 @@ func NewTestAPIMapProvider() *TestAPIMapProvider {
 // RemoveReceivers will not be implemented until go 1.20 or later is
 // required for this module.
 type TestAPIMapProvider struct {
+	logger klog.Logger
 	sync.Mutex
 	perCluster MutableMap[logicalcluster.Name, *TestAPIPerCluster]
 }
@@ -57,21 +63,23 @@ func (tap *TestAPIMapProvider) AddReceivers(cluster logicalcluster.Name,
 	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
 	tap.Lock()
 	defer tap.Unlock()
-	tpc := MapGetAdd(tap.perCluster, cluster, true, func(cluster logicalcluster.Name) *TestAPIPerCluster {
-		groupReceivers := MappingReceiverFork[string /*group name*/, APIGroupInfo]{}
-		resourceReceivers := MappingReceiverFork[metav1.GroupResource, ResourceDetails]{}
-		tpc := &TestAPIPerCluster{
-			GroupInfo:         NewMapMap[string /*group name*/, APIGroupInfo](MappingReceiverDiscardsPrevious[string /*group name*/, APIGroupInfo](groupReceivers)),
-			ResourceInfo:      NewMapMap[metav1.GroupResource, ResourceDetails](MappingReceiverDiscardsPrevious[metav1.GroupResource, ResourceDetails](resourceReceivers)),
-			groupReceivers:    groupReceivers,
-			resourceReceivers: resourceReceivers,
-		}
-		return tpc
-	})
+	tpc := tap.ensureClusterLocked(cluster)
 	MapApply[string /*group name*/, APIGroupInfo](tpc.GroupInfo, groupReceiver)
 	MapApply[metav1.GroupResource, ResourceDetails](tpc.ResourceInfo, resourceReceiver)
 	tpc.groupReceivers = append(tpc.groupReceivers, groupReceiver)
 	tpc.resourceReceivers = append(tpc.resourceReceivers, resourceReceiver)
+	tap.logger.Info("AddReceivers", "tap", fmt.Sprintf("%p", tap), "cluster", cluster, "tpc", fmt.Sprintf("%p", tpc))
+}
+
+func (tap *TestAPIMapProvider) ensureClusterLocked(cluster logicalcluster.Name) *TestAPIPerCluster {
+	return MapGetAdd(tap.perCluster, cluster, true, func(cluster logicalcluster.Name) *TestAPIPerCluster {
+		tpc := &TestAPIPerCluster{}
+		tpc.GroupInfo = NewMapMap(MappingReceiverDiscardsPrevious(MappingReceiverFunc(
+			func() MappingReceiver[string /*group name*/, APIGroupInfo] { return tpc.groupReceivers })))
+		tpc.ResourceInfo = NewMapMap(MappingReceiverDiscardsPrevious(MappingReceiverFunc(
+			func() MappingReceiver[metav1.GroupResource, ResourceDetails] { return tpc.resourceReceivers })))
+		return tpc
+	})
 }
 
 func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
@@ -91,4 +99,21 @@ func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
 	// The following requires go 1.20:
 	// tpc.groupReceivers = SliceRemoveFunctional(tpc.groupReceivers, groupReceiver)
 	// tpc.resourceReceivers = SliceRemoveFunctional(tpc.resourceReceivers, resourceReceiver)
+}
+
+func (tap *TestAPIMapProvider) AsResourceReceiver() MappingReceiver[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails] {
+	return MappingReceiverFuncs[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails]{
+		OnPut: func(key Pair[logicalcluster.Name, metav1.GroupResource], val ResourceDetails) {
+			tap.Lock()
+			defer tap.Unlock()
+			tpc := tap.ensureClusterLocked(key.First)
+			tap.logger.Info("AsResourceReceiver.Put", "tap", fmt.Sprintf("%p", tap), "cluster", key.First, "tpc", fmt.Sprintf("%p", tpc), "numReceivers", len(tpc.resourceReceivers))
+			tpc.ResourceInfo.Put(key.Second, val)
+		},
+		OnDelete: func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+			tap.Lock()
+			defer tap.Unlock()
+			tpc := tap.ensureClusterLocked(key.First)
+			tpc.ResourceInfo.Delete(key.Second)
+		}}
 }

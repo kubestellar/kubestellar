@@ -123,3 +123,14 @@ func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 		},
 	}
 }
+
+func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
+	return Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY]{
+		First: func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColX, ColZ], ColY] {
+			return Pair[Pair[ColX, ColZ], ColY]{Pair[ColX, ColZ]{tup.First, tup.Third}, tup.Second}
+		},
+		Second: func(put Pair[Pair[ColX, ColZ], ColY]) Triple[ColX, ColY, ColZ] {
+			return Triple[ColX, ColY, ColZ]{put.First.First, put.Second, put.First.Second}
+		},
+	}
+}

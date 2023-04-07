@@ -19,6 +19,7 @@ package placement
 // NewSetChangeProjector transforms a receiver of PartA into a receiver of Whole,
 // given a Factorer of Whole into PartA and PartB.
 // This buffers the set in an index.
+// The booleans returned by partAReceiver are ignored.
 func NewSetChangeProjector[Whole, PartA, PartB comparable](
 	factoring Factorer[Whole, PartA, PartB],
 	partAReceiver SetChangeReceiver[PartA],

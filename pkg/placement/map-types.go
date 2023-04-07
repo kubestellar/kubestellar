@@ -98,6 +98,25 @@ func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
 	}
 }
 
+// MappingReceiverFunc produces a MappingReceiver that defers to another MappingReceiver computed on each use
+func MappingReceiverFunc[Key comparable, Val any](fn func() MappingReceiver[Key, Val]) MappingReceiver[Key, Val] {
+	return mappingReceiverFunc[Key, Val]{fn}
+}
+
+type mappingReceiverFunc[Key comparable, Val any] struct {
+	fn func() MappingReceiver[Key, Val]
+}
+
+func (mrf mappingReceiverFunc[Key, Val]) Delete(key Key) {
+	mr := mrf.fn()
+	mr.Delete(key)
+}
+
+func (mrf mappingReceiverFunc[Key, Val]) Put(key Key, val Val) {
+	mr := mrf.fn()
+	mr.Put(key, val)
+}
+
 // MapChangeReceiver is what a stateful map offers to an observer
 type MapChangeReceiver[Key comparable, Val any] interface {
 	Create(Key, Val)

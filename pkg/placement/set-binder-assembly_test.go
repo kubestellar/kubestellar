@@ -18,18 +18,25 @@ package placement
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"k8s.io/klog/v2"
 )
 
+func TestMain(m *testing.M) {
+	klog.InitFlags(nil)
+	os.Exit(m.Run())
+}
+
 func TestSetBinder(t *testing.T) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
+	amp := NewTestAPIMapProvider(logger)
 	binder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
 		SimpleBindingOrganizer(logger),
-		NewTestAPIMapProvider(),
+		amp,
 		DefaultResourceModes,
 		nil)
-	exerciseSetBinder(t, binder)
+	exerciseSetBinder(t, amp.AsResourceReceiver(), binder)
 }
