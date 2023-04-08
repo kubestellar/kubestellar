@@ -75,12 +75,12 @@ func (gi *genericIndexedSet[Tuple, Key, Val]) Visit(visitor func(Tuple) error) e
 
 func (gi *genericIndexedSet[Tuple, Key, Val]) Add(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
-	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.Add(key, val)
+	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.AddX(key, val)
 }
 
 func (gi *genericIndexedSet[Tuple, Key, Val]) Remove(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
-	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.Remove(key, val)
+	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.RemoveX(key, val)
 }
 
 func (gi *genericIndexedSet[Tuple, Key, Val]) GetIndex1to2() Index2[Key, Val] {
@@ -91,7 +91,7 @@ type genericIndexedSetIndex[Tuple, Key, Val comparable] struct {
 	*genericIndexedSet[Tuple, Key, Val]
 }
 
-var _ MutableIndex2[int, string] = genericIndexedSetIndex[complex64, int, string]{}
+var _ Index2[int, string] = genericIndexedSetIndex[complex64, int, string]{}
 
 func (mi genericIndexedSetIndex[Tuple, Key, Val]) Get(key Key) (Set[Val], bool) {
 	set, ok := mi.rep.Get(key)
@@ -114,7 +114,7 @@ func (mi genericIndexedSetIndex[Tuple, Key, Val]) Visit1to2(key Key, visitor fun
 	return nil
 }
 
-func (gi genericIndexedSetIndex[Tuple, Key, Val]) Add(key Key, val Val) bool {
+func (gi genericIndexedSetIndex[Tuple, Key, Val]) AddX(key Key, val Val) bool {
 	vals, ok := gi.rep.Get(key)
 	if !ok {
 		vals = gi.valSetFactory()
@@ -129,7 +129,7 @@ func (gi genericIndexedSetIndex[Tuple, Key, Val]) Add(key Key, val Val) bool {
 	return true
 }
 
-func (gi genericIndexedSetIndex[Tuple, Key, Val]) Remove(key Key, val Val) bool {
+func (gi genericIndexedSetIndex[Tuple, Key, Val]) RemoveX(key Key, val Val) bool {
 	vals, ok := gi.rep.Get(key)
 	if !ok {
 		return false
