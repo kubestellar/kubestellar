@@ -111,11 +111,12 @@ func (gi *genericIndex[Tuple, Key, Val]) Remove(tup Tuple) bool {
 }
 
 func (gi *genericIndex[Tuple, Key, Val]) GetIndex1to2() Index2[Key, Val] {
-	return SetIndex2[Key, Val]{gi.rep}
+	return SetIndex2[Key, Val]{gi.rep, gi.valSetFactory}
 }
 
 type SetIndex2[First, Second comparable] struct {
 	MutableMap[First, MutableSet[Second]]
+	secondSetFactory func() MutableSet[Second]
 }
 
 var _ MutableIndex2[int, string] = SetIndex2[int, string]{}
@@ -144,7 +145,7 @@ func (mi SetIndex2[First, Second]) Visit1to2(first First, visitor func(Second) e
 func (mi SetIndex2[First, Second]) Add(key First, val Second) bool {
 	vals, ok := mi.MutableMap.Get(key)
 	if !ok {
-		vals = NewMapSet(val)
+		vals = mi.secondSetFactory()
 		mi.MutableMap.Put(key, vals)
 		return true
 	}
