@@ -16,134 +16,159 @@ limitations under the License.
 
 package placement
 
-// NewGenericIndexedSet constructs an index given the constituent functionality and,
-// optionally, an observer.
-func NewGenericIndexedSet[Tuple, Key, Val comparable](
-	// setObserver MappingReceiver[Key, Set[Val]],
-	factoring Factorer[Tuple, Key, Val],
-	valSetFactory func() MutableSet[Val],
-	rep MutableMap[Key, MutableSet[Val]],
-) GenericIndexedSet[Tuple, Key, Val] {
-	return &genericIndexedSet[Tuple, Key, Val]{
-		// setObserver:   setObserver,
-		factoring:     factoring,
-		valSetFactory: valSetFactory,
-		rep:           rep,
-	}
+// GenericIndexedSet is a readonly set of Tuple whose representation is based on
+// factoring each Tuple into Key and Val parts and using a map from
+// Key to set of Val.
+// Making the Val set type a type parameter allows the use of this in
+// contexts where the Val set itself has interesting properties beyond
+// just being a set of Val.
+// For example, this construction can be thus nested in a way that makes
+// the inner structure available.
+type GenericIndexedSet[Tuple, Key, Val comparable, ValSet any] interface {
+	Set[Tuple]
+	GetIndex1to2() Index2[Key, Val, ValSet]
 }
 
-type GenericIndexedSet[Tuple, Key, Val comparable] interface {
+// GenericMutableIndexedSet is a GenericIndexedSet that also provides write access.
+type GenericMutableIndexedSet[Tuple, Key, Val comparable, ValSet any] interface {
+	GenericIndexedSet[Tuple, Key, Val, ValSet]
 	MutableSet[Tuple]
-	GetIndex1to2() Index2[Key, Val]
+
+	// AsReadonly returns a view that does not support writes
+	AsReadonly() GenericIndexedSet[Tuple, Key, Val, ValSet]
 }
 
-type genericIndexedSet[Tuple, Key, Val comparable] struct {
-	setObserver   MappingReceiver[Key, Set[Val]]
-	factoring     Factorer[Tuple, Key, Val]
-	valSetFactory func() MutableSet[Val]
-	rep           MutableMap[Key, MutableSet[Val]]
+// NewGenericIndexedSet constructs an index given the constituent functionality.
+// The returned value implements GenericMutableIndexedSet.
+func NewGenericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any](
+	factoring Factorer[Tuple, Key, Val],
+	valSetFactory func() ValMutableSet,
+	valMutableSetAsSet func(ValMutableSet) MutableSet[Val],
+	insulateValSet func(ValMutableSet) ValSet,
+	rep MutableMap[Key, ValMutableSet],
+) *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet] {
+	return &genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]{
+		genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]{
+			// setObserver:   setObserver,
+			factoring:          factoring,
+			valSetFactory:      valSetFactory,
+			valMutableSetAsSet: valMutableSetAsSet,
+			insulateValSet:     insulateValSet,
+			rep:                rep,
+		}}
 }
 
-func (gi *genericIndexedSet[Tuple, Key, Val]) IsEmpty() bool    { return gi.rep.IsEmpty() }
-func (gi *genericIndexedSet[Tuple, Key, Val]) LenIsCheap() bool { return false }
+var _ GenericMutableIndexedSet[complex64, int, string, float32] = &genericMutableIndexedSet[complex64, int, string, byte, float32]{}
 
-func (gi *genericIndexedSet[Tuple, Key, Val]) Len() int {
+func GenericMutableIndexedSetToReadonly[Tuple, Key, Val comparable, ValMutableSet, ValSet any](gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) GenericIndexedSet[Tuple, Key, Val, ValSet] {
+	return &gi.genericIndexedSet
+}
+
+func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) AsReadonly() GenericIndexedSet[Tuple, Key, Val, ValSet] {
+	return &gi.genericIndexedSet
+}
+
+type genericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+	factoring          Factorer[Tuple, Key, Val]
+	valSetFactory      func() ValMutableSet
+	valMutableSetAsSet func(ValMutableSet) MutableSet[Val]
+	insulateValSet     func(ValMutableSet) ValSet
+	rep                MutableMap[Key, ValMutableSet]
+}
+
+type genericMutableIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+	genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]
+}
+
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) IsEmpty() bool {
+	return gi.rep.IsEmpty()
+}
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) LenIsCheap() bool { return false }
+
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Len() int {
 	var ans int
-	gi.rep.Visit(func(tup Pair[Key, MutableSet[Val]]) error {
-		ans += tup.Second.Len()
+	gi.rep.Visit(func(tup Pair[Key, ValMutableSet]) error {
+		vals := gi.valMutableSetAsSet(tup.Second)
+		ans += vals.Len()
 		return nil
 	})
 	return ans
 }
 
-func (gi *genericIndexedSet[Tuple, Key, Val]) Has(tup Tuple) bool {
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Has(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
-	vals, ok := gi.rep.Get(key)
+	valSet, ok := gi.rep.Get(key)
 	if !ok {
 		return false
 	}
+	vals := gi.valMutableSetAsSet(valSet)
 	return vals.Has(val)
 }
 
-func (gi *genericIndexedSet[Tuple, Key, Val]) Visit(visitor func(Tuple) error) error {
-	return gi.rep.Visit(func(tup Pair[Key, MutableSet[Val]]) error {
-		return tup.Second.Visit(func(val Val) error {
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Visit(visitor func(Tuple) error) error {
+	return gi.rep.Visit(func(tup Pair[Key, ValMutableSet]) error {
+		vals := gi.valMutableSetAsSet(tup.Second)
+		return vals.Visit(func(val Val) error {
 			return visitor(gi.factoring.Second(Pair[Key, Val]{tup.First, val}))
 		})
 	})
 }
 
-func (gi *genericIndexedSet[Tuple, Key, Val]) Add(tup Tuple) bool {
+func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Add(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
-	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.AddX(key, val)
-}
-
-func (gi *genericIndexedSet[Tuple, Key, Val]) Remove(tup Tuple) bool {
-	key, val := gi.factoring.Factor(tup)
-	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.RemoveX(key, val)
-}
-
-func (gi *genericIndexedSet[Tuple, Key, Val]) GetIndex1to2() Index2[Key, Val] {
-	return genericIndexedSetIndex[Tuple, Key, Val]{gi}
-}
-
-type genericIndexedSetIndex[Tuple, Key, Val comparable] struct {
-	*genericIndexedSet[Tuple, Key, Val]
-}
-
-var _ Index2[int, string] = genericIndexedSetIndex[complex64, int, string]{}
-
-func (mi genericIndexedSetIndex[Tuple, Key, Val]) Get(key Key) (Set[Val], bool) {
-	set, ok := mi.rep.Get(key)
-	return SetReadonly[Val]{set}, ok
-}
-
-func (mi genericIndexedSetIndex[Tuple, Key, Val]) Visit(visitor func(Pair[Key, Set[Val]]) error) error {
-	return mi.rep.Visit(Func11Compose11(mi.insulateSeconds, visitor))
-}
-
-func (mi genericIndexedSetIndex[Tuple, Key, Val]) insulateSeconds(tup Pair[Key, MutableSet[Val]]) Pair[Key, Set[Val]] {
-	return Pair[Key, Set[Val]]{tup.First, SetReadonly[Val]{tup.Second}}
-}
-
-func (mi genericIndexedSetIndex[Tuple, Key, Val]) Visit1to2(key Key, visitor func(Val) error) error {
-	vals, ok := mi.Get(key)
-	if ok {
-		return vals.Visit(visitor)
-	}
-	return nil
-}
-
-func (gi genericIndexedSetIndex[Tuple, Key, Val]) AddX(key Key, val Val) bool {
-	vals, ok := gi.rep.Get(key)
+	valSet, ok := gi.rep.Get(key)
 	if !ok {
-		vals = gi.valSetFactory()
-		gi.rep.Put(key, vals)
+		valSet = gi.valSetFactory()
+		gi.rep.Put(key, valSet)
 	}
-	if !vals.Add(val) {
-		return false
-	}
-	if gi.setObserver != nil {
-		gi.setObserver.Put(key, vals)
-	}
-	return true
+	vals := gi.valMutableSetAsSet(valSet)
+	return vals.Add(val)
 }
 
-func (gi genericIndexedSetIndex[Tuple, Key, Val]) RemoveX(key Key, val Val) bool {
-	vals, ok := gi.rep.Get(key)
+func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Remove(tup Tuple) bool {
+	key, val := gi.factoring.Factor(tup)
+	valSet, ok := gi.rep.Get(key)
 	if !ok {
 		return false
 	}
+	vals := gi.valMutableSetAsSet(valSet)
 	if !vals.Remove(val) {
 		return false
 	}
 	if vals.IsEmpty() {
 		gi.rep.Delete(key)
-		if gi.setObserver != nil {
-			gi.setObserver.Delete(key)
-		}
-	} else if gi.setObserver != nil {
-		gi.setObserver.Put(key, vals)
 	}
 	return true
+}
+
+func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) GetIndex1to2() Index2[Key, Val, ValSet] {
+	return genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]{gi}
+}
+
+type genericIndexedSetIndex[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+	*genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]
+}
+
+var _ Index2[int, string, MapSet[string]] = genericIndexedSetIndex[complex64, int, string, MapSet[int], MapSet[string]]{}
+
+func (gi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) Get(key Key) (ValSet, bool) {
+	set, ok := gi.rep.Get(key)
+	return gi.insulateValSet(set), ok
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) Visit(visitor func(Pair[Key, ValSet]) error) error {
+	return mi.rep.Visit(Func11Compose11(mi.insulateSeconds, visitor))
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) insulateSeconds(tup Pair[Key, ValMutableSet]) Pair[Key, ValSet] {
+	return NewPair(tup.First, mi.insulateValSet(tup.Second))
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) Visit1to2(key Key, visitor func(Val) error) error {
+	valSet, ok := mi.rep.Get(key)
+	if ok {
+		vals := mi.valMutableSetAsSet(valSet)
+		return vals.Visit(visitor)
+	}
+	return nil
 }

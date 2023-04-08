@@ -20,7 +20,7 @@ package placement
 // It is mutable.
 // It is not safe for concurrent access.
 type MapRelation2[First comparable, Second comparable] struct {
-	GenericIndexedSet[Pair[First, Second], First, Second]
+	GenericMutableIndexedSet[Pair[First, Second], First, Second, Set[Second]]
 }
 
 var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}
@@ -34,6 +34,45 @@ func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *Ma
 		NewMapMap[First, MutableSet[Second]](nil),
 		pairs...,
 	)
+}
+
+type MapRelation3[First, Second, Third comparable] struct {
+	GenericMutableIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
+		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]]
+}
+
+func NewMapRelation3[First, Second, Third comparable]() MapRelation3[First, Second, Third] {
+	gis := NewGenericIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
+		GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
+		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
+	](
+		TripleFactorerTo1and23[First, Second, Third](),
+		func() GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]] {
+			return NewGenericIndexedSet[Pair[Second, Third], Second, Third, MapSet[Third], Set[Third]](
+				PairFactorer[Second, Third](),
+				NewEmptyMapSet[Third],
+				func(thirds MapSet[Third]) MutableSet[Third] { return thirds },
+				func(thirds MapSet[Third]) Set[Third] { return NewSetReadonly[Third](thirds) },
+				NewMapMap[Second, MapSet[Third]](nil),
+			)
+		},
+		func(mutable23 GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]) MutableSet[Pair[Second, Third]] {
+			return mutable23
+		},
+		func(mutable23 GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]) GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]] {
+			return mutable23.AsReadonly()
+		},
+		NewMapMap[First, GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]](nil),
+	)
+	return MapRelation3[First, Second, Third]{gis}
+}
+
+func (mr MapRelation3[First, Second, Third]) Get1to2to3(first First) Index2[Second, Third, Set[Third]] {
+	inner, has := mr.GenericMutableIndexedSet.GetIndex1to2().Get(first)
+	if !has {
+		return nil
+	}
+	return inner.GetIndex1to2()
 }
 
 // NewGenericRelation3Index constructs a set of triples

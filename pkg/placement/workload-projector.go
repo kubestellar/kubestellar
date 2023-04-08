@@ -36,12 +36,20 @@ func NewWorkloadProjector(
 	wp := &workloadProjector{
 		ctx:              ctx,
 		queue:            workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		nsDistributions:  NewMapRelation3Index[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](),
-		nsrDistributions: NewMapRelation3Index[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](),
-		nsModes:          NewMapMap[ProjectionModeKey, ProjectionModeVal](nil),
-		nnsDistributions: NewMapRelation3Index[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](),
-		nnsModes:         NewMapMap[ProjectionModeKey, ProjectionModeVal](nil),
+		nsDistributions:  NewMapRelation3[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](),
+		nsrDistributions: NewMapRelation3[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](),
+		nnsDistributions: NewMapRelation3[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](),
 	}
+	noteModeWrite := MapChangeReceiverFuncs[edgeapi.SinglePlacement, MutableMap[metav1.GroupResource, ProjectionModeVal]]{
+		OnCreate: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
+			wp.changedDestinations.Add(destination)
+		},
+		OnDelete: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
+			wp.changedDestinations.Remove(destination)
+		},
+	}
+	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
+	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
 	return wp
 }
 
@@ -53,24 +61,28 @@ type workloadProjector struct {
 
 	sync.Mutex
 
-	nsDistributions  *MapRelation2[edgeapi.SinglePlacement, Pair[NamespaceName, logicalcluster.Name]]
-	nsrDistributions *MapRelation2[edgeapi.SinglePlacement, Pair[metav1.GroupResource, logicalcluster.Name]]
-	nsModes          MutableMap[ProjectionModeKey, ProjectionModeVal]
-	nnsDistributions *MapRelation2[edgeapi.SinglePlacement, Pair[GroupResourceInstance, logicalcluster.Name]]
-	nnsModes         MutableMap[ProjectionModeKey, ProjectionModeVal]
+	changedDestinations *MapSet[edgeapi.SinglePlacement]
+	nsDistributions     MapRelation3[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]
+	nsrDistributions    MapRelation3[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]
+	nsModes             FactoredMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal]
+	nnsDistributions    MapRelation3[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]
+	nnsModes            FactoredMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal]
 }
 
 type GroupResourceInstance = Pair[metav1.GroupResource, string /*object name*/]
 
 func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	logger := klog.FromContext(wp.ctx)
-	var s1 SetChangeReceiver[Pair[edgeapi.SinglePlacement, Pair[NamespaceName, logicalcluster.Name]]] = wp.nsDistributions
-	var s2 SetChangeReceiver[Pair[edgeapi.SinglePlacement, Pair[metav1.GroupResource, logicalcluster.Name]]] = wp.nsrDistributions
-	var s3 SetChangeReceiver[Pair[edgeapi.SinglePlacement, Pair[GroupResourceInstance, logicalcluster.Name]]] = wp.nnsDistributions
+	wp.Lock()
+	defer wp.Unlock()
+	var s1 SetChangeReceiver[Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]] = wp.nsDistributions
+	var s2 SetChangeReceiver[Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]] = wp.nsrDistributions
+	var s3 SetChangeReceiver[Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]] = wp.nnsDistributions
 	changedDestinations := NewMapSet[edgeapi.SinglePlacement]()
-	s1 = SetChangeReceiverFork(false, s1, recordFirst[edgeapi.SinglePlacement, Pair[NamespaceName, logicalcluster.Name]](changedDestinations))
-	s2 = SetChangeReceiverFork(false, s2, recordFirst[edgeapi.SinglePlacement, Pair[metav1.GroupResource, logicalcluster.Name]](changedDestinations))
-	s3 = SetChangeReceiverFork(false, s3, recordFirst[edgeapi.SinglePlacement, Pair[GroupResourceInstance, logicalcluster.Name]](changedDestinations))
+	wp.changedDestinations = &changedDestinations
+	s1 = SetChangeReceiverFork(false, s1, recordFirst[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](changedDestinations))
+	s2 = SetChangeReceiverFork(false, s2, recordFirst[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](changedDestinations))
+	s3 = SetChangeReceiverFork(false, s3, recordFirst[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](changedDestinations))
 	xn(WorkloadProjectionSections{
 		TransformSetChangeReceiver(factorNamespaceDistributionTupleForSyncer, s1),
 		TransformSetChangeReceiver(factorNamespacedResourceDistributionTupleForSyncer, s2),
@@ -79,40 +91,63 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 		wp.nnsModes})
 	logger.V(2).Info("Transaction response", "changedDestinations", changedDestinations)
 	changedDestinations.Visit(func(destination edgeapi.SinglePlacement) error {
-		wp.nsDistributions.GetIndex1to2().Get(destination)
-		// TODO: finish implementing
+		nsds, have := wp.nsDistributions.GetIndex1to2().Get(destination)
+		if have {
+			nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
+			logger.Info("Namespaces after transaction", "destination", destination, "namespaces", MapSetCopy[NamespaceName](nses))
+		}
+		nsrds, have := wp.nsrDistributions.GetIndex1to2().Get(destination)
+		if have {
+			nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
+			logger.Info("NamespacedResources after transation", "destination", destination, "resources", MapSetCopy[metav1.GroupResource](nsrs))
+		}
+		nsms, have := wp.nsModes.GetIndex().Get(destination)
+		if have {
+			logger.Info("Namespaced modes after transation", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
+
+		}
+		nnsds, have := wp.nnsDistributions.GetIndex1to2().Get(destination)
+		if have {
+			objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
+			logger.Info("NamespacedResources after transation", "destination", destination, "objs", MapSetCopy[GroupResourceInstance](objs))
+		}
+		nnsms, have := wp.nnsModes.GetIndex().Get(destination)
+		if have {
+			logger.Info("NonNamespaced modes after transation", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
+		}
 		return nil
 	})
+	wp.changedDestinations = nil
 }
 
-func recordFirst[First, Second comparable](record MutableSet[First]) SetChangeReceiver[Pair[First, Second]] {
-	return SetChangeReceiverFuncs[Pair[First, Second]]{
-		OnAdd: func(tup Pair[First, Second]) bool {
+func recordFirst[First, Second, Third comparable](record MutableSet[First]) SetChangeReceiver[Triple[First, Second, Third]] {
+	return SetChangeReceiverFuncs[Triple[First, Second, Third]]{
+		OnAdd: func(tup Triple[First, Second, Third]) bool {
 			record.Add(tup.First)
 			return true
 		},
-		OnRemove: func(tup Pair[First, Second]) bool {
+		OnRemove: func(tup Triple[First, Second, Third]) bool {
 			record.Add(tup.First)
 			return true
 		}}
 }
 
-func factorNamespaceDistributionTupleForSyncer(ndt NamespaceDistributionTuple) Pair[edgeapi.SinglePlacement, Pair[NamespaceName, logicalcluster.Name]] {
-	return Pair[edgeapi.SinglePlacement, Pair[NamespaceName, logicalcluster.Name]]{
-		First:  ndt.Third,
-		Second: Pair[NamespaceName, logicalcluster.Name]{ndt.Second, ndt.First}}
+func factorNamespaceDistributionTupleForSyncer(ndt NamespaceDistributionTuple) Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name] {
+	return NewTriple(ndt.Third, ndt.Second, ndt.First)
 }
 
-func factorNamespacedResourceDistributionTupleForSyncer(nrdt NamespacedResourceDistributionTuple) Pair[edgeapi.SinglePlacement, Pair[metav1.GroupResource, logicalcluster.Name]] {
-	return Pair[edgeapi.SinglePlacement, Pair[metav1.GroupResource, logicalcluster.Name]]{
-		First:  nrdt.Destination,
-		Second: Pair[metav1.GroupResource, logicalcluster.Name]{nrdt.GroupResource, nrdt.SourceCluster}}
+func factorNamespacedResourceDistributionTupleForSyncer(nrdt NamespacedResourceDistributionTuple) Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name] {
+	return NewTriple(nrdt.Destination, nrdt.GroupResource, nrdt.SourceCluster)
 }
 
-func factorNonNamespacedDistributionTupleForSyncer(nndt NonNamespacedDistributionTuple) Pair[edgeapi.SinglePlacement, Pair[GroupResourceInstance, logicalcluster.Name]] {
-	return Pair[edgeapi.SinglePlacement, Pair[GroupResourceInstance, logicalcluster.Name]]{
-		First: nndt.First.Destination,
-		Second: Pair[GroupResourceInstance, logicalcluster.Name]{
-			GroupResourceInstance{nndt.First.GroupResource, nndt.Second.Name},
-			nndt.Second.Cluster}}
+func factorNonNamespacedDistributionTupleForSyncer(nndt NonNamespacedDistributionTuple) Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name] {
+	return NewTriple(nndt.First.Destination, GroupResourceInstance{nndt.First.GroupResource, nndt.Second.Name}, nndt.Second.Cluster)
 }
+
+var factorProjectionModeKeyForSyncer = NewFactorer(
+	func(pmk ProjectionModeKey) Pair[edgeapi.SinglePlacement, metav1.GroupResource] {
+		return NewPair(pmk.Destination, pmk.GroupResource)
+	},
+	func(tup Pair[edgeapi.SinglePlacement, metav1.GroupResource]) ProjectionModeKey {
+		return ProjectionModeKey{Destination: tup.First, GroupResource: tup.Second}
+	})

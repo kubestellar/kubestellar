@@ -142,6 +142,10 @@ func Func11Compose11[Type1, Type2, Type3 any](fn1 func(Type1) Type2, fn2 func(Ty
 	}
 }
 
+func NewSetReadonly[Elt comparable](set MutableSet[Elt]) Set[Elt] {
+	return SetReadonly[Elt]{set}
+}
+
 // SetReadonly is a wrapper that removes the ability to write to the set
 type SetReadonly[Elt comparable] struct{ set Set[Elt] }
 

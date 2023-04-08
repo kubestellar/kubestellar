@@ -71,6 +71,10 @@ type Triple[First, Second, Third comparable] struct {
 	Third  Third
 }
 
+func NewTriple[First, Second, Third comparable](first First, second Second, third Third) Triple[First, Second, Third] {
+	return Triple[First, Second, Third]{first, second, third}
+}
+
 func (tup Triple[First, Second, Third]) String() string {
 	var ans strings.Builder
 	ans.WriteRune('(')
@@ -101,6 +105,10 @@ func NoRotation[Original comparable]() Rotator[Original, Original] {
 // Factorer is a Rotator that converts from some Whole type to some Pair type (and back)
 type Factorer[Whole, PartA, PartB comparable] Rotator[Whole, Pair[PartA, PartB]]
 
+func NewFactorer[Whole, PartA, PartB comparable](forward func(Whole) Pair[PartA, PartB], reverse func(Pair[PartA, PartB]) Whole) Factorer[Whole, PartA, PartB] {
+	return Factorer[Whole, PartA, PartB]{forward, reverse}
+}
+
 func (factoring Factorer[Whole, PartA, PartB]) Factor(whole Whole) (PartA, PartB) {
 	ans := factoring.First(whole)
 	return ans.First, ans.Second
@@ -129,12 +137,21 @@ func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 }
 
 func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
-	return Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY]{
-		First: func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColX, ColZ], ColY] {
-			return Pair[Pair[ColX, ColZ], ColY]{Pair[ColX, ColZ]{tup.First, tup.Third}, tup.Second}
+	return NewFactorer(
+		func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColX, ColZ], ColY] {
+			return NewPair(NewPair(tup.First, tup.Third), tup.Second)
 		},
-		Second: func(put Pair[Pair[ColX, ColZ], ColY]) Triple[ColX, ColY, ColZ] {
-			return Triple[ColX, ColY, ColZ]{put.First.First, put.Second, put.First.Second}
+		func(put Pair[Pair[ColX, ColZ], ColY]) Triple[ColX, ColY, ColZ] {
+			return NewTriple(put.First.First, put.Second, put.First.Second)
+		})
+}
+
+func TripleFactorerTo1and23[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], ColX, Pair[ColY, ColZ]] {
+	return NewFactorer(
+		func(tup Triple[ColX, ColY, ColZ]) Pair[ColX, Pair[ColY, ColZ]] {
+			return NewPair(tup.First, NewPair(tup.Second, tup.Third))
 		},
-	}
+		func(put Pair[ColX, Pair[ColY, ColZ]]) Triple[ColX, ColY, ColZ] {
+			return NewTriple(put.First, put.Second.First, put.Second.Second)
+		})
 }

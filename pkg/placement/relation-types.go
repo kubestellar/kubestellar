@@ -18,7 +18,7 @@ package placement
 
 type Relation2[First, Second comparable] interface {
 	Set[Pair[First, Second]]
-	GetIndex1to2() Index2[First, Second]
+	GetIndex1to2() Index2[First, Second, Set[Second]]
 }
 
 type MutableRelation2[First, Second comparable] interface {
@@ -26,13 +26,13 @@ type MutableRelation2[First, Second comparable] interface {
 	MutableSet[Pair[First, Second]]
 }
 
-type Index2[Key, Val comparable] interface {
-	Map[Key, Set[Val]]
+type Index2[Key, Val comparable, ValSet any] interface {
+	Map[Key, ValSet]
 	Visit1to2(Key, func(Val) error) error
 }
 
-type MutableIndex2[Key, Val comparable] interface {
-	Index2[Key, Val]
+type MutableIndex2[Key, Val comparable, ValSet any] interface {
+	Index2[Key, Val, ValSet]
 	Add(Key, Val) bool
 	Remove(Key, Val) bool
 }
@@ -76,14 +76,15 @@ func NewGenericRelation2Index[First, Second comparable](
 	secondSetFactory func() MutableSet[Second],
 	rep MutableMap[First, MutableSet[Second]],
 	pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
-	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second](
-		// nil,
+	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second, MutableSet[Second], Set[Second]](
 		PairFactorer[First, Second](),
 		secondSetFactory,
+		Identity1[MutableSet[Second]],
+		NewSetReadonly[Second],
 		rep,
 	)
 	ans := &MapRelation2[First, Second]{
-		GenericIndexedSet: wholeSet,
+		GenericMutableIndexedSet: wholeSet,
 	}
 	for _, pair := range pairs {
 		ans.Add(pair)
