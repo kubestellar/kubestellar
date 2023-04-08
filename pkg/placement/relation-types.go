@@ -37,6 +37,10 @@ type MutableIndex2[Key, Val comparable] interface {
 	Remove(Key, Val) bool
 }
 
+func Relation2WithObservers[First, Second comparable](inner MutableRelation2[First, Second], observers ...SetChangeReceiver[Pair[First, Second]]) MutableRelation2[First, Second] {
+	return &relation2WithObservers[First, Second]{inner, inner, observers}
+}
+
 type relation2WithObservers[First, Second comparable] struct {
 	Relation2[First, Second]
 	inner     MutableRelation2[First, Second]
@@ -63,4 +67,43 @@ func (rwo *relation2WithObservers[First, Second]) Remove(tup Pair[First, Second]
 		return true
 	}
 	return false
+}
+
+// NewGenericRelation2Index constructs a Relation2 that is represented
+// by an index on the first column.
+// The caller supplies the implementation of the index.
+func NewGenericRelation2Index[First, Second comparable](
+	secondSetFactory func() MutableSet[Second],
+	rep MutableMap[First, MutableSet[Second]],
+	pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+	wholeSet := NewGenericSetIndex[Pair[First, Second], First, Second](
+		nil,
+		PairFactorer[First, Second](),
+		secondSetFactory,
+		rep,
+	)
+	ans := &MapRelation2[First, Second]{
+		GenericSetIndex: wholeSet,
+	}
+	for _, pair := range pairs {
+		ans.Add(pair)
+	}
+	return ans
+}
+
+// NewGenericRelation3Index constructs a set of triples
+// that is represented by two layers of indexing.
+// The caller supplies the implementations of the indices.
+func NewGenericRelation3Index[First, Second, Third comparable](
+	thirdSetFactory func() MutableSet[Third],
+	midRepFactory func() MutableMap[Second, MutableSet[Third]],
+	rep MutableMap[First, MutableSet[Pair[Second, Third]]],
+) *MapRelation2[First, Pair[Second, Third]] {
+	return NewGenericRelation2Index(
+		func() MutableSet[Pair[Second, Third]] {
+			return NewGenericRelation2Index(
+				thirdSetFactory,
+				midRepFactory())
+		},
+		rep)
 }

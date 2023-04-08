@@ -181,10 +181,10 @@ func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPl
 				sbc.join12v.Put(Pair[ExternalName, WorkloadPartID]{epID, partID}, partDetails)
 			},
 		})
-		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(&TransformSetChangeReceiver[edgeapi.SinglePlacement, Pair[ExternalName, edgeapi.SinglePlacement]]{
-			Transform: NewPair1Then2[ExternalName, edgeapi.SinglePlacement](epID),
-			Inner:     sbc.join13,
-		})
+		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(TransformSetChangeReceiver(
+			NewPair1Then2[ExternalName, edgeapi.SinglePlacement](epID),
+			sbc.join13,
+		))
 		sbc.perPlacement[epName] = sbp
 	}
 	return sbp

@@ -245,8 +245,6 @@ type NamespaceAndDestination = Pair[NamespaceName, edgeapi.SinglePlacement]
 
 type SourceAndDestination = Pair[logicalcluster.Name, edgeapi.SinglePlacement]
 
-type NamespacedJoinKey = Triple[logicalcluster.Name, metav1.GroupResource, NamespaceAndDestination]
-
 type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]
 
 var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name]{

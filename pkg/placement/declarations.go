@@ -88,6 +88,7 @@ type WorkloadProjector interface {
 // for what goes where how, organized for consumption by syncers.
 // The FooDistributions are proper sets, while the
 // FooModes add dependent information for set members.
+// The booleans returned from the receivers may not be meaningful.
 type WorkloadProjectionSections struct {
 	NamespaceDistributions          SetChangeReceiver[NamespaceDistributionTuple]
 	NamespacedResourceDistributions SetChangeReceiver[NamespacedResourceDistributionTuple]

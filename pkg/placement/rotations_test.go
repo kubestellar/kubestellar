@@ -146,13 +146,6 @@ func (gen generator) NonNamespacedDistributionTuple() NonNamespacedDistributionT
 		Second: gen.ExternalName()}
 }
 
-func (gen generator) NamespacedJoinKey() NamespacedJoinKey {
-	return NamespacedJoinKey{
-		First:  gen.ClusterName(),
-		Second: gen.GroupResource(),
-		Third:  NamespaceAndDestination{gen.NamespaceName(), gen.SinglePlacement()}}
-}
-
 func (gen generator) NamespaceDistributionTuple() NamespaceDistributionTuple {
 	return NamespaceDistributionTuple{
 		First:  gen.ClusterName(),

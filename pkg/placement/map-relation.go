@@ -20,31 +20,30 @@ package placement
 // It is mutable.
 // It is not safe for concurrent access.
 type MapRelation2[First comparable, Second comparable] struct {
-	// by1 MutableIndex2[First, Second]
-	rep MutableMap[First, MutableSet[Second]]
 	GenericSetIndex[Pair[First, Second], First, Second]
 }
 
 var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}
 
-func NewMapRelation2[First comparable, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
-	rep := NewMapMap[First, MutableSet[Second]](nil)
-	wholeSet := NewGenericSetIndex[Pair[First, Second], First, Second](
-		nil,
-		PairFactorer[First, Second](),
+// NewGenericRelation2Index constructs a Relation2 that is represented
+// by an index on the first column.
+// The representation is based on golang `map`s.
+func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+	return NewGenericRelation2Index[First, Second](
 		func() MutableSet[Second] { return NewEmptyMapSet[Second]() },
-		rep,
+		NewMapMap[First, MutableSet[Second]](nil),
+		pairs...,
 	)
-	ans := &MapRelation2[First, Second]{
-		rep:             rep,
-		GenericSetIndex: wholeSet,
-	}
-	for _, pair := range pairs {
-		ans.Add(pair)
-	}
-	return ans
 }
 
-func Relation2WithObservers[First, Second comparable](inner MutableRelation2[First, Second], observers ...SetChangeReceiver[Pair[First, Second]]) MutableRelation2[First, Second] {
-	return &relation2WithObservers[First, Second]{inner, inner, observers}
+// NewGenericRelation3Index constructs a set of triples
+// that is represented by two layers of indexing.
+// The representation is based on golang `map`s.
+func NewMapRelation3Index[First, Second, Third comparable]() *MapRelation2[First, Pair[Second, Third]] {
+	return NewGenericRelation3Index[First, Second, Third](
+		func() MutableSet[Third] { return NewEmptyMapSet[Third]() },
+		func() MutableMap[Second, MutableSet[Third]] {
+			return NewMapMap[Second, MutableSet[Third]](nil)
+		},
+		NewMapMap[First, MutableSet[Pair[Second, Third]]](nil))
 }

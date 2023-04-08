@@ -213,19 +213,25 @@ func (crr setChangeReceiverReverse[Elt]) Remove(elt Elt) bool {
 	return crr.forward.Add(elt)
 }
 
-type TransformSetChangeReceiver[Type1 comparable, Type2 comparable] struct {
+func TransformSetChangeReceiver[Type1, Type2 comparable](
+	transform func(Type1) Type2,
+	inner SetChangeReceiver[Type2]) SetChangeReceiver[Type1] {
+	return transformSetChangeReceiver[Type1, Type2]{transform, inner}
+}
+
+type transformSetChangeReceiver[Type1, Type2 comparable] struct {
 	Transform func(Type1) Type2
 	Inner     SetChangeReceiver[Type2]
 }
 
-var _ SetChangeReceiver[int] = &TransformSetChangeReceiver[int, string]{}
+var _ SetChangeReceiver[int] = &transformSetChangeReceiver[int, string]{}
 
-func (xr TransformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+func (xr transformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Add(v2)
 }
 
-func (xr TransformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+func (xr transformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Remove(v2)
 }
