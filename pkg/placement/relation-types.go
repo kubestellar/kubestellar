@@ -76,14 +76,14 @@ func NewGenericRelation2Index[First, Second comparable](
 	secondSetFactory func() MutableSet[Second],
 	rep MutableMap[First, MutableSet[Second]],
 	pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
-	wholeSet := NewGenericSetIndex[Pair[First, Second], First, Second](
+	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second](
 		nil,
 		PairFactorer[First, Second](),
 		secondSetFactory,
 		rep,
 	)
 	ans := &MapRelation2[First, Second]{
-		GenericSetIndex: wholeSet,
+		GenericIndexedSet: wholeSet,
 	}
 	for _, pair := range pairs {
 		ans.Add(pair)

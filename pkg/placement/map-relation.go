@@ -20,7 +20,7 @@ package placement
 // It is mutable.
 // It is not safe for concurrent access.
 type MapRelation2[First comparable, Second comparable] struct {
-	GenericSetIndex[Pair[First, Second], First, Second]
+	GenericIndexedSet[Pair[First, Second], First, Second]
 }
 
 var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}

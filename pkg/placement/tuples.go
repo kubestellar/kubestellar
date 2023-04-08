@@ -26,9 +26,13 @@ import (
 
 type Empty struct{}
 
-type Pair[First any, Second any] struct {
+type Pair[First, Second any] struct {
 	First  First
 	Second Second
+}
+
+func NewPair[First, Second any](first First, second Second) Pair[First, Second] {
+	return Pair[First, Second]{first, second}
 }
 
 func (tup Pair[First, Second]) String() string {
@@ -61,7 +65,7 @@ func NewPair2Then1[First any, Second any](second Second) func(First) Pair[First,
 	}
 }
 
-type Triple[First comparable, Second comparable, Third comparable] struct {
+type Triple[First, Second, Third comparable] struct {
 	First  First
 	Second Second
 	Third  Third

@@ -16,16 +16,15 @@ limitations under the License.
 
 package placement
 
-// NewGenericSetIndex constructs an index given the constituent functionality and,
+// NewGenericIndexedSet constructs an index given the constituent functionality and,
 // optionally, an observer.
-// TODO: add the inverse of factor and make it implement Index2
-func NewGenericSetIndex[Tuple, Key, Val comparable](
+func NewGenericIndexedSet[Tuple, Key, Val comparable](
 	setObserver MappingReceiver[Key, Set[Val]],
 	factoring Factorer[Tuple, Key, Val],
 	valSetFactory func() MutableSet[Val],
 	rep MutableMap[Key, MutableSet[Val]],
-) GenericSetIndex[Tuple, Key, Val] {
-	return &genericIndex[Tuple, Key, Val]{
+) GenericIndexedSet[Tuple, Key, Val] {
+	return &genericIndexedSet[Tuple, Key, Val]{
 		setObserver:   setObserver,
 		factoring:     factoring,
 		valSetFactory: valSetFactory,
@@ -33,22 +32,22 @@ func NewGenericSetIndex[Tuple, Key, Val comparable](
 	}
 }
 
-type GenericSetIndex[Tuple, Key, Val comparable] interface {
+type GenericIndexedSet[Tuple, Key, Val comparable] interface {
 	MutableSet[Tuple]
 	GetIndex1to2() Index2[Key, Val]
 }
 
-type genericIndex[Tuple, Key, Val comparable] struct {
+type genericIndexedSet[Tuple, Key, Val comparable] struct {
 	setObserver   MappingReceiver[Key, Set[Val]]
 	factoring     Factorer[Tuple, Key, Val]
 	valSetFactory func() MutableSet[Val]
 	rep           MutableMap[Key, MutableSet[Val]]
 }
 
-func (gi *genericIndex[Tuple, Key, Val]) IsEmpty() bool    { return gi.rep.IsEmpty() }
-func (gi *genericIndex[Tuple, Key, Val]) LenIsCheap() bool { return false }
+func (gi *genericIndexedSet[Tuple, Key, Val]) IsEmpty() bool    { return gi.rep.IsEmpty() }
+func (gi *genericIndexedSet[Tuple, Key, Val]) LenIsCheap() bool { return false }
 
-func (gi *genericIndex[Tuple, Key, Val]) Len() int {
+func (gi *genericIndexedSet[Tuple, Key, Val]) Len() int {
 	var ans int
 	gi.rep.Visit(func(tup Pair[Key, MutableSet[Val]]) error {
 		ans += tup.Second.Len()
@@ -57,7 +56,7 @@ func (gi *genericIndex[Tuple, Key, Val]) Len() int {
 	return ans
 }
 
-func (gi *genericIndex[Tuple, Key, Val]) Has(tup Tuple) bool {
+func (gi *genericIndexedSet[Tuple, Key, Val]) Has(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
 	vals, ok := gi.rep.Get(key)
 	if !ok {
@@ -66,7 +65,7 @@ func (gi *genericIndex[Tuple, Key, Val]) Has(tup Tuple) bool {
 	return vals.Has(val)
 }
 
-func (gi *genericIndex[Tuple, Key, Val]) Visit(visitor func(Tuple) error) error {
+func (gi *genericIndexedSet[Tuple, Key, Val]) Visit(visitor func(Tuple) error) error {
 	return gi.rep.Visit(func(tup Pair[Key, MutableSet[Val]]) error {
 		return tup.Second.Visit(func(val Val) error {
 			return visitor(gi.factoring.Second(Pair[Key, Val]{tup.First, val}))
@@ -74,8 +73,48 @@ func (gi *genericIndex[Tuple, Key, Val]) Visit(visitor func(Tuple) error) error 
 	})
 }
 
-func (gi *genericIndex[Tuple, Key, Val]) Add(tup Tuple) bool {
+func (gi *genericIndexedSet[Tuple, Key, Val]) Add(tup Tuple) bool {
 	key, val := gi.factoring.Factor(tup)
+	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.Add(key, val)
+}
+
+func (gi *genericIndexedSet[Tuple, Key, Val]) Remove(tup Tuple) bool {
+	key, val := gi.factoring.Factor(tup)
+	return genericIndexedSetIndex[Tuple, Key, Val]{gi}.Remove(key, val)
+}
+
+func (gi *genericIndexedSet[Tuple, Key, Val]) GetIndex1to2() Index2[Key, Val] {
+	return genericIndexedSetIndex[Tuple, Key, Val]{gi}
+}
+
+type genericIndexedSetIndex[Tuple, Key, Val comparable] struct {
+	*genericIndexedSet[Tuple, Key, Val]
+}
+
+var _ MutableIndex2[int, string] = genericIndexedSetIndex[complex64, int, string]{}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val]) Get(key Key) (Set[Val], bool) {
+	set, ok := mi.rep.Get(key)
+	return SetReadonly[Val]{set}, ok
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val]) Visit(visitor func(Pair[Key, Set[Val]]) error) error {
+	return mi.rep.Visit(Func11Compose11(mi.insulateSeconds, visitor))
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val]) insulateSeconds(tup Pair[Key, MutableSet[Val]]) Pair[Key, Set[Val]] {
+	return Pair[Key, Set[Val]]{tup.First, SetReadonly[Val]{tup.Second}}
+}
+
+func (mi genericIndexedSetIndex[Tuple, Key, Val]) Visit1to2(key Key, visitor func(Val) error) error {
+	vals, ok := mi.Get(key)
+	if ok {
+		return vals.Visit(visitor)
+	}
+	return nil
+}
+
+func (gi genericIndexedSetIndex[Tuple, Key, Val]) Add(key Key, val Val) bool {
 	vals, ok := gi.rep.Get(key)
 	if !ok {
 		vals = gi.valSetFactory()
@@ -90,8 +129,7 @@ func (gi *genericIndex[Tuple, Key, Val]) Add(tup Tuple) bool {
 	return true
 }
 
-func (gi *genericIndex[Tuple, Key, Val]) Remove(tup Tuple) bool {
-	key, val := gi.factoring.Factor(tup)
+func (gi genericIndexedSetIndex[Tuple, Key, Val]) Remove(key Key, val Val) bool {
 	vals, ok := gi.rep.Get(key)
 	if !ok {
 		return false
@@ -108,58 +146,4 @@ func (gi *genericIndex[Tuple, Key, Val]) Remove(tup Tuple) bool {
 		gi.setObserver.Put(key, vals)
 	}
 	return true
-}
-
-func (gi *genericIndex[Tuple, Key, Val]) GetIndex1to2() Index2[Key, Val] {
-	return SetIndex2[Key, Val]{gi.rep, gi.valSetFactory}
-}
-
-type SetIndex2[First, Second comparable] struct {
-	MutableMap[First, MutableSet[Second]]
-	secondSetFactory func() MutableSet[Second]
-}
-
-var _ MutableIndex2[int, string] = SetIndex2[int, string]{}
-
-func (mi SetIndex2[First, Second]) Get(key First) (Set[Second], bool) {
-	set, ok := mi.MutableMap.Get(key)
-	return SetReadonly[Second]{set}, ok
-}
-
-func (mi SetIndex2[First, Second]) Visit(visitor func(Pair[First, Set[Second]]) error) error {
-	return mi.MutableMap.Visit(Func11Compose11(mi.insulateSeconds, visitor))
-}
-
-func (mi SetIndex2[First, Second]) insulateSeconds(tup Pair[First, MutableSet[Second]]) Pair[First, Set[Second]] {
-	return Pair[First, Set[Second]]{tup.First, SetReadonly[Second]{tup.Second}}
-}
-
-func (mi SetIndex2[First, Second]) Visit1to2(first First, visitor func(Second) error) error {
-	seconds, ok := mi.Get(first)
-	if ok {
-		return seconds.Visit(visitor)
-	}
-	return nil
-}
-
-func (mi SetIndex2[First, Second]) Add(key First, val Second) bool {
-	vals, ok := mi.MutableMap.Get(key)
-	if !ok {
-		vals = mi.secondSetFactory()
-		mi.MutableMap.Put(key, vals)
-		return true
-	}
-	return vals.Add(val)
-}
-
-func (mi SetIndex2[First, Second]) Remove(key First, val Second) bool {
-	vals, ok := mi.MutableMap.Get(key)
-	if !ok {
-		return false
-	}
-	change := vals.Remove(val)
-	if vals.IsEmpty() {
-		mi.MutableMap.Delete(key)
-	}
-	return change
 }
