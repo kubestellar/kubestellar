@@ -99,11 +99,13 @@ func (gi *genericIndex[Tuple, Key, Val]) Remove(tup Tuple) bool {
 	if !vals.Remove(val) {
 		return false
 	}
-	if gi.setObserver != nil {
-		gi.setObserver.Put(key, vals)
-	}
 	if vals.IsEmpty() {
 		gi.rep.Delete(key)
+		if gi.setObserver != nil {
+			gi.setObserver.Delete(key)
+		}
+	} else if gi.setObserver != nil {
+		gi.setObserver.Put(key, vals)
 	}
 	return true
 }
