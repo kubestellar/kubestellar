@@ -19,13 +19,13 @@ package placement
 // NewGenericIndexedSet constructs an index given the constituent functionality and,
 // optionally, an observer.
 func NewGenericIndexedSet[Tuple, Key, Val comparable](
-	setObserver MappingReceiver[Key, Set[Val]],
+	// setObserver MappingReceiver[Key, Set[Val]],
 	factoring Factorer[Tuple, Key, Val],
 	valSetFactory func() MutableSet[Val],
 	rep MutableMap[Key, MutableSet[Val]],
 ) GenericIndexedSet[Tuple, Key, Val] {
 	return &genericIndexedSet[Tuple, Key, Val]{
-		setObserver:   setObserver,
+		// setObserver:   setObserver,
 		factoring:     factoring,
 		valSetFactory: valSetFactory,
 		rep:           rep,

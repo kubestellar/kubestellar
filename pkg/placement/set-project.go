@@ -27,7 +27,7 @@ func NewSetChangeProjector[Whole, PartA, PartB comparable](
 	// indexerRep ignores the set of PartB and notifies partAReceiver of PartA set change
 	indexerRep := NewMapMap[PartA, MutableSet[PartB]](MapKeySetReceiver[PartA, MutableSet[PartB]](partAReceiver))
 	indexer := NewGenericIndexedSet[Whole, PartA, PartB](
-		nil,
+		// nil,
 		factoring,
 		func() MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
 		indexerRep,
