@@ -240,6 +240,47 @@ func (xr transformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
 	return xr.Inner.Remove(v2)
 }
 
+func SetRotate[Original, Rotated comparable](originalSet Set[Original], rotator Rotator[Original, Rotated]) Set[Rotated] {
+	return &setRotate[Original, Rotated]{originalSet, rotator}
+}
+
+type setRotate[Original, Rotated comparable] struct {
+	originalSet Set[Original]
+	rotator     Rotator[Original, Rotated]
+}
+
+func (sr *setRotate[Original, Rotated]) IsEmpty() bool    { return sr.originalSet.IsEmpty() }
+func (sr *setRotate[Original, Rotated]) LenIsCheap() bool { return sr.originalSet.LenIsCheap() }
+func (sr *setRotate[Original, Rotated]) Len() int         { return sr.originalSet.Len() }
+
+func (sr *setRotate[Original, Rotated]) Has(rotatedElt Rotated) bool {
+	originalElt := sr.rotator.Second(rotatedElt)
+	return sr.originalSet.Has(originalElt)
+}
+
+func (sr *setRotate[Original, Rotated]) Visit(visitor func(Rotated) error) error {
+	return sr.originalSet.Visit(func(originalElt Original) error {
+		rotatedElt := sr.rotator.First(originalElt)
+		return visitor(rotatedElt)
+	})
+}
+
+func TransformVisitable[Original, Transformed any](originalVisitable Visitable[Original], transform func(Original) Transformed) Visitable[Transformed] {
+	return &transformVisitable[Original, Transformed]{originalVisitable, transform}
+}
+
+type transformVisitable[Original, Transformed any] struct {
+	originalVisitable Visitable[Original]
+	transform         func(Original) Transformed
+}
+
+func (tv *transformVisitable[Original, Transformed]) Visit(visitor func(Transformed) error) error {
+	return tv.originalVisitable.Visit(func(originalElt Original) error {
+		transformedElt := tv.transform(originalElt)
+		return visitor(transformedElt)
+	})
+}
+
 // Reducer is something that crunches a collection down into one value
 type Reducer[Elt any, Ans any] func(Visitable[Elt]) Ans
 

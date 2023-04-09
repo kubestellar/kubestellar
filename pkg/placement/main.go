@@ -33,12 +33,15 @@ import (
 
 	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 )
 
 type placementTranslator struct {
 	context                context.Context
 	apiProvider            APIWatchMapProvider
 	spsClusterInformer     kcpcache.ScopeableSharedIndexInformer
+	syncfgClusterInformer  kcpcache.ScopeableSharedIndexInformer
+	syncfgClusterLister    edgev1a1listers.SyncerConfigClusterLister
 	mbwsInformer           k8scache.SharedIndexInformer
 	mbwsLister             tenancyv1a1listers.WorkspaceLister
 	kcpClusterClientset    kcpclusterclientset.ClusterInterface
@@ -47,6 +50,8 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
+
+	workloadProjector WorkloadProjector
 
 	whatResolver  WhatResolver
 	whereResolver WhereResolver
@@ -59,6 +64,8 @@ func NewPlacementTranslator(
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	spsClusterPreInformer edgev1a1informers.SinglePlacementSliceClusterInformer,
+	// pre-informer on syncer config objects, should be in mailbox workspaces
+	syncfgClusterPreInformer edgev1a1informers.SyncerConfigClusterInformer,
 	// pre-informer on Workspaces objects in the ESPW
 	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
 	// all-cluster clientset for kcp APIs,
@@ -81,6 +88,8 @@ func NewPlacementTranslator(
 		context:                ctx,
 		apiProvider:            amp,
 		spsClusterInformer:     spsClusterPreInformer.Informer(),
+		syncfgClusterInformer:  syncfgClusterPreInformer.Informer(),
+		syncfgClusterLister:    syncfgClusterPreInformer.Lister(),
 		mbwsInformer:           mbwsPreInformer.Informer(),
 		mbwsLister:             mbwsPreInformer.Lister(),
 		kcpClusterClientset:    kcpClusterClientset,
@@ -93,11 +102,13 @@ func NewPlacementTranslator(
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
+	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, pt.mbwsInformer, pt.mbwsLister, pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset)
 	logger := klog.FromContext(ctx)
 	doneCh := ctx.Done()
 	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
 		pt.spsClusterInformer.HasSynced, pt.mbwsInformer.HasSynced,
 		pt.crdClusterInformer.HasSynced, pt.bindingClusterInformer.HasSynced,
+		pt.syncfgClusterInformer.HasSynced,
 	) {
 		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
@@ -124,8 +135,8 @@ func (pt *placementTranslator) Run() {
 		DefaultResourceModes, // TODO: replace with configurable
 		nil,                  // TODO: get this right
 	)
-	workloadProjector := NewLoggingWorkloadProjector(logger)
-	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, workloadProjector)
+	// workloadProjector := NewLoggingWorkloadProjector(logger)
+	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, pt.workloadProjector)
 	// TODO: move all that stuff up before Run
 	go pt.apiProvider.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
