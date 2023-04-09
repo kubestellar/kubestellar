@@ -16,6 +16,10 @@ limitations under the License.
 
 package placement
 
+import (
+	"sync"
+)
+
 // Map is a finite set of (key,value) pairs
 // that has at most one value for any given key.
 // The collection may or may not be mutable.
@@ -246,6 +250,55 @@ func (xr TransformMappingReceiver[KeyOriginal, KeyTransformed, ValOriginal, ValT
 func (xr TransformMappingReceiver[KeyOriginal, KeyTransformed, ValOriginal, ValTransformed]) Delete(keyOriginal KeyOriginal) {
 	keyTransformed := xr.TransformKey(keyOriginal)
 	xr.Inner.Delete(keyTransformed)
+}
+
+func WrapMapWithMutex[Key comparable, Val any](theMap MutableMap[Key, Val]) MutableMap[Key, Val] {
+	return &mapMutex[Key, Val]{theMap: theMap}
+}
+
+type mapMutex[Key comparable, Val any] struct {
+	sync.RWMutex
+	theMap MutableMap[Key, Val]
+}
+
+func (mm *mapMutex[Key, Val]) IsEmpty() bool {
+	mm.RLock()
+	defer mm.RUnlock()
+	return mm.theMap.IsEmpty()
+}
+
+func (mm *mapMutex[Key, Val]) LenIsCheap() bool {
+	return mm.theMap.LenIsCheap()
+}
+
+func (mm *mapMutex[Key, Val]) Len() int {
+	mm.RLock()
+	defer mm.RUnlock()
+	return mm.theMap.Len()
+}
+
+func (mm *mapMutex[Key, Val]) Delete(key Key) {
+	mm.Lock()
+	defer mm.Unlock()
+	mm.theMap.Delete(key)
+}
+
+func (mm *mapMutex[Key, Val]) Put(key Key, val Val) {
+	mm.Lock()
+	defer mm.Unlock()
+	mm.theMap.Put(key, val)
+}
+
+func (mm *mapMutex[Key, Val]) Get(key Key) (Val, bool) {
+	mm.RLock()
+	defer mm.RUnlock()
+	return mm.theMap.Get(key)
+}
+
+func (mm *mapMutex[Key, Val]) Visit(visitor func(Pair[Key, Val]) error) error {
+	mm.RLock()
+	defer mm.RUnlock()
+	return mm.theMap.Visit(visitor)
 }
 
 func MappingReceiverAsVisitor[Key comparable, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {

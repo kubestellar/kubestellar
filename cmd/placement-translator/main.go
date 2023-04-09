@@ -135,20 +135,26 @@ func main() {
 	baseRestConfig, err := baseClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags", "which", baseClientOpts.which)
-		os.Exit(10)
+		os.Exit(20)
+	}
+
+	edgeClusterClientset, err := emcclusterclientset.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "Failed to build all-cluster edge clientset")
+		os.Exit(25)
 	}
 
 	// Get client config for view of SyncTarget objects
 	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of edge APIExport")
-		os.Exit(4)
+		os.Exit(30)
 	}
 
 	edgeViewClusterClientset, err := emcclusterclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create cluster clientset for view of edge APIExport")
-		os.Exit(6)
+		os.Exit(40)
 	}
 
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
@@ -159,7 +165,7 @@ func main() {
 	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for edge service provider workspace")
-		os.Exit(8)
+		os.Exit(50)
 	}
 
 	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
@@ -169,19 +175,19 @@ func main() {
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
-		os.Exit(10)
+		os.Exit(60)
 	}
 
 	discoveryClusterClient, err := clusterdiscovery.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster discovery client")
-		os.Exit(20)
+		os.Exit(70)
 	}
 
 	dynamicClusterClient, err := clusterdynamic.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create all-cluster dynamic client")
-		os.Exit(30)
+		os.Exit(80)
 	}
 
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
@@ -192,7 +198,7 @@ func main() {
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient)
+	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, edgeClusterClientset)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)

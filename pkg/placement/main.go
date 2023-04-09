@@ -29,7 +29,9 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
+	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
+	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 )
 
@@ -38,11 +40,13 @@ type placementTranslator struct {
 	apiProvider            APIWatchMapProvider
 	spsClusterInformer     kcpcache.ScopeableSharedIndexInformer
 	mbwsInformer           k8scache.SharedIndexInformer
+	mbwsLister             tenancyv1a1listers.WorkspaceLister
 	kcpClusterClientset    kcpclusterclientset.ClusterInterface
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface
 	crdClusterInformer     kcpcache.ScopeableSharedIndexInformer
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
+	edgeClusterClientset   edgeclusterclientset.ClusterInterface
 
 	whatResolver  WhatResolver
 	whereResolver WhereResolver
@@ -68,27 +72,27 @@ func NewPlacementTranslator(
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
 	// needed to read and write arbitrary objects
 	dynamicClusterClient clusterdynamic.ClusterInterface,
+	// to read and write syncer config objects
+	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
+	mbwsPreInformer.Lister()
 	pt := &placementTranslator{
 		context:                ctx,
 		apiProvider:            amp,
 		spsClusterInformer:     spsClusterPreInformer.Informer(),
 		mbwsInformer:           mbwsPreInformer.Informer(),
+		mbwsLister:             mbwsPreInformer.Lister(),
 		kcpClusterClientset:    kcpClusterClientset,
 		discoveryClusterClient: discoveryClusterClient,
 		crdClusterInformer:     crdClusterPreInformer.Informer(),
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
+		edgeClusterClientset:   edgeClusterClientset,
 		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
-	return pt
-}
-
-func (pt *placementTranslator) Run() {
-	ctx := pt.context
 	logger := klog.FromContext(ctx)
 	doneCh := ctx.Done()
 	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
@@ -98,6 +102,13 @@ func (pt *placementTranslator) Run() {
 		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
 	}
+
+	return pt
+}
+
+func (pt *placementTranslator) Run() {
+	ctx := pt.context
+	logger := klog.FromContext(ctx)
 
 	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
 		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{"what", logger}, mr}

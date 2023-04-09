@@ -20,22 +20,36 @@ import (
 	"context"
 	"sync"
 
+	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 
+	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
+	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 )
 
 func NewWorkloadProjector(
 	ctx context.Context,
+	configConcurrency int,
+	mbwsInformer k8scache.SharedIndexInformer,
+	mbwsLister tenancyv1a1listers.WorkspaceLister,
+	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 ) *workloadProjector {
 	wp := &workloadProjector{
-		ctx:              ctx,
-		queue:            workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		ctx:                  ctx,
+		configConcurrency:    configConcurrency,
+		queue:                workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		mbwsLister:           mbwsLister,
+		edgeClusterClientset: edgeClusterClientset,
+
+		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
+
 		nsDistributions:  NewMapRelation3[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](),
 		nsrDistributions: NewMapRelation3[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](),
 		nnsDistributions: NewMapRelation3[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](),
@@ -50,14 +64,39 @@ func NewWorkloadProjector(
 	}
 	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
 	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
+	mbwsInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj any) {
+			ws := obj.(*tenancyv1a1.Workspace)
+			wp.mbwsNameToCluster.Put(ws.Name, logicalcluster.Name(ws.Spec.Cluster))
+		},
+		UpdateFunc: func(oldObj, newObj any) {
+			ws := newObj.(*tenancyv1a1.Workspace)
+			wp.mbwsNameToCluster.Put(ws.Name, logicalcluster.Name(ws.Spec.Cluster))
+		},
+		DeleteFunc: func(obj any) {
+			innerObj := obj
+			switch typed := obj.(type) {
+			case k8scache.DeletedFinalStateUnknown:
+				innerObj = typed.Obj
+			default:
+			}
+			ws := innerObj.(*tenancyv1a1.Workspace)
+			wp.mbwsNameToCluster.Delete(ws.Name)
+		},
+	})
 	return wp
 }
 
 var _ WorkloadProjector = &workloadProjector{}
+var _ Runnable = &workloadProjector{}
 
 type workloadProjector struct {
-	ctx   context.Context
-	queue workqueue.RateLimitingInterface
+	ctx                  context.Context
+	configConcurrency    int
+	queue                workqueue.RateLimitingInterface
+	mbwsLister           tenancyv1a1listers.WorkspaceLister
+	edgeClusterClientset edgeclusterclientset.ClusterInterface
+	mbwsNameToCluster    MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
 
 	sync.Mutex
 
@@ -70,6 +109,62 @@ type workloadProjector struct {
 }
 
 type GroupResourceInstance = Pair[metav1.GroupResource, string /*object name*/]
+
+func (wp *workloadProjector) Run(ctx context.Context) {
+	doneCh := ctx.Done()
+	for worker := 0; worker < wp.configConcurrency; worker++ {
+		go wp.configSyncLoop(ctx, worker)
+	}
+	<-doneCh
+}
+
+func (wp *workloadProjector) configSyncLoop(ctx context.Context, worker int) {
+	doneCh := ctx.Done()
+	logger := klog.FromContext(ctx)
+	logger = logger.WithValues("worker", worker)
+	ctx = klog.NewContext(ctx, logger)
+	logger.V(4).Info("SyncLoop start")
+	for {
+		select {
+		case <-doneCh:
+			logger.V(2).Info("SyncLoop done")
+			return
+		default:
+			ref, shutdown := wp.queue.Get()
+			if shutdown {
+				logger.V(2).Info("Queue shutdown")
+				return
+			}
+			wp.sync1Config(ctx, ref)
+		}
+	}
+}
+
+func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
+	destination := ref.(edgeapi.SinglePlacement)
+	defer wp.queue.Done(ref)
+	logger := klog.FromContext(ctx)
+	logger.V(4).Info("Dequeued reference", "ref", ref)
+	retry := wp.syncConfig(ctx, destination)
+	if retry {
+		wp.queue.AddRateLimited(ref)
+	} else {
+		wp.queue.Forget(ref)
+	}
+}
+
+func (wp *workloadProjector) syncConfig(ctx context.Context, destination edgeapi.SinglePlacement) bool {
+	mbwsName := SPMailboxWorkspaceName(destination)
+	logger := klog.FromContext(ctx)
+	cluster, have := wp.mbwsNameToCluster.Get(mbwsName)
+	if !have {
+		logger.V(3).Info("Got reference to unknown mailbox workspace", "destination", destination)
+		return true
+	}
+	wp.edgeClusterClientset.Cluster(cluster.Path())
+	// TODO: create/update/delete syncer config object if needed
+	return false
+}
 
 func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	logger := klog.FromContext(wp.ctx)
@@ -115,6 +210,7 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 		if have {
 			logger.Info("NonNamespaced modes after transation", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
 		}
+		wp.queue.Add(destination)
 		return nil
 	})
 	wp.changedDestinations = nil
