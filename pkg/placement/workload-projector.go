@@ -22,11 +22,10 @@ import (
 	"sync"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
-	k8scache "k8s.io/client-go/tools/cache"
-	"k8s.io/klog/v2"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
@@ -245,7 +244,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef Externa
 			if logger.V(4).Enabled() {
 				logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
 					"specResources", syncfg.Spec.NamespaceScope.Resources,
-					"clusterObjects", syncfg.Spec.ClusterScope)
+					"specClusterObjects", syncfg.Spec.ClusterScope)
 			}
 			if err == nil {
 				logger.V(2).Info("Created SyncerConfig", "resourceVersion", syncfg2.ResourceVersion)
@@ -266,7 +265,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef Externa
 	if logger.V(4).Enabled() {
 		logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
 			"specResources", syncfg.Spec.NamespaceScope.Resources,
-			"clusterObjects", syncfg.Spec.ClusterScope)
+			"specClusterObjects", syncfg.Spec.ClusterScope)
 	}
 	if err != nil {
 		logger.Error(err, "SyncerConfig update failed", "resourceVersion", syncfg.ResourceVersion)
