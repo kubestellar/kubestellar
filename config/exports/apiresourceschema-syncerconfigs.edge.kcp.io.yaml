@@ -1,0 +1,155 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIResourceSchema
+metadata:
+  creationTimestamp: null
+  name: v230407-c87b2365.syncerconfigs.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: SyncerConfig
+    listKind: SyncerConfigList
+    plural: syncerconfigs
+    shortNames:
+    - escfg
+    singular: syncerconfig
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      description: 'SyncerConfig tells a syncer what to sync down and up. There is
+        a 1:1:1:1 relation between: - edge cluster - mailbox workspace - syncer -
+        syncer config.'
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: SyncerConfigSpec is instructions to the syncer
+          properties:
+            clusterScope:
+              description: '`clusterScope` holds a list of individual cluster-scoped
+                objects to downsync, organized by resource. Remember that a "resource"
+                is a kind/type/sort of objects, not an individual object.'
+              items:
+                properties:
+                  apiVersion:
+                    description: '`apiVeresion` holds just the version, not the group
+                      too. This is the version to use both upstream and downstream.'
+                    type: string
+                  group:
+                    type: string
+                  objects:
+                    description: '`objects` holds the names of the objects of this
+                      kind to downsync. Empty list means none of them.'
+                    items:
+                      type: string
+                    type: array
+                  resource:
+                    type: string
+                required:
+                - apiVersion
+                - group
+                - resource
+                type: object
+              type: array
+            namespaceScope:
+              description: NamespaceScopeDownsyncs describes what namespace-scoped
+                objects to downsync. Note that it is factored into two orthogonal
+                parts, one identifying namespaces and one identifying resources. An
+                object is to be downsynced iff it matches both parts.
+              properties:
+                namespaces:
+                  description: '`namespaces` is the names of the namespaces to downsync.
+                    Empty list means to downsync no namespace contents. Whether the
+                    particulars of the Namespace object itself are to be downsynced
+                    are controlled by the `clusterScope`; if not then downsync will
+                    ensure that the namespace exists but take no further care to make
+                    it match upstream.'
+                  items:
+                    type: string
+                  type: array
+                resources:
+                  description: '`resources` lists the namespace-scoped resources to
+                    downsync. Empty list means none of them.'
+                  items:
+                    properties:
+                      apiVersion:
+                        description: '`apiVeresion` holds just the version, not the
+                          group too. This is the version to use both upstream and
+                          downstream.'
+                        type: string
+                      group:
+                        type: string
+                      resource:
+                        type: string
+                    required:
+                    - apiVersion
+                    - group
+                    - resource
+                    type: object
+                  type: array
+              type: object
+            upsync:
+              description: '`upsync` identifies objects to upsync. An object matches
+                `upsync` if and only if it matches at least one member of `upsync`.
+                The syncer identifies matching objects in the edge cluster. The syncer
+                reads and writese the matching objects using the API version preferred
+                in the edge cluster.'
+              items:
+                description: 'UpsyncSet specifies a set of objects, which may be namespaced
+                  or cluster-scoped, from one particular API group. An object is in
+                  this set if: - its API group is the one listed; - its resource (lowercase
+                  plural form of object type) is one of those listed; - EITHER the
+                  resource is cluster-scoped OR the object''s namespace matches `namespaces`;
+                  and - the object''s name matches `names`.'
+                properties:
+                  apiGroup:
+                    description: '`apiGroup` is the API group of the referenced object,
+                      empty string for the core API group.'
+                    type: string
+                  names:
+                    description: '`Names` is a list of objects that match by name.
+                      An entry of `"*"` means that all match. Empty list means nothing
+                      matches (you probably never want an empty list).'
+                    items:
+                      type: string
+                    type: array
+                  namespaces:
+                    description: '`namespaces` is a list of acceptable namespaces.
+                      An entry of `"*"` means that all match. Empty list means nothing
+                      matches (you probably do not want this for namespaced resources).'
+                    items:
+                      type: string
+                    type: array
+                  resources:
+                    description: '`resources` is a list of lowercase plural names
+                      for the sorts of objects to match. An entry of `"*"` means that
+                      all match. Empty list means nothing matches.'
+                    items:
+                      type: string
+                    type: array
+                required:
+                - resources
+                type: object
+              type: array
+          type: object
+        status:
+          properties:
+            lastSyncerHeartbeatTime:
+              description: A timestamp indicating when the syncer last reported status.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    served: true
+    storage: true
+    subresources: {}

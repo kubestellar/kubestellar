@@ -32,6 +32,8 @@ type ClusterInterface interface {
 	EdgePlacements() EdgePlacementClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 	SinglePlacementSlices() SinglePlacementSliceClusterInformer
+	// SyncerConfigs returns a SyncerConfigClusterInformer
+	SyncerConfigs() SyncerConfigClusterInformer
 }
 
 type version struct {
@@ -59,6 +61,11 @@ func (v *version) SinglePlacementSlices() SinglePlacementSliceClusterInformer {
 	return &singlePlacementSliceClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// SyncerConfigs returns a SyncerConfigClusterInformer
+func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
+	return &syncerConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 type Interface interface {
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
@@ -66,6 +73,8 @@ type Interface interface {
 	EdgePlacements() EdgePlacementInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceInformer
 	SinglePlacementSlices() SinglePlacementSliceInformer
+	// SyncerConfigs returns a SyncerConfigInformer
+	SyncerConfigs() SyncerConfigInformer
 }
 
 type scopedVersion struct {
@@ -92,4 +101,9 @@ func (v *scopedVersion) EdgePlacements() EdgePlacementInformer {
 // SinglePlacementSlices returns a SinglePlacementSliceInformer
 func (v *scopedVersion) SinglePlacementSlices() SinglePlacementSliceInformer {
 	return &singlePlacementSliceScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// SyncerConfigs returns a SyncerConfigInformer
+func (v *scopedVersion) SyncerConfigs() SyncerConfigInformer {
+	return &syncerConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

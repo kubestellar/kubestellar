@@ -56,6 +56,10 @@ func (c *EdgeV1alpha1ClusterClient) SinglePlacementSlices() kcpedgev1alpha1.Sing
 	return &singlePlacementSlicesClusterClient{Fake: c.Fake}
 }
 
+func (c *EdgeV1alpha1ClusterClient) SyncerConfigs() kcpedgev1alpha1.SyncerConfigClusterInterface {
+	return &syncerConfigsClusterClient{Fake: c.Fake}
+}
+
 var _ edgev1alpha1.EdgeV1alpha1Interface = (*EdgeV1alpha1Client)(nil)
 
 type EdgeV1alpha1Client struct {
@@ -78,4 +82,8 @@ func (c *EdgeV1alpha1Client) EdgePlacements() edgev1alpha1.EdgePlacementInterfac
 
 func (c *EdgeV1alpha1Client) SinglePlacementSlices() edgev1alpha1.SinglePlacementSliceInterface {
 	return &singlePlacementSlicesClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
+}
+
+func (c *EdgeV1alpha1Client) SyncerConfigs() edgev1alpha1.SyncerConfigInterface {
+	return &syncerConfigsClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
