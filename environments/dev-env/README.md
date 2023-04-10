@@ -60,20 +60,22 @@ kubectl ws tree
 └── root
     ├── compute
     ├── espw
-    │   ├── 2sw7hflwls2yqcad-mb-7f38a3a2-b90f-4f68-a00d-44ba0b34e366
-    │   └── 2sw7hflwls2yqcad-mb-a57adcc9-b878-4891-802c-e4b75abf2c3b
-    ├── imw
-    ├── wmw-c
-    └── wmw-s
+    │   ├── limgjykhmrjeiwc6-mb-1c6d6132-4ef9-482e-bff5-ee7a70fb601e
+    │   └── limgjykhmrjeiwc6-mb-a1d8f1cd-6493-4480-8c5e-c7a3dd53600a
+    ├── imw-1
+    └── my-org
+        ├── wmw-c
+        └── wmw-s
+
+
 ```
 
 ```
-kubectl ws root:imw
+kubectl ws root:imw-1
 kubectl get locations
 NAME         RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-default      synctargets   0           2                    2m58s
-location-f   synctargets   0           1                    2m59s
-location-g   synctargets   0           1                    2m59s
+location-f   synctargets   0           1                    2m21s
+location-g   synctargets   0           1                    2m21s
 
 kubectl get synctargets
 NAME            AGE
@@ -89,8 +91,8 @@ guilder
 
 For workload common:
 ```
-kubectl ws root:wmw-c
-Current workspace is "root:wmw-c" (type root:universal).
+kubectl ws root:my-org:wmw-c
+Current workspace is "root:my-org:wmw-c".
 
 kubectl get ns
 NAME          STATUS   AGE
@@ -113,8 +115,8 @@ edge-placement-c   111s
 
 For workload special:
 ```
-kubectl ws root:wmw-s
-Current workspace is "root:wmw-s" (type root:universal).
+kubectl ws root:my-org:wmw-s
+Current workspace is "root:my-org:wmw-s".
 
 kubectl get ns
 NAME           STATUS   AGE
@@ -137,8 +139,8 @@ edge-placement-s   5m26s
 
 For placement translator:
 ```
-kubectl ws root:wmw-c
-Current workspace is "root:wmw-c" (type root:universal).
+kubectl root:my-org:wmw-c
+Current workspace is "root:my-org:wmw-c".
 
 kubectl get EdgePlacement
 NAME               AGE
