@@ -178,9 +178,11 @@ func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPl
 		}
 		sbp.resolvedWhatReceiver = sbc.resolvedWhatDifferencerConstructor(MappingReceiverFuncs[WorkloadPartID, WorkloadPartDetails]{
 			OnPut: func(partID WorkloadPartID, partDetails WorkloadPartDetails) {
-				sbc.join12v.Put(Pair[ExternalName, WorkloadPartID]{epID, partID}, partDetails)
+				sbc.join12v.Put(NewPair(epID, partID), partDetails)
 			},
-		})
+			OnDelete: func(partID WorkloadPartID) {
+				sbc.join12v.Delete(NewPair(epID, partID))
+			}})
 		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(TransformSetChangeReceiver(
 			NewPair1Then2[ExternalName, edgeapi.SinglePlacement](epID),
 			sbc.join13,

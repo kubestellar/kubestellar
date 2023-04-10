@@ -136,7 +136,7 @@ func NewWorkloadProjector(
 			return
 		}
 		ref := ExternalName{cluster, syncfg.Name}
-		logger.V(4).Info("Enqueuing SyncerConfig reference", "ref", ref, "event", event)
+		logger.V(4).Info("Enqueuing reference to written SyncerConfig", "ref", ref, "event", event)
 		wp.queue.Add(ref)
 	}
 	syncfgClusterInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
@@ -348,7 +348,7 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			wp.queue.Add(destination)
 		} else {
 			ref := ExternalName{mbwsCluster, SyncerConfigName}
-			logger.V(3).Info("Enqueuing SyncerConfig reference", "ref", ref)
+			logger.V(3).Info("Enqueuing reference to SyncerConfig affected by transaction", "destination", destination, "mbwsName", mbwsName, "ref", ref)
 			wp.queue.Add(ref)
 		}
 		return nil
