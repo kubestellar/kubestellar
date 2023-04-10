@@ -308,6 +308,23 @@ func StatefulReducer[Elt any, Accum any, Ans any](initialize func() Accum, add f
 	}
 }
 
+func SetEnumerateDifferences[Elt comparable](left, right Set[Elt], receiver SetChangeReceiver[Elt]) {
+	left.Visit(func(elt Elt) error {
+		has := right.Has(elt)
+		if !has {
+			receiver.Remove(elt)
+		}
+		return nil
+	})
+	right.Visit(func(elt Elt) error {
+		has := left.Has(elt)
+		if !has {
+			receiver.Add(elt)
+		}
+		return nil
+	})
+}
+
 var errStop = errors.New("it is done")
 
 func SetLessOrEqual[Elt comparable](set1, set2 Set[Elt]) bool {

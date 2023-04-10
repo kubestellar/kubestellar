@@ -252,6 +252,8 @@ func externalizeReceiver(receiver MappingReceiver[metav1.GroupResource, Resource
 
 func (awp *apiWatchProvider) syncGroupReceiver(ctx context.Context, cluster logicalcluster.Name, receiver MappingReceiver[string /*group name*/, APIGroupInfo]) bool {
 	// TODO: implement, once apiwatch supplies this information
+	logger := klog.FromContext(ctx)
+	logger.V(4).Info("syncGroupReceiver not implemented")
 	return false
 }
 
@@ -273,6 +275,7 @@ func (awp *apiWatchProvider) syncResourceReceiver(ctx context.Context, cluster l
 		logger.Error(err, "Impossible error listing from local cache", "cluster", wpc.cluster)
 	}
 	SliceApply(resources, externalizeReceiver(receiver))
+	logger.V(4).Info("syncResourceReceiver done", "cluster", cluster, "numResources", len(resources))
 	return false
 }
 

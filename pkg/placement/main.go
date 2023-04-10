@@ -51,7 +51,10 @@ type placementTranslator struct {
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
 
-	workloadProjector WorkloadProjector
+	workloadProjector interface {
+		WorkloadProjector
+		Runnable
+	}
 
 	whatResolver  WhatResolver
 	whereResolver WhereResolver
@@ -103,7 +106,14 @@ func NewPlacementTranslator(
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, pt.mbwsInformer, pt.mbwsLister, pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset)
+
+	return pt
+}
+
+func (pt *placementTranslator) Run() {
+	ctx := pt.context
 	logger := klog.FromContext(ctx)
+
 	doneCh := ctx.Done()
 	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
 		pt.spsClusterInformer.HasSynced, pt.mbwsInformer.HasSynced,
@@ -113,13 +123,6 @@ func NewPlacementTranslator(
 		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
 	}
-
-	return pt
-}
-
-func (pt *placementTranslator) Run() {
-	ctx := pt.context
-	logger := klog.FromContext(ctx)
 
 	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
 		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{"what", logger}, mr}
@@ -138,7 +141,8 @@ func (pt *placementTranslator) Run() {
 	// workloadProjector := NewLoggingWorkloadProjector(logger)
 	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, pt.workloadProjector)
 	// TODO: move all that stuff up before Run
-	go pt.apiProvider.Run(ctx) // TODO: also wait for this to finish
+	go pt.apiProvider.Run(ctx)       // TODO: also wait for this to finish
+	go pt.workloadProjector.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
 }
 

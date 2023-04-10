@@ -38,6 +38,10 @@ import (
 	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 )
 
+const SyncerConfigName = "the-one"
+
+// NewWorkloadProjector constructs a WorkloadProjector that also implements Runnable.
+// Run it after starting the informer factories.
 func NewWorkloadProjector(
 	ctx context.Context,
 	configConcurrency int,
@@ -207,7 +211,7 @@ func (wp *workloadProjector) syncConifgDestination(ctx context.Context, destinat
 	logger := klog.FromContext(ctx)
 	if ok {
 		ref := ExternalName{mbwsCluster, SyncerConfigName}
-		logger.V(3).Info("Finally able to enqueue syncer config ref", "ref", ref)
+		logger.V(3).Info("Finally able to enqueue SyncerConfig ref", "ref", ref)
 		wp.queue.Add(ref)
 		return false
 	}
@@ -216,44 +220,59 @@ func (wp *workloadProjector) syncConifgDestination(ctx context.Context, destinat
 
 func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef ExternalName) bool {
 	logger := klog.FromContext(ctx)
+	logger = logger.WithValues("syncerConfig", scRef)
 	mbwsName, ok := wp.clusterToMBWSName.Get(scRef.Cluster)
 	if !ok {
-		logger.Error(nil, "Failed to map mailbox cluster Name to mailbox WS name", "cluster", scRef.Cluster)
+		logger.Error(nil, "Failed to map mailbox cluster Name to mailbox WS name")
 		return true
 	}
 	sp, ok := wp.mbwsNameToSP.Get(mbwsName)
 	if !ok {
-		logger.Error(nil, "Failed to map mailbox workspace name to SinglePlacement", "mbwsName", mbwsName, "cluster", scRef.Cluster)
+		logger.Error(nil, "Failed to map mailbox workspace name to SinglePlacement", "mbwsName", mbwsName)
 		return true
 	}
+	logger = logger.WithValues("destination", sp)
 	syncfg, err := wp.syncfgClusterLister.Cluster(scRef.Cluster).Get(scRef.Name)
-	if err != nil && k8sapierrors.IsNotFound(err) {
-		syncfg = &edgeapi.SyncerConfig{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: scRef.Name,
-			},
-			Spec: wp.syncerConfigSpecForMailbox(sp)}
-		client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
-		_, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: "placement-translator"})
-		if err == nil {
-			logger.V(2).Info("Created SyncerConfig", "ref", scRef)
-			return false
+	if err != nil {
+		if k8sapierrors.IsNotFound(err) {
+			syncfg = &edgeapi.SyncerConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: scRef.Name,
+				},
+				Spec: wp.syncerConfigSpecForMailbox(sp)}
+			client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
+			syncfg2, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: "placement-translator"})
+			if logger.V(4).Enabled() {
+				logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
+					"specResources", syncfg.Spec.NamespaceScope.Resources,
+					"clusterObjects", syncfg.Spec.ClusterScope)
+			}
+			if err == nil {
+				logger.V(2).Info("Created SyncerConfig", "resourceVersion", syncfg2.ResourceVersion)
+				return false
+			}
+			logger.Error(err, "Failed to create SyncerConfig")
+			return true
 		}
-		logger.Error(err, "Failed to created SyncerConfig", "ref", scRef)
-		return true
+		logger.Error(err, "Unexpected failure reading local cache")
 	}
-	if wp.syncerConfigIsGood(sp, syncfg.Spec) {
-		logger.V(4).Info("SyncerConfig is already good", "ref", scRef)
+	if wp.syncerConfigIsGood(sp, scRef, syncfg) {
+		logger.V(4).Info("SyncerConfig is already good", "resourceVersion", syncfg.ResourceVersion)
 		return false
 	}
 	syncfg.Spec = wp.syncerConfigSpecForMailbox(sp)
 	client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
-	_, err = client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: "placement-translator"})
+	syncfg2, err := client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: "placement-translator"})
+	if logger.V(4).Enabled() {
+		logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
+			"specResources", syncfg.Spec.NamespaceScope.Resources,
+			"clusterObjects", syncfg.Spec.ClusterScope)
+	}
 	if err != nil {
-		logger.Error(err, "SyncerConfig update failed", "ref", scRef)
+		logger.Error(err, "SyncerConfig update failed", "resourceVersion", syncfg.ResourceVersion)
 		return true
 	}
-	logger.V(2).Info("Updated SyncerConfig", "ref", scRef)
+	logger.V(2).Info("Updated SyncerConfig", "resourceVersionOld", syncfg.ResourceVersion, "resourceVersionNew", syncfg2.ResourceVersion)
 	return false
 }
 
@@ -261,6 +280,7 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	logger := klog.FromContext(wp.ctx)
 	wp.Lock()
 	defer wp.Unlock()
+	logger.V(3).Info("Begin transaction")
 	var s1 SetChangeReceiver[Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]] = wp.nsDistributions
 	var s2 SetChangeReceiver[Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]] = wp.nsrDistributions
 	var s3 SetChangeReceiver[Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]] = wp.nnsDistributions
@@ -275,31 +295,31 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 		wp.nsModes,
 		TransformSetChangeReceiver(factorNonNamespacedDistributionTupleForSyncer, s3),
 		wp.nnsModes})
-	logger.V(2).Info("Transaction response", "changedDestinations", changedDestinations)
+	logger.V(3).Info("Transaction response", "changedDestinations", changedDestinations)
 	changedDestinations.Visit(func(destination edgeapi.SinglePlacement) error {
 		nsds, have := wp.nsDistributions.GetIndex1to2().Get(destination)
 		if have {
 			nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
-			logger.Info("Namespaces after transaction", "destination", destination, "namespaces", MapSetCopy[NamespaceName](nses))
+			logger.V(3).Info("Namespaces after transaction", "destination", destination, "namespaces", MapSetCopy[NamespaceName](nses))
 		}
 		nsrds, have := wp.nsrDistributions.GetIndex1to2().Get(destination)
 		if have {
 			nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
-			logger.Info("NamespacedResources after transation", "destination", destination, "resources", MapSetCopy[metav1.GroupResource](nsrs))
+			logger.V(3).Info("NamespacedResources after transaction", "destination", destination, "resources", MapSetCopy[metav1.GroupResource](nsrs))
 		}
 		nsms, have := wp.nsModes.GetIndex().Get(destination)
 		if have {
-			logger.Info("Namespaced modes after transation", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
+			logger.V(3).Info("Namespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
 
 		}
 		nnsds, have := wp.nnsDistributions.GetIndex1to2().Get(destination)
 		if have {
 			objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
-			logger.Info("NamespacedResources after transation", "destination", destination, "objs", MapSetCopy[GroupResourceInstance](objs))
+			logger.V(3).Info("NamespacedResources after transaction", "destination", destination, "objs", MapSetCopy[GroupResourceInstance](objs))
 		}
 		nnsms, have := wp.nnsModes.GetIndex().Get(destination)
 		if have {
-			logger.Info("NonNamespaced modes after transation", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
+			logger.V(3).Info("NonNamespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
 		}
 		mbwsName := SPMailboxWorkspaceName(destination)
 		wp.mbwsNameToSP.Put(mbwsName, destination)
@@ -309,16 +329,14 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			wp.queue.Add(destination)
 		} else {
 			ref := ExternalName{mbwsCluster, SyncerConfigName}
-			logger.V(3).Info("Enqueuing syncer config reference", "ref", ref)
+			logger.V(3).Info("Enqueuing SyncerConfig reference", "ref", ref)
 			wp.queue.Add(ref)
 		}
-		wp.queue.Add(destination)
 		return nil
 	})
+	logger.V(3).Info("End transaction")
 	wp.changedDestinations = nil
 }
-
-const SyncerConfigName = "config"
 
 func recordFirst[First, Second, Third comparable](record MutableSet[First]) SetChangeReceiver[Triple[First, Second, Third]] {
 	return SetChangeReceiverFuncs[Triple[First, Second, Third]]{
@@ -432,39 +450,60 @@ func (wp *workloadProjector) syncerConfigSpecForMailbox(destination edgeapi.Sing
 	return ans
 }
 
-func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacement, spec edgeapi.SyncerConfigSpec) bool {
+func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacement, configRef ExternalName, syncfg *edgeapi.SyncerConfig) bool {
+	spec := syncfg.Spec
 	goodNamespaces, goodNamespacedResources, goodClusterScopedResources := wp.syncerConfigRelations(destination)
 	haveNamespaces := NewMapSet(spec.NamespaceScope.Namespaces...)
-	if !SetEqual[string](goodNamespaces, haveNamespaces) {
-		return false
-	}
+	logger := klog.FromContext(wp.ctx)
+	logger = logger.WithValues("destination", destination, "syncerConfig", configRef, "resourceVersion", syncfg.ResourceVersion)
+	good := true
+	SetEnumerateDifferences[string](goodNamespaces, haveNamespaces, SetChangeReceiverFuncs[string]{
+		OnAdd: func(namespace string) bool {
+			logger.V(4).Info("SyncerConfig has excess namespace", "namespace", namespace)
+			good = false
+			return false
+		},
+		OnRemove: func(namespace string) bool {
+			logger.V(4).Info("SyncerConfig lacks namespace", "namespace", namespace)
+			good = false
+			return false
+		},
+	})
 	haveNamespacedResources := NewMapSet(spec.NamespaceScope.Resources...)
-	if !SetEqual[edgeapi.NamespaceScopeDownsyncResource](goodNamespacedResources, haveNamespacedResources) {
-		return false
-	}
+	SetEnumerateDifferences[edgeapi.NamespaceScopeDownsyncResource](goodNamespacedResources, haveNamespacedResources, SetChangeReceiverFuncs[edgeapi.NamespaceScopeDownsyncResource]{
+		OnAdd: func(nsr edgeapi.NamespaceScopeDownsyncResource) bool {
+			logger.V(4).Info("SyncerConfig has excess NamespaceScopeDownsyncResource", "resource", nsr)
+			good = false
+			return false
+		},
+		OnRemove: func(nsr edgeapi.NamespaceScopeDownsyncResource) bool {
+			logger.V(4).Info("SyncerConfig lacks NamespaceScopeDownsyncResource", "resource", nsr)
+			good = false
+			return false
+		},
+	})
 	haveClusterScopedResources := NewMapMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]](nil)
 	for _, cr := range spec.ClusterScope {
 		var objects MutableSet[string] = NewMapSet(cr.Objects...)
 		haveClusterScopedResources.Put(cr.GroupResource, NewPair(ProjectionModeVal{cr.APIVersion}, objects))
 	}
-	return MapEqualParametric[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]](csrEqual)(goodClusterScopedResources, haveClusterScopedResources)
+	MapEnumerateDifferencesParametric[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]](csrEqual, goodClusterScopedResources, haveClusterScopedResources, MapChangeReceiverFuncs[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]]{
+		OnCreate: func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) {
+			logger.V(4).Info("SyncerConfig has excess ClusterScopeDownsyncResource", "groupResource", key, "apiVersion", val.First.APIVersion, "objects", val.Second)
+			good = false
+		},
+		OnUpdate: func(key metav1.GroupResource, goodVal, haveVal Pair[ProjectionModeVal, MutableSet[string]]) {
+			logger.V(4).Info("SyncerConfig wrong ClusterScopeDownsyncResource", "groupResource", key, "apiVersionGood", goodVal.First.APIVersion, "apiVersionHave", haveVal.First.APIVersion, "objectsGood", goodVal.Second, "objectsHave", haveVal.Second)
+			good = false
+		},
+		OnDelete: func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) {
+			logger.V(4).Info("SyncerConfig lacks ClusterScopeDownsyncResource", "groupResource", key, "apiVersion", val.First.APIVersion, "objects", val.Second)
+			good = false
+		},
+	})
+	return good
 }
 
 func csrEqual(a, b Pair[ProjectionModeVal, MutableSet[string]]) bool {
 	return a.First == b.First && SetEqual[string](a.Second, b.Second)
-}
-
-func MapEqualParametric[Key comparable, Val any](isEqual func(Val, Val) bool) func(map1, map2 Map[Key, Val]) bool {
-	return func(map1, map2 Map[Key, Val]) bool {
-		if map1.Len() != map2.Len() {
-			return false
-		}
-		return map1.Visit(func(tup1 Pair[Key, Val]) error {
-			val2, have := map2.Get(tup1.First)
-			if !have || !isEqual(tup1.Second, val2) {
-				return errStop
-			}
-			return nil
-		}) == nil
-	}
 }

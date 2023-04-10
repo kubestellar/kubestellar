@@ -350,37 +350,42 @@ func MapGetAdd[Key comparable, Val any](theMap MutableMap[Key, Val], key Key, wa
 }
 
 func MapEqual[Key, Val comparable](left, right Map[Key, Val]) bool {
-	if left.Len() != right.Len() {
-		return false
-	}
-	if left.Visit(func(tup Pair[Key, Val]) error {
-		valRight, has := right.Get(tup.First)
-		if !has || tup.Second != valRight {
-			return errStop
+	return MapEqualParametric[Key, Val](func(a, b Val) bool { return a == b })(left, right)
+}
+
+func MapEqualParametric[Key comparable, Val any](isEqual func(Val, Val) bool) func(map1, map2 Map[Key, Val]) bool {
+	return func(map1, map2 Map[Key, Val]) bool {
+		if map1.Len() != map2.Len() {
+			return false
 		}
-		return nil
-	}) != nil {
-		return false
+		return map1.Visit(func(tup1 Pair[Key, Val]) error {
+			val2, have := map2.Get(tup1.First)
+			if !have || !isEqual(tup1.Second, val2) {
+				return errStop
+			}
+			return nil
+		}) == nil
 	}
-	return true
 }
 
 func MapEnumerateDifferences[Key, Val comparable](left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
+	MapEnumerateDifferencesParametric(func(a, b Val) bool { return a == b }, left, right, receiver)
+}
+
+func MapEnumerateDifferencesParametric[Key comparable, Val any](isEqual func(Val, Val) bool, left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
 	left.Visit(func(tup Pair[Key, Val]) error {
 		valRight, has := right.Get(tup.First)
 		if !has {
 			receiver.DeleteWithFinal(tup.First, tup.Second)
-		} else if valRight != tup.Second {
+		} else if !isEqual(valRight, tup.Second) {
 			receiver.Update(tup.First, tup.Second, valRight)
 		}
 		return nil
 	})
 	right.Visit(func(tup Pair[Key, Val]) error {
-		valLeft, has := left.Get(tup.First)
+		_, has := left.Get(tup.First)
 		if !has {
 			receiver.Create(tup.First, tup.Second)
-		} else if valLeft != tup.Second {
-			receiver.Update(tup.First, valLeft, tup.Second)
 		}
 		return nil
 	})
