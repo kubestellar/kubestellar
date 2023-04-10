@@ -75,8 +75,8 @@ type apiWatchProvider struct {
 }
 
 func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
-	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails],
+	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails],
 ) {
 	awp.Lock()
 	defer awp.Unlock()
@@ -85,8 +85,8 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 		wpc := &apiWatchProviderPerCluster{
 			awp:               awp,
 			cluster:           clusterName,
-			groupReceivers:    MappingReceiverFork[string /*group name*/, APIGroupInfo]{},
-			resourceReceivers: MappingReceiverFork[metav1.GroupResource, ResourceDetails]{},
+			groupReceivers:    MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{},
+			resourceReceivers: MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{},
 		}
 		discoveryScopedClient := awp.discoveryClusterClient.Cluster(clusterName.Path())
 		crdInformer := awp.crdClusterPreInformer.Cluster(clusterName).Informer()
@@ -96,16 +96,25 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 		go wpc.informer.Run(ctx.Done())
 		return wpc
 	})
-	wpc.groupReceivers = append(MappingReceiverFork[string /*group name*/, APIGroupInfo]{groupReceiver}, wpc.groupReceivers...)
-	wpc.resourceReceivers = append(MappingReceiverFork[metav1.GroupResource, ResourceDetails]{resourceReceiver}, wpc.resourceReceivers...)
+	wpc.groupReceivers = append(MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{groupReceiver}, wpc.groupReceivers...)
+	wpc.resourceReceivers = append(MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{resourceReceiver}, wpc.resourceReceivers...)
+	// The following make sure that the new receiver is notified about aready-known resources
 	awp.queue.Add(receiverForCluster[string /*group name*/, APIGroupInfo]{groupReceiver, clusterName})
 	awp.queue.Add(receiverForCluster[metav1.GroupResource, ResourceDetails]{resourceReceiver, clusterName})
 }
 
 func (awp *apiWatchProvider) RemoveReceivers(clusterName logicalcluster.Name,
-	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
-	panic("not implemented until this module requires go 1.20")
+	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
+	awp.Lock()
+	defer awp.Unlock()
+	wpc, have := awp.perCluster.Get(clusterName)
+	if !have {
+		return
+	}
+	wpc.groupReceivers = SliceRemoveFunctional(wpc.groupReceivers, groupReceiver)
+	wpc.resourceReceivers = SliceRemoveFunctional(wpc.resourceReceivers, resourceReceiver)
+	// TODO: shut it down if there are no remaining receivers
 }
 
 type apiWatchProviderPerCluster struct {
@@ -117,8 +126,8 @@ type apiWatchProviderPerCluster struct {
 	// The following fields may be read or written only with the provider locked,
 	// but every value ever held in these fields is immutable.
 
-	groupReceivers    MappingReceiverFork[string /*group name*/, APIGroupInfo]
-	resourceReceivers MappingReceiverFork[metav1.GroupResource, ResourceDetails]
+	groupReceivers    MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]
+	resourceReceivers MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]
 }
 
 func (wpc *apiWatchProviderPerCluster) OnAdd(obj any) {
@@ -219,13 +228,13 @@ func (awp *apiWatchProvider) sync(ctx context.Context, refany any) bool {
 
 func (awp *apiWatchProvider) syncResourceRef(ctx context.Context, rr resourceRef) bool {
 	logger := klog.FromContext(ctx)
-	metarsc, receivers := func() (*urmetav1a1.APIResource, MappingReceiverFork[metav1.GroupResource, ResourceDetails]) {
+	metarsc, receivers := func() (*urmetav1a1.APIResource, MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]) {
 		awp.Lock()
 		defer awp.Unlock()
 		wpc, has := awp.perCluster.Get(rr.cluster)
 		if !has {
 			logger.Error(nil, "Impossible: processing reference to unknown cluster", "rr", rr)
-			return nil, MappingReceiverFork[metav1.GroupResource, ResourceDetails]{}
+			return nil, []*MappingReceiverHolder[metav1.GroupResource, ResourceDetails]{}
 		}
 		metasrsc, err := wpc.lister.Get(rr.metaname)
 		if err != nil && !k8sapierrors.IsNotFound(err) {
@@ -266,8 +275,7 @@ func (awp *apiWatchProvider) syncResourceReceiver(ctx context.Context, cluster l
 		return wpc
 	}()
 	if wpc == nil {
-		// Removing will not be implemented until go 1.20 is required for this module.
-		logger.Error(nil, "Impossible: failed to find wpc", "cluster", cluster)
+		logger.Info("syncResourceReceiver did not find wpc, which may indicate a bug", "cluster", cluster)
 		return false
 	}
 	resources, err := wpc.lister.List(labels.Everything())

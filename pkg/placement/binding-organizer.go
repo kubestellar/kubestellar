@@ -372,7 +372,7 @@ func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, edgeapi.Sing
 	}
 	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, tup.Second.Name}, tup.Third}
 	sbo.clusterWhatWhereFull.Delete(key)
-	sbo.discovery.RemoveReceivers(sbc.cluster, sbcGroupReceiver{sbc}, sbcResourceReceiver{sbc})
+	sbo.discovery.RemoveReceivers(sbc.cluster, &sbc.groupReceiver, &sbc.resourceReceiver)
 }
 
 func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name, want bool) *simpleBindingPerCluster {
@@ -383,14 +383,18 @@ func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name,
 			cluster:                cluster,
 		}
 		sbo.perSourceCluster.Put(cluster, sbc)
-		sbo.discovery.AddReceivers(cluster, sbcGroupReceiver{sbc}, sbcResourceReceiver{sbc})
+		sbc.groupReceiver.MappingReceiver = sbcGroupReceiver{sbc}
+		sbc.resourceReceiver.MappingReceiver = sbcResourceReceiver{sbc}
+		sbo.discovery.AddReceivers(cluster, &sbc.groupReceiver, &sbc.resourceReceiver)
 	}
 	return sbc
 }
 
 type simpleBindingPerCluster struct {
 	*simpleBindingOrganizer
-	cluster logicalcluster.Name
+	cluster          logicalcluster.Name
+	groupReceiver    MappingReceiverHolder[string /*group name*/, APIGroupInfo]
+	resourceReceiver MappingReceiverHolder[metav1.GroupResource, ResourceDetails]
 }
 
 type sbcGroupReceiver struct {

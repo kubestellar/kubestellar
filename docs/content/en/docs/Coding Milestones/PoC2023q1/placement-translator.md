@@ -219,11 +219,9 @@ $ kubectl delete EdgePlacement edge-placement-c
 edgeplacement.edge.kcp.io "edge-placement-c" deleted
 ```
 
-That will cause the placement translator to log a new mapping and then crash, as
-follows.
+That will cause the placement translator to log updates, as follows.
 
 ```
 I0410 01:20:15.024734   27116 main.go:157] "Put" map="what" key="24oofcs9mbj9j4nd:edge-placement-c" val=map[]
 I0410 01:20:15.102275   27116 main.go:161] "Delete" map="where" key="24oofcs9mbj9j4nd:edge-placement-c"
-E0410 01:20:15.102872   27116 runtime.go:77] Observed a panic: not implemented until this module requires go 1.20
 ```

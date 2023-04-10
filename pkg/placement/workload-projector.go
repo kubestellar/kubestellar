@@ -19,6 +19,7 @@ package placement
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -77,18 +78,34 @@ func NewWorkloadProjector(
 	}
 	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
 	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
+	logger := klog.FromContext(ctx)
 	mbwsInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
 			ws := obj.(*tenancyv1a1.Workspace)
 			cluster := logicalcluster.Name(ws.Spec.Cluster)
+			if !looksLikeMBWSName(ws.Name) {
+				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
+				return
+			}
 			wp.mbwsNameToCluster.Put(ws.Name, cluster)
 			wp.clusterToMBWSName.Put(cluster, ws.Name)
+			logger.V(4).Info("Enqueuing reference to new workspace", "wsName", ws.Name, "cluster", cluster)
+			wp.queue.Add(ExternalName{cluster, SyncerConfigName})
 		},
 		UpdateFunc: func(oldObj, newObj any) {
 			ws := newObj.(*tenancyv1a1.Workspace)
 			cluster := logicalcluster.Name(ws.Spec.Cluster)
-			wp.mbwsNameToCluster.Put(ws.Name, cluster)
-			wp.clusterToMBWSName.Put(cluster, ws.Name)
+			if !looksLikeMBWSName(ws.Name) {
+				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
+				return
+			}
+			oldCluster, has := wp.mbwsNameToCluster.Get(ws.Name)
+			if !has || cluster != oldCluster {
+				wp.mbwsNameToCluster.Put(ws.Name, cluster)
+				wp.clusterToMBWSName.Put(cluster, ws.Name)
+				logger.V(4).Info("Enqueuing reference to modified workspace", "wsName", ws.Name, "cluster", cluster, "oldCluster", oldCluster)
+				wp.queue.Add(ExternalName{cluster, SyncerConfigName})
+			}
 		},
 		DeleteFunc: func(obj any) {
 			innerObj := obj
@@ -99,11 +116,14 @@ func NewWorkloadProjector(
 			}
 			ws := innerObj.(*tenancyv1a1.Workspace)
 			cluster := logicalcluster.Name(ws.Spec.Cluster)
+			if !looksLikeMBWSName(ws.Name) {
+				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
+				return
+			}
 			wp.mbwsNameToCluster.Delete(ws.Name)
 			wp.clusterToMBWSName.Delete(cluster)
 		},
 	})
-	logger := klog.FromContext(ctx)
 	enqueueObjRef := func(obj any, event string) {
 		dfu, ok := obj.(k8scache.DeletedFinalStateUnknown)
 		if ok {
@@ -505,4 +525,9 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 
 func csrEqual(a, b Pair[ProjectionModeVal, MutableSet[string]]) bool {
 	return a.First == b.First && SetEqual[string](a.Second, b.Second)
+}
+
+func looksLikeMBWSName(wsName string) bool {
+	mbwsNameParts := strings.Split(wsName, WSNameSep)
+	return len(mbwsNameParts) == 2
 }

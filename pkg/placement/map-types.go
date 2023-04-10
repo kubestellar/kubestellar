@@ -102,6 +102,22 @@ func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
 	}
 }
 
+type MappingReceiverHolderFork[Key comparable, Val any] []*MappingReceiverHolder[Key, Val]
+
+var _ MappingReceiver[int, func()] = MappingReceiverHolderFork[int, func()]{}
+
+func (mrf MappingReceiverHolderFork[Key, Val]) Put(key Key, val Val) {
+	for _, mr := range mrf {
+		mr.Put(key, val)
+	}
+}
+
+func (mrf MappingReceiverHolderFork[Key, Val]) Delete(key Key) {
+	for _, mr := range mrf {
+		mr.Delete(key)
+	}
+}
+
 // MappingReceiverFunc produces a MappingReceiver that defers to another MappingReceiver computed on each use
 func MappingReceiverFunc[Key comparable, Val any](fn func() MappingReceiver[Key, Val]) MappingReceiver[Key, Val] {
 	return mappingReceiverFunc[Key, Val]{fn}
