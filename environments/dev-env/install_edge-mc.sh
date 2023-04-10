@@ -70,8 +70,8 @@ if [ $(process_running kcp) == "running" ]
 then
     echo "An older deployment of kcp-playground is already running - terminating it ...."
     if [ $os_type == "darwin" ]; then
-        pkill -x kubectl-kcp-playground
-        pkill -x kcp
+        pkill kubectl-kcp-playground
+        pkill kcp
     elif [ $os_type == "linux" ]; then
         kill -9 $(pidof kubectl-kcp-playground)
         kill -9 $(pidof kcp)
@@ -83,7 +83,7 @@ if [ $(process_running mailbox-controller) == "running" ]
 then
     echo "An older deployment of mailbox-controller is already running - terminating it ...."
     if [ $os_type == "darwin" ]; then
-        pkill -x mailbox-controller
+        pkill mailbox-controller
     elif [ $os_type == "linux" ]; then
         kill -9 $(pidof mailbox-controller)
     fi 
@@ -93,12 +93,8 @@ fi
 if [ $(process_running main) == "running" ]
 then
     echo "An older deployment of edge-scheduler is already running - terminating it ...."
-    if [ $os_type == "darwin" ]; then
-        echo "I AM HERE ........"
-        pkill main # edge-scheduler
-    elif [ $os_type == "linux" ]; then
-        pkill -f .kubectl-kcp-playground # edge-scheduler
-    fi 
+    #ps xu | grep scheduler/main.go | grep -v grep | awk '{ print $2 }' | xargs kill -9
+    pkill -f  shard-main-shard-admin
 fi
 
 # Check placement-translator is already running
@@ -106,7 +102,7 @@ if [ $(process_running placement-translator) == "running" ]
 then
     echo "An older deployment of placement-translator is already running - terminating it ...."
     if [ $os_type == "darwin" ]; then
-        pkill -x placement-translator
+        pkill placement-translator
     elif [ $os_type == "linux" ]; then
         kill -9 $(pidof placement-translator)
     fi 
@@ -238,6 +234,10 @@ echo "Started deploying kCP-EDGE controllers ...."
 echo "****************************************"
 cd ../../..
 
+# Delete default location object in the inventory workspace
+kubectl ws imw-1
+kubectl delete location default > /dev/null 2>&1
+
 kubectl ws root:espw
 go run ./cmd/mailbox-controller --inventory-context=shard-main-root -v=2 >& environments/dev-env/mailbox-controller-log.txt &
 
@@ -255,7 +255,7 @@ if [ $stage -gt 1 ]; then
     # (7): Start the edge-mc scheduler
     sleep 3
     kubectl ws root:espw
-    go run cmd/scheduler/main.go -v 2 --kcp-kubeconfig=$kubeconfig_path >& environments/dev-env/edge-scheduler-log.txt &
+    go run cmd/scheduler/main.go -v 2 --root-user shard-main-kcp-admin  --root-cluster shard-main-root  --sysadm-context shard-main-system:admin  --sysadm-user shard-main-shard-admin >& environments/dev-env/edge-scheduler-log.txt &
     message=$(wait_for_process main)
     
     run_status=$(wait_for_process main)
