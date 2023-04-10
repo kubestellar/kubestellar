@@ -1,9 +1,0 @@
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-kube
-spec:
-  reference:
-    export:
-      path: "root:compute"
-      name: kubernetes
