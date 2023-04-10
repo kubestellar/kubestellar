@@ -159,11 +159,11 @@ echo "****************************************"
 rm -rf .kcp-playground/
 
 if [ $stage == 1 ]; then  
-    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage1.yml >& ../kcp-playground-log.txt &
+    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage1.yaml >& ../kcp-playground-log.txt &
 elif [ $stage == 2 ]; then
-    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yml >& ../kcp-playground-log.txt &
+    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
 elif [ $stage == 3 ]; then
-    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yml >& ../kcp-playground-log.txt &
+    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
 fi 
 
 #####################################################
