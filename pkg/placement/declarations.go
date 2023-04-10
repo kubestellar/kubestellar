@@ -17,10 +17,8 @@ limitations under the License.
 package placement
 
 import (
-	"context"
 	"fmt"
 	"strings"
-	"sync"
 
 	k8sevents "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -75,37 +73,46 @@ type WhatResolver func(MappingReceiver[ExternalName, WorkloadParts]) Runnable
 // using differencers constructed by a SetDifferencerConstructor.
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMappingReceiver behavior.
-type SetBinder func(workloadReceiver ProjectionMappingReceiver) (
+type SetBinder func(workloadProjector WorkloadProjector) (
 	whatReceiver MappingReceiver[ExternalName, WorkloadParts],
 	whereReceiver MappingReceiver[ExternalName, ResolvedWhere])
 
 // WorkloadProjector is kept appraised of what goes where
 // and is responsible for maintaining (a) the customized workload
 // copies in the mailbox workspaces and (b) the syncer configuration objects.
-type WorkloadProjector ProjectionMappingReceiver
-
-type ProjectionMappingReceiver TransactionalMappingReceiver[ProjectionKey, *ProjectionPerCluster]
-
-// Runnable is something that can run until a given context is closed
-type Runnable interface {
-	Run(context.Context)
+type WorkloadProjector interface {
+	Transact(func(WorkloadProjectionSections))
 }
 
-// RunAll is a Runnable that runs all the constituent Runnables
-type RunAll []Runnable
+// WorkloadProjectionSections is given, incrementally, instructions
+// for what goes where how, organized for consumption by syncers.
+// The FooDistributions are proper sets, while the
+// FooModes add dependent information for set members.
+// The booleans returned from the receivers may not be meaningful.
+type WorkloadProjectionSections struct {
+	NamespaceDistributions          SetChangeReceiver[NamespaceDistributionTuple]
+	NamespacedResourceDistributions SetChangeReceiver[NamespacedResourceDistributionTuple]
+	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NonNamespacedDistributions      SetChangeReceiver[NonNamespacedDistributionTuple]
+	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+}
 
-var _ Runnable = RunAll{}
+type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, edgeapi.SinglePlacement]
 
-func (ra RunAll) Run(ctx context.Context) {
-	var wg sync.WaitGroup
-	wg.Add(len(ra))
-	for _, runnable := range ra {
-		go func(runnable Runnable) {
-			runnable.Run(ctx)
-			wg.Done()
-		}(runnable)
-	}
-	wg.Wait()
+type NamespacedResourceDistributionTuple struct {
+	SourceCluster logicalcluster.Name
+	ProjectionModeKey
+}
+
+type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of downsynced object*/]
+
+type ProjectionModeKey struct {
+	GroupResource metav1.GroupResource
+	Destination   edgeapi.SinglePlacement
+}
+
+type ProjectionModeVal struct {
+	APIVersion string // just the version, no group
 }
 
 func GetNamespacesBuiltIntoEdgeClusters() k8ssets.String {
@@ -170,6 +177,9 @@ type WorkloadPartID struct {
 // is to be included.
 type WorkloadPartDetails struct {
 	// APIVersion is version (no group) that the source workspace prefers to serve.
+	// In the case of a namespace object: this field only applies to the namespace
+	// object itself, not the namespace contents, and is the empty string if
+	// IncludeNamespaceObject is false.
 	APIVersion string
 
 	// IncludeNamespaceObject is only interesting for a Namespace part, and
@@ -179,7 +189,7 @@ type WorkloadPartDetails struct {
 	IncludeNamespaceObject bool
 }
 
-type WorkloadPart struct {
+type WorkloadPartX struct {
 	WorkloadPartID
 	WorkloadPartDetails
 }
@@ -189,51 +199,6 @@ type WorkloadPart struct {
 type ProjectionKey struct {
 	metav1.GroupResource
 	Destination edgeapi.SinglePlacement
-}
-
-// ProjectionPerCluster is the second level of organization.
-// It identifies the API version to use currently and holds
-// the map provider that gets to the lowest level of organization.
-type ProjectionPerCluster struct {
-	// APIVersion is the version to read.  Just the version, no group included
-	APIVersion string
-
-	// PerSourceCluster drives awareness of the relevant logical clusters
-	// and the work to do for each.
-	// This provider (a) requires receivers to be comparable and (b) deduplicates
-	// additions of receivers.
-	PerSourceCluster DynamicMapProvider[logicalcluster.Name, ProjectionDetails]
-}
-
-// ProjectionDetails modulates projection
-type ProjectionDetails struct {
-
-	// For namespaced resoruces, Namespaces can optionally be non-nil to restrict
-	// the namespaces read from.
-	Namespaces *k8ssets.String
-
-	// For non-namespaced objects, Names can optionally be non-nil to restrict
-	// the objects handled.
-	Names *k8ssets.String
-}
-
-func (pd ProjectionDetails) String() string {
-	var builder strings.Builder
-	builder.WriteRune('{')
-	if pd.Namespaces != nil {
-		builder.WriteString("Namespaces: ")
-		builder.WriteString(fmt.Sprintf("%v", pd.Namespaces.List()))
-	}
-	if pd.Names != nil {
-		if pd.Namespaces != nil {
-			builder.WriteString(", ")
-		}
-		builder.WriteString("Names: ")
-		builder.WriteString(fmt.Sprintf("%v", pd.Names.List()))
-
-	}
-	builder.WriteRune('}')
-	return builder.String()
 }
 
 // SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
@@ -259,59 +224,67 @@ type SetBinderConstructor func(
 // The set differencer precedes the set difference receiver in the locking order.
 type SetDifferencerConstructor[Set any, Element comparable] func(SetChangeReceiver[Element]) Receiver[Set]
 
-type ResolvedWhatDifferencerConstructor = SetDifferencerConstructor[WorkloadParts, WorkloadPart]
+// MapDifferenceConstructor is a function that is given a receiver of map
+// differences and returns a receiver of maps that keeps track of the latest
+// map and keeps the difference receiver informed of differences as they arrive.
+// The map differencer precedes the map difference receiver in the locking order.
+type MapDifferenceConstructor[Map any, Key, Val comparable] func(MapChangeReceiver[Key, Val]) Receiver[Map]
+
+type ResolvedWhatDifferencerConstructor = MapDifferenceConstructor[WorkloadParts, WorkloadPartID, WorkloadPartDetails]
 
 type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
 
-// BindingOrganizer takes a ProjectionMappingReceiver and produces a SingleBinder
+// BindingOrganizer takes a WorkloadProjector and produces a SingleBinder
 // that takes the atomized bindings and reorganizes them and resolves
-// the API group version issue to feed the ProjectionMappingReceiver.
+// the API group version issue to feed the WorkloadProjector.
 // A SetBinder implementation will likely use one of these to drive its
-// ProjectionMappingReceiver, feeding the SingleBinder atomized changes
+// WorkloadProjector, feeding the SingleBinder atomized changes
 // from the incoming ResolvedWhat and ResolvedWhere values.
 // The given EventHandler is given events that the organizer produces
 // and publishes them somewhere.
-type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler, projectionMappingReceiver ProjectionMappingReceiver) SingleBinder
+type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes, eventHandler EventHandler, workloadProjector WorkloadProjector) SingleBinder
 
 // SingleBinder is appraised of individual bindings and unbindings,
 // but they may come in batches.
-// AddBinding calls are ordered by API machinery dependencies.
-// RemoveBinding calls are ordered by the reverse of the API machinery dependencies.
+// Add calls are ordered by API machinery dependencies.
+// Remove calls are ordered by the reverse of the API machinery dependencies.
 type SingleBinder interface {
 	// Transact does a collection of adds and removes.
 	Transact(func(SingleBindingOps))
 }
 
-type SingleBindingOps SetChangeReceiver[Pair[WorkloadPart, edgeapi.SinglePlacement]]
+type SingleBindingOps MappingReceiver[Triple[ExternalName /* of EdgePlacement object */, WorkloadPartID, edgeapi.SinglePlacement], WorkloadPartDetails]
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
 // as needed by clients.
 // This information comes from runtime monitoring of the API resources
 // of the clusters.
+// In the locking order, an resourceDiscoveryReceiver is _preceded_ by its clients.
 type APIMapProvider interface {
 	// AddClient adds a client for a cluster.
+	// The ScopedAPIProvider is set synchronously.
 	// All clients for the same cluster get the same provider.
-	AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
+	//AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
+
+	// Neither receiver is invoked synchronously.
+	AddReceivers(cluster logicalcluster.Name,
+		groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
+		resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails])
+
+	// The receiver values have to be comparable.
+	// Neither receiver is invoked synchronously.
+	RemoveReceivers(cluster logicalcluster.Name,
+		groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
+		resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails])
 
 	// RemoveClient removes a client for a cluster.
 	// Clients must be comparable.
 	// Removing the last client for a given cluster causes release of
 	// internal computational resources.
-	RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
+	//RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 }
-
-// ScopedAPIGroupVersioner is specific to one logical cluster and
-// provides a map from API group name to details about it in that cluster.
-// A nil pointer means that the group is not defined in the cluster.
-type ScopedAPIProvider DynamicMapProvider[string, *APIGroupInfo]
 
 type APIGroupInfo struct {
-	Versions  DynamicValueProvider[APIGroupVersions]
-	Resources APIResourceDetailsProvider
-}
-
-// APIGroupVersions tells about the versions available for the group.
-type APIGroupVersions struct {
 	// Versions are ordered as semantic versions.
 	// This slice is immutable.
 	Versions []metav1.GroupVersionForDiscovery
@@ -319,16 +292,11 @@ type APIGroupVersions struct {
 	PreferredVersion metav1.GroupVersionForDiscovery
 }
 
-// APIResourceDetailsProvider reveals details about the resoureces in a
-// given API group in a given cluster.
-// A resource is identified in the usual way, the lowercase plural.
-// A nil pointer means the resource is not defined there.
-type APIResourceDetailsProvider DynamicMapProvider[string, *ResourceDetails]
-
 // ResourceDetails holds the information needed here about a resource
 type ResourceDetails struct {
 	Namespaced        bool
 	SupportsInformers bool
+	PreferredVersion  string
 }
 
 // ResourceModes tells the handling of the given resource.

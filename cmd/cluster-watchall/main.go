@@ -143,15 +143,15 @@ func main() {
 
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
 
-	crdClusterInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	bindingClusterInformer := dynamicClusterInformerFactory.ForResource(kcpapis.SchemeGroupVersion.WithResource("apibindings"))
+	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapis.SchemeGroupVersion.WithResource("apibindings"))
 	dynamicClusterInformerFactory.Start(ctx.Done())
-	if !upstreamcache.WaitForCacheSync(ctx.Done(), crdClusterInformer.Informer().HasSynced, bindingClusterInformer.Informer().HasSynced) {
+	if !upstreamcache.WaitForCacheSync(ctx.Done(), crdClusterPreInformer.Informer().HasSynced, bindingClusterPreInformer.Informer().HasSynced) {
 		logger.Error(nil, "Failed to sync all-cluster dynamic informers on CRDs, APIBindings")
 		os.Exit(40)
 	}
 	acw := &allClustersWatcher{watcher, discoveryClusterClient,
-		crdClusterInformer, bindingClusterInformer, dynamicClusterClient,
+		crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient,
 		map[logicalcluster.Name]*clusterWatcher{}}
 	lcClusterInformer.AddEventHandler(acw)
 	kcpClusterInformerFactory.Start(ctx.Done())

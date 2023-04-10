@@ -18,8 +18,6 @@ package placement
 
 import (
 	"k8s.io/klog/v2"
-
-	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 func RelayWhatResolver() RelayMap[ExternalName, WorkloadParts] {
@@ -36,38 +34,24 @@ var _ Client[float64] = dummyClient[float64]{}
 
 func (dummyClient[Producer]) SetProvider(prod Producer) {}
 
-func NewDummyWorkloadProjector() WorkloadProjector {
-	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](MappingReceiverFork[ProjectionKey, *ProjectionPerCluster]{})
-}
-
 func NewLoggingWorkloadProjector(logger klog.Logger) WorkloadProjector {
-	return MappingReceiverTrivializeTransactions[ProjectionKey, *ProjectionPerCluster](loggingWorkloadProjector{logger})
+	return loggingWorkloadProjector{logger}
 }
 
 type loggingWorkloadProjector struct {
 	logger klog.Logger
 }
 
-func (lwp loggingWorkloadProjector) Put(pk ProjectionKey, ppc *ProjectionPerCluster) {
-	lwp.logger.Info("Received outer projection info", "pk", pk, "ppc", ppc)
-	if ppc != nil {
-		ppc.PerSourceCluster.AddReceiver(loggingWorkloadProjectorMid{lwp, pk}, true)
-	}
+func (lwp loggingWorkloadProjector) Transact(xn func(WorkloadProjectionSections)) {
+	xn(WorkloadProjectionSections{
+		NamespaceDistributions:          LoggingSetChangeReceiver[NamespaceDistributionTuple]{"NamespaceDistributionTuple", lwp.logger},
+		NamespacedResourceDistributions: LoggingSetChangeReceiver[NamespacedResourceDistributionTuple]{"NamespacedResourceDistributionTuple", lwp.logger},
+		NamespacedModes:                 LoggingMappingReceiver[ProjectionModeKey, ProjectionModeVal]{"NamespacedModes", lwp.logger},
+		NonNamespacedDistributions:      LoggingSetChangeReceiver[NonNamespacedDistributionTuple]{"NonNamespacedDistributions", lwp.logger},
+		NonNamespacedModes:              LoggingMappingReceiver[ProjectionModeKey, ProjectionModeVal]{"NonNamespacedModes", lwp.logger},
+	})
 }
 
-func (lwp loggingWorkloadProjector) Delete(pk ProjectionKey) {
-	lwp.logger.Info("Received outer projection deletion", "pk", pk)
-}
+type TrivialTransactor[OpsType any] struct{ Ops OpsType }
 
-type loggingWorkloadProjectorMid struct {
-	loggingWorkloadProjector
-	pk ProjectionKey
-}
-
-func (lwpm loggingWorkloadProjectorMid) Put(cluster logicalcluster.Name, pd ProjectionDetails) {
-	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster, "pd", pd)
-}
-
-func (lwpm loggingWorkloadProjectorMid) Delete(cluster logicalcluster.Name) {
-	lwpm.logger.Info("Received inner projection info", "pk", lwpm.pk, "cluster", cluster)
-}
+func (tt TrivialTransactor[OpsType]) Transact(xn func(OpsType)) { xn(tt.Ops) }

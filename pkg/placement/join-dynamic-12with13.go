@@ -27,10 +27,12 @@ import (
 // In other words, this joins the change streams of two tables to produce the change stream
 // of the join of those two tables --- in a passive stance (i.e., is in terms of the stream receivers).
 // Note: the uniformity of the input and output types means that this can be chained.
-func NewDynamicJoin12with13[ColX comparable, ColY comparable, ColZ comparable](logger klog.Logger, receiver SetChangeReceiver[Pair[ColY, ColZ]]) (SetChangeReceiver[Pair[ColX, ColY]], SetChangeReceiver[Pair[ColX, ColZ]]) {
-	projector := NewProjectIncremental[Pair[ColY, ColZ], ColX](receiver)
-	indexer := NewIndex123by23to1s(projector)
-	return NewDynamicFullJoin12with13(logger, indexer)
+func NewDynamicJoin12with13[ColX, ColY, ColZ comparable](logger klog.Logger, receiver SetChangeReceiver[Pair[ColY, ColZ]]) (SetChangeReceiver[Pair[ColX, ColY]], SetChangeReceiver[Pair[ColX, ColZ]]) {
+	indexerAsReceiver := NewSetChangeProjector[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX](
+		TripleFactorerTo23and1[ColX, ColY, ColZ](),
+		receiver,
+	)
+	return NewDynamicFullJoin12with13(logger, indexerAsReceiver)
 }
 
 // NewDynamicFullJoin12with13 is like NewDynamicJoin12with13 but passes along the set of joint values too.
@@ -45,12 +47,6 @@ func NewDynamicFullJoin12with13[ColX comparable, ColY comparable, ColZ comparabl
 	dj.xzReln = Relation2WithObservers[ColX, ColZ](dj.xzReln, extrapolateFwd1[ColX, ColZ, ColY]{dj.xyReln, TripleSetChangeReceiverReverse23[ColX, ColY, ColZ]{receiver}})
 	return dj.xyReln, dj.xzReln
 }
-
-// TripleSetChangeReceiver is given a series of changes to a set of triples
-// type TripleSetChangeReceiver[First any, Second any, Third any] interface {
-//	Add(First, Second, Third)
-// 	Remove(First, Second, Third)
-// }
 
 // dynamicJoin implements DynamicJoin.
 // It buffers the two incoming relations and passes on changes.
@@ -67,7 +63,7 @@ type extrapolateFwd1[ColX, ColY, ColZ comparable] struct {
 }
 
 func (er extrapolateFwd1[ColX, ColY, ColZ]) Add(xy Pair[ColX, ColY]) bool {
-	er.xzReln.Visit1to2(xy.First, func(z ColZ) error {
+	er.xzReln.GetIndex1to2().Visit1to2(xy.First, func(z ColZ) error {
 		er.receiver.Add(Triple[ColX, ColY, ColZ]{xy.First, xy.Second, z})
 		return nil
 	})
@@ -75,7 +71,7 @@ func (er extrapolateFwd1[ColX, ColY, ColZ]) Add(xy Pair[ColX, ColY]) bool {
 }
 
 func (er extrapolateFwd1[ColX, ColY, ColZ]) Remove(xy Pair[ColX, ColY]) bool {
-	er.xzReln.Visit1to2(xy.First, func(z ColZ) error {
+	er.xzReln.GetIndex1to2().Visit1to2(xy.First, func(z ColZ) error {
 		er.receiver.Remove(Triple[ColX, ColY, ColZ]{xy.First, xy.Second, z})
 		return nil
 	})

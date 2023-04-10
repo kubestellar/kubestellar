@@ -16,98 +16,73 @@ limitations under the License.
 
 package placement
 
-// MapRelation2 is a relation represented by two map-based indices.
+// MapRelation2 is a 2-ary relation represented by an index on the first column.
 // It is mutable.
 // It is not safe for concurrent access.
 type MapRelation2[First comparable, Second comparable] struct {
-	by1 map[First]MapSet[Second]
-	by2 map[Second]MapSet[First]
+	GenericMutableIndexedSet[Pair[First, Second], First, Second, Set[Second]]
 }
 
 var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}
 
-func NewMapRelation2[First comparable, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
-	return &MapRelation2[First, Second]{
-		by1: map[First]MapSet[Second]{},
-		by2: map[Second]MapSet[First]{},
+// NewGenericRelation2Index constructs a Relation2 that is represented
+// by an index on the first column.
+// The representation is based on golang `map`s.
+func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+	return NewGenericRelation2Index[First, Second](
+		func() MutableSet[Second] { return NewEmptyMapSet[Second]() },
+		NewMapMap[First, MutableSet[Second]](nil),
+		pairs...,
+	)
+}
+
+type MapRelation3[First, Second, Third comparable] struct {
+	GenericMutableIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
+		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]]
+}
+
+func NewMapRelation3[First, Second, Third comparable]() MapRelation3[First, Second, Third] {
+	gis := NewGenericIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
+		GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
+		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
+	](
+		TripleFactorerTo1and23[First, Second, Third](),
+		func() GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]] {
+			return NewGenericIndexedSet[Pair[Second, Third], Second, Third, MapSet[Third], Set[Third]](
+				PairFactorer[Second, Third](),
+				NewEmptyMapSet[Third],
+				func(thirds MapSet[Third]) MutableSet[Third] { return thirds },
+				func(thirds MapSet[Third]) Set[Third] { return NewSetReadonly[Third](thirds) },
+				NewMapMap[Second, MapSet[Third]](nil),
+			)
+		},
+		func(mutable23 GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]) MutableSet[Pair[Second, Third]] {
+			return mutable23
+		},
+		func(mutable23 GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]) GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]] {
+			return mutable23.AsReadonly()
+		},
+		NewMapMap[First, GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]](nil),
+	)
+	return MapRelation3[First, Second, Third]{gis}
+}
+
+func (mr MapRelation3[First, Second, Third]) Get1to2to3(first First) Index2[Second, Third, Set[Third]] {
+	inner, has := mr.GenericMutableIndexedSet.GetIndex1to2().Get(first)
+	if !has {
+		return nil
 	}
+	return inner.GetIndex1to2()
 }
 
-func (mr MapRelation2[First, Second]) IsEmpty() bool {
-	return len(mr.by1) == 0
-}
-
-func (mr MapRelation2[First, Second]) LenIsCheap() bool { return false }
-func (mr MapRelation2[First, Second]) Len() int         { return Relation2LenFromVisit[First, Second](mr) }
-
-func (mr MapRelation2[First, Second]) Has(tup Pair[First, Second]) bool {
-	seconds := mr.by1[tup.First]
-	return seconds != nil && seconds.Has(tup.Second)
-}
-
-func (mr MapRelation2[First, Second]) Visit(visitor func(Pair[First, Second]) error) error {
-	for first, seconds := range mr.by1 {
-		if err := seconds.Visit(func(second Second) error {
-			return visitor(Pair[First, Second]{first, second})
-		}); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (mr MapRelation2[First, Second]) Visit1to2(first First, visitor func(Second) error) error {
-	seconds := mr.by1[first]
-	if seconds != nil {
-		return seconds.Visit(visitor)
-	}
-	return nil
-}
-
-func (mr MapRelation2[First, Second]) Visit2to1(second Second, visitor func(First) error) error {
-	firsts := mr.by2[second]
-	if firsts != nil {
-		return firsts.Visit(visitor)
-	}
-	return nil
-}
-
-func (mr MapRelation2[First, Second]) Add(tup Pair[First, Second]) bool {
-	if addToIndex(mr.by1, tup.First, tup.Second) {
-		return addToIndex(mr.by2, tup.Second, tup.First)
-	}
-	return false
-}
-
-func addToIndex[First, Second comparable](index map[First]MapSet[Second], key First, val Second) bool {
-	vals := index[key]
-	if vals == nil {
-		vals = NewMapSet(val)
-		index[key] = vals
-		return true
-	}
-	return vals.Add(val)
-}
-
-func (mr MapRelation2[First, Second]) Remove(tup Pair[First, Second]) bool {
-	if delFromIndex(mr.by1, tup.First, tup.Second) {
-		return delFromIndex(mr.by2, tup.Second, tup.First)
-	}
-	return false
-}
-
-func delFromIndex[First, Second comparable](index map[First]MapSet[Second], key First, val Second) bool {
-	vals := index[key]
-	if vals == nil {
-		return false
-	}
-	change := vals.Remove(val)
-	if vals.IsEmpty() {
-		delete(index, key)
-	}
-	return change
-}
-
-func Relation2WithObservers[First, Second comparable](inner MutableRelation2[First, Second], observers ...SetChangeReceiver[Pair[First, Second]]) MutableRelation2[First, Second] {
-	return &relation2WithObservers[First, Second]{inner, inner, observers}
+// NewGenericRelation3Index constructs a set of triples
+// that is represented by two layers of indexing.
+// The representation is based on golang `map`s.
+func NewMapRelation3Index[First, Second, Third comparable]() *MapRelation2[First, Pair[Second, Third]] {
+	return NewGenericRelation3Index[First, Second, Third](
+		func() MutableSet[Third] { return NewEmptyMapSet[Third]() },
+		func() MutableMap[Second, MutableSet[Third]] {
+			return NewMapMap[Second, MutableSet[Third]](nil)
+		},
+		NewMapMap[First, MutableSet[Pair[Second, Third]]](nil))
 }
