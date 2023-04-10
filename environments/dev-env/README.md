@@ -27,7 +27,7 @@ git clone -b dev-env https://github.com/dumb0002/edge-mc.git
   cd edge-mc/environments/dev-env
 ```
 
-3. Experiment with the kcp-edge 2023q1 PoC example scenarios at: https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/
+3. Experiment with the kcp-edge 2023q1 PoC example scenarios:
 
 NB: if you're using a macOS, you may see pop-us messages similar to the one below while deploying kcp-edge: 
 
@@ -37,9 +37,11 @@ Do you want the application “kcp” to accept incoming network connections?
 
 You can accept it or configure your firewall to suppress them by adding our kcp-edge components to the list of permitted apps.
 
-## Stage 3:
+## Stage 3
 
-Stage 3 creates the following components:
+Stage 3 creates the following components (more details: https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/
+):
+
 
 -  the infrastructure and the edge service provider workspace and lets that react to the inventory
 -  two workloads, called “common” and “special” and in response to each EdgePlacement, the edge scheduler creates the corresponding SinglePlacementSlice object.
