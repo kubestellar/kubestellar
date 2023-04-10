@@ -18,33 +18,12 @@ do
   fi
 done
 
-
-# Find os type (supported: linux and darwin)
-get_os_type() {
-  case "$OSTYPE" in
-      darwin*)  echo "darwin" ;;
-      linux*)   echo "linux" ;;
-      *)        echo "unknown: $OSTYPE" && exit 1 ;;
-  esac
-}
-os_type=$(get_os_type)
-
-if [ $os_type == "darwin" ]; then
-    pkill kubectl-kcp-playground
-    pkill kcp
-    pkill mailbox-controller
-    pkill placement-translator
-    pkill main # edge-scheduler
-    rm -rf $(pwd)/kcp
-
-elif [ $os_type == "linux" ]; then
-    kill -9 $(pidof kubectl-kcp-playground)
-    kill -9 $(pidof kcp)
-    kill -9 $(pidof mailbox-controller)
-    pkill -f  shard-main-shard-admin # edge-scheduler
-    kill -9 $(pidof placement-translator)
-    rm -rf $(pwd)/kcp
-fi 
+pkill -f kubectl-kcp-playground
+pkill -f kcp
+pkill -f mailbox-controller
+pkill -f placement-translator
+pkill -f cmd/scheduler/main.go # edge-scheduler
+rm -rf $(pwd)/kcp
 
 if [ -f "placement-translator-log.txt" ]; then
       rm placement-translator-log.txt
@@ -68,5 +47,4 @@ if [ -f "kcp-playground-log.txt" ]; then
 fi
 
 rm -rf $(pwd)/kcp
-
 echo "Finished deletion ...."

@@ -21,14 +21,14 @@ done
 
 
 # Find os type (supported: linux and darwin)
-get_os_type() {
-  case "$OSTYPE" in
-      darwin*)  echo "darwin" ;;
-      linux*)   echo "linux" ;;
-      *)        echo "unknown: $OSTYPE" && exit 1 ;;
-  esac
-}
-os_type=$(get_os_type)
+# get_os_type() {
+#   case "$OSTYPE" in
+#       darwin*)  echo "darwin" ;;
+#       linux*)   echo "linux" ;;
+#       *)        echo "unknown: $OSTYPE" && exit 1 ;;
+#   esac
+# }
+# os_type=$(get_os_type)
 
 # Check if docker is running
 if ! docker ps > /dev/null
@@ -57,7 +57,7 @@ done
 # KCP is an older kcp-edge deployment is already running
 process_running() {
   SERVICE="$1"
-  if pgrep -x "$SERVICE" >/dev/null
+  if pgrep -f "$SERVICE" >/dev/null
   then
       echo "running"
   else
@@ -69,43 +69,30 @@ process_running() {
 if [ $(process_running kcp) == "running" ]
 then
     echo "An older deployment of kcp-playground is already running - terminating it ...."
-    if [ $os_type == "darwin" ]; then
-        pkill kubectl-kcp-playground
-        pkill kcp
-    elif [ $os_type == "linux" ]; then
-        kill -9 $(pidof kubectl-kcp-playground)
-        kill -9 $(pidof kcp)
-    fi 
+    pkill -f kubectl-kcp-playground
+    pkill -f kcp
 fi
 
 # Check mailbox-controller is already running
 if [ $(process_running mailbox-controller) == "running" ]
 then
     echo "An older deployment of mailbox-controller is already running - terminating it ...."
-    if [ $os_type == "darwin" ]; then
-        pkill mailbox-controller
-    elif [ $os_type == "linux" ]; then
-        kill -9 $(pidof mailbox-controller)
-    fi 
+    pkill -f mailbox-controller
 fi
 
 # Check edge-scheduler is already running
-if [ $(process_running main) == "running" ]
+if [ $(process_running cmd/scheduler/main.go) == "running" ]
 then
     echo "An older deployment of edge-scheduler is already running - terminating it ...."
     #ps xu | grep scheduler/main.go | grep -v grep | awk '{ print $2 }' | xargs kill -9
-    pkill -f  shard-main-shard-admin
+    pkill -f cmd/scheduler/main.go
 fi
 
 # Check placement-translator is already running
 if [ $(process_running placement-translator) == "running" ]
 then
     echo "An older deployment of placement-translator is already running - terminating it ...."
-    if [ $os_type == "darwin" ]; then
-        pkill placement-translator
-    elif [ $os_type == "linux" ]; then
-        kill -9 $(pidof placement-translator)
-    fi 
+    pkill -f placement-translator
 fi
 
 
@@ -256,7 +243,7 @@ if [ $stage -gt 1 ]; then
     sleep 3
     kubectl ws root:espw
     go run cmd/scheduler/main.go -v 2 --root-user shard-main-kcp-admin  --root-cluster shard-main-root  --sysadm-context shard-main-system:admin  --sysadm-user shard-main-shard-admin >& environments/dev-env/edge-scheduler-log.txt &
-    message=$(wait_for_process main)
+    message=$(wait_for_process  cmd/scheduler/main.go)
     
     run_status=$(wait_for_process main)
     if [ $run_status -eq 0 ]; then
