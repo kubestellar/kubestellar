@@ -1,0 +1,91 @@
+---
+apiVersion: test.kcp.io/v1alpha1
+kind: Playground
+spec:
+  shards:
+    - name: main
+      workspaces:
+        - name: root
+          workspaces:
+            # Stage 1
+            - name: imw-1
+              others:
+                - name: sync-target-f
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/sync-target-f.yaml
+                - name: sync-target-g
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/sync-target-g.yaml
+              Locations:
+                - name: location-f
+                  labels:
+                    env: prod
+                  instanceSelector:
+                    matchLabels:
+                      example: "yes"
+                      extended: "no"
+                - name: location-g
+                  labels:
+                    env: prod
+                    extended: "yes"
+                  instanceSelector:
+                    matchLabels: 
+                      example: "yes"
+                      extended: "yes"
+            - name: espw
+              others:
+                - name: edge-CRDs
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/edge_crds.yaml
+                - name: edge-Exports
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/edge_exports.yaml
+            # Stage 2
+            - name: wmw-c
+              apiBindings:
+                - name: bind-kube
+                  apiExport:
+                    name: kubernetes
+                    path: "root:compute"
+                - name: bind-edge
+                  apiExport:
+                    name: edge.kcp.io
+                    path: "root:espw"
+              others:
+                - name: common_workload
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/common_workload.yaml
+                - name: edge-placement-c
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/edge-placement-c.yaml
+            - name: wmw-s
+              apiBindings:
+                - name: bind-kube
+                  apiExport:
+                    name: kubernetes
+                    path: "root:compute"
+                - name: bind-edge
+                  apiExport:
+                    name: edge.kcp.io
+                    path: "root:espw"
+              others:
+                - name: special_workload
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/special_workload.yaml
+                - name: edge-placement-s
+                  source:
+                    file:
+                      path: test/kubectl-kcp-playground/examples/kcp-edge/edge-placement-s.yaml
+
+  pClusters:
+    - name: florin
+      type: kind
+    - name: guilder
+      type: kind

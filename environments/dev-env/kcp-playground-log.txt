@@ -1,0 +1,22 @@
+Starting KCP playground 🛝...
+ 🔹 Adding KCP shard 'main' 🏈...
+--- FAIL: start playground (0.14s)
+    start.go:85: Starting kcp servers...
+    kcp.go:626: running: go run /Users/brauliodumba/Documents/Projects/edge-computing/edge-computing/challenge4900/kcp-edge/repo/edge-mc/environments/dev-env/kcp/cmd/kcp start --root-directory .kcp-playground/kcp/main --secure-port=57672 --embedded-etcd-client-port=57673 --embedded-etcd-peer-port=57674 --embedded-etcd-wal-size-bytes=5000 --kubeconfig-path=.kcp-playground/kcp/main/admin.kubeconfig --feature-gates=CustomResourceValidationExpressions=true --audit-log-path .kcp-playground/artifacts/kcp/main/kcp.audit --audit-policy-file /var/folders/_r/vzlprh1s6mq29yz2mrmk4wnc0000gn/T/start playground616373225/001/audit-policy.yaml
+    kcp.go:751: `kcp` failed: exit status 1 logs:
+        go: no packages loaded from /Users/brauliodumba/Documents/Projects/edge-computing/edge-computing/challenge4900/kcp-edge/repo/edge-mc/environments/dev-env/kcp/cmd/kcp
+    kcp.go:752: `kcp` failed: exit status 1
+    kcp.go:373: 
+        	Error Trace:	kcp.go:373
+        	            				asm_amd64.s:1594
+        	Error:      	Received unexpected error:
+        	            	failed to load admin kubeconfig: timed out waiting for the condition
+        	Test:       	start playground
+        	Messages:   	error loading config
+    kcp.go:218: PROMETHEUS_URL environment variable unset, skipping Prometheus scrape config generation
+    start.go:85: Fixture setup failed: one or more servers did not become ready
+    kcp.go:738: Saw an error trying to kill `kcp`: no such process
+    kcp.go:613: cleanup: canceling context
+    kcp.go:617: cleanup: waiting for shutdownComplete
+    kcp.go:621: cleanup: received shutdownComplete
+FAIL

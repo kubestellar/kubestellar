@@ -1,0 +1,9 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: edge-placement-s
+spec:
+  locationSelectors:
+  - matchLabels: {"env":"prod","extended":"si"}
+  namespaceSelector: 
+    matchLabels: {"special":"si"}
