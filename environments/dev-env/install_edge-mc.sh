@@ -282,4 +282,5 @@ export KUBECONFIG=$(pwd)/kcp/.kcp-playground/playground.kubeconfig
 
 echo "KCP-Edge dev-env successfully started"
 echo "To start using the KCP-Edge dev-env: "
-echo "   export KUBECONFIG=kcp/.kcp-playground/playground.kubeconfig"
+echo '   export KUBECONFIG="$(pwd)/kcp/.kcp-playground/playground.kubeconfig"'
+echo '   export PATH="$PATH:$(pwd)/kcp/bin"'
