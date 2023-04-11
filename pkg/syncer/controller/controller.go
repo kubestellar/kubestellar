@@ -22,8 +22,6 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
@@ -31,12 +29,7 @@ import (
 	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
-)
-
-const (
-	controllerName = "kcp-edge-syncconfig-controller"
 )
 
 // NewSyncConfigController returns a controller watching a [edge.kcp.io.EdgeSyncConfig] and update down/up syncer,
@@ -50,13 +43,20 @@ func NewSyncConfigController(
 ) (*controller, error) {
 	rateLimitter := workqueue.NewItemFastSlowRateLimiter(reconcileInterval, reconcileInterval*5, 1000)
 	c := &controller{
-		queue:                       workqueue.NewNamedRateLimitingQueue(rateLimitter, controllerName),
-		syncConfigLister:            syncConfigInformer.Lister(),
-		syncConfigInformerHasSynced: syncConfigInformer.Informer().HasSynced,
-		syncConfigClient:            syncConfigClient,
-		upSyncer:                    upSyncer,
-		downSyncer:                  downSyncer,
+		syncConfigLister: syncConfigInformer.Lister(),
+		syncConfigClient: syncConfigClient,
+		upSyncer:         upSyncer,
+		downSyncer:       downSyncer,
 	}
+	controllerName := "kcp-edge-syncconfig-controller"
+	controllerBase := &controllerBase{
+		name:              controllerName,
+		target:            "SyncConfig",
+		queue:             workqueue.NewNamedRateLimitingQueue(rateLimitter, controllerName),
+		informerHasSynced: syncConfigInformer.Informer().HasSynced,
+		process:           c.process,
+	}
+	c.controllerBase = controllerBase
 	syncConfigInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
 			key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
@@ -67,9 +67,9 @@ func NewSyncConfigController(
 			return err == nil
 		},
 		Handler: cache.ResourceEventHandlerFuncs{
-			AddFunc:    func(obj interface{}) { c.enqueueSyncConfig(obj, logger) },
-			UpdateFunc: func(old, obj interface{}) { c.enqueueSyncConfig(obj, logger) },
-			DeleteFunc: func(obj interface{}) { c.enqueueSyncConfig(obj, logger) },
+			AddFunc:    func(obj interface{}) { c.enqueue(obj, logger) },
+			UpdateFunc: func(old, obj interface{}) { c.enqueue(obj, logger) },
+			DeleteFunc: func(obj interface{}) { c.enqueue(obj, logger) },
 		},
 	})
 
@@ -78,77 +78,11 @@ func NewSyncConfigController(
 
 // controller is a control loop that watches EdgeSyncConfig.
 type controller struct {
-	queue                       workqueue.RateLimitingInterface
-	syncConfigLister            edgev1alpha1listers.EdgeSyncConfigLister
-	syncConfigInformerHasSynced cache.InformerSynced
-	syncConfigClient            edgev1alpha1typed.EdgeSyncConfigInterface
-	upSyncer                    syncers.SyncerInterface
-	downSyncer                  syncers.SyncerInterface
-}
-
-// Ready returns true if the controller is ready to return the GVRs to sync.
-// It implements [informer.GVRSource.Ready].
-func (c *controller) Ready() bool {
-	return c.syncConfigInformerHasSynced()
-}
-
-func (c *controller) enqueueSyncConfig(obj interface{}, logger klog.Logger) {
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
-
-	shared.WithQueueKey(logger, key).V(2).Info("queueing SyncConfig")
-	c.queue.Add(key)
-}
-
-// Run the controller workers.
-func (c *controller) Run(ctx context.Context, numThreads int) {
-	defer runtime.HandleCrash()
-	defer c.queue.ShutDown()
-
-	logger := shared.WithReconciler(klog.FromContext(ctx), controllerName)
-	ctx = klog.NewContext(ctx, logger)
-	logger.Info("Starting controller")
-	defer logger.Info("Shutting down controller")
-
-	for i := 0; i < numThreads; i++ {
-		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
-	}
-
-	<-ctx.Done()
-}
-
-func (c *controller) runWorker(ctx context.Context) {
-	for c.processNextWorkItem(ctx) {
-	}
-}
-
-func (c *controller) processNextWorkItem(ctx context.Context) bool {
-	// Wait until there is a new item in the working queue
-	k, quit := c.queue.Get()
-	if quit {
-		return false
-	}
-	key := k.(string)
-
-	logger := klog.FromContext(ctx).WithValues("key", key)
-	ctx = klog.NewContext(ctx, logger)
-	logger.V(1).Info("processing key")
-
-	// No matter what, tell the queue we're done with this key, to unblock
-	// other workers.
-	defer c.queue.Done(key)
-
-	if err := c.process(ctx, key); err != nil {
-		runtime.HandleError(fmt.Errorf("%q controller failed to sync %q, err: %w", controllerName, key, err))
-		c.queue.AddRateLimited(key)
-		return true
-	}
-
-	c.queue.Forget(key)
-	return true
+	*controllerBase
+	syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister
+	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface
+	upSyncer         syncers.SyncerInterface
+	downSyncer       syncers.SyncerInterface
 }
 
 func (c *controller) process(ctx context.Context, key string) error {
