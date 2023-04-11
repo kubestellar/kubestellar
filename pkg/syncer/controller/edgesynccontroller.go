@@ -32,17 +32,17 @@ import (
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
 
-// NewSyncConfigController returns a controller watching a [edge.kcp.io.EdgeSyncConfig] and update down/up syncer,
-func NewSyncConfigController(
+// NewEdgeSyncConfigController returns a edgeSyncConfigController watching a [edge.kcp.io.EdgeSyncConfig] and update down/up syncer,
+func NewEdgeSyncConfigController(
 	logger klog.Logger,
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,
 	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
 	upSyncer syncers.SyncerInterface,
 	downSyncer syncers.SyncerInterface,
 	reconcileInterval time.Duration,
-) (*controller, error) {
+) (*edgeSyncConfigController, error) {
 	rateLimitter := workqueue.NewItemFastSlowRateLimiter(reconcileInterval, reconcileInterval*5, 1000)
-	c := &controller{
+	c := &edgeSyncConfigController{
 		syncConfigLister: syncConfigInformer.Lister(),
 		syncConfigClient: syncConfigClient,
 		upSyncer:         upSyncer,
@@ -76,8 +76,8 @@ func NewSyncConfigController(
 	return c, nil
 }
 
-// controller is a control loop that watches EdgeSyncConfig.
-type controller struct {
+// edgeSyncConfigController is a control loop that watches EdgeSyncConfig.
+type edgeSyncConfigController struct {
 	*controllerBase
 	syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface
@@ -85,7 +85,7 @@ type controller struct {
 	downSyncer       syncers.SyncerInterface
 }
 
-func (c *controller) process(ctx context.Context, key string) error {
+func (c *edgeSyncConfigController) process(ctx context.Context, key string) error {
 	logger := klog.FromContext(ctx)
 
 	_, name, err := cache.SplitMetaNamespaceKey(key)

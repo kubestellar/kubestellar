@@ -205,7 +205,7 @@ func TestSyncConfig(t *testing.T) {
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
 			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
+			controller, err := NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigInformer, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
 			require.NoError(t, err)
 
 			syncConfigInformerFactory.Start(ctx.Done())
