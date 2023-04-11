@@ -40,7 +40,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			workloadProjector: workloadProjector,
 			perSourceCluster:  NewMapMap[logicalcluster.Name, *simpleBindingPerCluster](nil),
 		}
-		namespaceDistributionsRelay := SetChangeReceiverFuncs[NamespaceDistributionTuple]{
+		namespaceDistributionsRelay := SetWriterFuncs[NamespaceDistributionTuple]{
 			OnAdd: func(tup NamespaceDistributionTuple) bool {
 				logger.V(4).Info("NamespaceDistributionTuple added", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespaceDistributions.Add(tup)
@@ -49,7 +49,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 				logger.V(4).Info("NamespaceDistributionTuple removed", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespaceDistributions.Remove(tup)
 			}}
-		namespacedResourceDistributionRelay := SetChangeReceiverFuncs[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]]{
+		namespacedResourceDistributionRelay := SetWriterFuncs[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]]{
 			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
 				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
 				logger.V(4).Info("NamespacedResourceDistributionTuple added", "tuple", tup)
@@ -89,7 +89,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement, ProjectionModeVal](
 			logger, nsCommon)
 		sbo.resourceDiscoveryReceiver = rscDisco
-		nsSrcAndDestAndLog := NewSetChangeReceiverFuncs( // logging and the ability to set breakpoints
+		nsSrcAndDestAndLog := NewSetWriterFuncs( // logging and the ability to set breakpoints
 			func(elt Pair[logicalcluster.Name, edgeapi.SinglePlacement]) bool {
 				news := nsSrcAndDest.Add(elt)
 				logger.V(4).Info("Add to nsSrcAndDest", "tuple", elt, "news", news)
@@ -102,15 +102,15 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		)
 
-		nsToGoLoseNamespace := NewSetChangeProjector[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
+		nsToGoLoseNamespace := NewSetChangeProjectorByMapMap[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
 			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement](), nsSrcAndDestAndLog)
 
-		nsToGo := SetChangeReceiverFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
+		nsToGo := SetWriterFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
 
-		sbo.namespacedWhatWhereFull = NewSetChangeProjector[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/](
+		sbo.namespacedWhatWhereFull = NewSetChangeProjectorByMapMap[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/](
 			factorNamespacedWhatWhereFullKey, nsToGo)
 
-		clusterDistributionsReceiver := SetChangeReceiverFuncs[NonNamespacedDistributionTuple]{
+		clusterDistributionsReceiver := SetWriterFuncs[NonNamespacedDistributionTuple]{
 			OnAdd: func(nnd NonNamespacedDistributionTuple) bool {
 				return sbo.workloadProjectionSections.NonNamespacedDistributions.Add(nnd)
 			},
@@ -137,11 +137,11 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		)
 		// ctSansEPName receives the change stream of clusterWhatWhereFull with epName projected out,
 		// and passes it along to clusterDistributionsReceiver and aggregateForCluster.
-		var ctSansEPName MapChangeReceiver[NonNamespacedDistributionTuple, ProjectionModeVal] = MapChangeReceiverFork[NonNamespacedDistributionTuple, ProjectionModeVal]{
-			MapKeySetReceiver[NonNamespacedDistributionTuple, ProjectionModeVal](clusterDistributionsReceiver),
-			MappingReceiverDiscardsPrevious[NonNamespacedDistributionTuple, ProjectionModeVal](aggregateForCluster),
+		var ctSansEPName MappingReceiver[NonNamespacedDistributionTuple, ProjectionModeVal] = MappingReceiverFork[NonNamespacedDistributionTuple, ProjectionModeVal]{
+			MapKeySetReceiverLossy[NonNamespacedDistributionTuple, ProjectionModeVal](clusterDistributionsReceiver),
+			aggregateForCluster,
 		}
-		pickVersionForEP := func(versions MutableMap[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
+		pickVersionForEP := func(versions Map[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
 			var version ProjectionModeVal
 			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
 				version = pair.Second
@@ -154,20 +154,16 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		// clusterChangeReceiver receives the change stream of the full map and projects out the EdgePlacement
 		// object name to feed to sansEPName.
 		// This is relatively simple because the API version does not vary for a given resource and source cluster.
-		clusterChangeReceiver := MapChangeReceiverFuncs[NonNamespacedDistributionTuple, MutableMap[string /*epName*/, ProjectionModeVal]]{
-			OnCreate: func(nndt NonNamespacedDistributionTuple, versions MutableMap[string /*epName*/, ProjectionModeVal]) {
+		clusterChangeReceiver := MappingReceiverFuncs[NonNamespacedDistributionTuple, Map[string /*epName*/, ProjectionModeVal]]{
+			OnPut: func(nndt NonNamespacedDistributionTuple, versions Map[string /*epName*/, ProjectionModeVal]) {
 				version, ok := pickVersionForEP(versions)
 				if !ok {
 					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
 				}
-				ctSansEPName.Create(nndt, version)
+				ctSansEPName.Put(nndt, version)
 			},
-			OnDelete: func(nndt NonNamespacedDistributionTuple, versions MutableMap[string /*epName*/, ProjectionModeVal]) {
-				version, ok := pickVersionForEP(versions)
-				if !ok {
-					sbo.logger.Error(nil, "Impossible: removal of empty version map", "nndt", nndt)
-				}
-				ctSansEPName.DeleteWithFinal(nndt, version)
+			OnDelete: func(nndt NonNamespacedDistributionTuple) {
+				ctSansEPName.Delete(nndt)
 			},
 		}
 		// clusterWhatWhereFull is a map from ClusterWhatWhereFullKey to API version (no group),
@@ -175,12 +171,36 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, string /* ep name */, ProjectionModeVal](
 			factorClusterWhatWhereFullKey,
 			nil,
-			clusterChangeReceiver,
 			nil,
+			clusterChangeReceiver,
 		)
+
+		upsyncsRelay := SetWriterFuncs[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]]{
+			OnAdd: func(tup Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]) bool {
+				logger.V(4).Info("Upsyncs added", "tuple", tup)
+				return sbo.workloadProjectionSections.Upsyncs.Add(tup)
+			},
+			OnRemove: func(tup Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]) bool {
+				logger.V(4).Info("Upsyncs removed", "tuple", tup)
+				return sbo.workloadProjectionSections.Upsyncs.Remove(tup)
+			}}
+		sbo.upsyncsFull = NewSetChangeProjectorByHashMap[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement],
+			Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */](
+			factorUpsyncTuple,
+			upsyncsRelay,
+			PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+			HashExternalName)
 		return sbo
 	}
 }
+
+var factorUpsyncTuple = NewFactorer(
+	func(whole Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) Pair[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */] {
+		return NewPair(NewPair(whole.Third, whole.Second), whole.First)
+	},
+	func(parts Pair[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */]) Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement] {
+		return NewTriple(parts.Second, parts.First.Second, parts.First.First) // cdr, cdar, caar
+	})
 
 // simpleBindingOrganizer is the top-level data structure of the organizer.
 // In the locking order it precedes its discovery and its projectionMapProvider,
@@ -235,7 +255,17 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 // clusterDistributionsReceiver <- ctSansEPName.Keys()
 // ctSansEPName <- WhatWheres.ProjectOut(epName)
 //
-// Not implemented yet: namespaced objects.
+// For the upsyncs, as a SingleBinder this organizer is given the stream of changes
+// to the following relation:
+// - WhatWheres: set of ((epCluster,epName),UpsyncSet,destination)
+// and produces the change stream to the following relation:
+// - upsyncs: set of (UpsyncSet,destination)
+//
+// In relational algebra, the desired computation is as follows.
+// upsyncs = WhatWheres.ProjectOut((epCluster,epName))
+//
+// The query plan is as follows.
+// upsyncsRelay <- WhatWheres.ProjectOut((epCluster,epName))
 type simpleBindingOrganizer struct {
 	logger        klog.Logger
 	discovery     APIMapProvider
@@ -255,7 +285,8 @@ type simpleBindingOrganizer struct {
 	// only be invoked during a transaction.
 
 	clusterWhatWhereFull      MappingReceiver[ClusterWhatWhereFullKey, ProjectionModeVal]
-	namespacedWhatWhereFull   SetChangeReceiver[NamespacedWhatWhereFullKey]
+	namespacedWhatWhereFull   SetWriter[NamespacedWhatWhereFullKey]
+	upsyncsFull               SetWriter[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]]
 	resourceDiscoveryReceiver MappingReceiver[ResourceDiscoveryKey, ProjectionModeVal]
 }
 
@@ -347,16 +378,24 @@ type NamespacedWhatWhereFullKey = Triple[ExternalName, NamespaceName, edgeapi.Si
 // ClusterWhatWhereFullKey is (EdgePlacement id, (resource, object name), destination)
 type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], edgeapi.SinglePlacement]
 
-func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps)) {
+func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps, UpsyncOps)) {
 	sbo.Lock()
 	defer sbo.Unlock()
 	sbo.logger.V(3).Info("Begin transaction")
 	sbo.workloadProjector.Transact(func(wps WorkloadProjectionSections) {
 		sbo.workloadProjectionSections = wps
-		xn(sboXnOps{sbo})
+		xn(sboXnOps{sbo}, sbo.receiveUpsyncChange)
 		sbo.workloadProjectionSections = WorkloadProjectionSections{}
 	})
 	sbo.logger.V(3).Info("End transaction")
+}
+
+func (sbo *simpleBindingOrganizer) receiveUpsyncChange(add bool, tup Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) {
+	if add {
+		sbo.upsyncsFull.Add(tup)
+	} else {
+		sbo.upsyncsFull.Remove(tup)
+	}
 }
 
 // sboXnOps exposes the SingleBindingOps behavior, in the locked context of a transaction
@@ -392,7 +431,11 @@ func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, edgeapi.Sing
 	}
 	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, tup.Second.Name}, tup.Third}
 	sbo.clusterWhatWhereFull.Delete(key)
-	sbo.discovery.RemoveReceivers(sbc.cluster, &sbc.groupReceiver, &sbc.resourceReceiver)
+	if false {
+		// TODO: make this happen iff there is no remaining data for the cluster
+		sbo.logger.V(4).Info("Removing discovery receivers", "cluster", sbc.cluster)
+		sbo.discovery.RemoveReceivers(sbc.cluster, &sbc.groupReceiver, &sbc.resourceReceiver)
+	}
 }
 
 func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name, want bool) *simpleBindingPerCluster {
@@ -405,6 +448,7 @@ func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name,
 		sbo.perSourceCluster.Put(cluster, sbc)
 		sbc.groupReceiver.MappingReceiver = sbcGroupReceiver{sbc}
 		sbc.resourceReceiver.MappingReceiver = sbcResourceReceiver{sbc}
+		sbo.logger.V(4).Info("Adding discovery receivers", "cluster", sbc.cluster)
 		sbo.discovery.AddReceivers(cluster, &sbc.groupReceiver, &sbc.resourceReceiver)
 	}
 	return sbc
@@ -441,6 +485,7 @@ func (srr sbcResourceReceiver) Put(gr metav1.GroupResource, details ResourceDeta
 	defer sbc.Unlock()
 	sbc.workloadProjector.Transact(func(ops WorkloadProjectionSections) {
 		sbc.workloadProjectionSections = ops
+		sbc.logger.V(4).Info("sbcResourceReceiver.Put", "cluster", sbc.cluster, "gr", gr, "good", good, "details", details)
 		if good {
 			sbc.resourceDiscoveryReceiver.Put(key, ProjectionModeVal{details.PreferredVersion})
 		} else {
@@ -457,6 +502,7 @@ func (srr sbcResourceReceiver) Delete(gr metav1.GroupResource) {
 	defer sbc.Unlock()
 	sbc.workloadProjector.Transact(func(ops WorkloadProjectionSections) {
 		sbc.workloadProjectionSections = ops
+		sbc.logger.V(4).Info("sbcResourceReceiver.Delete", "cluster", sbc.cluster, "gr", gr)
 		sbc.resourceDiscoveryReceiver.Delete(key)
 		sbc.workloadProjectionSections = WorkloadProjectionSections{}
 	})

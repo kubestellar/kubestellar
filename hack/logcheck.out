@@ -2,5 +2,5 @@
 /cmd/kcp-watchall/main.go:103:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/mailbox-controller/main.go:85:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/placement-translator/main.go:115:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
-/pkg/placement/workload-projector.go:244:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-/pkg/placement/workload-projector.go:265:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:267:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:289:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }

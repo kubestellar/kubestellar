@@ -65,13 +65,13 @@ func NewPair2Then1[First any, Second any](second Second) func(First) Pair[First,
 	}
 }
 
-type Triple[First, Second, Third comparable] struct {
+type Triple[First, Second, Third any] struct {
 	First  First
 	Second Second
 	Third  Third
 }
 
-func NewTriple[First, Second, Third comparable](first First, second Second, third Third) Triple[First, Second, Third] {
+func NewTriple[First, Second, Third any](first First, second Second, third Third) Triple[First, Second, Third] {
 	return Triple[First, Second, Third]{first, second, third}
 }
 
@@ -89,13 +89,13 @@ func (tup Triple[First, Second, Third]) String() string {
 
 // Rotator is something that can change one value into an equivalent value and back again.
 // To understand the name, think of something that can rotate (forward and back) a point in some coordinate system.
-type Rotator[Original, Rotated comparable] Pair[func(Original) Rotated, func(Rotated) Original]
+type Rotator[Original, Rotated any] Pair[func(Original) Rotated, func(Rotated) Original]
 
 func (rr Rotator[Original, Rotated]) Reverse() Rotator[Rotated, Original] {
 	return Rotator[Rotated, Original]{rr.Second, rr.First}
 }
 
-func NoRotation[Original comparable]() Rotator[Original, Original] {
+func NoRotation[Original any]() Rotator[Original, Original] {
 	return Rotator[Original, Original]{
 		First:  Identity1[Original],
 		Second: Identity1[Original],
@@ -103,9 +103,9 @@ func NoRotation[Original comparable]() Rotator[Original, Original] {
 }
 
 // Factorer is a Rotator that converts from some Whole type to some Pair type (and back)
-type Factorer[Whole, PartA, PartB comparable] Rotator[Whole, Pair[PartA, PartB]]
+type Factorer[Whole, PartA, PartB any] Rotator[Whole, Pair[PartA, PartB]]
 
-func NewFactorer[Whole, PartA, PartB comparable](forward func(Whole) Pair[PartA, PartB], reverse func(Pair[PartA, PartB]) Whole) Factorer[Whole, PartA, PartB] {
+func NewFactorer[Whole, PartA, PartB any](forward func(Whole) Pair[PartA, PartB], reverse func(Pair[PartA, PartB]) Whole) Factorer[Whole, PartA, PartB] {
 	return Factorer[Whole, PartA, PartB]{forward, reverse}
 }
 
@@ -118,14 +118,14 @@ func (factoring Factorer[Whole, PartA, PartB]) Unfactor(partA PartA, partB PartB
 	return factoring.Second(Pair[PartA, PartB]{partA, partB})
 }
 
-func PairFactorer[PartA, PartB comparable]() Factorer[Pair[PartA, PartB], PartA, PartB] {
+func PairFactorer[PartA, PartB any]() Factorer[Pair[PartA, PartB], PartA, PartB] {
 	return Factorer[Pair[PartA, PartB], PartA, PartB]{
 		First:  Identity1[Pair[PartA, PartB]],
 		Second: Identity1[Pair[PartA, PartB]],
 	}
 }
 
-func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX] {
+func TripleFactorerTo23and1[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX] {
 	return Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX]{
 		First: func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColY, ColZ], ColX] {
 			return Pair[Pair[ColY, ColZ], ColX]{Pair[ColY, ColZ]{tup.Second, tup.Third}, tup.First}
@@ -136,7 +136,7 @@ func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 	}
 }
 
-func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
+func TripleFactorerTo13and2[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
 	return NewFactorer(
 		func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColX, ColZ], ColY] {
 			return NewPair(NewPair(tup.First, tup.Third), tup.Second)
@@ -146,7 +146,7 @@ func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 		})
 }
 
-func TripleFactorerTo1and23[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], ColX, Pair[ColY, ColZ]] {
+func TripleFactorerTo1and23[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], ColX, Pair[ColY, ColZ]] {
 	return NewFactorer(
 		func(tup Triple[ColX, ColY, ColZ]) Pair[ColX, Pair[ColY, ColZ]] {
 			return NewPair(tup.First, NewPair(tup.Second, tup.Third))

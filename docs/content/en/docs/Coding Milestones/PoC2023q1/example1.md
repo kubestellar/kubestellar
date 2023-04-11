@@ -338,6 +338,14 @@ spec:
   - matchLabels: {"env":"prod"}
   namespaceSelector:
     matchLabels: {"common":"si"}
+  upsync:
+  - apiGroup: "greoup1.test"
+    resources: ["sprockets", "flanges"]
+    namespaces: ["orbital"]
+    names: ["george", "cosmo"]
+  - apiGroup: "group2.test"
+    resources: ["cogs"]
+    names: ["William"]
 EOF
 ```
 
@@ -458,6 +466,14 @@ spec:
   - matchLabels: {"env":"prod","extended":"si"}
   namespaceSelector: 
     matchLabels: {"special":"si"}
+  upsync:
+  - apiGroup: "greoup1.test"
+    resources: ["sprockets", "flanges"]
+    namespaces: ["orbital"]
+    names: ["george", "cosmo"]
+  - apiGroup: "group3.test"
+    resources: ["widgets"]
+    names: ["*"]
 EOF
 ```
 

@@ -31,6 +31,7 @@ import (
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
@@ -124,15 +125,15 @@ func (pt *placementTranslator) Run() {
 		os.Exit(100)
 	}
 
-	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
-		fork := MappingReceiverFork[ExternalName, WorkloadParts]{NewLoggingMappingReceiver[ExternalName, WorkloadParts]("what", logger), mr}
+	whatResolver := func(mr MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
+		fork := MappingReceiverFork[ExternalName, ResolvedWhat]{NewLoggingMappingReceiver[ExternalName, ResolvedWhat]("what", logger), mr}
 		return pt.whatResolver(fork)
 	}
 	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
 		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{NewLoggingMappingReceiver[ExternalName, ResolvedWhere]("where", logger), mr}
 		return pt.whereResolver(fork)
 	}
-	setBinder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+	setBinder := NewSetBinder(logger, NewWorkloadPartsDifferencer, NewUpsyncDifferencer, NewResolvedWhereDifferencer,
 		SimpleBindingOrganizer(logger),
 		pt.apiProvider,
 		DefaultResourceModes, // TODO: replace with configurable
@@ -144,4 +145,8 @@ func (pt *placementTranslator) Run() {
 	go pt.apiProvider.Run(ctx)       // TODO: also wait for this to finish
 	go pt.workloadProjector.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
+}
+
+func NewUpsyncDifferencer(eltReceiver SetChangeReceiver[edgeapi.UpsyncSet]) Receiver[ /*immutable*/ []edgeapi.UpsyncSet] {
+	return NewSliceDifferencerParametric(UpsyncSetEqual, eltReceiver, nil)
 }

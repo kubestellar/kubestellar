@@ -19,19 +19,30 @@ package placement
 // MapRelation2 is a 2-ary relation represented by an index on the first column.
 // It is mutable.
 // It is not safe for concurrent access.
-type MapRelation2[First comparable, Second comparable] struct {
+type MapRelation2[First, Second any] struct {
 	GenericMutableIndexedSet[Pair[First, Second], First, Second, Set[Second]]
 }
 
 var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}
 
-// NewGenericRelation2Index constructs a Relation2 that is represented
+// NewMapRelation2 constructs a Relation2 that is represented
 // by an index on the first column.
 // The representation is based on golang `map`s.
 func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
 	return NewGenericRelation2Index[First, Second](
 		func() MutableSet[Second] { return NewEmptyMapSet[Second]() },
 		NewMapMap[First, MutableSet[Second]](nil),
+		pairs...,
+	)
+}
+
+// NewHashRelation2 constructs a Relation2 that is represented
+// by an index on the first column.
+// The representation is based on HashMaps.
+func NewHashRelation2[First, Second any](hashDomainFirst HashDomain[First], hashDomainSecond HashDomain[Second], pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+	return NewGenericRelation2Index[First, Second](
+		func() MutableSet[Second] { return NewHashSet(hashDomainSecond) },
+		NewHashMap[First, MutableSet[Second]](hashDomainFirst)(nil),
 		pairs...,
 	)
 }

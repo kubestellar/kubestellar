@@ -73,17 +73,17 @@ func (rw ResolvedWhere) Visit(visitor func(edgeapi.SinglePlacement) error) error
 }
 
 var _ ResolvedWhereDifferencerConstructor = NewResolvedWhereDifferencer
-var _ ResolvedWhatDifferencerConstructor = NewResolvedWhatDifferencer
+var _ DownsyncsDifferencerConstructor = NewWorkloadPartsDifferencer
 
-func NewResolvedWhereDifferencer(eltChangeReceiver SetChangeReceiver[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
+func NewResolvedWhereDifferencer(eltChangeReceiver SetWriter[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
 	return NewSetDifferenceByMapAndEnum[ResolvedWhere, edgeapi.SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
 }
 
-func NewResolvedWhatDifferencer(mappingReceiver MapChangeReceiver[WorkloadPartID, WorkloadPartDetails]) Receiver[WorkloadParts] {
+func NewWorkloadPartsDifferencer(mappingReceiver MapChangeReceiver[WorkloadPartID, WorkloadPartDetails]) Receiver[WorkloadParts] {
 	return NewMapDifferenceByMapAndEnum[WorkloadParts, WorkloadPartID, WorkloadPartDetails](ResolvedWhatAsVisitable, mappingReceiver)
 }
 
-func NewSetDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(SetType) Visitable[Elt], eltChangeReceiver SetChangeReceiver[Elt]) Receiver[SetType] {
+func NewSetDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(SetType) Visitable[Elt], eltChangeReceiver SetWriter[Elt]) Receiver[SetType] {
 	return setDifferenceByMapAndEnum[SetType, Elt]{
 		visitablize:       visitablize,
 		eltChangeReceiver: eltChangeReceiver,
@@ -100,7 +100,7 @@ func NewMapDifferenceByMapAndEnum[MapType any, Key, Val comparable](visitablize 
 
 type setDifferenceByMapAndEnum[SetType any, Elt comparable] struct {
 	visitablize       func(SetType) Visitable[Elt]
-	eltChangeReceiver SetChangeReceiver[Elt]
+	eltChangeReceiver SetWriter[Elt]
 	current           MutableSet[Elt]
 }
 
@@ -119,7 +119,7 @@ func (dme mapDifferenceByMapAndEnum[MapType, Key, Val]) Receive(nextA MapType) {
 	MapUpdateToMatch[Key, Val](dme.current, nextS)
 }
 
-func SetUpdateToMatch[Elt comparable](current MutableSet[Elt], target Visitable[Elt], eltChangeReceiver SetChangeReceiver[Elt]) {
+func SetUpdateToMatch[Elt comparable](current MutableSet[Elt], target Visitable[Elt], eltChangeReceiver SetWriter[Elt]) {
 	goners := MapSetCopy[Elt](current)
 	target.Visit(func(newElt Elt) error {
 		if current.Add(newElt) {

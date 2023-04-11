@@ -67,14 +67,15 @@ func NewWorkloadProjector(
 		nsDistributions:  NewMapRelation3[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](),
 		nsrDistributions: NewMapRelation3[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](),
 		nnsDistributions: NewMapRelation3[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](),
+		upsyncs: NewHashRelation2[edgeapi.SinglePlacement, edgeapi.UpsyncSet](
+			HashSinglePlacement{}, HashUpsyncSet{}),
 	}
-	noteModeWrite := MapChangeReceiverFuncs[edgeapi.SinglePlacement, MutableMap[metav1.GroupResource, ProjectionModeVal]]{
-		OnCreate: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
+	noteModeWrite := func(add bool, destination edgeapi.SinglePlacement) {
+		if add {
 			(*wp.changedDestinations).Add(destination)
-		},
-		OnDelete: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
+		} else {
 			(*wp.changedDestinations).Remove(destination)
-		},
+		}
 	}
 	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite, nil)
 	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite, nil)
@@ -170,6 +171,7 @@ type workloadProjector struct {
 	nsModes             FactoredMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal]
 	nnsDistributions    MapRelation3[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]
 	nnsModes            FactoredMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal]
+	upsyncs             *MapRelation2[edgeapi.SinglePlacement, edgeapi.UpsyncSet]
 }
 
 type GroupResourceInstance = Pair[metav1.GroupResource, string /*object name*/]
@@ -302,9 +304,9 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	wp.Lock()
 	defer wp.Unlock()
 	logger.V(3).Info("Begin transaction")
-	var s1 SetChangeReceiver[Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]] = wp.nsDistributions
-	var s2 SetChangeReceiver[Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]] = wp.nsrDistributions
-	var s3 SetChangeReceiver[Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]] = wp.nnsDistributions
+	var s1 SetWriter[Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]] = wp.nsDistributions
+	var s2 SetWriter[Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]] = wp.nsrDistributions
+	var s3 SetWriter[Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]] = wp.nnsDistributions
 	changedDestinations := func() *MutableSet[edgeapi.SinglePlacement] {
 		var ms MutableSet[edgeapi.SinglePlacement] = NewMapSet[edgeapi.SinglePlacement]()
 		ms = WrapSetWithMutex(ms)
@@ -312,40 +314,56 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	}()
 	wp.changedDestinations = changedDestinations
 	recordLogger := logger.V(4)
-	s1 = SetChangeReceiverFork(false, s1, recordFirst[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](recordLogger, changedDestinations))
-	s2 = SetChangeReceiverFork(false, s2, recordFirst[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](recordLogger, changedDestinations))
-	s3 = SetChangeReceiverFork(false, s3, recordFirst[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](recordLogger, changedDestinations))
+	s1 = SetWriterFork(false, s1, recordFirst[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](recordLogger, changedDestinations))
+	s2 = SetWriterFork(false, s2, recordFirst[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](recordLogger, changedDestinations))
+	s3 = SetWriterFork(false, s3, recordFirst[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](recordLogger, changedDestinations))
 	xn(WorkloadProjectionSections{
-		TransformSetChangeReceiver(factorNamespaceDistributionTupleForSyncer, s1),
-		TransformSetChangeReceiver(factorNamespacedResourceDistributionTupleForSyncer, s2),
+		TransformSetWriter(factorNamespaceDistributionTupleForSyncer, s1),
+		TransformSetWriter(factorNamespacedResourceDistributionTupleForSyncer, s2),
 		wp.nsModes,
-		TransformSetChangeReceiver(factorNonNamespacedDistributionTupleForSyncer, s3),
-		wp.nnsModes})
+		TransformSetWriter(factorNonNamespacedDistributionTupleForSyncer, s3),
+		wp.nnsModes,
+		wp.upsyncs})
 	logger.V(3).Info("Transaction response", "changedDestinations", *changedDestinations)
 	(*changedDestinations).Visit(func(destination edgeapi.SinglePlacement) error {
 		nsds, have := wp.nsDistributions.GetIndex1to2().Get(destination)
 		if have {
 			nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
-			logger.V(3).Info("Namespaces after transaction", "destination", destination, "namespaces", MapSetCopy[NamespaceName](nses))
+			logger.V(4).Info("Namespaces after transaction", "destination", destination, "namespaces", MapSetCopy[NamespaceName](nses))
+		} else {
+			logger.V(4).Info("No Namespaces after transaction", "destination", destination)
 		}
 		nsrds, have := wp.nsrDistributions.GetIndex1to2().Get(destination)
 		if have {
 			nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
-			logger.V(3).Info("NamespacedResources after transaction", "destination", destination, "resources", MapSetCopy[metav1.GroupResource](nsrs))
+			logger.V(4).Info("NamespacedResources after transaction", "destination", destination, "resources", MapSetCopy[metav1.GroupResource](nsrs))
+		} else {
+			logger.V(4).Info("No NamespacedResources after transaction", "destination", destination)
 		}
 		nsms, have := wp.nsModes.GetIndex().Get(destination)
 		if have {
-			logger.V(3).Info("Namespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
-
+			logger.V(4).Info("Namespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
+		} else {
+			logger.V(4).Info("No Namespaced modes after transaction", "destination", destination)
 		}
 		nnsds, have := wp.nnsDistributions.GetIndex1to2().Get(destination)
 		if have {
 			objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
-			logger.V(3).Info("NamespacedResources after transaction", "destination", destination, "objs", MapSetCopy[GroupResourceInstance](objs))
+			logger.V(4).Info("NamespacedResources after transaction", "destination", destination, "objs", MapSetCopy[GroupResourceInstance](objs))
+		} else {
+			logger.V(4).Info("No NamespacedResources after transaction", "destination", destination)
 		}
 		nnsms, have := wp.nnsModes.GetIndex().Get(destination)
 		if have {
-			logger.V(3).Info("NonNamespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
+			logger.V(4).Info("NonNamespaced modes after transaction", "destination", destination, "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nnsms))
+		} else {
+			logger.V(4).Info("No NonNamespaced modes after transaction", "destination", destination)
+		}
+		upsyncs, have := wp.upsyncs.GetIndex1to2().Get(destination)
+		if have {
+			logger.V(4).Info("Upsyncs after transaction", "destination", destination, "upsyncs", VisitableToSlice[edgeapi.UpsyncSet](upsyncs))
+		} else {
+			logger.V(4).Info("No Upsyncs after transaction", "destination", destination)
 		}
 		mbwsName := SPMailboxWorkspaceName(destination)
 		wp.mbwsNameToSP.Put(mbwsName, destination)
@@ -355,7 +373,7 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			wp.queue.Add(destination)
 		} else {
 			ref := ExternalName{mbwsCluster, SyncerConfigName}
-			logger.V(3).Info("Enqueuing reference to SyncerConfig affected by transaction", "destination", destination, "mbwsName", mbwsName, "ref", ref)
+			logger.V(4).Info("Enqueuing reference to SyncerConfig affected by transaction", "destination", destination, "mbwsName", mbwsName, "ref", ref)
 			wp.queue.Add(ref)
 		}
 		return nil
@@ -364,8 +382,8 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	wp.changedDestinations = nil
 }
 
-func recordFirst[First, Second, Third comparable](logger klog.Logger, record *MutableSet[First]) SetChangeReceiver[Triple[First, Second, Third]] {
-	return SetChangeReceiverFuncs[Triple[First, Second, Third]]{
+func recordFirst[First, Second, Third comparable](logger klog.Logger, record *MutableSet[First]) SetWriter[Triple[First, Second, Third]] {
+	return SetWriterFuncs[Triple[First, Second, Third]]{
 		OnAdd: func(tup Triple[First, Second, Third]) bool {
 			news := (*record).Add(tup.First)
 			logger.Info("Recorded subject of Add", "news", news, "first", tup.First, "second", tup.Second, "third", tup.Third, "revisedSet", *record)
@@ -404,7 +422,7 @@ type syncerConfigSpecRelations struct {
 	namespaces           Set[string]
 	namespacedResources  Set[edgeapi.NamespaceScopeDownsyncResource]
 	clusterScopedObjects MutableMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]]
-	// TODO: add upsync
+	upsyncs              Set[edgeapi.UpsyncSet]
 }
 
 func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePlacement) syncerConfigSpecRelations {
@@ -460,25 +478,30 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 			cso.Second.Add(gri.Second)
 			return nil
 		})
-		// TODO: the rest
 	}
+	upsyncs, haveUpsyncs := wp.upsyncs.GetIndex1to2().Get(destination)
+	if !haveUpsyncs {
+		upsyncs = NewHashSet[edgeapi.UpsyncSet](HashUpsyncSet{})
+	}
+	ans.upsyncs = upsyncs
 	return ans
 }
 
 func (wp *workloadProjector) syncerConfigSpecFromRelations(specRelations syncerConfigSpecRelations) edgeapi.SyncerConfigSpec {
 	ans := edgeapi.SyncerConfigSpec{
 		NamespaceScope: edgeapi.NamespaceScopeDownsyncs{
-			Namespaces: SetToSlice(specRelations.namespaces),
-			Resources:  SetToSlice(specRelations.namespacedResources),
+			Namespaces: VisitableToSlice[string](specRelations.namespaces),
+			Resources:  VisitableToSlice[edgeapi.NamespaceScopeDownsyncResource](specRelations.namespacedResources),
 		},
-		ClusterScope: MapMapToSlice[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]], edgeapi.ClusterScopeDownsyncResource](specRelations.clusterScopedObjects,
+		ClusterScope: MapTransformToSlice[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]], edgeapi.ClusterScopeDownsyncResource](specRelations.clusterScopedObjects,
 			func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) edgeapi.ClusterScopeDownsyncResource {
 				return edgeapi.ClusterScopeDownsyncResource{
 					GroupResource: key,
 					APIVersion:    val.First.APIVersion,
-					Objects:       SetToSlice[string](val.Second),
+					Objects:       VisitableToSlice[string](val.Second),
 				}
 			}),
+		Upsync: VisitableToSlice[edgeapi.UpsyncSet](specRelations.upsyncs),
 	}
 	return ans
 }
@@ -489,7 +512,7 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 	logger := klog.FromContext(wp.ctx)
 	logger = logger.WithValues("destination", destination, "syncerConfig", configRef, "resourceVersion", syncfg.ResourceVersion)
 	good := true
-	SetEnumerateDifferences[string](goodSpecRelations.namespaces, haveNamespaces, SetChangeReceiverFuncs[string]{
+	SetEnumerateDifferences[string](goodSpecRelations.namespaces, haveNamespaces, SetWriterFuncs[string]{
 		OnAdd: func(namespace string) bool {
 			logger.V(4).Info("SyncerConfig has excess namespace", "namespace", namespace)
 			good = false
@@ -502,7 +525,7 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 		},
 	})
 	haveNamespacedResources := NewMapSet(spec.NamespaceScope.Resources...)
-	SetEnumerateDifferences[edgeapi.NamespaceScopeDownsyncResource](goodSpecRelations.namespacedResources, haveNamespacedResources, SetChangeReceiverFuncs[edgeapi.NamespaceScopeDownsyncResource]{
+	SetEnumerateDifferences[edgeapi.NamespaceScopeDownsyncResource](goodSpecRelations.namespacedResources, haveNamespacedResources, SetWriterFuncs[edgeapi.NamespaceScopeDownsyncResource]{
 		OnAdd: func(nsr edgeapi.NamespaceScopeDownsyncResource) bool {
 			logger.V(4).Info("SyncerConfig has excess NamespaceScopeDownsyncResource", "resource", nsr)
 			good = false
@@ -531,6 +554,19 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 		OnDelete: func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) {
 			logger.V(4).Info("SyncerConfig lacks ClusterScopeDownsyncResource", "groupResource", key, "apiVersion", val.First.APIVersion, "objects", val.Second)
 			good = false
+		},
+	})
+	haveUpsyncs := NewHashSet[edgeapi.UpsyncSet](HashUpsyncSet{}, spec.Upsync...)
+	SetEnumerateDifferences[edgeapi.UpsyncSet](goodSpecRelations.upsyncs, haveUpsyncs, SetWriterFuncs[edgeapi.UpsyncSet]{
+		OnAdd: func(upsync edgeapi.UpsyncSet) bool {
+			logger.V(4).Info("SyncerConfig has excess UpsyncSet", "upsync", upsync)
+			good = false
+			return false
+		},
+		OnRemove: func(upsync edgeapi.UpsyncSet) bool {
+			logger.V(4).Info("SyncerConfig lacks UpsyncSet", "upsync", upsync)
+			good = false
+			return false
 		},
 	})
 	return good

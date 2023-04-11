@@ -16,25 +16,12 @@ limitations under the License.
 
 package placement
 
-import (
-	"context"
-	"os"
-	"testing"
-
-	"k8s.io/klog/v2"
-)
-
-func TestMain(m *testing.M) {
-	klog.InitFlags(nil)
-	os.Exit(m.Run())
-}
-
-func TestSetBinder(t *testing.T) {
-	ctx := context.Background()
-	logger := klog.FromContext(ctx)
-	amp := NewTestAPIMapProvider(logger)
-	binder := NewSetBinder(logger, NewWorkloadPartsDifferencer, NewUpsyncDifferencer, NewResolvedWhereDifferencer,
-		SimpleBindingOrganizer(logger),
-		amp, DefaultResourceModes, nil)
-	exerciseSetBinder(t, logger, amp.AsResourceReceiver(), binder)
+// NewHashSet creates a new set based on a hash map
+func NewHashSet[Elt any](domain HashDomain[Elt], elts ...Elt) MutableSet[Elt] {
+	theMap := NewHashMap[Elt, Empty](domain)(nil)
+	ans := NewSetByMapToEmpty(theMap)
+	for _, elt := range elts {
+		ans.Add(elt)
+	}
+	return ans
 }
