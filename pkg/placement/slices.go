@@ -35,6 +35,18 @@ func SliceRemoveFunctional[Elt comparable](slice []Elt, seek Elt) []Elt {
 	return ans
 }
 
+func SliceEqual[Elt comparable](a, b []Elt) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for index, elta := range a {
+		if elta != b[index] {
+			return false
+		}
+	}
+	return true
+}
+
 func SliceApply[Elt any](slice []Elt, fn func(Elt)) {
 	for _, elt := range slice {
 		fn(elt)

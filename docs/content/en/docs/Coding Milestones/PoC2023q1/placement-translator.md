@@ -225,3 +225,29 @@ That will cause the placement translator to log updates, as follows.
 I0410 01:20:15.024734   27116 main.go:157] "Put" map="what" key="24oofcs9mbj9j4nd:edge-placement-c" val=map[]
 I0410 01:20:15.102275   27116 main.go:161] "Delete" map="where" key="24oofcs9mbj9j4nd:edge-placement-c"
 ```
+
+After that, the SyncerConfig in the florin mailbox should be empty, as
+in the following (you mailbox workspace names may be different).
+
+```console
+$ kubectl ws root:espw
+Current workspace is "root:espw".
+
+$ kubectl ws 2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f
+Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
+
+$ kubectl get SyncerConfig the-one -o yaml
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  annotations:
+    kcp.io/cluster: 2cow9p3xogak4n0u
+  creationTimestamp: "2023-04-11T04:34:22Z"
+  generation: 4
+  name: the-one
+  resourceVersion: "2130"
+  uid: 2b66b4bc-4130-4bf0-8524-73d6885f2ad8
+spec:
+  namespaceScope: {}
+status: {}
+```

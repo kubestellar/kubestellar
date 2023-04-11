@@ -19,6 +19,8 @@ package placement
 import (
 	"errors"
 	"sync"
+
+	"k8s.io/klog/v2"
 )
 
 type Set[Elt comparable] interface {
@@ -55,6 +57,10 @@ type MutableSet[Elt comparable] interface {
 type SetChangeReceiver[Elt comparable] interface {
 	Add(Elt) bool    /* changed */
 	Remove(Elt) bool /* changed */
+}
+
+func NewSetChangeReceiverFuncs[Elt comparable](OnAdd, OnRemove func(Elt) bool) SetChangeReceiverFuncs[Elt] {
+	return SetChangeReceiverFuncs[Elt]{OnAdd, OnRemove}
 }
 
 // SetChangeReceiverFuncs puts the SetChangeReceiver stamp of approval on a pair of funcs.
@@ -317,6 +323,27 @@ func (sr *setRotate[Original, Rotated]) Visit(visitor func(Rotated) error) error
 		rotatedElt := sr.rotator.First(originalElt)
 		return visitor(rotatedElt)
 	})
+}
+
+func NewLoggingSetChangeReceiver[Elt comparable](setName string, logger klog.Logger) SetChangeReceiver[Elt] {
+	logger = logger.WithValues("set", setName)
+	return loggingSetChangeReceiver[Elt]{logger}
+}
+
+type loggingSetChangeReceiver[Elt comparable] struct {
+	logger klog.Logger
+}
+
+var _ SetChangeReceiver[int] = loggingSetChangeReceiver[int]{}
+
+func (lcr loggingSetChangeReceiver[Elt]) Add(elt Elt) bool {
+	lcr.logger.Info("Add", "elt", elt)
+	return true
+}
+
+func (lcr loggingSetChangeReceiver[Elt]) Remove(elt Elt) bool {
+	lcr.logger.Info("Remove", "elt", elt)
+	return true
 }
 
 func TransformVisitable[Original, Transformed any](originalVisitable Visitable[Original], transform func(Original) Transformed) Visitable[Transformed] {

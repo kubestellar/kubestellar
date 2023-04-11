@@ -125,11 +125,11 @@ func (pt *placementTranslator) Run() {
 	}
 
 	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
-		fork := MappingReceiverFork[ExternalName, WorkloadParts]{LoggingMappingReceiver[ExternalName, WorkloadParts]{"what", logger}, mr}
+		fork := MappingReceiverFork[ExternalName, WorkloadParts]{NewLoggingMappingReceiver[ExternalName, WorkloadParts]("what", logger), mr}
 		return pt.whatResolver(fork)
 	}
 	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
-		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{LoggingMappingReceiver[ExternalName, ResolvedWhere]{"where", logger}, mr}
+		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{NewLoggingMappingReceiver[ExternalName, ResolvedWhere]("where", logger), mr}
 		return pt.whereResolver(fork)
 	}
 	setBinder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
@@ -144,36 +144,4 @@ func (pt *placementTranslator) Run() {
 	go pt.apiProvider.Run(ctx)       // TODO: also wait for this to finish
 	go pt.workloadProjector.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
-}
-
-type LoggingMappingReceiver[Key comparable, Val any] struct {
-	mapName string
-	logger  klog.Logger
-}
-
-var _ MappingReceiver[string, []any] = &LoggingMappingReceiver[string, []any]{}
-
-func (lmr LoggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
-	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", val)
-}
-
-func (lmr LoggingMappingReceiver[Key, Val]) Delete(key Key) {
-	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
-}
-
-type LoggingSetChangeReceiver[Elt comparable] struct {
-	setName string
-	logger  klog.Logger
-}
-
-var _ SetChangeReceiver[int] = LoggingSetChangeReceiver[int]{}
-
-func (lcr LoggingSetChangeReceiver[Elt]) Add(elt Elt) bool {
-	lcr.logger.Info("Add", "set", lcr.setName, "elt", elt)
-	return true
-}
-
-func (lcr LoggingSetChangeReceiver[Elt]) Remove(elt Elt) bool {
-	lcr.logger.Info("Remove", "set", lcr.setName, "elt", elt)
-	return true
 }

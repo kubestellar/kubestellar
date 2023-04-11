@@ -18,6 +18,8 @@ package placement
 
 import (
 	"sync"
+
+	"k8s.io/klog/v2"
 )
 
 // Map is a finite set of (key,value) pairs
@@ -315,6 +317,25 @@ func (mm *mapMutex[Key, Val]) Visit(visitor func(Pair[Key, Val]) error) error {
 	mm.RLock()
 	defer mm.RUnlock()
 	return mm.theMap.Visit(visitor)
+}
+
+func NewLoggingMappingReceiver[Key comparable, Val any](mapName string, logger klog.Logger) MappingReceiver[Key, Val] {
+	return loggingMappingReceiver[Key, Val]{mapName, logger}
+}
+
+type loggingMappingReceiver[Key comparable, Val any] struct {
+	mapName string
+	logger  klog.Logger
+}
+
+var _ MappingReceiver[string, []any] = loggingMappingReceiver[string, []any]{}
+
+func (lmr loggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
+	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", val)
+}
+
+func (lmr loggingMappingReceiver[Key, Val]) Delete(key Key) {
+	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
 }
 
 func MappingReceiverAsVisitor[Key comparable, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {

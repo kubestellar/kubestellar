@@ -63,9 +63,11 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		}
 		namespacedModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
+				logger.V(4).Info("Put to NamespacedModes", "key", mk, "val", val)
 				sbo.workloadProjectionSections.NamespacedModes.Put(mk, val)
 			},
 			OnDelete: func(mk ProjectionModeKey) {
+				logger.V(4).Info("Delete from NamespacedModes", "key", mk)
 				sbo.workloadProjectionSections.NamespacedModes.Delete(mk)
 			},
 		}
@@ -80,15 +82,28 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		)
 
 		nsCommon := MappingReceiverFork[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal]{
+			NewLoggingMappingReceiver[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal]("nsCommon", logger.V(4)),
 			MapKeySetReceiverLossy[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal](namespacedResourceDistributionRelay),
 			nsToAggregate}
 
 		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement, ProjectionModeVal](
 			logger, nsCommon)
 		sbo.resourceDiscoveryReceiver = rscDisco
+		nsSrcAndDestAndLog := NewSetChangeReceiverFuncs( // logging and the ability to set breakpoints
+			func(elt Pair[logicalcluster.Name, edgeapi.SinglePlacement]) bool {
+				news := nsSrcAndDest.Add(elt)
+				logger.V(4).Info("Add to nsSrcAndDest", "tuple", elt, "news", news)
+				return news
+			},
+			func(elt Pair[logicalcluster.Name, edgeapi.SinglePlacement]) bool {
+				news := nsSrcAndDest.Remove(elt)
+				logger.V(4).Info("Remove from nsSrcAndDest", "tuple", elt, "news", news)
+				return news
+			},
+		)
 
 		nsToGoLoseNamespace := NewSetChangeProjector[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
-			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement](), nsSrcAndDest)
+			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement](), nsSrcAndDestAndLog)
 
 		nsToGo := SetChangeReceiverFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
 
@@ -161,6 +176,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			factorClusterWhatWhereFullKey,
 			nil,
 			clusterChangeReceiver,
+			nil,
 		)
 		return sbo
 	}

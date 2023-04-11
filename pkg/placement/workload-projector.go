@@ -76,8 +76,8 @@ func NewWorkloadProjector(
 			(*wp.changedDestinations).Remove(destination)
 		},
 	}
-	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
-	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
+	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite, nil)
+	wp.nnsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite, nil)
 	logger := klog.FromContext(ctx)
 	mbwsInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
@@ -254,11 +254,12 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef Externa
 	syncfg, err := wp.syncfgClusterLister.Cluster(scRef.Cluster).Get(scRef.Name)
 	if err != nil {
 		if k8sapierrors.IsNotFound(err) {
+			goodConfigSpecRelations := wp.syncerConfigRelations(sp)
 			syncfg = &edgeapi.SyncerConfig{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: scRef.Name,
 				},
-				Spec: wp.syncerConfigSpecForMailbox(sp)}
+				Spec: wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)}
 			client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
 			syncfg2, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: "placement-translator"})
 			if logger.V(4).Enabled() {
@@ -275,11 +276,12 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef Externa
 		}
 		logger.Error(err, "Unexpected failure reading local cache")
 	}
-	if wp.syncerConfigIsGood(sp, scRef, syncfg) {
+	goodConfigSpecRelations := wp.syncerConfigRelations(sp)
+	if wp.syncerConfigIsGood(sp, scRef, syncfg, goodConfigSpecRelations) {
 		logger.V(4).Info("SyncerConfig is already good", "resourceVersion", syncfg.ResourceVersion)
 		return false
 	}
-	syncfg.Spec = wp.syncerConfigSpecForMailbox(sp)
+	syncfg.Spec = wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)
 	client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
 	syncfg2, err := client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: "placement-translator"})
 	if logger.V(4).Enabled() {
@@ -396,20 +398,28 @@ var factorProjectionModeKeyForSyncer = NewFactorer(
 		return ProjectionModeKey{Destination: tup.First, GroupResource: tup.Second}
 	})
 
-func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePlacement) (
-	namespaces Set[string],
-	namespacedResources Set[edgeapi.NamespaceScopeDownsyncResource],
-	clusterScopedObjects MutableMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]],
-) {
+// syncerConfigSpecRelations is a relational represetntation of SyncerConfigSpec.
+// It takes O(N) to construct and O(N) to compare.
+type syncerConfigSpecRelations struct {
+	namespaces           Set[string]
+	namespacedResources  Set[edgeapi.NamespaceScopeDownsyncResource]
+	clusterScopedObjects MutableMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]]
+	// TODO: add upsync
+}
+
+func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePlacement) syncerConfigSpecRelations {
 	logger := klog.FromContext(wp.ctx)
 	wp.Lock()
 	defer wp.Unlock()
 	nsds, have := wp.nsDistributions.GetIndex1to2().Get(destination)
+	ans := syncerConfigSpecRelations{
+		clusterScopedObjects: NewMapMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](nil),
+	}
 	if have {
 		nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
-		namespaces = MapSetCopy(TransformVisitable[NamespaceName, string](nses, func(ns NamespaceName) string { return string(ns) }))
+		ans.namespaces = MapSetCopy(TransformVisitable[NamespaceName, string](nses, func(ns NamespaceName) string { return string(ns) }))
 	} else {
-		namespaces = NewEmptyMapSet[string]()
+		ans.namespaces = NewEmptyMapSet[string]()
 	}
 	nsrds, haveDists := wp.nsrDistributions.GetIndex1to2().Get(destination)
 	if haveDists {
@@ -419,7 +429,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 			nsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
 		nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
-		namespacedResources = MapSetCopy(TransformVisitable[metav1.GroupResource, edgeapi.NamespaceScopeDownsyncResource](nsrs, func(gr metav1.GroupResource) edgeapi.NamespaceScopeDownsyncResource {
+		ans.namespacedResources = MapSetCopy(TransformVisitable[metav1.GroupResource, edgeapi.NamespaceScopeDownsyncResource](nsrs, func(gr metav1.GroupResource) edgeapi.NamespaceScopeDownsyncResource {
 			pmv, ok := nsms.Get(gr)
 			if !ok {
 				logger.Error(nil, "Missing API group version info", "groupResource", gr, "destination", destination)
@@ -427,9 +437,8 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 			return edgeapi.NamespaceScopeDownsyncResource{GroupResource: gr, APIVersion: pmv.APIVersion}
 		}))
 	} else {
-		namespacedResources = NewEmptyMapSet[edgeapi.NamespaceScopeDownsyncResource]()
+		ans.namespacedResources = NewEmptyMapSet[edgeapi.NamespaceScopeDownsyncResource]()
 	}
-	clusterScopedObjects = NewMapMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](nil)
 	nnsds, haveDists := wp.nnsDistributions.GetIndex1to2().Get(destination)
 	if haveDists {
 		nnsms, haveModes := wp.nnsModes.GetIndex().Get(destination)
@@ -444,7 +453,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 			if !ok {
 				logger.Error(nil, "Missing API version", "obj", gri, "destination", destination)
 			}
-			cso := MapGetAdd[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](clusterScopedObjects, gr,
+			cso := MapGetAdd[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](ans.clusterScopedObjects, gr,
 				true, func(metav1.GroupResource) Pair[ProjectionModeVal, MutableSet[string /*object name*/]] {
 					return NewPair[ProjectionModeVal, MutableSet[string]](pmv, NewEmptyMapSet[string /*object name*/]())
 				})
@@ -453,17 +462,16 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 		})
 		// TODO: the rest
 	}
-	return
+	return ans
 }
 
-func (wp *workloadProjector) syncerConfigSpecForMailbox(destination edgeapi.SinglePlacement) edgeapi.SyncerConfigSpec {
-	namespaces, namespacedResources, clusterScopedResources := wp.syncerConfigRelations(destination)
+func (wp *workloadProjector) syncerConfigSpecFromRelations(specRelations syncerConfigSpecRelations) edgeapi.SyncerConfigSpec {
 	ans := edgeapi.SyncerConfigSpec{
 		NamespaceScope: edgeapi.NamespaceScopeDownsyncs{
-			Namespaces: SetToSlice(namespaces),
-			Resources:  SetToSlice(namespacedResources),
+			Namespaces: SetToSlice(specRelations.namespaces),
+			Resources:  SetToSlice(specRelations.namespacedResources),
 		},
-		ClusterScope: MapMapToSlice[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]], edgeapi.ClusterScopeDownsyncResource](clusterScopedResources,
+		ClusterScope: MapMapToSlice[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]], edgeapi.ClusterScopeDownsyncResource](specRelations.clusterScopedObjects,
 			func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) edgeapi.ClusterScopeDownsyncResource {
 				return edgeapi.ClusterScopeDownsyncResource{
 					GroupResource: key,
@@ -475,14 +483,13 @@ func (wp *workloadProjector) syncerConfigSpecForMailbox(destination edgeapi.Sing
 	return ans
 }
 
-func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacement, configRef ExternalName, syncfg *edgeapi.SyncerConfig) bool {
+func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacement, configRef ExternalName, syncfg *edgeapi.SyncerConfig, goodSpecRelations syncerConfigSpecRelations) bool {
 	spec := syncfg.Spec
-	goodNamespaces, goodNamespacedResources, goodClusterScopedResources := wp.syncerConfigRelations(destination)
 	haveNamespaces := NewMapSet(spec.NamespaceScope.Namespaces...)
 	logger := klog.FromContext(wp.ctx)
 	logger = logger.WithValues("destination", destination, "syncerConfig", configRef, "resourceVersion", syncfg.ResourceVersion)
 	good := true
-	SetEnumerateDifferences[string](goodNamespaces, haveNamespaces, SetChangeReceiverFuncs[string]{
+	SetEnumerateDifferences[string](goodSpecRelations.namespaces, haveNamespaces, SetChangeReceiverFuncs[string]{
 		OnAdd: func(namespace string) bool {
 			logger.V(4).Info("SyncerConfig has excess namespace", "namespace", namespace)
 			good = false
@@ -495,7 +502,7 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 		},
 	})
 	haveNamespacedResources := NewMapSet(spec.NamespaceScope.Resources...)
-	SetEnumerateDifferences[edgeapi.NamespaceScopeDownsyncResource](goodNamespacedResources, haveNamespacedResources, SetChangeReceiverFuncs[edgeapi.NamespaceScopeDownsyncResource]{
+	SetEnumerateDifferences[edgeapi.NamespaceScopeDownsyncResource](goodSpecRelations.namespacedResources, haveNamespacedResources, SetChangeReceiverFuncs[edgeapi.NamespaceScopeDownsyncResource]{
 		OnAdd: func(nsr edgeapi.NamespaceScopeDownsyncResource) bool {
 			logger.V(4).Info("SyncerConfig has excess NamespaceScopeDownsyncResource", "resource", nsr)
 			good = false
@@ -512,7 +519,7 @@ func (wp *workloadProjector) syncerConfigIsGood(destination edgeapi.SinglePlacem
 		var objects MutableSet[string] = NewMapSet(cr.Objects...)
 		haveClusterScopedResources.Put(cr.GroupResource, NewPair(ProjectionModeVal{cr.APIVersion}, objects))
 	}
-	MapEnumerateDifferencesParametric[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]](csrEqual, goodClusterScopedResources, haveClusterScopedResources, MapChangeReceiverFuncs[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]]{
+	MapEnumerateDifferencesParametric[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]](csrEqual, goodSpecRelations.clusterScopedObjects, haveClusterScopedResources, MapChangeReceiverFuncs[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string]]]{
 		OnCreate: func(key metav1.GroupResource, val Pair[ProjectionModeVal, MutableSet[string]]) {
 			logger.V(4).Info("SyncerConfig has excess ClusterScopeDownsyncResource", "groupResource", key, "apiVersion", val.First.APIVersion, "objects", val.Second)
 			good = false
