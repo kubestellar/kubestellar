@@ -28,6 +28,18 @@ func Relation2Equijoin12with13[First, Second, Third comparable](left Relation2[F
 	return ans
 }
 
+func Map12VEquijoinRelation13[First, Second, Third comparable, Val any](left Map[Pair[First, Second], Val], right Relation2[Second, Third]) Map[Triple[First, Second, Third], Val] {
+	ans := NewMapMap[Triple[First, Second, Third], Val](nil)
+	rightIndex := right.GetIndex1to2()
+	left.Visit(func(tupl Pair[Pair[First, Second], Val]) error {
+		return rightIndex.Visit1to2(tupl.First.Second, func(third Third) error {
+			ans.Put(NewTriple(tupl.First.First, tupl.First.Second, third), tupl.Second)
+			return nil
+		})
+	})
+	return ans
+}
+
 func MapEquijoin12With13[Key comparable, ValLeft, ValRight any](left Map[Key, ValLeft], right Map[Key, ValRight]) Map[Key, Pair[ValLeft, ValRight]] {
 	ans := NewMapMap[Key, Pair[ValLeft, ValRight]](nil)
 	left.Visit(func(kl Pair[Key, ValLeft]) error {

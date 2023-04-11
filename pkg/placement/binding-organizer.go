@@ -42,18 +42,22 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		}
 		namespaceDistributionsRelay := SetChangeReceiverFuncs[NamespaceDistributionTuple]{
 			OnAdd: func(tup NamespaceDistributionTuple) bool {
+				logger.V(4).Info("NamespaceDistributionTuple added", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespaceDistributions.Add(tup)
 			},
 			OnRemove: func(tup NamespaceDistributionTuple) bool {
+				logger.V(4).Info("NamespaceDistributionTuple removed", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespaceDistributions.Remove(tup)
 			}}
 		namespacedResourceDistributionRelay := SetChangeReceiverFuncs[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]]{
 			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
 				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
+				logger.V(4).Info("NamespacedResourceDistributionTuple added", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Add(dist)
 			},
 			OnRemove: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
 				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
+				logger.V(4).Info("NamespacedResourceDistributionTuple removed", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Remove(dist)
 			},
 		}
@@ -180,8 +184,8 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 // - DiscoR: map of (epCluster,GroupResource) -> APIVersion (the preferred one)
 // and produces change streams for the following three relations:
 // - nsToGo: set of NamespaceDistributionTuple (epCluster,namespace,destination)
-// - set of NamespacedResourceDistributionTuple (epCluster,GroupResource,destionation)
-// - map of ProjectionModeKey (GroupResource,destionation) -> ProjectionModeVal (APIVersion).
+// - set of NamespacedResourceDistributionTuple (epCluster,GroupResource,destination)
+// - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational expression, the desired computation is as follows.
 // nsToGo = WhatWhere.ProjectOut(epName)
@@ -202,16 +206,16 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 // - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> APIVersion
 // and produces the change streams to the following two relations:
 // - set of NonNamespacedDistributionTuple (epCluster,GroupResource,ObjName,destination)
-// - map of ProjectionModeKey (GroupResource,destionation) -> ProjectionModeVal (APIVersion).
+// - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational algebra expression, the desired computation is as follows.
 // common = WhatWheres.ProjectOut(epName)
 // (that's a map (epCluster,GroupResource,ObjName,destination) -> APIVersion)
 // NonNamespacedDistributionTuples = common.Keys()
-// ProjectionModes = common.GroupBy(GroupResource,destionation).Aggregate(PickVersion)
+// ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
-// clusterModesReceiver <- ctSansEPName.GroupBy(GroupResource,destionation).Aggregate(PickVersion)
+// clusterModesReceiver <- ctSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 // clusterDistributionsReceiver <- ctSansEPName.Keys()
 // ctSansEPName <- WhatWheres.ProjectOut(epName)
 //

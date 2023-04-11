@@ -16,7 +16,10 @@ limitations under the License.
 
 package placement
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
 type Set[Elt comparable] interface {
 	Emptyable
@@ -238,6 +241,57 @@ func (xr transformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
 func (xr transformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Remove(v2)
+}
+
+func WrapSetWithMutex[Elt comparable](inner MutableSet[Elt]) MutableSet[Elt] {
+	return &setMutex[Elt]{inner: inner}
+}
+
+type setMutex[Elt comparable] struct {
+	sync.RWMutex
+	inner MutableSet[Elt]
+}
+
+func (sm *setMutex[Elt]) IsEmpty() bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.IsEmpty()
+}
+
+func (sm *setMutex[Elt]) LenIsCheap() bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.LenIsCheap()
+}
+
+func (sm *setMutex[Elt]) Len() int {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Len()
+}
+
+func (sm *setMutex[Elt]) Has(elt Elt) bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Has(elt)
+}
+
+func (sm *setMutex[Elt]) Visit(visitor func(Elt) error) error {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Visit(visitor)
+}
+
+func (sm *setMutex[Elt]) Add(elt Elt) bool {
+	sm.Lock()
+	defer sm.Unlock()
+	return sm.inner.Add(elt)
+}
+
+func (sm *setMutex[Elt]) Remove(elt Elt) bool {
+	sm.Lock()
+	defer sm.Unlock()
+	return sm.inner.Add(elt)
 }
 
 func SetRotate[Original, Rotated comparable](originalSet Set[Original], rotator Rotator[Original, Rotated]) Set[Rotated] {

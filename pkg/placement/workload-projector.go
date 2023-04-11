@@ -70,10 +70,10 @@ func NewWorkloadProjector(
 	}
 	noteModeWrite := MapChangeReceiverFuncs[edgeapi.SinglePlacement, MutableMap[metav1.GroupResource, ProjectionModeVal]]{
 		OnCreate: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
-			wp.changedDestinations.Add(destination)
+			(*wp.changedDestinations).Add(destination)
 		},
 		OnDelete: func(destination edgeapi.SinglePlacement, _ MutableMap[metav1.GroupResource, ProjectionModeVal]) {
-			wp.changedDestinations.Remove(destination)
+			(*wp.changedDestinations).Remove(destination)
 		},
 	}
 	wp.nsModes = NewFactoredMapMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal](factorProjectionModeKeyForSyncer, nil, noteModeWrite)
@@ -164,7 +164,7 @@ type workloadProjector struct {
 
 	sync.Mutex
 
-	changedDestinations *MapSet[edgeapi.SinglePlacement]
+	changedDestinations *MutableSet[edgeapi.SinglePlacement]
 	nsDistributions     MapRelation3[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]
 	nsrDistributions    MapRelation3[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]
 	nsModes             FactoredMap[ProjectionModeKey, edgeapi.SinglePlacement, metav1.GroupResource, ProjectionModeVal]
@@ -303,19 +303,24 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	var s1 SetChangeReceiver[Triple[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name]] = wp.nsDistributions
 	var s2 SetChangeReceiver[Triple[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name]] = wp.nsrDistributions
 	var s3 SetChangeReceiver[Triple[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name]] = wp.nnsDistributions
-	changedDestinations := NewMapSet[edgeapi.SinglePlacement]()
-	wp.changedDestinations = &changedDestinations
-	s1 = SetChangeReceiverFork(false, s1, recordFirst[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](changedDestinations))
-	s2 = SetChangeReceiverFork(false, s2, recordFirst[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](changedDestinations))
-	s3 = SetChangeReceiverFork(false, s3, recordFirst[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](changedDestinations))
+	changedDestinations := func() *MutableSet[edgeapi.SinglePlacement] {
+		var ms MutableSet[edgeapi.SinglePlacement] = NewMapSet[edgeapi.SinglePlacement]()
+		ms = WrapSetWithMutex(ms)
+		return &ms
+	}()
+	wp.changedDestinations = changedDestinations
+	recordLogger := logger.V(4)
+	s1 = SetChangeReceiverFork(false, s1, recordFirst[edgeapi.SinglePlacement, NamespaceName, logicalcluster.Name](recordLogger, changedDestinations))
+	s2 = SetChangeReceiverFork(false, s2, recordFirst[edgeapi.SinglePlacement, metav1.GroupResource, logicalcluster.Name](recordLogger, changedDestinations))
+	s3 = SetChangeReceiverFork(false, s3, recordFirst[edgeapi.SinglePlacement, GroupResourceInstance, logicalcluster.Name](recordLogger, changedDestinations))
 	xn(WorkloadProjectionSections{
 		TransformSetChangeReceiver(factorNamespaceDistributionTupleForSyncer, s1),
 		TransformSetChangeReceiver(factorNamespacedResourceDistributionTupleForSyncer, s2),
 		wp.nsModes,
 		TransformSetChangeReceiver(factorNonNamespacedDistributionTupleForSyncer, s3),
 		wp.nnsModes})
-	logger.V(3).Info("Transaction response", "changedDestinations", changedDestinations)
-	changedDestinations.Visit(func(destination edgeapi.SinglePlacement) error {
+	logger.V(3).Info("Transaction response", "changedDestinations", *changedDestinations)
+	(*changedDestinations).Visit(func(destination edgeapi.SinglePlacement) error {
 		nsds, have := wp.nsDistributions.GetIndex1to2().Get(destination)
 		if have {
 			nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
@@ -357,14 +362,16 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	wp.changedDestinations = nil
 }
 
-func recordFirst[First, Second, Third comparable](record MutableSet[First]) SetChangeReceiver[Triple[First, Second, Third]] {
+func recordFirst[First, Second, Third comparable](logger klog.Logger, record *MutableSet[First]) SetChangeReceiver[Triple[First, Second, Third]] {
 	return SetChangeReceiverFuncs[Triple[First, Second, Third]]{
 		OnAdd: func(tup Triple[First, Second, Third]) bool {
-			record.Add(tup.First)
+			news := (*record).Add(tup.First)
+			logger.Info("Recorded subject of Add", "news", news, "first", tup.First, "second", tup.Second, "third", tup.Third, "revisedSet", *record)
 			return true
 		},
 		OnRemove: func(tup Triple[First, Second, Third]) bool {
-			record.Add(tup.First)
+			news := (*record).Add(tup.First)
+			logger.Info("Recorded subject of Remove", "news", news, "first", tup.First, "second", tup.Second, "third", tup.Third, "revisedSet", *record)
 			return true
 		}}
 }
@@ -408,7 +415,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 	if haveDists {
 		nsms, haveModes := wp.nsModes.GetIndex().Get(destination)
 		if !haveModes {
-			logger.Error(nil, "Missing projection modes for namespaced resourced", "destination", destination)
+			logger.Error(nil, "No ProjectionModeVals for namespaced resources", "destination", destination)
 			nsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
 		nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
@@ -427,11 +434,10 @@ func (wp *workloadProjector) syncerConfigRelations(destination edgeapi.SinglePla
 	if haveDists {
 		nnsms, haveModes := wp.nnsModes.GetIndex().Get(destination)
 		if !haveModes {
-			logger.Error(nil, "Missing projection modes for namespaced resourced", "destination", destination)
+			logger.Error(nil, "No ProjectionModeVals for cluster-scoped resources", "destination", destination)
 			nnsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
 		objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
-		logger.Info("TODO", "x", nnsms, "y", objs)
 		objs.Visit(func(gri GroupResourceInstance) error {
 			gr := gri.First
 			pmv, ok := nnsms.Get(gr)
