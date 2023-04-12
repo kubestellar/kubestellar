@@ -130,6 +130,63 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 	return nil
 }
 
+func (us *UpSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	logger := us.logger.WithName("SyncMany").WithValues("resource", resourceToString(resource))
+	logger.V(3).Info("upsync many")
+
+	upstreamClient, downstreamClient, err := us.getClients(resource, conversions)
+	if err != nil {
+		us.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
+		return err
+	}
+
+	logger.V(3).Info("  list resources from downstream")
+	resourceForDown := convertToDownstream(resource, conversions)
+	downstreamResourceList, err := downstreamClient.List(resourceForDown)
+	if err != nil {
+		logger.Error(err, "failed to list resource from downstream")
+		return err
+	}
+
+	logger.V(3).Info("  list resources from upstream")
+	resourceForUp := convertToUpstream(resource, conversions)
+	upstreamResourceList, err := upstreamClient.List(resourceForUp)
+	if err != nil {
+		logger.Error(err, "failed to list resource from upstream")
+		return err
+	}
+
+	logger.V(3).Info("  compute diff between downstream and upstream")
+	newResources, updatedResources, deletedResources := diff(logger, downstreamResourceList, upstreamResourceList)
+
+	logger.V(3).Info("  create resources in upstream")
+	for _, resource := range newResources {
+		resource.SetResourceVersion("")
+		resource.SetUID("")
+		applyConversion(&resource, resourceForUp)
+		logger.V(3).Info("  create " + resource.GetName())
+		if _, err := upstreamClient.Create(resourceForUp, &resource); err != nil {
+			logger.Error(err, "failed to create resource in upstream")
+			return err
+		}
+	}
+	logger.V(3).Info("  update resources in upstream")
+	for _, resource := range updatedResources {
+		resource.SetResourceVersion("")
+		resource.SetUID("")
+		resource.SetManagedFields(nil)
+		applyConversion(&resource, resourceForUp)
+		logger.V(3).Info("  update " + resource.GetName())
+		if _, err := upstreamClient.Update(resourceForUp, &resource); err != nil {
+			logger.Error(err, "failed to create resource in upstream")
+			return err
+		}
+	}
+	// nothing to do for deletion for now
+	_ = deletedResources
+	return nil
+}
+
 func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	return nil
 }

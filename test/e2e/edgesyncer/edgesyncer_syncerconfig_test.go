@@ -42,21 +42,35 @@ var syncerConfigGvr = schema.GroupVersionResource{
 }
 
 func TestEdgeSyncerWithSyncerConfig(t *testing.T) {
-
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
+	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
+}
 
-	var sampleCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-crd.yaml", embedded, &sampleCRDUnst)
+func TestEdgeSyncerWithWildcardSyncerConfig(t *testing.T) {
+	var syncerConfigUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
+	require.NoError(t, err)
+	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
+}
+
+func testEdgeSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
+
+	var sampleDownsyncCRDUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
 	require.NoError(t, err)
 
-	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
+	var sampleUpsyncCRDUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/sample-upsync-crd.yaml", embedded, &sampleUpsyncCRDUnst)
 	require.NoError(t, err)
 
 	var sampleDownsyncCRUnst *unstructured.Unstructured
 	err = edgeframework.LoadFile("testdata/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
+	require.NoError(t, err)
+
+	var sampleUpsyncCRUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
@@ -82,21 +96,35 @@ func TestEdgeSyncerWithSyncerConfig(t *testing.T) {
 	t.Logf("Create namespace %q in workspace %q.", testNamespaceObj.Name, wsPath.String())
 	_, err = upstreamKubeClusterClient.Cluster(wsPath).CoreV1().Namespaces().Create(ctx, testNamespaceObj, v1.CreateOptions{})
 	require.NoError(t, err)
-	t.Logf("Create sample CRD %q in workspace %q.", sampleCRDUnst.GetName(), wsPath.String())
-	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(crdGVR).Create(ctx, sampleCRDUnst, v1.CreateOptions{})
+
+	t.Logf("Create sampleUpsync CRD %q in workspace %q.", sampleUpsyncCRDUnst.GetName(), wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(crdGVR).Create(ctx, sampleUpsyncCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
-	t.Logf("Wait for API %q to be available.", sampleCRDUnst.GetName())
+	t.Logf("Wait for API %q to be available.", sampleUpsyncCRDUnst.GetName())
 	framework.Eventually(t, func() (bool, string) {
-		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).List(ctx, v1.ListOptions{})
+		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleUpsyncCRGVR).List(ctx, v1.ListOptions{})
 		if err != nil {
 			return false, fmt.Sprintf("Failed to list sample CR: %v", err)
 		}
 		return true, ""
-	}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", sampleCRDUnst.GetName())
+	}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", sampleUpsyncCRDUnst.GetName())
 
-	t.Logf("Create sample CR %q in workspace %q.", sampleDownsyncCRUnst.GetName(), wsPath.String())
-	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Create(ctx, sampleDownsyncCRUnst, v1.CreateOptions{})
+	t.Logf("Create sampleDownsync CRD %q in workspace %q.", sampleDownsyncCRDUnst.GetName(), wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(crdGVR).Create(ctx, sampleDownsyncCRDUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	t.Logf("Wait for API %q to be available.", sampleDownsyncCRDUnst.GetName())
+	framework.Eventually(t, func() (bool, string) {
+		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleDownsyncCRGVR).List(ctx, v1.ListOptions{})
+		if err != nil {
+			return false, fmt.Sprintf("Failed to list sample CR: %v", err)
+		}
+		return true, ""
+	}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", sampleDownsyncCRDUnst.GetName())
+
+	t.Logf("Create sample downsync CR %q in workspace %q.", sampleDownsyncCRUnst.GetName(), wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleDownsyncCRGVR).Create(ctx, sampleDownsyncCRUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Wait for resources to be downsynced.")
@@ -107,27 +135,32 @@ func TestEdgeSyncerWithSyncerConfig(t *testing.T) {
 		if err != nil {
 			return false, fmt.Sprintf("Failed to get namespace %s: %v", testNamespaceObj.Name, err)
 		}
-		_, err = dynamicClient.Resource(crdGVR).Get(ctx, sampleCRDUnst.GetName(), v1.GetOptions{})
+		_, err = dynamicClient.Resource(crdGVR).Get(ctx, sampleUpsyncCRDUnst.GetName(), v1.GetOptions{})
 		if err != nil {
-			return false, fmt.Sprintf("Failed to get CRD %s: %v", sampleCRDUnst.GetName(), err)
+			return false, fmt.Sprintf("Failed to get sample upsync CRD %s: %v", sampleUpsyncCRDUnst.GetName(), err)
 		}
-		_, err = dynamicClient.Resource(sampleCRGVR).Get(ctx, sampleDownsyncCRUnst.GetName(), v1.GetOptions{})
+		_, err = dynamicClient.Resource(crdGVR).Get(ctx, sampleDownsyncCRDUnst.GetName(), v1.GetOptions{})
+		if err != nil {
+			return false, fmt.Sprintf("Failed to get sample downsync CRD %s: %v", sampleUpsyncCRDUnst.GetName(), err)
+		}
+		_, err = dynamicClient.Resource(sampleDownsyncCRGVR).Get(ctx, sampleDownsyncCRUnst.GetName(), v1.GetOptions{})
 		if err != nil {
 			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleDownsyncCRUnst.GetName(), err)
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
 
-	// t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleUpsyncCRUnst.GetName(), wsPath.String())
-	// _, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleUpsyncCRUnst, v1.CreateOptions{})
-	// require.NoError(t, err)
+	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleUpsyncCRUnst.GetName(), wsPath.String())
+	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleUpsyncCRGVR).Create(ctx, sampleUpsyncCRUnst, v1.CreateOptions{})
+	require.NoError(t, err)
 
-	// t.Logf("Wait for resources to be upsynced.")
-	// framework.Eventually(t, func() (bool, string) {
-	// 	_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
-	// 	if err != nil {
-	// 		return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
-	// 	}
-	// 	return true, ""
-	// }, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
+	t.Logf("Wait for resources to be upsynced.")
+	framework.Eventually(t, func() (bool, string) {
+		fetched, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleUpsyncCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
+		if err != nil {
+			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
+		}
+		t.Logf("fetched upsynced SampleCR: %v", fetched)
+		return true, ""
+	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
 }

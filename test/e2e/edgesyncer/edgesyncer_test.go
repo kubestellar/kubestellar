@@ -57,6 +57,18 @@ var sampleCRGVR = schema.GroupVersionResource{
 	Resource: "samples",
 }
 
+var sampleDownsyncCRGVR = schema.GroupVersionResource{
+	Group:    "my.domain",
+	Version:  "v1alpha1",
+	Resource: "sampledownsyncs",
+}
+
+var sampleUpsyncCRGVR = schema.GroupVersionResource{
+	Group:    "my.domain",
+	Version:  "v1alpha1",
+	Resource: "sampleupsyncs",
+}
+
 func TestEdgeSyncer(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
@@ -67,12 +79,12 @@ func TestEdgeSyncer(t *testing.T) {
 	err = edgeframework.LoadFile("testdata/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
-	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
+	var sampleCRUpsyncUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
 	require.NoError(t, err)
 
-	var sampleDownsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
+	var sampleCRDownsyncUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
@@ -111,8 +123,8 @@ func TestEdgeSyncer(t *testing.T) {
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", sampleCRDUnst.GetName())
 
-	t.Logf("Create sample CR %q in workspace %q.", sampleDownsyncCRUnst.GetName(), wsPath.String())
-	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Create(ctx, sampleDownsyncCRUnst, v1.CreateOptions{})
+	t.Logf("Create sample CR %q in workspace %q.", sampleCRDownsyncUnst.GetName(), wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Create(ctx, sampleCRDownsyncUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Wait for resources to be downsynced.")
@@ -127,22 +139,22 @@ func TestEdgeSyncer(t *testing.T) {
 		if err != nil {
 			return false, fmt.Sprintf("Failed to get CRD %s: %v", sampleCRDUnst.GetName(), err)
 		}
-		_, err = dynamicClient.Resource(sampleCRGVR).Get(ctx, sampleDownsyncCRUnst.GetName(), v1.GetOptions{})
+		_, err = dynamicClient.Resource(sampleCRGVR).Get(ctx, sampleCRDownsyncUnst.GetName(), v1.GetOptions{})
 		if err != nil {
-			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleDownsyncCRUnst.GetName(), err)
+			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleCRDownsyncUnst.GetName(), err)
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
 
-	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleUpsyncCRUnst.GetName(), wsPath.String())
-	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleUpsyncCRUnst, v1.CreateOptions{})
+	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleCRUpsyncUnst.GetName(), wsPath.String())
+	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleCRUpsyncUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Wait for resources to be upsynced.")
 	framework.Eventually(t, func() (bool, string) {
-		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
+		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Get(ctx, sampleCRUpsyncUnst.GetName(), v1.GetOptions{})
 		if err != nil {
-			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
+			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleCRUpsyncUnst.GetName(), wsPath, err)
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")

@@ -1,5 +1,5 @@
 apiVersion: my.domain/v1alpha1
-kind: SampleDownsync
+kind: Sample
 metadata:
   name: sample-downsync
 spec:

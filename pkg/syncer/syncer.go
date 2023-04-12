@@ -160,13 +160,14 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 			logger.V(2).Info("Sync ")
 			syncerConfigManager.Refresh()
 			_ = downSyncer.ReInitializeClients(syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
+			_ = upSyncer.ReInitializeClients(syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
 			for _, resource := range syncConfigManager.GetDownSyncedResources() {
 				if resource.Name == "*" {
 					if err := downSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+						logger.V(1).Info(fmt.Sprintf("failed to downsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}
 					if err := downSyncer.BackStatusMany(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+						logger.V(1).Info(fmt.Sprintf("failed to status upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}
 				} else {
 					if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
@@ -178,8 +179,14 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 				}
 			}
 			for _, resource := range syncConfigManager.GetUpSyncedResources() {
-				if err := upSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+				if resource.Name == "*" {
+					if err := upSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+				} else {
+					if err := upSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
 				}
 			}
 		}

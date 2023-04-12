@@ -1,7 +1,7 @@
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
-  name: syncer-config
+  name: syncer-config-wildcard
 spec:
   namespaceScope:
     namespaces:
@@ -21,10 +21,10 @@ spec:
     group: my.domain
     resource: sampledownsyncs
     objects:
-    - sample-downsync
+    - "*"
   upsync:
   - apiGroup: my.domain
     resources:
     - sampleupsyncs
     names:
-    - sample-upsync
+    - "*"

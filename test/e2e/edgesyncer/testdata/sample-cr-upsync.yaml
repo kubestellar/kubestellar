@@ -1,5 +1,5 @@
 apiVersion: my.domain/v1alpha1
-kind: SampleUpsync
+kind: Sample
 metadata:
   name: sample-upsync
 spec:
