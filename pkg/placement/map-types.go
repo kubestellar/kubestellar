@@ -18,6 +18,8 @@ package placement
 
 import (
 	"sync"
+
+	"k8s.io/klog/v2"
 )
 
 // Map is a finite set of (key,value) pairs
@@ -97,6 +99,22 @@ func (mrf MappingReceiverFork[Key, Val]) Put(key Key, val Val) {
 }
 
 func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
+	for _, mr := range mrf {
+		mr.Delete(key)
+	}
+}
+
+type MappingReceiverHolderFork[Key comparable, Val any] []*MappingReceiverHolder[Key, Val]
+
+var _ MappingReceiver[int, func()] = MappingReceiverHolderFork[int, func()]{}
+
+func (mrf MappingReceiverHolderFork[Key, Val]) Put(key Key, val Val) {
+	for _, mr := range mrf {
+		mr.Put(key, val)
+	}
+}
+
+func (mrf MappingReceiverHolderFork[Key, Val]) Delete(key Key) {
 	for _, mr := range mrf {
 		mr.Delete(key)
 	}
@@ -301,6 +319,25 @@ func (mm *mapMutex[Key, Val]) Visit(visitor func(Pair[Key, Val]) error) error {
 	return mm.theMap.Visit(visitor)
 }
 
+func NewLoggingMappingReceiver[Key comparable, Val any](mapName string, logger klog.Logger) MappingReceiver[Key, Val] {
+	return loggingMappingReceiver[Key, Val]{mapName, logger}
+}
+
+type loggingMappingReceiver[Key comparable, Val any] struct {
+	mapName string
+	logger  klog.Logger
+}
+
+var _ MappingReceiver[string, []any] = loggingMappingReceiver[string, []any]{}
+
+func (lmr loggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
+	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", val)
+}
+
+func (lmr loggingMappingReceiver[Key, Val]) Delete(key Key) {
+	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
+}
+
 func MappingReceiverAsVisitor[Key comparable, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {
 	return func(tup Pair[Key, Val]) error {
 		receiver.Put(tup.First, tup.Second)
@@ -350,37 +387,42 @@ func MapGetAdd[Key comparable, Val any](theMap MutableMap[Key, Val], key Key, wa
 }
 
 func MapEqual[Key, Val comparable](left, right Map[Key, Val]) bool {
-	if left.Len() != right.Len() {
-		return false
-	}
-	if left.Visit(func(tup Pair[Key, Val]) error {
-		valRight, has := right.Get(tup.First)
-		if !has || tup.Second != valRight {
-			return errStop
+	return MapEqualParametric[Key, Val](func(a, b Val) bool { return a == b })(left, right)
+}
+
+func MapEqualParametric[Key comparable, Val any](isEqual func(Val, Val) bool) func(map1, map2 Map[Key, Val]) bool {
+	return func(map1, map2 Map[Key, Val]) bool {
+		if map1.Len() != map2.Len() {
+			return false
 		}
-		return nil
-	}) != nil {
-		return false
+		return map1.Visit(func(tup1 Pair[Key, Val]) error {
+			val2, have := map2.Get(tup1.First)
+			if !have || !isEqual(tup1.Second, val2) {
+				return errStop
+			}
+			return nil
+		}) == nil
 	}
-	return true
 }
 
 func MapEnumerateDifferences[Key, Val comparable](left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
+	MapEnumerateDifferencesParametric(func(a, b Val) bool { return a == b }, left, right, receiver)
+}
+
+func MapEnumerateDifferencesParametric[Key comparable, Val any](isEqual func(Val, Val) bool, left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
 	left.Visit(func(tup Pair[Key, Val]) error {
 		valRight, has := right.Get(tup.First)
 		if !has {
 			receiver.DeleteWithFinal(tup.First, tup.Second)
-		} else if valRight != tup.Second {
+		} else if !isEqual(valRight, tup.Second) {
 			receiver.Update(tup.First, tup.Second, valRight)
 		}
 		return nil
 	})
 	right.Visit(func(tup Pair[Key, Val]) error {
-		valLeft, has := left.Get(tup.First)
+		_, has := left.Get(tup.First)
 		if !has {
 			receiver.Create(tup.First, tup.Second)
-		} else if valLeft != tup.Second {
-			receiver.Update(tup.First, valLeft, tup.Second)
 		}
 		return nil
 	})

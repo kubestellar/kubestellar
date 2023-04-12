@@ -160,6 +160,7 @@ func main() {
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
 	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
+	syncfgClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SyncerConfigs()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
 	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
@@ -198,7 +199,9 @@ func main() {
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, edgeClusterClientset)
+	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer,
+		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
+		dynamicClusterClient, edgeClusterClientset)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)

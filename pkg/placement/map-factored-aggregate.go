@@ -25,28 +25,14 @@ func NewFactoredMapMapAggregator[WholeKey, KeyPartA, KeyPartB comparable, Val an
 	aggregate func(KeyPartA, Map[KeyPartB, Val]) Aggregation,
 	aggregationObserver MappingReceiver[KeyPartA, Aggregation],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
-	// We use a variable so that an observer passed into the factored map constructor can
-	// use the map created by that constructor.
-	// We need to do that because FactoredMap does not have a hook that gets called on
-	// every change and given the (KerPartA, Map[KeyPartB,Val]) pair.
-	var fm FactoredMap[WholeKey, KeyPartA, KeyPartB, Val]
-	observeToSolve := MappingReceiverFuncs[WholeKey, Val]{
-		OnPut: func(wholeKey WholeKey, val Val) {
-			decomposedKey := keyDecomposer.First(wholeKey)
-			problem, _ := fm.GetIndex().Get(decomposedKey.First)
-			aggregation := aggregate(decomposedKey.First, problem)
-			aggregationObserver.Put(decomposedKey.First, aggregation)
+	observeToSolve := MappingReceiverFuncs[KeyPartA, Map[KeyPartB, Val]]{
+		OnPut: func(keyPartA KeyPartA, problem Map[KeyPartB, Val]) {
+			aggregation := aggregate(keyPartA, problem)
+			aggregationObserver.Put(keyPartA, aggregation)
 		},
-		OnDelete: func(wholeKey WholeKey) {
-			decomposedKey := keyDecomposer.First(wholeKey)
-			aggregationObserver.Delete(decomposedKey.First)
+		OnDelete: func(keyPartA KeyPartA) {
+			aggregationObserver.Delete(keyPartA)
 		},
 	}
-	if unifiedObserver == nil {
-		unifiedObserver = observeToSolve
-	} else {
-		unifiedObserver = MapChangeReceiverFork[WholeKey, Val]{unifiedObserver, observeToSolve}
-	}
-	fm = NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB, Val](keyDecomposer, unifiedObserver, outerObserver)
-	return fm
+	return NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB, Val](keyDecomposer, unifiedObserver, outerObserver, observeToSolve)
 }

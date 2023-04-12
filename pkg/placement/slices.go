@@ -35,8 +35,49 @@ func SliceRemoveFunctional[Elt comparable](slice []Elt, seek Elt) []Elt {
 	return ans
 }
 
+func SliceEqual[Elt comparable](a, b []Elt) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for index, elta := range a {
+		if elta != b[index] {
+			return false
+		}
+	}
+	return true
+}
+
 func SliceApply[Elt any](slice []Elt, fn func(Elt)) {
 	for _, elt := range slice {
 		fn(elt)
 	}
+}
+
+func SetToSlice[Elt comparable](set Set[Elt]) []Elt {
+	ans := make([]Elt, 0, set.Len())
+	set.Visit(func(elt Elt) error {
+		ans = append(ans, elt)
+		return nil
+	})
+	return ans
+}
+
+func SetMapToSlice[Original comparable, Mapped any](set Set[Original], mapfn func(Original) Mapped) []Mapped {
+	ans := make([]Mapped, 0, set.Len())
+	set.Visit(func(elt Original) error {
+		mapped := mapfn(elt)
+		ans = append(ans, mapped)
+		return nil
+	})
+	return ans
+}
+
+func MapMapToSlice[Key comparable, Val, Mapped any](theMap Map[Key, Val], mapfn func(Key, Val) Mapped) []Mapped {
+	ans := make([]Mapped, 0, theMap.Len())
+	theMap.Visit(func(tup Pair[Key, Val]) error {
+		mapped := mapfn(tup.First, tup.Second)
+		ans = append(ans, mapped)
+		return nil
+	})
+	return ans
 }

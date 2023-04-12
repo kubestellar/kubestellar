@@ -30,16 +30,20 @@ type FactoredMapIndex[KeyPartA, KeyPartB comparable, Val any] interface {
 }
 
 // NewFactoredMapMap makes a FactoredMap implements by golang maps.
+// For outerObserver1: the Update method is not called, only Create and Delete.
+// For outerObserver2: all three methods are called.
 func NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
 	keyDecomposer Factorer[WholeKey, KeyPartA, KeyPartB],
 	unifiedObserver MapChangeReceiver[WholeKey, Val],
-	outerObserver MapChangeReceiver[KeyPartA, MutableMap[KeyPartB, Val]],
+	outerObserver1 MapChangeReceiver[KeyPartA, MutableMap[KeyPartB, Val]],
+	outerObserver2 MappingReceiver[KeyPartA, Map[KeyPartB, Val]],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
 	return NewFactoredMap[WholeKey, KeyPartA, KeyPartB, Val](
 		keyDecomposer,
 		NewMapMapFactory[KeyPartB, Val](nil),
-		NewMapMap[KeyPartA, MutableMap[KeyPartB, Val]](outerObserver),
+		NewMapMap[KeyPartA, MutableMap[KeyPartB, Val]](outerObserver1),
 		unifiedObserver,
+		outerObserver2,
 	)
 }
 
@@ -50,12 +54,14 @@ func NewFactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
 	innerMapConstructor func() MutableMap[KeyPartB, Val],
 	outerMap MutableMap[KeyPartA, MutableMap[KeyPartB, Val]],
 	unifiedObserver MapChangeReceiver[WholeKey, Val],
+	outerObserver MappingReceiver[KeyPartA, Map[KeyPartB, Val]],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
 	return &factoredMap[WholeKey, KeyPartA, KeyPartB, Val]{
 		keyDecomposer:       keyDecomposer,
 		innerMapConstructor: innerMapConstructor,
 		outerMap:            outerMap,
 		unifiedObserver:     unifiedObserver,
+		outerObserver:       outerObserver,
 	}
 }
 
@@ -64,6 +70,7 @@ type factoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any] struct {
 	innerMapConstructor func() MutableMap[KeyPartB, Val]
 	outerMap            MutableMap[KeyPartA, MutableMap[KeyPartB, Val]]
 	unifiedObserver     MapChangeReceiver[WholeKey, Val]
+	outerObserver       MappingReceiver[KeyPartA, Map[KeyPartB, Val]]
 }
 
 func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) IsEmpty() bool {
@@ -110,15 +117,28 @@ func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Put(wholeKey WholeKey,
 		if fm.unifiedObserver != nil {
 			fm.unifiedObserver.Create(wholeKey, val)
 		}
+		if fm.outerObserver != nil {
+			fm.outerObserver.Put(decomposedKey.First, innerMap)
+		}
 		return
 	}
-	if fm.unifiedObserver != nil {
+	if fm.unifiedObserver != nil || fm.outerObserver != nil {
 		oldVal, had := innerMap.Get(decomposedKey.Second)
 		innerMap.Put(decomposedKey.Second, val)
 		if had {
-			fm.unifiedObserver.Update(wholeKey, oldVal, val)
+			if fm.unifiedObserver != nil {
+				fm.unifiedObserver.Update(wholeKey, oldVal, val)
+			}
+			if fm.outerObserver != nil {
+				fm.outerObserver.Put(decomposedKey.First, innerMap)
+			}
 		} else {
-			fm.unifiedObserver.Create(wholeKey, val)
+			if fm.unifiedObserver != nil {
+				fm.unifiedObserver.Create(wholeKey, val)
+			}
+			if fm.outerObserver != nil {
+				fm.outerObserver.Put(decomposedKey.First, innerMap)
+			}
 		}
 		return
 	}
@@ -131,19 +151,21 @@ func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Delete(wholeKey WholeK
 	if !ok {
 		return
 	}
-	if fm.unifiedObserver != nil {
-		oldVal, had := innerMap.Get(decomposedKey.Second)
-		if had {
-			innerMap.Delete(decomposedKey.Second)
-			fm.unifiedObserver.DeleteWithFinal(wholeKey, oldVal)
-		} else {
-			return
-		}
-	} else {
-		innerMap.Delete(decomposedKey.Second)
+	oldVal, had := innerMap.Get(decomposedKey.Second)
+	if !had {
+		return
 	}
+	innerMap.Delete(decomposedKey.Second)
 	if innerMap.IsEmpty() {
 		fm.outerMap.Delete(decomposedKey.First)
+		if fm.outerObserver != nil {
+			fm.outerObserver.Delete(decomposedKey.First)
+		}
+	} else if fm.outerObserver != nil {
+		fm.outerObserver.Put(decomposedKey.First, innerMap)
+	}
+	if fm.unifiedObserver != nil {
+		fm.unifiedObserver.DeleteWithFinal(wholeKey, oldVal)
 	}
 }
 

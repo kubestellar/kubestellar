@@ -153,7 +153,11 @@ var _ Index2[int, string, MapSet[string]] = genericIndexedSetIndex[complex64, in
 
 func (gi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) Get(key Key) (ValSet, bool) {
 	set, ok := gi.rep.Get(key)
-	return gi.insulateValSet(set), ok
+	if !ok {
+		var zero ValSet
+		return zero, false
+	}
+	return gi.insulateValSet(set), true
 }
 
 func (mi genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]) Visit(visitor func(Pair[Key, ValSet]) error) error {

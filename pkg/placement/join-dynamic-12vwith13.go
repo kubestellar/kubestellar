@@ -33,8 +33,7 @@ func NewDynamicFullJoin12VWith13[ColX, ColY, ColZ comparable, Val any](logger kl
 		receiver: receiver,
 		xzReln:   NewMapRelation2[ColX, ColZ](),
 	}
-
-	dj.xyvReln = NewFactoredMapMap[Pair[ColX, ColY], ColX, ColY, Val](PairFactorer[ColX, ColY](), extrapolate2v[ColX, ColY, ColZ, Val]{dj.xzReln, receiver}, nil)
+	dj.xyvReln = NewFactoredMapMap[Pair[ColX, ColY], ColX, ColY, Val](PairFactorer[ColX, ColY](), extrapolate2v[ColX, ColY, ColZ, Val]{dj.xzReln, receiver}, nil, nil)
 	dj.xzReln = Relation2WithObservers[ColX, ColZ](dj.xzReln, extrapolate1v[ColX, ColY, ColZ, Val]{dj.xyvReln, receiver})
 	return dj.xyvReln, dj.xzReln
 }

@@ -268,14 +268,14 @@ type APIMapProvider interface {
 
 	// Neither receiver is invoked synchronously.
 	AddReceivers(cluster logicalcluster.Name,
-		groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-		resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails])
+		groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+		resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails])
 
 	// The receiver values have to be comparable.
 	// Neither receiver is invoked synchronously.
 	RemoveReceivers(cluster logicalcluster.Name,
-		groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-		resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails])
+		groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+		resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails])
 
 	// RemoveClient removes a client for a cluster.
 	// Clients must be comparable.
@@ -283,6 +283,9 @@ type APIMapProvider interface {
 	// internal computational resources.
 	//RemoveClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 }
+
+// Pointers to these are comparable, unlike `MappingReceiver` in go 1.19
+type MappingReceiverHolder[Key comparable, Val any] struct{ MappingReceiver[Key, Val] }
 
 type APIGroupInfo struct {
 	// Versions are ordered as semantic versions.

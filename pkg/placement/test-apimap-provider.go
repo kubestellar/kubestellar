@@ -41,8 +41,6 @@ func NewTestAPIMapProvider(logger klog.Logger) *TestAPIMapProvider {
 // A test func can modify a cluster's GroupInfo and/or ResourceInfo
 // and the registered receivers will be synchronously updated, but this
 // should only be done while there is no concurrent acess going on.
-// RemoveReceivers will not be implemented until go 1.20 or later is
-// required for this module.
 type TestAPIMapProvider struct {
 	logger klog.Logger
 	sync.Mutex
@@ -52,15 +50,15 @@ type TestAPIMapProvider struct {
 type TestAPIPerCluster struct {
 	GroupInfo         MutableMap[string /*group name*/, APIGroupInfo]
 	ResourceInfo      MutableMap[metav1.GroupResource, ResourceDetails]
-	groupReceivers    MappingReceiverFork[string /*group name*/, APIGroupInfo]
-	resourceReceivers MappingReceiverFork[metav1.GroupResource, ResourceDetails]
+	groupReceivers    MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]
+	resourceReceivers MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]
 }
 
 var _ APIMapProvider = &TestAPIMapProvider{}
 
 func (tap *TestAPIMapProvider) AddReceivers(cluster logicalcluster.Name,
-	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
+	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
 	tap.Lock()
 	defer tap.Unlock()
 	tpc := tap.ensureClusterLocked(cluster)
@@ -83,22 +81,16 @@ func (tap *TestAPIMapProvider) ensureClusterLocked(cluster logicalcluster.Name) 
 }
 
 func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
-	groupReceiver MappingReceiver[string /*group name*/, APIGroupInfo],
-	resourceReceiver MappingReceiver[metav1.GroupResource, ResourceDetails]) {
+	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
+	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
 	tap.Lock()
 	defer tap.Unlock()
 	tpc, has := tap.perCluster.Get(cluster)
 	if !has {
 		return
-	} else {
-		// The following statement is only here to stop linters from complaining that tpc is unused.
-		// Remove this statement once the panic is removed.
-		tpc.groupReceivers = MappingReceiverFork[string /*group name*/, APIGroupInfo]{}
 	}
-	panic("not implemented until go 1.20 is required for this module")
-	// The following requires go 1.20:
-	// tpc.groupReceivers = SliceRemoveFunctional(tpc.groupReceivers, groupReceiver)
-	// tpc.resourceReceivers = SliceRemoveFunctional(tpc.resourceReceivers, resourceReceiver)
+	tpc.groupReceivers = SliceRemoveFunctional(tpc.groupReceivers, groupReceiver)
+	tpc.resourceReceivers = SliceRemoveFunctional(tpc.resourceReceivers, resourceReceiver)
 }
 
 func (tap *TestAPIMapProvider) AsResourceReceiver() MappingReceiver[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails] {
