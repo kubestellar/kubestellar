@@ -30,6 +30,7 @@ The command line flags, beyond the basics, are as follows.
 
 ```console
       --concurrency int                  number of syncs to run in parallel (default 4)
+      --espw-path string                 the pathname of the edge service provider workspace (default "root:espw")
       --inventory-context string         current-context override for inventory-kubeconfig (default "root")
       --inventory-kubeconfig string      pathname of kubeconfig file for inventory service provider workspace
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)
@@ -121,6 +122,12 @@ $ kubectl get workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 ```
+
+FYI, if you look inside that workspace you will see an `APIBinding`
+named `bind-edge` that binds to the `APIExport` named `edge.kcp.io`
+from the edge service provider workspace (and this is why the
+controller needs to know the pathname of that workspace), so that the
+edge API is available in the mailbox workspace.
 
 Next, `kubectl delete` that workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.
