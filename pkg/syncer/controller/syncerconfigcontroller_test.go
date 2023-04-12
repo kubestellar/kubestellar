@@ -76,13 +76,6 @@ var testAPIResourceList = []*metav1.APIResourceList{
 }
 
 func TestSyncerConfig(t *testing.T) {
-	syncConfigManager = _syncConfigManager{
-		logger:                     klog.FromContext(context.TODO()),
-		syncConfigMap:              map[string]syncerv1alpha1.EdgeSyncConfig{},
-		indexedDownSyncedResources: newIndexedSyncedResources(),
-		indexedUpSyncedResources:   newIndexedSyncedResources(),
-		conversions:                []syncerv1alpha1.EdgeSynConversion{},
-	}
 	tests := []struct {
 		description      string
 		op               string
@@ -165,7 +158,8 @@ func TestSyncerConfig(t *testing.T) {
 			downstreamClientFactory, err := clientfactory.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
 			require.NoError(t, err)
 
-			syncerConfigManager := NewSyncerConfigManager(logger, upstreamClientFactory, downstreamClientFactory)
+			syncConfigManager := NewSyncConfigManager(klog.FromContext(context.TODO()))
+			syncerConfigManager := NewSyncerConfigManager(logger, syncConfigManager, upstreamClientFactory, downstreamClientFactory)
 			controller, err := NewSyncerConfigController(logger, syncerConfigClient, syncerConfigInformer, syncerConfigManager, 1*time.Second)
 			require.NoError(t, err)
 
@@ -203,9 +197,9 @@ func TestSyncerConfig(t *testing.T) {
 				return count == 3
 			}, wait.ForeverTestTimeout, 1*time.Second)
 
-			downsyncedResources := syncConfigManager.getDownSyncedResources()
+			downsyncedResources := syncConfigManager.GetDownSyncedResources()
 			assertEqualArrayWithouOrder(t, tc.expected.downSyncedResources, downsyncedResources)
-			upsyncedResources := syncConfigManager.getUpSyncedResources()
+			upsyncedResources := syncConfigManager.GetUpSyncedResources()
 			assertEqualArrayWithouOrder(t, tc.expected.upSyncedResources, upsyncedResources)
 		})
 	}

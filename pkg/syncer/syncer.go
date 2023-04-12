@@ -35,7 +35,6 @@ import (
 	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	syncerv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
@@ -128,12 +127,13 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
-	syncConfigController, err := controller.NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigAccess, upSyncer, downSyncer, 5*time.Second)
+	syncConfigManager := controller.NewSyncConfigManager(logger)
+	syncConfigController, err := controller.NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigAccess, syncConfigManager, upSyncer, downSyncer, 5*time.Second)
 	if err != nil {
 		return err
 	}
 
-	syncerConfigManager := controller.NewSyncerConfigManager(logger, upstreamClientFactory, downstreamClientFactory)
+	syncerConfigManager := controller.NewSyncerConfigManager(logger, syncConfigManager, upstreamClientFactory, downstreamClientFactory)
 	syncerConfigController, err := controller.NewSyncerConfigController(logger, syncerConfigClient, syncerConfigAccess, syncerConfigManager, 5*time.Second)
 	if err != nil {
 		return err
@@ -141,11 +141,11 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 
 	go syncConfigController.Run(ctx, numSyncerThreads)
 	go syncerConfigController.Run(ctx, numSyncerThreads)
-	runSync(ctx, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
+	runSync(ctx, cfg, syncConfigManager, upSyncer, downSyncer)
 	return nil
 }
 
-func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister syncerv1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controller.SyncConfigManager, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
 	interval := cfg.Interval
@@ -158,16 +158,16 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister syncerv1al
 			return
 		case <-time.Tick(interval):
 			logger.V(2).Info("Sync ")
-			for _, resource := range controller.GetDownSyncedResources() {
-				if err := downSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
+			for _, resource := range syncConfigManager.GetDownSyncedResources() {
+				if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
 					logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 				}
-				if err := downSyncer.BackStatusOne(resource, controller.GetConversions()); err != nil {
+				if err := downSyncer.BackStatusOne(resource, syncConfigManager.GetConversions()); err != nil {
 					logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 				}
 			}
-			for _, resource := range controller.GetUpSyncedResources() {
-				if err := upSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
+			for _, resource := range syncConfigManager.GetUpSyncedResources() {
+				if err := upSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
 					logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 				}
 			}

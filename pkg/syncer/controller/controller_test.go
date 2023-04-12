@@ -108,6 +108,7 @@ type Expected struct {
 }
 
 func TestSyncConfig(t *testing.T) {
+	syncConfigManager := NewSyncConfigManager(klog.FromContext(context.TODO()))
 	tests := []struct {
 		description        string
 		op                 string
@@ -206,7 +207,7 @@ func TestSyncConfig(t *testing.T) {
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
 			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-			controller, err := NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigInformer, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
+			controller, err := NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigInformer, syncConfigManager, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
 			require.NoError(t, err)
 
 			syncConfigInformerFactory.Start(ctx.Done())

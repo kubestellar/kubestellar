@@ -35,9 +35,10 @@ const (
 	UPSYNC_SUFFIX                 string = "_upsync"
 )
 
-func NewSyncerConfigManager(logger klog.Logger, upstreamClientFactory clientfactory.ClientFactory, downstreamClientFactory clientfactory.ClientFactory) *SyncerConfigManager {
+func NewSyncerConfigManager(logger klog.Logger, syncConfigManager *SyncConfigManager, upstreamClientFactory clientfactory.ClientFactory, downstreamClientFactory clientfactory.ClientFactory) *SyncerConfigManager {
 	return &SyncerConfigManager{
 		logger:                  logger,
+		syncConfigManager:       syncConfigManager,
 		syncerConfigMap:         map[string]edgev1alpha1.SyncerConfig{},
 		upstreamClientFactory:   upstreamClientFactory,
 		downstreamClientFactory: downstreamClientFactory,
@@ -47,6 +48,7 @@ func NewSyncerConfigManager(logger klog.Logger, upstreamClientFactory clientfact
 type SyncerConfigManager struct {
 	sync.Mutex
 	logger                  klog.Logger
+	syncConfigManager       *SyncConfigManager
 	syncerConfigMap         map[string]edgev1alpha1.SyncerConfig
 	upstreamClientFactory   clientfactory.ClientFactory
 	downstreamClientFactory clientfactory.ClientFactory
@@ -111,7 +113,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 			DownSyncedResources: edgeSyncConfigResources,
 		},
 	}
-	syncConfigManager.upsert(edgeSyncConfig)
+	s.syncConfigManager.upsert(edgeSyncConfig)
 }
 
 func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
@@ -157,7 +159,7 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 			DownSyncedResources: edgeSyncConfigResources,
 		},
 	}
-	syncConfigManager.upsert(edgeSyncConfig)
+	s.syncConfigManager.upsert(edgeSyncConfig)
 }
 
 func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfig, downstreamGroupResourcesList []*restmapper.APIGroupResources) {
@@ -201,7 +203,7 @@ func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfi
 			UpSyncedResources: edgeSyncConfigResources,
 		},
 	}
-	syncConfigManager.upsert(edgeSyncConfig)
+	s.syncConfigManager.upsert(edgeSyncConfig)
 }
 
 func (s *SyncerConfigManager) delete(key string) {
@@ -210,9 +212,9 @@ func (s *SyncerConfigManager) delete(key string) {
 	s.Lock()
 	defer s.Unlock()
 	delete(s.syncerConfigMap, key)
-	syncConfigManager.delete(key + DOWNSYNC_NAMESPACED_SUFFIX)
-	syncConfigManager.delete(key + DOWNSYNC_CLUSTERSCOPED_SUFFIX)
-	syncConfigManager.delete(key + UPSYNC_SUFFIX)
+	s.syncConfigManager.delete(key + DOWNSYNC_NAMESPACED_SUFFIX)
+	s.syncConfigManager.delete(key + DOWNSYNC_CLUSTERSCOPED_SUFFIX)
+	s.syncConfigManager.delete(key + UPSYNC_SUFFIX)
 }
 
 func findVersionedResourcesByGVR(group string, version string, resource string, apiGroupResourcesList []*restmapper.APIGroupResources, logger klog.Logger) []v1.APIResource {

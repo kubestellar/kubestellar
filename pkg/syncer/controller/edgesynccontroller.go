@@ -37,16 +37,18 @@ func NewEdgeSyncConfigController(
 	logger klog.Logger,
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,
 	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
+	syncConfigManager *SyncConfigManager,
 	upSyncer syncers.SyncerInterface,
 	downSyncer syncers.SyncerInterface,
 	reconcileInterval time.Duration,
 ) (*edgeSyncConfigController, error) {
 	rateLimitter := workqueue.NewItemFastSlowRateLimiter(reconcileInterval, reconcileInterval*5, 1000)
 	c := &edgeSyncConfigController{
-		syncConfigLister: syncConfigInformer.Lister(),
-		syncConfigClient: syncConfigClient,
-		upSyncer:         upSyncer,
-		downSyncer:       downSyncer,
+		syncConfigLister:  syncConfigInformer.Lister(),
+		syncConfigClient:  syncConfigClient,
+		syncConfigManager: syncConfigManager,
+		upSyncer:          upSyncer,
+		downSyncer:        downSyncer,
 	}
 	controllerName := "kcp-edge-syncconfig-controller"
 	controllerBase := &controllerBase{
@@ -79,10 +81,11 @@ func NewEdgeSyncConfigController(
 // edgeSyncConfigController is a control loop that watches EdgeSyncConfig.
 type edgeSyncConfigController struct {
 	*controllerBase
-	syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister
-	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface
-	upSyncer         syncers.SyncerInterface
-	downSyncer       syncers.SyncerInterface
+	syncConfigLister  edgev1alpha1listers.EdgeSyncConfigLister
+	syncConfigClient  edgev1alpha1typed.EdgeSyncConfigInterface
+	syncConfigManager *SyncConfigManager
+	upSyncer          syncers.SyncerInterface
+	downSyncer        syncers.SyncerInterface
 }
 
 func (c *edgeSyncConfigController) process(ctx context.Context, key string) error {
@@ -95,8 +98,8 @@ func (c *edgeSyncConfigController) process(ctx context.Context, key string) erro
 	}
 
 	refresh := func() error {
-		downsyncerError := c.downSyncer.ReInitializeClients(syncConfigManager.getDownSyncedResources(), syncConfigManager.getConversions())
-		upSyncerError := c.upSyncer.ReInitializeClients(syncConfigManager.getUpSyncedResources(), syncConfigManager.getConversions())
+		downsyncerError := c.downSyncer.ReInitializeClients(c.syncConfigManager.GetDownSyncedResources(), c.syncConfigManager.GetConversions())
+		upSyncerError := c.upSyncer.ReInitializeClients(c.syncConfigManager.GetUpSyncedResources(), c.syncConfigManager.GetConversions())
 
 		if downsyncerError != nil && upSyncerError != nil {
 			return fmt.Errorf("failed to reinitialize downsyncer (%w) and upsyncer (%w)", downsyncerError, upSyncerError)
@@ -111,13 +114,13 @@ func (c *edgeSyncConfigController) process(ctx context.Context, key string) erro
 	syncConfig, err := c.syncConfigLister.Get(name)
 	if err != nil {
 		if errors.IsNotFound(err) { // object is deleted
-			syncConfigManager.delete(name)
+			c.syncConfigManager.delete(name)
 			return refresh()
 		}
 		return err
 	}
 
-	syncConfigManager.upsert(*syncConfig)
+	c.syncConfigManager.upsert(*syncConfig)
 
 	return refresh()
 }
