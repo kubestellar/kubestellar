@@ -18,6 +18,7 @@ package framework
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"strings"
 	"testing"
@@ -27,6 +28,9 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
@@ -41,6 +45,15 @@ import (
 
 	edgesyncer "github.com/kcp-dev/edge-mc/pkg/syncer"
 )
+
+//go:embed testdata/*
+var embedded embed.FS
+
+var crdGVR = schema.GroupVersionResource{
+	Group:    "apiextensions.k8s.io",
+	Version:  "v1",
+	Resource: "customresourcedefinitions",
+}
 
 type SyncerOption func(t *testing.T, fs *edgeSyncerFixture)
 
@@ -135,6 +148,19 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	require.NoError(t, err)
 
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
+	require.NoError(t, err)
+
+	logicalRawConfig := framework.LogicalClusterRawConfig(upstreamRawConfig, sf.edgeSyncTargetPath, "base")
+	logicalConfig := clientcmd.NewNonInteractiveClientConfig(logicalRawConfig, logicalRawConfig.CurrentContext, &clientcmd.ConfigOverrides{}, nil)
+	upstreamKubeConfig, err := logicalConfig.ClientConfig()
+	require.NoError(t, err)
+	upstreamDynamicKubeClient, err := dynamic.NewForConfig(upstreamKubeConfig)
+
+	var syncerConfigCRDUnst *unstructured.Unstructured
+	err = LoadFile("testdata/edge.kcp.io_syncerconfigs.yaml", embedded, &syncerConfigCRDUnst)
+	require.NoError(t, err)
+	t.Logf("Create SyncerConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
+	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), syncerConfigCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	return &appliedEdgeSyncerFixture{
@@ -239,4 +265,12 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 		SyncTargetUID:    "",
 		Interval:         time.Second * 3,
 	}
+}
+
+func LoadFile(path string, embedded embed.FS, v interface{}) error {
+	data, err := embedded.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(data, v)
 }

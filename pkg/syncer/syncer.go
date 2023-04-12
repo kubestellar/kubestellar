@@ -31,7 +31,9 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	syncerv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	syncerv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
@@ -78,6 +80,21 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	syncConfigInformerFactory.Start(ctx.Done())
 	syncConfigInformerFactory.WaitForCacheSync(ctx.Done())
 
+	// For syncerConfig
+	syncerConfigClientSet, err := edgeclientset.NewForConfig(bootstrapConfig)
+	if err != nil {
+		return err
+	}
+	syncerConfigClient := syncerConfigClientSet.EdgeV1alpha1().SyncerConfigs()
+	// syncerConfigInformerFactory to watch a certain syncConfig on upstream
+	syncerConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncerConfigClientSet, resyncPeriod)
+	syncerConfigAccess := syncerConfigInformerFactory.Edge().V1alpha1().SyncerConfigs()
+
+	syncerConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
+
+	syncerConfigInformerFactory.Start(ctx.Done())
+	syncerConfigInformerFactory.WaitForCacheSync(ctx.Done())
+
 	upstreamConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(upstreamConfig, "edge-mc#syncer/"+kcpVersion)
 	upstreamDynamicClient, err := dynamic.NewForConfig(upstreamConfig)
@@ -116,7 +133,14 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
+	syncerConfigManager := controller.NewSyncerConfigManager(logger, upstreamClientFactory, downstreamClientFactory)
+	syncerConfigController, err := controller.NewSyncerConfigController(logger, syncerConfigClient, syncerConfigAccess, syncerConfigManager, 5*time.Second)
+	if err != nil {
+		return err
+	}
+
 	go syncConfigController.Run(ctx, numSyncerThreads)
+	go syncerConfigController.Run(ctx, numSyncerThreads)
 	runSync(ctx, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
 	return nil
 }

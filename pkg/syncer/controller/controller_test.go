@@ -101,12 +101,13 @@ var downSyncedResource2 = edgev1alpha1.EdgeSyncConfigResource{
 	Namespace: "dns2",
 }
 
+type Expected struct {
+	downSyncedResources []edgev1alpha1.EdgeSyncConfigResource
+	upSyncedResources   []edgev1alpha1.EdgeSyncConfigResource
+	conversions         []edgev1alpha1.EdgeSynConversion
+}
+
 func TestSyncConfig(t *testing.T) {
-	type Expected struct {
-		downSyncedResources []edgev1alpha1.EdgeSyncConfigResource
-		upSyncedResources   []edgev1alpha1.EdgeSyncConfigResource
-		conversions         []edgev1alpha1.EdgeSynConversion
-	}
 	tests := []struct {
 		description        string
 		op                 string

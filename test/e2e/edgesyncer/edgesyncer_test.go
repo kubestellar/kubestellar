@@ -30,7 +30,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/util/yaml"
 
 	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
@@ -60,30 +59,22 @@ var sampleCRGVR = schema.GroupVersionResource{
 	Resource: "samples",
 }
 
-func loadFile(path string, v interface{}) error {
-	edgeSyncConfigData, err := embedded.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	return yaml.Unmarshal(edgeSyncConfigData, v)
-}
-
 func TestEdgeSyncer(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
-	err := loadFile("testdata/edge-sync-config.yaml", &edgeSyncConfigUnst)
+	err := edgeframework.LoadFile("testdata/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
 	require.NoError(t, err)
 
 	var sampleCRDUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-crd.yaml", &sampleCRDUnst)
+	err = edgeframework.LoadFile("testdata/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
 	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-upsync-cr.yaml", &sampleUpsyncCRUnst)
+	err = edgeframework.LoadFile("testdata/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
 	require.NoError(t, err)
 
 	var sampleDownsyncCRUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-downsync-cr.yaml", &sampleDownsyncCRUnst)
+	err = edgeframework.LoadFile("testdata/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
