@@ -55,7 +55,7 @@ type SyncerConfigManager struct {
 }
 
 func (s *SyncerConfigManager) upsert(syncerConfig edgev1alpha1.SyncerConfig) {
-	logger := s.logger.WithValues("syncer-config-name", syncerConfig.Name)
+	logger := s.logger.WithValues("syncerConfigName", syncerConfig.Name)
 	s.Lock()
 	defer s.Unlock()
 	s.syncerConfigMap[syncerConfig.Name] = syncerConfig
@@ -66,7 +66,7 @@ func (s *SyncerConfigManager) Refresh() {
 	s.Lock()
 	defer s.Unlock()
 	for _, syncerConfig := range s.syncerConfigMap {
-		logger := s.logger.WithValues("syncer-config-name", syncerConfig.Name)
+		logger := s.logger.WithValues("syncerConfigName", syncerConfig.Name)
 		logger.V(3).Info("upsert syncerConfig to syncConfigManager stores")
 		upstreamGroupResourcesList, err := s.upstreamClientFactory.GetAPIGroupResources()
 		if err != nil {
@@ -214,7 +214,7 @@ func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfi
 }
 
 func (s *SyncerConfigManager) delete(key string) {
-	logger := s.logger.WithValues("syncer-config-name", key)
+	logger := s.logger.WithValues("syncerConfigName", key)
 	logger.V(3).Info("delete syncConfigs for syncerConfig from syncConfigManager stores")
 	s.Lock()
 	defer s.Unlock()
