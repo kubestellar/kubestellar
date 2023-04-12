@@ -22,13 +22,13 @@ import (
 	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
 
-	"github.com/kcp-dev/edge-mc/pkg/client"
+	clientoptions "github.com/kcp-dev/edge-mc/pkg/client-options"
 )
 
 type Options struct {
-	EspwClientOpts   client.ClientOpts
-	RootClientOpts   client.ClientOpts
-	SysAdmClientOpts client.ClientOpts
+	EspwClientOpts   clientoptions.ClientOpts
+	RootClientOpts   clientoptions.ClientOpts
+	SysAdmClientOpts clientoptions.ClientOpts
 	Logs             *logs.Options
 }
 
@@ -38,9 +38,9 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	return &Options{
-		EspwClientOpts:   *client.NewClientOpts("espw", "access to the edge service provider workspace"),
-		RootClientOpts:   *client.NewClientOpts("root", "access to all clusters"),
-		SysAdmClientOpts: *client.NewClientOpts("sysadm", "access to all clusters as system:admin"),
+		EspwClientOpts:   *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
+		RootClientOpts:   *clientoptions.NewClientOpts("root", "access to all clusters"),
+		SysAdmClientOpts: *clientoptions.NewClientOpts("sysadm", "access to all clusters as system:admin"),
 		Logs:             logs,
 	}
 }
