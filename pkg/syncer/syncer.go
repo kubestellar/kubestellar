@@ -141,11 +141,11 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 
 	go syncConfigController.Run(ctx, numSyncerThreads)
 	go syncerConfigController.Run(ctx, numSyncerThreads)
-	runSync(ctx, cfg, syncConfigManager, upSyncer, downSyncer)
+	runSync(ctx, cfg, syncConfigManager, syncerConfigManager, upSyncer, downSyncer)
 	return nil
 }
 
-func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controller.SyncConfigManager, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controller.SyncConfigManager, syncerConfigManager *controller.SyncerConfigManager, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
 	interval := cfg.Interval
@@ -158,12 +158,23 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 			return
 		case <-time.Tick(interval):
 			logger.V(2).Info("Sync ")
+			syncerConfigManager.Refresh()
+			_ = downSyncer.ReInitializeClients(syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
 			for _, resource := range syncConfigManager.GetDownSyncedResources() {
-				if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-				}
-				if err := downSyncer.BackStatusOne(resource, syncConfigManager.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+				if resource.Name == "*" {
+					if err := downSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+					if err := downSyncer.BackStatusMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+				} else {
+					if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+					if err := downSyncer.BackStatusOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
 				}
 			}
 			for _, resource := range syncConfigManager.GetUpSyncedResources() {

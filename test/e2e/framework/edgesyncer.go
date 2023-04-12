@@ -39,6 +39,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/yaml"
 
+	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
+	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	workloadcliplugin "github.com/kcp-dev/kcp/pkg/cliplugins/workload/plugin"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -163,15 +165,25 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), syncerConfigCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
+	upstreamConfig := sf.upstreamServer.BaseConfig(t)
+	upstreamDynamicClueterClient, err := kcpdynamic.NewForConfig(upstreamConfig)
+	require.NoError(t, err)
+	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
+	require.NoError(t, err)
+
 	return &appliedEdgeSyncerFixture{
 		edgeSyncerFixture: *sf,
 
 		SyncerConfig:                syncerConfig,
 		SyncerID:                    syncerID,
+		WorkspacePath:               sf.edgeSyncTargetPath,
 		DownstreamConfig:            downstreamConfig,
 		DownstreamKubeClient:        downstreamKubeClient,
 		DownstreamDynamicKubeClient: downstreamDynamicKubeClient,
 		DownstreamKubeconfigPath:    downstreamKubeconfigPath,
+		UpstreamConfig:              upstreamConfig,
+		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
+		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
 	}
 }
 
@@ -199,15 +211,19 @@ func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFi
 type appliedEdgeSyncerFixture struct {
 	edgeSyncerFixture
 
-	SyncerConfig *edgesyncer.SyncerConfig
-	SyncerID     string
-
+	SyncerConfig  *edgesyncer.SyncerConfig
+	SyncerID      string
+	WorkspacePath logicalcluster.Path
 	// Provide cluster-admin config and client for test purposes. The downstream config in
 	// SyncerConfig will be less privileged.
 	DownstreamConfig            *rest.Config
 	DownstreamKubeClient        kubernetesclient.Interface
 	DownstreamDynamicKubeClient dynamic.Interface
 	DownstreamKubeconfigPath    string
+
+	UpstreamConfig            *rest.Config
+	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
+	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
 }
 
 // StartedEdgeSyncerFixture contains the configuration used to start a syncer and interact with its

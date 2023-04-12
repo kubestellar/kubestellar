@@ -58,6 +58,17 @@ func (c *Client) Get(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructure
 	return unstObj, err
 }
 
+func (c *Client) List(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructured.UnstructuredList, error) {
+	var unstListObj *unstructured.UnstructuredList
+	var err error
+	if c.IsNamespaced() {
+		unstListObj, err = c.ResourceClient.Namespace(resource.Namespace).List(context.Background(), v1.ListOptions{})
+	} else {
+		unstListObj, err = c.ResourceClient.List(context.Background(), v1.ListOptions{})
+	}
+	return unstListObj, err
+}
+
 func (c *Client) Update(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 	var updatedObj *unstructured.Unstructured
 	var err error
