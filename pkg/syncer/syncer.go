@@ -30,10 +30,11 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	syncerv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	syncerv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
@@ -62,6 +63,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	bootstrapConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
 
+	// For edgeSyncConfig
 	syncConfigClientSet, err := syncerclientset.NewForConfig(bootstrapConfig)
 	if err != nil {
 		return err
@@ -83,7 +85,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
-	upstreamClientFactory, err := syncers.NewClientFactory(logger, upstreamDynamicClient, upstreamDiscoveryClient)
+	upstreamClientFactory, err := clientfactory.NewClientFactory(logger, upstreamDynamicClient, upstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
@@ -95,31 +97,31 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
-	downstreamClientFactory, err := syncers.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
+	downstreamClientFactory, err := clientfactory.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
 
-	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
+	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []syncerv1alpha1.EdgeSyncConfigResource{}, []syncerv1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
-	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
-	if err != nil {
-		return err
-	}
-
-	controller, err := controller.NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigAccess, upSyncer, downSyncer, 5*time.Second)
+	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []syncerv1alpha1.EdgeSyncConfigResource{}, []syncerv1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
 
-	go controller.Run(ctx, numSyncerThreads)
+	syncConfigController, err := controller.NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigAccess, upSyncer, downSyncer, 5*time.Second)
+	if err != nil {
+		return err
+	}
+
+	go syncConfigController.Run(ctx, numSyncerThreads)
 	runSync(ctx, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
 	return nil
 }
 
-func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister syncerv1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
 	interval := cfg.Interval
