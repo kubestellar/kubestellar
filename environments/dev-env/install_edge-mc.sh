@@ -148,10 +148,6 @@ kubeconfig_path=$(pwd)/.kcp-playground/playground.kubeconfig
 export PATH=$PATH:$kcp_path
 export KUBECONFIG=$kubeconfig_path
 
-echo $kcp_path
-#echo $kubeconfig_path
-
-
 #(5): Start the kcp-playground
 echo "****************************************"
 echo "Started deploying kcp-playground: complete in ~ 150 sec (maximum waiting time: 300 sec)"
