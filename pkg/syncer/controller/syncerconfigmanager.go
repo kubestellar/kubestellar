@@ -88,6 +88,13 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 	s.logger.V(3).Info(fmt.Sprintf("upsert namespace scoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
 	edgeSyncConfigResources := []syncerv1alpha1.EdgeSyncConfigResource{}
 	for _, namespace := range syncerConfig.Spec.NamespaceScope.Namespaces {
+		edgeSyncConfigResourceForNamespace := syncerv1alpha1.EdgeSyncConfigResource{
+			Group:   "",
+			Version: "v1",
+			Kind:    "Namespace",
+			Name:    namespace,
+		}
+		edgeSyncConfigResources = append(edgeSyncConfigResources, edgeSyncConfigResourceForNamespace)
 		for _, syncerConfigResource := range syncerConfig.Spec.NamespaceScope.Resources {
 			group := syncerConfigResource.Group
 			version := syncerConfigResource.APIVersion

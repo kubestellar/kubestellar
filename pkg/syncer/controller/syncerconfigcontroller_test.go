@@ -115,6 +115,7 @@ func TestSyncerConfig(t *testing.T) {
 			expected: Expected{
 				downSyncedResources: []syncerv1alpha1.EdgeSyncConfigResource{
 					{Group: "", Version: "v1", Kind: "ConfigMap", Namespace: "default", Name: "*"},
+					{Group: "", Version: "v1", Kind: "Namespace", Name: "default"},
 					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Name: "*"},
 				},
 				upSyncedResources: []syncerv1alpha1.EdgeSyncConfigResource{
