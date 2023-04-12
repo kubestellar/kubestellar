@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
@@ -69,7 +70,7 @@ var sampleUpsyncCRGVR = schema.GroupVersionResource{
 	Resource: "sampleupsyncs",
 }
 
-func TestEdgeSyncer(t *testing.T) {
+func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
@@ -169,8 +170,8 @@ func setup(t *testing.T) *edgeframework.StartedEdgeSyncerFixture {
 	orgPath, _ := framework.NewOrganizationFixture(t, upstreamServer, framework.TODO_WithoutMultiShardSupport())
 
 	t.Log("Creating a workspace")
-	wsPath, _ := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.TODO_WithoutMultiShardSupport())
-
+	upstreamRunningServer := framework.NewFakeWorkloadServer(t, upstreamServer, orgPath, "upstream")
+	wsPath := logicalcluster.NewPath(upstreamRunningServer.Name())
 	syncerFixture := edgeframework.NewEdgeSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())

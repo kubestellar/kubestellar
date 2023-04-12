@@ -1,0 +1,28 @@
+apiVersion: wgpolicyk8s.io/v1alpha2
+kind: ClusterPolicyReport
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+  name: sample-cluster-policy-report
+results:
+- message: 'validation error: label ''app.kubernetes.io/name'' is required. rule cluster-kyverno-label-check
+    failed at path /metadata/labels/'
+  policy: policy/cluster-kyverno-label-check
+  resources:
+  - apiVersion: v1
+    kind: Namespace
+    name: default
+    uid: 3bdd0808-4916-47e5-a76c-425018a82205
+  result: fail
+  rule: cluster-kyverno-label-check
+  scored: true
+  source: kyverno
+  timestamp:
+    nanos: 0
+    seconds: 1680142787
+summary:
+  error: 0
+  fail: 1
+  pass: 0
+  skip: 0
+  warn: 0

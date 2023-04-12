@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    labels:
+        app: kyverno
+    name: policy
+---
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: sample-policy
+  namespace: policy
+spec:
+  background: true
+  validationFailureAction: enforce
+  rules:
+  - name: sample-check-for-labels-in-configmap
+    match:
+      any:
+      - resources:
+          kinds:
+          - ConfigMap
+    validate:
+      message: "label 'app.kubernetes.io/name' is required"
+      pattern:
+        metadata:
+          labels:
+            app.kubernetes.io/name: "?*"

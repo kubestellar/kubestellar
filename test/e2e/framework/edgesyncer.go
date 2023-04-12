@@ -152,11 +152,11 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
 
-	logicalRawConfig := framework.LogicalClusterRawConfig(upstreamRawConfig, sf.edgeSyncTargetPath, "base")
-	logicalConfig := clientcmd.NewNonInteractiveClientConfig(logicalRawConfig, logicalRawConfig.CurrentContext, &clientcmd.ConfigOverrides{}, nil)
+	logicalConfig, upstreamKubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 	upstreamKubeConfig, err := logicalConfig.ClientConfig()
 	require.NoError(t, err)
 	upstreamDynamicKubeClient, err := dynamic.NewForConfig(upstreamKubeConfig)
+	require.NoError(t, err)
 
 	var syncerConfigCRDUnst *unstructured.Unstructured
 	err = LoadFile("testdata/edge.kcp.io_syncerconfigs.yaml", embedded, &syncerConfigCRDUnst)
@@ -184,6 +184,7 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 		UpstreamConfig:              upstreamConfig,
 		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
 		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
+		UpstreamKubeconfigPath:      upstreamKubeconfigPath,
 	}
 }
 
@@ -195,6 +196,10 @@ func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFi
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	go func() {
+		sf.SyncerConfig.DownstreamConfig.Burst = 128
+		sf.SyncerConfig.DownstreamConfig.QPS = 128
+		sf.SyncerConfig.UpstreamConfig.Burst = 128
+		sf.SyncerConfig.UpstreamConfig.QPS = 128
 		err := edgesyncer.RunSyncer(ctx, sf.SyncerConfig, 1)
 		require.NoError(t, err, "syncer failed to start")
 	}()
@@ -224,6 +229,7 @@ type appliedEdgeSyncerFixture struct {
 	UpstreamConfig            *rest.Config
 	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
 	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
+	UpstreamKubeconfigPath    string
 }
 
 // StartedEdgeSyncerFixture contains the configuration used to start a syncer and interact with its
