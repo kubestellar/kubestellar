@@ -47,9 +47,9 @@ func NewOptions() *Options {
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.EspwClientOpts.AddFlags(fs)
-	options.RootClientOpts.OverrideUserAndCluster("kcp-admin", "root")
+	options.RootClientOpts.SetDefaultUserAndCluster("kcp-admin", "root")
 	options.RootClientOpts.AddFlags(fs)
-	options.SysAdmClientOpts.OverrideCurrentContext("system:admin")
+	options.SysAdmClientOpts.SetDefaultCurrentContext("system:admin")
 	options.SysAdmClientOpts.AddFlags(fs)
 	options.Logs.AddFlags(fs)
 }
