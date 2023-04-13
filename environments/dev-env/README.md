@@ -14,16 +14,17 @@
   - MacOS
   - Windows WSL/Ubuntu
 
-For MacOS only:
-
-```bash
-brew install ko gcc jq make go@1.19 kind kubectl
-```
 
 Run the following script to install the required package (Linux or MacOS ):
 
 ```bash
 ./install_req.sh
+```
+
+Alternatively, run the following command for MacOS platform:
+
+```bash
+brew install ko gcc jq make go@1.19 kind kubectl
 ```
 
 For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
@@ -34,7 +35,7 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
 #### 1. Clone this repo:
 
 ```bash
-git clone -b dev-env-v3 https://github.com/dumb0002/edge-mc.git
+git clone https://github.com/kcp-dev/edge-mc
 ```
 
 #### 2. Change into the following directory path:
@@ -180,7 +181,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
 ## Bring your own workload (BYOW)
 
-#### 1. Create your own edge infrastructure (pclusters):
+#### 1. Create your own edge infrastructure (edge pclusters):
 
 For example: create a kind cluster
 
@@ -193,7 +194,7 @@ kind create cluster --name florin
   * Step-1: Clone this repo:
 
     ```bash
-      git clone -b dev-env-v3 https://github.com/dumb0002/edge-mc.git
+    git clone https://github.com/kcp-dev/edge-mc
     ```
 
   * Step-2: change into the following directory path:
@@ -239,7 +240,7 @@ kind create cluster --name florin
           kubectl ws root:imw-1
       ```
     
-    * Step-2: create a SyncTarget object to represent your pcluster. For example:
+    * Step-2: create a SyncTarget object to represent your edge pcluster. For example:
 
       ```bash
       cat <<EOF | kubectl apply -f -
@@ -256,7 +257,7 @@ kind create cluster --name florin
       EOF
       ```
 
-   * Step-3: create a Location object describing your pcluster. For example:
+   * Step-3: create a Location object describing your edge pcluster. For example:
 
       ```bash
       cat <<EOF | kubectl apply -f -
@@ -344,7 +345,7 @@ kind create cluster --name florin
     EOF
     ```
 
-  * Step-3: create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your pcluster.
+  * Step-3: create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
  
     ```bash
     cat <<EOF | kubectl apply -f -

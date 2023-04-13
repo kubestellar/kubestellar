@@ -32,17 +32,6 @@ while (( $# > 0 )); do
     shift
 done
 
-
-# Find os type (supported: linux and darwin)
-# get_os_type() {
-#   case "$OSTYPE" in
-#       darwin*)  echo "darwin" ;;
-#       linux*)   echo "linux" ;;
-#       *)        echo "unknown: $OSTYPE" && exit 1 ;;
-#   esac
-# }
-# os_type=$(get_os_type)
-
 # Check if docker is running
 if ! docker ps > /dev/null
 then
