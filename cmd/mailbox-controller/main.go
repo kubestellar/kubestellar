@@ -68,11 +68,11 @@ func main() {
 	fs.StringVar(&espwPath, "espw-path", espwPath, "the pathname of the edge service provider workspace")
 
 	inventoryClientOpts := clientopts.NewClientOpts("inventory", "access to inventory management workspace")
-	inventoryClientOpts.OverrideCurrentContext("root")
+	inventoryClientOpts.SetDefaultCurrentContext("root")
 
 	workloadClientOpts := clientopts.NewClientOpts("workload", "access to edge service provider workspace")
 	mbwsClientOpts := clientopts.NewClientOpts("mbws", "access to mailbox workspaces (really all clusters)")
-	mbwsClientOpts.OverrideCurrentContext("base")
+	mbwsClientOpts.SetDefaultCurrentContext("base")
 
 	fs.Parse(os.Args[1:])
 

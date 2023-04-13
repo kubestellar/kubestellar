@@ -40,12 +40,12 @@ func NewClientOpts(which, description string) *ClientOpts {
 	}
 }
 
-func (opts *ClientOpts) OverrideCurrentContext(currCtx string) *ClientOpts {
+func (opts *ClientOpts) SetDefaultCurrentContext(currCtx string) *ClientOpts {
 	opts.overrides.CurrentContext = currCtx
 	return opts
 }
 
-func (opts *ClientOpts) OverrideUserAndCluster(user, cluster string) *ClientOpts {
+func (opts *ClientOpts) SetDefaultUserAndCluster(user, cluster string) *ClientOpts {
 	opts.overrides.Context = clientcmdapi.Context{
 		AuthInfo: user,
 		Cluster:  cluster,
