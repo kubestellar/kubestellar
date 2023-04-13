@@ -77,7 +77,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			factorNamespacedJoinKeyLessNS,
 			nil,
 			nil,
-			pickThe1[ProjectionModeKey, logicalcluster.Name](sbo, "Should not happen: version difference between namespaces"),
+			pickThe1[ProjectionModeKey, logicalcluster.Name](sbo.logger, "Should not happen: version difference between namespaces"),
 			namespacedModesReceiver,
 		)
 
@@ -132,7 +132,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			PairFactorer[ProjectionModeKey, ExternalName /*of downsynced object*/](),
 			nil,
 			nil,
-			pickThe1[ProjectionModeKey, ExternalName /*of downsynced object*/](sbo, "Not implemented yet: handling version conflicts for cluster-scoped resources"),
+			pickThe1[ProjectionModeKey, ExternalName /*of downsynced object*/](sbo.logger, "Not implemented yet: handling version conflicts for cluster-scoped resources"),
 			clusterModesReceiver,
 		)
 		// ctSansEPName receives the change stream of clusterWhatWhereFull with epName projected out,
@@ -312,7 +312,7 @@ var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, Projection
 	},
 }
 
-func pickThe1[KeyPartA, KeyPartB comparable](sbo *simpleBindingOrganizer, errmsg string) func(keyPartA KeyPartA, problem Map[KeyPartB, ProjectionModeVal]) ProjectionModeVal {
+func pickThe1[KeyPartA, KeyPartB comparable](logger klog.Logger, errmsg string) func(keyPartA KeyPartA, problem Map[KeyPartB, ProjectionModeVal]) ProjectionModeVal {
 	return func(keyPartA KeyPartA, problem Map[KeyPartB, ProjectionModeVal]) ProjectionModeVal {
 		versions := NewMapSet[ProjectionModeVal]()
 		var solution ProjectionModeVal
@@ -322,7 +322,7 @@ func pickThe1[KeyPartA, KeyPartB comparable](sbo *simpleBindingOrganizer, errmsg
 			return nil
 		})
 		if versions.Len() != 1 {
-			sbo.logger.Error(nil, errmsg, "keyPartA", keyPartA, "problem", problem, "chosen", solution)
+			logger.Error(nil, errmsg, "keyPartA", keyPartA, "problem", problem, "chosen", solution)
 		}
 		return solution
 	}

@@ -70,13 +70,22 @@ func (rwo *relation2WithObservers[First, Second]) Remove(tup Pair[First, Second]
 	return false
 }
 
+// SingleIndexedRelation2 is a 2-ary relation represented by an index on the first column.
+// It is mutable.
+// It is not safe for concurrent access.
+type SingleIndexedRelation2[First, Second any] struct {
+	GenericMutableIndexedSet[Pair[First, Second], First, Second, Set[Second]]
+}
+
+var _ MutableRelation2[string, float64] = SingleIndexedRelation2[string, float64]{}
+
 // NewGenericRelation2Index constructs a Relation2 that is represented
 // by an index on the first column.
 // The caller supplies the implementation of the index.
 func NewGenericRelation2Index[First, Second any](
 	secondSetFactory func() MutableSet[Second],
 	rep MutableMap[First, MutableSet[Second]],
-	pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+	pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
 	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second, MutableSet[Second], Set[Second]](
 		PairFactorer[First, Second](),
 		secondSetFactory,
@@ -84,13 +93,22 @@ func NewGenericRelation2Index[First, Second any](
 		NewSetReadonly[Second],
 		rep,
 	)
-	ans := &MapRelation2[First, Second]{
+	ans := SingleIndexedRelation2[First, Second]{
 		GenericMutableIndexedSet: wholeSet,
 	}
 	for _, pair := range pairs {
 		ans.Add(pair)
 	}
 	return ans
+}
+
+// SingleIndexedRelation3 is a 3-ary relation represented by one nested index that maps
+// a First value to an index from Second to Third.
+// It is mutable.
+// It is not safe for concurrent access.
+type SingleIndexedRelation3[First, Second, Third any] struct {
+	GenericMutableIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
+		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]]
 }
 
 // NewGenericRelation3Index constructs a set of triples
@@ -100,7 +118,7 @@ func NewGenericRelation3Index[First, Second, Third comparable](
 	thirdSetFactory func() MutableSet[Third],
 	midRepFactory func() MutableMap[Second, MutableSet[Third]],
 	rep MutableMap[First, MutableSet[Pair[Second, Third]]],
-) *MapRelation2[First, Pair[Second, Third]] {
+) SingleIndexedRelation2[First, Pair[Second, Third]] {
 	return NewGenericRelation2Index(
 		func() MutableSet[Pair[Second, Third]] {
 			return NewGenericRelation2Index(
@@ -108,4 +126,14 @@ func NewGenericRelation3Index[First, Second, Third comparable](
 				midRepFactory())
 		},
 		rep)
+}
+
+// SingleIndexedRelation4 is a 4-ary relation represented by one nested index that maps
+// a First value to an index from Second to index from Third to Fourth.
+// It is mutable.
+// It is not safe for concurrent access.
+type SingleIndexedRelation4[First, Second, Third, Fourth any] struct {
+	GenericMutableIndexedSet[Quad[First, Second, Third, Fourth], First, Triple[Second, Third, Fourth],
+		GenericIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]]]
 }

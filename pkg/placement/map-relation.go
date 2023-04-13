@@ -16,19 +16,10 @@ limitations under the License.
 
 package placement
 
-// MapRelation2 is a 2-ary relation represented by an index on the first column.
-// It is mutable.
-// It is not safe for concurrent access.
-type MapRelation2[First, Second any] struct {
-	GenericMutableIndexedSet[Pair[First, Second], First, Second, Set[Second]]
-}
-
-var _ MutableRelation2[string, float64] = &MapRelation2[string, float64]{}
-
 // NewMapRelation2 constructs a Relation2 that is represented
 // by an index on the first column.
 // The representation is based on golang `map`s.
-func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
 	return NewGenericRelation2Index[First, Second](
 		func() MutableSet[Second] { return NewEmptyMapSet[Second]() },
 		NewMapMap[First, MutableSet[Second]](nil),
@@ -39,7 +30,7 @@ func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) *Ma
 // NewHashRelation2 constructs a Relation2 that is represented
 // by an index on the first column.
 // The representation is based on HashMaps.
-func NewHashRelation2[First, Second any](hashDomainFirst HashDomain[First], hashDomainSecond HashDomain[Second], pairs ...Pair[First, Second]) *MapRelation2[First, Second] {
+func NewHashRelation2[First, Second any](hashDomainFirst HashDomain[First], hashDomainSecond HashDomain[Second], pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
 	return NewGenericRelation2Index[First, Second](
 		func() MutableSet[Second] { return NewHashSet(hashDomainSecond) },
 		NewHashMap[First, MutableSet[Second]](hashDomainFirst)(nil),
@@ -47,12 +38,7 @@ func NewHashRelation2[First, Second any](hashDomainFirst HashDomain[First], hash
 	)
 }
 
-type MapRelation3[First, Second, Third comparable] struct {
-	GenericMutableIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
-		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]]
-}
-
-func NewMapRelation3[First, Second, Third comparable]() MapRelation3[First, Second, Third] {
+func NewMapRelation3[First, Second, Third comparable]() SingleIndexedRelation3[First, Second, Third] {
 	gis := NewGenericIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
 		GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
 		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]],
@@ -75,25 +61,70 @@ func NewMapRelation3[First, Second, Third comparable]() MapRelation3[First, Seco
 		},
 		NewMapMap[First, GenericMutableIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]](nil),
 	)
-	return MapRelation3[First, Second, Third]{gis}
-}
-
-func (mr MapRelation3[First, Second, Third]) Get1to2to3(first First) Index2[Second, Third, Set[Third]] {
-	inner, has := mr.GenericMutableIndexedSet.GetIndex1to2().Get(first)
-	if !has {
-		return nil
-	}
-	return inner.GetIndex1to2()
+	return SingleIndexedRelation3[First, Second, Third]{gis}
 }
 
 // NewGenericRelation3Index constructs a set of triples
 // that is represented by two layers of indexing.
 // The representation is based on golang `map`s.
-func NewMapRelation3Index[First, Second, Third comparable]() *MapRelation2[First, Pair[Second, Third]] {
+func NewMapRelation3Index[First, Second, Third comparable]() SingleIndexedRelation2[First, Pair[Second, Third]] {
 	return NewGenericRelation3Index[First, Second, Third](
 		func() MutableSet[Third] { return NewEmptyMapSet[Third]() },
 		func() MutableMap[Second, MutableSet[Third]] {
 			return NewMapMap[Second, MutableSet[Third]](nil)
 		},
 		NewMapMap[First, MutableSet[Pair[Second, Third]]](nil))
+}
+
+func NewMapRelation4[First, Second, Third, Fourth comparable]() SingleIndexedRelation4[First, Second, Third, Fourth] {
+	gis := NewGenericIndexedSet[Quad[First, Second, Third, Fourth], First, Triple[Second, Third, Fourth],
+		GenericMutableIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]],
+		GenericIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]],
+	](
+		QuadFactorerTo1and234[First, Second, Third, Fourth](),
+		func() GenericMutableIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]] {
+			return NewGenericIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+				GenericMutableIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]],
+				GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]],
+			](
+				TripleFactorerTo1and23[Second, Third, Fourth](),
+				func() GenericMutableIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]] {
+					return NewGenericIndexedSet[Pair[Third, Fourth], Third, Fourth, MapSet[Fourth], Set[Fourth]](
+						PairFactorer[Third, Fourth](),
+						NewEmptyMapSet[Fourth],
+						func(thirds MapSet[Fourth]) MutableSet[Fourth] { return thirds },
+						func(thirds MapSet[Fourth]) Set[Fourth] { return NewSetReadonly[Fourth](thirds) },
+						NewMapMap[Third, MapSet[Fourth]](nil),
+					)
+				},
+				func(mutable34 GenericMutableIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]) MutableSet[Pair[Third, Fourth]] {
+					return mutable34
+				},
+				func(mutable34 GenericMutableIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]) GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]] {
+					return mutable34.AsReadonly()
+				},
+
+				NewMapMap[Second, GenericMutableIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]](nil),
+			)
+		},
+		func(mutable234 GenericMutableIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]],
+		) MutableSet[Triple[Second, Third, Fourth]] {
+			return mutable234
+		},
+		func(mutable234 GenericMutableIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]],
+		) GenericIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+			GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]] {
+			return mutable234.AsReadonly()
+		},
+		NewMapMap[First,
+			GenericMutableIndexedSet[Triple[Second, Third, Fourth], Second, Pair[Third, Fourth],
+				GenericIndexedSet[Pair[Third, Fourth], Third, Fourth, Set[Fourth]]],
+		](nil),
+	)
+	return SingleIndexedRelation4[First, Second, Third, Fourth]{gis}
 }
