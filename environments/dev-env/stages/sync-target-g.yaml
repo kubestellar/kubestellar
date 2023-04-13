@@ -3,8 +3,8 @@ kind: SyncTarget
 metadata:
   name: sync-target-g
   labels:
-    example: "yes"
-    extended: "yes"
+    example: "si"
+    extended: "si"
 spec:
   cells:
     bar: baz

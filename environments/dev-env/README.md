@@ -19,7 +19,7 @@ brew install ko gcc jq make go@1.19 kind kubectl
 1. Clone this repo:
 
 ```
-git clone -b dev-env https://github.com/dumb0002/edge-mc.git
+git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
 ```
 
 2. Change into the following directory path: `edge-mc/environments/dev-env`

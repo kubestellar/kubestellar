@@ -23,16 +23,16 @@ spec:
                     env: prod
                   instanceSelector:
                     matchLabels:
-                      example: "yes"
-                      extended: "no"
+                      example: "si"
+                      extended: "non"
                 - name: location-g
                   labels:
                     env: prod
-                    extended: "yes"
+                    extended: "si"
                   instanceSelector:
                     matchLabels: 
-                      example: "yes"
-                      extended: "yes"
+                      example: "si"
+                      extended: "si"
             - name: espw
   pClusters:
     - name: florin
