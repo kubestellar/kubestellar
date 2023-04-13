@@ -16,7 +16,12 @@ limitations under the License.
 
 package placement
 
-import "errors"
+import (
+	"errors"
+	"sync"
+
+	"k8s.io/klog/v2"
+)
 
 type Set[Elt comparable] interface {
 	Emptyable
@@ -49,9 +54,44 @@ type MutableSet[Elt comparable] interface {
 }
 
 // SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[T comparable] interface {
-	Add(T) bool    /* changed */
-	Remove(T) bool /* changed */
+type SetChangeReceiver[Elt comparable] interface {
+	Add(Elt) bool    /* changed */
+	Remove(Elt) bool /* changed */
+}
+
+func NewSetChangeReceiverFuncs[Elt comparable](OnAdd, OnRemove func(Elt) bool) SetChangeReceiverFuncs[Elt] {
+	return SetChangeReceiverFuncs[Elt]{OnAdd, OnRemove}
+}
+
+// SetChangeReceiverFuncs puts the SetChangeReceiver stamp of approval on a pair of funcs.
+// Either may be `nil“, in which case the corresponding SetChangeReceiver method returns `false`.
+type SetChangeReceiverFuncs[Elt comparable] struct {
+	OnAdd    func(Elt) bool
+	OnRemove func(Elt) bool
+}
+
+var _ SetChangeReceiver[int] = SetChangeReceiverFuncs[int]{}
+
+func (scrf SetChangeReceiverFuncs[Elt]) Add(elt Elt) bool {
+	if scrf.OnAdd != nil {
+		return scrf.OnAdd(elt)
+	}
+	return false
+}
+func (scrf SetChangeReceiverFuncs[Elt]) Remove(elt Elt) bool {
+	if scrf.OnRemove != nil {
+		return scrf.OnRemove(elt)
+	}
+	return false
+}
+
+func VisitableLen[Elt any](visitable Visitable[Elt]) int {
+	var ans int
+	visitable.Visit(func(_ Elt) error {
+		ans++
+		return nil
+	})
+	return ans
 }
 
 func VisitableHas[Elt comparable](set Visitable[Elt], seek Elt) bool {
@@ -61,6 +101,20 @@ func VisitableHas[Elt comparable](set Visitable[Elt], seek Elt) bool {
 		}
 		return nil
 	}) != nil
+}
+
+func VisitableGet[Elt any](seq Visitable[Elt], index int) (Elt, bool) {
+	var ans Elt
+	var currentIndex int
+	res := seq.Visit(func(elt Elt) error {
+		if currentIndex == index {
+			ans = elt
+			return errStop
+		}
+		currentIndex++
+		return nil
+	})
+	return ans, res != nil
 }
 
 func SetAddAll[Elt comparable](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allNew bool) {
@@ -88,6 +142,29 @@ func SetRemoveAll[Elt comparable](set MutableSet[Elt], goners Visitable[Elt]) (s
 	})
 	return
 }
+
+// Func11Compose11 composes two 1-arg 1-result functions
+func Func11Compose11[Type1, Type2, Type3 any](fn1 func(Type1) Type2, fn2 func(Type2) Type3) func(Type1) Type3 {
+	return func(val1 Type1) Type3 {
+		val2 := fn1(val1)
+		return fn2(val2)
+	}
+}
+
+func NewSetReadonly[Elt comparable](set MutableSet[Elt]) Set[Elt] {
+	return SetReadonly[Elt]{set}
+}
+
+// SetReadonly is a wrapper that removes the ability to write to the set
+type SetReadonly[Elt comparable] struct{ set Set[Elt] }
+
+var _ Set[string] = SetReadonly[string]{}
+
+func (sr SetReadonly[Elt]) IsEmpty() bool                       { return sr.set.IsEmpty() }
+func (sr SetReadonly[Elt]) LenIsCheap() bool                    { return sr.set.LenIsCheap() }
+func (sr SetReadonly[Elt]) Len() int                            { return sr.set.Len() }
+func (sr SetReadonly[Elt]) Has(elt Elt) bool                    { return sr.set.Has(elt) }
+func (sr SetReadonly[Elt]) Visit(visitor func(Elt) error) error { return sr.set.Visit(visitor) }
 
 // SetChangeReceiverReverse returns a receiver that acts in the opposite way as the given receiver.
 // That is, Add and Remove are swapped.
@@ -149,6 +226,142 @@ func (crr setChangeReceiverReverse[Elt]) Remove(elt Elt) bool {
 	return crr.forward.Add(elt)
 }
 
+func TransformSetChangeReceiver[Type1, Type2 comparable](
+	transform func(Type1) Type2,
+	inner SetChangeReceiver[Type2]) SetChangeReceiver[Type1] {
+	return transformSetChangeReceiver[Type1, Type2]{transform, inner}
+}
+
+type transformSetChangeReceiver[Type1, Type2 comparable] struct {
+	Transform func(Type1) Type2
+	Inner     SetChangeReceiver[Type2]
+}
+
+var _ SetChangeReceiver[int] = &transformSetChangeReceiver[int, string]{}
+
+func (xr transformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Add(v2)
+}
+
+func (xr transformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+	v2 := xr.Transform(v1)
+	return xr.Inner.Remove(v2)
+}
+
+func WrapSetWithMutex[Elt comparable](inner MutableSet[Elt]) MutableSet[Elt] {
+	return &setMutex[Elt]{inner: inner}
+}
+
+type setMutex[Elt comparable] struct {
+	sync.RWMutex
+	inner MutableSet[Elt]
+}
+
+func (sm *setMutex[Elt]) IsEmpty() bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.IsEmpty()
+}
+
+func (sm *setMutex[Elt]) LenIsCheap() bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.LenIsCheap()
+}
+
+func (sm *setMutex[Elt]) Len() int {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Len()
+}
+
+func (sm *setMutex[Elt]) Has(elt Elt) bool {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Has(elt)
+}
+
+func (sm *setMutex[Elt]) Visit(visitor func(Elt) error) error {
+	sm.RLock()
+	defer sm.RUnlock()
+	return sm.inner.Visit(visitor)
+}
+
+func (sm *setMutex[Elt]) Add(elt Elt) bool {
+	sm.Lock()
+	defer sm.Unlock()
+	return sm.inner.Add(elt)
+}
+
+func (sm *setMutex[Elt]) Remove(elt Elt) bool {
+	sm.Lock()
+	defer sm.Unlock()
+	return sm.inner.Add(elt)
+}
+
+func SetRotate[Original, Rotated comparable](originalSet Set[Original], rotator Rotator[Original, Rotated]) Set[Rotated] {
+	return &setRotate[Original, Rotated]{originalSet, rotator}
+}
+
+type setRotate[Original, Rotated comparable] struct {
+	originalSet Set[Original]
+	rotator     Rotator[Original, Rotated]
+}
+
+func (sr *setRotate[Original, Rotated]) IsEmpty() bool    { return sr.originalSet.IsEmpty() }
+func (sr *setRotate[Original, Rotated]) LenIsCheap() bool { return sr.originalSet.LenIsCheap() }
+func (sr *setRotate[Original, Rotated]) Len() int         { return sr.originalSet.Len() }
+
+func (sr *setRotate[Original, Rotated]) Has(rotatedElt Rotated) bool {
+	originalElt := sr.rotator.Second(rotatedElt)
+	return sr.originalSet.Has(originalElt)
+}
+
+func (sr *setRotate[Original, Rotated]) Visit(visitor func(Rotated) error) error {
+	return sr.originalSet.Visit(func(originalElt Original) error {
+		rotatedElt := sr.rotator.First(originalElt)
+		return visitor(rotatedElt)
+	})
+}
+
+func NewLoggingSetChangeReceiver[Elt comparable](setName string, logger klog.Logger) SetChangeReceiver[Elt] {
+	logger = logger.WithValues("set", setName)
+	return loggingSetChangeReceiver[Elt]{logger}
+}
+
+type loggingSetChangeReceiver[Elt comparable] struct {
+	logger klog.Logger
+}
+
+var _ SetChangeReceiver[int] = loggingSetChangeReceiver[int]{}
+
+func (lcr loggingSetChangeReceiver[Elt]) Add(elt Elt) bool {
+	lcr.logger.Info("Add", "elt", elt)
+	return true
+}
+
+func (lcr loggingSetChangeReceiver[Elt]) Remove(elt Elt) bool {
+	lcr.logger.Info("Remove", "elt", elt)
+	return true
+}
+
+func TransformVisitable[Original, Transformed any](originalVisitable Visitable[Original], transform func(Original) Transformed) Visitable[Transformed] {
+	return &transformVisitable[Original, Transformed]{originalVisitable, transform}
+}
+
+type transformVisitable[Original, Transformed any] struct {
+	originalVisitable Visitable[Original]
+	transform         func(Original) Transformed
+}
+
+func (tv *transformVisitable[Original, Transformed]) Visit(visitor func(Transformed) error) error {
+	return tv.originalVisitable.Visit(func(originalElt Original) error {
+		transformedElt := tv.transform(originalElt)
+		return visitor(transformedElt)
+	})
+}
+
 // Reducer is something that crunches a collection down into one value
 type Reducer[Elt any, Ans any] func(Visitable[Elt]) Ans
 
@@ -164,9 +377,6 @@ func ValueReducer[Elt any, Accum any, Ans any](initialize func() Accum, add func
 	}
 }
 
-// Identity1 is useful in reduers where the accumulator has the same type as the result
-func Identity1[Val any](val Val) Val { return val }
-
 // StatefulReducer makes a Reducer that works with a stateful accumulator
 func StatefulReducer[Elt any, Accum any, Ans any](initialize func() Accum, add func(Accum, Elt), finish func(Accum) Ans) Reducer[Elt, Ans] {
 	return func(elts Visitable[Elt]) Ans {
@@ -177,6 +387,23 @@ func StatefulReducer[Elt any, Accum any, Ans any](initialize func() Accum, add f
 		})
 		return finish(accum)
 	}
+}
+
+func SetEnumerateDifferences[Elt comparable](left, right Set[Elt], receiver SetChangeReceiver[Elt]) {
+	left.Visit(func(elt Elt) error {
+		has := right.Has(elt)
+		if !has {
+			receiver.Remove(elt)
+		}
+		return nil
+	})
+	right.Visit(func(elt Elt) error {
+		has := left.Has(elt)
+		if !has {
+			receiver.Add(elt)
+		}
+		return nil
+	})
 }
 
 var errStop = errors.New("it is done")

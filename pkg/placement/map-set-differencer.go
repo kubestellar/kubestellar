@@ -20,18 +20,21 @@ import (
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
-func ResolvedWhatAsVisitable(rw WorkloadParts) Visitable[WorkloadPart]             { return rw }
+func ResolvedWhatAsVisitable(rw WorkloadParts) Visitable[Pair[WorkloadPartID, WorkloadPartDetails]] {
+	return MintMapMap[WorkloadPartID, WorkloadPartDetails](rw, nil)
+}
+
 func ResolvedWhereAsVisitable(rw ResolvedWhere) Visitable[edgeapi.SinglePlacement] { return rw }
 
-func (parts WorkloadParts) Visit(visitor func(WorkloadPart) error) error {
-	for partID, partDetails := range parts {
-		part := WorkloadPart{partID, partDetails}
-		if err := visitor(part); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// func (parts WorkloadParts) Visit(visitor func(WorkloadPart) error) error {
+// 	for partID, partDetails := range parts {
+// 		part := WorkloadPart{partID, partDetails}
+// 		if err := visitor(part); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 func (rw ResolvedWhere) IsEmpty() bool {
 	for _, sps := range rw {
@@ -73,30 +76,47 @@ var _ ResolvedWhereDifferencerConstructor = NewResolvedWhereDifferencer
 var _ ResolvedWhatDifferencerConstructor = NewResolvedWhatDifferencer
 
 func NewResolvedWhereDifferencer(eltChangeReceiver SetChangeReceiver[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
-	return NewDifferenceByMapAndEnum[ResolvedWhere, edgeapi.SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
+	return NewSetDifferenceByMapAndEnum[ResolvedWhere, edgeapi.SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
 }
 
-func NewResolvedWhatDifferencer(eltChangeReceiver SetChangeReceiver[WorkloadPart]) Receiver[WorkloadParts] {
-	return NewDifferenceByMapAndEnum[WorkloadParts, WorkloadPart](ResolvedWhatAsVisitable, eltChangeReceiver)
+func NewResolvedWhatDifferencer(mappingReceiver MapChangeReceiver[WorkloadPartID, WorkloadPartDetails]) Receiver[WorkloadParts] {
+	return NewMapDifferenceByMapAndEnum[WorkloadParts, WorkloadPartID, WorkloadPartDetails](ResolvedWhatAsVisitable, mappingReceiver)
 }
 
-func NewDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(SetType) Visitable[Elt], eltChangeReceiver SetChangeReceiver[Elt]) Receiver[SetType] {
-	return differenceByMapAndEnum[SetType, Elt]{
+func NewSetDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(SetType) Visitable[Elt], eltChangeReceiver SetChangeReceiver[Elt]) Receiver[SetType] {
+	return setDifferenceByMapAndEnum[SetType, Elt]{
 		visitablize:       visitablize,
 		eltChangeReceiver: eltChangeReceiver,
 		current:           NewMapSet[Elt](),
 	}
 }
 
-type differenceByMapAndEnum[SetType any, Elt comparable] struct {
+func NewMapDifferenceByMapAndEnum[MapType any, Key, Val comparable](visitablize func(MapType) Visitable[Pair[Key, Val]], mappingChangeReceiver MapChangeReceiver[Key, Val]) Receiver[MapType] {
+	return mapDifferenceByMapAndEnum[MapType, Key, Val]{
+		visitablize: visitablize,
+		current:     NewMapMap[Key, Val](mappingChangeReceiver),
+	}
+}
+
+type setDifferenceByMapAndEnum[SetType any, Elt comparable] struct {
 	visitablize       func(SetType) Visitable[Elt]
 	eltChangeReceiver SetChangeReceiver[Elt]
 	current           MutableSet[Elt]
 }
 
-func (dme differenceByMapAndEnum[SetType, Elt]) Receive(nextA SetType) {
+type mapDifferenceByMapAndEnum[MapType any, Key, Val comparable] struct {
+	visitablize func(MapType) Visitable[Pair[Key, Val]]
+	current     MutableMap[Key, Val]
+}
+
+func (dme setDifferenceByMapAndEnum[SetType, Elt]) Receive(nextA SetType) {
 	nextS := dme.visitablize(nextA)
 	SetUpdateToMatch[Elt](dme.current, nextS, dme.eltChangeReceiver)
+}
+
+func (dme mapDifferenceByMapAndEnum[MapType, Key, Val]) Receive(nextA MapType) {
+	nextS := dme.visitablize(nextA)
+	MapUpdateToMatch[Key, Val](dme.current, nextS)
 }
 
 func SetUpdateToMatch[Elt comparable](current MutableSet[Elt], target Visitable[Elt], eltChangeReceiver SetChangeReceiver[Elt]) {
@@ -111,6 +131,19 @@ func SetUpdateToMatch[Elt comparable](current MutableSet[Elt], target Visitable[
 	goners.Visit(func(oldElt Elt) error {
 		current.Remove(oldElt)
 		eltChangeReceiver.Remove(oldElt)
+		return nil
+	})
+}
+
+func MapUpdateToMatch[Key, Val comparable](current MutableMap[Key, Val], target Visitable[Pair[Key, Val]]) {
+	goners := MapMapCopy[Key, Val](nil, current)
+	target.Visit(func(tup Pair[Key, Val]) error {
+		current.Put(tup.First, tup.Second)
+		goners.Delete(tup.First)
+		return nil
+	})
+	goners.Visit(func(oldTup Pair[Key, Val]) error {
+		current.Delete(oldTup.First)
 		return nil
 	})
 }

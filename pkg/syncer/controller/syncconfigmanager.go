@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"sync"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
 	"k8s.io/klog/v2"
+
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 type _syncConfigManager struct {

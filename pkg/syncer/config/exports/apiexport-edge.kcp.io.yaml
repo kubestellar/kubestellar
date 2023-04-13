@@ -1,9 +1,0 @@
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIExport
-metadata:
-  creationTimestamp: null
-  name: edge.kcp.io
-spec:
-  latestResourceSchemas:
-  - v230322-06f3c92.edgesyncconfigs.edge.kcp.io
-status: {}

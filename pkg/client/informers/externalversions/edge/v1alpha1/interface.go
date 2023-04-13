@@ -30,8 +30,12 @@ type ClusterInterface interface {
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
 	EdgePlacements() EdgePlacementClusterInformer
+	// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
+	EdgeSyncConfigs() EdgeSyncConfigClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 	SinglePlacementSlices() SinglePlacementSliceClusterInformer
+	// SyncerConfigs returns a SyncerConfigClusterInformer
+	SyncerConfigs() SyncerConfigClusterInformer
 }
 
 type version struct {
@@ -54,9 +58,19 @@ func (v *version) EdgePlacements() EdgePlacementClusterInformer {
 	return &edgePlacementClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
+func (v *version) EdgeSyncConfigs() EdgeSyncConfigClusterInformer {
+	return &edgeSyncConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 // SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 func (v *version) SinglePlacementSlices() SinglePlacementSliceClusterInformer {
 	return &singlePlacementSliceClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// SyncerConfigs returns a SyncerConfigClusterInformer
+func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
+	return &syncerConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 type Interface interface {
@@ -64,8 +78,12 @@ type Interface interface {
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
 	EdgePlacements() EdgePlacementInformer
+	// EdgeSyncConfigs returns a EdgeSyncConfigInformer
+	EdgeSyncConfigs() EdgeSyncConfigInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceInformer
 	SinglePlacementSlices() SinglePlacementSliceInformer
+	// SyncerConfigs returns a SyncerConfigInformer
+	SyncerConfigs() SyncerConfigInformer
 }
 
 type scopedVersion struct {
@@ -89,7 +107,17 @@ func (v *scopedVersion) EdgePlacements() EdgePlacementInformer {
 	return &edgePlacementScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// EdgeSyncConfigs returns a EdgeSyncConfigInformer
+func (v *scopedVersion) EdgeSyncConfigs() EdgeSyncConfigInformer {
+	return &edgeSyncConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 // SinglePlacementSlices returns a SinglePlacementSliceInformer
 func (v *scopedVersion) SinglePlacementSlices() SinglePlacementSliceInformer {
 	return &singlePlacementSliceScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// SyncerConfigs returns a SyncerConfigInformer
+func (v *scopedVersion) SyncerConfigs() SyncerConfigInformer {
+	return &syncerConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

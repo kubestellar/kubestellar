@@ -143,13 +143,17 @@ func TestMailboxInformer(t *testing.T) {
 		k8sTracker := k8sClientset.Tracker()
 		ctx, stop := context.WithCancel(context.Background())
 		actual := NewTestObjectTracker()
-		wsPreInformer := kcpinformers.NewSharedInformerFactory(kcpClientset, 0).Tenancy().V1alpha1().Workspaces()
-		go func() {
-			wsPreInformer.Informer().Run(ctx.Done())
-		}()
+		kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClientset, 0)
+		wsPreInformer := kcpClusterInformerFactory.Tenancy().V1alpha1().Workspaces()
+		if true {
+			go func() {
+				wsPreInformer.Informer().Run(ctx.Done())
+			}()
+		}
 		rslw := NewListerWatcher[*k8sapps.ReplicaSetList](ctx, k8sClientset.AppsV1().ReplicaSets())
 		rsInformer := NewSharedInformer(wsPreInformer.Cluster(espwCluster), rslw, &k8sapps.ReplicaSet{}, 0, upstreamcache.Indexers{})
 		rsInformer.AddEventHandler(actual)
+		kcpClusterInformerFactory.Start(ctx.Done())
 		go rsInformer.Run(ctx.Done())
 		for iteration := 1; iteration <= 64; iteration++ {
 			if len(replicaSets) > 0 && rand.Intn(2) == 0 {

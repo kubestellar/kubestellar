@@ -30,10 +30,10 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	syncerclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
-	syncerinformers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )

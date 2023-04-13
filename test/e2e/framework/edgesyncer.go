@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kcp-dev/logicalcluster/v3"
 	"github.com/stretchr/testify/require"
 
 	corev1 "k8s.io/api/core/v1"
@@ -38,6 +37,7 @@ import (
 
 	workloadcliplugin "github.com/kcp-dev/kcp/pkg/cliplugins/workload/plugin"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgesyncer "github.com/kcp-dev/edge-mc/pkg/syncer"
 )
