@@ -36,6 +36,7 @@ type EdgeV1alpha1ClusterInterface interface {
 	EdgeV1alpha1ClusterScoper
 	CustomizersClusterGetter
 	EdgePlacementsClusterGetter
+	EdgeSyncConfigsClusterGetter
 	SinglePlacementSlicesClusterGetter
 	SyncerConfigsClusterGetter
 }
@@ -61,6 +62,10 @@ func (c *EdgeV1alpha1ClusterClient) Customizers() CustomizerClusterInterface {
 
 func (c *EdgeV1alpha1ClusterClient) EdgePlacements() EdgePlacementClusterInterface {
 	return &edgePlacementsClusterInterface{clientCache: c.clientCache}
+}
+
+func (c *EdgeV1alpha1ClusterClient) EdgeSyncConfigs() EdgeSyncConfigClusterInterface {
+	return &edgeSyncConfigsClusterInterface{clientCache: c.clientCache}
 }
 
 func (c *EdgeV1alpha1ClusterClient) SinglePlacementSlices() SinglePlacementSliceClusterInterface {

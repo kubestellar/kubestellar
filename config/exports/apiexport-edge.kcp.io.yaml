@@ -9,4 +9,5 @@ spec:
   - v230303-6f7f2fe.singleplacementslices.edge.kcp.io
   - v230317-d43d2d5.edgeplacements.edge.kcp.io
   - v230407-c87b2365.syncerconfigs.edge.kcp.io
+  - v230413-5a4d4ba.edgesyncconfigs.edge.kcp.io
 status: {}

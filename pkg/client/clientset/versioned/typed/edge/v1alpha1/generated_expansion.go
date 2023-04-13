@@ -22,6 +22,8 @@ type CustomizerExpansion interface{}
 
 type EdgePlacementExpansion interface{}
 
+type EdgeSyncConfigExpansion interface{}
+
 type SinglePlacementSliceExpansion interface{}
 
 type SyncerConfigExpansion interface{}

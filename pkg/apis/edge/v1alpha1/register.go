@@ -53,6 +53,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&CustomizerList{},
 		&SyncerConfig{},
 		&SyncerConfigList{},
+		&EdgeSyncConfig{},
+		&EdgeSyncConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
