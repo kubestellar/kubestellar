@@ -49,13 +49,13 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 				logger.V(4).Info("NamespaceDistributionTuple removed", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespaceDistributions.Remove(tup)
 			}}
-		namespacedResourceDistributionRelay := SetWriterFuncs[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]]{
-			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
+		namespacedResourceDistributionRelay := SetWriterFuncs[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]]{
+			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]) bool {
 				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
 				logger.V(4).Info("NamespacedResourceDistributionTuple added", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Add(dist)
 			},
-			OnRemove: func(tup Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]) bool {
+			OnRemove: func(tup Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]) bool {
 				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
 				logger.V(4).Info("NamespacedResourceDistributionTuple removed", "tuple", tup)
 				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Remove(dist)
@@ -63,16 +63,16 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		}
 		namespacedModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
-				logger.V(4).Info("Put to NamespacedModes", "key", mk, "val", val)
+				logger.V(4).Info("NamespacedModes.Put", "key", mk, "val", val)
 				sbo.workloadProjectionSections.NamespacedModes.Put(mk, val)
 			},
 			OnDelete: func(mk ProjectionModeKey) {
-				logger.V(4).Info("Delete from NamespacedModes", "key", mk)
+				logger.V(4).Info("NamespacedModes.Delete", "key", mk)
 				sbo.workloadProjectionSections.NamespacedModes.Delete(mk)
 			},
 		}
 
-		nsToAggregate := NewFactoredMapMapAggregator[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement],
+		nsToAggregate := NewFactoredMapMapAggregator[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement],
 			ProjectionModeKey, logicalcluster.Name, ProjectionModeVal, ProjectionModeVal](
 			factorNamespacedJoinKeyLessNS,
 			nil,
@@ -81,21 +81,30 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			namespacedModesReceiver,
 		)
 
-		nsCommon := MappingReceiverFork[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal]{
-			NewLoggingMappingReceiver[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal]("nsCommon", logger.V(4)),
-			MapKeySetReceiverLossy[Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement], ProjectionModeVal](namespacedResourceDistributionRelay),
+		nsCommon := MappingReceiverFork[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal]{
+			NewLoggingMappingReceiver[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal]("nsCommon", logger.V(4)),
+			MapKeySetReceiverLossy[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal](namespacedResourceDistributionRelay),
 			nsToAggregate}
 
-		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement, ProjectionModeVal](
+		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, SinglePlacement, ProjectionModeVal](
 			logger, nsCommon)
-		sbo.resourceDiscoveryReceiver = rscDisco
+		// sbo.resourceDiscoveryReceiver = rscDisco
+		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
+			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
+				logger.V(4).Info("Binder got new namespaced resource", "key", key, "val", val)
+				rscDisco.Put(key, val)
+			},
+			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+				logger.V(4).Info("Binder told there is no namespaced resource", "key", key)
+				rscDisco.Delete(key)
+			})
 		nsSrcAndDestAndLog := NewSetWriterFuncs( // logging and the ability to set breakpoints
-			func(elt Pair[logicalcluster.Name, edgeapi.SinglePlacement]) bool {
+			func(elt Pair[logicalcluster.Name, SinglePlacement]) bool {
 				news := nsSrcAndDest.Add(elt)
 				logger.V(4).Info("Add to nsSrcAndDest", "tuple", elt, "news", news)
 				return news
 			},
-			func(elt Pair[logicalcluster.Name, edgeapi.SinglePlacement]) bool {
+			func(elt Pair[logicalcluster.Name, SinglePlacement]) bool {
 				news := nsSrcAndDest.Remove(elt)
 				logger.V(4).Info("Remove from nsSrcAndDest", "tuple", elt, "news", news)
 				return news
@@ -103,7 +112,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		)
 
 		nsToGoLoseNamespace := NewSetChangeProjectorByMapMap[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
-			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement](), nsSrcAndDestAndLog)
+			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, SinglePlacement](), nsSrcAndDestAndLog)
 
 		nsToGo := SetWriterFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
 
@@ -175,30 +184,30 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			clusterChangeReceiver,
 		)
 
-		upsyncsRelay := SetWriterFuncs[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]]{
-			OnAdd: func(tup Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]) bool {
+		upsyncsRelay := SetWriterFuncs[Pair[SinglePlacement, edgeapi.UpsyncSet]]{
+			OnAdd: func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
 				logger.V(4).Info("Upsyncs added", "tuple", tup)
 				return sbo.workloadProjectionSections.Upsyncs.Add(tup)
 			},
-			OnRemove: func(tup Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]) bool {
+			OnRemove: func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
 				logger.V(4).Info("Upsyncs removed", "tuple", tup)
 				return sbo.workloadProjectionSections.Upsyncs.Remove(tup)
 			}}
-		sbo.upsyncsFull = NewSetChangeProjectorByHashMap[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement],
-			Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */](
+		sbo.upsyncsFull = NewSetChangeProjectorByHashMap[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement],
+			Pair[SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */](
 			factorUpsyncTuple,
 			upsyncsRelay,
-			PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+			PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
 			HashExternalName)
 		return sbo
 	}
 }
 
 var factorUpsyncTuple = NewFactorer(
-	func(whole Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) Pair[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */] {
+	func(whole Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]) Pair[Pair[SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */] {
 		return NewPair(NewPair(whole.Third, whole.Second), whole.First)
 	},
-	func(parts Pair[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */]) Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement] {
+	func(parts Pair[Pair[SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */]) Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement] {
 		return NewTriple(parts.Second, parts.First.Second, parts.First.First) // cdr, cdar, caar
 	})
 
@@ -286,17 +295,17 @@ type simpleBindingOrganizer struct {
 
 	clusterWhatWhereFull      MappingReceiver[ClusterWhatWhereFullKey, ProjectionModeVal]
 	namespacedWhatWhereFull   SetWriter[NamespacedWhatWhereFullKey]
-	upsyncsFull               SetWriter[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]]
+	upsyncsFull               SetWriter[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]]
 	resourceDiscoveryReceiver MappingReceiver[ResourceDiscoveryKey, ProjectionModeVal]
 }
 
 type NamespaceName string
 
-type NamespaceAndDestination = Pair[NamespaceName, edgeapi.SinglePlacement]
+type NamespaceAndDestination = Pair[NamespaceName, SinglePlacement]
 
-type SourceAndDestination = Pair[logicalcluster.Name, edgeapi.SinglePlacement]
+type SourceAndDestination = Pair[logicalcluster.Name, SinglePlacement]
 
-type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, edgeapi.SinglePlacement]
+type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]
 
 var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name]{
 	First: func(whole NamespacedJoinKeyLessnS) Pair[ProjectionModeKey, logicalcluster.Name] {
@@ -331,7 +340,7 @@ func pickThe1[KeyPartA, KeyPartB comparable](logger klog.Logger, errmsg string) 
 var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/]{
 	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespaceDistributionTuple, string /*epName*/] {
 		return Pair[NamespaceDistributionTuple, string /*epName*/]{
-			First: Triple[logicalcluster.Name, NamespaceName, edgeapi.SinglePlacement]{
+			First: Triple[logicalcluster.Name, NamespaceName, SinglePlacement]{
 				nfk.First.Cluster,
 				nfk.Second,
 				nfk.Third},
@@ -373,10 +382,10 @@ var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespa
 
 type ResourceDiscoveryKey = Pair[logicalcluster.Name /*wmw*/, metav1.GroupResource]
 
-type NamespacedWhatWhereFullKey = Triple[ExternalName, NamespaceName, edgeapi.SinglePlacement]
+type NamespacedWhatWhereFullKey = Triple[ExternalName, NamespaceName, SinglePlacement]
 
 // ClusterWhatWhereFullKey is (EdgePlacement id, (resource, object name), destination)
-type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], edgeapi.SinglePlacement]
+type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], SinglePlacement]
 
 func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps, UpsyncOps)) {
 	sbo.Lock()
@@ -390,7 +399,7 @@ func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps, UpsyncOps)
 	sbo.logger.V(3).Info("End transaction")
 }
 
-func (sbo *simpleBindingOrganizer) receiveUpsyncChange(add bool, tup Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) {
+func (sbo *simpleBindingOrganizer) receiveUpsyncChange(add bool, tup Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]) {
 	if add {
 		sbo.upsyncsFull.Add(tup)
 	} else {
@@ -403,7 +412,7 @@ type sboXnOps struct {
 	sbo *simpleBindingOrganizer
 }
 
-func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, edgeapi.SinglePlacement], val WorkloadPartDetails) {
+func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], val WorkloadPartDetails) {
 	sbo := sxo.sbo
 	sbo.getSourceCluster(tup.First.Cluster, true)
 	gr := tup.Second.GroupResource()
@@ -418,7 +427,7 @@ func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, edgeapi.SingleP
 	sbo.clusterWhatWhereFull.Put(key, ProjectionModeVal{APIVersion: val.APIVersion})
 }
 
-func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, edgeapi.SinglePlacement]) {
+func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacement]) {
 	sbo := sxo.sbo
 	sbc := sbo.getSourceCluster(tup.First.Cluster, false)
 	if sbc == nil {
@@ -480,7 +489,7 @@ type sbcResourceReceiver struct {
 func (srr sbcResourceReceiver) Put(gr metav1.GroupResource, details ResourceDetails) {
 	sbc := srr.sbc
 	good := details.Namespaced && details.SupportsInformers
-	key := Pair[logicalcluster.Name, metav1.GroupResource]{sbc.cluster, gr}
+	key := NewPair(sbc.cluster, gr)
 	sbc.Lock()
 	defer sbc.Unlock()
 	sbc.workloadProjector.Transact(func(ops WorkloadProjectionSections) {
@@ -497,7 +506,7 @@ func (srr sbcResourceReceiver) Put(gr metav1.GroupResource, details ResourceDeta
 
 func (srr sbcResourceReceiver) Delete(gr metav1.GroupResource) {
 	sbc := srr.sbc
-	key := Pair[logicalcluster.Name, metav1.GroupResource]{sbc.cluster, gr}
+	key := NewPair(sbc.cluster, gr)
 	sbc.Lock()
 	defer sbc.Unlock()
 	sbc.workloadProjector.Transact(func(ops WorkloadProjectionSections) {

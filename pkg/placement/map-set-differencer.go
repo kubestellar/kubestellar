@@ -16,15 +16,11 @@ limitations under the License.
 
 package placement
 
-import (
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-)
-
 func ResolvedWhatAsVisitable(rw WorkloadParts) Visitable[Pair[WorkloadPartID, WorkloadPartDetails]] {
 	return MintMapMap[WorkloadPartID, WorkloadPartDetails](rw, nil)
 }
 
-func ResolvedWhereAsVisitable(rw ResolvedWhere) Visitable[edgeapi.SinglePlacement] { return rw }
+func ResolvedWhereAsVisitable(rw ResolvedWhere) Visitable[SinglePlacement] { return rw }
 
 // func (parts WorkloadParts) Visit(visitor func(WorkloadPart) error) error {
 // 	for partID, partDetails := range parts {
@@ -57,11 +53,11 @@ func (rw ResolvedWhere) LenIsCheap() bool {
 	return true // some day this may be more difficult to answer, but not today
 }
 
-func (rw ResolvedWhere) Has(seek edgeapi.SinglePlacement) bool {
-	return VisitableHas[edgeapi.SinglePlacement](rw, seek)
+func (rw ResolvedWhere) Has(seek SinglePlacement) bool {
+	return VisitableHas[SinglePlacement](rw, seek)
 }
 
-func (rw ResolvedWhere) Visit(visitor func(edgeapi.SinglePlacement) error) error {
+func (rw ResolvedWhere) Visit(visitor func(SinglePlacement) error) error {
 	for _, sps := range rw {
 		for _, sp := range sps.Destinations {
 			if err := visitor(sp); err != nil {
@@ -75,8 +71,8 @@ func (rw ResolvedWhere) Visit(visitor func(edgeapi.SinglePlacement) error) error
 var _ ResolvedWhereDifferencerConstructor = NewResolvedWhereDifferencer
 var _ DownsyncsDifferencerConstructor = NewWorkloadPartsDifferencer
 
-func NewResolvedWhereDifferencer(eltChangeReceiver SetWriter[edgeapi.SinglePlacement]) Receiver[ResolvedWhere] {
-	return NewSetDifferenceByMapAndEnum[ResolvedWhere, edgeapi.SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
+func NewResolvedWhereDifferencer(eltChangeReceiver SetWriter[SinglePlacement]) Receiver[ResolvedWhere] {
+	return NewSetDifferenceByMapAndEnum[ResolvedWhere, SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
 }
 
 func NewWorkloadPartsDifferencer(mappingReceiver MapChangeReceiver[WorkloadPartID, WorkloadPartDetails]) Receiver[WorkloadParts] {

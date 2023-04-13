@@ -79,11 +79,10 @@ type SingleIndexedRelation2[First, Second any] struct {
 
 var _ MutableRelation2[string, float64] = SingleIndexedRelation2[string, float64]{}
 
-// NewGenericRelation2Index constructs a Relation2 that is represented
-// by an index on the first column.
-// The caller supplies the implementation of the index.
-func NewGenericRelation2Index[First, Second any](
-	secondSetFactory func() MutableSet[Second],
+// NewSingleIndexedRelation2 constructs a SingleIndexedRelation2.
+// The caller supplies the map implementations used in the index.
+func NewSingleIndexedRelation2[First, Second any](
+	secondSetFactory func(First) MutableSet[Second],
 	rep MutableMap[First, MutableSet[Second]],
 	pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
 	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second, MutableSet[Second], Set[Second]](
@@ -109,23 +108,6 @@ func NewGenericRelation2Index[First, Second any](
 type SingleIndexedRelation3[First, Second, Third any] struct {
 	GenericMutableIndexedSet[Triple[First, Second, Third], First, Pair[Second, Third],
 		GenericIndexedSet[Pair[Second, Third], Second, Third, Set[Third]]]
-}
-
-// NewGenericRelation3Index constructs a set of triples
-// that is represented by two layers of indexing.
-// The caller supplies the implementations of the indices.
-func NewGenericRelation3Index[First, Second, Third comparable](
-	thirdSetFactory func() MutableSet[Third],
-	midRepFactory func() MutableMap[Second, MutableSet[Third]],
-	rep MutableMap[First, MutableSet[Pair[Second, Third]]],
-) SingleIndexedRelation2[First, Pair[Second, Third]] {
-	return NewGenericRelation2Index(
-		func() MutableSet[Pair[Second, Third]] {
-			return NewGenericRelation2Index(
-				thirdSetFactory,
-				midRepFactory())
-		},
-		rep)
 }
 
 // SingleIndexedRelation4 is a 4-ary relation represented by one nested index that maps

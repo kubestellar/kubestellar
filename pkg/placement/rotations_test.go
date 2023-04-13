@@ -103,8 +103,8 @@ func TestFactorers(t *testing.T) {
 		gen.NamespaceDistributionTuple(),
 		gen.String()))
 	t.Run("factorUpsyncTuple", exerciseFactorerParametric(
-		TripleHashDomain[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement](HashExternalName, HashUpsyncSet{}, HashSinglePlacement{}),
-		PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+		TripleHashDomain[ExternalName, edgeapi.UpsyncSet, SinglePlacement](HashExternalName, HashUpsyncSet{}, HashSinglePlacement{}),
+		PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
 		HashExternalName,
 		factorUpsyncTuple,
 		NewTriple(gen.ExternalName(), gen.UpsyncSet(), gen.SinglePlacement()),
@@ -162,8 +162,8 @@ func (generator) UID() machtypes.UID {
 	return uuid.NewUUID()
 }
 
-func (gen generator) SinglePlacement() edgeapi.SinglePlacement {
-	return edgeapi.SinglePlacement{
+func (gen generator) SinglePlacement() SinglePlacement {
+	return SinglePlacement{
 		Cluster:        "clu-" + gen.String(),
 		LocationName:   "loc-" + gen.String(),
 		SyncTargetName: "st-" + gen.String(),

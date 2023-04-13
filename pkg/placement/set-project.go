@@ -30,7 +30,7 @@ func NewSetChangeProjectorByMapMap[Whole any, PartA, PartB comparable](
 		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
 			return NewMapMap[PartA, MutableSet[PartB]](observer)
 		},
-		func() MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
+		func(PartA) MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
 	)
 }
 
@@ -46,7 +46,7 @@ func NewSetChangeProjectorByHashMap[Whole, PartA, PartB any](
 		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
 			return NewHashMap[PartA, MutableSet[PartB]](hashDomainA)(observer)
 		},
-		func() MutableSet[PartB] { return NewHashSet[PartB](hashDomainB) },
+		func(PartA) MutableSet[PartB] { return NewHashSet[PartB](hashDomainB) },
 	)
 }
 
@@ -58,7 +58,7 @@ func NewSetChangeProjector[Whole, PartA, PartB any](
 	factoring Factorer[Whole, PartA, PartB],
 	partAReceiver SetWriter[PartA],
 	repMaker func(MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]],
-	innerSetFactory func() MutableSet[PartB],
+	innerSetFactory func(PartA) MutableSet[PartB],
 ) SetWriter[Whole] {
 	// indexerRep ignores the set of PartB and notifies partAReceiver of PartA set change
 	indexerRep := repMaker(MapKeySetReceiver[PartA, MutableSet[PartB]](partAReceiver))

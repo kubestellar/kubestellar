@@ -681,7 +681,7 @@ var GRsNaturedInBoth = NewMapSet(
 	mkgr("", "namespaces"),
 )
 
-var NaturedInCenterNoGo = NewMapSet(
+var NaturedInCenterGoToMailbox = NewMapSet(
 	mkgr("apis.kcp.io", "apibindings"),
 )
 
@@ -728,8 +728,8 @@ func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
 		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
 	case GRsNaturedInBoth.Has(sgr):
 		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
-	case NaturedInCenterNoGo.Has(sgr):
-		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	case NaturedInCenterGoToMailbox.Has(sgr):
+		return ResourceMode{GoesToMailbox, NaturallyNatured, builtin}
 	case GRsNotSupported.Has(sgr):
 		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
 	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):

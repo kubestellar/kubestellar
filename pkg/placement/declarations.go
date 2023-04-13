@@ -95,10 +95,12 @@ type WorkloadProjectionSections struct {
 	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
 	NonNamespacedDistributions      SetWriter[NonNamespacedDistributionTuple]
 	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	Upsyncs                         SetWriter[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]]
+	Upsyncs                         SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
 }
 
-type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, edgeapi.SinglePlacement]
+type SinglePlacement = edgeapi.SinglePlacement
+
+type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, SinglePlacement]
 
 type NamespacedResourceDistributionTuple struct {
 	SourceCluster logicalcluster.Name
@@ -109,7 +111,7 @@ type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of 
 
 type ProjectionModeKey struct {
 	GroupResource metav1.GroupResource
-	Destination   edgeapi.SinglePlacement
+	Destination   SinglePlacement
 }
 
 type ProjectionModeVal struct {
@@ -206,7 +208,7 @@ type WorkloadPartX struct {
 // the combinatin of the destination and the API group and resource.
 type ProjectionKey struct {
 	metav1.GroupResource
-	Destination edgeapi.SinglePlacement
+	Destination SinglePlacement
 }
 
 // SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
@@ -249,7 +251,7 @@ type DownsyncsDifferencerConstructor = MapDifferenceConstructor[WorkloadParts, W
 // changes in which ANDs are present.
 type UpsyncsDifferenceConstructor = func(SetChangeReceiver[edgeapi.UpsyncSet]) Receiver[[]edgeapi.UpsyncSet]
 
-type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
+type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, SinglePlacement]
 
 // BindingOrganizer takes a WorkloadProjector and produces a SingleBinder
 // that takes the atomized bindings and reorganizes them and resolves
@@ -271,13 +273,13 @@ type SingleBinder interface {
 }
 
 // SingleBindingOps is a receiver of downsync tuples
-type SingleBindingOps MappingReceiver[Triple[ExternalName /* of EdgePlacement object */, WorkloadPartID, edgeapi.SinglePlacement], WorkloadPartDetails]
+type SingleBindingOps MappingReceiver[Triple[ExternalName /* of EdgePlacement object */, WorkloadPartID, SinglePlacement], WorkloadPartDetails]
 
 // UpsyncOps is a receiver of upsync tuples.
 // Each call conveys one UpsyncSet that a particular EdgePlacement object calls for, and where it is to be upsynced from.
 // Some day we might recognize that an UpsyncSet is a predicate and we combine predicates when one implies the other,
 // but today is not that day.  Today we simply treat each as a syntactic expression and look at syntactic equality.
-type UpsyncOps SetChangeReceiver[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]]
+type UpsyncOps SetChangeReceiver[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]]
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
 // as needed by clients.
@@ -352,6 +354,7 @@ type PropagationMode string
 const (
 	ErrorInCenter    PropagationMode = "error"
 	TolerateInCenter PropagationMode = "tolerate"
+	GoesToMailbox    PropagationMode = "tomail"
 	GoesToEdge       PropagationMode = "propagate"
 )
 
@@ -373,7 +376,7 @@ const (
 	ForciblyDenatured NatureMode = "ForciblyDenatured"
 )
 
-func SPMailboxWorkspaceName(sp edgeapi.SinglePlacement) string {
+func SPMailboxWorkspaceName(sp SinglePlacement) string {
 	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
 }
 

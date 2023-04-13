@@ -338,6 +338,10 @@ spec:
   - matchLabels: {"env":"prod"}
   namespaceSelector:
     matchLabels: {"common":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
   upsync:
   - apiGroup: "greoup1.test"
     resources: ["sprockets", "flanges"]
@@ -466,6 +470,10 @@ spec:
   - matchLabels: {"env":"prod","extended":"si"}
   namespaceSelector: 
     matchLabels: {"special":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
   upsync:
   - apiGroup: "greoup1.test"
     resources: ["sprockets", "flanges"]

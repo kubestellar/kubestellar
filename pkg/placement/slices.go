@@ -16,6 +16,11 @@ limitations under the License.
 
 package placement
 
+import (
+	"fmt"
+	"strings"
+)
+
 func SliceCopy[Elt any](original []Elt) []Elt {
 	if original == nil {
 		return original
@@ -76,6 +81,35 @@ func VisitableToSlice[Elt any](set Visitable[Elt]) []Elt {
 		return nil
 	})
 	return ans
+}
+
+// VisitableStringer wraps a given set with particular String() behavior.
+// NB: you only want to apply this to a set that is safe for concurrent access,
+// and you probably only want to apply it to an immutable set.
+func VisitableStringer[Elt any](set Visitable[Elt]) VisitableStringerVal[Elt] {
+	return VisitableStringerVal[Elt]{set}
+}
+
+type VisitableStringerVal[Elt any] struct {
+	set Visitable[Elt]
+}
+
+func (vs VisitableStringerVal[Elt]) String() string {
+	var ans strings.Builder
+	ans.WriteRune('{')
+	first := true
+	vs.set.Visit(func(elt Elt) error {
+		if first {
+			first = false
+		} else {
+			ans.WriteString(", ")
+		}
+		eltStr := fmt.Sprintf("%v", elt)
+		ans.WriteString(eltStr)
+		return nil
+	})
+	ans.WriteRune('}')
+	return ans.String()
 }
 
 func VisitableTransformToSlice[Original, Transformed any](set Visitable[Original], xform func(Original) Transformed) []Transformed {

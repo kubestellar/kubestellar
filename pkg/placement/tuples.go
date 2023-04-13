@@ -172,6 +172,16 @@ func TripleFactorerTo1and23[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, 
 		})
 }
 
+func TripleFactorerTo3and21[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], ColZ, Pair[ColY, ColX]] {
+	return NewFactorer(
+		func(tup Triple[ColX, ColY, ColZ]) Pair[ColZ, Pair[ColY, ColX]] {
+			return NewPair(tup.Third, NewPair(tup.Second, tup.First))
+		},
+		func(put Pair[ColZ, Pair[ColY, ColX]]) Triple[ColX, ColY, ColZ] {
+			return NewTriple(put.Second.Second, put.Second.First, put.First)
+		})
+}
+
 type Quad[First, Second, Third, Fourth any] struct {
 	First  First
 	Second Second
