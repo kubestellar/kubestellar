@@ -34,11 +34,11 @@ import (
 	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	scopedclientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned"
-	clientset "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/cluster"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/internalinterfaces"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
+	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 )
 
 // EdgeSyncConfigClusterInformer provides access to a shared informer and lister for

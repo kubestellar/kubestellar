@@ -190,16 +190,6 @@ codegen: crds $(CODE_GENERATOR)
 	$(MAKE) imports
 .PHONY: codegen
 
-syncer-crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
-	./pkg/syncer/scripts/update-codegen-crds.sh
-.PHONY: syncer-crds
-
-syncer-codegen: syncer-crds $(CODE_GENERATOR)
-	go mod download
-	./pkg/syncer/scripts/update-codegen-clients.sh
-	$(MAKE) imports
-.PHONY: syncer-codegen
-
 # Note, running this locally if you have any modified files, even those that are not generated,
 # will result in an error. This target is mostly for CI jobs.
 .PHONY: verify-codegen

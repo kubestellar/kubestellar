@@ -34,8 +34,8 @@ import (
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/syncer/apis/edge/v1alpha1"
-	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/typed/edge/v1alpha1"
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
 var edgeSyncConfigsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "edgesyncconfigs"}

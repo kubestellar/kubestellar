@@ -28,9 +28,9 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/syncer/client/clientset/versioned/typed/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/syncer/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/syncer/client/listers/edge/v1alpha1"
+	edgev1alpha1typed "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
