@@ -1,0 +1,64 @@
+---
+apiVersion: test.kcp.io/v1alpha1
+kind: Playground
+spec:
+  shards:
+    - name: main
+      workspaces:
+        - name: root
+          workspaces:
+            - name: imw-1
+            - name: espw
+              others:
+                - name: edgeCRD - edge.kcp.io_customizers
+                  source:
+                    file:
+                      path: ../../../config/crds/edge.kcp.io_customizers.yaml
+                - name: edge-CRD - edge.kcp.io_edgeplacements
+                  source:
+                    file:
+                      path: ../../../config/crds/edge.kcp.io_edgeplacements.yaml
+                - name: edge-CRD - edge.kcp.io_singleplacementslices
+                  source:
+                    file:
+                      path: ../../../config/crds/edge.kcp.io_singleplacementslices.yaml
+                - name: edge-CRD - meta.kcp.io_apiresources
+                  source:
+                    file:
+                      path: ../../../config/crds/meta.kcp.io_apiresources.yaml
+                - name: edge-Export - apiexport-edge.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiexport-edge.kcp.io.yaml
+                - name: edge-Export - apiexport-meta.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiexport-meta.kcp.io.yaml
+                - name: edge-Export - apiresourceschema-apiresources.meta.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiresourceschema-apiresources.meta.kcp.io.yaml
+                - name: edge-Export - apiresourceschema-customizers.edge.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiresourceschema-customizers.edge.kcp.io.yaml
+                - name: edge-Export - apiresourceschema-edgeplacements.edge.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiresourceschema-edgeplacements.edge.kcp.io.yaml
+                - name: edge-Export - apiresourceschema-singleplacementslices.edge.kcp.io
+                  source:
+                    file:
+                      path: ../../../config/exports/apiresourceschema-singleplacementslices.edge.kcp.io.yaml
+            - name: my-org
+              workspaces:
+                - name: wmw-1
+                  apiBindings:
+                    - name: bind-kube
+                      apiExport:
+                        name: kubernetes
+                        path: "root:compute"
+                    - name: bind-edge
+                      apiExport:
+                        name: edge.kcp.io
+                        path: "root:espw"

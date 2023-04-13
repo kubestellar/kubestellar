@@ -167,7 +167,9 @@ echo "Started deploying kcp-playground: complete in ~ 150 sec (maximum waiting t
 echo "****************************************"
 rm -rf .kcp-playground/
 
-if [ $stage == 1 ]; then  
+if [ $stage == 0 ]; then
+    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-BYOW.yaml >& ../kcp-playground-log.txt &
+elif [ $stage == 1 ]; then  
     kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage1.yaml >& ../kcp-playground-log.txt &
 elif [ $stage == 2 ]; then
     kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
@@ -231,8 +233,11 @@ echo "****************************************"
 cd ../../..
 
 # Delete default location object in the inventory workspace
-kubectl ws imw-1
-kubectl delete location default > /dev/null 2>&1
+if [ $stage -gt 0 ]; then
+    kubectl ws imw-1
+    kubectl delete location default > /dev/null 2>&1
+fi
+
 
 kubectl ws root:espw
 go run ./cmd/mailbox-controller --inventory-context=shard-main-root -v=2 >& environments/dev-env/mailbox-controller-log.txt &
@@ -247,7 +252,7 @@ else
 fi
 
 
-if [ $stage -gt 1 ]; then 
+if [ $stage != 1 ]; then 
     # (7): Start the edge-mc scheduler
     sleep 3
     kubectl ws root:espw
@@ -264,7 +269,7 @@ if [ $stage -gt 1 ]; then
 fi
 
 
-if [ $stage -gt 2 ]; then 
+if [ $stage -eq 0 ] || [ $stage -gt 2 ]; then 
     # (8): Start the Placement Translator
     sleep 3
     kubectl ws root:espw
