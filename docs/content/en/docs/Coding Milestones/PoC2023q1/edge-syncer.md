@@ -26,6 +26,103 @@ Edge-syncer can be deployed on p-cluster easily by the following steps.
 
 ![edge-syncer boot](/docs/Coding%20Milestones/PoC2023q1/images/edge-syncer-boot.png)
 
+#### What edge-sync plugin does
+
+In order for Syncer to sync resources between upstream (workspace) and doenstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (`kubectl kcp workload edge-sync`) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to `serviceAccountName` in the deployment manifest.
+
+Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;`kubectl kcp workload edge-sync <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
+
+The source code of the command is https://github.com/yana1205/kcp/blob/emc/pkg/cliplugins/workload/plugin/edgesync.go.
+
+The equivalent manual steps are as follows:
+1. Generate UUID for Syncer identification
+    ```
+    uuidgen | tr '[:upper:]' '[:lower:]' | read syncer_id
+    syncer_id="syncer-$syncer_id"
+    ```
+1. Go to a workspace
+    ```
+    kubectl ws create ws1 --enter
+    ```
+1. Create a serviceaccount in the workspace
+    ```
+    cat << EOL | kubectl apply -f -
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: $syncer_id
+    EOL
+    ```
+1. Create clusterrole and clusterrolebinding to bind the serviceaccount to the role
+    ```
+    cat << EOL | kubectl apply -f -
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: $syncer_id
+    rules:
+    - apiGroups: ["*"]
+      resources: ["*"]
+      verbs: ["*"]
+    - nonResourceURLs: ["/"]
+      verbs: ["access"]
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: $syncer_id
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: $syncer_id
+    subjects:
+    - apiGroup: ""
+      kind: ServiceAccount
+      name: $syncer_id
+      namespace: default
+    EOL
+    ```
+1. Get the serviceaccount token that will be set in the upstream kubeconfig manifest
+    ```
+    kubectl get secret -o custom-columns=":.metadata.name"| grep $syncer_id | read secret_name
+    kubectl get secret $secret_name -o jsonpath='{.data.token}' | base64 -d | read token
+    ```
+1. Get the certificates that will be set in the upstream kubeconfig manifest
+    ```
+    kubectl config view --minify --raw | yq ".clusters[0].cluster.certificate-authority-data" | read cacrt
+    echo $cacrt
+    ```
+1. Get the server host and port that will be set in the upstream kubeconfig manifest
+    ```
+    kubectl config view --minify --raw | yq ".clusters[0].cluster.server" | sed -e 's|https://\(.*\):\([^/]*\)/.*|\1 \2|g' | read host port
+    echo $host, $port
+    ```
+1. Set some other parameters
+    1. server_url of KCP from host and port
+        ```
+        server_url="https://$host:$port"
+        ```
+    1. downstream_namespace where Syncer Pod runs
+        ```
+        downstream_namespace="kcp-edge-$syncer_id"
+        ```
+    1. Syncer image
+        ```
+        image="quay.io/kcpedge/syncer:dev-2023-03-30"
+        ```
+1. Generate bootstrap manifest
+    ```
+    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
+    ```
+    You can extract kubeconfig.yaml for the upstream too
+    ```
+    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e "select(.kind == \"Secret\" and .metadata.name == \"$syncer_id\")" | yq .stringData.kubeconfig 
+    ```
+1. For now, EdgeSyncConfig API is required. Please create EdgeSyncConfig CRD in the workspace, if you run Syncer from the generated bootstrap manifest.
+    ```
+    kubectl create ./pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml
+    ```
+
 #### Deploy workload objects from edge-mc to p-cluster
 
 To deploy resources to p-clusters, create the following in workload management workspace

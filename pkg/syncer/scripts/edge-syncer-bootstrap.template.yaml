@@ -1,0 +1,125 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${downstream_namespace}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${syncer_id}
+  namespace: $downstream_namespace
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${syncer_id}-token
+  namespace: $downstream_namespace
+  annotations:
+    kubernetes.io/service-account.name: ${syncer_id}
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ${syncer_id}
+rules:
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - "*"
+- apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ${syncer_id}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ${syncer_id}
+subjects:
+- kind: ServiceAccount
+  name: ${syncer_id}
+  namespace: ${downstream_namespace}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${syncer_id}
+  namespace: ${downstream_namespace}
+stringData:
+  kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: default-cluster
+      cluster:
+        certificate-authority-data: $cacrt
+        server: ${server_url}
+    contexts:
+    - name: default-context
+      context:
+        cluster: default-cluster
+        namespace: default
+        user: default-user
+    current-context: default-context
+    users:
+    - name: default-user
+      user:
+        token: ${token}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${syncer_id}
+  namespace: ${downstream_namespace}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ${syncer_id}
+  template:
+    metadata:
+      labels:
+        app: ${syncer_id}
+    spec:
+      containers:
+      - name: kcp-syncer
+        command:
+        - /ko-app/syncer
+        args:
+        - --from-kubeconfig=/kcp/kubeconfig
+        - --sync-target-name=${syncer_id}
+        - --sync-target-uid=${syncer_id}
+        - --qps=30
+        - --burst=30
+        - --v=3
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ${image}
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - name: kcp-config
+          mountPath: /kcp/
+          readOnly: true
+      serviceAccountName: ${syncer_id}
+      volumes:
+        - name: kcp-config
+          secret:
+            secretName: ${syncer_id}
+            optional: false
