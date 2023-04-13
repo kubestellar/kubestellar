@@ -363,7 +363,16 @@ their workload desired and reported state.
 | v1 | ComponentStatus | false |
 | v1 | Event | true |
 | v1 | Node | false |
+| v1 | Secret (system infrastructure _types_) | true |
 | workload.kcp.io/v1alpha1 | SyncTarget | false |
+
+For `Secret` objects there is another level of discrimination
+required.  A `Secret` object has a _type_, as explained in [the
+Kubernetes
+documentation](https://v1-24.docs.kubernetes.io/docs/concepts/configuration/secret/#secret-types).
+Two of those types, `kubernetes.io/service-account-token` and
+`bootstrap.kubernetes.io/token`, identify objects that are not
+destined for the edge clusters.
 
 #### Already denatured in center, want natured in edge
 
@@ -402,8 +411,13 @@ this category.
 | v1 | Pod | true |
 | v1 | PodTemplate | true |
 | v1 | ReplicationController | true |
-| v1 | Secret | true |
+| v1 | Secret (except for system infrastructure _types_) | true |
 | v1 | Service | true |
+
+As mentioned in the previous section, for `Secret` objects the _type_
+matters.  The Secret objects that belong in the category at hand are
+those whose type is neither `kubernetes.io/service-account-token` nor
+`bootstrap.kubernetes.io/token`.
 
 ### Built-in resources and namespaces
 
