@@ -27,7 +27,10 @@ import (
 
 // TypedContextualListWatcher is a ListWatcher that takes a Context
 // and returns a specific type of list object.
-// This may be all-cluster to specific to one cluster.
+// This may be all-cluster or specific to one cluster.
+// For an all-cluster example,
+// see https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/client/clientset/versioned/cluster/typed/scheduling/v1alpha1/placement.go#L47-L48 ;
+// `PlacementClusterInterface` is a subtype of `TypedContextualListWatcher[*schedulingv1alpha1.PlacementList]`.
 type TypedContextualListWatcher[ListType runtime.Object] interface {
 	List(ctx context.Context, opts metav1.ListOptions) (ListType, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
