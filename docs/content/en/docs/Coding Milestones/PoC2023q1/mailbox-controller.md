@@ -26,16 +26,43 @@ provider workspace).
 
 ## Usage
 
+The mailbox controller needs three Kubernetes client configurations.
+One --- concerned with reading inventory --- is to access the
+APIExport view of the `workload.kcp.io` API group, to read the
+`SyncTarget` objects.  This must be a client config that is pointed at
+the workspace (which is always `root`, as far as I know) that has this
+APIExport and is authorized to read its view.  Another client config
+is needed to give read/write access to all the mailbox workspaces, so
+that the controller can create `APIBinding` objects to the edge
+APIExport in those workspaces; this should be a cliet config that is
+able to read/write in all clusters.  For example, that is in the
+kubeconfig context named `base` in the kubeconfig created by `kcp
+start`.  Finally, the controller also needs a kube client config that
+is pointed at the edge service provider workspace and is authorized to
+consume the `Workspace` objects from there.
+
 The command line flags, beyond the basics, are as follows.
 
 ```console
       --concurrency int                  number of syncs to run in parallel (default 4)
       --espw-path string                 the pathname of the edge service provider workspace (default "root:espw")
-      --inventory-context string         current-context override for inventory-kubeconfig (default "root")
-      --inventory-kubeconfig string      pathname of kubeconfig file for inventory service provider workspace
+
+      --inventory-cluster string         The name of the kubeconfig cluster to use for access to APIExport view of SyncTarget objects
+      --inventory-context string         The name of the kubeconfig context to use for access to APIExport view of SyncTarget objects (default "root")
+      --inventory-kubeconfig string      Path to the kubeconfig file to use for access to APIExport view of SyncTarget objects
+      --inventory-user string            The name of the kubeconfig user to use for access to APIExport view of SyncTarget objects
+
+      --mbws-cluster string              The name of the kubeconfig cluster to use for access to mailbox workspaces (really all clusters)
+      --mbws-context string              The name of the kubeconfig context to use for access to mailbox workspaces (really all clusters) (default "base")
+      --mbws-kubeconfig string           Path to the kubeconfig file to use for access to mailbox workspaces (really all clusters)
+      --mbws-user string                 The name of the kubeconfig user to use for access to mailbox workspaces (really all clusters)
+
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)
-      --workload-context string          current-context override for workload-kubeconfig
-      --workload-kubeconfig string       pathname of kubeconfig file for edge workload service provider workspace
+
+      --workload-cluster string          The name of the kubeconfig cluster to use for access to edge service provider workspace
+      --workload-context string          The name of the kubeconfig context to use for access to edge service provider workspace
+      --workload-kubeconfig string       Path to the kubeconfig file to use for access to edge service provider workspace
+      --workload-user string             The name of the kubeconfig user to use for access to edge service provider workspace
 ```
 
 ## Try It
