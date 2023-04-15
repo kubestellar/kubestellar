@@ -95,7 +95,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 				rscDisco.Put(key, val)
 			},
 			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
-				logger.V(4).Info("Binder told there is no namespaced resource", "key", key)
+				logger.V(4).Info("Binder told there is no such namespaced resource", "key", key)
 				rscDisco.Delete(key)
 			})
 		nsSrcAndDestAndLog := NewSetWriterFuncs( // logging and the ability to set breakpoints
@@ -414,6 +414,11 @@ type sboXnOps struct {
 
 func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], val WorkloadPartDetails) {
 	sbo := sxo.sbo
+	rscMode := sbo.resourceModes(metav1.GroupResource{Group: tup.Second.APIGroup, Resource: tup.Second.Resource})
+	if !rscMode.GoesToMailbox() {
+		sbo.logger.V(4).Info("Ignoring WhatWhere tuple because it does not go to the mailbox workspaces", "tup", tup, "rscMode", rscMode)
+		return
+	}
 	sbo.getSourceCluster(tup.First.Cluster, true)
 	gr := tup.Second.GroupResource()
 	if mgrIsNamespace(gr) {
@@ -429,6 +434,11 @@ func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement
 
 func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacement]) {
 	sbo := sxo.sbo
+	rscMode := sbo.resourceModes(metav1.GroupResource{Group: tup.Second.APIGroup, Resource: tup.Second.Resource})
+	if !rscMode.GoesToMailbox() {
+		sbo.logger.V(4).Info("Ignoring WhatWhere tuple because it does not go to the mailbox workspaces", "tup", tup, "rscMode", rscMode)
+		return
+	}
 	sbc := sbo.getSourceCluster(tup.First.Cluster, false)
 	if sbc == nil {
 		return

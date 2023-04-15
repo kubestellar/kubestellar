@@ -26,7 +26,9 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
+	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
@@ -51,6 +53,8 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
+	nsClusterPreInformer   kcpkubecorev1informers.NamespaceClusterInformer
+	nsClusterClient        kcpkubecorev1client.NamespaceClusterInterface
 
 	workloadProjector interface {
 		WorkloadProjector
@@ -78,13 +82,17 @@ func NewPlacementTranslator(
 	// needed for enumerating resources in workload mgmt workspaces
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	// needed to watch for new resources appearing
-	crdClusterPreInformer kcpinformers.GenericClusterInformer,
+	crdClusterPreInformer kcpkubeinformers.GenericClusterInformer,
 	// needed to watch for new resources appearing
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
+	bindingClusterPreInformer kcpkubeinformers.GenericClusterInformer,
 	// needed to read and write arbitrary objects
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	// to read and write syncer config objects
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
+	// for monitoring namespaces in mailbox workspaces
+	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
+	// for creating namespaces in mailbox workspaces
+	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	mbwsPreInformer.Lister()
@@ -102,12 +110,15 @@ func NewPlacementTranslator(
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
 		edgeClusterClientset:   edgeClusterClientset,
+		nsClusterPreInformer:   nsClusterPreInformer,
+		nsClusterClient:        nsClusterClient,
 		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, pt.mbwsInformer, pt.mbwsLister,
-		pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset, dynamicClusterClient)
+		pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset, dynamicClusterClient,
+		nsClusterPreInformer, nsClusterClient)
 
 	return pt
 }

@@ -18,11 +18,13 @@ package placement
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
 
+	k8scorev1 "k8s.io/api/core/v1"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -30,12 +32,16 @@ import (
 	k8sdynamic "k8s.io/client-go/dynamic"
 	k8sdynamicinformer "k8s.io/client-go/dynamic/dynamicinformer"
 	upstreaminformers "k8s.io/client-go/informers"
+	k8scorev1informers "k8s.io/client-go/informers/core/v1"
+	k8scorev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
+	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
+	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -74,6 +80,8 @@ func NewWorkloadProjector(
 	syncfgClusterLister edgev1a1listers.SyncerConfigClusterLister,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
+	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
+	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
 ) *workloadProjector {
 	wp := &workloadProjector{
 		ctx:                   ctx,
@@ -85,6 +93,8 @@ func NewWorkloadProjector(
 		syncfgClusterLister:   syncfgClusterLister,
 		edgeClusterClientset:  edgeClusterClientset,
 		dynamicClusterClient:  dynamicClusterClient,
+		nsClusterPreInformer:  nsClusterPreInformer,
+		nsClusterClient:       nsClusterClient,
 
 		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
 		clusterToMBWSName: WrapMapWithMutex[logicalcluster.Name, string](NewMapMap[logicalcluster.Name, string](nil)),
@@ -286,6 +296,8 @@ type workloadProjector struct {
 	syncfgClusterLister   edgev1a1listers.SyncerConfigClusterLister
 	edgeClusterClientset  edgeclusterclientset.ClusterInterface
 	dynamicClusterClient  clusterdynamic.ClusterInterface
+	nsClusterPreInformer  kcpkubecorev1informers.NamespaceClusterInformer
+	nsClusterClient       kcpkubecorev1client.NamespaceClusterInterface
 
 	mbwsNameToCluster MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
 	clusterToMBWSName MutableMap[logicalcluster.Name, string /*mailbox workspace name*/]
@@ -336,36 +348,52 @@ type GroupResourceInstance = Pair[metav1.GroupResource, string /*object name*/]
 
 // Constructs the data structure specific to a mailbox/edge-cluster
 func (wp *workloadProjector) newPerDestinationLocked(destination SinglePlacement) *wpPerDestination {
-	wpd := &wpPerDestination{wp, destination,
-		NewMapRelation2[NamespaceName, logicalcluster.Name](),
-		NewMapRelation2[metav1.GroupResource, logicalcluster.Name](),
-		NewMapRelation2[GroupResourceInstance, logicalcluster.Name](),
-		nil,
+	wpd := &wpPerDestination{wp: wp, destination: destination,
+		nsDistributions:  NewMapRelation2[NamespaceName, logicalcluster.Name](),
+		nsrDistributions: NewMapRelation2[metav1.GroupResource, logicalcluster.Name](),
+		nnsDistributions: NewMapRelation2[GroupResourceInstance, logicalcluster.Name](),
 	}
 	return wpd
 }
 
 // The data structure specific to a mailbox/edge-cluster.
 // All the variable fields must be accessed with the wp mutex locked.
+// The readyChan is closed once the namespace informer has synced.
 type wpPerDestination struct {
-	wp               *workloadProjector
-	destination      SinglePlacement
-	nsDistributions  SingleIndexedRelation2[NamespaceName, logicalcluster.Name]
-	nsrDistributions SingleIndexedRelation2[metav1.GroupResource, logicalcluster.Name]
-	nnsDistributions SingleIndexedRelation2[GroupResourceInstance, logicalcluster.Name]
-	dynamicClient    k8sdynamic.Interface
+	wp                     *workloadProjector
+	destination            SinglePlacement
+	nsDistributions        SingleIndexedRelation2[NamespaceName, logicalcluster.Name]
+	nsrDistributions       SingleIndexedRelation2[metav1.GroupResource, logicalcluster.Name]
+	nnsDistributions       SingleIndexedRelation2[GroupResourceInstance, logicalcluster.Name]
+	dynamicClient          k8sdynamic.Interface
+	dynamicInformerFactory k8sdynamicinformer.DynamicSharedInformerFactory
+	namespaceClient        k8scorev1client.NamespaceInterface
+	namespacePreInformer   k8scorev1informers.NamespaceInformer
+	readyChan              <-chan struct{}
 }
 
-func (wpd *wpPerDestination) getDynamicClientLocked() k8sdynamic.Interface {
+func (wpd *wpPerDestination) getDynamicClientLocked() (k8sdynamic.Interface, <-chan struct{}, error) {
 	if wpd.dynamicClient == nil {
 		mbwsName := SPMailboxWorkspaceName(wpd.destination)
 		mbwsCluster, have := wpd.wp.mbwsNameToCluster.Get(mbwsName)
 		if !have {
-			return nil
+			return nil, nil, errors.New("unable to map mailbox workspace name to cluster")
 		}
 		wpd.dynamicClient = wpd.wp.dynamicClusterClient.Cluster(mbwsCluster.Path())
+		wpd.dynamicInformerFactory = k8sdynamicinformer.NewDynamicSharedInformerFactory(wpd.dynamicClient, 0)
+		wpd.namespaceClient = wpd.wp.nsClusterClient.Cluster(mbwsCluster.Path())
+		wpd.namespacePreInformer = wpd.wp.nsClusterPreInformer.Cluster(mbwsCluster)
+		nsInformer := wpd.namespacePreInformer.Informer()
+		readyChan := make(chan struct{})
+		wpd.readyChan = readyChan
+		go func() {
+			k8scache.WaitForNamedCacheSync("workload-projector", wpd.wp.ctx.Done(), nsInformer.HasSynced)
+			close(readyChan)
+		}()
+		go nsInformer.Run(wpd.wp.ctx.Done())
+		wpd.dynamicInformerFactory.Start(wpd.wp.ctx.Done())
 	}
-	return wpd.dynamicClient
+	return wpd.dynamicClient, wpd.readyChan, nil
 
 }
 
@@ -395,14 +423,14 @@ func (nsd wpPerDestinationNNSDistributions) GetIndex1to2() Map[GroupResourceInst
 
 // Constructs the data structure specific to a workload management workspace
 func (wp *workloadProjector) newPerSourceLocked(source logicalcluster.Name) *wpPerSource {
-	scopedGenericClient := wp.dynamicClusterClient.Cluster(source.Path())
-	dynamicInformerFactory := k8sdynamicinformer.NewDynamicSharedInformerFactory(scopedGenericClient, 0)
+	dynamicClient := wp.dynamicClusterClient.Cluster(source.Path())
+	dynamicInformerFactory := k8sdynamicinformer.NewDynamicSharedInformerFactory(dynamicClient, 0)
 	wps := &wpPerSource{wp: wp, source: source,
 		logger:                 klog.FromContext(wp.ctx).WithValues("source", source),
 		nsDistributions:        NewMapRelation2[NamespaceName, SinglePlacement](),
 		nsrDistributions:       NewMapRelation2[metav1.GroupResource, SinglePlacement](),
 		nnsDistributions:       NewMapRelation3[metav1.GroupResource, string /*obj name*/, SinglePlacement](),
-		scopedGenericClient:    scopedGenericClient,
+		dynamicClient:          dynamicClient,
 		dynamicInformerFactory: dynamicInformerFactory,
 		preInformers:           NewMapMap[metav1.GroupResource, upstreaminformers.GenericInformer](nil),
 	}
@@ -419,7 +447,7 @@ type wpPerSource struct {
 	nsDistributions        SingleIndexedRelation2[NamespaceName, SinglePlacement]
 	nsrDistributions       SingleIndexedRelation2[metav1.GroupResource, SinglePlacement]
 	nnsDistributions       SingleIndexedRelation3[metav1.GroupResource, string /*obj name*/, SinglePlacement]
-	scopedGenericClient    k8sdynamic.Interface
+	dynamicClient          k8sdynamic.Interface
 	dynamicInformerFactory k8sdynamicinformer.DynamicSharedInformerFactory
 	preInformers           MutableMap[metav1.GroupResource, upstreaminformers.GenericInformer]
 }
@@ -665,7 +693,12 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 				tryAgain = true
 				return nil
 			}
-			dynamicClient := wpd.getDynamicClientLocked()
+			dynamicClient, clientReadyChan, err := wpd.getDynamicClientLocked()
+			if err != nil {
+				logger.Error(err, "Failed to wpd.getDynamicClientLocked")
+				tryAgain = true
+				return nil
+			}
 			remWork = append(remWork, func() bool {
 				sgvr := MetaGroupResourceToSchema(soRef.groupResource).WithVersion(pmv.APIVersion)
 				nsblClient := dynamicClient.Resource(sgvr)
@@ -685,6 +718,30 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 						logger.V(3).Info("Deletion already propagated")
 					}
 					return false
+				}
+				if namespaced {
+					<-clientReadyChan
+					nsObj, err := wpd.namespacePreInformer.Lister().Get(soRef.namespace)
+					if err != nil && !k8sapierrors.IsNotFound(err) {
+						logger.Error(err, "Failed to lookup namespace in local cache")
+						return true
+					}
+					if nsObj == nil {
+						nsObj = &k8scorev1.Namespace{
+							ObjectMeta: metav1.ObjectMeta{
+								Name: soRef.namespace,
+							},
+						}
+						_, err := wpd.namespaceClient.Create(ctx, nsObj, metav1.CreateOptions{})
+						if err == nil {
+							logger.V(3).Info("Created namespace in mailbox workspace")
+						} else if k8sapierrors.IsAlreadyExists(err) {
+							logger.V(4).Info("Something else created needed namespace concurrently")
+						} else {
+							logger.Error(err, "Failed to create needed namespace in mailbox workspace")
+							return true
+						}
+					}
 				}
 				destObj, err := rscClient.Get(ctx, soRef.name, metav1.GetOptions{})
 				if err != nil && !k8sapierrors.IsNotFound(err) {
@@ -760,7 +817,10 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 			outputDest[key] = val
 		}
 		for key, val := range src {
-			if oval, have := outputDest[key]; have {
+			if kvIsSystem(which, key) {
+				continue
+			}
+			if oval, have := outputDest[key]; have && oval != val {
 				logger.Info("Overwriting key/val", "which", which, "key", key, "oldVal", oval, "newVal", val)
 			}
 			outputDest[key] = val
@@ -770,6 +830,10 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 	outputDest.SetAnnotations(kvMerge("annotations", srcObj.GetAnnotations(), inputDest.GetAnnotations()))
 	outputDest.SetLabels(kvMerge("labels", srcObj.GetLabels(), inputDest.GetLabels()))
 	return outputDest
+}
+
+func kvIsSystem(which, key string) bool {
+	return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/")) && !strings.Contains(key, "edge.kcp.io/")
 }
 
 func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
@@ -936,6 +1000,17 @@ func (wps *wpPerSource) enqueueSourceNamespacedObject(gr metav1.GroupResource, o
 		obj = dfu.Obj
 	}
 	objm := obj.(metav1.Object)
+	// Cluster-scoped objects are filtered by ResourceMode in the SetBinder;
+	// namespaced objects have to get filtered here.
+	rscMode := DefaultResourceModes(gr) // TODO:plumb this properly
+	if !rscMode.GoesToMailbox() {
+		wps.logger.V(4).Info("Ignoring object due to ResourceMode", "resourceMode", rscMode, "groupResource", gr, "namespace", objm.GetNamespace(), "name", objm.GetName())
+		return
+	}
+	if ObjectIsSystem(objm) {
+		wps.logger.V(4).Info("Ignoring system object", "groupResource", gr, "namespace", objm.GetNamespace(), "name", objm.GetName())
+		return
+	}
 	ref := sourceObjectRef{wps.source, gr, objm.GetNamespace(), objm.GetName()}
 	wps.logger.V(4).Info("Enqueuing reference to source namespaced object", "ref", ref)
 	wps.wp.queue.Add(ref)
@@ -947,9 +1022,33 @@ func (wps *wpPerSource) enqueueSourceNonNamespacedObject(gr metav1.GroupResource
 		obj = dfu.Obj
 	}
 	objm := obj.(metav1.Object)
+	if ObjectIsSystem(objm) {
+		wps.logger.V(4).Info("Ignoring system object", "groupResource", gr, "namespace", objm.GetNamespace(), "name", objm.GetName())
+		return
+	}
 	ref := sourceObjectRef{wps.source, gr, noNamespace, objm.GetName()}
 	wps.logger.V(4).Info("Enqueuing reference to source cluster-scoped object", "ref", ref)
 	wps.wp.queue.Add(ref)
+}
+
+func ObjectIsSystem(objm metav1.Object) bool {
+	obju := objm.(*unstructured.Unstructured)
+	objt := objm.(metav1.Type)
+	apiVersion := objt.GetAPIVersion()
+	kind := objt.GetKind()
+	if apiVersion != "v1" {
+		return false
+	}
+	switch kind {
+	case "Secret":
+		secretType := obju.UnstructuredContent()["type"]
+		return secretType == "kubernetes.io/service-account-token" ||
+			secretType == "bootstrap.kubernetes.io/token"
+	case "ConfigMap":
+		return objm.GetNamespace() == "default" && strings.HasPrefix(objm.GetName(), "kube-")
+	default:
+		return false
+	}
 }
 
 func recordPart[Whole, Part, Rest any](logger klog.Logger, partType string, record *MutableSet[Part], factorer Factorer[Whole, Part, Rest]) SetWriter[Whole] {
@@ -1094,7 +1193,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 	if !haveUpsyncs {
 		upsyncs = NewHashSet[edgeapi.UpsyncSet](HashUpsyncSet{})
 	}
-	ans.upsyncs = upsyncs
+	ans.upsyncs = HashSetCopy[edgeapi.UpsyncSet](HashUpsyncSet{})(upsyncs)
 	return ans
 }
 

@@ -49,6 +49,8 @@ import (
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
+	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubeclient "github.com/kcp-dev/client-go/kubernetes"
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
@@ -157,6 +159,15 @@ func main() {
 		os.Exit(40)
 	}
 
+	kubeClusterClient, err := kcpkubeclient.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create kcp-kube all-cluster client")
+		os.Exit(44)
+	}
+	nsClusterClient := kubeClusterClient.CoreV1().Namespaces()
+	kubeClusterInformerFactory := kcpkubeinformers.NewSharedInformerFactory(kubeClusterClient, 0)
+	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
+
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
 	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
@@ -201,10 +212,11 @@ func main() {
 	// TODO: more
 	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset)
+		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
+	kubeClusterInformerFactory.Start(doneCh)
 	pt.Run()
 	logger.Info("Time to stop")
 }

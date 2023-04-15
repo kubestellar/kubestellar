@@ -376,6 +376,18 @@ const (
 	ForciblyDenatured NatureMode = "ForciblyDenatured"
 )
 
+// GoesToMailbox tells whether objects of this sort can downsync at least as far as the mailbox workspace
+func (rscMode ResourceMode) GoesToMailbox() bool {
+	switch rscMode.PropagationMode {
+	case ErrorInCenter, TolerateInCenter:
+		return false
+	case GoesToEdge, GoesToMailbox:
+		return true
+	default:
+		panic(rscMode)
+	}
+}
+
 func SPMailboxWorkspaceName(sp SinglePlacement) string {
 	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
 }
