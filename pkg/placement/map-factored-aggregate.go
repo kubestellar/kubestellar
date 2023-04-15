@@ -21,7 +21,7 @@ package placement
 func NewFactoredMapMapAggregator[WholeKey, KeyPartA, KeyPartB comparable, Val any, Aggregation any](
 	keyDecomposer Factorer[WholeKey, KeyPartA, KeyPartB],
 	unifiedObserver MapChangeReceiver[WholeKey, Val],
-	outerObserver MapChangeReceiver[KeyPartA, MutableMap[KeyPartB, Val]],
+	outerKeysetObserver SetChangeReceiver[KeyPartA],
 	aggregate func(KeyPartA, Map[KeyPartB, Val]) Aggregation,
 	aggregationObserver MappingReceiver[KeyPartA, Aggregation],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
@@ -34,5 +34,5 @@ func NewFactoredMapMapAggregator[WholeKey, KeyPartA, KeyPartB comparable, Val an
 			aggregationObserver.Delete(keyPartA)
 		},
 	}
-	return NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB, Val](keyDecomposer, unifiedObserver, outerObserver, observeToSolve)
+	return NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB, Val](keyDecomposer, unifiedObserver, outerKeysetObserver, observeToSolve)
 }

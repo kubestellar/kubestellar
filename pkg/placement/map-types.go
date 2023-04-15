@@ -27,7 +27,7 @@ import (
 // The collection may or may not be mutable.
 // This view of the collection may or may not have a limited scope of validity.
 // This view may or may not have concurrency restrictions.
-type Map[Key comparable, Val any] interface {
+type Map[Key, Val any] interface {
 	Emptyable
 	Len() int
 	LenIsCheap() bool
@@ -36,7 +36,7 @@ type Map[Key comparable, Val any] interface {
 }
 
 // MutableMap is a Map that can be written to.
-type MutableMap[Key comparable, Val any] interface {
+type MutableMap[Key, Val any] interface {
 	Map[Key, Val]
 	MappingReceiver[Key, Val]
 }
@@ -44,13 +44,17 @@ type MutableMap[Key comparable, Val any] interface {
 // MappingReceiver is something that can be given key/value pairs.
 // This is the writable aspect of a Map.
 // Some DynamicMapProvider implementations require receivers to be comparable.
-type MappingReceiver[Key comparable, Val any] interface {
+type MappingReceiver[Key, Val any] interface {
 	Put(Key, Val)
 	Delete(Key)
 }
 
+func NewMappingReceiverFuncs[Key, Val any](put func(Key, Val), delete func(Key)) MappingReceiver[Key, Val] {
+	return MappingReceiverFuncs[Key, Val]{put, delete}
+}
+
 // MappingReceiverFuncs is a convenient constructor of MappingReceiver from two funcs
-type MappingReceiverFuncs[Key comparable, Val any] struct {
+type MappingReceiverFuncs[Key, Val any] struct {
 	OnPut    func(Key, Val)
 	OnDelete func(Key)
 }
@@ -88,7 +92,7 @@ func (mrf MappingReceiverFuncs[Key, Val]) DeleteWithFinal(key Key, oldVal Val) {
 	}
 }
 
-type MappingReceiverFork[Key comparable, Val any] []MappingReceiver[Key, Val]
+type MappingReceiverFork[Key, Val any] []MappingReceiver[Key, Val]
 
 var _ MappingReceiver[int, func()] = MappingReceiverFork[int, func()]{}
 
@@ -104,7 +108,7 @@ func (mrf MappingReceiverFork[Key, Val]) Delete(key Key) {
 	}
 }
 
-type MappingReceiverHolderFork[Key comparable, Val any] []*MappingReceiverHolder[Key, Val]
+type MappingReceiverHolderFork[Key, Val any] []*MappingReceiverHolder[Key, Val]
 
 var _ MappingReceiver[int, func()] = MappingReceiverHolderFork[int, func()]{}
 
@@ -121,11 +125,11 @@ func (mrf MappingReceiverHolderFork[Key, Val]) Delete(key Key) {
 }
 
 // MappingReceiverFunc produces a MappingReceiver that defers to another MappingReceiver computed on each use
-func MappingReceiverFunc[Key comparable, Val any](fn func() MappingReceiver[Key, Val]) MappingReceiver[Key, Val] {
+func MappingReceiverFunc[Key, Val any](fn func() MappingReceiver[Key, Val]) MappingReceiver[Key, Val] {
 	return mappingReceiverFunc[Key, Val]{fn}
 }
 
-type mappingReceiverFunc[Key comparable, Val any] struct {
+type mappingReceiverFunc[Key, Val any] struct {
 	fn func() MappingReceiver[Key, Val]
 }
 
@@ -140,7 +144,7 @@ func (mrf mappingReceiverFunc[Key, Val]) Put(key Key, val Val) {
 }
 
 // MapChangeReceiver is what a stateful map offers to an observer
-type MapChangeReceiver[Key comparable, Val any] interface {
+type MapChangeReceiver[Key, Val any] interface {
 	Create(Key, Val)
 
 	// Update is given key, old value, new value
@@ -151,7 +155,7 @@ type MapChangeReceiver[Key comparable, Val any] interface {
 }
 
 // MapChangeReceiverFuncs is a convenient constructor of MapChangeReceiver from three funcs
-type MapChangeReceiverFuncs[Key comparable, Val any] struct {
+type MapChangeReceiverFuncs[Key, Val any] struct {
 	OnCreate func(Key, Val)
 	OnUpdate func(Key, Val, Val)
 	OnDelete func(Key, Val)
@@ -177,7 +181,7 @@ func (mrf MapChangeReceiverFuncs[Key, Val]) DeleteWithFinal(key Key, val Val) {
 	}
 }
 
-type MapChangeReceiverFork[Key comparable, Val any] []MapChangeReceiver[Key, Val]
+type MapChangeReceiverFork[Key, Val any] []MapChangeReceiver[Key, Val]
 
 var _ MapChangeReceiver[int, func()] = MapChangeReceiverFork[int, func()]{}
 
@@ -200,11 +204,11 @@ func (mrf MapChangeReceiverFork[Key, Val]) DeleteWithFinal(key Key, val Val) {
 }
 
 // MappingReceiverDiscardsPrevious produces a MapChangeReceiver that dumbs down its info to pass along to the given MappingReceiver
-func MappingReceiverDiscardsPrevious[Key comparable, Val any](mr MappingReceiver[Key, Val]) MapChangeReceiver[Key, Val] {
+func MappingReceiverDiscardsPrevious[Key, Val any](mr MappingReceiver[Key, Val]) MapChangeReceiver[Key, Val] {
 	return mappingReceiverDiscardsPrevious[Key, Val]{inner: mr}
 }
 
-type mappingReceiverDiscardsPrevious[Key comparable, Val any] struct{ inner MappingReceiver[Key, Val] }
+type mappingReceiverDiscardsPrevious[Key, Val any] struct{ inner MappingReceiver[Key, Val] }
 
 func (mr mappingReceiverDiscardsPrevious[Key, Val]) Create(key Key, val Val) {
 	mr.inner.Put(key, val)
@@ -219,26 +223,26 @@ func (mr mappingReceiverDiscardsPrevious[Key, Val]) DeleteWithFinal(key Key, val
 }
 
 // TransactionalMappingReceiver is one that takes updates in batches
-type TransactionalMappingReceiver[Key comparable, Val any] interface {
+type TransactionalMappingReceiver[Key, Val any] interface {
 	Transact(func(MappingReceiver[Key, Val]))
 }
 
 // MapReadonly returns a version of the argument that does not support writes
-func MapReadonly[Key comparable, Val any](inner Map[Key, Val]) Map[Key, Val] {
+func MapReadonly[Key, Val any](inner Map[Key, Val]) Map[Key, Val] {
 	return mapReadonly[Key, Val]{inner}
 }
 
-type mapReadonly[Key comparable, Val any] struct {
+type mapReadonly[Key, Val any] struct {
 	Map[Key, Val]
 }
 
-func MutableMapWithKeyObserver[Key comparable, Val any](mm MutableMap[Key, Val], observer SetChangeReceiver[Key]) MutableMap[Key, Val] {
+func MutableMapWithKeyObserver[Key, Val any](mm MutableMap[Key, Val], observer SetWriter[Key]) MutableMap[Key, Val] {
 	return &mutableMapWithKeyObserver[Key, Val]{mm, observer}
 }
 
-type mutableMapWithKeyObserver[Key comparable, Val any] struct {
+type mutableMapWithKeyObserver[Key, Val any] struct {
 	MutableMap[Key, Val]
-	observer SetChangeReceiver[Key]
+	observer SetWriter[Key]
 }
 
 func (mko *mutableMapWithKeyObserver[Key, Val]) Put(key Key, val Val) {
@@ -251,7 +255,7 @@ func (mko *mutableMapWithKeyObserver[Key, Val]) Delete(key Key) {
 	mko.observer.Remove(key)
 }
 
-type TransformMappingReceiver[KeyOriginal, KeyTransformed comparable, ValOriginal, ValTransformed any] struct {
+type TransformMappingReceiver[KeyOriginal, KeyTransformed, ValOriginal, ValTransformed any] struct {
 	TransformKey func(KeyOriginal) KeyTransformed
 	TransformVal func(ValOriginal) ValTransformed
 	Inner        MappingReceiver[KeyTransformed, ValTransformed]
@@ -323,7 +327,7 @@ func NewLoggingMappingReceiver[Key comparable, Val any](mapName string, logger k
 	return loggingMappingReceiver[Key, Val]{mapName, logger}
 }
 
-type loggingMappingReceiver[Key comparable, Val any] struct {
+type loggingMappingReceiver[Key, Val any] struct {
 	mapName string
 	logger  klog.Logger
 }
@@ -338,32 +342,32 @@ func (lmr loggingMappingReceiver[Key, Val]) Delete(key Key) {
 	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
 }
 
-func MappingReceiverAsVisitor[Key comparable, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {
+func MappingReceiverAsVisitor[Key, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {
 	return func(tup Pair[Key, Val]) error {
 		receiver.Put(tup.First, tup.Second)
 		return nil
 	}
 }
 
-func MappingReceiverNegativeAsVisitor[Key comparable, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {
+func MappingReceiverNegativeAsVisitor[Key, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {
 	return func(tup Pair[Key, Val]) error {
 		receiver.Delete(tup.First)
 		return nil
 	}
 }
 
-func MapApply[Key comparable, Val any](theMap Map[Key, Val], receiver MappingReceiver[Key, Val]) {
+func MapApply[Key, Val any](theMap Map[Key, Val], receiver MappingReceiver[Key, Val]) {
 	theMap.Visit(MappingReceiverAsVisitor(receiver))
 }
 
-func MapAddAll[Key comparable, Val any](theMap MutableMap[Key, Val], adds Visitable[Pair[Key, Val]]) {
+func MapAddAll[Key, Val any](theMap MutableMap[Key, Val], adds Visitable[Pair[Key, Val]]) {
 	adds.Visit(func(add Pair[Key, Val]) error {
 		theMap.Put(add.First, add.Second)
 		return nil
 	})
 }
 
-func MapRemoveAll[Key comparable, Val any](theMap MutableMap[Key, Val], goners Visitable[Pair[Key, Val]]) {
+func MapRemoveAll[Key, Val any](theMap MutableMap[Key, Val], goners Visitable[Pair[Key, Val]]) {
 	goners.Visit(func(goner Pair[Key, Val]) error {
 		theMap.Delete(goner.First)
 		return nil
@@ -372,7 +376,7 @@ func MapRemoveAll[Key comparable, Val any](theMap MutableMap[Key, Val], goners V
 
 // MapGetAdd does a Get and an add if the sought mmapping is missing and desired.
 // If the sought mapping is missing and undesired then the result is the zero value of Val.
-func MapGetAdd[Key comparable, Val any](theMap MutableMap[Key, Val], key Key, want bool, valGenerator func(Key) Val) Val {
+func MapGetAdd[Key, Val any](theMap MutableMap[Key, Val], key Key, want bool, valGenerator func(Key) Val) Val {
 	val, have := theMap.Get(key)
 	if have {
 		return val
@@ -409,7 +413,7 @@ func MapEnumerateDifferences[Key, Val comparable](left, right Map[Key, Val], rec
 	MapEnumerateDifferencesParametric(func(a, b Val) bool { return a == b }, left, right, receiver)
 }
 
-func MapEnumerateDifferencesParametric[Key comparable, Val any](isEqual func(Val, Val) bool, left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
+func MapEnumerateDifferencesParametric[Key, Val any](isEqual func(Val, Val) bool, left, right Map[Key, Val], receiver MapChangeReceiver[Key, Val]) {
 	left.Visit(func(tup Pair[Key, Val]) error {
 		valRight, has := right.Get(tup.First)
 		if !has {

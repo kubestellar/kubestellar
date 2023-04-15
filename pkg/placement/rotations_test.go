@@ -35,6 +35,20 @@ func exerciseFactorer[Whole, PartA, PartB comparable](factor Factorer[Whole, Par
 	return exerciseRotator(rotator, exampleWhole, Pair[PartA, PartB]{examplePartA, examplePartB})
 }
 
+func exerciseFactorerParametric[Whole, PartA, PartB any](
+	domainWhole HashDomain[Whole],
+	domainA HashDomain[PartA],
+	domainB HashDomain[PartB],
+	factor Factorer[Whole, PartA, PartB],
+	exampleWhole Whole, examplePartA PartA, examplePartB PartB,
+) func(*testing.T) {
+	rotator := Rotator[Whole, Pair[PartA, PartB]](factor)
+	return exerciseRotatorParametric(domainWhole,
+		PairHashDomain(domainA, domainB),
+		rotator,
+		exampleWhole, Pair[PartA, PartB]{examplePartA, examplePartB})
+}
+
 func exerciseRotator[Original, Rotated comparable](rotator Rotator[Original, Rotated], exampleOriginal Original, exampleRotated Rotated) func(*testing.T) {
 	return func(t *testing.T) {
 		exampleOriginalR := rotator.First(exampleOriginal)
@@ -50,16 +64,52 @@ func exerciseRotator[Original, Rotated comparable](rotator Rotator[Original, Rot
 	}
 }
 
+func exerciseRotatorParametric[Original, Rotated any](hashOriginal HashDomain[Original],
+	hashRotated HashDomain[Rotated],
+	rotator Rotator[Original, Rotated],
+	exampleOriginal Original, exampleRotated Rotated,
+) func(*testing.T) {
+	return func(t *testing.T) {
+		exampleOriginalR := rotator.First(exampleOriginal)
+		exampleOriginalRR := rotator.Second(exampleOriginalR)
+		if !hashOriginal.Equal(exampleOriginal, exampleOriginalRR) {
+			t.Errorf("Round trip failed: expected %#v, got %#v", exampleOriginal, exampleOriginalRR)
+		}
+		exampleRotatedR := rotator.Second(exampleRotated)
+		exampleRotatedRR := rotator.First(exampleRotatedR)
+		if !hashRotated.Equal(exampleRotated, exampleRotatedRR) {
+			t.Errorf("Reverse round trip failed: expected %#v, got %#v", exampleRotated, exampleRotatedRR)
+		}
+	}
+}
+
 func TestFactorers(t *testing.T) {
 	gen := generator{}
-	t.Run("factorNamespacedWhatWhereFullKey", exerciseFactorer(factorNamespacedWhatWhereFullKey,
-		gen.NamespacedWhatWhereFullKey(),
-		gen.NamespaceDistributionTuple(),
-		gen.String()))
 	t.Run("factorClusterWhatWhereFullKey", exerciseFactorer(factorClusterWhatWhereFullKey,
 		gen.ClusterWhatWhereFullKey(),
 		gen.NonNamespacedDistributionTuple(),
 		gen.String()))
+	t.Run("factorExternalName", exerciseFactorer(factorExternalName,
+		gen.ExternalName(),
+		gen.ClusterName(),
+		gen.String()))
+	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name](
+		factorNamespacedJoinKeyLessNS,
+		gen.NamespacedJoinKeyLessnS(),
+		gen.ProjectionModeKey(),
+		gen.ClusterName()))
+	t.Run("factorNamespacedWhatWhereFullKey", exerciseFactorer(factorNamespacedWhatWhereFullKey,
+		gen.NamespacedWhatWhereFullKey(),
+		gen.NamespaceDistributionTuple(),
+		gen.String()))
+	t.Run("factorUpsyncTuple", exerciseFactorerParametric(
+		TripleHashDomain[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement](HashExternalName, HashUpsyncSet{}, HashSinglePlacement{}),
+		PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+		HashExternalName,
+		factorUpsyncTuple,
+		NewTriple(gen.ExternalName(), gen.UpsyncSet(), gen.SinglePlacement()),
+		NewPair(gen.SinglePlacement(), gen.UpsyncSet()),
+		gen.ExternalName()))
 	t.Run("PairFactorer", exerciseFactorer[Pair[int, string], int, string](PairFactorer[int, string](),
 		Pair[int, string]{rand.Intn(100) + 301, gen.String()},
 		rand.Intn(100)+3,
@@ -74,11 +124,6 @@ func TestFactorers(t *testing.T) {
 		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
 		Pair[int, float32]{rand.Intn(100) - 200, rand.Float32()},
 		gen.String()))
-	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name](
-		factorNamespacedJoinKeyLessNS,
-		gen.NamespacedJoinKeyLessnS(),
-		gen.ProjectionModeKey(),
-		gen.ClusterName()))
 }
 
 type generator struct{}
@@ -164,4 +209,12 @@ func (gen generator) ProjectionModeKey() ProjectionModeKey {
 	return ProjectionModeKey{
 		GroupResource: gen.GroupResource(),
 		Destination:   gen.SinglePlacement()}
+}
+
+func (gen generator) UpsyncSet() edgeapi.UpsyncSet {
+	return edgeapi.UpsyncSet{
+		APIGroup:   gen.String() + "." + gen.String(),
+		Resources:  []string{gen.String() + "s", gen.String() + "s"},
+		Namespaces: []string{"ns" + gen.String(), "ns" + gen.String()},
+		Names:      []string{"n" + gen.String(), "n" + gen.String()}}
 }

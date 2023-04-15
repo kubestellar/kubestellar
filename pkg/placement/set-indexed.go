@@ -24,13 +24,13 @@ package placement
 // just being a set of Val.
 // For example, this construction can be thus nested in a way that makes
 // the inner structure available.
-type GenericIndexedSet[Tuple, Key, Val comparable, ValSet any] interface {
+type GenericIndexedSet[Tuple, Key, Val, ValSet any] interface {
 	Set[Tuple]
 	GetIndex1to2() Index2[Key, Val, ValSet]
 }
 
 // GenericMutableIndexedSet is a GenericIndexedSet that also provides write access.
-type GenericMutableIndexedSet[Tuple, Key, Val comparable, ValSet any] interface {
+type GenericMutableIndexedSet[Tuple, Key, Val, ValSet any] interface {
 	GenericIndexedSet[Tuple, Key, Val, ValSet]
 	MutableSet[Tuple]
 
@@ -40,7 +40,7 @@ type GenericMutableIndexedSet[Tuple, Key, Val comparable, ValSet any] interface 
 
 // NewGenericIndexedSet constructs an index given the constituent functionality.
 // The returned value implements GenericMutableIndexedSet.
-func NewGenericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any](
+func NewGenericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet any](
 	factoring Factorer[Tuple, Key, Val],
 	valSetFactory func() ValMutableSet,
 	valMutableSetAsSet func(ValMutableSet) MutableSet[Val],
@@ -60,7 +60,7 @@ func NewGenericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any]
 
 var _ GenericMutableIndexedSet[complex64, int, string, float32] = &genericMutableIndexedSet[complex64, int, string, byte, float32]{}
 
-func GenericMutableIndexedSetToReadonly[Tuple, Key, Val comparable, ValMutableSet, ValSet any](gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) GenericIndexedSet[Tuple, Key, Val, ValSet] {
+func GenericMutableIndexedSetToReadonly[Tuple, Key, Val, ValMutableSet, ValSet any](gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) GenericIndexedSet[Tuple, Key, Val, ValSet] {
 	return &gi.genericIndexedSet
 }
 
@@ -68,7 +68,7 @@ func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) AsRe
 	return &gi.genericIndexedSet
 }
 
-type genericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+type genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet any] struct {
 	factoring          Factorer[Tuple, Key, Val]
 	valSetFactory      func() ValMutableSet
 	valMutableSetAsSet func(ValMutableSet) MutableSet[Val]
@@ -76,7 +76,7 @@ type genericIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any] st
 	rep                MutableMap[Key, ValMutableSet]
 }
 
-type genericMutableIndexedSet[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+type genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet any] struct {
 	genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]
 }
 
@@ -145,7 +145,7 @@ func (gi *genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) GetIndex1to
 	return genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet]{gi}
 }
 
-type genericIndexedSetIndex[Tuple, Key, Val comparable, ValMutableSet, ValSet any] struct {
+type genericIndexedSetIndex[Tuple, Key, Val, ValMutableSet, ValSet any] struct {
 	*genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]
 }
 

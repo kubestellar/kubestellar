@@ -23,7 +23,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type Set[Elt comparable] interface {
+type Set[Elt any] interface {
 	Emptyable
 	Len() int
 	LenIsCheap() bool
@@ -48,37 +48,42 @@ type Emptyable interface {
 	IsEmpty() bool
 }
 
-type MutableSet[Elt comparable] interface {
+type MutableSet[Elt any] interface {
 	Set[Elt]
-	SetChangeReceiver[Elt]
+	SetWriter[Elt]
 }
 
-// SetChangeReceiver is kept appraised of changes in a set of T
-type SetChangeReceiver[Elt comparable] interface {
+// SetChangeReceiver is SetWriter shorn of returned information and refactored
+// to a simpler signature.  The `bool` is `true` for additions to the set,
+// `false` for removals.
+type SetChangeReceiver[Elt any] func(bool, Elt)
+
+// SetWriter is the write aspect of a Set
+type SetWriter[Elt any] interface {
 	Add(Elt) bool    /* changed */
 	Remove(Elt) bool /* changed */
 }
 
-func NewSetChangeReceiverFuncs[Elt comparable](OnAdd, OnRemove func(Elt) bool) SetChangeReceiverFuncs[Elt] {
-	return SetChangeReceiverFuncs[Elt]{OnAdd, OnRemove}
+func NewSetWriterFuncs[Elt any](OnAdd, OnRemove func(Elt) bool) SetWriterFuncs[Elt] {
+	return SetWriterFuncs[Elt]{OnAdd, OnRemove}
 }
 
-// SetChangeReceiverFuncs puts the SetChangeReceiver stamp of approval on a pair of funcs.
-// Either may be `nil“, in which case the corresponding SetChangeReceiver method returns `false`.
-type SetChangeReceiverFuncs[Elt comparable] struct {
+// SetWriterFuncs puts the SetWriter stamp of approval on a pair of funcs.
+// Either may be `nil“, in which case the corresponding SetWriter method returns `false`.
+type SetWriterFuncs[Elt any] struct {
 	OnAdd    func(Elt) bool
 	OnRemove func(Elt) bool
 }
 
-var _ SetChangeReceiver[int] = SetChangeReceiverFuncs[int]{}
+var _ SetWriter[int] = SetWriterFuncs[int]{}
 
-func (scrf SetChangeReceiverFuncs[Elt]) Add(elt Elt) bool {
+func (scrf SetWriterFuncs[Elt]) Add(elt Elt) bool {
 	if scrf.OnAdd != nil {
 		return scrf.OnAdd(elt)
 	}
 	return false
 }
-func (scrf SetChangeReceiverFuncs[Elt]) Remove(elt Elt) bool {
+func (scrf SetWriterFuncs[Elt]) Remove(elt Elt) bool {
 	if scrf.OnRemove != nil {
 		return scrf.OnRemove(elt)
 	}
@@ -117,7 +122,7 @@ func VisitableGet[Elt any](seq Visitable[Elt], index int) (Elt, bool) {
 	return ans, res != nil
 }
 
-func SetAddAll[Elt comparable](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allNew bool) {
+func SetAddAll[Elt any](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allNew bool) {
 	someNew, allNew = false, true
 	adds.Visit(func(add Elt) error {
 		if set.Add(add) {
@@ -130,7 +135,7 @@ func SetAddAll[Elt comparable](set MutableSet[Elt], adds Visitable[Elt]) (someNe
 	return
 }
 
-func SetRemoveAll[Elt comparable](set MutableSet[Elt], goners Visitable[Elt]) (someNew, allNew bool) {
+func SetRemoveAll[Elt any](set MutableSet[Elt], goners Visitable[Elt]) (someNew, allNew bool) {
 	someNew, allNew = false, true
 	goners.Visit(func(goner Elt) error {
 		if set.Remove(goner) {
@@ -151,12 +156,12 @@ func Func11Compose11[Type1, Type2, Type3 any](fn1 func(Type1) Type2, fn2 func(Ty
 	}
 }
 
-func NewSetReadonly[Elt comparable](set MutableSet[Elt]) Set[Elt] {
+func NewSetReadonly[Elt any](set MutableSet[Elt]) Set[Elt] {
 	return SetReadonly[Elt]{set}
 }
 
 // SetReadonly is a wrapper that removes the ability to write to the set
-type SetReadonly[Elt comparable] struct{ set Set[Elt] }
+type SetReadonly[Elt any] struct{ set Set[Elt] }
 
 var _ Set[string] = SetReadonly[string]{}
 
@@ -166,30 +171,30 @@ func (sr SetReadonly[Elt]) Len() int                            { return sr.set.
 func (sr SetReadonly[Elt]) Has(elt Elt) bool                    { return sr.set.Has(elt) }
 func (sr SetReadonly[Elt]) Visit(visitor func(Elt) error) error { return sr.set.Visit(visitor) }
 
-// SetChangeReceiverReverse returns a receiver that acts in the opposite way as the given receiver.
+// SetWriterReverse returns a receiver that acts in the opposite way as the given receiver.
 // That is, Add and Remove are swapped.
-func SetChangeReceiverReverse[Elt comparable](forward SetChangeReceiver[Elt]) SetChangeReceiver[Elt] {
+func SetWriterReverse[Elt any](forward SetWriter[Elt]) SetWriter[Elt] {
 	return setChangeReceiverReverse[Elt]{forward}
 }
 
-type setChangeReceiverReverse[Elt comparable] struct {
-	forward SetChangeReceiver[Elt]
+type setChangeReceiverReverse[Elt any] struct {
+	forward SetWriter[Elt]
 }
 
-// SetChangeReceiverFork constructs a SetChangeReceiver that broadcasts incoming changes to the given receivers.
+// SetWriterFork constructs a SetWriter that broadcasts incoming changes to the given receivers.
 // Each change is passed on to every receiver, and
 // combineWithAnd says whether to combine the returned values with AND
 // (the alternative is OR).
-func SetChangeReceiverFork[Elt comparable](combineWithAnd bool, receivers ...SetChangeReceiver[Elt]) SetChangeReceiver[Elt] {
+func SetWriterFork[Elt any](combineWithAnd bool, receivers ...SetWriter[Elt]) SetWriter[Elt] {
 	return &setChangeReceiverFork[Elt]{
 		combineWithAnd: combineWithAnd,
 		receivers:      receivers,
 	}
 }
 
-type setChangeReceiverFork[Elt comparable] struct {
+type setChangeReceiverFork[Elt any] struct {
 	combineWithAnd bool
-	receivers      []SetChangeReceiver[Elt]
+	receivers      []SetWriter[Elt]
 }
 
 func (crf *setChangeReceiverFork[Elt]) Add(elt Elt) bool {
@@ -226,34 +231,34 @@ func (crr setChangeReceiverReverse[Elt]) Remove(elt Elt) bool {
 	return crr.forward.Add(elt)
 }
 
-func TransformSetChangeReceiver[Type1, Type2 comparable](
+func TransformSetWriter[Type1, Type2 any](
 	transform func(Type1) Type2,
-	inner SetChangeReceiver[Type2]) SetChangeReceiver[Type1] {
-	return transformSetChangeReceiver[Type1, Type2]{transform, inner}
+	inner SetWriter[Type2]) SetWriter[Type1] {
+	return transformSetWriter[Type1, Type2]{transform, inner}
 }
 
-type transformSetChangeReceiver[Type1, Type2 comparable] struct {
+type transformSetWriter[Type1, Type2 any] struct {
 	Transform func(Type1) Type2
-	Inner     SetChangeReceiver[Type2]
+	Inner     SetWriter[Type2]
 }
 
-var _ SetChangeReceiver[int] = &transformSetChangeReceiver[int, string]{}
+var _ SetWriter[int] = &transformSetWriter[int, string]{}
 
-func (xr transformSetChangeReceiver[Type1, Type2]) Add(v1 Type1) bool {
+func (xr transformSetWriter[Type1, Type2]) Add(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Add(v2)
 }
 
-func (xr transformSetChangeReceiver[Type1, Type2]) Remove(v1 Type1) bool {
+func (xr transformSetWriter[Type1, Type2]) Remove(v1 Type1) bool {
 	v2 := xr.Transform(v1)
 	return xr.Inner.Remove(v2)
 }
 
-func WrapSetWithMutex[Elt comparable](inner MutableSet[Elt]) MutableSet[Elt] {
+func WrapSetWithMutex[Elt any](inner MutableSet[Elt]) MutableSet[Elt] {
 	return &setMutex[Elt]{inner: inner}
 }
 
-type setMutex[Elt comparable] struct {
+type setMutex[Elt any] struct {
 	sync.RWMutex
 	inner MutableSet[Elt]
 }
@@ -300,11 +305,11 @@ func (sm *setMutex[Elt]) Remove(elt Elt) bool {
 	return sm.inner.Add(elt)
 }
 
-func SetRotate[Original, Rotated comparable](originalSet Set[Original], rotator Rotator[Original, Rotated]) Set[Rotated] {
+func SetRotate[Original, Rotated any](originalSet Set[Original], rotator Rotator[Original, Rotated]) Set[Rotated] {
 	return &setRotate[Original, Rotated]{originalSet, rotator}
 }
 
-type setRotate[Original, Rotated comparable] struct {
+type setRotate[Original, Rotated any] struct {
 	originalSet Set[Original]
 	rotator     Rotator[Original, Rotated]
 }
@@ -325,23 +330,23 @@ func (sr *setRotate[Original, Rotated]) Visit(visitor func(Rotated) error) error
 	})
 }
 
-func NewLoggingSetChangeReceiver[Elt comparable](setName string, logger klog.Logger) SetChangeReceiver[Elt] {
+func NewLoggingSetWriter[Elt any](setName string, logger klog.Logger) SetWriter[Elt] {
 	logger = logger.WithValues("set", setName)
-	return loggingSetChangeReceiver[Elt]{logger}
+	return loggingSetWriter[Elt]{logger}
 }
 
-type loggingSetChangeReceiver[Elt comparable] struct {
+type loggingSetWriter[Elt any] struct {
 	logger klog.Logger
 }
 
-var _ SetChangeReceiver[int] = loggingSetChangeReceiver[int]{}
+var _ SetWriter[int] = loggingSetWriter[int]{}
 
-func (lcr loggingSetChangeReceiver[Elt]) Add(elt Elt) bool {
+func (lcr loggingSetWriter[Elt]) Add(elt Elt) bool {
 	lcr.logger.Info("Add", "elt", elt)
 	return true
 }
 
-func (lcr loggingSetChangeReceiver[Elt]) Remove(elt Elt) bool {
+func (lcr loggingSetWriter[Elt]) Remove(elt Elt) bool {
 	lcr.logger.Info("Remove", "elt", elt)
 	return true
 }
@@ -389,7 +394,7 @@ func StatefulReducer[Elt any, Accum any, Ans any](initialize func() Accum, add f
 	}
 }
 
-func SetEnumerateDifferences[Elt comparable](left, right Set[Elt], receiver SetChangeReceiver[Elt]) {
+func SetEnumerateDifferences[Elt any](left, right Set[Elt], receiver SetWriter[Elt]) {
 	left.Visit(func(elt Elt) error {
 		has := right.Has(elt)
 		if !has {
@@ -408,7 +413,7 @@ func SetEnumerateDifferences[Elt comparable](left, right Set[Elt], receiver SetC
 
 var errStop = errors.New("it is done")
 
-func SetLessOrEqual[Elt comparable](set1, set2 Set[Elt]) bool {
+func SetLessOrEqual[Elt any](set1, set2 Set[Elt]) bool {
 	return set1.Visit(func(elt Elt) error {
 		if !set2.Has(elt) {
 			return errStop
@@ -417,14 +422,14 @@ func SetLessOrEqual[Elt comparable](set1, set2 Set[Elt]) bool {
 	}) == nil
 }
 
-func SetCompare[Elt comparable](set1, set2 Set[Elt]) Comparison {
+func SetCompare[Elt any](set1, set2 Set[Elt]) Comparison {
 	return Comparison{
 		LessOrEqual:    SetLessOrEqual(set1, set2),
 		GreaterOrEqual: SetLessOrEqual(set2, set1),
 	}
 }
 
-func SetEqual[Elt comparable](set1, set2 Set[Elt]) bool {
+func SetEqual[Elt any](set1, set2 Set[Elt]) bool {
 	if set1.LenIsCheap() {
 		return set1.Len() == set2.Len() && SetLessOrEqual(set1, set2)
 	}

@@ -18,18 +18,54 @@ package placement
 
 // NewSetChangeProjector transforms a receiver of PartA into a receiver of Whole,
 // given a Factorer of Whole into PartA and PartB.
-// This buffers the set in an index.
+// This buffers the set in a MapMap used as an index.
 // The booleans returned by partAReceiver are ignored.
-func NewSetChangeProjector[Whole, PartA, PartB comparable](
+func NewSetChangeProjectorByMapMap[Whole any, PartA, PartB comparable](
 	factoring Factorer[Whole, PartA, PartB],
-	partAReceiver SetChangeReceiver[PartA],
-) SetChangeReceiver[Whole] {
+	partAReceiver SetWriter[PartA],
+) SetWriter[Whole] {
+	return NewSetChangeProjector[Whole, PartA, PartB](
+		factoring,
+		partAReceiver,
+		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
+			return NewMapMap[PartA, MutableSet[PartB]](observer)
+		},
+		func() MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
+	)
+}
+
+func NewSetChangeProjectorByHashMap[Whole, PartA, PartB any](
+	factoring Factorer[Whole, PartA, PartB],
+	partAReceiver SetWriter[PartA],
+	hashDomainA HashDomain[PartA],
+	hashDomainB HashDomain[PartB],
+) SetWriter[Whole] {
+	return NewSetChangeProjector[Whole, PartA, PartB](
+		factoring,
+		partAReceiver,
+		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
+			return NewHashMap[PartA, MutableSet[PartB]](hashDomainA)(observer)
+		},
+		func() MutableSet[PartB] { return NewHashSet[PartB](hashDomainB) },
+	)
+}
+
+// NewSetChangeProjector transforms a receiver of PartA into a receiver of Whole,
+// given a Factorer of Whole into PartA and PartB.
+// This buffers the set in an index created by the given maker.
+// The booleans returned by partAReceiver are ignored.
+func NewSetChangeProjector[Whole, PartA, PartB any](
+	factoring Factorer[Whole, PartA, PartB],
+	partAReceiver SetWriter[PartA],
+	repMaker func(MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]],
+	innerSetFactory func() MutableSet[PartB],
+) SetWriter[Whole] {
 	// indexerRep ignores the set of PartB and notifies partAReceiver of PartA set change
-	indexerRep := NewMapMap[PartA, MutableSet[PartB]](MapKeySetReceiver[PartA, MutableSet[PartB]](partAReceiver))
+	indexerRep := repMaker(MapKeySetReceiver[PartA, MutableSet[PartB]](partAReceiver))
 	indexer := NewGenericIndexedSet[Whole, PartA, PartB, MutableSet[PartB], Set[PartB]](
 		// nil,
 		factoring,
-		func() MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
+		innerSetFactory,
 		Identity1[MutableSet[PartB]],
 		NewSetReadonly[PartB],
 		indexerRep,

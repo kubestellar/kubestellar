@@ -44,10 +44,10 @@ type loggingWorkloadProjector struct {
 
 func (lwp loggingWorkloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	xn(WorkloadProjectionSections{
-		NamespaceDistributions:          NewLoggingSetChangeReceiver[NamespaceDistributionTuple]("NamespaceDistributionTuple", lwp.logger),
-		NamespacedResourceDistributions: NewLoggingSetChangeReceiver[NamespacedResourceDistributionTuple]("NamespacedResourceDistributionTuple", lwp.logger),
+		NamespaceDistributions:          NewLoggingSetWriter[NamespaceDistributionTuple]("NamespaceDistributionTuple", lwp.logger),
+		NamespacedResourceDistributions: NewLoggingSetWriter[NamespacedResourceDistributionTuple]("NamespacedResourceDistributionTuple", lwp.logger),
 		NamespacedModes:                 NewLoggingMappingReceiver[ProjectionModeKey, ProjectionModeVal]("NamespacedModes", lwp.logger),
-		NonNamespacedDistributions:      NewLoggingSetChangeReceiver[NonNamespacedDistributionTuple]("NonNamespacedDistributions", lwp.logger),
+		NonNamespacedDistributions:      NewLoggingSetWriter[NonNamespacedDistributionTuple]("NonNamespacedDistributions", lwp.logger),
 		NonNamespacedModes:              NewLoggingMappingReceiver[ProjectionModeKey, ProjectionModeVal]("NonNamespacedModes", lwp.logger),
 	})
 }

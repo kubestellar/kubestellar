@@ -62,9 +62,9 @@ import (
 type WhereResolver func(MappingReceiver[ExternalName, ResolvedWhere]) Runnable
 
 // WhatResolver is responsible for keeping its receiver eventually consistent
-// with the resolution of the "what" predicate of each EdgePlacement
-// (identified by cluster ane name).
-type WhatResolver func(MappingReceiver[ExternalName, WorkloadParts]) Runnable
+// with the resolution of the "what" predicate and the upsync prescription
+// of each EdgePlacement (identified by cluster ane name).
+type WhatResolver func(MappingReceiver[ExternalName, ResolvedWhat]) Runnable
 
 // SetBinder is a component that is kept appraised of the "what" and "where"
 // resolutions and reorganizing and picking API versions to guide the
@@ -74,7 +74,7 @@ type WhatResolver func(MappingReceiver[ExternalName, WorkloadParts]) Runnable
 // The implementation may use a BindingOrganizer to get from the atomized
 // "what" and "where" to the ProjectionMappingReceiver behavior.
 type SetBinder func(workloadProjector WorkloadProjector) (
-	whatReceiver MappingReceiver[ExternalName, WorkloadParts],
+	whatReceiver MappingReceiver[ExternalName, ResolvedWhat],
 	whereReceiver MappingReceiver[ExternalName, ResolvedWhere])
 
 // WorkloadProjector is kept appraised of what goes where
@@ -88,13 +88,14 @@ type WorkloadProjector interface {
 // for what goes where how, organized for consumption by syncers.
 // The FooDistributions are proper sets, while the
 // FooModes add dependent information for set members.
-// The booleans returned from the receivers may not be meaningful.
+// The booleans returned from the SetWriters may not be meaningful.
 type WorkloadProjectionSections struct {
-	NamespaceDistributions          SetChangeReceiver[NamespaceDistributionTuple]
-	NamespacedResourceDistributions SetChangeReceiver[NamespacedResourceDistributionTuple]
+	NamespaceDistributions          SetWriter[NamespaceDistributionTuple]
+	NamespacedResourceDistributions SetWriter[NamespacedResourceDistributionTuple]
 	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedDistributions      SetChangeReceiver[NonNamespacedDistributionTuple]
+	NonNamespacedDistributions      SetWriter[NonNamespacedDistributionTuple]
 	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	Upsyncs                         SetWriter[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]]
 }
 
 type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, edgeapi.SinglePlacement]
@@ -143,8 +144,15 @@ func AssemplePlacementTranslator(
 // Each `*edgeapi.SinglePlacementSlice` points to an immutable object.
 type ResolvedWhere []*edgeapi.SinglePlacementSlice
 
-// WorkloadParts identifies a workload prescription and provides
-// ephemeral details of how to access it.
+// ResolvedWhat describes what to downsync and what to upsync for a given
+// (workload management workspace, edge cluster) pair.
+type ResolvedWhat struct {
+	Downsync WorkloadParts
+	Upsync   []edgeapi.UpsyncSet
+}
+
+// WorkloadParts identifies what to downsync and provides
+// ephemeral details for that process.
 // A workload prescription is the things that match the "what" predicate
 // of an EdgePlacement.
 //
@@ -202,7 +210,7 @@ type ProjectionKey struct {
 }
 
 // SetBinderConstructor is a likely signature for the final assembly of a SetBinder.
-// The two set differencer constructors will be called to create set differencers
+// The differencer constructors will be called to create differencers
 // that translate new whole values of ResolvedWhat and ResolvedWhere into
 // elemental differences.
 // The BindingOrganizer produces a pipe stage that is given those elemental
@@ -210,7 +218,8 @@ type ProjectionKey struct {
 // supply input to a ProjectionMappingReceiver.
 type SetBinderConstructor func(
 	logger klog.Logger,
-	resolvedWhatDifferencerConstructor ResolvedWhatDifferencerConstructor,
+	downsyncsDifferencerConstructor DownsyncsDifferencerConstructor,
+	upsyncsDifferenceConstructor UpsyncsDifferenceConstructor,
 	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor,
 	bindingOrganizer BindingOrganizer,
 	discovery APIMapProvider,
@@ -222,7 +231,7 @@ type SetBinderConstructor func(
 // differences and returns a receiver of sets that keeps track of the latest
 // set and keeps the difference receiver informed of differences as they arrive.
 // The set differencer precedes the set difference receiver in the locking order.
-type SetDifferencerConstructor[Set any, Element comparable] func(SetChangeReceiver[Element]) Receiver[Set]
+type SetDifferencerConstructor[Set any, Element comparable] func(SetWriter[Element]) Receiver[Set]
 
 // MapDifferenceConstructor is a function that is given a receiver of map
 // differences and returns a receiver of maps that keeps track of the latest
@@ -230,7 +239,15 @@ type SetDifferencerConstructor[Set any, Element comparable] func(SetChangeReceiv
 // The map differencer precedes the map difference receiver in the locking order.
 type MapDifferenceConstructor[Map any, Key, Val comparable] func(MapChangeReceiver[Key, Val]) Receiver[Map]
 
-type ResolvedWhatDifferencerConstructor = MapDifferenceConstructor[WorkloadParts, WorkloadPartID, WorkloadPartDetails]
+type DownsyncsDifferencerConstructor = MapDifferenceConstructor[WorkloadParts, WorkloadPartID, WorkloadPartDetails]
+
+// UpsyncsDifferenceConstructor constructs a difference for slices of UpsyncSet.
+// Note that there are two levels of "set" here: a `[]UpsyncSet` is an OR-of-ANDs
+// expression of how to identify objects to upsync, and an `UpsyncSet` has "set"
+// in its name because it includes some fields that are logically sets.
+// The differencer here differences successive OR-of-ANDs expressions to deliver
+// changes in which ANDs are present.
+type UpsyncsDifferenceConstructor = func(SetChangeReceiver[edgeapi.UpsyncSet]) Receiver[[]edgeapi.UpsyncSet]
 
 type ResolvedWhereDifferencerConstructor = SetDifferencerConstructor[ResolvedWhere, edgeapi.SinglePlacement]
 
@@ -250,10 +267,17 @@ type BindingOrganizer func(discovery APIMapProvider, resourceModes ResourceModes
 // Remove calls are ordered by the reverse of the API machinery dependencies.
 type SingleBinder interface {
 	// Transact does a collection of adds and removes.
-	Transact(func(SingleBindingOps))
+	Transact(func(SingleBindingOps, UpsyncOps))
 }
 
+// SingleBindingOps is a receiver of downsync tuples
 type SingleBindingOps MappingReceiver[Triple[ExternalName /* of EdgePlacement object */, WorkloadPartID, edgeapi.SinglePlacement], WorkloadPartDetails]
+
+// UpsyncOps is a receiver of upsync tuples.
+// Each call conveys one UpsyncSet that a particular EdgePlacement object calls for, and where it is to be upsynced from.
+// Some day we might recognize that an UpsyncSet is a predicate and we combine predicates when one implies the other,
+// but today is not that day.  Today we simply treat each as a syntactic expression and look at syntactic equality.
+type UpsyncOps SetChangeReceiver[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, edgeapi.SinglePlacement]]
 
 // APIMapProvider provides API information on a cluster-by-cluster basis,
 // as needed by clients.
@@ -285,7 +309,7 @@ type APIMapProvider interface {
 }
 
 // Pointers to these are comparable, unlike `MappingReceiver` in go 1.19
-type MappingReceiverHolder[Key comparable, Val any] struct{ MappingReceiver[Key, Val] }
+type MappingReceiverHolder[Key, Val any] struct{ MappingReceiver[Key, Val] }
 
 type APIGroupInfo struct {
 	// Versions are ordered as semantic versions.
