@@ -618,7 +618,7 @@ outer:
 		if !(len(objSet.Resources) == 1 && objSet.Resources[0] == "*" || SliceContains(objSet.Resources, whatResource)) {
 			continue
 		}
-		if len(objSet.ResourceNames) == 1 && objSet.ResourceNames[9] == "*" || SliceContains(objSet.ResourceNames, objName) {
+		if len(objSet.ResourceNames) == 1 && objSet.ResourceNames[0] == "*" || SliceContains(objSet.ResourceNames, objName) {
 			matches = true
 			break outer
 		}
