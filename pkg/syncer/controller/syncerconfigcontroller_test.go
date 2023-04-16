@@ -35,7 +35,6 @@ import (
 	"k8s.io/klog/v2"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	syncerv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 
@@ -113,18 +112,18 @@ func TestSyncerConfig(t *testing.T) {
 				},
 			},
 			expected: Expected{
-				downSyncedResources: []syncerv1alpha1.EdgeSyncConfigResource{
+				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
 					{Group: "", Version: "v1", Kind: "ConfigMap", Namespace: "default", Name: "*"},
 					{Group: "", Version: "v1", Kind: "Namespace", Name: "default"},
 					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Name: "*"},
 				},
-				upSyncedResources: []syncerv1alpha1.EdgeSyncConfigResource{
+				upSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
 					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Namespace: "*", Name: "*"},
 					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Gouda", Name: "*"},
 					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Cheddar", Namespace: "*", Name: "*"},
 					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Gouda", Name: "*"},
 				},
-				conversions: []syncerv1alpha1.EdgeSynConversion{{
+				conversions: []edgev1alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},

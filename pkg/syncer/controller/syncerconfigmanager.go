@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	syncerv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -86,9 +85,9 @@ func (s *SyncerConfigManager) Refresh() {
 
 func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
 	s.logger.V(3).Info(fmt.Sprintf("upsert namespace scoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
-	edgeSyncConfigResources := []syncerv1alpha1.EdgeSyncConfigResource{}
+	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	for _, namespace := range syncerConfig.Spec.NamespaceScope.Namespaces {
-		edgeSyncConfigResourceForNamespace := syncerv1alpha1.EdgeSyncConfigResource{
+		edgeSyncConfigResourceForNamespace := edgev1alpha1.EdgeSyncConfigResource{
 			Group:   "",
 			Version: "v1",
 			Kind:    "Namespace",
@@ -101,7 +100,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 			resource := syncerConfigResource.Resource
 			versionedResources := findVersionedResourcesByGVR(group, version, resource, upstreamGroupResourcesList, s.logger)
 			for _, versionedResource := range versionedResources {
-				edgeSyncConfigResource := syncerv1alpha1.EdgeSyncConfigResource{
+				edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
 					Group:     group,
 					Version:   version,
 					Kind:      versionedResource.Kind,
@@ -112,11 +111,11 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 			}
 		}
 	}
-	edgeSyncConfig := syncerv1alpha1.EdgeSyncConfig{
+	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
 		ObjectMeta: v1.ObjectMeta{
 			Name: syncerConfig.Name + DOWNSYNC_NAMESPACED_SUFFIX,
 		},
-		Spec: syncerv1alpha1.EdgeSyncConfigSpec{
+		Spec: edgev1alpha1.EdgeSyncConfigSpec{
 			DownSyncedResources: edgeSyncConfigResources,
 		},
 	}
@@ -125,7 +124,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 
 func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
 	s.logger.V(3).Info(fmt.Sprintf("upsert clusterscoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
-	edgeSyncConfigResources := []syncerv1alpha1.EdgeSyncConfigResource{}
+	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	for _, clusterScope := range syncerConfig.Spec.ClusterScope {
 		group := clusterScope.Group
 		version := clusterScope.APIVersion
@@ -138,7 +137,7 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 		versionedResources := findVersionedResourcesByGVR(group, version, resource, upstreamGroupResourcesList, s.logger)
 		for _, versionedResource := range versionedResources {
 			if objects == nil {
-				edgeSyncConfigResource := syncerv1alpha1.EdgeSyncConfigResource{
+				edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
 					Group:   group,
 					Version: version,
 					Kind:    versionedResource.Kind,
@@ -147,7 +146,7 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 				edgeSyncConfigResources = append(edgeSyncConfigResources, edgeSyncConfigResource)
 			} else {
 				for _, object := range objects {
-					edgeSyncConfigResource := syncerv1alpha1.EdgeSyncConfigResource{
+					edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
 						Group:   group,
 						Version: version,
 						Kind:    versionedResource.Kind,
@@ -158,11 +157,11 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 			}
 		}
 	}
-	edgeSyncConfig := syncerv1alpha1.EdgeSyncConfig{
+	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
 		ObjectMeta: v1.ObjectMeta{
 			Name: syncerConfig.Name + DOWNSYNC_CLUSTERSCOPED_SUFFIX,
 		},
-		Spec: syncerv1alpha1.EdgeSyncConfigSpec{
+		Spec: edgev1alpha1.EdgeSyncConfigSpec{
 			DownSyncedResources: edgeSyncConfigResources,
 		},
 	}
@@ -171,7 +170,7 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 
 func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfig, downstreamGroupResourcesList []*restmapper.APIGroupResources) {
 	s.logger.V(3).Info(fmt.Sprintf("upsert clusterscoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
-	edgeSyncConfigResources := []syncerv1alpha1.EdgeSyncConfigResource{}
+	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	for _, upsync := range syncerConfig.Spec.Upsync {
 		group := upsync.APIGroup
 		resources := upsync.Resources
@@ -180,7 +179,7 @@ func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfi
 		for _, resource := range resources {
 			versionedResources := findVersionedResourcesByGV(group, resource, downstreamGroupResourcesList, s.logger)
 			for _, versionedResource := range versionedResources {
-				edgeSyncConfigResource := syncerv1alpha1.EdgeSyncConfigResource{
+				edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
 					Group:   group,
 					Version: versionedResource.Version,
 					Kind:    versionedResource.Kind,
@@ -202,11 +201,11 @@ func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfi
 			}
 		}
 	}
-	edgeSyncConfig := syncerv1alpha1.EdgeSyncConfig{
+	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
 		ObjectMeta: v1.ObjectMeta{
 			Name: syncerConfig.Name + UPSYNC_SUFFIX,
 		},
-		Spec: syncerv1alpha1.EdgeSyncConfigSpec{
+		Spec: edgev1alpha1.EdgeSyncConfigSpec{
 			UpSyncedResources: edgeSyncConfigResources,
 		},
 	}

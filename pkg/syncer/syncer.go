@@ -30,11 +30,9 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	syncerv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
@@ -65,13 +63,13 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
 
 	// For edgeSyncConfig
-	syncConfigClientSet, err := syncerclientset.NewForConfig(bootstrapConfig)
+	syncConfigClientSet, err := edgeclientset.NewForConfig(bootstrapConfig)
 	if err != nil {
 		return err
 	}
 	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
-	syncConfigInformerFactory := syncerinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
+	syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
 	syncConfigAccess := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
 	syncConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
@@ -118,11 +116,11 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
-	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []syncerv1alpha1.EdgeSyncConfigResource{}, []syncerv1alpha1.EdgeSynConversion{})
+	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
-	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []syncerv1alpha1.EdgeSyncConfigResource{}, []syncerv1alpha1.EdgeSynConversion{})
+	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
