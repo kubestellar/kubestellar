@@ -122,6 +122,7 @@ func TestSyncerConfig(t *testing.T) {
 					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Gouda", Name: "*"},
 					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Cheddar", Namespace: "*", Name: "*"},
 					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Gouda", Name: "*"},
+					{Group: "", Version: "v1", Kind: "Namespace", Name: "*"},
 				},
 				conversions: []edgev1alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,

@@ -177,7 +177,7 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 				}
 			}
 			for _, resource := range syncConfigManager.GetUpSyncedResources() {
-				if resource.Name == "*" {
+				if resource.Name == "*" || resource.Namespace == "*" {
 					if err := upSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
 						logger.V(1).Info(fmt.Sprintf("failed to upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 					}

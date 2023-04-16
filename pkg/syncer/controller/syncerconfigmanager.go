@@ -24,6 +24,7 @@ import (
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog/v2"
 )
@@ -171,6 +172,19 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfig, downstreamGroupResourcesList []*restmapper.APIGroupResources) {
 	s.logger.V(3).Info(fmt.Sprintf("upsert clusterscoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
+	upsyncedNamespaces := sets.String{}
+	for _, upsync := range syncerConfig.Spec.Upsync {
+		upsyncedNamespaces.Insert(upsync.Namespaces...)
+	}
+	for _, namespace := range upsyncedNamespaces.List() {
+		edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
+			Group:   "",
+			Version: "v1",
+			Kind:    "Namespace",
+			Name:    namespace,
+		}
+		edgeSyncConfigResources = append(edgeSyncConfigResources, edgeSyncConfigResource)
+	}
 	for _, upsync := range syncerConfig.Spec.Upsync {
 		group := upsync.APIGroup
 		resources := upsync.Resources

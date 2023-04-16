@@ -131,6 +131,17 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 }
 
 func (us *UpSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	if resource.Name == "*" && resource.Namespace != "*" {
+		return us.syncMany(resource, conversions)
+	} else if resource.Name != "*" && resource.Namespace == "*" {
+		return us.syncAllNamespaces(resource, conversions, us.SyncOne)
+	} else if resource.Name == "*" && resource.Namespace == "*" {
+		return us.syncAllNamespaces(resource, conversions, us.SyncMany)
+	}
+	return us.syncMany(resource, conversions)
+}
+
+func (us *UpSyncer) syncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
 	logger := us.logger.WithName("SyncMany").WithValues("resource", resourceToString(resource))
 	logger.V(3).Info("upsync many")
 
@@ -185,6 +196,49 @@ func (us *UpSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conve
 	// nothing to do for deletion for now
 	_ = deletedResources
 	return nil
+}
+
+func (us *UpSyncer) syncAllNamespaces(
+	resource edgev1alpha1.EdgeSyncConfigResource,
+	conversions []edgev1alpha1.EdgeSynConversion,
+	syncFunc func(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error,
+) error {
+	namespaces, err := us.getNamespaces()
+	if err != nil {
+		us.logger.Error(err, fmt.Sprintf("failed to get namespaces %q", resourceToString(resource)))
+		return err
+	}
+	for _, namespace := range namespaces {
+		_resource := resource.DeepCopy()
+		_resource.Namespace = namespace
+		err := syncFunc(*_resource, conversions)
+		if err != nil {
+			us.logger.Error(err, fmt.Sprintf("failed to upsync %q for namespace %s", resourceToString(resource), namespace))
+			return err
+		}
+	}
+	return nil
+}
+
+func (us *UpSyncer) getNamespaces() ([]string, error) {
+	namespaces := []string{}
+	nsResource := edgev1alpha1.EdgeSyncConfigResource{
+		Kind: "Namespace", Group: "", Version: "v1",
+	}
+	_, downstreamClient, err := us.getClients(nsResource, []edgev1alpha1.EdgeSynConversion{})
+	if err != nil {
+		us.logger.Error(err, "failed to get namespace client")
+		return nil, err
+	}
+	nsUnstList, err := downstreamClient.List(nsResource)
+	if err != nil {
+		us.logger.Error(err, "failed to get namespaces")
+		return nil, err
+	}
+	for _, nsUnst := range nsUnstList.Items {
+		namespaces = append(namespaces, nsUnst.GetName())
+	}
+	return namespaces, nil
 }
 
 func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
