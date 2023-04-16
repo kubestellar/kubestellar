@@ -91,12 +91,22 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		// sbo.resourceDiscoveryReceiver = rscDisco
 		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
 			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
-				logger.V(4).Info("Binder got new namespaced resource", "key", key, "val", val)
-				rscDisco.Put(key, val)
+				rscMode := resourceModes(key.Second)
+				if rscMode.GoesToMailbox() {
+					logger.V(4).Info("Binder got namespaced resource", "key", key, "val", val)
+					rscDisco.Put(key, val)
+				} else {
+					logger.V(4).Info("Ignoring namespaced resource because it does not propagate", "key", key, "val", val)
+				}
 			},
 			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
-				logger.V(4).Info("Binder told there is no such namespaced resource", "key", key)
-				rscDisco.Delete(key)
+				rscMode := resourceModes(key.Second)
+				if rscMode.GoesToMailbox() {
+					logger.V(4).Info("Binder told there is no such namespaced resource", "key", key)
+					rscDisco.Delete(key)
+				} else {
+					logger.V(4).Info("Ignoring resource because it does not propagate", "key", key)
+				}
 			})
 		nsSrcAndDestAndLog := NewSetWriterFuncs( // logging and the ability to set breakpoints
 			func(elt Pair[logicalcluster.Name, SinglePlacement]) bool {

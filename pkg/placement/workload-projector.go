@@ -25,6 +25,7 @@ import (
 	"time"
 
 	k8scorev1 "k8s.io/api/core/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -84,9 +85,9 @@ func NewWorkloadProjector(
 	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
 ) *workloadProjector {
 	wp := &workloadProjector{
+		// delay:                 2 * time.Second,
 		ctx:                   ctx,
 		configConcurrency:     configConcurrency,
-		delay:                 2 * time.Second,
 		queue:                 workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
 		mbwsLister:            mbwsLister,
 		syncfgClusterInformer: syncfgClusterInformer,
@@ -652,8 +653,10 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 			return []func() bool{returnFalse}
 		}
 		var srcMRObject mrObject
-		if srcObj != nil {
+		deleted := srcObj == nil || k8sapierrors.IsNotFound(err)
+		if !deleted {
 			srcMRObject = srcObj.(mrObject)
+			deleted = srcMRObject.GetDeletionTimestamp() != nil
 		}
 		var destinations Set[SinglePlacement]
 		var haveDestinations bool
@@ -680,94 +683,11 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 		var tryAgain bool
 		remWork := []func() bool{}
 		destinations.Visit(func(destination SinglePlacement) error {
-			logger := logger.WithValues("destination", destination)
-			wpd, have := wp.perDestination.Get(destination)
-			if !have {
-				logger.Error(nil, "Impossible: object going to unknown destination")
-				tryAgain = true
-				return nil
+			retryThis, rem := wp.syncSourceToDest(ctx, logger, soRef, srcMRObject, namespaced, deleted, modesForSync, destination)
+			tryAgain = tryAgain || retryThis
+			if rem != nil {
+				remWork = append(remWork, rem)
 			}
-			pmv, have := modesForSync.Get(ProjectionModeKey{soRef.groupResource, destination})
-			if !have {
-				logger.Error(nil, "Missing version")
-				tryAgain = true
-				return nil
-			}
-			dynamicClient, clientReadyChan, err := wpd.getDynamicClientLocked()
-			if err != nil {
-				logger.Error(err, "Failed to wpd.getDynamicClientLocked")
-				tryAgain = true
-				return nil
-			}
-			remWork = append(remWork, func() bool {
-				sgvr := MetaGroupResourceToSchema(soRef.groupResource).WithVersion(pmv.APIVersion)
-				nsblClient := dynamicClient.Resource(sgvr)
-				var rscClient k8sdynamic.ResourceInterface = nsblClient
-				if namespaced {
-					rscClient = nsblClient.Namespace(soRef.namespace)
-				}
-				if srcObj == nil || srcMRObject.GetDeletionTimestamp() != nil { // propagate deletion
-					time.Sleep(wp.delay)
-					err := rscClient.Delete(ctx, soRef.name, metav1.DeleteOptions{})
-					if err == nil {
-						logger.V(3).Info("Deleted object in mailbox workspace")
-					} else if !k8sapierrors.IsNotFound(err) {
-						logger.Error(err, "Failed to delete object in mailbox workspace")
-						return true
-					} else {
-						logger.V(3).Info("Deletion already propagated")
-					}
-					return false
-				}
-				if namespaced {
-					<-clientReadyChan
-					nsObj, err := wpd.namespacePreInformer.Lister().Get(soRef.namespace)
-					if err != nil && !k8sapierrors.IsNotFound(err) {
-						logger.Error(err, "Failed to lookup namespace in local cache")
-						return true
-					}
-					if nsObj == nil {
-						nsObj = &k8scorev1.Namespace{
-							ObjectMeta: metav1.ObjectMeta{
-								Name: soRef.namespace,
-							},
-						}
-						_, err := wpd.namespaceClient.Create(ctx, nsObj, metav1.CreateOptions{})
-						if err == nil {
-							logger.V(3).Info("Created namespace in mailbox workspace")
-						} else if k8sapierrors.IsAlreadyExists(err) {
-							logger.V(4).Info("Something else created needed namespace concurrently")
-						} else {
-							logger.Error(err, "Failed to create needed namespace in mailbox workspace")
-							return true
-						}
-					}
-				}
-				destObj, err := rscClient.Get(ctx, soRef.name, metav1.GetOptions{})
-				if err != nil && !k8sapierrors.IsNotFound(err) {
-					logger.Error(err, "Failed to fetch object from mailbox workspace")
-					return true
-				} else if err == nil {
-					revisedDestObj := wpd.wp.genericObjectMerge(soRef.cluster, destination, srcMRObject, destObj)
-					time.Sleep(wp.delay)
-					_, err = rscClient.Update(ctx, revisedDestObj, metav1.UpdateOptions{FieldManager: FieldManager})
-					if err != nil {
-						logger.Error(err, "Failed to update object in mailbox workspace")
-						return true
-					}
-					logger.V(3).Info("Updated object in mailbox workspace")
-					return false
-				}
-				destObj = wpd.wp.trimForDestination(srcMRObject)
-				time.Sleep(time.Second)
-				_, err = rscClient.Create(ctx, destObj, metav1.CreateOptions{FieldManager: FieldManager})
-				if err != nil {
-					logger.Error(err, "Failed to create object in mailbox workspace")
-					return true
-				}
-				logger.V(3).Info("Created object in mailbox workspace")
-				return false
-			})
 			return nil
 		})
 		if tryAgain {
@@ -787,11 +707,110 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 var returnFalse = func() bool { return false }
 var returnTrue = func() bool { return true }
 
+func (wp *workloadProjector) syncSourceToDest(ctx context.Context, logger klog.Logger,
+	soRef sourceObjectRef, srcMRObject mrObject, namespaced, deleted bool,
+	modesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal],
+	destination SinglePlacement) (bool, func() bool) {
+	logger = logger.WithValues("destination", destination)
+	wpd, have := wp.perDestination.Get(destination)
+	if !have {
+		logger.Error(nil, "Impossible: object going to unknown destination")
+		return true, nil
+	}
+	pmv, have := modesForSync.Get(ProjectionModeKey{soRef.groupResource, destination})
+	if !have {
+		logger.Error(nil, "Missing version")
+		return true, nil
+	}
+	dynamicClient, clientReadyChan, err := wpd.getDynamicClientLocked()
+	if err != nil {
+		logger.Error(err, "Failed to wpd.getDynamicClientLocked")
+		return true, nil
+	}
+	return false, func() bool {
+		sgvr := MetaGroupResourceToSchema(soRef.groupResource).WithVersion(pmv.APIVersion)
+		nsblClient := dynamicClient.Resource(sgvr)
+		var rscClient k8sdynamic.ResourceInterface = nsblClient
+		if namespaced {
+			rscClient = nsblClient.Namespace(soRef.namespace)
+		}
+		if deleted { // propagate deletion
+			time.Sleep(wp.delay)
+			err := rscClient.Delete(ctx, soRef.name, metav1.DeleteOptions{})
+			if err == nil {
+				logger.V(3).Info("Deleted object in mailbox workspace")
+			} else if !k8sapierrors.IsNotFound(err) {
+				logger.Error(err, "Failed to delete object in mailbox workspace")
+				return true
+			} else {
+				logger.V(3).Info("Deletion already propagated")
+			}
+			return false
+		}
+		if namespaced {
+			<-clientReadyChan
+			nsObj, err := wpd.namespacePreInformer.Lister().Get(soRef.namespace)
+			if err != nil && !k8sapierrors.IsNotFound(err) {
+				logger.Error(err, "Failed to lookup namespace in local cache")
+				return true
+			}
+			if nsObj == nil {
+				nsObj = &k8scorev1.Namespace{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: soRef.namespace,
+					},
+				}
+				_, err := wpd.namespaceClient.Create(ctx, nsObj, metav1.CreateOptions{})
+				if err == nil {
+					logger.V(3).Info("Created namespace in mailbox workspace")
+				} else if k8sapierrors.IsAlreadyExists(err) {
+					logger.V(4).Info("Something else created needed namespace concurrently")
+				} else {
+					logger.Error(err, "Failed to create needed namespace in mailbox workspace")
+					return true
+				}
+			}
+		}
+		destObj, err := rscClient.Get(ctx, soRef.name, metav1.GetOptions{})
+		if err != nil && !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to fetch object from mailbox workspace")
+			return true
+		} else if err == nil {
+			revisedDestObj := wpd.wp.genericObjectMerge(soRef.cluster, destination, srcMRObject, destObj)
+			if apiequality.Semantic.DeepEqual(destObj, revisedDestObj) {
+				logger.V(4).Info("No need to update object in mailbox workspace")
+				return false
+			}
+			time.Sleep(wp.delay)
+			_, err = rscClient.Update(ctx, revisedDestObj, metav1.UpdateOptions{FieldManager: FieldManager})
+			if err != nil {
+				logger.Error(err, "Failed to update object in mailbox workspace")
+				return true
+			}
+			if logger.V(5).Enabled() {
+				logger = logger.WithValues("oldVal", destObj, "newVal", revisedDestObj)
+			}
+			logger.V(3).Info("Updated object in mailbox workspace")
+			return false
+		}
+		destObj = wpd.wp.trimForDestination(srcMRObject)
+		time.Sleep(time.Second)
+		_, err = rscClient.Create(ctx, destObj, metav1.CreateOptions{FieldManager: FieldManager})
+		if err != nil {
+			logger.Error(err, "Failed to create object in mailbox workspace")
+			return true
+		}
+		logger.V(3).Info("Created object in mailbox workspace")
+		return false
+	}
+}
+
 func (wp *workloadProjector) trimForDestination(srcObj mrObject) *unstructured.Unstructured {
-	srcUnstructured := srcObj.(machruntime.Unstructured)
-	destUnstructuredR := srcUnstructured.NewEmptyInstance()
-	destObj := destUnstructuredR.(*unstructured.Unstructured)
-	destObj.SetUnstructuredContent(srcUnstructured.UnstructuredContent())
+	srcObjU := srcObj.(*unstructured.Unstructured)
+	srcObjU = srcObjU.DeepCopy()
+	destObjR := srcObjU.NewEmptyInstance()
+	destObj := destObjR.(*unstructured.Unstructured)
+	destObj.SetUnstructuredContent(srcObjU.UnstructuredContent())
 	destObj.SetManagedFields([]metav1.ManagedFieldsEntry{})
 	destObj.SetOwnerReferences([]metav1.OwnerReference{}) // we do not transport owner UIDs
 	destObj.SetResourceVersion("")
@@ -801,16 +820,19 @@ func (wp *workloadProjector) trimForDestination(srcObj mrObject) *unstructured.U
 	return destObj
 }
 
-func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject, inputDest *unstructured.Unstructured) *unstructured.Unstructured {
+func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Name, destSP SinglePlacement,
+	srcObj mrObject, inputDest *unstructured.Unstructured) *unstructured.Unstructured {
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
 		"destSP", destSP,
 		"destGVK", inputDest.GroupVersionKind,
 		"namespace", srcObj.GetNamespace(),
 		"name", srcObj.GetName())
+	srcObjU := srcObj.(*unstructured.Unstructured)
 	outputDestR := inputDest.NewEmptyInstance()
-	outputDest := outputDestR.(*unstructured.Unstructured)
-	outputDest.SetUnstructuredContent(inputDest.UnstructuredContent())
+	outputDestU := outputDestR.(*unstructured.Unstructured)
+	inputDest = inputDest.DeepCopy() // because the following only swings the top-level pointer
+	outputDestU.SetUnstructuredContent(inputDest.UnstructuredContent())
 	kvMerge := func(which string, src, inputDest map[string]string) map[string]string {
 		outputDest := map[string]string{}
 		for key, val := range inputDest {
@@ -827,9 +849,24 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 		}
 		return outputDest
 	}
-	outputDest.SetAnnotations(kvMerge("annotations", srcObj.GetAnnotations(), inputDest.GetAnnotations()))
-	outputDest.SetLabels(kvMerge("labels", srcObj.GetLabels(), inputDest.GetLabels()))
-	return outputDest
+	if len(srcObj.GetAnnotations()) != 0 { // If nothing to merge then do not gratuitously change absent to empty map.
+		outputDestU.SetAnnotations(kvMerge("annotations", srcObj.GetAnnotations(), inputDest.GetAnnotations()))
+	}
+	if len(srcObj.GetLabels()) != 0 { // If nothing to merge then do not gratuitously change absent to empty map.
+		outputDestU.SetLabels(kvMerge("labels", srcObj.GetLabels(), inputDest.GetLabels()))
+	}
+	destContent := outputDestU.UnstructuredContent()
+	srcContent := srcObjU.UnstructuredContent()
+	for topKey, srcTopVal := range srcContent {
+		switch topKey {
+		case "apiVersion", "kind", "metadata", "status":
+			continue
+		default:
+		}
+		destContent[topKey] = srcTopVal
+	}
+	outputDestU.SetUnstructuredContent(destContent)
+	return outputDestU
 }
 
 func kvIsSystem(which, key string) bool {
@@ -1000,13 +1037,6 @@ func (wps *wpPerSource) enqueueSourceNamespacedObject(gr metav1.GroupResource, o
 		obj = dfu.Obj
 	}
 	objm := obj.(metav1.Object)
-	// Cluster-scoped objects are filtered by ResourceMode in the SetBinder;
-	// namespaced objects have to get filtered here.
-	rscMode := DefaultResourceModes(gr) // TODO:plumb this properly
-	if !rscMode.GoesToMailbox() {
-		wps.logger.V(4).Info("Ignoring object due to ResourceMode", "resourceMode", rscMode, "groupResource", gr, "namespace", objm.GetNamespace(), "name", objm.GetName())
-		return
-	}
 	if ObjectIsSystem(objm) {
 		wps.logger.V(4).Info("Ignoring system object", "groupResource", gr, "namespace", objm.GetNamespace(), "name", objm.GetName())
 		return
@@ -1045,7 +1075,9 @@ func ObjectIsSystem(objm metav1.Object) bool {
 		return secretType == "kubernetes.io/service-account-token" ||
 			secretType == "bootstrap.kubernetes.io/token"
 	case "ConfigMap":
-		return objm.GetNamespace() == "default" && strings.HasPrefix(objm.GetName(), "kube-")
+		return objm.GetName() == "kube-root-ca.crt"
+	case "ServiceAccount":
+		return objm.GetName() == "default"
 	default:
 		return false
 	}
