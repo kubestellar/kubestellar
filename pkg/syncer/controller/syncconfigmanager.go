@@ -17,7 +17,6 @@ limitations under the License.
 package controller
 
 import (
-	"context"
 	"fmt"
 	"sync"
 
@@ -26,7 +25,7 @@ import (
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
-type _syncConfigManager struct {
+type SyncConfigManager struct {
 	sync.Mutex
 	logger                     klog.Logger
 	syncConfigMap              map[string]edgev1alpha1.EdgeSyncConfig
@@ -58,15 +57,17 @@ func newIndexedSyncedResources(resources ...edgev1alpha1.EdgeSyncConfigResource)
 	return isr
 }
 
-var syncConfigManager = _syncConfigManager{
-	logger:                     klog.FromContext(context.TODO()),
-	syncConfigMap:              map[string]edgev1alpha1.EdgeSyncConfig{},
-	indexedDownSyncedResources: newIndexedSyncedResources(),
-	indexedUpSyncedResources:   newIndexedSyncedResources(),
-	conversions:                []edgev1alpha1.EdgeSynConversion{},
+func NewSyncConfigManager(logger klog.Logger) *SyncConfigManager {
+	return &SyncConfigManager{
+		logger:                     logger,
+		syncConfigMap:              map[string]edgev1alpha1.EdgeSyncConfig{},
+		indexedDownSyncedResources: newIndexedSyncedResources(),
+		indexedUpSyncedResources:   newIndexedSyncedResources(),
+		conversions:                []edgev1alpha1.EdgeSynConversion{},
+	}
 }
 
-func (s *_syncConfigManager) upsert(syncConfig edgev1alpha1.EdgeSyncConfig) {
+func (s *SyncConfigManager) upsert(syncConfig edgev1alpha1.EdgeSyncConfig) {
 	key := syncConfig.Name
 	s.logger.V(3).Info(fmt.Sprintf("upsert %s to synConfigMap", key))
 	s.Lock()
@@ -75,7 +76,7 @@ func (s *_syncConfigManager) upsert(syncConfig edgev1alpha1.EdgeSyncConfig) {
 	s.refresh()
 }
 
-func (s *_syncConfigManager) delete(key string) {
+func (s *SyncConfigManager) delete(key string) {
 	s.logger.V(3).Info(fmt.Sprintf("delete %s from synConfigMap", key))
 	s.Lock()
 	defer s.Unlock()
@@ -83,7 +84,7 @@ func (s *_syncConfigManager) delete(key string) {
 	s.refresh()
 }
 
-func (s *_syncConfigManager) refresh() {
+func (s *SyncConfigManager) refresh() {
 	downSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	upSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	conversions := []edgev1alpha1.EdgeSynConversion{}
@@ -98,26 +99,14 @@ func (s *_syncConfigManager) refresh() {
 	s.logger.V(3).Info("refreshed syncConfigManager")
 }
 
-func (s *_syncConfigManager) getDownSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetDownSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
 	return s.indexedDownSyncedResources.syncedResources
 }
 
-func (s *_syncConfigManager) getUpSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetUpSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
 	return s.indexedUpSyncedResources.syncedResources
 }
 
-func (s *_syncConfigManager) getConversions() []edgev1alpha1.EdgeSynConversion {
+func (s *SyncConfigManager) GetConversions() []edgev1alpha1.EdgeSynConversion {
 	return s.conversions
-}
-
-func GetDownSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
-	return syncConfigManager.getDownSyncedResources()
-}
-
-func GetUpSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
-	return syncConfigManager.getUpSyncedResources()
-}
-
-func GetConversions() []edgev1alpha1.EdgeSynConversion {
-	return syncConfigManager.getConversions()
 }

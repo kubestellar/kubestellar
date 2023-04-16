@@ -19,6 +19,7 @@ package syncers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -26,6 +27,7 @@ import (
 	"k8s.io/klog/v2"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	. "github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 )
 
 func resourceToString(resource edgev1alpha1.EdgeSyncConfigResource) string {
@@ -90,7 +92,16 @@ func initializeClients(
 	return nil
 }
 
+// TODO: Disable dinaturing/re-naturing feature as default. Remove the feature flag once it's fully supported.
+func isDenaturingEnabled() bool {
+	env, ok := os.LookupEnv("ENABLE_DENATURING")
+	return ok && env == "true"
+}
+
 func convertToUpstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+	if !isDenaturingEnabled() {
+		return resource
+	}
 	for _, conversion := range conversions {
 		if conversion.Downstream.Group == resource.Group && conversion.Downstream.Kind == resource.Kind && conversion.Downstream.Name == resource.Name {
 			resource.Group = conversion.Upstream.Group
@@ -103,6 +114,9 @@ func convertToUpstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions
 }
 
 func convertToDownstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+	if !isDenaturingEnabled() {
+		return resource
+	}
 	for _, conversion := range conversions {
 		if conversion.Upstream.Group == resource.Group && conversion.Upstream.Kind == resource.Kind && conversion.Upstream.Name == resource.Name {
 			resource.Group = conversion.Downstream.Group
@@ -115,6 +129,9 @@ func convertToDownstream(resource edgev1alpha1.EdgeSyncConfigResource, conversio
 }
 
 func applyConversion(source *unstructured.Unstructured, target edgev1alpha1.EdgeSyncConfigResource) {
+	if !isDenaturingEnabled() {
+		return
+	}
 	source.SetAPIVersion(target.Group + "/" + target.Version)
 	source.SetKind(target.Kind)
 	source.SetName(target.Name)

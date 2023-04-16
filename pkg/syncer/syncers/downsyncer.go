@@ -27,6 +27,7 @@ import (
 	"k8s.io/klog/v2"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	. "github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 )
 
 type DownSyncer struct {
@@ -181,4 +182,159 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 		return err
 	}
 	return nil
+}
+
+func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	logger := ds.logger.WithName("SyncMany").WithValues("resource", resourceToString(resource))
+	logger.V(3).Info("downsync many")
+	upstreamClient, downstreamClient, err := ds.getClients(resource, conversions)
+	if err != nil {
+		logger.Error(err, "failed to get client")
+		return err
+	}
+	resourceForUp := convertToUpstream(resource, conversions)
+	logger.V(3).Info("  list resources from upstream")
+	upstreamResourceList, err := upstreamClient.List(resourceForUp)
+	if err != nil {
+		logger.Error(err, "failed to list resource from upstream")
+		return err
+	}
+
+	resourceForDown := convertToDownstream(resource, conversions)
+	logger.V(3).Info("  list resources from downstream")
+	downstreamResourceList, err := downstreamClient.List(resourceForDown)
+	if err != nil {
+		logger.Error(err, "failed to list resource from downstream")
+		return err
+	}
+
+	logger.V(3).Info("  compute diff between upstream and downstream")
+	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList)
+
+	logger.V(3).Info("  create resources in downstream")
+	for _, resource := range newResources {
+		resource.SetResourceVersion("")
+		resource.SetUID("")
+		applyConversion(&resource, resourceForDown)
+		logger.V(3).Info("  create " + resource.GetName())
+		if _, err := downstreamClient.Create(resourceForDown, &resource); err != nil {
+			logger.Error(err, "failed to create resource to downstream")
+			return err
+		}
+	}
+	logger.V(3).Info("  update resources in downstream")
+	for _, resource := range updatedResources {
+		resource.SetResourceVersion("")
+		resource.SetUID("")
+		resource.SetManagedFields(nil)
+		applyConversion(&resource, resourceForDown)
+		logger.V(3).Info("  update " + resource.GetName())
+		if _, err := downstreamClient.Update(resourceForDown, &resource); err != nil {
+			logger.Error(err, "failed to create resource to downstream")
+			return err
+		}
+	}
+	// nothing to do for deletion for now
+	_ = deletedResources
+	return nil
+}
+
+func (ds *DownSyncer) BackStatusMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	logger := ds.logger.WithName("BackStatusMany").WithValues("resource", resourceToString(resource))
+	upstreamClient, downstreamClient, err := ds.getClients(resource, conversions)
+	if err != nil {
+		logger.Error(err, "failed to get client")
+		return err
+	}
+
+	logger.V(3).Info("  list resources from downstream")
+	resourceForDown := convertToDownstream(resource, conversions)
+	downstreamResourceList, err := downstreamClient.List(resourceForDown)
+	if err != nil {
+		logger.Error(err, "failed to list resource from downstream")
+		return err
+	}
+
+	resourceForUp := convertToUpstream(resource, conversions)
+	upstreamResourceList, err := upstreamClient.List(resourceForUp)
+	if err != nil {
+		logger.Error(err, "failed to list resource from upstream")
+		return err
+	}
+
+	for _, downstreamResource := range downstreamResourceList.Items {
+		status, found, err := unstructured.NestedMap(downstreamResource.Object, "status")
+		if err != nil {
+			logger.Error(err, fmt.Sprintf("failed to extract status from downstream object: %s. Skip", downstreamResource.GetName()))
+			continue
+		} else if !found {
+			logger.V(3).Info(fmt.Sprintf("  skip status upsync for since no status field in it: %s. Skip", downstreamResource.GetName()))
+			continue
+		}
+		upstreamResource, ok := findWithObject(downstreamResource, upstreamResourceList)
+		if ok {
+			resourceForUp := convertToUpstream(resource, conversions)
+			upstreamResource.Object["status"] = status
+			applyConversion(upstreamResource, resourceForUp)
+			if _, err := upstreamClient.UpdateStatus(resourceForUp, upstreamResource); err != nil {
+				ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func findWithObject(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) (*unstructured.Unstructured, bool) {
+	for _, resource := range resourceList.Items {
+		if target.GetName() == resource.GetName() && target.GetNamespace() == resource.GetNamespace() {
+			return &resource, true
+		}
+	}
+	return nil, false
+}
+
+func find(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) bool {
+	_, ok := findWithObject(target, resourceList)
+	return ok
+}
+
+func diff(logger klog.Logger, upstreamResourceList *unstructured.UnstructuredList, downstreamResourceList *unstructured.UnstructuredList) (
+	[]unstructured.Unstructured,
+	[]unstructured.Unstructured,
+	[]unstructured.Unstructured,
+) {
+	newResources := []unstructured.Unstructured{}
+	updatedResources := []unstructured.Unstructured{}
+	deletedResources := []unstructured.Unstructured{}
+	for _, upstreamResource := range upstreamResourceList.Items {
+		if find(upstreamResource, downstreamResourceList) {
+			updatedResources = append(updatedResources, upstreamResource)
+		} else {
+			newResources = append(newResources, upstreamResource)
+		}
+	}
+	for _, downstreamResource := range downstreamResourceList.Items {
+		if !find(downstreamResource, upstreamResourceList) {
+			deletedResources = append(deletedResources, downstreamResource)
+		}
+	}
+
+	newResourceNames := []string{}
+	for _, resource := range newResources {
+		newResourceNames = append(newResourceNames, resource.GetName())
+	}
+	updatedResourceNames := []string{}
+	for _, resource := range updatedResources {
+		updatedResourceNames = append(updatedResourceNames, resource.GetName())
+	}
+	deletedResourceNames := []string{}
+	for _, resource := range deletedResources {
+		deletedResourceNames = append(deletedResourceNames, resource.GetName())
+	}
+	logger.V(3).Info(fmt.Sprintf("  new resource names: %v", newResourceNames))
+	logger.V(3).Info(fmt.Sprintf("  updated resource names: %v", updatedResourceNames))
+	logger.V(3).Info(fmt.Sprintf("  deleted resource names: %v", deletedResourceNames))
+
+	return newResources, updatedResources, deletedResources
 }

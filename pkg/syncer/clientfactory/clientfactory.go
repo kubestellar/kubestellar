@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package syncers
+package clientfactory
 
 import (
 	"fmt"
@@ -30,17 +30,21 @@ var BURST = 1024
 
 type ClientFactory struct {
 	logger          klog.Logger
-	discoveryClient *discovery.DiscoveryClient
+	discoveryClient discovery.DiscoveryInterface
 	dyClient        dynamic.Interface
 }
 
-func NewClientFactory(logger klog.Logger, dyClient dynamic.Interface, discoveryClient *discovery.DiscoveryClient) (ClientFactory, error) {
+func NewClientFactory(logger klog.Logger, dyClient dynamic.Interface, discoveryClient discovery.DiscoveryInterface) (ClientFactory, error) {
 	clientFactory := ClientFactory{
 		logger:          logger,
 		discoveryClient: discoveryClient,
 		dyClient:        dyClient,
 	}
 	return clientFactory, nil
+}
+
+func (cf *ClientFactory) GetAPIGroupResources() ([]*restmapper.APIGroupResources, error) {
+	return restmapper.GetAPIGroupResources(cf.discoveryClient)
 }
 
 func (cf *ClientFactory) GetResourceClient(group string, kind string) (Client, error) {
@@ -50,7 +54,7 @@ func (cf *ClientFactory) GetResourceClient(group string, kind string) (Client, e
 		Group: group,
 		Kind:  kind,
 	}
-	groupResources, err := restmapper.GetAPIGroupResources(cf.discoveryClient)
+	groupResources, err := cf.GetAPIGroupResources()
 	if err != nil {
 		cf.logger.Error(err, "failed to get APIGroupResource")
 		return resourceClient, err

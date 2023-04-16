@@ -1,0 +1,12 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  name: syncer-config
+spec:
+  namespaceScope:
+    namespaces:
+    - test
+    resources:
+    - apiVersion: v1
+      group: apps
+      resource: deployments

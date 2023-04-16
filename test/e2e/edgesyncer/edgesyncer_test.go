@@ -18,7 +18,6 @@ package edgesyncer
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"testing"
 	"time"
@@ -28,89 +27,41 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/util/yaml"
 
-	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-//go:embed testdata/*
-var embedded embed.FS
-
-var edgeSyncConfigGvr = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
-	Version:  "v1alpha1",
-	Resource: "edgesyncconfigs",
-}
-
-var crdGVR = schema.GroupVersionResource{
-	Group:    "apiextensions.k8s.io",
-	Version:  "v1",
-	Resource: "customresourcedefinitions",
-}
-
-var sampleCRGVR = schema.GroupVersionResource{
-	Group:    "my.domain",
-	Version:  "v1alpha1",
-	Resource: "samples",
-}
-
-func loadFile(path string, v interface{}) error {
-	edgeSyncConfigData, err := embedded.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	return yaml.Unmarshal(edgeSyncConfigData, v)
-}
-
-func TestEdgeSyncer(t *testing.T) {
+func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
-	err := loadFile("testdata/edge-sync-config.yaml", &edgeSyncConfigUnst)
+	err := edgeframework.LoadFile("testdata/edgesyncconfig/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
 	require.NoError(t, err)
 
 	var sampleCRDUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-crd.yaml", &sampleCRDUnst)
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
-	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-upsync-cr.yaml", &sampleUpsyncCRUnst)
+	var sampleCRUpsyncUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
 	require.NoError(t, err)
 
-	var sampleDownsyncCRUnst *unstructured.Unstructured
-	err = loadFile("testdata/sample-downsync-cr.yaml", &sampleDownsyncCRUnst)
+	var sampleCRDownsyncUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
 
-	upstreamServer := framework.SharedKcpServer(t)
-
-	t.Log("Creating an organization")
-	orgPath, _ := framework.NewOrganizationFixture(t, upstreamServer, framework.TODO_WithoutMultiShardSupport())
-
-	t.Log("Creating a workspace")
-	wsPath, _ := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.TODO_WithoutMultiShardSupport())
-
-	syncerFixture := edgeframework.NewEdgeSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
+	syncerFixture := setup(t)
+	wsPath := syncerFixture.WorkspacePath
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)
 
-	upstreamConfig := upstreamServer.BaseConfig(t)
-	upstreamDynamicClueterClient, err := kcpdynamic.NewForConfig(upstreamConfig)
-	require.NoError(t, err)
-	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
-	require.NoError(t, err)
-
-	t.Logf("Confirm that a default EdgeSyncConfig is created.")
-	unstList, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(edgeSyncConfigGvr).List(ctx, v1.ListOptions{})
-	require.NoError(t, err)
-	require.Greater(t, len(unstList.Items), 0)
+	upstreamDynamicClueterClient := syncerFixture.UpstreamDynamicKubeClient
+	upstreamKubeClusterClient := syncerFixture.UpstreamKubeClusterClient
 
 	t.Logf("Create an EdgeSyncConfig for test in workspace %q.", wsPath.String())
 	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(edgeSyncConfigGvr).Create(ctx, edgeSyncConfigUnst, v1.CreateOptions{})
@@ -137,8 +88,8 @@ func TestEdgeSyncer(t *testing.T) {
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", sampleCRDUnst.GetName())
 
-	t.Logf("Create sample CR %q in workspace %q.", sampleDownsyncCRUnst.GetName(), wsPath.String())
-	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Create(ctx, sampleDownsyncCRUnst, v1.CreateOptions{})
+	t.Logf("Create sample CR %q in workspace %q.", sampleCRDownsyncUnst.GetName(), wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Create(ctx, sampleCRDownsyncUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Wait for resources to be downsynced.")
@@ -153,22 +104,22 @@ func TestEdgeSyncer(t *testing.T) {
 		if err != nil {
 			return false, fmt.Sprintf("Failed to get CRD %s: %v", sampleCRDUnst.GetName(), err)
 		}
-		_, err = dynamicClient.Resource(sampleCRGVR).Get(ctx, sampleDownsyncCRUnst.GetName(), v1.GetOptions{})
+		_, err = dynamicClient.Resource(sampleCRGVR).Get(ctx, sampleCRDownsyncUnst.GetName(), v1.GetOptions{})
 		if err != nil {
-			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleDownsyncCRUnst.GetName(), err)
+			return false, fmt.Sprintf("Failed to get sample downsync CR %s: %v", sampleCRDownsyncUnst.GetName(), err)
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
 
-	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleUpsyncCRUnst.GetName(), wsPath.String())
-	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleUpsyncCRUnst, v1.CreateOptions{})
+	t.Logf("Create sample CR %q in downstream cluster %q for upsyncing.", sampleCRUpsyncUnst.GetName(), wsPath.String())
+	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleCRGVR).Create(ctx, sampleCRUpsyncUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Wait for resources to be upsynced.")
 	framework.Eventually(t, func() (bool, string) {
-		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
+		_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleCRGVR).Get(ctx, sampleCRUpsyncUnst.GetName(), v1.GetOptions{})
 		if err != nil {
-			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
+			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleCRUpsyncUnst.GetName(), wsPath, err)
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
