@@ -18,8 +18,6 @@ package placement
 
 import (
 	"github.com/kcp-dev/logicalcluster/v3"
-
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 )
 
 // ExternalName identifies a cluster-scoped object of some implicit kind
@@ -35,11 +33,11 @@ func NewExternalName(cluster, name string) ExternalName {
 	return ExternalName{Cluster: logicalcluster.Name(cluster), Name: name}
 }
 
-func (ExternalName) OfSPLocation(sp edgeapi.SinglePlacement) ExternalName {
+func (ExternalName) OfSPLocation(sp SinglePlacement) ExternalName {
 	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: sp.LocationName}
 }
 
-func (ExternalName) OfSPTarget(sp edgeapi.SinglePlacement) ExternalName {
+func (ExternalName) OfSPTarget(sp SinglePlacement) ExternalName {
 	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: sp.SyncTargetName}
 }
 

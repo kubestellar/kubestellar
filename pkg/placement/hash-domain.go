@@ -156,15 +156,15 @@ func UpsyncSetEqual(left, right edgeapi.UpsyncSet) bool {
 
 type HashSinglePlacement struct{}
 
-var _ HashDomain[edgeapi.SinglePlacement] = HashSinglePlacement{}
+var _ HashDomain[SinglePlacement] = HashSinglePlacement{}
 
-func (HashSinglePlacement) Equal(left, right edgeapi.SinglePlacement) bool {
+func (HashSinglePlacement) Equal(left, right SinglePlacement) bool {
 	return left.Cluster == right.Cluster &&
 		left.LocationName == right.LocationName &&
 		left.SyncTargetName == right.SyncTargetName &&
 		left.SyncTargetUID == right.SyncTargetUID
 }
 
-func (HashSinglePlacement) Hash(arg edgeapi.SinglePlacement) HashValue {
+func (HashSinglePlacement) Hash(arg SinglePlacement) HashValue {
 	return StringHash(arg.Cluster) + StringHash(arg.LocationName) + StringHash(arg.SyncTargetName) + StringHash(string(arg.SyncTargetUID))
 }

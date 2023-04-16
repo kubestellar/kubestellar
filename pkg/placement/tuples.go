@@ -87,12 +87,20 @@ func (tup Triple[First, Second, Third]) String() string {
 	return ans.String()
 }
 
+func (tup Triple[PartA, PartB, PartC]) Reverse() Triple[PartC, PartB, PartA] {
+	return NewTriple(tup.Third, tup.Second, tup.First)
+}
+
 // Rotator is something that can change one value into an equivalent value and back again.
 // To understand the name, think of something that can rotate (forward and back) a point in some coordinate system.
 type Rotator[Original, Rotated any] Pair[func(Original) Rotated, func(Rotated) Original]
 
 func (rr Rotator[Original, Rotated]) Reverse() Rotator[Rotated, Original] {
 	return Rotator[Rotated, Original]{rr.Second, rr.First}
+}
+
+func NewRotator[Original, Rotated any](forward func(Original) Rotated, reverse func(Rotated) Original) Rotator[Original, Rotated] {
+	return Rotator[Original, Rotated](NewPair(forward, reverse))
 }
 
 func NoRotation[Original any]() Rotator[Original, Original] {
@@ -118,11 +126,19 @@ func (factoring Factorer[Whole, PartA, PartB]) Unfactor(partA PartA, partB PartB
 	return factoring.Second(Pair[PartA, PartB]{partA, partB})
 }
 
+func PairReverser[PartA, PartB any]() Rotator[Pair[PartA, PartB], Pair[PartB, PartA]] {
+	return NewRotator(Pair[PartA, PartB].Reverse, Pair[PartB, PartA].Reverse)
+}
+
 func PairFactorer[PartA, PartB any]() Factorer[Pair[PartA, PartB], PartA, PartB] {
 	return Factorer[Pair[PartA, PartB], PartA, PartB]{
 		First:  Identity1[Pair[PartA, PartB]],
 		Second: Identity1[Pair[PartA, PartB]],
 	}
+}
+
+func TripleReverser[PartA, PartB, PartC any]() Rotator[Triple[PartA, PartB, PartC], Triple[PartC, PartB, PartA]] {
+	return NewRotator(Triple[PartA, PartB, PartC].Reverse, Triple[PartC, PartB, PartA].Reverse)
 }
 
 func TripleFactorerTo23and1[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX] {
@@ -153,5 +169,36 @@ func TripleFactorerTo1and23[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, 
 		},
 		func(put Pair[ColX, Pair[ColY, ColZ]]) Triple[ColX, ColY, ColZ] {
 			return NewTriple(put.First, put.Second.First, put.Second.Second)
+		})
+}
+
+func TripleFactorerTo3and21[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], ColZ, Pair[ColY, ColX]] {
+	return NewFactorer(
+		func(tup Triple[ColX, ColY, ColZ]) Pair[ColZ, Pair[ColY, ColX]] {
+			return NewPair(tup.Third, NewPair(tup.Second, tup.First))
+		},
+		func(put Pair[ColZ, Pair[ColY, ColX]]) Triple[ColX, ColY, ColZ] {
+			return NewTriple(put.Second.Second, put.Second.First, put.First)
+		})
+}
+
+type Quad[First, Second, Third, Fourth any] struct {
+	First  First
+	Second Second
+	Third  Third
+	Fourth Fourth
+}
+
+func NewQuad[First, Second, Third, Fourth any](first First, second Second, third Third, fourth Fourth) Quad[First, Second, Third, Fourth] {
+	return Quad[First, Second, Third, Fourth]{first, second, third, fourth}
+}
+
+func QuadFactorerTo1and234[ColW, ColX, ColY, ColZ any]() Factorer[Quad[ColW, ColX, ColY, ColZ], ColW, Triple[ColX, ColY, ColZ]] {
+	return NewFactorer(
+		func(tup Quad[ColW, ColX, ColY, ColZ]) Pair[ColW, Triple[ColX, ColY, ColZ]] {
+			return NewPair(tup.First, NewTriple(tup.Second, tup.Third, tup.Fourth))
+		},
+		func(put Pair[ColW, Triple[ColX, ColY, ColZ]]) Quad[ColW, ColX, ColY, ColZ] {
+			return NewQuad(put.First, put.Second.First, put.Second.Second, put.Second.Third)
 		})
 }

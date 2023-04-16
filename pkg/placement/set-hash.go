@@ -25,3 +25,14 @@ func NewHashSet[Elt any](domain HashDomain[Elt], elts ...Elt) MutableSet[Elt] {
 	}
 	return ans
 }
+
+func HashSetCopy[Elt any](domain HashDomain[Elt]) func(Visitable[Elt]) MutableSet[Elt] {
+	return func(source Visitable[Elt]) MutableSet[Elt] {
+		ans := NewHashSet(domain)
+		source.Visit(func(elt Elt) error {
+			ans.Add(elt)
+			return nil
+		})
+		return ans
+	}
+}

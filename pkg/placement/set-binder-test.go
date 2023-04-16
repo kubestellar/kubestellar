@@ -70,14 +70,14 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 		{APIGroup: "group3.test", Resources: []string{"widgets"}, Names: []string{"*"}}}
 	sc1 := logicalcluster.Name("wm1")
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
-	sp1 := edgeapi.SinglePlacement{
+	sp1 := SinglePlacement{
 		Cluster:        "inv1",
 		LocationName:   "loc1",
 		SyncTargetName: "st1",
 		SyncTargetUID:  apimachtypes.UID("uid1"),
 	}
 	sps1 := &edgeapi.SinglePlacementSlice{
-		Destinations: []edgeapi.SinglePlacement{sp1},
+		Destinations: []SinglePlacement{sp1},
 	}
 	where1 := ResolvedWhere{sps1}
 	NamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
@@ -85,7 +85,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	NamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	NonNamespacedDistributions := NewMapSet[NonNamespacedDistributionTuple]()
 	NonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
-	Upsyncs := NewHashSet[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
+	Upsyncs := NewHashSet[Pair[SinglePlacement, edgeapi.UpsyncSet]](PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
 	projectionTracker := WorkloadProjectionSections{
 		NamespaceDistributions:          NamespaceDistributions,
 		NamespacedResourceDistributions: NamespacedResourceDistributions,
@@ -125,14 +125,14 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 			},
 		})
 
-	expectedUpsyncs := NewHashSet[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](
-		PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+	expectedUpsyncs := NewHashSet[Pair[SinglePlacement, edgeapi.UpsyncSet]](
+		PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
 		NewPair(sp1, ups1[0]),
 		NewPair(sp1, ups1[1]))
-	if !SetEqual[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
+	if !SetEqual[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
 		t.Fatalf("Wrong Upsyncs: expected %v, got %v",
-			VisitableToSlice[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
-			VisitableToSlice[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
+			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
+			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
 	}
 	expectedNamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
 	expectedNamespacedResourceDistributions := NewMapSet[NamespacedResourceDistributionTuple]()
@@ -181,9 +181,9 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 			},
 		})
 	expectedUpsyncs.Add(NewPair(sp1, ups2[1]))
-	if !SetEqual[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
+	if !SetEqual[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
 		t.Errorf("Wrong Upsyncs: expected %v, got %v",
-			VisitableToSlice[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
-			VisitableToSlice[Pair[edgeapi.SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
+			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
+			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
 	}
 }

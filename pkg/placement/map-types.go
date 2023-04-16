@@ -92,6 +92,10 @@ func (mrf MappingReceiverFuncs[Key, Val]) DeleteWithFinal(key Key, oldVal Val) {
 	}
 }
 
+func NewMappingReceiverFork[Key, Val any](elts ...MappingReceiver[Key, Val]) MappingReceiverFork[Key, Val] {
+	return MappingReceiverFork[Key, Val](elts)
+}
+
 type MappingReceiverFork[Key, Val any] []MappingReceiver[Key, Val]
 
 var _ MappingReceiver[int, func()] = MappingReceiverFork[int, func()]{}

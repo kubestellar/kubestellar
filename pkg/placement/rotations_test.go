@@ -103,8 +103,8 @@ func TestFactorers(t *testing.T) {
 		gen.NamespaceDistributionTuple(),
 		gen.String()))
 	t.Run("factorUpsyncTuple", exerciseFactorerParametric(
-		TripleHashDomain[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement](HashExternalName, HashUpsyncSet{}, HashSinglePlacement{}),
-		PairHashDomain[edgeapi.SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
+		TripleHashDomain[ExternalName, edgeapi.UpsyncSet, SinglePlacement](HashExternalName, HashUpsyncSet{}, HashSinglePlacement{}),
+		PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
 		HashExternalName,
 		factorUpsyncTuple,
 		NewTriple(gen.ExternalName(), gen.UpsyncSet(), gen.SinglePlacement()),
@@ -114,6 +114,9 @@ func TestFactorers(t *testing.T) {
 		Pair[int, string]{rand.Intn(100) + 301, gen.String()},
 		rand.Intn(100)+3,
 		gen.String()))
+	t.Run("PairReverser", exerciseRotator[Pair[int, string], Pair[string, int]](PairReverser[int, string](),
+		Pair[int, string]{rand.Intn(100) + 301, gen.String()},
+		Pair[string, int]{gen.String(), rand.Intn(100) + 301}))
 	t.Run("TripleFactorerTo23and1", exerciseFactorer(
 		TripleFactorerTo23and1[int, string, float32](),
 		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
@@ -124,6 +127,9 @@ func TestFactorers(t *testing.T) {
 		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
 		Pair[int, float32]{rand.Intn(100) - 200, rand.Float32()},
 		gen.String()))
+	t.Run("TripleReverser", exerciseRotator[Triple[int, string, float64], Triple[float64, string, int]](TripleReverser[int, string, float64](),
+		Triple[int, string, float64]{rand.Intn(100) + 301, gen.String(), rand.Float64()},
+		Triple[float64, string, int]{rand.Float64(), gen.String(), rand.Intn(100) + 301}))
 }
 
 type generator struct{}
@@ -156,8 +162,8 @@ func (generator) UID() machtypes.UID {
 	return uuid.NewUUID()
 }
 
-func (gen generator) SinglePlacement() edgeapi.SinglePlacement {
-	return edgeapi.SinglePlacement{
+func (gen generator) SinglePlacement() SinglePlacement {
+	return SinglePlacement{
 		Cluster:        "clu-" + gen.String(),
 		LocationName:   "loc-" + gen.String(),
 		SyncTargetName: "st-" + gen.String(),

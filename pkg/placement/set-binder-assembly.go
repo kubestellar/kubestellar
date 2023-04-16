@@ -43,7 +43,7 @@ type setBinder struct {
 	perCluster                          map[logicalcluster.Name]*setBindingForCluster
 	singleBinder                        SingleBinder
 	downsyncJoinLeftInput               MappingReceiver[Pair[ExternalName, WorkloadPartID], WorkloadPartDetails]
-	bothJoinRightInput                  SetWriter[Pair[ExternalName, edgeapi.SinglePlacement]]
+	bothJoinRightInput                  SetWriter[Pair[ExternalName, SinglePlacement]]
 	upsyncJoinLeftInput                 SetWriter[Pair[ExternalName, edgeapi.UpsyncSet]]
 	singleBindingOps                    SingleBindingOps
 	upsyncOps                           UpsyncOps
@@ -88,29 +88,29 @@ func NewSetBinder(
 			singleBinder:                        singleBinder,
 		}
 
-		var downsyncJoinRightInput, upsyncJoinRightInput SetWriter[Pair[ExternalName, edgeapi.SinglePlacement]]
-		sb.downsyncJoinLeftInput, downsyncJoinRightInput = NewDynamicFullJoin12VWith13[ExternalName, WorkloadPartID, edgeapi.SinglePlacement, WorkloadPartDetails](sb.logger,
+		var downsyncJoinRightInput, upsyncJoinRightInput SetWriter[Pair[ExternalName, SinglePlacement]]
+		sb.downsyncJoinLeftInput, downsyncJoinRightInput = NewDynamicFullJoin12VWith13[ExternalName, WorkloadPartID, SinglePlacement, WorkloadPartDetails](sb.logger,
 			NewMappingReceiverFuncs(
-				func(tup Triple[ExternalName, WorkloadPartID, edgeapi.SinglePlacement], workloadPartDetails WorkloadPartDetails) {
+				func(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], workloadPartDetails WorkloadPartDetails) {
 					sb.logger.V(4).Info("Adding singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third, "details", workloadPartDetails)
 					sb.singleBindingOps.Put(tup, workloadPartDetails)
 				},
-				func(tup Triple[ExternalName, WorkloadPartID, edgeapi.SinglePlacement]) {
+				func(tup Triple[ExternalName, WorkloadPartID, SinglePlacement]) {
 					sb.logger.V(4).Info("Removing singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third)
 					sb.singleBindingOps.Delete(tup)
 				},
 			))
-		sb.upsyncJoinLeftInput, upsyncJoinRightInput = NewDynamicFullJoin12with13Parametric[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement](sb.logger,
+		sb.upsyncJoinLeftInput, upsyncJoinRightInput = NewDynamicFullJoin12with13Parametric[ExternalName, edgeapi.UpsyncSet, SinglePlacement](sb.logger,
 			HashExternalName,
 			HashUpsyncSet{},
 			HashSinglePlacement{},
 			NewSetWriterFuncs(
-				func(tup Triple[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) bool {
+				func(tup Triple[ExternalName, edgeapi.UpsyncSet, SinglePlacement]) bool {
 					sb.logger.V(4).Info("Adding upsync tuple", "epRef", tup.First, "upsyncSet", tup.Second, "where", tup.Third)
 					sb.upsyncOps(true, tup)
 					return true
 				},
-				func(tup Triple[ExternalName, edgeapi.UpsyncSet, edgeapi.SinglePlacement]) bool {
+				func(tup Triple[ExternalName, edgeapi.UpsyncSet, SinglePlacement]) bool {
 					sb.logger.V(4).Info("Removing upsync tuple", "epRef", tup.First, "upsyncSet", tup.Second, "where", tup.Third)
 					sb.upsyncOps(false, tup)
 					return true
@@ -228,7 +228,7 @@ func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPl
 			}
 		})
 		sbp.resolvedWhereReceiver = sbc.resolvedWhereDifferencerConstructor(TransformSetWriter(
-			NewPair1Then2[ExternalName, edgeapi.SinglePlacement](epID),
+			NewPair1Then2[ExternalName, SinglePlacement](epID),
 			sbc.bothJoinRightInput,
 		))
 		sbc.perPlacement[epName] = sbp

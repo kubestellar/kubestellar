@@ -42,7 +42,7 @@ type GenericMutableIndexedSet[Tuple, Key, Val, ValSet any] interface {
 // The returned value implements GenericMutableIndexedSet.
 func NewGenericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet any](
 	factoring Factorer[Tuple, Key, Val],
-	valSetFactory func() ValMutableSet,
+	valSetFactory func(Key) ValMutableSet,
 	valMutableSetAsSet func(ValMutableSet) MutableSet[Val],
 	insulateValSet func(ValMutableSet) ValSet,
 	rep MutableMap[Key, ValMutableSet],
@@ -70,7 +70,7 @@ func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) AsRe
 
 type genericIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet any] struct {
 	factoring          Factorer[Tuple, Key, Val]
-	valSetFactory      func() ValMutableSet
+	valSetFactory      func(Key) ValMutableSet
 	valMutableSetAsSet func(ValMutableSet) MutableSet[Val]
 	insulateValSet     func(ValMutableSet) ValSet
 	rep                MutableMap[Key, ValMutableSet]
@@ -118,7 +118,7 @@ func (gi *genericMutableIndexedSet[Tuple, Key, Val, ValMutableSet, ValSet]) Add(
 	key, val := gi.factoring.Factor(tup)
 	valSet, ok := gi.rep.Get(key)
 	if !ok {
-		valSet = gi.valSetFactory()
+		valSet = gi.valSetFactory(key)
 		gi.rep.Put(key, valSet)
 	}
 	vals := gi.valMutableSetAsSet(valSet)

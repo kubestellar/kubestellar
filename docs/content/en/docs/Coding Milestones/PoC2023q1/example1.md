@@ -137,6 +137,17 @@ spec:
 EOF
 ```
 
+### Delete default Location
+
+You will probably find that something automatically created a
+`Location` named `default` for your convenience.  It is actually a
+nuisance in this scenario.  Delete that Location, such as with the
+following command.
+
+```shell
+kubectl delete locations default
+```
+
 ### Create a SyncTarget object describing the guilder cluster
 
 Use `kubectl` to create the following SyncTarget object.
@@ -229,9 +240,10 @@ $ kubectl ws create work-c --enter
 ```
 
 Next, make sure that the Kubernetes workload APIs are available in
-this workspace.  TODO: show how.  If they are not then use `kubectl`
-to create the following APIBinding object --- which enables use of
-those Kubernetes APIs.
+this workspace.  In a freshly created workspace of the expected type
+(`root:organization` in this case), the Kube workload APIs would not
+yet be available.  Use `kubectl` to create the following APIBinding
+object --- which enables use of those Kubernetes APIs.
 
 ```shell
 cat <<EOF | kubectl apply -f -
@@ -338,6 +350,10 @@ spec:
   - matchLabels: {"env":"prod"}
   namespaceSelector:
     matchLabels: {"common":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
   upsync:
   - apiGroup: "greoup1.test"
     resources: ["sprockets", "flanges"]
@@ -360,9 +376,8 @@ kubectl ws create work-s --enter
 ```
 
 Next, make sure that the Kubernetes workload APIs are available in
-this workspace.  TODO: show how.  If they are not then use `kubectl`
-to create the following APIBinding object --- which enables use of
-those Kubernetes APIs.
+this workspace.  Use `kubectl` to create the following APIBinding
+object --- which enables use of those Kubernetes APIs.
 
 ```shell
 cat <<EOF | kubectl apply -f -
@@ -466,6 +481,10 @@ spec:
   - matchLabels: {"env":"prod","extended":"si"}
   namespaceSelector: 
     matchLabels: {"special":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
   upsync:
   - apiGroup: "greoup1.test"
     resources: ["sprockets", "flanges"]
