@@ -170,8 +170,8 @@ func setup(t *testing.T) *edgeframework.StartedEdgeSyncerFixture {
 	orgPath, _ := framework.NewOrganizationFixture(t, upstreamServer, framework.TODO_WithoutMultiShardSupport())
 
 	t.Log("Creating a workspace")
-	upstreamRunningServer := framework.NewFakeWorkloadServer(t, upstreamServer, orgPath, "upstream")
-	wsPath := logicalcluster.NewPath(upstreamRunningServer.Name())
+	_, ws := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.WithName("upstream-sink"), framework.TODO_WithoutMultiShardSupport())
+	wsPath := logicalcluster.NewPath(logicalcluster.Name(ws.Spec.Cluster).String())
 	syncerFixture := edgeframework.NewEdgeSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())

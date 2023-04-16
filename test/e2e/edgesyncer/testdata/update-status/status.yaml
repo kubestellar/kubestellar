@@ -1,0 +1,18 @@
+availableReplicas: 1
+conditions:
+- lastTransitionTime: "2023-04-15T03:34:23Z"
+  lastUpdateTime: "2023-04-15T03:34:23Z"
+  message: Deployment has minimum availability.
+  reason: MinimumReplicasAvailable
+  status: "True"
+  type: Available
+- lastTransitionTime: "2023-04-15T03:34:13Z"
+  lastUpdateTime: "2023-04-15T03:34:23Z"
+  message: ReplicaSet "busybox-6694894547" has successfully progressed.
+  reason: NewReplicaSetAvailable
+  status: "True"
+  type: Progressing
+observedGeneration: 1
+readyReplicas: 1
+replicas: 1
+updatedReplicas: 1
