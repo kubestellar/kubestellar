@@ -18,7 +18,6 @@ package edgesyncer
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"testing"
 	"time"
@@ -28,64 +27,29 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-//go:embed testdata/*
-var embedded embed.FS
-
-var edgeSyncConfigGvr = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
-	Version:  "v1alpha1",
-	Resource: "edgesyncconfigs",
-}
-
-var crdGVR = schema.GroupVersionResource{
-	Group:    "apiextensions.k8s.io",
-	Version:  "v1",
-	Resource: "customresourcedefinitions",
-}
-
-var sampleCRGVR = schema.GroupVersionResource{
-	Group:    "my.domain",
-	Version:  "v1alpha1",
-	Resource: "samples",
-}
-
-var sampleDownsyncCRGVR = schema.GroupVersionResource{
-	Group:    "my.domain",
-	Version:  "v1alpha1",
-	Resource: "sampledownsyncs",
-}
-
-var sampleUpsyncCRGVR = schema.GroupVersionResource{
-	Group:    "my.domain",
-	Version:  "v1alpha1",
-	Resource: "sampleupsyncs",
-}
-
 func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
+	err := edgeframework.LoadFile("testdata/edgesyncconfig/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
 	require.NoError(t, err)
 
 	var sampleCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-crd.yaml", embedded, &sampleCRDUnst)
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
 	var sampleCRUpsyncUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
 	require.NoError(t, err)
 
 	var sampleCRDownsyncUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
+	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
@@ -159,27 +123,4 @@ func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
 		}
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
-}
-
-func setup(t *testing.T) *edgeframework.StartedEdgeSyncerFixture {
-	framework.Suite(t, "edge-syncer")
-
-	upstreamServer := framework.SharedKcpServer(t)
-
-	t.Log("Creating an organization")
-	orgPath, _ := framework.NewOrganizationFixture(t, upstreamServer, framework.TODO_WithoutMultiShardSupport())
-
-	t.Log("Creating a workspace")
-	_, ws := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.WithName("upstream-sink"), framework.TODO_WithoutMultiShardSupport())
-	wsPath := logicalcluster.NewPath(logicalcluster.Name(ws.Spec.Cluster).String())
-	syncerFixture := edgeframework.NewEdgeSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
-
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	t.Cleanup(cancelFunc)
-
-	t.Logf("Confirm that a default EdgeSyncConfig is created.")
-	unstList, err := syncerFixture.UpstreamDynamicKubeClient.Cluster(wsPath).Resource(edgeSyncConfigGvr).List(ctx, v1.ListOptions{})
-	require.NoError(t, err)
-	require.Greater(t, len(unstList.Items), 0)
-	return syncerFixture
 }

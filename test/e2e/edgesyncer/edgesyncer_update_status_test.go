@@ -28,19 +28,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
-
-var deploymentGvr = schema.GroupVersionResource{
-	Group:    "apps",
-	Version:  "v1",
-	Resource: "deployments",
-}
 
 func TestEdgeSyncerForUpdateStatus(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured

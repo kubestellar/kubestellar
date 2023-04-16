@@ -19,8 +19,6 @@ package edgesyncer
 import (
 	"context"
 	"fmt"
-	"path"
-	"runtime"
 	"testing"
 	"time"
 
@@ -28,37 +26,12 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
-
-var policyGvr = schema.GroupVersionResource{
-	Group:    "kyverno.io",
-	Version:  "v1",
-	Resource: "policies",
-}
-
-var policyReportGvr = schema.GroupVersionResource{
-	Group:    "wgpolicyk8s.io",
-	Version:  "v1alpha2",
-	Resource: "policyreports",
-}
-
-var clusterPolicyReportGvr = schema.GroupVersionResource{
-	Group:    "wgpolicyk8s.io",
-	Version:  "v1alpha2",
-	Resource: "clusterpolicyreports",
-}
-
-func pathToTestdataDir() string {
-	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Join(path.Dir(filename), "./testdata")
-	return dir
-}
 
 func TestEdgeSyncerForKyvernoWithSyncerConfig(t *testing.T) {
 

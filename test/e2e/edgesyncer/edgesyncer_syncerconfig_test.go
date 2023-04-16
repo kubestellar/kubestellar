@@ -27,7 +27,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
@@ -35,22 +34,16 @@ import (
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-var syncerConfigGvr = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
-	Version:  "v1alpha1",
-	Resource: "syncerconfigs",
-}
-
 func TestEdgeSyncerWithSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
 func TestEdgeSyncerWithWildcardSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
+	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
@@ -58,19 +51,19 @@ func TestEdgeSyncerWithWildcardSyncerConfig(t *testing.T) {
 func testEdgeSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var sampleDownsyncCRDUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
+	err := edgeframework.LoadFile("testdata/syncerconfig/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
 	require.NoError(t, err)
 
 	var sampleUpsyncCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-upsync-crd.yaml", embedded, &sampleUpsyncCRDUnst)
+	err = edgeframework.LoadFile("testdata/syncerconfig/sample-upsync-crd.yaml", embedded, &sampleUpsyncCRDUnst)
 	require.NoError(t, err)
 
 	var sampleDownsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
+	err = edgeframework.LoadFile("testdata/syncerconfig/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
 	require.NoError(t, err)
 
 	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
+	err = edgeframework.LoadFile("testdata/syncerconfig/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "edge-syncer")
