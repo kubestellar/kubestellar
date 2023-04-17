@@ -27,7 +27,7 @@ import (
 // this function returns receivers of changes to the two ipnputs.
 // In other words, this joins the change streams of two tables to produce the change stream
 // of the join of those two tables --- in a passive stance (i.e., is in terms of the stream receivers).
-func NewDynamicFullJoin12VWith13[ColX, ColY, ColZ comparable, Val any](logger klog.Logger, receiver MappingReceiver[Triple[ColX, ColY, ColZ], Val]) (MappingReceiver[Pair[ColX, ColY], Val], SetChangeReceiver[Pair[ColX, ColZ]]) {
+func NewDynamicFullJoin12VWith13[ColX, ColY, ColZ comparable, Val any](logger klog.Logger, receiver MappingReceiver[Triple[ColX, ColY, ColZ], Val]) (MappingReceiver[Pair[ColX, ColY], Val], SetWriter[Pair[ColX, ColZ]]) {
 	dj := &dynamicJoin12VWith13[ColX, ColY, ColZ, Val]{
 		logger:   logger,
 		receiver: receiver,

@@ -30,8 +30,10 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
+	apisclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/apis/v1alpha1"
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	kcpworkloadinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/workload/v1alpha1"
@@ -50,37 +52,43 @@ const mbwsNameIndexKey = "mbwsName"
 const SyncTargetNameAnnotationKey = "edge.kcp.io/sync-target-name"
 
 type mbCtl struct {
-	context                   context.Context
-	syncTargetClusterInformer kcpcache.ScopeableSharedIndexInformer
-	syncTargetClusterLister   workloadlisters.SyncTargetClusterLister
-	syncTargetIndexer         cache.Indexer
-	workspaceScopedInformer   cache.SharedIndexInformer
-	workspaceScopedLister     tenancylisters.WorkspaceLister
-	workspaceScopedClient     tenancyclient.WorkspaceInterface
-	queue                     workqueue.RateLimitingInterface // of mailbox workspace Name
+	context                    context.Context
+	espwPath                   string
+	syncTargetClusterInformer  kcpcache.ScopeableSharedIndexInformer
+	syncTargetClusterLister    workloadlisters.SyncTargetClusterLister
+	syncTargetIndexer          cache.Indexer
+	workspaceScopedInformer    cache.SharedIndexInformer
+	workspaceScopedLister      tenancylisters.WorkspaceLister
+	workspaceScopedClient      tenancyclient.WorkspaceInterface
+	apiBindingClusterInterface apisclient.APIBindingClusterInterface
+	queue                      workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
 // SyncTarget objects (not limited to one cluster).
 func newMailboxController(ctx context.Context,
+	espwPath string,
 	syncTargetClusterPreInformer kcpworkloadinformers.SyncTargetClusterInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
 	workspaceScopedClient tenancyclient.WorkspaceInterface,
+	apiBindingClusterInterface apisclient.APIBindingClusterInterface,
 ) *mbCtl {
 	syncTargetClusterInformer := syncTargetClusterPreInformer.Informer()
 	syncTargetClusterInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: mbwsNameOfObj})
 	workspacesInformer := workspaceScopedPreInformer.Informer()
 
 	ctl := &mbCtl{
-		context:                   ctx,
-		syncTargetClusterInformer: syncTargetClusterInformer,
-		syncTargetClusterLister:   syncTargetClusterPreInformer.Lister(),
-		syncTargetIndexer:         syncTargetClusterInformer.GetIndexer(),
-		workspaceScopedInformer:   workspacesInformer,
-		workspaceScopedLister:     workspaceScopedPreInformer.Lister(),
-		workspaceScopedClient:     workspaceScopedClient,
-		queue:                     workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
+		context:                    ctx,
+		espwPath:                   espwPath,
+		syncTargetClusterInformer:  syncTargetClusterInformer,
+		syncTargetClusterLister:    syncTargetClusterPreInformer.Lister(),
+		syncTargetIndexer:          syncTargetClusterInformer.GetIndexer(),
+		workspaceScopedInformer:    workspacesInformer,
+		workspaceScopedLister:      workspaceScopedPreInformer.Lister(),
+		workspaceScopedClient:      workspaceScopedClient,
+		apiBindingClusterInterface: apiBindingClusterInterface,
+		queue:                      workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
 
 	syncTargetClusterInformer.AddEventHandler(ctl)
@@ -244,9 +252,52 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "mbwsName", mbwsName)
 		return true
 	}
-	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, nothing to do", "mbwsName", mbwsName)
-	return false
+	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, now check on the APIBinding to edge", "mbwsName", mbwsName)
+	return ctl.ensureEdgeBinding(ctx, workspace)
 
+}
+
+const TheEdgeBindingName = "bind-edge"
+const TheEdgeExportName = "edge.kcp.io"
+
+func (ctl *mbCtl) ensureEdgeBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
+	logger := klog.FromContext(ctx).WithValues("mbwsName", workspace.Name)
+	mbwsCluster := logicalcluster.Name(workspace.Spec.Cluster)
+	if mbwsCluster == "" {
+		logger.V(2).Info("Mailbox workspace does not have a Spec.Cluster yet")
+		return true
+	}
+	logger = logger.WithValues("mbwsCluster", mbwsCluster, "bindingName", TheEdgeBindingName)
+	scopedAPIBindingIfc := ctl.apiBindingClusterInterface.Cluster(mbwsCluster.Path())
+	theBinding, err := scopedAPIBindingIfc.Get(ctx, TheEdgeBindingName, metav1.GetOptions{})
+	if err != nil && !k8sapierrors.IsNotFound(err) {
+		logger.Error(err, "Failed to read APIBinding")
+		return true
+	}
+	if err == nil {
+		logger.V(4).Info("Found existing APIBinding, not checking spec", "spec", theBinding.Spec)
+		return false
+	}
+	binding := &apisv1alpha1.APIBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: TheEdgeBindingName,
+		},
+		Spec: apisv1alpha1.APIBindingSpec{
+			Reference: apisv1alpha1.BindingReference{
+				Export: &apisv1alpha1.ExportBindingReference{
+					Path: ctl.espwPath,
+					Name: TheEdgeExportName,
+				},
+			},
+		},
+	}
+	binding2, err := scopedAPIBindingIfc.Create(ctx, binding, metav1.CreateOptions{FieldManager: "TODO"})
+	if err != nil {
+		logger.Error(err, "Failed to create APIBinding", "binding", binding)
+		return true
+	}
+	logger.V(2).Info("Created APIBinding", "resourceVersion", binding2.ResourceVersion)
+	return false
 }
 
 func mbwsNameOfSynctarget(st *workloadv1alpha1.SyncTarget) string {

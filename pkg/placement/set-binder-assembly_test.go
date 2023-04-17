@@ -33,10 +33,8 @@ func TestSetBinder(t *testing.T) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
 	amp := NewTestAPIMapProvider(logger)
-	binder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+	binder := NewSetBinder(logger, NewWorkloadPartsDifferencer, NewUpsyncDifferencer, NewResolvedWhereDifferencer,
 		SimpleBindingOrganizer(logger),
-		amp,
-		DefaultResourceModes,
-		nil)
-	exerciseSetBinder(t, amp.AsResourceReceiver(), binder)
+		amp, DefaultResourceModes, nil)
+	exerciseSetBinder(t, logger, amp.AsResourceReceiver(), binder)
 }

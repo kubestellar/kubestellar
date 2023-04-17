@@ -30,18 +30,26 @@ type FactoredMapIndex[KeyPartA, KeyPartB comparable, Val any] interface {
 }
 
 // NewFactoredMapMap makes a FactoredMap implements by golang maps.
-// For outerObserver1: the Update method is not called, only Create and Delete.
-// For outerObserver2: all three methods are called.
 func NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
 	keyDecomposer Factorer[WholeKey, KeyPartA, KeyPartB],
 	unifiedObserver MapChangeReceiver[WholeKey, Val],
-	outerObserver1 MapChangeReceiver[KeyPartA, MutableMap[KeyPartB, Val]],
+	outerKeysetObserver SetChangeReceiver[KeyPartA],
 	outerObserver2 MappingReceiver[KeyPartA, Map[KeyPartB, Val]],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
 	return NewFactoredMap[WholeKey, KeyPartA, KeyPartB, Val](
 		keyDecomposer,
 		NewMapMapFactory[KeyPartB, Val](nil),
-		NewMapMap[KeyPartA, MutableMap[KeyPartB, Val]](outerObserver1),
+		NewMapMap[KeyPartA, MutableMap[KeyPartB, Val]](MapChangeReceiverFuncs[KeyPartA, MutableMap[KeyPartB, Val]]{
+			OnCreate: func(keyPartA KeyPartA, rest MutableMap[KeyPartB, Val]) {
+				if outerKeysetObserver != nil {
+					outerKeysetObserver(true, keyPartA)
+				}
+			},
+			OnDelete: func(keyPartA KeyPartA, rest MutableMap[KeyPartB, Val]) {
+				if outerKeysetObserver != nil {
+					outerKeysetObserver(false, keyPartA)
+				}
+			}}),
 		unifiedObserver,
 		outerObserver2,
 	)

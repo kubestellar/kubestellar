@@ -65,13 +65,13 @@ func NewPair2Then1[First any, Second any](second Second) func(First) Pair[First,
 	}
 }
 
-type Triple[First, Second, Third comparable] struct {
+type Triple[First, Second, Third any] struct {
 	First  First
 	Second Second
 	Third  Third
 }
 
-func NewTriple[First, Second, Third comparable](first First, second Second, third Third) Triple[First, Second, Third] {
+func NewTriple[First, Second, Third any](first First, second Second, third Third) Triple[First, Second, Third] {
 	return Triple[First, Second, Third]{first, second, third}
 }
 
@@ -87,15 +87,23 @@ func (tup Triple[First, Second, Third]) String() string {
 	return ans.String()
 }
 
+func (tup Triple[PartA, PartB, PartC]) Reverse() Triple[PartC, PartB, PartA] {
+	return NewTriple(tup.Third, tup.Second, tup.First)
+}
+
 // Rotator is something that can change one value into an equivalent value and back again.
 // To understand the name, think of something that can rotate (forward and back) a point in some coordinate system.
-type Rotator[Original, Rotated comparable] Pair[func(Original) Rotated, func(Rotated) Original]
+type Rotator[Original, Rotated any] Pair[func(Original) Rotated, func(Rotated) Original]
 
 func (rr Rotator[Original, Rotated]) Reverse() Rotator[Rotated, Original] {
 	return Rotator[Rotated, Original]{rr.Second, rr.First}
 }
 
-func NoRotation[Original comparable]() Rotator[Original, Original] {
+func NewRotator[Original, Rotated any](forward func(Original) Rotated, reverse func(Rotated) Original) Rotator[Original, Rotated] {
+	return Rotator[Original, Rotated](NewPair(forward, reverse))
+}
+
+func NoRotation[Original any]() Rotator[Original, Original] {
 	return Rotator[Original, Original]{
 		First:  Identity1[Original],
 		Second: Identity1[Original],
@@ -103,9 +111,9 @@ func NoRotation[Original comparable]() Rotator[Original, Original] {
 }
 
 // Factorer is a Rotator that converts from some Whole type to some Pair type (and back)
-type Factorer[Whole, PartA, PartB comparable] Rotator[Whole, Pair[PartA, PartB]]
+type Factorer[Whole, PartA, PartB any] Rotator[Whole, Pair[PartA, PartB]]
 
-func NewFactorer[Whole, PartA, PartB comparable](forward func(Whole) Pair[PartA, PartB], reverse func(Pair[PartA, PartB]) Whole) Factorer[Whole, PartA, PartB] {
+func NewFactorer[Whole, PartA, PartB any](forward func(Whole) Pair[PartA, PartB], reverse func(Pair[PartA, PartB]) Whole) Factorer[Whole, PartA, PartB] {
 	return Factorer[Whole, PartA, PartB]{forward, reverse}
 }
 
@@ -118,14 +126,22 @@ func (factoring Factorer[Whole, PartA, PartB]) Unfactor(partA PartA, partB PartB
 	return factoring.Second(Pair[PartA, PartB]{partA, partB})
 }
 
-func PairFactorer[PartA, PartB comparable]() Factorer[Pair[PartA, PartB], PartA, PartB] {
+func PairReverser[PartA, PartB any]() Rotator[Pair[PartA, PartB], Pair[PartB, PartA]] {
+	return NewRotator(Pair[PartA, PartB].Reverse, Pair[PartB, PartA].Reverse)
+}
+
+func PairFactorer[PartA, PartB any]() Factorer[Pair[PartA, PartB], PartA, PartB] {
 	return Factorer[Pair[PartA, PartB], PartA, PartB]{
 		First:  Identity1[Pair[PartA, PartB]],
 		Second: Identity1[Pair[PartA, PartB]],
 	}
 }
 
-func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX] {
+func TripleReverser[PartA, PartB, PartC any]() Rotator[Triple[PartA, PartB, PartC], Triple[PartC, PartB, PartA]] {
+	return NewRotator(Triple[PartA, PartB, PartC].Reverse, Triple[PartC, PartB, PartA].Reverse)
+}
+
+func TripleFactorerTo23and1[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX] {
 	return Factorer[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX]{
 		First: func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColY, ColZ], ColX] {
 			return Pair[Pair[ColY, ColZ], ColX]{Pair[ColY, ColZ]{tup.Second, tup.Third}, tup.First}
@@ -136,7 +152,7 @@ func TripleFactorerTo23and1[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 	}
 }
 
-func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
+func TripleFactorerTo13and2[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], Pair[ColX, ColZ], ColY] {
 	return NewFactorer(
 		func(tup Triple[ColX, ColY, ColZ]) Pair[Pair[ColX, ColZ], ColY] {
 			return NewPair(NewPair(tup.First, tup.Third), tup.Second)
@@ -146,12 +162,43 @@ func TripleFactorerTo13and2[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX,
 		})
 }
 
-func TripleFactorerTo1and23[ColX, ColY, ColZ comparable]() Factorer[Triple[ColX, ColY, ColZ], ColX, Pair[ColY, ColZ]] {
+func TripleFactorerTo1and23[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], ColX, Pair[ColY, ColZ]] {
 	return NewFactorer(
 		func(tup Triple[ColX, ColY, ColZ]) Pair[ColX, Pair[ColY, ColZ]] {
 			return NewPair(tup.First, NewPair(tup.Second, tup.Third))
 		},
 		func(put Pair[ColX, Pair[ColY, ColZ]]) Triple[ColX, ColY, ColZ] {
 			return NewTriple(put.First, put.Second.First, put.Second.Second)
+		})
+}
+
+func TripleFactorerTo3and21[ColX, ColY, ColZ any]() Factorer[Triple[ColX, ColY, ColZ], ColZ, Pair[ColY, ColX]] {
+	return NewFactorer(
+		func(tup Triple[ColX, ColY, ColZ]) Pair[ColZ, Pair[ColY, ColX]] {
+			return NewPair(tup.Third, NewPair(tup.Second, tup.First))
+		},
+		func(put Pair[ColZ, Pair[ColY, ColX]]) Triple[ColX, ColY, ColZ] {
+			return NewTriple(put.Second.Second, put.Second.First, put.First)
+		})
+}
+
+type Quad[First, Second, Third, Fourth any] struct {
+	First  First
+	Second Second
+	Third  Third
+	Fourth Fourth
+}
+
+func NewQuad[First, Second, Third, Fourth any](first First, second Second, third Third, fourth Fourth) Quad[First, Second, Third, Fourth] {
+	return Quad[First, Second, Third, Fourth]{first, second, third, fourth}
+}
+
+func QuadFactorerTo1and234[ColW, ColX, ColY, ColZ any]() Factorer[Quad[ColW, ColX, ColY, ColZ], ColW, Triple[ColX, ColY, ColZ]] {
+	return NewFactorer(
+		func(tup Quad[ColW, ColX, ColY, ColZ]) Pair[ColW, Triple[ColX, ColY, ColZ]] {
+			return NewPair(tup.First, NewTriple(tup.Second, tup.Third, tup.Fourth))
+		},
+		func(put Pair[ColW, Triple[ColX, ColY, ColZ]]) Quad[ColW, ColX, ColY, ColZ] {
+			return NewQuad(put.First, put.Second.First, put.Second.Second, put.Second.Third)
 		})
 }

@@ -89,30 +89,33 @@ EOF
 
 Next make sure you run `kubectl ws root:espw` to enter the edge
 service provider workspace, then just run the placement translator
-from the command line.  It should start out like the following and
-continue with more log messages (possibly including some complaints,
-which do not necessarily indicate real problems because the subsequent
-success is not logged so profligately).
+from the command line.  That should look like the following (possibly
+including some complaints, which do not necessarily indicate real
+problems because the subsequent success is not logged so
+profligately).
 
 ```console
 $ go run ./cmd/placement-translator
 
-I0410 01:05:03.920954   27116 shared_informer.go:282] Waiting for caches to sync for placement-translator
-I0410 01:05:04.024390   27116 shared_informer.go:289] Caches are synced for placement-translator
-I0410 01:05:04.024800   27116 shared_informer.go:282] Waiting for caches to sync for what-resolver
-I0410 01:05:04.024814   27116 shared_informer.go:289] Caches are synced for what-resolver
-I0410 01:05:04.025051   27116 shared_informer.go:282] Waiting for caches to sync for where-resolver
-I0410 01:05:04.025067   27116 shared_informer.go:289] Caches are synced for where-resolver
-I0410 01:05:04.026845   27116 main.go:157] "Put" map="where" key="24oofcs9mbj9j4nd:edge-placement-c" val="[&{{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-c    00f4c242-41bc-48f4-800f-2b41e42c94ea 1489 4 2023-04-09 19:19:59 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:24oofcs9mbj9j4nd] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-c 14e26ba1-c255-421a-8a21-bf1e72e91873 <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-09 19:19:59 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"14e26ba1-c255-421a-8a21-bf1e72e91873\\\"}\":{}}}} }]} [{2yv5njwiqbnakwd7 location-g sync-target-g 39afc608-de3c-4faa-bbca-d72cd42d6c6c} {2yv5njwiqbnakwd7 location-f sync-target-f 1dffad3f-8783-420b-95b8-1da7c854302e}]}]"
-I0410 01:05:04.027469   27116 main.go:157] "Put" map="where" key="2rdfbafqhpt3cekf:edge-placement-s" val="[&{{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-s    1ddd6510-d98a-430b-a130-319f151c1da3 1487 1 2023-04-09 19:19:59 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:2rdfbafqhpt3cekf] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-s 6d459327-59a5-4874-b670-fa254aaeb79c <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-09 19:19:59 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"6d459327-59a5-4874-b670-fa254aaeb79c\\\"}\":{}}}} }]} [{2yv5njwiqbnakwd7 location-g sync-target-g 39afc608-de3c-4faa-bbca-d72cd42d6c6c}]}]"
-I0410 01:05:04.229392   27116 main.go:157] "Put" map="what" key="24oofcs9mbj9j4nd:edge-placement-c" val=map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}]
-I0410 01:05:04.231417   27116 main.go:157] "Put" map="what" key="2rdfbafqhpt3cekf:edge-placement-s" val=map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}]
+I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
+I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
+I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
+I0412 15:15:57.970014   94634 shared_informer.go:289] Caches are synced for what-resolver
+I0412 15:15:57.970178   94634 shared_informer.go:282] Waiting for caches to sync for where-resolver
+I0412 15:15:57.970192   94634 shared_informer.go:289] Caches are synced for where-resolver
+...
+I0412 15:15:57.972185   94634 map-types.go:338] "Put" map="where" key="r0bdh9oumjkoag3s:edge-placement-s" val="[&{{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-s    e1b1033d-49f2-45e8-8a90-6d0295b644b6 1184 1 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:r0bdh9oumjkoag3s] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-s 0e718a31-db21-47f1-b789-cd55835b1418 <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"0e718a31-db21-47f1-b789-cd55835b1418\\\"}\":{}}}} }]} [{1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
+I0412 15:15:57.973740   94634 map-types.go:338] "Put" map="where" key="1i1weo8uoea04wxr:edge-placement-c" val="[&{{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-c    c446ca9b-8937-4751-89ab-058bcfb079c1 1183 3 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:1i1weo8uoea04wxr] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-c c1e038b9-8bd8-4d22-8ab8-916e40c794d1 <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"c1e038b9-8bd8-4d22-8ab8-916e40c794d1\\\"}\":{}}}} }]} [{1xpg93182scl85te location-f sync-target-f e6efb8bd-6755-45ac-b44d-5d38f978f990} {1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
+...
+I0412 15:15:58.173974   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:greoup1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group2.test Resources:[cogs] Namespaces:[] Names:[William]}]}
+I0412 15:15:58.180380   94634 map-types.go:338] "Put" map="what" key="r0bdh9oumjkoag3s:edge-placement-s" val={Downsync:map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:greoup1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group3.test Resources:[widgets] Namespaces:[] Names:[*]}]}
+...
 ```
 
 The "Put" log entries with `map="what"` show what the "what resolver" is
 reporting.  This reports mappings from `ExternalName` of an
 `EdgePlacement` object to the workload parts that that `EdgePlacement`
-says to downsync.
+says to downsync and upsync.
 
 The "Put" log entries with `map="where"` show the
 `SinglePlacementSlice` objects associated with each `EdgePlacement`.
@@ -130,8 +133,8 @@ provider workspace, as follows.
 ```console
 $ kubectl get Workspace
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
-2yv5njwiqbnakwd7-mb-1dffad3f-8783-420b-95b8-1da7c854302e   universal            Ready   https://192.168.58.123:6443/clusters/2s895m084fo48yyv   5h50m
-2yv5njwiqbnakwd7-mb-39afc608-de3c-4faa-bbca-d72cd42d6c6c   universal            Ready   https://192.168.58.123:6443/clusters/27eh2l0czvz5eqa4   5h50m
+1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19   universal            Ready   https://192.168.58.123:6443/clusters/12zzf3frkqz2yj39   36m
+1xpg93182scl85te-mb-e6efb8bd-6755-45ac-b44d-5d38f978f990   universal            Ready   https://192.168.58.123:6443/clusters/2v6wl3x41zxmpmhr   36m
 ```
 
 Next switch to one of the mailbox workspaces (in my case I picked the
@@ -139,71 +142,91 @@ one for the guilder cluster) and examine the `SyncerConfig` object.
 That should look like the following.
 
 ```console
-$ kubectl ws 2yv5njwiqbnakwd7-mb-39afc608-de3c-4faa-bbca-d72cd42d6c6c
-Current workspace is "root:espw:2yv5njwiqbnakwd7-mb-39afc608-de3c-4faa-bbca-d72cd42d6c6c" (type root:universal).
+$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
 
-$ kubectl get syncerconfigs the-one -o yaml
+$ kubectl get SyncerConfig the-one -o yaml                           
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
-    kcp.io/cluster: 27eh2l0czvz5eqa4
-  creationTimestamp: "2023-04-10T05:05:04Z"
+    kcp.io/cluster: 12zzf3frkqz2yj39
+  creationTimestamp: "2023-04-12T19:15:58Z"
   generation: 2
   name: the-one
-  resourceVersion: "1641"
-  uid: abb39edc-b3f8-4b10-aa49-888b98ca5110
+  resourceVersion: "1249"
+  uid: 00bf8d10-393a-4d94-b032-79fae30646f6
 spec:
   namespaceScope:
     namespaces:
     - commonstuff
     - specialstuff
     resources:
+    - apiVersion: v1alpha1
+      group: edge.kcp.io
+      resource: customizers
+    - apiVersion: v1
+      group: ""
+      resource: limitranges
+    - apiVersion: v1
+      group: coordination.k8s.io
+      resource: leases
     - apiVersion: v1
       group: ""
       resource: resourcequotas
     - apiVersion: v1
       group: ""
-      resource: events
+      resource: configmaps
     - apiVersion: v1
       group: networking.k8s.io
       resource: ingresses
     - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
+      group: events.k8s.io
+      resource: events
+    - apiVersion: v1
+      group: apps
+      resource: deployments
     - apiVersion: v1
       group: ""
-      resource: configmaps
+      resource: events
     - apiVersion: v1
       group: ""
       resource: secrets
     - apiVersion: v1
       group: ""
+      resource: services
+    - apiVersion: v1
+      group: ""
       resource: pods
     - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
+      group: ""
+      resource: serviceaccounts
     - apiVersion: v1
       group: rbac.authorization.k8s.io
       resource: rolebindings
     - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
-    - apiVersion: v1alpha1
-      group: edge.kcp.io
-      resource: customizers
-    - apiVersion: v1
-      group: events.k8s.io
-      resource: events
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
+      group: rbac.authorization.k8s.io
+      resource: roles
+  upsync:
+  - apiGroup: group2.test
+    names:
+    - William
+    resources:
+    - cogs
+  - apiGroup: group3.test
+    names:
+    - '*'
+    resources:
+    - widgets
+  - apiGroup: greoup1.test
+    names:
+    - george
+    - cosmo
+    namespaces:
+    - orbital
+    resources:
+    - sprockets
+    - flanges
 status: {}
 ```
 
@@ -222,8 +245,8 @@ edgeplacement.edge.kcp.io "edge-placement-c" deleted
 That will cause the placement translator to log updates, as follows.
 
 ```
-I0410 01:20:15.024734   27116 main.go:157] "Put" map="what" key="24oofcs9mbj9j4nd:edge-placement-c" val=map[]
-I0410 01:20:15.102275   27116 main.go:161] "Delete" map="where" key="24oofcs9mbj9j4nd:edge-placement-c"
+I0412 15:20:43.129842   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[] Upsync:[]}
+I0412 15:20:43.241674   94634 map-types.go:342] "Delete" map="where" key="1i1weo8uoea04wxr:edge-placement-c"
 ```
 
 After that, the SyncerConfig in the florin mailbox should be empty, as
@@ -249,5 +272,94 @@ metadata:
   uid: 2b66b4bc-4130-4bf0-8524-73d6885f2ad8
 spec:
   namespaceScope: {}
+status: {}
+```
+
+And the SyncerConfig in the guilder mailbox workspace should reflect
+only the special workload.  That would look something like the
+following.
+
+```console
+$ kubectl ws root:espw
+
+$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+
+$ kubectl get SyncerConfig the-one -o yaml                           
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  annotations:
+    kcp.io/cluster: 12zzf3frkqz2yj39
+  creationTimestamp: "2023-04-12T19:15:58Z"
+  generation: 3
+  name: the-one
+  resourceVersion: "1254"
+  uid: 00bf8d10-393a-4d94-b032-79fae30646f6
+spec:
+  namespaceScope:
+    namespaces:
+    - specialstuff
+    resources:
+    - apiVersion: v1
+      group: ""
+      resource: pods
+    - apiVersion: v1
+      group: ""
+      resource: events
+    - apiVersion: v1
+      group: ""
+      resource: limitranges
+    - apiVersion: v1
+      group: ""
+      resource: services
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1alpha1
+      group: edge.kcp.io
+      resource: customizers
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: ""
+      resource: serviceaccounts
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: roles
+    - apiVersion: v1
+      group: ""
+      resource: resourcequotas
+    - apiVersion: v1
+      group: events.k8s.io
+      resource: events
+    - apiVersion: v1
+      group: networking.k8s.io
+      resource: ingresses
+    - apiVersion: v1
+      group: coordination.k8s.io
+      resource: leases
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+  upsync:
+  - apiGroup: group3.test
+    names:
+    - '*'
+    resources:
+    - widgets
+  - apiGroup: greoup1.test
+    names:
+    - george
+    - cosmo
+    namespaces:
+    - orbital
+    resources:
+    - sprockets
+    - flanges
 status: {}
 ```

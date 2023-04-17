@@ -26,11 +26,14 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
+	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
+	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
@@ -50,6 +53,8 @@ type placementTranslator struct {
 	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
+	nsClusterPreInformer   kcpkubecorev1informers.NamespaceClusterInformer
+	nsClusterClient        kcpkubecorev1client.NamespaceClusterInterface
 
 	workloadProjector interface {
 		WorkloadProjector
@@ -77,13 +82,17 @@ func NewPlacementTranslator(
 	// needed for enumerating resources in workload mgmt workspaces
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	// needed to watch for new resources appearing
-	crdClusterPreInformer kcpinformers.GenericClusterInformer,
+	crdClusterPreInformer kcpkubeinformers.GenericClusterInformer,
 	// needed to watch for new resources appearing
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
+	bindingClusterPreInformer kcpkubeinformers.GenericClusterInformer,
 	// needed to read and write arbitrary objects
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	// to read and write syncer config objects
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
+	// for monitoring namespaces in mailbox workspaces
+	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
+	// for creating namespaces in mailbox workspaces
+	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	mbwsPreInformer.Lister()
@@ -101,11 +110,15 @@ func NewPlacementTranslator(
 		bindingClusterInformer: bindingClusterPreInformer.Informer(),
 		dynamicClusterClient:   dynamicClusterClient,
 		edgeClusterClientset:   edgeClusterClientset,
+		nsClusterPreInformer:   nsClusterPreInformer,
+		nsClusterClient:        nsClusterClient,
 		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
-	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, pt.mbwsInformer, pt.mbwsLister, pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset)
+	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, pt.mbwsInformer, pt.mbwsLister,
+		pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset, dynamicClusterClient,
+		nsClusterPreInformer, nsClusterClient)
 
 	return pt
 }
@@ -124,15 +137,15 @@ func (pt *placementTranslator) Run() {
 		os.Exit(100)
 	}
 
-	whatResolver := func(mr MappingReceiver[ExternalName, WorkloadParts]) Runnable {
-		fork := MappingReceiverFork[ExternalName, WorkloadParts]{NewLoggingMappingReceiver[ExternalName, WorkloadParts]("what", logger), mr}
+	whatResolver := func(mr MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
+		fork := MappingReceiverFork[ExternalName, ResolvedWhat]{NewLoggingMappingReceiver[ExternalName, ResolvedWhat]("what", logger), mr}
 		return pt.whatResolver(fork)
 	}
 	whereResolver := func(mr MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
 		fork := MappingReceiverFork[ExternalName, ResolvedWhere]{NewLoggingMappingReceiver[ExternalName, ResolvedWhere]("where", logger), mr}
 		return pt.whereResolver(fork)
 	}
-	setBinder := NewSetBinder(logger, NewResolvedWhatDifferencer, NewResolvedWhereDifferencer,
+	setBinder := NewSetBinder(logger, NewWorkloadPartsDifferencer, NewUpsyncDifferencer, NewResolvedWhereDifferencer,
 		SimpleBindingOrganizer(logger),
 		pt.apiProvider,
 		DefaultResourceModes, // TODO: replace with configurable
@@ -144,4 +157,8 @@ func (pt *placementTranslator) Run() {
 	go pt.apiProvider.Run(ctx)       // TODO: also wait for this to finish
 	go pt.workloadProjector.Run(ctx) // TODO: also wait for this to finish
 	runner.Run(ctx)
+}
+
+func NewUpsyncDifferencer(eltReceiver SetChangeReceiver[edgeapi.UpsyncSet]) Receiver[ /*immutable*/ []edgeapi.UpsyncSet] {
+	return NewSliceDifferencerParametric(UpsyncSetEqual, eltReceiver, nil)
 }

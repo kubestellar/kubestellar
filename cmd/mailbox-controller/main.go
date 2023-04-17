@@ -39,7 +39,6 @@ import (
 	"k8s.io/apiserver/pkg/server/routes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
@@ -50,30 +49,34 @@ import (
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	"github.com/kcp-dev/logicalcluster/v3"
+
+	clientopts "github.com/kcp-dev/edge-mc/pkg/client-options"
 )
 
 func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10203"
+	espwPath := logicalcluster.Name("root").Path().Join("espw").String()
 	fs := pflag.NewFlagSet("mailbox-controller", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
+	fs.StringVar(&espwPath, "espw-path", espwPath, "the pathname of the edge service provider workspace")
 
-	inventoryLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	inventoryConfigOverrides := &clientcmd.ConfigOverrides{}
+	inventoryClientOpts := clientopts.NewClientOpts("inventory", "access to APIExport view of SyncTarget objects")
+	inventoryClientOpts.SetDefaultCurrentContext("root")
 
-	fs.StringVar(&inventoryLoadingRules.ExplicitPath, "inventory-kubeconfig", inventoryLoadingRules.ExplicitPath, "pathname of kubeconfig file for inventory service provider workspace")
-	fs.StringVar(&inventoryConfigOverrides.CurrentContext, "inventory-context", "root", "current-context override for inventory-kubeconfig")
+	workloadClientOpts := clientopts.NewClientOpts("workload", "access to edge service provider workspace")
+	mbwsClientOpts := clientopts.NewClientOpts("mbws", "access to mailbox workspaces (really all clusters)")
+	mbwsClientOpts.SetDefaultCurrentContext("base")
 
-	workloadLoadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-	workloadConfigOverrides := &clientcmd.ConfigOverrides{}
-
-	fs.StringVar(&workloadLoadingRules.ExplicitPath, "workload-kubeconfig", workloadLoadingRules.ExplicitPath, "pathname of kubeconfig file for edge workload service provider workspace")
-	fs.StringVar(&workloadConfigOverrides.CurrentContext, "workload-context", workloadConfigOverrides.CurrentContext, "current-context override for workload-kubeconfig")
+	inventoryClientOpts.AddFlags(fs)
+	workloadClientOpts.AddFlags(fs)
+	mbwsClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -97,8 +100,7 @@ func main() {
 	}()
 
 	// create config for accessing TMC service provider workspace
-	inventoryClientConfigGen := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(inventoryLoadingRules, inventoryConfigOverrides)
-	inventoryClientConfig, err := inventoryClientConfigGen.ClientConfig()
+	inventoryClientConfig, err := inventoryClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make inventory config")
 		os.Exit(2)
@@ -123,8 +125,7 @@ func main() {
 	syncTargetClusterPreInformer := stViewInformerFactory.Workload().V1alpha1().SyncTargets()
 
 	// create config for accessing edge service provider workspace
-	workspaceClientConfigGen := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(workloadLoadingRules, workloadConfigOverrides)
-	workspaceClientConfig, err := workspaceClientConfigGen.ClientConfig()
+	workspaceClientConfig, err := workloadClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make workspaces config")
 		os.Exit(8)
@@ -140,7 +141,22 @@ func main() {
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
 
-	ctl := newMailboxController(ctx, syncTargetClusterPreInformer, workspaceScopedPreInformer, workspaceScopedClientset.TenancyV1alpha1().Workspaces())
+	mbwsClientConfig, err := mbwsClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to make all-cluster config")
+		os.Exit(20)
+	}
+	mbwsClientConfig.UserAgent = "mailbox-controller"
+	mbwsClientset, err := kcpclusterclientset.NewForConfig(mbwsClientConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create all-cluster clientset")
+		os.Exit(24)
+	}
+
+	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
+		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
+		mbwsClientset.ApisV1alpha1().APIBindings(),
+	)
 
 	doneCh := ctx.Done()
 	stViewInformerFactory.Start(doneCh)

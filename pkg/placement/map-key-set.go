@@ -18,6 +18,7 @@ package placement
 
 // MapKeySet produces a readonly view of a given Map's key set.
 // For the passive version, see MapKeySetReceiver and MapKeySetReceiverLossy.
+// For the writable version, see NewSetByMapToEmpty.
 func MapKeySet[Key comparable, Val any](theMap Map[Key, Val]) Set[Key] {
 	return mapKeySet[Key, Val]{theMap}
 }
@@ -39,19 +40,60 @@ func (mks mapKeySet[Key, Val]) Visit(visitor func(Key) error) error {
 	})
 }
 
-// MapKeySetReceiver extends a SetChangeReceiver for keys into a MapChangeReceiver that simply ignores the associated values.
-func MapKeySetReceiver[Key comparable, Val any](ksr SetChangeReceiver[Key]) MapChangeReceiver[Key, Val] {
+// MapKeySetReceiver extends a SetWriter for keys into a MapChangeReceiver that simply ignores the associated values.
+func MapKeySetReceiver[Key, Val any](ksr SetWriter[Key]) MapChangeReceiver[Key, Val] {
 	return MapChangeReceiverFuncs[Key, Val]{
 		OnCreate: func(key Key, _ Val) { ksr.Add(key) },
 		OnDelete: func(key Key, _ Val) { ksr.Remove(key) },
 	}
 }
 
-// MapKeySetReceiverLossy extends a SetChangeReceiver for keys into a MappingReceiver that simply ignores the associated values.
+// MapKeySetReceiverLossy extends a SetWriter for keys into a MappingReceiver that simply ignores the associated values.
 // It is lossy in that it may make redundant calls to Add.
-func MapKeySetReceiverLossy[Key comparable, Val any](ksr SetChangeReceiver[Key]) MappingReceiver[Key, Val] {
+func MapKeySetReceiverLossy[Key, Val any](ksr SetWriter[Key]) MappingReceiver[Key, Val] {
 	return MappingReceiverFuncs[Key, Val]{
 		OnPut:    func(key Key, _ Val) { ksr.Add(key) },
 		OnDelete: func(key Key) { ksr.Remove(key) },
 	}
+}
+
+// NewSetByMapToEmpty takes a mutable map to Empty and returns the behavior of its key set.
+// For the readonly version, see MapKeySet.
+func NewSetByMapToEmpty[Elt any](theMap MutableMap[Elt, Empty]) MutableSet[Elt] {
+	return setByMapToEmpty[Elt]{theMap}
+}
+
+type setByMapToEmpty[Elt any] struct{ theMap MutableMap[Elt, Empty] }
+
+func (sme setByMapToEmpty[Elt]) IsEmpty() bool    { return sme.theMap.IsEmpty() }
+func (sme setByMapToEmpty[Elt]) LenIsCheap() bool { return sme.theMap.LenIsCheap() }
+func (sme setByMapToEmpty[Elt]) Len() int         { return sme.theMap.Len() }
+
+func (sme setByMapToEmpty[Elt]) Has(elt Elt) bool {
+	_, had := sme.theMap.Get(elt)
+	return had
+}
+
+func (sme setByMapToEmpty[Elt]) Add(elt Elt) bool {
+	_, had := sme.theMap.Get(elt)
+	if had {
+		return false
+	}
+	sme.theMap.Put(elt, Empty{})
+	return true
+}
+
+func (sme setByMapToEmpty[Elt]) Remove(elt Elt) bool {
+	_, had := sme.theMap.Get(elt)
+	if !had {
+		return false
+	}
+	sme.theMap.Delete(elt)
+	return true
+}
+
+func (sme setByMapToEmpty[Elt]) Visit(visitor func(Elt) error) error {
+	return sme.theMap.Visit(func(pair Pair[Elt, Empty]) error {
+		return visitor(pair.First)
+	})
 }

@@ -18,6 +18,7 @@ package framework
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"strings"
 	"testing"
@@ -26,21 +27,55 @@ import (
 	"github.com/stretchr/testify/require"
 
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	kubernetesclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/yaml"
 
+	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
+	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	workloadcliplugin "github.com/kcp-dev/kcp/pkg/cliplugins/workload/plugin"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgesyncer "github.com/kcp-dev/edge-mc/pkg/syncer"
 )
+
+//go:embed testdata/*
+var embedded embed.FS
+
+var crdGVR = schema.GroupVersionResource{
+	Group:    "apiextensions.k8s.io",
+	Version:  "v1",
+	Resource: "customresourcedefinitions",
+}
+
+var clusterroleGVR = schema.GroupVersionResource{
+	Group:    "rbac.authorization.k8s.io",
+	Version:  "v1",
+	Resource: "clusterroles",
+}
+
+var clusterrolebindingGVR = schema.GroupVersionResource{
+	Group:    "rbac.authorization.k8s.io",
+	Version:  "v1",
+	Resource: "clusterrolebindings",
+}
+
+var apibindingGVR = schema.GroupVersionResource{
+	Group:    "apis.kcp.io",
+	Version:  "v1alpha1",
+	Resource: "apibindings",
+}
 
 type SyncerOption func(t *testing.T, fs *edgeSyncerFixture)
 
@@ -76,6 +111,9 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	upstreamRawConfig, err := sf.upstreamServer.RawConfig()
 	require.NoError(t, err)
 	_, kubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
+
+	// Modify root:compute so that Syncer can update deployment.status
+	modifyRootCompute(t, upstreamRawConfig)
 
 	syncerImage := framework.TestConfig.SyncerImage()
 	if useDeployedSyncer {
@@ -133,8 +171,59 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	syncerConfig := syncerConfigFromCluster(t, downstreamConfig, syncerID, syncerID)
 	downstreamKubeClient, err := kubernetesclient.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
-
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
+	require.NoError(t, err)
+
+	logicalConfig, upstreamKubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
+	upstreamKubeConfig, err := logicalConfig.ClientConfig()
+	require.NoError(t, err)
+	upstreamKubeClient, err := kubernetesclient.NewForConfig(upstreamKubeConfig)
+	require.NoError(t, err)
+	upstreamDynamicKubeClient, err := dynamic.NewForConfig(upstreamKubeConfig)
+	require.NoError(t, err)
+
+	var syncerConfigCRDUnst *unstructured.Unstructured
+	err = LoadFile("testdata/edge.kcp.io_syncerconfigs.yaml", embedded, &syncerConfigCRDUnst)
+	require.NoError(t, err)
+	t.Logf("Create SyncerConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
+	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), syncerConfigCRDUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	var apibindingUnst *unstructured.Unstructured
+	err = LoadFile("testdata/apibinding.yaml", embedded, &apibindingUnst)
+	require.NoError(t, err)
+	t.Log("Create apibinding (root:compute:kubernetes) in workspace.")
+	_, err = upstreamDynamicKubeClient.Resource(apibindingGVR).Create(context.Background(), apibindingUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		_, err := upstreamKubeClient.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for deployment crd to become active: %v", err)
+			return false
+		}
+		_, err = upstreamKubeClient.CoreV1().Services("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for service crd to become active: %v", err)
+			return false
+		}
+		_, err = upstreamKubeClient.CoreV1().Endpoints("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for endpoint crd to become active: %v", err)
+			return false
+		}
+		_, err = upstreamKubeClient.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for pods crd to become active: %v", err)
+			return false
+		}
+		return true
+	}, wait.ForeverTestTimeout, time.Millisecond*100)
+
+	upstreamConfig := sf.upstreamServer.BaseConfig(t)
+	upstreamDynamicClueterClient, err := kcpdynamic.NewForConfig(upstreamConfig)
+	require.NoError(t, err)
+	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
 	require.NoError(t, err)
 
 	return &appliedEdgeSyncerFixture{
@@ -142,10 +231,15 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 
 		SyncerConfig:                syncerConfig,
 		SyncerID:                    syncerID,
+		WorkspacePath:               sf.edgeSyncTargetPath,
 		DownstreamConfig:            downstreamConfig,
 		DownstreamKubeClient:        downstreamKubeClient,
 		DownstreamDynamicKubeClient: downstreamDynamicKubeClient,
 		DownstreamKubeconfigPath:    downstreamKubeconfigPath,
+		UpstreamConfig:              upstreamConfig,
+		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
+		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
+		UpstreamKubeconfigPath:      upstreamKubeconfigPath,
 	}
 }
 
@@ -157,6 +251,10 @@ func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFi
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	go func() {
+		sf.SyncerConfig.DownstreamConfig.Burst = 128
+		sf.SyncerConfig.DownstreamConfig.QPS = 128
+		sf.SyncerConfig.UpstreamConfig.Burst = 128
+		sf.SyncerConfig.UpstreamConfig.QPS = 128
 		err := edgesyncer.RunSyncer(ctx, sf.SyncerConfig, 1)
 		require.NoError(t, err, "syncer failed to start")
 	}()
@@ -173,15 +271,20 @@ func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFi
 type appliedEdgeSyncerFixture struct {
 	edgeSyncerFixture
 
-	SyncerConfig *edgesyncer.SyncerConfig
-	SyncerID     string
-
+	SyncerConfig  *edgesyncer.SyncerConfig
+	SyncerID      string
+	WorkspacePath logicalcluster.Path
 	// Provide cluster-admin config and client for test purposes. The downstream config in
 	// SyncerConfig will be less privileged.
 	DownstreamConfig            *rest.Config
 	DownstreamKubeClient        kubernetesclient.Interface
 	DownstreamDynamicKubeClient dynamic.Interface
 	DownstreamKubeconfigPath    string
+
+	UpstreamConfig            *rest.Config
+	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
+	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
+	UpstreamKubeconfigPath    string
 }
 
 // StartedEdgeSyncerFixture contains the configuration used to start a syncer and interact with its
@@ -239,4 +342,39 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 		SyncTargetUID:    "",
 		Interval:         time.Second * 3,
 	}
+}
+
+func modifyRootCompute(t *testing.T, upstreamRawConfig clientcmdapi.Config) {
+	// Write the upstream root:compute logical cluster config to disk for the workspace plugin
+	rootComputeClientConfig, _ := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", logicalcluster.NewPath("root:compute"))
+	rootComputeKubeconfig, err := rootComputeClientConfig.ClientConfig()
+	require.NoError(t, err)
+	rootComputeDynamicKubeClient, err := dynamic.NewForConfig(rootComputeKubeconfig)
+	require.NoError(t, err)
+
+	var clusterRoleUnst *unstructured.Unstructured
+	err = LoadFile("testdata/clusterrole.additional.yaml", embedded, &clusterRoleUnst)
+	require.NoError(t, err)
+	t.Log("Create additional clusterrole in root:compute workspace")
+	_, err = rootComputeDynamicKubeClient.Resource(clusterroleGVR).Create(context.Background(), clusterRoleUnst, v1.CreateOptions{})
+	if !apierrors.IsAlreadyExists(err) {
+		require.NoError(t, err)
+	}
+
+	var clusterRoleBindingUnst *unstructured.Unstructured
+	err = LoadFile("testdata/clusterrolebinding.additional.yaml", embedded, &clusterRoleBindingUnst)
+	require.NoError(t, err)
+	t.Log("Create additional clusterrolebinding in root:compute workspace")
+	_, err = rootComputeDynamicKubeClient.Resource(clusterrolebindingGVR).Create(context.Background(), clusterRoleBindingUnst, v1.CreateOptions{})
+	if !apierrors.IsAlreadyExists(err) {
+		require.NoError(t, err)
+	}
+}
+
+func LoadFile(path string, embedded embed.FS, v interface{}) error {
+	data, err := embedded.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(data, v)
 }

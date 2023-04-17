@@ -29,11 +29,11 @@ import (
 // a sorted slice of the sum of the uint8 and the float32.
 func TestAggregate(t *testing.T) {
 	factorer := NewFactorer(
-		func(whole uint16) Pair[uint8, uint8] { return NewPair(uint8(whole/256), uint8(whole%256)) },
+		func(whole uint16) Pair[uint8, uint8] { return NewPair(uint8(whole/10), uint8(whole%10)) },
 		func(parts Pair[uint8, uint8]) uint16 { return uint16(parts.First)*256 + uint16(parts.Second) })
 	valmap := func(right uint8, val float32) float64 { return float64(right) + float64(val) }
 	solve := func(left uint8, problem Map[uint8, float32]) []float64 {
-		slice := MapMapToSlice(problem, valmap)
+		slice := MapTransformToSlice(problem, valmap)
 		sort.Float64s(slice)
 		return slice
 	}
@@ -62,7 +62,7 @@ func TestAggregate(t *testing.T) {
 		for iteration := 1; iteration <= 100; iteration++ {
 			growness := 70 - iteration/2
 			if wholeMap.Len() == 0 || rand.Intn(100) < growness {
-				key := uint16(rand.Intn(1 << 16))
+				key := uint16(rand.Intn(100))
 				val := float32(rand.Intn(63)+1) / 64
 				wholeMap.Put(key, val)
 				fm.Put(key, val)

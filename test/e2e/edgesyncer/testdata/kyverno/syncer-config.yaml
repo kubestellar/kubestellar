@@ -1,0 +1,81 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  name: syncer-config
+spec:
+  namespaceScope:
+    namespaces:
+    - kyverno
+    - policy
+    resources:
+    - apiVersion: v1
+      group: ""
+      resource: serviceaccounts
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: services
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: roles
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+    - apiVersion: v1
+      group: kyverno.io
+      resource: policies
+  clusterScope:
+  - apiVersion: v1
+    group: apiextensions.k8s.io
+    resource: customresourcedefinitions
+    objects:
+    - admissionreports.kyverno.io
+    - backgroundscanreports.kyverno.io
+    - clusteradmissionreports.kyverno.io
+    - clusterbackgroundscanreports.kyverno.io
+    - clusterpolicies.kyverno.io
+    - clusterpolicyreports.wgpolicyk8s.io
+    - generaterequests.kyverno.io
+    - policies.kyverno.io
+    - policyreports.wgpolicyk8s.io
+    - updaterequests.kyverno.io
+  - apiVersion: v1
+    group: rbac.authorization.k8s.io
+    resource: clusterroles
+    objects:
+    - kyverno:admin-policies
+    - kyverno:admin-policyreport
+    - kyverno:admin-reports
+    - kyverno:admin-generaterequest
+    - kyverno:admin-updaterequest
+    - kyverno
+    - kyverno:userinfo
+    - kyverno:policies
+    - kyverno:view
+    - kyverno:generate
+    - kyverno:events
+    - kyverno:webhook
+  - apiVersion: v1
+    group: rbac.authorization.k8s.io
+    resource: clusterrolebindings
+    objects:
+    - kyverno
+  - apiVersion: v1
+    group: kyverno.io
+    resource: clusterpolicies
+    objects:
+    - "*"
+  upsync:
+  - apiGroup: wgpolicyk8s.io
+    resources:
+    - policyreports
+    - clusterpolicyreports
+    namespaces:
+    - policy
+    names:
+    - "*"

@@ -101,12 +101,14 @@ var downSyncedResource2 = edgev1alpha1.EdgeSyncConfigResource{
 	Namespace: "dns2",
 }
 
+type Expected struct {
+	downSyncedResources []edgev1alpha1.EdgeSyncConfigResource
+	upSyncedResources   []edgev1alpha1.EdgeSyncConfigResource
+	conversions         []edgev1alpha1.EdgeSynConversion
+}
+
 func TestSyncConfig(t *testing.T) {
-	type Expected struct {
-		downSyncedResources []edgev1alpha1.EdgeSyncConfigResource
-		upSyncedResources   []edgev1alpha1.EdgeSyncConfigResource
-		conversions         []edgev1alpha1.EdgeSynConversion
-	}
+	syncConfigManager := NewSyncConfigManager(klog.FromContext(context.TODO()))
 	tests := []struct {
 		description        string
 		op                 string
@@ -205,7 +207,7 @@ func TestSyncConfig(t *testing.T) {
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
 			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
-			controller, err := NewSyncConfigController(logger, syncConfigClient, syncConfigInformer, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
+			controller, err := NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigInformer, syncConfigManager, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
 			require.NoError(t, err)
 
 			syncConfigInformerFactory.Start(ctx.Done())

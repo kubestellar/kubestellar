@@ -31,9 +31,9 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	syncerclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	syncerinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
+	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
 	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
 )
@@ -62,19 +62,35 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	bootstrapConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
 
-	syncConfigClientSet, err := syncerclientset.NewForConfig(bootstrapConfig)
+	// For edgeSyncConfig
+	syncConfigClientSet, err := edgeclientset.NewForConfig(bootstrapConfig)
 	if err != nil {
 		return err
 	}
 	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
-	syncConfigInformerFactory := syncerinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
+	syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
 	syncConfigAccess := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
 
 	syncConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
 
 	syncConfigInformerFactory.Start(ctx.Done())
 	syncConfigInformerFactory.WaitForCacheSync(ctx.Done())
+
+	// For syncerConfig
+	syncerConfigClientSet, err := edgeclientset.NewForConfig(bootstrapConfig)
+	if err != nil {
+		return err
+	}
+	syncerConfigClient := syncerConfigClientSet.EdgeV1alpha1().SyncerConfigs()
+	// syncerConfigInformerFactory to watch a certain syncConfig on upstream
+	syncerConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncerConfigClientSet, resyncPeriod)
+	syncerConfigAccess := syncerConfigInformerFactory.Edge().V1alpha1().SyncerConfigs()
+
+	syncerConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
+
+	syncerConfigInformerFactory.Start(ctx.Done())
+	syncerConfigInformerFactory.WaitForCacheSync(ctx.Done())
 
 	upstreamConfig := rest.CopyConfig(cfg.UpstreamConfig)
 	rest.AddUserAgent(upstreamConfig, "edge-mc#syncer/"+kcpVersion)
@@ -83,7 +99,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
-	upstreamClientFactory, err := syncers.NewClientFactory(logger, upstreamDynamicClient, upstreamDiscoveryClient)
+	upstreamClientFactory, err := clientfactory.NewClientFactory(logger, upstreamDynamicClient, upstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
@@ -95,7 +111,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
-	downstreamClientFactory, err := syncers.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
+	downstreamClientFactory, err := clientfactory.NewClientFactory(logger, downstreamDynamicClient, downstreamDiscoveryClient)
 	if err != nil {
 		return err
 	}
@@ -109,17 +125,25 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
-	controller, err := controller.NewSyncConfigController(logger, syncConfigClient, syncConfigAccess, upSyncer, downSyncer, 5*time.Second)
+	syncConfigManager := controller.NewSyncConfigManager(logger)
+	syncConfigController, err := controller.NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigAccess, syncConfigManager, upSyncer, downSyncer, 5*time.Second)
 	if err != nil {
 		return err
 	}
 
-	go controller.Run(ctx, numSyncerThreads)
-	runSync(ctx, cfg, syncConfigAccess.Lister(), upSyncer, downSyncer)
+	syncerConfigManager := controller.NewSyncerConfigManager(logger, syncConfigManager, upstreamClientFactory, downstreamClientFactory)
+	syncerConfigController, err := controller.NewSyncerConfigController(logger, syncerConfigClient, syncerConfigAccess, syncerConfigManager, 5*time.Second)
+	if err != nil {
+		return err
+	}
+
+	go syncConfigController.Run(ctx, numSyncerThreads)
+	go syncerConfigController.Run(ctx, numSyncerThreads)
+	runSync(ctx, cfg, syncConfigManager, syncerConfigManager, upSyncer, downSyncer)
 	return nil
 }
 
-func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alpha1listers.EdgeSyncConfigLister, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
+func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controller.SyncConfigManager, syncerConfigManager *controller.SyncerConfigManager, upSyncer *syncers.UpSyncer, downSyncer *syncers.DownSyncer) {
 	logger := klog.FromContext(ctx)
 	logger.V(2).Info("Start sync")
 	interval := cfg.Interval
@@ -132,17 +156,35 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigLister edgev1alph
 			return
 		case <-time.Tick(interval):
 			logger.V(2).Info("Sync ")
-			for _, resource := range controller.GetDownSyncedResources() {
-				if err := downSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-				}
-				if err := downSyncer.BackStatusOne(resource, controller.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+			syncerConfigManager.Refresh()
+			_ = downSyncer.ReInitializeClients(syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
+			_ = upSyncer.ReInitializeClients(syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
+			for _, resource := range syncConfigManager.GetDownSyncedResources() {
+				if resource.Name == "*" {
+					if err := downSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to downsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+					if err := downSyncer.BackStatusMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to status upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+				} else {
+					if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+					if err := downSyncer.BackStatusOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
 				}
 			}
-			for _, resource := range controller.GetUpSyncedResources() {
-				if err := upSyncer.SyncOne(resource, controller.GetConversions()); err != nil {
-					logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+			for _, resource := range syncConfigManager.GetUpSyncedResources() {
+				if resource.Name == "*" {
+					if err := upSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
+				} else {
+					if err := upSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
+						logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+					}
 				}
 			}
 		}

@@ -53,7 +53,7 @@ type whatResolver struct {
 	logger     klog.Logger
 	numThreads int
 	queue      workqueue.RateLimitingInterface
-	receiver   MappingReceiver[ExternalName, WorkloadParts]
+	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
 	sync.Mutex
 
@@ -125,7 +125,7 @@ func NewWhatResolver(
 		dynamicClusterClient:      dynamicClusterClient,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
-	return func(receiver MappingReceiver[ExternalName, WorkloadParts]) Runnable {
+	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
 		wr.receiver = receiver
 		wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
 		if !upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
@@ -225,15 +225,19 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
 	wr.Lock()
 	defer wr.Unlock()
-	parts := wr.getPartsLocked(placement.Cluster, placement.Name)
-	kont(parts)
+	resolvedWhat := wr.getPartsLocked(placement.Cluster, placement.Name)
+	kont(resolvedWhat.Downsync)
 }
 
-func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName string) WorkloadParts {
+func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName string) ResolvedWhat {
 	parts := WorkloadParts{}
+	var upsyncs []edgeapi.UpsyncSet
 	wsDetails, found := wr.workspaceDetails[wldCluster]
 	if !found {
-		return parts
+		return ResolvedWhat{parts, upsyncs}
+	}
+	if ep, found := wsDetails.placements[epName]; found {
+		upsyncs = ep.Spec.Upsync
 	}
 	for _, rr := range wsDetails.resources {
 		for objName, objDetails := range rr.byObjName {
@@ -247,7 +251,7 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName st
 			parts[partID] = partDetails
 		}
 	}
-	return parts
+	return ResolvedWhat{parts, upsyncs}
 }
 
 func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements k8ssets.String) {
@@ -257,9 +261,9 @@ func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name,
 }
 
 func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName string) {
-	parts := wr.getPartsLocked(wldCluster, epName)
+	resolvedWhat := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
-	wr.receiver.Put(epRef, parts)
+	wr.receiver.Put(epRef, resolvedWhat)
 }
 
 func (wr *whatResolver) runWorker() {
@@ -614,7 +618,7 @@ outer:
 		if !(len(objSet.Resources) == 1 && objSet.Resources[0] == "*" || SliceContains(objSet.Resources, whatResource)) {
 			continue
 		}
-		if len(objSet.ResourceNames) == 1 && objSet.ResourceNames[9] == "*" || SliceContains(objSet.ResourceNames, objName) {
+		if len(objSet.ResourceNames) == 1 && objSet.ResourceNames[0] == "*" || SliceContains(objSet.ResourceNames, objName) {
 			matches = true
 			break outer
 		}
@@ -677,7 +681,7 @@ var GRsNaturedInBoth = NewMapSet(
 	mkgr("", "namespaces"),
 )
 
-var NaturedInCenterNoGo = NewMapSet(
+var NaturedInCenterGoToMailbox = NewMapSet(
 	mkgr("apis.kcp.io", "apibindings"),
 )
 
@@ -724,8 +728,8 @@ func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
 		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
 	case GRsNaturedInBoth.Has(sgr):
 		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
-	case NaturedInCenterNoGo.Has(sgr):
-		return ResourceMode{TolerateInCenter, NaturallyNatured, builtin}
+	case NaturedInCenterGoToMailbox.Has(sgr):
+		return ResourceMode{GoesToMailbox, NaturallyNatured, builtin}
 	case GRsNotSupported.Has(sgr):
 		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
 	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):

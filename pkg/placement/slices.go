@@ -16,9 +16,30 @@ limitations under the License.
 
 package placement
 
+import (
+	"fmt"
+	"strings"
+)
+
+func SliceCopy[Elt any](original []Elt) []Elt {
+	if original == nil {
+		return original
+	}
+	return append([]Elt{}, original...)
+}
+
 func SliceContains[Elt comparable](slice []Elt, seek Elt) bool {
 	for _, elt := range slice {
 		if elt == seek {
+			return true
+		}
+	}
+	return false
+}
+
+func SliceContainsParametric[Elt any](isEqual func(Elt, Elt) bool, slice []Elt, seek Elt) bool {
+	for _, elt := range slice {
+		if isEqual(elt, seek) {
 			return true
 		}
 	}
@@ -53,8 +74,8 @@ func SliceApply[Elt any](slice []Elt, fn func(Elt)) {
 	}
 }
 
-func SetToSlice[Elt comparable](set Set[Elt]) []Elt {
-	ans := make([]Elt, 0, set.Len())
+func VisitableToSlice[Elt any](set Visitable[Elt]) []Elt {
+	ans := []Elt{}
 	set.Visit(func(elt Elt) error {
 		ans = append(ans, elt)
 		return nil
@@ -62,20 +83,49 @@ func SetToSlice[Elt comparable](set Set[Elt]) []Elt {
 	return ans
 }
 
-func SetMapToSlice[Original comparable, Mapped any](set Set[Original], mapfn func(Original) Mapped) []Mapped {
-	ans := make([]Mapped, 0, set.Len())
+// VisitableStringer wraps a given set with particular String() behavior.
+// NB: you only want to apply this to a set that is safe for concurrent access,
+// and you probably only want to apply it to an immutable set.
+func VisitableStringer[Elt any](set Visitable[Elt]) VisitableStringerVal[Elt] {
+	return VisitableStringerVal[Elt]{set}
+}
+
+type VisitableStringerVal[Elt any] struct {
+	set Visitable[Elt]
+}
+
+func (vs VisitableStringerVal[Elt]) String() string {
+	var ans strings.Builder
+	ans.WriteRune('{')
+	first := true
+	vs.set.Visit(func(elt Elt) error {
+		if first {
+			first = false
+		} else {
+			ans.WriteString(", ")
+		}
+		eltStr := fmt.Sprintf("%v", elt)
+		ans.WriteString(eltStr)
+		return nil
+	})
+	ans.WriteRune('}')
+	return ans.String()
+}
+
+func VisitableTransformToSlice[Original, Transformed any](set Visitable[Original], xform func(Original) Transformed) []Transformed {
+	ans := []Transformed{}
 	set.Visit(func(elt Original) error {
-		mapped := mapfn(elt)
+		mapped := xform(elt)
 		ans = append(ans, mapped)
 		return nil
 	})
 	return ans
 }
 
-func MapMapToSlice[Key comparable, Val, Mapped any](theMap Map[Key, Val], mapfn func(Key, Val) Mapped) []Mapped {
-	ans := make([]Mapped, 0, theMap.Len())
+func MapTransformToSlice[Key, Val, Transformed any](theMap Map[Key, Val], xform func(Key, Val) Transformed) []Transformed {
+	ans := make([]Transformed, 0, theMap.Len())
 	theMap.Visit(func(tup Pair[Key, Val]) error {
-		mapped := mapfn(tup.First, tup.Second)
+		mapped := xform(tup.First, tup.Second)
 		ans = append(ans, mapped)
 		return nil
 	})
