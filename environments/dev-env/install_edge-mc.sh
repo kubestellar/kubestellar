@@ -229,7 +229,7 @@ fi
 
 
 kubectl ws root:espw
-go run ./cmd/mailbox-controller --inventory-context=shard-main-root -v=2 >& environments/dev-env/mailbox-controller-log.txt &
+go run ./cmd/mailbox-controller --inventory-context=shard-main-root --mbws-context=shard-main-base -v=2 >& environments/dev-env/mailbox-controller-log.txt &
 
 run_status=$(wait_for_process mailbox-controller)
 if [ $run_status -eq 0 ]; then
@@ -262,7 +262,7 @@ if [ $stage -eq 0 ] || [ $stage -gt 2 ]; then
     # (8): Start the Placement Translator
     sleep 3
     kubectl ws root:espw
-    go run ./cmd/placement-translator --allclusters-context  "shard-main-system:admin" >& environments/dev-env/placement-translator-log.txt &
+    go run ./cmd/placement-translator --allclusters-context  "shard-main-system:admin" -v=2 >& environments/dev-env/placement-translator-log.txt &
 
     run_status=$(wait_for_process placement-translator)
     if [ $run_status -eq 0 ]; then
