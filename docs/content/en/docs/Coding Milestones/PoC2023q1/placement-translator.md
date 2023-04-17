@@ -119,30 +119,26 @@ $ kubectl create -f config/exports
 ```
 
 Continue to follow the steps until the start of Stage 3 of the
-exercise.  Because the mailbox controller does not yet install the
-needed `APIBinding` objects into the mailbox workspaces, you will have
-to do that by hand.  In each mailbox workspace, do the following.
-
-```shell
-kubectl create -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-edge
-spec:
-  reference:
-    export:
-      name: edge.kcp.io
-      path: root:espw
-EOF
-```
+exercise.
 
 Next make sure you run `kubectl ws root:espw` to enter the edge
-service provider workspace, then just run the placement translator
-from the command line.  That should look like the following (possibly
-including some complaints, which do not necessarily indicate real
-problems because the subsequent success is not logged so
-profligately).
+service provider workspace, then you will be ready to run the edge
+controllers.
+
+First run the mailbox controller, long for it to create the mailbox
+workspaces; it does not need to keep running, you can ^C it.  This
+should not take long, and do not expect an explicit ackowledgement on
+the console.  You can check for their existence by doing `kubectl get
+workspaces` while in the ESPW.
+
+Next run the scheduler, long enough for it to create the
+SinglePlacementSlice objects.  Again, this should not take long, and
+you can ^C the scheduler once it has created those objects.
+
+Finally run the placement translator from the command line.  That
+should look like the following (possibly including some complaints,
+which do not necessarily indicate real problems because the subsequent
+success is not logged so profligately).
 
 ```console
 $ go run ./cmd/placement-translator
