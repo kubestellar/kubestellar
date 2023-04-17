@@ -6,16 +6,14 @@ description: >
 ---
 
 {{% pageinfo %}}
-The placement translator runs in the edge service provider workspace and translates EMC placement problems to TMC placement problems.
+The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 {{% /pageinfo %}}
 
 ## Status
 
-The placement translator is a work in progress.  The functionality of
-maintaining syncer config objects is starting to work, but is still
-rough around the edges.  The functionality of propagating objects from
-workload management workspace to mailbox workspace is not there yet.
-This document includes a brief exercise of the current code.
+The placement translator is a work in progress.  It maintains
+`SyncerConfig` objects and downsynced objects in mailbox workspaces,
+albeit with limitations discussed in the next section.
 
 ## Additional Design Details
 
@@ -23,6 +21,58 @@ The placement translator maintains one `SyncerConfig` object in each
 mailbox workspace.  That object is named `the-one`.  Other
 `SyncerConfig` objects may exist; the placement translator ignores
 them.
+
+The placement translator responds to each resource discovery
+independently.  This makes the behavior jaggy and the logging noisy.
+For example, it means that the `SyncerConfig` objects may be rewritten
+for each resource discovery.  But eventually the right things happen.
+
+The placement translator does not yet attempt the full prescribed
+technique for picking the API version to use when reading and writing.
+Currently it looks only at the preferred version reported in each
+workload management workspace, and only succeeds if they all agree.
+
+One detail left vague in the design outline is what constitutes the
+"desired state" that propagates from center to edge.  The easy obvious
+answer is the "spec" section of downsynced objects, but that answer
+ignores some issues.  Following is the current full answer.
+
+When creating a workload object in a mailbox workspace, the placement
+translator uses a copy of the object read from the workload management
+workspace but with the following changes.
+
+- The `metadata.managedFields` is emptied.
+- The `metadata.resourceVersion` is emptied.
+- The `metadata.selfLlink` is emptied.
+- The `metadata.uid` is emptied.
+- The `metadata.ownerReferences` is emptied.  (Doing better would
+  require tracking UID mappings from WMW to MBWS.)
+
+The placement translator does not react to changes to the workload
+objects in the mailbox workspace.
+
+When downsyncing desired state and the placement translator finds the
+object already exists in the mailbox workspace, the placement
+translator does an HTTP PUT (`Update` in the
+`k8s.io/client-go/dynamic` package) using an object value --- called
+below the "destination" object --- constructed by reading the object
+from the MBWS and making the following changes.
+
+- For top-level sections in the source object other than `apiVersion`,
+  `kind`, `metadata`, and `status`, the destination object gets the
+  same contents for that section.
+- If the source object has some annotations then they are merged into
+  the destination object annotations as follows.
+  - A destination annotation that has no corresponding annotation in
+    the source is unchanged.
+  - A destination annotation that has the same value as the
+    corresponding annotation in the source is unchanged.
+  - A "system" annnotation is unchanged.  The system annotations are
+    those whose key (a) starts with `kcp.io/` or other stuff followed
+    by `.kcp.io/` and (b) does not start with `edge.kcp.io/`.
+- If the source object has some labels then they are merged into the
+  destination object using the same rules as for annotations.
+- The remainder of the `metadata` is unchanged.
 
 ## Usage
 
@@ -69,30 +119,26 @@ $ kubectl create -f config/exports
 ```
 
 Continue to follow the steps until the start of Stage 3 of the
-exercise.  Because the mailbox controller does not yet install the
-needed `APIBinding` objects into the mailbox workspaces, you will have
-to do that by hand.  In each mailbox workspace, do the following.
-
-```shell
-kubectl create -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-edge
-spec:
-  reference:
-    export:
-      name: edge.kcp.io
-      path: root:espw
-EOF
-```
+exercise.
 
 Next make sure you run `kubectl ws root:espw` to enter the edge
-service provider workspace, then just run the placement translator
-from the command line.  That should look like the following (possibly
-including some complaints, which do not necessarily indicate real
-problems because the subsequent success is not logged so
-profligately).
+service provider workspace, then you will be ready to run the edge
+controllers.
+
+First run the mailbox controller, long for it to create the mailbox
+workspaces; it does not need to keep running, you can ^C it.  This
+should not take long, and do not expect an explicit ackowledgement on
+the console.  You can check for their existence by doing `kubectl get
+workspaces` while in the ESPW.
+
+Next run the scheduler, long enough for it to create the
+SinglePlacementSlice objects.  Again, this should not take long, and
+you can ^C the scheduler once it has created those objects.
+
+Finally run the placement translator from the command line.  That
+should look like the following (possibly including some complaints,
+which do not necessarily indicate real problems because the subsequent
+success is not logged so profligately).
 
 ```console
 $ go run ./cmd/placement-translator
