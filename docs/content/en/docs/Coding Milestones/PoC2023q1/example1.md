@@ -646,12 +646,6 @@ metadata:
   resourceVersion: "1653"
   uid: 47843727-bbe8-4660-8c25-4566fc0b6d70
 spec:
-  clusterScope:
-  - apiVersion: v1alpha1
-    group: apis.kcp.io
-    objects:
-    - bind-kube
-    resource: apibindings
   namespaceScope:
     namespaces:
     - commonstuff
