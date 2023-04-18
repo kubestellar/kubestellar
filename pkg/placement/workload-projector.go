@@ -75,6 +75,7 @@ const FieldManager = "placement-translator"
 func NewWorkloadProjector(
 	ctx context.Context,
 	configConcurrency int,
+	resourceModes ResourceModes,
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
 	syncfgClusterInformer kcpcache.ScopeableSharedIndexInformer,
@@ -88,6 +89,7 @@ func NewWorkloadProjector(
 		// delay:                 2 * time.Second,
 		ctx:                   ctx,
 		configConcurrency:     configConcurrency,
+		resourceModes:         resourceModes,
 		queue:                 workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
 		mbwsLister:            mbwsLister,
 		syncfgClusterInformer: syncfgClusterInformer,
@@ -290,6 +292,7 @@ var _ Runnable = &workloadProjector{}
 type workloadProjector struct {
 	ctx                   context.Context
 	configConcurrency     int
+	resourceModes         ResourceModes
 	delay                 time.Duration // to slow down for debugging
 	queue                 workqueue.RateLimitingInterface
 	mbwsLister            tenancyv1a1listers.WorkspaceLister
@@ -1168,7 +1171,7 @@ type syncerConfigSpecRelations struct {
 }
 
 func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) syncerConfigSpecRelations {
-	logger := klog.FromContext(wp.ctx)
+	logger := klog.FromContext(wp.ctx).WithValues("destination", destination)
 	wp.Lock()
 	defer wp.Unlock()
 	nsds, have := wp.nsDistributionsForSync.GetIndex1to2().Get(destination)
@@ -1185,14 +1188,14 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 	if haveDists {
 		nsms, haveModes := wp.nsModesForSync.GetIndex().Get(destination)
 		if !haveModes {
-			logger.Error(nil, "No ProjectionModeVals for namespaced resources", "destination", destination)
+			logger.Error(nil, "No ProjectionModeVals for namespaced resources")
 			nsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
 		nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
 		ans.namespacedResources = MapSetCopy(TransformVisitable[metav1.GroupResource, edgeapi.NamespaceScopeDownsyncResource](nsrs, func(gr metav1.GroupResource) edgeapi.NamespaceScopeDownsyncResource {
 			pmv, ok := nsms.Get(gr)
 			if !ok {
-				logger.Error(nil, "Missing API group version info", "groupResource", gr, "destination", destination)
+				logger.Error(nil, "Missing API group version info", "groupResource", gr)
 			}
 			return edgeapi.NamespaceScopeDownsyncResource{GroupResource: gr, APIVersion: pmv.APIVersion}
 		}))
@@ -1203,15 +1206,20 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 	if haveDists {
 		nnsms, haveModes := wp.nnsModesForSync.GetIndex().Get(destination)
 		if !haveModes {
-			logger.Error(nil, "No ProjectionModeVals for cluster-scoped resources", "destination", destination)
+			logger.Error(nil, "No ProjectionModeVals for cluster-scoped resources")
 			nnsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
 		objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
 		objs.Visit(func(gri GroupResourceInstance) error {
 			gr := gri.First
+			rscMode := wp.resourceModes(gr)
+			if !rscMode.GoesToEdge() {
+				logger.V(5).Info("Omitting cluster-scoped resource from SyncerConfig because it does not go to edge clusters", "groupResource", gr)
+				return nil
+			}
 			pmv, ok := nnsms.Get(gr)
 			if !ok {
-				logger.Error(nil, "Missing API version", "obj", gri, "destination", destination)
+				logger.Error(nil, "Missing API version", "obj", gri)
 			}
 			cso := MapGetAdd[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](ans.clusterScopedObjects, gr,
 				true, func(metav1.GroupResource) Pair[ProjectionModeVal, MutableSet[string /*object name*/]] {
