@@ -542,8 +542,8 @@ following resolutions of the "where" predicates.
 | edge-placement-s | guilder |
 
 Eventually there will be automation that conveniently runs the edge
-scheduler.  In the meantime, you can run it by hand wit a command like
-the following.
+scheduler.  In the meantime, you can run it by hand with a command
+like the following.
 
 ```console
 $ kubectl ws root:espw
