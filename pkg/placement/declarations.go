@@ -388,6 +388,18 @@ func (rscMode ResourceMode) GoesToMailbox() bool {
 	}
 }
 
+// GoesToEdge tells whether objects of this sort can downsync all the way to the edge cluster
+func (rscMode ResourceMode) GoesToEdge() bool {
+	switch rscMode.PropagationMode {
+	case ErrorInCenter, TolerateInCenter, GoesToMailbox:
+		return false
+	case GoesToEdge:
+		return true
+	default:
+		panic(rscMode)
+	}
+}
+
 func SPMailboxWorkspaceName(sp SinglePlacement) string {
 	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
 }
