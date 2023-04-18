@@ -136,8 +136,17 @@ authorizations in the center that are not needed and are undesired in
 a well-secured environment but tolerable in early demonstrations ---
 provided that there is not a conflict with an object of the same name
 that is positively desired in the center.  In particular, these are:
-`ClusterRole`, `ClusterRoleBinding`, `Role`, `RoleBinding`,
-`ServiceAccount`.
+`ClusterRole`, `ClusterRoleBinding`, `Role`, `RoleBinding`, and,
+depending on the Kubernetes release and usage style, `ServiceAccount`.
+The extra consideration for `ServiceAccount` is when an associated
+`Secret` is a natural consequence.  However, that is not a practical
+problem because such `Secret` objects are recognized as system
+infrastructure (see [below](#system-infrastructure-objects)).  Another
+consideration for `ServiceAccount` objects, as for `Secret` and
+`ConfigMap` objects, is that some are in some sense "reverse-natured":
+some are created by some other thing as part of the nature of that
+other thing (object or external system).  Another way of looking at
+these particular objects is that they are system infrastructure.
 
 For some kinds of object, lack of denaturing/renaturing means that
 edge-mc will simply not be able to support workloads that contain such
@@ -404,6 +413,25 @@ this category.
 | v1 | ReplicationController | true |
 | v1 | Secret | true |
 | v1 | Service | true |
+
+Note that some `ConfigMap` and `Secret` objets are treated
+differently, as explained in the next section.
+
+#### System infrastructure objects
+
+Even in a kcp workspace, some certain objects --- called here "system
+infrastructure objects" --- are created as a consequence of certain
+other objects or things.  The system infrastructure objects are
+tolerated in the center and do not propagate toward the edge.  Here is
+an initial list of system infrastructure objects:
+
+- `Secret` objects whose _type_ is
+  `kubernetes.io/service-account-token` (these are automatically
+  created to support a `ServiceAccount` in some circumstances) or
+  `bootstrap.kubernetes.io/token`;
+- `ConfigMap` objects named `kube-root-ca.crt`;
+- `ServiceAcount` objects named `default` (these are automatically
+  created as a consequence of a namespace being created).
 
 ### Built-in resources and namespaces
 
