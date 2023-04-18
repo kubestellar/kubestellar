@@ -395,7 +395,7 @@ spec:
     names: ["george", "cosmo"]
   - apiGroup: "group2.test"
     resources: ["cogs"]
-    names: ["William"]
+    names: ["william"]
 EOF
 ```
 
@@ -689,7 +689,7 @@ spec:
   upsync:
   - apiGroup: group2.test
     names:
-    - William
+    - william
     resources:
     - cogs
   - apiGroup: group1.test
