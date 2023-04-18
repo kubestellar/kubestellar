@@ -389,7 +389,7 @@ spec:
     resources: [ "apibindings" ]
     resourceNames: [ "bind-kube" ]
   upsync:
-  - apiGroup: "greoup1.test"
+  - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
     namespaces: ["orbital"]
     names: ["george", "cosmo"]
@@ -520,7 +520,7 @@ spec:
     resources: [ "apibindings" ]
     resourceNames: [ "bind-kube" ]
   upsync:
-  - apiGroup: "greoup1.test"
+  - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
     namespaces: ["orbital"]
     names: ["george", "cosmo"]
@@ -692,7 +692,7 @@ spec:
     - William
     resources:
     - cogs
-  - apiGroup: greoup1.test
+  - apiGroup: group1.test
     names:
     - george
     - cosmo
