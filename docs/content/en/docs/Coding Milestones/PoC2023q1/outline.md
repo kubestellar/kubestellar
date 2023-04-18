@@ -431,7 +431,7 @@ an initial list of system infrastructure objects:
   `bootstrap.kubernetes.io/token`;
 - `ConfigMap` objects named `kube-root-ca.crt`;
 - `ServiceAcount` objects named `default` (these are automatically
-  created created as a consequence of a namespace being created).
+  created as a consequence of a namespace being created).
 
 ### Built-in resources and namespaces
 
