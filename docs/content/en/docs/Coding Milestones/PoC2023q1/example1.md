@@ -74,8 +74,8 @@ paying attention to `$KUBECONFIG` and, if that's empty,
 "context" in your active kubeconfig.
 
 ```shell
-$ kind create cluster --name florin --config florin-config.yaml
-$ kind create cluster --name guilder --config guilder-config.yaml
+kind create cluster --name florin --config florin-config.yaml
+kind create cluster --name guilder --config guilder-config.yaml
 ```
 
 ### Start kcp
@@ -94,17 +94,20 @@ It is also assumed that you have the usual kcp kubectl plugins on your
 
 ### Create an inventory management workspace.
 
+Use the following commands.
+
 ```shell
-$ kubectl ws root
-$ kubectl ws create inv1 --enter
+kubectl ws root
+kubectl ws create imw-1 --enter
 ```
 
 ### Create a SyncTarget object to represent the florin cluster
 
-Use `kubectl` to create the following SyncTarget object:
+Use `kubectl` to create the SyncTarget object, as in the following
+command.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -120,10 +123,11 @@ EOF
 
 ### Create a Location object describing the florin cluster
 
-Use `kubectl` to create the following Location object.
+Use `kubectl` to create the Location object, as in the following
+command.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
@@ -150,10 +154,11 @@ kubectl delete locations default
 
 ### Create a SyncTarget object describing the guilder cluster
 
-Use `kubectl` to create the following SyncTarget object.
+Use `kubectl` to create the SyncTarget object, like in the following
+command.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -169,10 +174,11 @@ EOF
 
 ### Create a Location object describing the guilder cluster
 
-Use `kubectl` to create the following Location object.
+Use `kubectl` to create the Location object, such as with the
+following command.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
@@ -189,30 +195,56 @@ EOF
 
 ### Create the edge service provider workspace
 
+Use the following commands.
+
 ```shell
-$ kubectl ws root
-$ kubectl ws create espw --enter
+kubectl ws root
+kubectl ws create espw --enter
 ```
 
 ### Populate the edge service provider workspace
 
-This creates the controllers and APIExports from the edge service
-provider workspace.
+This puts the definition and export of the edge-mc API in the edge
+service provider workspace.
 
-This will be wrapped up into a single command, still to be designed.
-It will include creating the objects in the `config/crds` and
-`config/exports` directories of the edge-mc repo.
-
-### The mailbox controller will create two mailbox workspaces
-
-That is, one for each SyncTarget.  After that is done (TODO: show how),
-check it out as follows.
+Use the following commands.
 
 ```shell
-$ kubectl get workspaces
+kubectl create -f config/crds
+kubectl create -f config/exports
+```
+
+### The mailbox controller
+
+Running the mailbox controller will be conveniently automated.
+Eventually.  In the meantime, you can run it by hand as follows.
+
+```console
+$ go run ./cmd/mailbox-controller -v=2
+...
+I0418 00:06:33.600117    6576 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
+...
+I0418 00:06:34.361128    6576 controller.go:299] "Created APIBinding" worker=1 mbwsName="2rp1gztc6m5b8b7r-mb-31e5fa4d-a84e-4397-a523-63fa62d16dad" mbwsCluster="1b0eso4ld8np1d3z" bindingName="bind-edge" resourceVersion="1303"
+I0418 00:06:34.361216    6576 controller.go:299] "Created APIBinding" worker=2 mbwsName="2rp1gztc6m5b8b7r-mb-58f7e799-4653-422b-adba-b1e5e85a7fac" mbwsCluster="2gqno7cdbsthqsmz" bindingName="bind-edge" resourceVersion="1305"
+^C
+```
+
+You need a `-v` setting of 2 or numerically higher to get log messages
+about individual mailbox workspaces.
+
+This controller creates a mailbox workspace for each SyncTarget and
+puts an APIBinding to the edge API in each of those mailbox
+workspaces.  For this simple scenario, you do not need to keep this
+controller running after it does those things (hence the `^C` above);
+normally it would run continuously.
+
+You can get a listing of those mailbox workspaces as follows.
+
+```console
+$ kubectl get Workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
-niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
-niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a   universal            Ready   https://192.168.58.123:6443/clusters/dead3333beef3333   22s
+2rp1gztc6m5b8b7r-mb-31e5fa4d-a84e-4397-a523-63fa62d16dad   universal            Ready   https://192.168.58.123:6443/clusters/1b0eso4ld8np1d3z   4m56s
+2rp1gztc6m5b8b7r-mb-58f7e799-4653-422b-adba-b1e5e85a7fac   universal            Ready   https://192.168.58.123:6443/clusters/2gqno7cdbsthqsmz   4m56s
 ```
 
 ## Stage 2
@@ -232,21 +264,23 @@ One of the workloads is called "common", because it will go to both
 edge clusters.
 
 Create the "common" workload management workspace with the following
-commands.
+commands.  For the sake of orderliness we choose to keep the two
+workload management workspaces under a common parent.
 
 ```shell
-$ kubectl ws root
-$ kubectl ws create work-c --enter
+kubectl ws root
+kubectl ws create my-org --enter
+kubectl ws create wmw-c --enter
 ```
 
 Next, make sure that the Kubernetes workload APIs are available in
 this workspace.  In a freshly created workspace of the expected type
-(`root:organization` in this case), the Kube workload APIs would not
-yet be available.  Use `kubectl` to create the following APIBinding
-object --- which enables use of those Kubernetes APIs.
+(`root:universal` in this case), the Kube workload APIs would not yet
+be available.  Use `kubectl` to create the following APIBinding object
+--- which enables use of those Kubernetes APIs.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -265,7 +299,7 @@ that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -321,7 +355,7 @@ Before or after the previous step, use `kubectl` to create the
 following APIBinding object --- which enables use of the edge API.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -340,7 +374,7 @@ selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.
    
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: edge.kcp.io/v1alpha1
 kind: EdgePlacement
 metadata:
@@ -371,8 +405,8 @@ Use `kubectl` to create the workload management workspace for the
 special workload, using the following commands.
 
 ```shell
-kubectl ws root
-kubectl ws create work-s --enter
+kubectl ws root:my-org
+kubectl ws create wmw-s --enter
 ```
 
 Next, make sure that the Kubernetes workload APIs are available in
@@ -380,7 +414,7 @@ this workspace.  Use `kubectl` to create the following APIBinding
 object --- which enables use of those Kubernetes APIs.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -396,7 +430,7 @@ EOF
 Next, use `kubectl` to create the following workload objects in that workspace.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -452,7 +486,7 @@ Before or after the previous step, use `kubectl` to create the
 following APIBinding object --- which enables use of the edge API.
 
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -471,7 +505,7 @@ selector that matches only one of the Location objects created
 earlier, thus directing the special workload to just one edge cluster.
    
 ```shell
-cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
 apiVersion: edge.kcp.io/v1alpha1
 kind: EdgePlacement
 metadata:
@@ -507,10 +541,31 @@ following resolutions of the "where" predicates.
 | edge-placement-c | florin, guilder |
 | edge-placement-s | guilder |
 
+Eventually there will be automation that conveniently runs the edge
+scheduler.  In the meantime, you can run it by hand wit a command like
+the following.
+
+```console
+$ kubectl ws root:espw
+Current workspace is "root:espw".
+$ go run ./cmd/scheduler
+I0418 00:23:58.516391    6754 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/2mk49qlwexsf0dbl/edge.kcp.io"
+...
+I0418 00:23:58.787650    6754 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="2rp1gztc6m5b8b7r|location-g" locationWorkspace="2rp1gztc6m5b8b7r" location="location-g" workloadWorkspace="29qof7rv6tzefi7b" singlePlacementSlice="edge-placement-c"
+...
+I0418 00:23:58.790090    6754 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="2rp1gztc6m5b8b7r|location-f" locationWorkspace="2rp1gztc6m5b8b7r" location="location-f" workloadWorkspace="29qof7rv6tzefi7b" singlePlacementSlice="edge-placement-c"
+^C
+```
+
+In this simple scenario you do not need to keep the scheduler running
+after it gets its initial work done; normally it would run
+continually.
+
 Check out the SinglePlacementSlice objects as follows.
 
-```shell
-$ kubectl ws root:work-c
+```console
+$ kubectl ws root:my-org:wmw-c
+Current workspace is "root:my-org:wmw-c".
 $ kubectl get SinglePlacementSlice -o yaml
 apiVersion: v1
 items:
@@ -543,9 +598,9 @@ metadata:
   resourceVersion: ""
 ```
 
-Also check out the SinglePlacementSlice objects in `root:work-s`.  It
-should go similarly, but the `destinations` should include only the
-entry for florin.
+Also check out the SinglePlacementSlice objects in
+`root:my-org:wmw-s`.  It should go similarly, but the `destinations`
+should include only the entry for florin.
 
 ## Stage 3
 
@@ -554,34 +609,134 @@ entry for florin.
 
 In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
-into the mailbox workspaces and create TMC placement objects there.
+into the mailbox workspaces and create `SyncerConfig` objects there.
 
 TODO later: add customization
 
-The florin cluster gets only the common workload.  Examine florin's TMC
-Placement object and common workload as follows.
+Eventually there will be convenient automation running the placement
+translator.  In the meantime, you can run it manually as follows.
+
+```console
+$ kubectl ws root:espw
+Current workspace is "root:espw".
+$ go run ./cmd/placement-translator
+I0418 00:32:49.789575    6849 shared_informer.go:282] Waiting for caches to sync for placement-translator
+...
+```
+
+After it stops logging stuff, wait another minute and then you can ^C
+it or use another shell to continue exploring.
+
+The florin cluster gets only the common workload.  Examine florin's
+`SyncerConfig` as follows.
 
 ```shell
-$ kubectl ws root:espw:niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368
-$ kubectl get Placement -o yaml
-TODO: show what it looks like
+$ kubectl ws 2rp1gztc6m5b8b7r-mb-58f7e799-4653-422b-adba-b1e5e85a7fac
+Current workspace is "root:espw:2rp1gztc6m5b8b7r-mb-58f7e799-4653-422b-adba-b1e5e85a7fac" (type root:universal).
+
+$ kubectl get SyncerConfig the-one -o yaml
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  annotations:
+    kcp.io/cluster: 2gqno7cdbsthqsmz
+  creationTimestamp: "2023-04-18T04:32:50Z"
+  generation: 4
+  name: the-one
+  resourceVersion: "1653"
+  uid: 47843727-bbe8-4660-8c25-4566fc0b6d70
+spec:
+  clusterScope:
+  - apiVersion: v1alpha1
+    group: apis.kcp.io
+    objects:
+    - bind-kube
+    resource: apibindings
+  namespaceScope:
+    namespaces:
+    - commonstuff
+    resources:
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: roles
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+    - apiVersion: v1
+      group: ""
+      resource: serviceaccounts
+    - apiVersion: v1
+      group: networking.k8s.io
+      resource: ingresses
+    - apiVersion: v1
+      group: ""
+      resource: resourcequotas
+    - apiVersion: v1
+      group: ""
+      resource: services
+    - apiVersion: v1
+      group: ""
+      resource: limitranges
+    - apiVersion: v1
+      group: ""
+      resource: pods
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+    - apiVersion: v1
+      group: coordination.k8s.io
+      resource: leases
+  upsync:
+  - apiGroup: group2.test
+    names:
+    - William
+    resources:
+    - cogs
+  - apiGroup: greoup1.test
+    names:
+    - george
+    - cosmo
+    namespaces:
+    - orbital
+    resources:
+    - sprockets
+    - flanges
+status: {}
+```
+
+You can check that the workload got there too.
+
+```console
 $ kubectl get ns
-(will list the syncer workspace and specialstuff)
-$ kubectl get Deployment -A
-(will list the syncer and speciald Deployments)
+NAME          STATUS   AGE
+commonstuff   Active   6m34s
+default       Active   32m
+
+$ kubectl get deployments -A
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff   commond   0/0     0            0           6m44s
 ```
 
 The guilder cluster gets both the common and special workloads.
 Examine guilder's TMC Placement object and workloads as follows.
 
-```shell
-$ kubectl ws root:espw:niqdko2g2pwoadfb-mb-c5820696-016b-41f6-b676-d7c0ef02fc5a
-$ kubectl get Placement -o yaml
-TODO: show what it looks like
-$ kubectl get ns
-(will list the syncer workspace, commonstuff, and specialstuff)
-$ kubectl get Deployment -A
-(will list the syncer, commond, and speciald Deployments)
+```console
+$ kubectl ws root:espw
+Current workspace is "root:espw".
+
+$ kubectl ws 2rp1gztc6m5b8b7r-mb-31e5fa4d-a84e-4397-a523-63fa62d16dad
+Current workspace is "root:espw:2rp1gztc6m5b8b7r-mb-31e5fa4d-a84e-4397-a523-63fa62d16dad" (type root:universal).
+
+$ kubectl get deployments -A
+NAMESPACE      NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff    commond    0/0     0            0           8m26s
+specialstuff   speciald   0/0     0            0           8m26s
 ```
 
 ## Stage 4
@@ -603,7 +758,7 @@ workload.
 Using the kubeconfig that `kind` modified, examine the florin cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
-```shell
+```console
 $ kubectl get --context kind-florin ns | grep stuff         
 commonstuff          Active   8h
 
@@ -615,7 +770,7 @@ commond   1/1     1            1           8h
 Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.
 
-```shell
+```console
 $ kubectl get --context kind-guilder ns | grep stuff
 commonstuff          Active   8h
 specialstuff         Active   8h
@@ -627,7 +782,7 @@ specialstuff         speciald                 1/1     1            1           8
 
 Check that the common workload on the florin cluster is working.
 
-```shell
+```console
 $ curl http://localhost:8081
 <!DOCTYPE html>
 <html>
@@ -639,7 +794,7 @@ $ curl http://localhost:8081
 
 Check that the special workload on the guilder cluster is working.
 
-```shell
+```console
 $ curl http://localhost:8082
 <!DOCTYPE html>
 <html>
@@ -651,7 +806,7 @@ $ curl http://localhost:8082
 
 Check that the common workload on the guilder cluster is working.
 
-```shell
+```console
 $ curl http://localhost:8083
 <!DOCTYPE html>
 <html>
@@ -661,7 +816,7 @@ $ curl http://localhost:8083
 </html>
 ```
 
-## Stage 6
+## Stage 5
 
 ![Summarization for special](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
 
