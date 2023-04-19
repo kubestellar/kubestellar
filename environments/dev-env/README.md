@@ -376,7 +376,13 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
         kubectl ws root:my-org:wmw-1
       ```
 
-  * Step-1: deploy your workload. For example:
+    N.B: if your using the `florin` kind edge pcluster created in this example, then you should switch back to the kcp edge context first before executing the command above:
+
+      ```bash
+        kubectl config use-context shard-main-root
+      ```
+
+  * Step-2: deploy your workload. For example:
 
       ```bash
       cat <<EOF | kubectl apply -f -
@@ -410,11 +416,13 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
       EOF
       ```
 
-#### 2. Create the `EdgePlacement` object for your workload. 
+#### 2. Create the EdgePlacement object for your workload. 
 
-Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
+In the `wmw-1` workspace create the following `EdgePlacement` object: 
  
   ```bash
+  kubectl ws root:my-org:wmw-1
+
   cat <<EOF | kubectl apply -f -
     apiVersion: edge.kcp.io/v1alpha1
     kind: EdgePlacement
@@ -439,8 +447,9 @@ Its “where predicate” (the locationSelectors array) has one label selector t
         names: ["william"]
   EOF
   ```
+Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
  
-In response to the created `EdgePlacement`, the edge scheduler will create a corresponding `SinglePlacementSlice` object:
+In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/) will create a corresponding `SinglePlacementSlice` object:
 
   ```bash
       kubectl get SinglePlacementSlice -o yaml edge-placement-c
@@ -469,10 +478,17 @@ In response to the created `EdgePlacement`, the edge scheduler will create a cor
 
 #### 3. Check that the workloads objects are copied to mailbox workspace:
 
-In response to the EdgePlacement and SinglePlacementSlice objects, the placement translator will copy the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+
+```bash
+
+```
 
 #### 5. Check that the workloads are running in the edge pclusters:
 
+```bash
+
+```
 #### 6. Delete your kcp-edge environment:
 
 ```bash
