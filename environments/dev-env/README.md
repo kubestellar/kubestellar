@@ -503,6 +503,90 @@ In response to the created EdgePlacement and SinglePlacementSlice objects, the [
   kubectl -n commonstuff get deploy
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           2m25s
+
+  kubectl get syncerConfig
+  NAME      AGE
+  the-one   21m
+```
+
+```bash
+    kubectl get syncerConfig the-one -o yaml
+    apiVersion: edge.kcp.io/v1alpha1
+    kind: SyncerConfig
+    metadata:
+      annotations:
+        kcp.io/cluster: 32uj0ldbsw50x5np
+      creationTimestamp: "2023-04-19T16:06:03Z"
+      generation: 4
+      name: the-one
+      resourceVersion: "1150"
+      uid: 2f75a6b6-96ad-4cc6-8a53-2cfbcbf6ce84
+    spec:
+      clusterScope:
+      - apiVersion: v1alpha1
+        group: apis.kcp.io
+        objects:
+        - bind-kube
+        resource: apibindings
+      namespaceScope:
+        namespaces:
+        - commonstuff
+        resources:
+        - apiVersion: v1
+          group: rbac.authorization.k8s.io
+          resource: roles
+        - apiVersion: v1
+          group: coordination.k8s.io
+          resource: leases
+        - apiVersion: v1
+          group: ""
+          resource: limitranges
+        - apiVersion: v1
+          group: networking.k8s.io
+          resource: ingresses
+        - apiVersion: v1
+          group: ""
+          resource: endpoints
+        - apiVersion: v1
+          group: ""
+          resource: services
+        - apiVersion: v1
+          group: apps
+          resource: deployments
+        - apiVersion: v1
+          group: ""
+          resource: serviceaccounts
+        - apiVersion: v1
+          group: ""
+          resource: configmaps
+        - apiVersion: v1
+          group: ""
+          resource: secrets
+        - apiVersion: v1
+          group: ""
+          resource: resourcequotas
+        - apiVersion: v1
+          group: ""
+          resource: pods
+        - apiVersion: v1
+          group: rbac.authorization.k8s.io
+          resource: rolebindings
+      upsync:
+      - apiGroup: group1.test
+        names:
+        - george
+        - cosmo
+        namespaces:
+        - orbital
+        resources:
+        - sprockets
+        - flanges
+      - apiGroup: group2.test
+        names:
+        - william
+        resources:
+        - cogs
+    status: {}
 ```
 
 #### 5. Check that the workloads are running in the edge pclusters:
