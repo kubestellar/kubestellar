@@ -22,29 +22,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
-	upstreamcache "k8s.io/client-go/tools/cache"
+
+	"github.com/kcp-dev/logicalcluster/v3"
 )
 
-// TypedContextualListWatcher is a ListWatcher that takes a Context
+// ScopedListerWatcher is a ListWatcher that takes a Context
 // and returns a specific type of list object.
-// This may be all-cluster or specific to one cluster.
-// For an all-cluster example,
-// see https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/client/clientset/versioned/cluster/typed/scheduling/v1alpha1/placement.go#L47-L48 ;
-// `PlacementClusterInterface` is a subtype of `TypedContextualListWatcher[*schedulingv1alpha1.PlacementList]`.
-type TypedContextualListWatcher[ListType runtime.Object] interface {
+// It is specific to one cluster.
+// For an example,
+// see https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/client/clientset/versioned/typed/scheduling/v1alpha1/placement.go#L48-L49 ;
+// `PlacementInterface` is a subtype of `ScopedListerWatcher[*schedulingv1alpha1.PlacementList]`.
+type ScopedListerWatcher[ListType runtime.Object] interface {
 	List(ctx context.Context, opts metav1.ListOptions) (ListType, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 }
 
-// NewListerWatcher binds a TypedContextualListWatcher with a Context and
-// adjusts the List return type to match the upstream interface
-func NewListerWatcher[ListType runtime.Object](ctx context.Context, clw TypedContextualListWatcher[ListType]) upstreamcache.ListerWatcher {
-	return &upstreamcache.ListWatch{
-		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return clw.List(ctx, opts)
-		},
-		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return clw.Watch(ctx, opts)
-		},
-	}
+// ClusterListerWatcher is something that can map a cluster to a ScopedListerWatcher for that cluster.
+// For an example,
+// see https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/client/clientset/versioned/cluster/typed/scheduling/v1alpha1/placement.go#L47-L48 ;
+// `PlacementClusterInterface` is a subtype of `ClusterListerWatcher[PlacementInterface, *schedulingv1alpha1.PlacementList]`.
+type ClusterListerWatcher[Scoped ScopedListerWatcher[ListType], ListType runtime.Object] interface {
+	Cluster(logicalcluster.Path) Scoped
 }

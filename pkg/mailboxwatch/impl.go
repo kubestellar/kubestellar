@@ -19,54 +19,81 @@ package mailboxwatch
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
+	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	machmeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	k8ssets "k8s.io/apimachinery/pkg/util/sets"
+	machschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 	upstreamcache "k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
+	tenancyv1a1client "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	"github.com/kcp-dev/edge-mc/pkg/placement"
 )
 
-func newFilteredListerWatcher(
+func newCrossClusterListerWatcher[Scoped ScopedListerWatcher[ListType], ListType runtime.Object](
+	ctx context.Context,
+	listGVK machschema.GroupVersionKind,
 	mailboxWorkspacePreInformer tenancyv1a1informers.WorkspaceInformer,
-	unfiltered upstreamcache.ListerWatcher,
-) *filteredListerWatcher {
-	flw := &filteredListerWatcher{
-		unfiltered: unfiltered,
-		clusters:   k8ssets.NewString(),
+	gen ClusterListerWatcher[Scoped, ListType],
+) *crossClusterListerWatcher[Scoped, ListType] {
+	clw := &crossClusterListerWatcher[Scoped, ListType]{
+		ctx:          ctx,
+		listGVK:      listGVK,
+		gen:          gen,
+		perCluster:   map[logicalcluster.Name]*lwPerCluster[Scoped, ListType]{},
+		reconfigChan: make(chan struct{}),
 	}
-	mailboxWorkspacePreInformer.Informer().AddEventHandler(flw)
-	return flw
+	mailboxWorkspacePreInformer.Informer().AddEventHandler(clw)
+	return clw
 }
 
-type filteredListerWatcher struct {
+// crossClusterListerWatcher implements upstreamcache.ListerWatcher by scatter/gather to
+// a collection of per-cluster ListerWatchers, one for each mailbox workspace.
+type crossClusterListerWatcher[Scoped ScopedListerWatcher[ListType], ListType runtime.Object] struct {
+	ctx     context.Context
+	listGVK machschema.GroupVersionKind
+	gen     ClusterListerWatcher[Scoped, ListType]
+
 	sync.Mutex
-	unfiltered upstreamcache.ListerWatcher
-	clusters   k8ssets.String
+
+	perCluster map[logicalcluster.Name]*lwPerCluster[Scoped, ListType]
+
+	// clusterListFirst is the first one to scatter to when doing a List.
+	clusterListFirst logicalcluster.Name
+
+	// reconfigChan gets closed and replaced whenever perCluster changes
+	reconfigChan chan struct{}
 }
 
-func (flw *filteredListerWatcher) OnAdd(obj any) {
-	flw.setInclusion(obj, true)
+type lwPerCluster[Scoped ScopedListerWatcher[ListType], ListType runtime.Object] struct {
+	*crossClusterListerWatcher[Scoped, ListType]
+	cluster  logicalcluster.Name
+	scopedLW Scoped
 }
 
-func (flw *filteredListerWatcher) OnUpdate(old, obj any) {
-	flw.setInclusion(obj, true)
+func (clw *crossClusterListerWatcher[Scoped, ListType]) OnAdd(obj any) {
+	clw.setInclusion(obj, true)
 }
 
-func (flw *filteredListerWatcher) OnDelete(obj any) {
-	flw.setInclusion(obj, false)
+func (clw *crossClusterListerWatcher[Scoped, ListType]) OnUpdate(old, obj any) {
+	clw.setInclusion(obj, true)
 }
 
-func (flw *filteredListerWatcher) setInclusion(obj any, include bool) {
+func (clw *crossClusterListerWatcher[Scoped, ListType]) OnDelete(obj any) {
+	clw.setInclusion(obj, false)
+}
+
+func (clw *crossClusterListerWatcher[Scoped, ListType]) setInclusion(obj any, include bool) {
 	ws := obj.(*tenancyv1a1.Workspace)
 	mbwsName := ws.Name
 	mbwsNameParts := strings.Split(mbwsName, placement.WSNameSep)
@@ -74,14 +101,22 @@ func (flw *filteredListerWatcher) setInclusion(obj any, include bool) {
 		// Only accept the workspace if its name looks like a mailbox workspace name
 		include = false
 	}
-	cluster := ws.Spec.Cluster
-	flw.Lock()
-	defer flw.Unlock()
-	if include {
-		flw.clusters.Insert(cluster)
-	} else {
-		flw.clusters.Delete(cluster)
+	clusterStr := ws.Spec.Cluster
+	clusterName := logicalcluster.Name(clusterStr)
+	clw.Lock()
+	defer clw.Unlock()
+	_, have := clw.perCluster[clusterName]
+	if have == include {
+		return
 	}
+	if include {
+		lwForCluster := &lwPerCluster[Scoped, ListType]{clw, clusterName, clw.gen.Cluster(clusterName.Path())}
+		clw.perCluster[clusterName] = lwForCluster
+	} else {
+		delete(clw.perCluster, clusterName)
+	}
+	close(clw.reconfigChan)
+	clw.reconfigChan = make(chan struct{})
 }
 
 type myList struct {
@@ -90,42 +125,104 @@ type myList struct {
 	Items []runtime.Object
 }
 
-var _ upstreamcache.ListerWatcher = &filteredListerWatcher{}
+var _ upstreamcache.ListerWatcher = &crossClusterListerWatcher[tenancyv1a1client.WorkspaceInterface, *tenancyv1a1.WorkspaceList]{}
 
-func (flw *filteredListerWatcher) List(options metav1.ListOptions) (runtime.Object, error) {
-	unfilteredListObj, err := flw.unfiltered.List(options)
-	if err != nil {
-		return nil, err
-	}
-	listMeta, err := machmeta.ListAccessor(unfilteredListObj)
-	if err != nil {
-		return nil, fmt.Errorf("inner Lister produced a %T (%+v), which machmeta.ListAccessor rejects: %w", unfilteredListObj, unfilteredListObj, err)
-	}
-	unfilteredList, err := machmeta.ExtractList(unfilteredListObj)
-	if err != nil {
-		return nil, fmt.Errorf("inner Lister produced a %T (%+v), which machmeta.ExtractList rejects: %w", unfilteredListObj, unfilteredListObj, err)
-	}
-	flw.Lock()
-	defer flw.Unlock()
-	filteredSlice := []runtime.Object{}
-	for _, item := range unfilteredList {
-		objm := item.(metav1.Object)
-		cluster := logicalcluster.From(objm)
-		if flw.clusters.Has(cluster.String()) {
-			filteredSlice = append(filteredSlice, item)
+// List queries each mailbox workspace, one at a time, and combines the replies.
+// The ResourceVersion is a pain point here.
+// Background: all the underlying clusters share in the same progression of ResourceVersion.
+// Problem: what ResourceVersiom to put on the whole result?
+// The highest safe ResourceVersion for the whole list is the RV returned from the first cluster queried.
+// Sadly, we have to parse ResourceVersions and discard items from later queries that are too new.
+// As a hueristic to minimze that lossage, List keeps track of which cluster returned the highest RV
+// and starts with that one next time.
+func (clw *crossClusterListerWatcher[Scoped, ListType]) List(options metav1.ListOptions) (runtime.Object, error) {
+	logger := klog.FromContext(clw.ctx)
+	allItems := []runtime.Object{}
+	var firstListRV *int64
+	var maxRV int64 = -1
+	var clusterOfMaxRV logicalcluster.Name
+	listCluster := func(clusterName logicalcluster.Name, lwForCluster *lwPerCluster[Scoped, ListType]) {
+		logger := logger.WithValues("cluster", clusterName)
+		sublist, err := lwForCluster.scopedLW.List(clw.ctx, options)
+		if err != nil {
+			if k8sapierrors.IsNotFound(err) {
+				logger.V(4).Info("Resourece not (yet) known")
+			} else {
+				logger.Error(err, "Failed to list")
+			}
+			return
 		}
+		sublistGVK := sublist.GetObjectKind().GroupVersionKind()
+		if sublistGVK != clw.listGVK && sublistGVK != (machschema.GroupVersionKind{}) {
+			logger.Error(nil, "List returned unexpected GroupVersionKind", "expected", clw.listGVK, "got", sublistGVK)
+			return
+		}
+		subItems, err := machmeta.ExtractList(sublist)
+		if err != nil {
+			logger.Error(err, "Failed to machmeta.ExtractList", "sublist", sublist)
+			return
+		}
+		listMeta, err := machmeta.ListAccessor(sublist)
+		if err != nil {
+			logger.Error(err, "Failed to machmeta.ListAccessor", "sublist", sublist)
+			return
+		}
+		rv, err := strconv.ParseInt(listMeta.GetResourceVersion(), 10, 64)
+		if err != nil {
+			logger.Error(err, "Failed to parse ResourceVersion of a List result")
+			return
+		}
+		if rv > maxRV {
+			maxRV = rv
+			clusterOfMaxRV = clusterName
+		}
+		if firstListRV == nil {
+			firstListRV = &rv
+			allItems = append(allItems, subItems...)
+			return
+		}
+		for _, item := range subItems {
+			itemM := item.(metav1.Object)
+			itemRV, err := strconv.ParseInt(itemM.GetResourceVersion(), 10, 64)
+			if err != nil {
+				logger.Error(err, "Failed to parse ResourceVersion of item", "item", item)
+				continue
+			}
+			if itemRV <= *firstListRV {
+				allItems = append(allItems, item)
+			}
+		}
+		if listMeta.GetContinue() != "" {
+			logger.Info("Warning: skipping list CONTINUE due to incomplete implementation", "gvk", clw.listGVK) // TODO: better
+		}
+	}
+	clw.Lock()
+	defer clw.Unlock()
+	if clw.clusterListFirst != "" {
+		if lwFirst, have := clw.perCluster[clw.clusterListFirst]; have {
+			listCluster(clw.clusterListFirst, lwFirst)
+		}
+	}
+	for clusterName, lwForCluster := range clw.perCluster {
+		if clusterName == clw.clusterListFirst {
+			continue
+		}
+		listCluster(clusterName, lwForCluster)
+	}
+	clw.clusterListFirst = clusterOfMaxRV // hueristic to lose minimize lossage next time
+	if firstListRV == nil {
+		var one int64 = 1
+		firstListRV = &one
 	}
 	return &myList{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: unfilteredListObj.GetObjectKind().GroupVersionKind().GroupVersion().String(),
-			Kind:       unfilteredListObj.GetObjectKind().GroupVersionKind().Kind,
+			APIVersion: clw.listGVK.GroupVersion().String(),
+			Kind:       clw.listGVK.Kind,
 		},
 		ListMeta: metav1.ListMeta{
-			ResourceVersion:    listMeta.GetResourceVersion(),
-			Continue:           listMeta.GetContinue(),
-			RemainingItemCount: listMeta.GetRemainingItemCount(),
+			ResourceVersion: strconv.FormatInt(*firstListRV, 10),
 		},
-		Items: filteredSlice,
+		Items: allItems,
 	}, nil
 }
 
@@ -141,60 +238,70 @@ func (ml *myList) DeepCopyObject() runtime.Object {
 	return &ans
 }
 
-func (flw *filteredListerWatcher) Watch(options metav1.ListOptions) (watch.Interface, error) {
-	unfilteredWatch, err := flw.unfiltered.Watch(options)
-	if err != nil {
-		return nil, fmt.Errorf("inner Watcher failed: %w", err)
-	}
-	ctx := context.Background()
+func (clw *crossClusterListerWatcher[Scoped, ListType]) Watch(options metav1.ListOptions) (watch.Interface, error) {
+	ctx := clw.ctx
 	ctx, close := context.WithCancel(ctx)
-	ans := &myWatch{
-		unfilteredIfc:  unfilteredWatch,
-		unfilteredChan: unfilteredWatch.ResultChan(),
-		close:          close,
-		doneChan:       ctx.Done(),
-		filtered:       make(chan watch.Event),
+	clw.Lock()
+	defer clw.Unlock()
+	ans := &myWatch[Scoped, ListType]{
+		clw:          clw,
+		close:        close,
+		doneChan:     ctx.Done(),
+		reconfigChan: clw.reconfigChan,
+		filtered:     make(chan watch.Event),
 	}
-	go func() {
-		for {
-			select {
-			case <-ans.doneChan:
-				ans.unfilteredIfc.Stop()
-				return
-			case event, ok := <-ans.unfilteredChan:
-				if !ok {
-					ans.unfilteredIfc.Stop() // do we need this in this case?  https://kubernetes.slack.com/archives/C0EG7JC6T/p1679684882556809
-					ans.close()
-					return
-				}
-				objm := event.Object.(metav1.Object)
-				cluster := logicalcluster.From(objm)
-				pass := func() bool {
-					flw.Lock()
-					defer flw.Unlock()
-					return flw.clusters.Has(cluster.String())
-				}()
-				if pass {
-					ans.filtered <- event
-				}
-			}
+	for clusterName, lwForCluster := range clw.perCluster {
+		clusterWatch, err := lwForCluster.scopedLW.Watch(clw.ctx, options)
+		if err != nil {
+			return nil, fmt.Errorf("Watch for cluster %s failed: %w", clusterName, err)
 		}
-	}()
+		wpc := &watchPerCluster[Scoped, ListType]{
+			myWatch:     ans,
+			scopedWatch: clusterWatch,
+			scopedChan:  clusterWatch.ResultChan(),
+		}
+		go wpc.Run()
+	}
 	return ans, nil
 }
 
-type myWatch struct {
-	unfilteredIfc  watch.Interface
-	unfilteredChan <-chan watch.Event
-	close          func()
-	doneChan       <-chan struct{}
-	filtered       chan watch.Event
+func (wpc *watchPerCluster[Scoped, ListType]) Run() {
+	for {
+		select {
+		case <-wpc.doneChan:
+			wpc.scopedWatch.Stop()
+			return
+		case <-wpc.reconfigChan:
+			wpc.scopedWatch.Stop()
+			return
+		case event, ok := <-wpc.scopedChan:
+			if !ok {
+				wpc.close()
+				return
+			}
+			wpc.filtered <- event
+		}
+	}
 }
 
-func (mw *myWatch) Stop() {
+type myWatch[Scoped ScopedListerWatcher[ListType], ListType runtime.Object] struct {
+	clw          *crossClusterListerWatcher[Scoped, ListType]
+	close        func()
+	doneChan     <-chan struct{}
+	reconfigChan <-chan struct{} // the chan that was current when this watch started
+	filtered     chan watch.Event
+}
+
+type watchPerCluster[Scoped ScopedListerWatcher[ListType], ListType runtime.Object] struct {
+	*myWatch[Scoped, ListType]
+	scopedWatch watch.Interface
+	scopedChan  <-chan watch.Event
+}
+
+func (mw *myWatch[Scoped, ListType]) Stop() {
 	mw.close()
 }
 
-func (mw *myWatch) ResultChan() <-chan watch.Event {
+func (mw *myWatch[Scoped, ListType]) ResultChan() <-chan watch.Event {
 	return mw.filtered
 }

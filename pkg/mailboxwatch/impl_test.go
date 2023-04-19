@@ -34,14 +34,21 @@ import (
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	kcpk8sfake "github.com/kcp-dev/client-go/kubernetes/fake"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	kcpfake "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
+	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/fake"
+	edgeclusterclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
+	edgescopedclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/placement"
 )
+
+var _ edgeapi.SyncerConfig
+var _ edgescopedclient.SyncerConfigInterface
+var _ edgeclusterclient.SyncerConfigClusterInterface
 
 func TestMain(m *testing.M) {
 	klog.InitFlags(nil)
@@ -126,21 +133,22 @@ func (tot *testObjectTracker) objectsEqualCond(gvk machschema.GroupVersionKind, 
 }
 
 func TestMailboxInformer(t *testing.T) {
-	resource := "replicasets"
-	kind := "ReplicaSet"
+	resource := "syncerconfigs"
+	kind := "SyncerConfig"
 	espwCluster := logicalcluster.Name("espw")
-	rsGV := k8sapps.SchemeGroupVersion
-	rsGVK := rsGV.WithKind(kind)
-	rsGVR := rsGV.WithResource(resource)
+	scGV := edgeapi.SchemeGroupVersion
+	scGVK := scGV.WithKind(kind)
+	sclGVK := scGV.WithKind(kind + "List")
+	scGVR := scGV.WithResource(resource)
 	wsGV := tenancyv1a1.SchemeGroupVersion
 	wsGVK := wsGV.WithKind("Workspace")
 	for super := 1; super <= 3; super++ {
-		replicaSets := map[objectName]mrObject{}
+		syncerConfigs := map[objectName]mrObject{}
 		workspaces := map[objectName]mrObject{}
 		kcpClientset := kcpfake.NewSimpleClientset()
 		kcpTracker := kcpClientset.Tracker()
-		k8sClientset := kcpk8sfake.NewSimpleClientset()
-		k8sTracker := k8sClientset.Tracker()
+		edgeClientset := edgefakeclient.NewSimpleClientset()
+		edgeTracker := edgeClientset.Tracker()
 		ctx, stop := context.WithCancel(context.Background())
 		actual := NewTestObjectTracker()
 		kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClientset, 0)
@@ -150,22 +158,22 @@ func TestMailboxInformer(t *testing.T) {
 				wsPreInformer.Informer().Run(ctx.Done())
 			}()
 		}
-		rslw := NewListerWatcher[*k8sapps.ReplicaSetList](ctx, k8sClientset.AppsV1().ReplicaSets())
-		rsInformer := NewSharedInformer(wsPreInformer.Cluster(espwCluster), rslw, &k8sapps.ReplicaSet{}, 0, upstreamcache.Indexers{})
-		rsInformer.AddEventHandler(actual)
+		scInformer := NewSharedInformer[edgescopedclient.SyncerConfigInterface, *edgeapi.SyncerConfigList](ctx, sclGVK, wsPreInformer.Cluster(espwCluster),
+			edgeClientset.EdgeV1alpha1().SyncerConfigs(), &edgeapi.SyncerConfig{}, 0, upstreamcache.Indexers{})
+		scInformer.AddEventHandler(actual)
 		kcpClusterInformerFactory.Start(ctx.Done())
-		go rsInformer.Run(ctx.Done())
+		go scInformer.Run(ctx.Done())
 		for iteration := 1; iteration <= 64; iteration++ {
-			if len(replicaSets) > 0 && rand.Intn(2) == 0 {
-				gonerIndex := rand.Intn(len(replicaSets))
-				_, gonerObj := MapRemove(replicaSets, gonerIndex)
-				gonerRS := gonerObj.(*k8sapps.ReplicaSet)
-				cluster := logicalcluster.From(gonerRS)
-				err := k8sTracker.Cluster(cluster.Path()).Delete(rsGVR, gonerRS.Namespace, gonerRS.Name)
+			if len(syncerConfigs) > 0 && rand.Intn(2) == 0 {
+				gonerIndex := rand.Intn(len(syncerConfigs))
+				_, gonerObj := MapRemove(syncerConfigs, gonerIndex)
+				gonerSC := gonerObj.(*k8sapps.ReplicaSet)
+				cluster := logicalcluster.From(gonerSC)
+				err := edgeTracker.Cluster(cluster.Path()).Delete(scGVR, gonerSC.Namespace, gonerSC.Name)
 				if err != nil {
-					t.Fatalf("Failed to delete goner %+v: %v", gonerRS, err)
+					t.Fatalf("Failed to delete goner %+v: %v", gonerSC, err)
 				} else {
-					t.Logf("Removed from tracker: ReplicaSet %+v", gonerRS)
+					t.Logf("Removed from tracker: SyncerConfig %+v", gonerSC)
 				}
 			} else {
 				invWSNum := rand.Intn(int(math.Sqrt(float64(iteration))))
@@ -202,21 +210,20 @@ func TestMailboxInformer(t *testing.T) {
 					workspaces[wsObjName] = workspace
 				}
 				var objName objectName
-				var obj *k8sapps.ReplicaSet
+				var obj *edgeapi.SyncerConfig
 				for {
 					objName = objectName{
-						cluster:   mbwsClusterN,
-						namespace: fmt.Sprintf("ns%d", rand.Intn(10000)),
-						name:      fmt.Sprintf("rs%d", rand.Intn(10000)),
+						cluster: mbwsClusterN,
+						name:    fmt.Sprintf("rs%d", rand.Intn(10000)),
 					}
-					if _, has := replicaSets[objName]; !has {
+					if _, has := syncerConfigs[objName]; !has {
 						break
 					}
 				}
-				obj = &k8sapps.ReplicaSet{
+				obj = &edgeapi.SyncerConfig{
 					TypeMeta: metav1.TypeMeta{
 						Kind:       kind,
-						APIVersion: rsGV.String(),
+						APIVersion: scGV.String(),
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: objName.namespace,
@@ -226,19 +233,19 @@ func TestMailboxInformer(t *testing.T) {
 						},
 					},
 				}
-				scopedTracker := k8sTracker.Cluster(mbwsClusterN.Path())
+				scopedTracker := edgeTracker.Cluster(mbwsClusterN.Path())
 				err := scopedTracker.Add(obj)
 				if err != nil {
 					t.Fatalf("Failed to add %+v to testing tracker: %v", obj, err)
 				} else {
-					t.Logf("Added to tracker: ReplicaSet named %#v", objName)
+					t.Logf("Added to tracker: SyncerConfig named %#v", objName)
 				}
 			}
 			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(wsGVK, workspaces)) != nil {
 				t.Fatalf("Workspaces did not settle in time: %+v != %+v", actual.getObjects(wsGVK), workspaces)
 			}
-			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(rsGVK, replicaSets)) != nil {
-				t.Fatalf("Workspaces did not settle in time: %+v != %+v", actual.getObjects(rsGVK), replicaSets)
+			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(scGVK, syncerConfigs)) != nil {
+				t.Fatalf("Workspaces did not settle in time: %+v != %+v", actual.getObjects(scGVK), syncerConfigs)
 			}
 		}
 		stop()
