@@ -181,15 +181,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
 ## Bring your own cluster (BYOC)
 
-#### 1. Create your own edge infrastructure (edge pclusters):
-
-  For example: create a kind cluster
-
-  ```bash
-  kind create cluster --name florin
-  ``` 
-
-#### 2. Deploy the kcp-edge platform:
+#### 1. Deploy the kcp-edge platform:
 
   * Step-1: Clone this repo:
 
@@ -214,6 +206,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
     - 4 kcp workspaces: edge service provider workspace (`espw`), inventory management workspace (`imw`) and workload management workspace (`wmw`) under my-org workspace
 
     ```bash
+    kubectl ws tree
     .
     └── root
         ├── compute
@@ -232,14 +225,21 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
     ```
 
+#### 2. Create your own edge infrastructure (edge pclusters):
+
+  - For example: create a kind cluster
+
+    ```bash
+    kind create cluster --name florin
+    ```  
+
 #### 3. Connect your edge pcluster to the kcp-edge platform:
 
-  * Step-1: Populate the `imw`:
-    - enter the target workspace:
+  * Step-1: Populate the `imw`: enter the target workspace:
 
-      ```bash
-          kubectl ws root:imw-1
-      ```
+    ```bash
+        kubectl ws root:imw-1
+    ```
     
   * Step-2: create a SyncTarget object to represent your edge pcluster. For example:
 
@@ -286,6 +286,14 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
     NAME                                       AGE
     synctarget.workload.kcp.io/sync-target-f   36s
     ```
+  
+    You can remove the default location object created:
+
+    ```bash
+    kubectl delete location default
+    location.scheduling.kcp.io "default" deleted
+    ```
+
 
     The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `sync-target-f`:
 
@@ -308,17 +316,54 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
     ```bash
        ./build-edge-syncer.sh  --syncTarget sync-target-f
+
+       -----------------------------------------------------------
+        Edge-syncer manifest created:  sync-target-f-syncer.yaml
+        Current workspace: root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
+       -----------------------------------------------------------
     ```
+    An edge syncer manifest yaml file is created in your current director: `sync-target-f-syncer.yaml`
 
   * Step-5: deploy the edge syncer to your edge pcluter
 
-    - Apply the edge syncer manifest:
+    For example: switch to the context of the florin kind cluster
 
     ```bash
-       kubectl apply -f sync-target-g-syncer.yaml
+       kubectl config use-context kind-florin
     ```
 
+    Apply the edge syncer manifest:
 
+    ```bash
+      kubectl apply -f sync-target-g-syncer.yaml
+
+      namespace/kcp-edge-syncer-the-one-2p3eqojn created
+      serviceaccount/kcp-edge-syncer-the-one-2p3eqojn created
+      secret/kcp-edge-syncer-the-one-2p3eqojn-token created
+      clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-the-one-2p3eqojn created
+      clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-the-one-2p3eqojn created
+      role.rbac.authorization.k8s.io/kcp-edge-dns-the-one-2p3eqojn created
+      rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-the-one-2p3eqojn created
+      secret/kcp-edge-syncer-the-one-2p3eqojn created
+      deployment.apps/kcp-edge-syncer-the-one-2p3eqojn created
+    ```
+
+    Check that the edge syncer pod is running:
+
+    ```bash
+        kubectl get pods -A
+        NAMESPACE                          NAME                                                READY   STATUS    RESTARTS   AGE
+        kcp-edge-syncer-the-one-2p3eqojn   kcp-edge-syncer-the-one-2p3eqojn-6884cd645b-tn6s7   1/1     Running   0          2m16s
+        kube-system                        coredns-565d847f94-fw7vt                            1/1     Running   0          4m40s
+        kube-system                        coredns-565d847f94-kc4gk                            1/1     Running   0          4m40s
+        kube-system                        etcd-florin-control-plane                           1/1     Running   0          4m56s
+        kube-system                        kindnet-9vzg8                                       1/1     Running   0          4m40s
+        kube-system                        kube-apiserver-florin-control-plane                 1/1     Running   0          4m55s
+        kube-system                        kube-controller-manager-florin-control-plane        1/1     Running   0          4m55s
+        kube-system                        kube-proxy-qhprt                                    1/1     Running   0          4m40s
+        kube-system                        kube-scheduler-florin-control-plane                 1/1     Running   0          4m55s
+        local-path-storage                 local-path-provisioner-684f458cdd-bc5c4             1/1     Running   0          4m40s
+    ``` 
 
 
 ## Bring your own workload (BYOW)
