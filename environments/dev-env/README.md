@@ -370,13 +370,13 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
 #### 1. Populate the `wmw` with your workload objects:  
 
-  Enter the target workspace: `wmw-1`
+  * Step-1: enter the target workspace: `wmw-1`
   
       ```bash
         kubectl ws root:my-org:wmw-1
       ```
 
-  For example:
+  * Step-1: deploy your workload. For example:
 
       ```bash
       cat <<EOF | kubectl apply -f -
@@ -416,15 +416,27 @@ Its “where predicate” (the locationSelectors array) has one label selector t
  
   ```bash
   cat <<EOF | kubectl apply -f -
-  apiVersion: edge.kcp.io/v1alpha1
-  kind: EdgePlacement
-  metadata:
-    name: edge-placement-c
-  spec:
-    locationSelectors:
-    - matchLabels: {"env":"prod"}
-    namespaceSelector:
-      matchLabels: {"common":"si"}
+    apiVersion: edge.kcp.io/v1alpha1
+    kind: EdgePlacement
+    metadata:
+      name: edge-placement-c
+    spec:
+      locationSelectors:
+      - matchLabels: {"env":"prod"}
+      namespaceSelector:
+        matchLabels: {"common":"si"}
+      nonNamespacedObjects:
+      - apiGroup: apis.kcp.io
+        resources: [ "apibindings" ]
+        resourceNames: [ "bind-kube" ]
+      upsync:
+      - apiGroup: "group1.test"
+        resources: ["sprockets", "flanges"]
+        namespaces: ["orbital"]
+        names: ["george", "cosmo"]
+      - apiGroup: "group2.test"
+        resources: ["cogs"]
+        names: ["william"]
   EOF
   ```
  
