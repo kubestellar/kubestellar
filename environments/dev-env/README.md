@@ -396,6 +396,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
       kind: Deployment
       metadata:
         name: nginx-deployment
+        namespace: commonstuff
         labels:
           app: nginx
       spec:
@@ -416,7 +417,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
       EOF
       ```
 
-#### 2. Create the EdgePlacement object for your workload. 
+#### 2. Create the `EdgePlacement` object for your workload. 
 
 In the `wmw-1` workspace create the following `EdgePlacement` object: 
  
@@ -478,7 +479,7 @@ In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kc
 
 #### 3. Check that the workloads objects are copied to mailbox workspace:
 
-In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
 ```bash
 
