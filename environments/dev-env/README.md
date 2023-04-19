@@ -417,6 +417,15 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
       EOF
       ```
 
+    Check that your workload was deployed successfully: 
+
+    ```bash
+        kubectl -n commonstuff get deploy
+        NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+        nginx-deployment   0/3     0            0           13s
+    ```
+
+
 #### 2. Create the `EdgePlacement` object for your workload. 
 
 In the `wmw-1` workspace create the following `EdgePlacement` object: 
@@ -482,14 +491,51 @@ In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kc
 In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
 ```bash
+  kubectl ws root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
+  Current workspace is "root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303".
 
+  kubectl get ns
+  NAME          STATUS   AGE
+  commonstuff   Active   2m16s
+  default       Active   73m
+
+  kubectl -n commonstuff get deploy
+  NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+  nginx-deployment   0/3     0            0           2m25s
 ```
 
 #### 5. Check that the workloads are running in the edge pclusters:
 
-```bash
+   * Step-1: switch to your edge pcluster: `wmw-1`
+    
+     ```bash
+        kubectl config use-context kind-florin
+     ```
 
-```
+   * Step-2: check your workload:
+
+      ```bash
+          kubectl get ns
+          NAME                               STATUS   AGE
+          commonstuff                        Active   4m58s
+          default                            Active   49m
+          kcp-edge-syncer-the-one-2p3eqojn   Active   46m
+          kube-node-lease                    Active   49m
+          kube-public                        Active   49m
+          kube-system                        Active   49m
+          local-path-storage                 Active   48m
+
+          kubectl -n commonstuff get deploy
+          NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+          nginx-deployment   3/3     3            3           4m55s
+
+
+          kubectl -n commonstuff get pods
+          NAME                                READY   STATUS    RESTARTS   AGE
+          nginx-deployment-7fb96c846b-6v6fq   1/1     Running   0          5m1s
+          nginx-deployment-7fb96c846b-f52qc   1/1     Running   0          5m1s
+          nginx-deployment-7fb96c846b-r85t6   1/1     Running   0          5m1s
+      ```
 #### 6. Delete your kcp-edge environment:
 
 ```bash
