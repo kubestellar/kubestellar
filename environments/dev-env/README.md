@@ -183,11 +183,11 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
 #### 1. Create your own edge infrastructure (edge pclusters):
 
-For example: create a kind cluster
+  For example: create a kind cluster
 
-```bash
-kind create cluster --name florin
-``` 
+  ```bash
+  kind create cluster --name florin
+  ``` 
 
 #### 2. Deploy the kcp-edge platform:
 
@@ -323,51 +323,49 @@ kind create cluster --name florin
 
 ## Bring your own workload (BYOW)
 
-#### 1. Populate the `wmw`:  
+#### 1. Populate the `wmw` with your workload objects:  
 
-Enter the target workspace: `wmw-1`
- 
-    ```bash
-      kubectl ws root:my-org:wmw-1
-    ```
+  Enter the target workspace: `wmw-1`
+  
+      ```bash
+        kubectl ws root:my-org:wmw-1
+      ```
 
-#### 2. Create your workload objects:
+  For example:
 
-For example:
-
-    ```bash
-    cat <<EOF | kubectl apply -f -
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: commonstuff
-      labels: {common: "si"}
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: nginx-deployment
-      labels:
-        app: nginx
-    spec:
-      replicas: 3
-      selector:
-        matchLabels:
+      ```bash
+      cat <<EOF | kubectl apply -f -
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: commonstuff
+        labels: {common: "si"}
+      ---
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: nginx-deployment
+        labels:
           app: nginx
-      template:
-        metadata:
-          labels:
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
             app: nginx
-        spec:
-          containers:
-          - name: nginx
-            image: nginx:1.14.2
-            ports:
-            - containerPort: 80
-    EOF
-    ```
+        template:
+          metadata:
+            labels:
+              app: nginx
+          spec:
+            containers:
+            - name: nginx
+              image: nginx:1.14.2
+              ports:
+              - containerPort: 80
+      EOF
+      ```
 
-#### 3. Create the `EdgePlacement` object for your workload. 
+#### 2. Create the `EdgePlacement` object for your workload. 
 
 Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
  
@@ -412,11 +410,11 @@ In response to the created `EdgePlacement`, the edge scheduler will create a cor
         uid: b7a8e302-1532-4e48-a69e-910a9ac2aa62
   ```
 
-#### 4. You can check that the workloads are running in the edge clusters:
+#### 3. Check that the workloads objects are copied to mailbox workspace:
 
 In response to the EdgePlacement and SinglePlacementSlice objects, the placement translator will copy the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
 
-#### 5. You can check that the workloads are running in the edge clusters:
+#### 5. Check that the workloads are running in the edge pclusters:
 
 #### 6. Delete your kcp-edge environment:
 
