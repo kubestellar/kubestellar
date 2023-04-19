@@ -179,7 +179,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 ./delete_edge-mc.sh
 ```
 
-## Bring your own cluster (BYOC)
+## Bring Your Own Cluster (BYOC)
 
 #### 1. Deploy the kcp-edge platform:
 
@@ -367,7 +367,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
     ``` 
 
 
-## Bring your own workload (BYOW)
+## Bring Your Own Workload (BYOW)
 
 #### 1. Populate the `wmw` with your workload objects:  
 
