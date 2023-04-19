@@ -589,7 +589,7 @@ In response to the created EdgePlacement and SinglePlacementSlice objects, the [
     status: {}
 ```
 
-#### 5. Check that the workloads are running in the edge pclusters:
+#### 4. Check that the workloads are running in the edge pclusters:
 
    * Step-1: switch to your edge pcluster: `wmw-1`
     
@@ -622,7 +622,7 @@ In response to the created EdgePlacement and SinglePlacementSlice objects, the [
           nginx-deployment-7fb96c846b-f52qc   1/1     Running   0          5m1s
           nginx-deployment-7fb96c846b-r85t6   1/1     Running   0          5m1s
       ```
-#### 6. Delete your kcp-edge environment:
+#### 5. Delete your kcp-edge environment:
 
 ```bash
 ./delete_edge-mc.sh
