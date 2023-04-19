@@ -330,6 +330,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 
     ```bash
        kubectl config use-context kind-florin
+       Switched to context "kind-florin".
     ```
 
     Apply the edge syncer manifest:
@@ -510,6 +511,7 @@ In response to the created EdgePlacement and SinglePlacementSlice objects, the [
     
      ```bash
         kubectl config use-context kind-florin
+        Switched to context "kind-florin".
      ```
 
    * Step-2: check your workload:
