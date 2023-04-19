@@ -101,6 +101,22 @@ fi
 
 #(1): Clone the kcp-playground tool
 echo "****************************************"
+echo "Clonining edge-syncer kcp-plugins repo"
+echo "****************************************"
+if [[ ! -d $(pwd)/edge-syncer || ! "$(ls -A $(pwd)/edge-syncer)" ]] 
+then
+    if [ $verbosity == 1 ]; then
+        git clone -b emc https://github.com/yana1205/kcp  edge-syncer
+    else
+        git clone -b emc https://github.com/yana1205/kcp  edge-syncer  > /dev/null 2>&1
+        echo "Finished cloning repo ......"
+    fi
+else 
+   echo "   edge-syncer repo already exists ..."
+fi
+
+
+echo "****************************************"
 echo "Clonining kcp-playground repo"
 echo "****************************************"
 
@@ -116,7 +132,10 @@ else
    echo "  kcp-playground repo already exists ..."
 fi
 
-#(2): Move the kcp-playground yaml files to the target repo
+#(2): Move the edge-syncer plugin to the kcp-playground repo
+cp -r edge-syncer/pkg/cliplugins/workload/*   kcp/pkg/cliplugins/workload
+
+#(3): Move the kcp-playground yaml files to the target repo
 stages_path=$(pwd)/kcp/test/kubectl-kcp-playground/examples/kcp-edge/
 if [ ! -d $stages_path ] 
 then
@@ -125,7 +144,7 @@ fi
 
 cp stages/*  $stages_path
 
-#(3): build the binaries for kcp and kcp-playground plugin
+#(4): build the binaries for kcp and kcp-playground plugin
 echo "****************************************"
 echo "Building kcp-playground binaries"
 echo "****************************************"
@@ -144,13 +163,13 @@ else
     fi
 fi
 
-#(4): Set up the kubeconfig and path variables
+#(5): Set up the kubeconfig and path variables
 kcp_path=$(pwd)/bin
 kubeconfig_path=$(pwd)/.kcp-playground/playground.kubeconfig
 export PATH=$PATH:$kcp_path
 export KUBECONFIG=$kubeconfig_path
 
-#(5): Start the kcp-playground
+#(6): Start the kcp-playground
 echo "****************************************"
 echo "Started deploying kcp-playground: complete in ~ 150 sec (maximum waiting time: 300 sec)"
 echo "****************************************"
@@ -215,7 +234,7 @@ wait_for_process(){
 }
 
 
-#(6): Start the edge-mc controller
+#(7): Start the edge-mc controller
 echo "****************************************"
 echo "Started deploying kCP-EDGE controllers ...."
 echo "****************************************"
@@ -242,7 +261,7 @@ fi
 
 
 if [ $stage != 1 ]; then 
-    # (7): Start the edge-mc scheduler
+    # (8): Start the edge-mc scheduler
     sleep 3
     kubectl ws root:espw
     go run cmd/scheduler/main.go -v 2 --root-user shard-main-kcp-admin  --root-cluster shard-main-root  --sysadm-context shard-main-system:admin  --sysadm-user shard-main-shard-admin >& environments/dev-env/edge-scheduler-log.txt &
@@ -259,7 +278,7 @@ fi
 
 
 if [ $stage -eq 0 ] || [ $stage -gt 2 ]; then 
-    # (8): Start the Placement Translator
+    # (9): Start the Placement Translator
     sleep 3
     kubectl ws root:espw
     go run ./cmd/placement-translator --allclusters-context  "shard-main-system:admin" -v=2 >& environments/dev-env/placement-translator-log.txt &
@@ -274,12 +293,60 @@ if [ $stage -eq 0 ] || [ $stage -gt 2 ]; then
 fi
 
 sleep 5
-kubectl ws root
 
 echo "****************************************"
 echo "Finished deploying kCP-EDGE controllers ...."
 echo "****************************************"
 
+
+if [ $stage -gt 2 ]; then
+    # (10): Create syncers manifest and apply it to the edge pcluters
+    echo "****************************************"
+    echo "Started deploying kCP-EDGE syncer ...."
+    echo "****************************************"
+
+    cd environments/dev-env/
+    
+    if [ $verbosity == 1 ]; then
+        ./build-edge-syncer.sh --syncTarget  sync-target-f -v
+        ./build-edge-syncer.sh --syncTarget  sync-target-g -v
+    else
+        ./build-edge-syncer.sh --syncTarget  sync-target-f
+        ./build-edge-syncer.sh --syncTarget  sync-target-g     
+    fi
+
+    cd kcp/
+
+    if [ $verbosity == 1 ]; then
+        # pcluster florin
+        kubectl kcp playground use pcluster florin 
+        kubectl apply -f ../sync-target-f-syncer.yaml
+
+        # pcluster guilder
+        kubectl kcp playground use pcluster guilder
+        kubectl apply -f ../sync-target-g-syncer.yaml
+    else
+        kubectl kcp playground use pcluster florin > /dev/null 2>&1
+        kubectl apply -f ../sync-target-f-syncer.yaml > /dev/null 2>&1
+
+        # pcluster guilder
+        kubectl kcp playground use pcluster guilder > /dev/null 2>&1
+        kubectl apply -f ../sync-target-g-syncer.yaml  > /dev/null 2>&1
+    fi
+
+
+    if [ $verbosity == 1 ]; then
+       kubectl kcp playground use shard main # switch to kcp shard
+    else
+       kubectl kcp playground use shard main > /dev/null 2>&1
+    fi
+    
+    echo "****************************************"
+    echo "Finished deploying kCP-EDGE syncer ...."
+    echo "****************************************"
+fi
+
+kubectl ws root
 export PATH=$PATH:$(pwd)/kcp/bin
 export KUBECONFIG=$(pwd)/kcp/.kcp-playground/playground.kubeconfig
 

@@ -7,3 +7,15 @@ spec:
   - matchLabels: {"env":"prod"}
   namespaceSelector:
     matchLabels: {"common":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
+  upsync:
+  - apiGroup: "group1.test"
+    resources: ["sprockets", "flanges"]
+    namespaces: ["orbital"]
+    names: ["george", "cosmo"]
+  - apiGroup: "group2.test"
+    resources: ["cogs"]
+    names: ["william"]

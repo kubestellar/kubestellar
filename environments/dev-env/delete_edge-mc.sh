@@ -38,6 +38,18 @@ pkill -f mailbox-controller
 pkill -f placement-translator
 pkill -f cmd/scheduler/main.go # edge-scheduler
 rm -rf $(pwd)/kcp
+rm -rf $(pwd)/edge-syncer
+
+
+if [ -f "sync-target-f-syncer.yaml" ]; then
+      rm sync-target-f-syncer.yaml
+      echo "Deleted syncer manifest: sync-target-f-syncer.yaml"
+fi 
+
+if [ -f "sync-target-g-syncer.yaml" ]; then
+      rm sync-target-g-syncer.yaml
+      echo "Deleted syncer manifest: sync-target-g-syncer.yaml"
+fi 
 
 if [ -f "placement-translator-log.txt" ]; then
       rm placement-translator-log.txt
@@ -61,4 +73,5 @@ if [ -f "kcp-playground-log.txt" ]; then
 fi
 
 rm -rf $(pwd)/kcp
+rm -rf $(pwd)/edge-syncer
 echo "Finished deletion ...."

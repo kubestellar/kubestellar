@@ -179,7 +179,7 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 ./delete_edge-mc.sh
 ```
 
-## Bring your own workload (BYOW)
+## Bring your own cluster (BYOC)
 
 #### 1. Create your own edge infrastructure (edge pclusters):
 
@@ -229,89 +229,111 @@ kind create cluster --name florin
     user      2898   0.0  0.1 34922264  45188 s004  S     3:22PM   0:01.84 go run cmd/scheduler/main.go -v 2 --root-user shard-main-kcp-admin --root-cluster shard-main-root --sysadm-context shard-main-system:admin --sysadm-user shard-main-shard-admin
     user      2872   0.0  0.2 34925136  56132 s004  S     3:22PM   0:02.44 go run ./cmd/mailbox-controller --inventory-context=shard-main-root -v=2
     user      2929   0.0  0.2 34922964  69724 s004  S     3:22PM   0:03.74 go run ./cmd/placement-translator --allclusters-context shard-main-system:admin
+
     ```
 
-#### 3. Deploy your own workload: 
+#### 3. Connect your edge pcluster to the kcp-edge platform:
 
- * Populate the `imw`:
-    * Step-1: enter the target workspace:
+  * Step-1: Populate the `imw`:
+    - enter the target workspace:
 
       ```bash
           kubectl ws root:imw-1
       ```
     
-    * Step-2: create a SyncTarget object to represent your edge pcluster. For example:
+  * Step-2: create a SyncTarget object to represent your edge pcluster. For example:
 
-      ```bash
-      cat <<EOF | kubectl apply -f -
-      apiVersion: workload.kcp.io/v1alpha1
-      kind: SyncTarget
-      metadata:
-        name: sync-target-f
-        labels:
-          example: si
-          extended: non
-      spec:
-        cells:
-          foo: bar
-      EOF
-      ```
+    ```bash
+    cat <<EOF | kubectl apply -f -
+    apiVersion: workload.kcp.io/v1alpha1
+    kind: SyncTarget
+    metadata:
+      name: sync-target-f
+      labels:
+        example: si
+        extended: non
+    spec:
+      cells:
+        foo: bar
+    EOF
+    ```
 
-   * Step-3: create a Location object describing your edge pcluster. For example:
+  * Step-3: create a Location object describing your edge pcluster. For example:
 
-      ```bash
-      cat <<EOF | kubectl apply -f -
-      apiVersion: scheduling.kcp.io/v1alpha1
-      kind: Location
-      metadata:
-        name: location-f
-        labels:
-          env: prod
-      spec:
-        resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
-        instanceSelector:
-          matchLabels: {"example":"si", "extended":"non"}
-      EOF
-     ```
+    ```bash
+    cat <<EOF | kubectl apply -f -
+    apiVersion: scheduling.kcp.io/v1alpha1
+    kind: Location
+    metadata:
+      name: location-f
+      labels:
+        env: prod
+    spec:
+      resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
+      instanceSelector:
+        matchLabels: {"example":"si", "extended":"non"}
+    EOF
+    ```
 
-      A location and synctarget objects will be created:
+    A location and synctarget objects will be created:
 
-      ```bash
-      kubectl get locations,synctargets
-      NAME                                    RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-      location.scheduling.kcp.io/default      synctargets   0           1                    36s
-      location.scheduling.kcp.io/location-f   synctargets   0           1                    25s
+    ```bash
+    kubectl get locations,synctargets
+    NAME                                    RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
+    location.scheduling.kcp.io/default      synctargets   0           1                    36s
+    location.scheduling.kcp.io/location-f   synctargets   0           1                    25s
 
-      NAME                                       AGE
-      synctarget.workload.kcp.io/sync-target-f   36s
-      ```
+    NAME                                       AGE
+    synctarget.workload.kcp.io/sync-target-f   36s
+    ```
 
-      The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `sync-target-f`:
+    The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `sync-target-f`:
 
-      ```bash
-      kubectl ws root
-      Current workspace is "root".
+    ```bash
+    kubectl ws root
+    Current workspace is "root".
 
-      kubectl ws tree
-      .
-      └── root
-          ├── compute
-          ├── espw
-          │   └── 1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
-          ├── imw-1
-          └── my-org
-              └── wmw-1
-      ```
+    kubectl ws tree
+    .
+    └── root
+        ├── compute
+        ├── espw
+        │   └── 1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
+        ├── imw-1
+        └── my-org
+            └── wmw-1
+    ```
 
-* Populate the `wmw`: 
+  * Step-4: create the edge syncer manifest
 
-  * Step-1: Enter the target workspace: `wmw-1`
+    ```bash
+       ./build-edge-syncer.sh  --syncTarget sync-target-f
+    ```
+
+  * Step-5: deploy the edge syncer to your edge pcluter
+
+    - Apply the edge syncer manifest:
+
+    ```bash
+       kubectl apply -f sync-target-g-syncer.yaml
+    ```
+
+
+
+
+## Bring your own workload (BYOW)
+
+#### 1. Populate the `wmw`:  
+
+Enter the target workspace: `wmw-1`
  
     ```bash
       kubectl ws root:my-org:wmw-1
     ```
 
-  * Step-2: create your workload objects. For example:
+#### 2. Create your workload objects:
+
+For example:
 
     ```bash
     cat <<EOF | kubectl apply -f -
@@ -345,51 +367,59 @@ kind create cluster --name florin
     EOF
     ```
 
-  * Step-3: create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
- 
-    ```bash
-    cat <<EOF | kubectl apply -f -
-    apiVersion: edge.kcp.io/v1alpha1
-    kind: EdgePlacement
-    metadata:
-      name: edge-placement-c
-    spec:
-      locationSelectors:
-      - matchLabels: {"env":"prod"}
-      namespaceSelector:
-        matchLabels: {"common":"si"}
-    EOF
-    ```
- 
-    In response to the created `EdgePlacement`, the edge scheduler will create a corresponding `SinglePlacementSlice` object:
+#### 3. Create the `EdgePlacement` object for your workload. 
 
-    ```bash
-        kubectl get SinglePlacementSlice -o yaml edge-placement-c
+Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
+ 
+  ```bash
+  cat <<EOF | kubectl apply -f -
+  apiVersion: edge.kcp.io/v1alpha1
+  kind: EdgePlacement
+  metadata:
+    name: edge-placement-c
+  spec:
+    locationSelectors:
+    - matchLabels: {"env":"prod"}
+    namespaceSelector:
+      matchLabels: {"common":"si"}
+  EOF
+  ```
+ 
+In response to the created `EdgePlacement`, the edge scheduler will create a corresponding `SinglePlacementSlice` object:
 
-        apiVersion: edge.kcp.io/v1alpha1
-        destinations:
-        - cluster: 2vsg1pyc1uqtyk40
-          locationName: location-f
-          syncTargetName: sync-target-f
-          syncTargetUID: b7acd821-319b-4061-be47-084fbce36f29
-        kind: SinglePlacementSlice
-        metadata:
-          annotations:
-            kcp.io/cluster: 19nyul7j8az21nkp
-          creationTimestamp: "2023-04-13T03:58:20Z"
-          generation: 1
+  ```bash
+      kubectl get SinglePlacementSlice -o yaml edge-placement-c
+
+      apiVersion: edge.kcp.io/v1alpha1
+      destinations:
+      - cluster: 2vsg1pyc1uqtyk40
+        locationName: location-f
+        syncTargetName: sync-target-f
+        syncTargetUID: b7acd821-319b-4061-be47-084fbce36f29
+      kind: SinglePlacementSlice
+      metadata:
+        annotations:
+          kcp.io/cluster: 19nyul7j8az21nkp
+        creationTimestamp: "2023-04-13T03:58:20Z"
+        generation: 1
+        name: edge-placement-c
+        ownerReferences:
+        - apiVersion: edge.kcp.io/v1alpha1
+          kind: EdgePlacement
           name: edge-placement-c
-          ownerReferences:
-          - apiVersion: edge.kcp.io/v1alpha1
-            kind: EdgePlacement
-            name: edge-placement-c
-            uid: c3d718b8-9a2f-4a34-9b80-b98d091cff67
-          resourceVersion: "1088"
-          uid: b7a8e302-1532-4e48-a69e-910a9ac2aa62
-    ```
+          uid: c3d718b8-9a2f-4a34-9b80-b98d091cff67
+        resourceVersion: "1088"
+        uid: b7a8e302-1532-4e48-a69e-910a9ac2aa62
+  ```
 
-   * Step-4: delete your kcp-edge environment
+#### 4. You can check that the workloads are running in the edge clusters:
 
-   ```bash
-   ./delete_edge-mc.sh
-   ```
+In response to the EdgePlacement and SinglePlacementSlice objects, the placement translator will copy the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+
+#### 5. You can check that the workloads are running in the edge clusters:
+
+#### 6. Delete your kcp-edge environment:
+
+```bash
+./delete_edge-mc.sh
+```

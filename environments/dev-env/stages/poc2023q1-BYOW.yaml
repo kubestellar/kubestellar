@@ -7,7 +7,6 @@ spec:
       workspaces:
         - name: root
           workspaces:
-            - name: imw-1
             - name: espw
               others:
                 - name: edgeCRD - edge.kcp.io_customizers
@@ -78,3 +77,4 @@ spec:
                       apiExport:
                         name: edge.kcp.io
                         path: "root:espw"
+            - name: imw-1
