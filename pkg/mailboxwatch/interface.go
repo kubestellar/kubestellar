@@ -40,6 +40,7 @@ import (
 // - an informer on mailbox workspaces, used to keep appraised of the mailbox workspaces.
 // The ListerWatcher should be among your generated client code,
 // see the comments on ScopedListerWatcher and ClusterListerWatcher.
+// Like any informer, the one returned here needs to be `Run`.
 func NewSharedInformer[Scoped ScopedListerWatcher[ListType], ListType runtime.Object](
 	ctx context.Context,
 	listGVK machschema.GroupVersionKind,
@@ -53,9 +54,6 @@ func NewSharedInformer[Scoped ScopedListerWatcher[ListType], ListType runtime.Ob
 	// Use the informer on mailbox workspaces to stay appraised of the logicalcluster.Name for
 	// each mailbox workspace qua logical cluster.
 	// Construct a synthetic ListerWatcher that does scatter/gather to cluster-specific ListerWatchers.
-	// At first stage of development, do not take special care when mailbox workspaces arrive or depart,
-	// because objects in them will likely arrive later and depart sooner.
-	// At a later stage of development, do not rely on happy timing.
 	wrappedListerWatcher := newCrossClusterListerWatcher(ctx, listGVK, mailboxWorkspacePreInformer, listerWatcher)
 	return kcpinformers.NewSharedIndexInformer(wrappedListerWatcher, exampleObject, defaultEventHandlerResyncPeriod, indexers)
 }
