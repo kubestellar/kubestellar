@@ -20,7 +20,7 @@ Edge-syncer can be deployed on Edge cluster easily by the following steps.
 1. Use command to register edge-syncer and obtain yaml manifests to bootstrap Edge Syncer
     ```console
     kubectl ws <mb-ws name>
-    kubectl kcp workload edge-sync <EM Sync Target name> --image <EM Syncer Image> -o edge-syncer.yaml
+    kubectl kcp workload edge-sync <EM Sync Target name> --syncer-image <EM Syncer Image> -o edge-syncer.yaml
     ```
 1. Deploy edge-syncer on an Edge cluster
 1. Syncer starts to run on the Edge cluster
