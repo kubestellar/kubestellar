@@ -17,10 +17,12 @@ limitations under the License.
 package mailboxwatch
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	machschema "k8s.io/apimachinery/pkg/runtime/schema"
 	restclient "k8s.io/client-go/rest"
 	upstreamcache "k8s.io/client-go/tools/cache"
 
@@ -32,13 +34,18 @@ import (
 )
 
 // NewSharedInformer constructs a shared index informer on objects of a given kind in mailbox workspaces.
-// It follows the usual pattern for a constructor of informers except for an additional parameter
-// at the front, which it uses to keep appraised of the mailbox workspaces.
-// The ListerWatcher can be constructed using `NewListerWatcher`, for example
-// as is done in `impl_test.go`.
-func NewSharedInformer(
+// It follows the usual pattern for a constructor of informers except for additional parameters at the start:
+// - a context.Context, because, really;
+// - the GroupVersionKind of a _list_;
+// - an informer on mailbox workspaces, used to keep appraised of the mailbox workspaces.
+// The ListerWatcher should be among your generated client code,
+// see the comments on ScopedListerWatcher and ClusterListerWatcher.
+// Like any informer, the one returned here needs to be `Run`.
+func NewSharedInformer[Scoped ScopedListerWatcher[ListType], ListType runtime.Object](
+	ctx context.Context,
+	listGVK machschema.GroupVersionKind,
 	mailboxWorkspacePreInformer tenancyv1a1informers.WorkspaceInformer,
-	listerWatcher upstreamcache.ListerWatcher,
+	listerWatcher ClusterListerWatcher[Scoped, ListType],
 	exampleObject runtime.Object,
 	defaultEventHandlerResyncPeriod time.Duration,
 	indexers upstreamcache.Indexers,
@@ -46,11 +53,8 @@ func NewSharedInformer(
 	// Implementation outline:
 	// Use the informer on mailbox workspaces to stay appraised of the logicalcluster.Name for
 	// each mailbox workspace qua logical cluster.
-	// Wrap the given ListerWatcher with filtering that passes only objects in one of those logical clusters.
-	// At first stage of development, do not take special care when mailbox workspaces arrive or depart,
-	// because objects in them will likely arrive later and depart sooner.
-	// At a later stage of development, do not rely on happy timing.
-	wrappedListerWatcher := newFilteredListerWatcher(mailboxWorkspacePreInformer, listerWatcher)
+	// Construct a synthetic ListerWatcher that does scatter/gather to cluster-specific ListerWatchers.
+	wrappedListerWatcher := newCrossClusterListerWatcher(ctx, listGVK, mailboxWorkspacePreInformer, listerWatcher)
 	return kcpinformers.NewSharedIndexInformer(wrappedListerWatcher, exampleObject, defaultEventHandlerResyncPeriod, indexers)
 }
 
@@ -58,9 +62,11 @@ func NewSharedInformer(
 // edge service provider workspace and constructs the pre-informer for the mailbox workspaces.
 // That pre-informer is then used to call NewSharedInformer and is also returned,
 // so that the caller can wait on HasSynced of the mailbox workspace informer.
-func NewSharedInformerForEdgeConfig(
+func NewSharedInformerForEdgeConfig[Scoped ScopedListerWatcher[ListType], ListType runtime.Object](
+	ctx context.Context,
+	listGVK machschema.GroupVersionKind,
 	edgeServiceProviderWorkspaceClientConfig *restclient.Config,
-	listerWatcher upstreamcache.ListerWatcher,
+	listerWatcher ClusterListerWatcher[Scoped, ListType],
 	exampleObject runtime.Object,
 	defaultEventHandlerResyncPeriod time.Duration,
 	indexers upstreamcache.Indexers,
@@ -71,5 +77,5 @@ func NewSharedInformerForEdgeConfig(
 	}
 	workspaceScopedInformerFactory := kcpapiinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, 0)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
-	return workspaceScopedPreInformer, NewSharedInformer(workspaceScopedPreInformer, listerWatcher, exampleObject, defaultEventHandlerResyncPeriod, indexers), nil
+	return workspaceScopedPreInformer, NewSharedInformer(ctx, listGVK, workspaceScopedPreInformer, listerWatcher, exampleObject, defaultEventHandlerResyncPeriod, indexers), nil
 }
