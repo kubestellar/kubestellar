@@ -76,10 +76,14 @@ from the MBWS and making the following changes.
   is set to `yes`.
 - The remainder of the `metadata` is unchanged.
 
-For objects that exist in a mailbox workspace and whose API
-GroupResource has been relevant to the placement translator since it
-started, ones that have the `edge.kcp.io/projected=yes` label but are
-not currently desired are deleted.
+For objects --- other than `Namespace` objects --- that exist in a
+mailbox workspace and whose API GroupResource has been relevant to the
+placement translator since it started, ones that have the
+`edge.kcp.io/projected=yes` label but are not currently desired are
+deleted.  The exclusion for `Namespace` objects is there because the
+placement translator does not take full ownership of them, rather it
+takes the position that there might be other parties that create
+`Namespace` objects or rely on their existence.
 
 ## Usage
 
