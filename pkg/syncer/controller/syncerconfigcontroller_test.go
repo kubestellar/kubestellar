@@ -22,11 +22,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	fakediscovery "k8s.io/client-go/discovery/fake"
@@ -37,10 +39,7 @@ import (
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-
 	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var testAPIResourceList = []*metav1.APIResourceList{

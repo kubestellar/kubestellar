@@ -32,10 +32,11 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
+	"github.com/kcp-dev/logicalcluster/v3"
+
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	clientopts "github.com/kcp-dev/edge-mc/pkg/client-options"
 	clusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 func main() {
