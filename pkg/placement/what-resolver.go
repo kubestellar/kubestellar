@@ -324,9 +324,12 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 		return true
 	}
 	rObj, err := rr.lister.Get(objName)
-	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Failed to fetch generic object from lister")
-		return true
+	if err != nil {
+		if !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to fetch generic object from lister")
+			return true
+		}
+		rObj = nil
 	}
 	oldDetails := rr.byObjName[objName]
 	if oldDetails == nil {
@@ -373,9 +376,12 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		return true
 	}
 	ar, err := wsDetails.apiLister.Get(arName)
-	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Failed to lookup APIResource")
-		return true
+	if err != nil {
+		if !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to lookup APIResource")
+			return true
+		}
+		ar = nil
 	}
 	rr := wsDetails.resources[arName]
 	// TODO: handle the case where ar.Spec changed
@@ -441,9 +447,12 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName string) bool {
 	logger := klog.FromContext(ctx)
 	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(epName)
-	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Failed to fetch EdgePlacement from local cache", "cluster", cluster, "epName", epName)
-		return true // I think these errors are not transient
+	if err != nil {
+		if !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to fetch EdgePlacement from local cache", "cluster", cluster, "epName", epName)
+			return true // I think these errors are not transient
+		}
+		ep = nil
 	}
 	epFound := err == nil
 	wr.Lock()
