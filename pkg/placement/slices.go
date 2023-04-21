@@ -112,6 +112,15 @@ func (vs VisitableStringerVal[Elt]) String() string {
 	return ans.String()
 }
 
+func VisitableMapFnReduceOr[Elt any](visitable Visitable[Elt], test func(Elt) bool) bool {
+	return visitable.Visit(func(elt Elt) error {
+		if test(elt) {
+			return errStop
+		}
+		return nil
+	}) != nil
+}
+
 func VisitableTransformToSlice[Original, Transformed any](set Visitable[Original], xform func(Original) Transformed) []Transformed {
 	ans := []Transformed{}
 	set.Visit(func(elt Original) error {
