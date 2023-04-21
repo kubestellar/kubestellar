@@ -47,6 +47,7 @@ workspace but with the following changes.
 - The `metadata.uid` is emptied.
 - The `metadata.ownerReferences` is emptied.  (Doing better would
   require tracking UID mappings from WMW to MBWS.)
+- In `metadata.labels`, `edge.kcp.io/projected=yes` is added.
 
 The placement translator does not react to changes to the workload
 objects in the mailbox workspace.
@@ -70,9 +71,15 @@ from the MBWS and making the following changes.
   - A "system" annnotation is unchanged.  The system annotations are
     those whose key (a) starts with `kcp.io/` or other stuff followed
     by `.kcp.io/` and (b) does not start with `edge.kcp.io/`.
-- If the source object has some labels then they are merged into the
-  destination object using the same rules as for annotations.
+- The source object's labels are merged into the destination object
+  using the same rules as for annotations, and `edge.kcp.io/projected`
+  is set to `yes`.
 - The remainder of the `metadata` is unchanged.
+
+For objects that exist in a mailbox workspace and whose API
+GroupResource has been relevant to the placement translator since it
+started, ones that have the `edge.kcp.io/projected=yes` label but are
+not currently desired are deleted.
 
 ## Usage
 

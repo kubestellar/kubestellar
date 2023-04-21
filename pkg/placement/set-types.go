@@ -436,6 +436,44 @@ func SetEqual[Elt any](set1, set2 Set[Elt]) bool {
 	return SetCompare[Elt](set1, set2).IsEqual()
 }
 
+func SetIntersection[Elt any](set1, set2 Set[Elt]) Set[Elt] {
+	return setIntersection[Elt]{set1, set2}
+}
+
+type setIntersection[Elt any] struct {
+	set1 Set[Elt]
+	set2 Set[Elt]
+}
+
+func (si setIntersection[Elt]) IsEmpty() bool {
+	if si.set2.IsEmpty() {
+		return true
+	}
+	return si.Visit(func(elt Elt) error {
+		return errStop
+	}) == nil
+}
+
+func (si setIntersection[Elt]) LenIsCheap() bool { return false }
+
+func (si setIntersection[Elt]) Len() int {
+	return VisitableLen[Elt](si)
+}
+
+func (si setIntersection[Elt]) Has(elt Elt) bool { return si.set1.Has(elt) && si.set2.Has(elt) }
+
+func (si setIntersection[Elt]) Visit(visitor func(Elt) error) error {
+	if si.set2.IsEmpty() {
+		return nil
+	}
+	return si.set1.Visit(func(elt Elt) error {
+		if si.set2.Has(elt) {
+			return visitor(elt)
+		}
+		return nil
+	})
+}
+
 type Comparison struct{ LessOrEqual, GreaterOrEqual bool }
 
 func (comp Comparison) Reverse() Comparison {
