@@ -906,9 +906,12 @@ func (wp *workloadProjector) syncSourceToDest(ctx context.Context, logger klog.L
 		if namespaced {
 			<-clientReadyChan
 			nsObj, err := wpd.namespacePreInformer.Lister().Get(soRef.namespace)
-			if err != nil && !k8sapierrors.IsNotFound(err) {
-				logger.Error(err, "Failed to lookup namespace in local cache")
-				return true
+			if err != nil {
+				if !k8sapierrors.IsNotFound(err) {
+					logger.Error(err, "Failed to lookup namespace in local cache")
+					return true
+				}
+				nsObj = nil
 			}
 			if nsObj == nil {
 				nsObj = &k8scorev1.Namespace{
