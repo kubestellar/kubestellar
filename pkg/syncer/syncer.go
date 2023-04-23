@@ -159,33 +159,36 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 			syncerConfigManager.Refresh()
 			_ = downSyncer.ReInitializeClients(syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
 			_ = upSyncer.ReInitializeClients(syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
-			for _, resource := range syncConfigManager.GetDownSyncedResources() {
-				if resource.Name == "*" {
-					if err := downSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to downsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-					if err := downSyncer.BackStatusMany(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to status upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-				} else {
-					if err := downSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to downsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-					if err := downSyncer.BackStatusOne(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to status upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-				}
+			sync(logger.WithValues("actor", "DownSyncer"), downSyncer, syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
+			syncStatus(logger.WithValues("actor", "DownSyncer"), downSyncer, syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
+			sync(logger.WithValues("actor", "UpSyncer"), upSyncer, syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
+		}
+	}
+}
+
+func sync(logger klog.Logger, syncer syncers.SyncerInterface, resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) {
+	for _, resource := range resources {
+		if resource.Name == "*" || resource.Namespace == "*" {
+			if err := syncer.SyncMany(resource, conversions); err != nil {
+				logger.V(1).Info(fmt.Sprintf("failed to sync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 			}
-			for _, resource := range syncConfigManager.GetUpSyncedResources() {
-				if resource.Name == "*" || resource.Namespace == "*" {
-					if err := upSyncer.SyncMany(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to upsync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-				} else {
-					if err := upSyncer.SyncOne(resource, syncConfigManager.GetConversions()); err != nil {
-						logger.V(1).Info(fmt.Sprintf("failed to upsync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
-					}
-				}
+		} else {
+			if err := syncer.SyncOne(resource, conversions); err != nil {
+				logger.V(1).Info(fmt.Sprintf("failed to sync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+			}
+		}
+	}
+}
+
+func syncStatus(logger klog.Logger, downSyncer *syncers.DownSyncer, resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) {
+	for _, resource := range resources {
+		if resource.Name == "*" || resource.Namespace == "*" {
+			if err := downSyncer.BackStatusMany(resource, conversions); err != nil {
+				logger.V(1).Info(fmt.Sprintf("failed to status sync-many %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
+			}
+		} else {
+			if err := downSyncer.BackStatusOne(resource, conversions); err != nil {
+				logger.V(1).Info(fmt.Sprintf("failed to status sync %s.%s/%s (ns=%s)", resource.Kind, resource.Group, resource.Name, resource.Namespace))
 			}
 		}
 	}
