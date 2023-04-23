@@ -19,7 +19,7 @@ they appear in this example.
 
 ## Stage 1
 
-![Boxes and arrows. Two kind clusters exist, named kind1 and kind3. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoD controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
+![Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
 
 Stage 1 creates the infrastructure and the edge service provider
 workspace and lets that react to the inventory.  Then the edge syncers
@@ -102,97 +102,63 @@ kubectl ws root
 kubectl ws create imw-1 --enter
 ```
 
-### Create a SyncTarget object to represent the florin cluster
+### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
-Use `kubectl` to create the SyncTarget object, as in the following
-command.
+Use the following two commands. They label both florin and guilder
+with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
-kubectl apply -f - <<EOF
+scripts/ensure-location.sh florin  env=prod
+scripts/ensure-location.sh guilder env=prod extended=si
+```
+
+Those two script invocations are equivalent to creating the following
+four objects.
+
+```yaml
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: sync-target-f
+  name: florin
   labels:
-    example: si
-    extended: non
-spec:
-  cells:
-    foo: bar
-EOF
-```
-
-### Create a Location object describing the florin cluster
-
-Use `kubectl` to create the Location object, as in the following
-command.
-
-```shell
-kubectl apply -f - <<EOF
+    id: florin
+    env: prod
+---
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: location-f
+  name: florin
   labels:
     env: prod
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {"example":"si", "extended":"non"}
-EOF
-```
-
-### Delete default Location
-
-You will probably find that something automatically created a
-`Location` named `default` for your convenience.  It is actually a
-nuisance in this scenario.  Delete that Location, such as with the
-following command.
-
-```shell
-kubectl delete locations default
-```
-
-### Create a SyncTarget object describing the guilder cluster
-
-Use `kubectl` to create the SyncTarget object, like in the following
-command.
-
-```shell
-kubectl apply -f - <<EOF
+    matchLabels: {id: florin}
+---
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: sync-target-g
+  name: guilder
   labels:
-    example: si
+    id: guilder
+    env: prod
     extended: si
-spec:
-  cells:
-    bar: baz
-EOF
-```
-
-### Create a Location object describing the guilder cluster
-
-Use `kubectl` to create the Location object, such as with the
-following command.
-
-```shell
-kubectl apply -f - <<EOF
+---
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: location-g
+  name: guilder
   labels:
     env: prod
     extended: si
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {"example":"si", "extended":"si"}
-EOF
+    matchLabels: {id: guilder}
 ```
+
+That script also deletes the Location named `default`, which is not
+used in this PoC, if it shows up.
 
 ### Create the edge service provider workspace
 
@@ -223,10 +189,11 @@ Eventually.  In the meantime, you can run it by hand as follows.
 ```console
 $ go run ./cmd/mailbox-controller -v=2
 ...
-I0418 00:06:33.600117    6576 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
+I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
 ...
-I0418 00:06:34.361128    6576 controller.go:299] "Created APIBinding" worker=1 mbwsName="2rp1gztc6m5b8b7r-mb-31e5fa4d-a84e-4397-a523-63fa62d16dad" mbwsCluster="1b0eso4ld8np1d3z" bindingName="bind-edge" resourceVersion="1303"
-I0418 00:06:34.361216    6576 controller.go:299] "Created APIBinding" worker=2 mbwsName="2rp1gztc6m5b8b7r-mb-58f7e799-4653-422b-adba-b1e5e85a7fac" mbwsCluster="2gqno7cdbsthqsmz" bindingName="bind-edge" resourceVersion="1305"
+I0423 01:09:38.449395   10624 controller.go:299] "Created APIBinding" worker=1 mbwsName="apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" mbwsCluster="yk9a66vjms1pi8hu" bindingName="bind-edge" resourceVersion="914"
+...
+I0423 01:09:38.842881   10624 controller.go:299] "Created APIBinding" worker=3 mbwsName="apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" mbwsCluster="12299slctppnhjnn" bindingName="bind-edge" resourceVersion="968"
 ^C
 ```
 
@@ -244,132 +211,96 @@ You can get a listing of those mailbox workspaces as follows.
 ```console
 $ kubectl get Workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
-4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5   universal            Ready   https://192.168.58.123:6443/clusters/2ed8dgm0r236p37s   24m
-4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234   universal            Ready   https://192.168.58.123:6443/clusters/lt9tl3fhowweev8r   24m
+apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54   universal            Ready   https://192.168.58.123:6443/clusters/12299slctppnhjnn   2m4s
+apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba   universal            Ready   https://192.168.58.123:6443/clusters/yk9a66vjms1pi8hu   2m4s
 ```
 
 More usefully, using custom columns you can get a listing that shows
 the _name_ of the associated SyncTarget.
 
 ```console
-$ kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name']"
-NAME                                                       SYNCTARGET
-4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5   sync-target-g
-4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234   sync-target-f
+$ kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
+NAME                                                       SYNCTARGET   CLUSTER
+apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54   florin       12299slctppnhjnn
+apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba   guilder      yk9a66vjms1pi8hu
 ```
 
 Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```console
-$ kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "sync-target-g") | .name'
-4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5
+$ kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
+apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
 ```
-
-### Build the edge-mc variant of the kubectl-kcp plugin
-
-Do these things in a separate shell, or `pushd` for the duration here
-and `popd` to get back.  You will need a `git clone` of
-[kcp](https://github.com/kcp-dev/kcp); create that if you have not
-already.  In the following commands, `$KCPDIR` refers to the local
-`kcp` directory where that clone landed.  In there, also create a `git
-remote` for https://github.com/yana1205/kcp .  Then `git fetch` that
-remote and then `git checkout emc`, to get the branch that has the
-edge variant of the kubectl-kcp plugin.  With `$KCPDIR` as your
-current working directory, do the following command.
-
-```shell
-make
-```
-
-Among other things, that will create `$KCPDIR/bin/kubectl-kcp`; this
-is the plugin binary that you need.
-
-Do NOT `make install`, because this branch is NOT based on the same
-version of kcp as the rest of edge-mc.
 
 ### Connect guilder edge cluster with its mailbox workspace
 
-In your main shell, use the edge-mc variant of the kubectl-kcp plugin
-to connect the guilder edge cluster with its mailbox workspace.  That
-is, deploy the edge syncer in the edge cluster and configure the
-mailbox workspace to authorize the edge syncer as it needs.  The
-commands below direct the plugin to modify the current workspace
-(which will be the guilder mailbox --- substitute the right name for
-your guilder mailbox) and write into the file named `edge-syncer.yaml`
-the objects that need to be created in the guilder edge cluster.
+The following command will (a) create, in the mailbox workspace for
+guilder, an identity and authorizations for the edge syncer and (b)
+write a file containing YAML for deploying the syncer in the guilder
+cluster.  The first time you run this command, it will (as shown here)
+`git clone` the repo contaiing the kubectl kcp plugin that does the
+actual work and build it.
 
 ```console
-$ kubectl ws root:espw
-Current workspace is "root:espw".
+$ scripts/mailbox-prep.sh guilder
+Current workspace is "root:espw:apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" (type root:universal).
+Cloning into 'build/syncer-kcp'...
+remote: Enumerating objects: 47989, done.
+remote: Total 47989 (delta 0), reused 0 (delta 0), pack-reused 47989
+Receiving objects: 100% (47989/47989), 18.59 MiB | 12.91 MiB/s, done.
+Resolving deltas: 100% (31297/31297), done.
+branch 'emc' set up to track 'origin/emc'.
+Switched to a new branch 'emc'
+hack/verify-go-versions.sh
+GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build  -ldflags="-X k8s.io/client-go/pkg/version.gitCommit=11d1f3a8 -X k8s.io/client-go/pkg/version.gitTreeState=clean -X k8s.io/client-go/pkg/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/client-go/pkg/version.gitMajor=1 -X k8s.io/client-go/pkg/version.gitMinor=24 -X k8s.io/client-go/pkg/version.buildDate=2023-04-23T05:21:50Z -X k8s.io/component-base/version.gitCommit=11d1f3a8 -X k8s.io/component-base/version.gitTreeState=clean -X k8s.io/component-base/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/component-base/version.gitMajor=1 -X k8s.io/component-base/version.gitMinor=24 -X k8s.io/component-base/version.buildDate=2023-04-23T05:21:50Z -extldflags '-static'" -o bin ./cmd/kubectl-kcp
+ln -sf kubectl-workspace bin/kubectl-workspaces
+ln -sf kubectl-workspace bin/kubectl-ws
+Creating service account "kcp-edge-syncer-guilder-saaywsu5"
+Creating cluster role "kcp-edge-syncer-guilder-saaywsu5" to give service account "kcp-edge-syncer-guilder-saaywsu5"
 
-$ kubectl ws 4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5
-Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5" (type root:universal).
-
-$ $KCPDIR/bin/kubectl-kcp workload edge-sync sync-target-g --syncer-image quay.io/kcpedge/syncer:dev-2023-04-18 -o edge-syncer.yaml 
-Creating service account "kcp-edge-syncer-sync-target-g-2s28jt1z"
-Creating cluster role "kcp-edge-syncer-sync-target-g-2s28jt1z" to give service account "kcp-edge-syncer-sync-target-g-2s28jt1z"
-
- 1. write and sync access to the synctarget "kcp-edge-syncer-sync-target-g-2s28jt1z"
+ 1. write and sync access to the synctarget "kcp-edge-syncer-guilder-saaywsu5"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-sync-target-g-2s28jt1z" to bind service account "kcp-edge-syncer-sync-target-g-2s28jt1z" to cluster role "kcp-edge-syncer-sync-target-g-2s28jt1z".
+Creating or updating cluster role binding "kcp-edge-syncer-guilder-saaywsu5" to bind service account "kcp-edge-syncer-guilder-saaywsu5" to cluster role "kcp-edge-syncer-guilder-saaywsu5".
 
-Wrote physical cluster manifest to edge-syncer.yaml for namespace "kcp-edge-syncer-sync-target-g-2s28jt1z". Use
+Wrote physical cluster manifest to guilder-syncer.yaml for namespace "kcp-edge-syncer-guilder-saaywsu5". Use
 
-  KUBECONFIG=<pcluster-config> kubectl apply -f "edge-syncer.yaml"
+  KUBECONFIG=<pcluster-config> kubectl apply -f "guilder-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-sync-target-g-2s28jt1z" kcp-edge-syncer-sync-target-g-2s28jt1z
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-guilder-saaywsu5" kcp-edge-syncer-guilder-saaywsu5
 
 to verify the syncer pod is running.
 ```
 
-Next, make sure you know how to use the alternate kube client config
-that addresses the guilder cluster.  You might practice like as
-follows.  In this example, that involves specifying an alternate
-kubeconfig file and context within that file.
+The file written was, as mentioned in the output,
+`guilder-syncer.yaml`.  Next `kubectl apply` that to the guilder
+cluster.  That will look something like the following; adjust as
+necessary to make kubectl manipulate **your** guilder cluster.
 
 ```console
-$ KUBECONFIG=~/.kube/config kubectl version --context kind-guilder
-WARNING: This version information is deprecated and will be replaced with the output from kubectl version --short.  Use --output=yaml|json to get the full version.
-Client Version: version.Info{Major:"1", Minor:"25", GitVersion:"v1.25.0", GitCommit:"a866cbe2e5bbaa01cfd5e969aa3e033f3282a8a2", GitTreeState:"clean", BuildDate:"2022-08-23T17:44:59Z", GoVersion:"go1.19", Compiler:"gc", Platform:"darwin/amd64"}
-Kustomize Version: v4.5.7
-Server Version: version.Info{Major:"1", Minor:"25", GitVersion:"v1.25.2", GitCommit:"5835544ca568b757a8ecae5c153f317e5736700e", GitTreeState:"clean", BuildDate:"2022-09-22T05:25:21Z", GoVersion:"go1.19.1", Compiler:"gc", Platform:"linux/amd64"}
-
-$ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder ns
-NAME                 STATUS   AGE
-default              Active   89m
-kube-node-lease      Active   89m
-kube-public          Active   89m
-kube-system          Active   89m
-local-path-storage   Active   89m
-```
-
-When you are confident, deploy the syncer as follows.
-
-```console
-$ KUBECONFIG=~/.kube/config kubectl apply --context kind-guilder -f edge-syncer.yaml 
-namespace/kcp-edge-syncer-sync-target-g-2s28jt1z created
-serviceaccount/kcp-edge-syncer-sync-target-g-2s28jt1z created
-secret/kcp-edge-syncer-sync-target-g-2s28jt1z-token created
-clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-sync-target-g-2s28jt1z created
-clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-sync-target-g-2s28jt1z created
-role.rbac.authorization.k8s.io/kcp-edge-dns-sync-target-g-2s28jt1z created
-rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-sync-target-g-2s28jt1z created
-secret/kcp-edge-syncer-sync-target-g-2s28jt1z created
-deployment.apps/kcp-edge-syncer-sync-target-g-2s28jt1z created
+$ KUBECONFIG=~/.kube/config kubectl apply --context kind-guilder -f guilder-syncer.yaml
+namespace/kcp-edge-syncer-guilder-saaywsu5 created
+serviceaccount/kcp-edge-syncer-guilder-saaywsu5 created
+secret/kcp-edge-syncer-guilder-saaywsu5-token created
+clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-guilder-saaywsu5 created
+clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-guilder-saaywsu5 created
+role.rbac.authorization.k8s.io/kcp-edge-dns-guilder-saaywsu5 created
+rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-guilder-saaywsu5 created
+secret/kcp-edge-syncer-guilder-saaywsu5 created
+deployment.apps/kcp-edge-syncer-guilder-saaywsu5 created
 ```
 
 You might check that the syncer is running, as follows.
 
 ```console
 $ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder deploy -A
-NAMESPACE                                NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
-kcp-edge-syncer-sync-target-g-2s28jt1z   kcp-edge-syncer-sync-target-g-2s28jt1z   1/1     1            1           39s
-kube-system                              coredns                                  2/2     2            2           91m
-local-path-storage                       local-path-provisioner                   1/1     1            1           91m
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+kcp-edge-syncer-guilder-saaywsu5   kcp-edge-syncer-guilder-saaywsu5   1/1     1            1           52s
+kube-system                        coredns                            2/2     2            2           35m
+local-path-storage                 local-path-provisioner             1/1     1            1           35m
 ```
 
 ### Connect florin edge cluster with its mailbox workspace
@@ -380,25 +311,25 @@ Do the analogous stuff for the florin cluster.
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 
-$ kubectl ws 4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234            
-Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234" (type root:universal).
+$ scripts/mailbox-prep.sh florin
+Current workspace is "root:espw:apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" (type root:universal).
+Already on 'emc'
+Your branch is up to date with 'origin/emc'.
+Creating service account "kcp-edge-syncer-florin-1t9zgidy"
+Creating cluster role "kcp-edge-syncer-florin-1t9zgidy" to give service account "kcp-edge-syncer-florin-1t9zgidy"
 
-$ $KCPDIR/bin/kubectl-kcp workload edge-sync sync-target-f --syncer-image quay.io/kcpedge/syncer:dev-2023-04-18 -o edge-syncer.yaml
-Creating service account "kcp-edge-syncer-sync-target-f-1vzjlz1t"
-Creating cluster role "kcp-edge-syncer-sync-target-f-1vzjlz1t" to give service account "kcp-edge-syncer-sync-target-f-1vzjlz1t"
-
- 1. write and sync access to the synctarget "kcp-edge-syncer-sync-target-f-1vzjlz1t"
+ 1. write and sync access to the synctarget "kcp-edge-syncer-florin-1t9zgidy"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-sync-target-f-1vzjlz1t" to bind service account "kcp-edge-syncer-sync-target-f-1vzjlz1t" to cluster role "kcp-edge-syncer-sync-target-f-1vzjlz1t".
+Creating or updating cluster role binding "kcp-edge-syncer-florin-1t9zgidy" to bind service account "kcp-edge-syncer-florin-1t9zgidy" to cluster role "kcp-edge-syncer-florin-1t9zgidy".
 
-Wrote physical cluster manifest to edge-syncer.yaml for namespace "kcp-edge-syncer-sync-target-f-1vzjlz1t". Use
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-1t9zgidy". Use
 
-  KUBECONFIG=<pcluster-config> kubectl apply -f "edge-syncer.yaml"
+  KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-sync-target-f-1vzjlz1t" kcp-edge-syncer-sync-target-f-1vzjlz1t
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-1t9zgidy" kcp-edge-syncer-florin-1t9zgidy
 
 to verify the syncer pod is running.
 ```
@@ -406,17 +337,18 @@ to verify the syncer pod is running.
 And deploy the syncer in the florin cluster.
 
 ```console
-$ KUBECONFIG=~/.kube/config kubectl apply --context kind-florin -f edge-syncer.yaml 
-namespace/kcp-edge-syncer-sync-target-f-1vzjlz1t created
-serviceaccount/kcp-edge-syncer-sync-target-f-1vzjlz1t created
-secret/kcp-edge-syncer-sync-target-f-1vzjlz1t-token created
-clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-sync-target-f-1vzjlz1t created
-clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-sync-target-f-1vzjlz1t created
-role.rbac.authorization.k8s.io/kcp-edge-dns-sync-target-f-1vzjlz1t created
-rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-sync-target-f-1vzjlz1t created
-secret/kcp-edge-syncer-sync-target-f-1vzjlz1t created
-deployment.apps/kcp-edge-syncer-sync-target-f-1vzjlz1t created
+$ KUBECONFIG=~/.kube/config kubectl apply --context kind-florin -f florin-syncer.yaml 
+namespace/kcp-edge-syncer-florin-1t9zgidy created
+serviceaccount/kcp-edge-syncer-florin-1t9zgidy created
+secret/kcp-edge-syncer-florin-1t9zgidy-token created
+clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1t9zgidy created
+clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1t9zgidy created
+role.rbac.authorization.k8s.io/kcp-edge-dns-florin-1t9zgidy created
+rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-florin-1t9zgidy created
+secret/kcp-edge-syncer-florin-1t9zgidy created
+deployment.apps/kcp-edge-syncer-florin-1t9zgidy created
 ```
+
 ## Stage 2
 
 ![Placement and scheduling](/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-2.svg
@@ -719,11 +651,11 @@ like the following.
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 $ go run ./cmd/scheduler
-I0420 00:00:19.561423   13136 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/1ccbkf91dy8uz2tz/edge.kcp.io"
+I0423 01:33:37.036752   11305 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
-I0420 00:00:19.862585   13136 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="4yqm57kx0m6mn76c|location-g" locationWorkspace="4yqm57kx0m6mn76c" location="location-g" workloadWorkspace="j35lga33wf2ukdq9" singlePlacementSlice="edge-placement-c"
+I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
-I0420 00:00:19.881597   13136 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="4yqm57kx0m6mn76c|location-g" locationWorkspace="4yqm57kx0m6mn76c" location="location-g" workloadWorkspace="1339fu5baaf2tl41" singlePlacementSlice="edge-placement-s"
+I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ^C
 ```
 
@@ -741,28 +673,28 @@ apiVersion: v1
 items:
 - apiVersion: edge.kcp.io/v1alpha1
   destinations:
-  - cluster: 4yqm57kx0m6mn76c
-    locationName: location-f
-    syncTargetName: sync-target-f
-    syncTargetUID: bfa7098f-3345-47e6-be45-3e5c5802a234
-  - cluster: 4yqm57kx0m6mn76c
-    locationName: location-g
-    syncTargetName: sync-target-g
-    syncTargetUID: 146be099-736f-4e72-85b4-e9b463072ed5
+  - cluster: apmziqj9p9fqlflm
+    locationName: florin
+    syncTargetName: florin
+    syncTargetUID: b8c64c64-070c-435b-b3bd-9c0f0c040a54
+  - cluster: apmziqj9p9fqlflm
+    locationName: guilder
+    syncTargetName: guilder
+    syncTargetUID: bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
   kind: SinglePlacementSlice
   metadata:
     annotations:
-      kcp.io/cluster: j35lga33wf2ukdq9
-    creationTimestamp: "2023-04-20T04:00:19Z"
+      kcp.io/cluster: 10l175x6ejfjag3e
+    creationTimestamp: "2023-04-23T05:33:37Z"
     generation: 4
     name: edge-placement-c
     ownerReferences:
     - apiVersion: edge.kcp.io/v1alpha1
       kind: EdgePlacement
       name: edge-placement-c
-      uid: 52f569a3-45a8-4343-8984-8f632c747fe0
-    resourceVersion: "2126"
-    uid: 4a9cc781-7feb-4046-83f0-17ccd7c276e5
+      uid: 199cfe1e-48d9-4351-af5c-e66c83bf50dd
+    resourceVersion: "1316"
+    uid: b5db1f9d-1aed-4a25-91da-26dfbb5d8879
 kind: List
 metadata:
   resourceVersion: ""
@@ -790,7 +722,7 @@ translator.  In the meantime, you can run it manually as follows.
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 $ go run ./cmd/placement-translator
-I0418 00:32:49.789575    6849 shared_informer.go:282] Waiting for caches to sync for placement-translator
+I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
 ...
 ```
 
@@ -801,61 +733,61 @@ The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.
 
 ```shell
-$ kubectl ws 4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234
-Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-bfa7098f-3345-47e6-be45-3e5c5802a234" (type root:universal).
+$ kubectl ws apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54
+Current workspace is "root:espw:apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" (type root:universal).
 
 $ kubectl get SyncerConfig the-one -o yaml
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
-    kcp.io/cluster: lt9tl3fhowweev8r
-  creationTimestamp: "2023-04-20T04:02:05Z"
+    kcp.io/cluster: 12299slctppnhjnn
+  creationTimestamp: "2023-04-23T05:39:56Z"
   generation: 3
   name: the-one
-  resourceVersion: "2156"
-  uid: 75abbd08-a8a4-4dab-b9b0-569b3c7b1541
+  resourceVersion: "1323"
+  uid: 8840fee6-37dc-407e-ad01-2ad59389d4ff
 spec:
   namespaceScope:
     namespaces:
     - commonstuff
     resources:
     - apiVersion: v1
+      group: networking.k8s.io
+      resource: ingresses
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: roles
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: limitranges
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: ""
+      resource: pods
+    - apiVersion: v1
       group: ""
       resource: serviceaccounts
+    - apiVersion: v1
+      group: ""
+      resource: services
     - apiVersion: v1
       group: ""
       resource: resourcequotas
     - apiVersion: v1
       group: coordination.k8s.io
       resource: leases
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v1
-      group: ""
-      resource: pods
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: ""
-      resource: secrets
   upsync:
   - apiGroup: group1.test
     names:
@@ -894,62 +826,62 @@ Examine guilder's `SyncerConfig` object and workloads as follows.
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 
-$ kubectl ws 4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5
-Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-146be099-736f-4e72-85b4-e9b463072ed5" (type root:universal).
+$ kubectl ws apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
+Current workspace is "root:espw:apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" (type root:universal).
 
 $ kubectl get SyncerConfig the-one -o yaml
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
-    kcp.io/cluster: 2ed8dgm0r236p37s
-  creationTimestamp: "2023-04-20T04:02:05Z"
-  generation: 2
+    kcp.io/cluster: yk9a66vjms1pi8hu
+  creationTimestamp: "2023-04-23T05:39:56Z"
+  generation: 4
   name: the-one
-  resourceVersion: "2130"
-  uid: 91b710cf-5d23-4edf-94e4-f23e09151a80
+  resourceVersion: "1325"
+  uid: 3da056c7-0d5c-45a3-9d91-d04f04415f30
 spec:
   namespaceScope:
     namespaces:
-    - specialstuff
     - commonstuff
+    - specialstuff
     resources:
     - apiVersion: v1
       group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
+      resource: services
     - apiVersion: v1
       group: apps
       resource: deployments
     - apiVersion: v1
       group: ""
-      resource: resourcequotas
+      resource: pods
     - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
+      group: coordination.k8s.io
+      resource: leases
     - apiVersion: v1
       group: networking.k8s.io
       resource: ingresses
     - apiVersion: v1
       group: ""
-      resource: secrets
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
+      resource: limitranges
     - apiVersion: v1
       group: ""
       resource: serviceaccounts
     - apiVersion: v1
-      group: ""
-      resource: pods
-    - apiVersion: v1
       group: rbac.authorization.k8s.io
       resource: rolebindings
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: roles
+    - apiVersion: v1
+      group: ""
+      resource: resourcequotas
   upsync:
   - apiGroup: group3.test
     names:
@@ -974,8 +906,8 @@ status: {}
 
 $ kubectl get deployments -A
 NAMESPACE      NAME       READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff    commond    0/0     0            0           8m26s
-specialstuff   speciald   0/0     0            0           8m26s
+commonstuff    commond    0/0     0            0           6m1s
+specialstuff   speciald   0/0     0            0           5m58s
 ```
 
 ## Stage 4
@@ -1002,30 +934,33 @@ Find just the `commonstuff` namespace and the `commond` Deployment.
 
 ```console
 $ KUBECONFIG=~/.kube/config kubectl get --context kind-florin ns
-NAME                                     STATUS   AGE
-commonstuff                              Active   18s
-default                                  Active   114m
-kcp-edge-syncer-sync-target-f-1vzjlz1t   Active   56s
-kube-node-lease                          Active   114m
-kube-public                              Active   114m
-kube-system                              Active   114m
-local-path-storage                       Active   114m
+NAME                              STATUS   AGE
+commonstuff                       Active   6m51s
+default                           Active   57m
+kcp-edge-syncer-florin-1t9zgidy   Active   17m
+kube-node-lease                   Active   57m
+kube-public                       Active   57m
+kube-system                       Active   57m
+local-path-storage                Active   57m
 
-$ KUBECONFIG=~/.kube/config kubectl get --context kind-florin deploy -A | grep stuff
-commonstuff                              commond                                  1/1     1            1           52s
+$ KUBECONFIG=~/.kube/config kubectl get --context kind-florin deploy -A | egrep 'NAME|stuff'
+NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                       commond                           1/1     1            1           7m59s
 ```
 
 Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.
 
 ```console
-$ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder ns | grep stuff
-commonstuff                              Active   5m55s
-specialstuff                             Active   6m26s
+$ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder ns | egrep NAME\|stuff
+NAME                               STATUS   AGE
+commonstuff                        Active   8m33s
+specialstuff                       Active   8m33s
 
-$ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder deploy -A | grep stuff
-commonstuff                              commond                                  1/1     1            1           6m18s
-specialstuff                             speciald                                 1/1     1            1           6m19s
+$ KUBECONFIG=~/.kube/config kubectl get --context kind-guilder deploy -A | egrep NAME\|stuff
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           8m37s
+specialstuff                       speciald                           1/1     1            1           8m55s
 ```
 
 Check that the common workload on the florin cluster is working.
