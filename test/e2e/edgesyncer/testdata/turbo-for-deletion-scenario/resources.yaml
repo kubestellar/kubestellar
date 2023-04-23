@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: optimized
+  labels:
+    optimizer: turbonomic
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-usage
+  namespace: optimized
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: cpu-usage
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: cpu-usage
+      name: cpu-usage
+    spec:
+      containers:
+      - env:
+        - name: RUN_TYPE
+          value: cpu
+        - name: CPU_PERCENT
+          value: "85"
+        image: beekman9527/cpumemload:latest
+        imagePullPolicy: Always
+        name: cpu-usage-1
+        resources:
+          limits:
+            cpu: 800m
+            memory: 128Mi
+          requests:
+            cpu: 400m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

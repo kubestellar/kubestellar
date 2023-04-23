@@ -74,7 +74,7 @@ func (ds *DownSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, c
 }
 
 func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
-	ds.logger.V(3).Info(fmt.Sprintf("downsync %q", resourceToString(resource)))
+	ds.logger.V(3).Info(fmt.Sprintf("sync %q from upstream to downstream", resourceToString(resource)))
 	upstreamClient, downstreamClient, err := ds.getClients(resource, conversions)
 	if err != nil {
 		ds.logger.Error(err, fmt.Sprintf("failed to get client %q", resourceToString(resource)))
@@ -83,11 +83,12 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 	resourceForUp := convertToUpstream(resource, conversions)
 	ds.logger.V(3).Info(fmt.Sprintf("  get %q from upstream", resourceToString(resourceForUp)))
 	upstreamResource, err := upstreamClient.Get(resourceForUp)
+	isDeleted := false
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			ds.logger.V(3).Info(fmt.Sprintf("  not found %q in upstream", resourceToString(resourceForUp)))
-			ds.logger.V(3).Info(fmt.Sprintf("  skip downsync %q", resourceToString(resourceForUp)))
-			return nil
+			ds.logger.V(3).Info(fmt.Sprintf("  delete %q from downstream", resourceToString(resourceForUp)))
+			isDeleted = true
 		} else {
 			ds.logger.Error(err, fmt.Sprintf("failed to get resource from upstream %q", resourceToString(resourceForUp)))
 			return err
@@ -99,14 +100,18 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 	downstreamResource, err := downstreamClient.Get(resourceForDown)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			// create
-			ds.logger.V(3).Info(fmt.Sprintf("  create %q in downstream since it's not found", resourceToString(resourceForDown)))
-			upstreamResource.SetResourceVersion("")
-			upstreamResource.SetUID("")
-			applyConversion(upstreamResource, resourceForDown)
-			if _, err := downstreamClient.Create(resourceForDown, upstreamResource); err != nil {
-				ds.logger.Error(err, fmt.Sprintf("failed to create resource to downstream %q", resourceToString(resourceForDown)))
-				return err
+			if !isDeleted {
+				ds.logger.V(3).Info(fmt.Sprintf("  create %q in downstream since it's not found", resourceToString(resourceForDown)))
+				upstreamResource.SetResourceVersion("")
+				upstreamResource.SetUID("")
+				setDownsyncAnnotation(upstreamResource)
+				applyConversion(upstreamResource, resourceForDown)
+				if _, err := downstreamClient.Create(resourceForDown, upstreamResource); err != nil {
+					ds.logger.Error(err, fmt.Sprintf("failed to create resource to downstream %q", resourceToString(resourceForDown)))
+					return err
+				}
+			} else {
+				ds.logger.V(3).Info(fmt.Sprintf("  %q has already been deleted from downstream", resourceToString(resourceForDown)))
 			}
 		} else {
 			ds.logger.Error(err, fmt.Sprintf("failed to get resource from downstream %q", resourceToString(resourceForDown)))
@@ -114,15 +119,27 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 		}
 	} else {
 		if downstreamResource != nil {
-			// update
-			ds.logger.V(3).Info(fmt.Sprintf("  update %q in downstream since it's found", resourceToString(resourceForDown)))
-			upstreamResource.SetResourceVersion("")
-			upstreamResource.SetUID("")
-			upstreamResource.SetManagedFields(nil)
-			applyConversion(upstreamResource, resourceForDown)
-			if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
-				ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
-				return err
+			if !isDeleted {
+				// update
+				ds.logger.V(3).Info(fmt.Sprintf("  update %q in downstream since it's found", resourceToString(resourceForDown)))
+				upstreamResource.SetResourceVersion(downstreamResource.GetResourceVersion())
+				upstreamResource.SetUID(downstreamResource.GetUID())
+				if hasDownsyncAnnotation(downstreamResource) {
+					setDownsyncAnnotation(upstreamResource)
+				}
+				applyConversion(upstreamResource, resourceForDown)
+				if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
+					ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
+					return err
+				}
+			} else {
+				if hasDownsyncAnnotation(downstreamResource) {
+					ds.logger.V(3).Info(fmt.Sprintf("  delete %q from downstream since it's found", resourceToString(resourceForDown)))
+					if err := downstreamClient.Delete(resourceForDown, resourceForDown.Name); err != nil {
+						ds.logger.Error(err, fmt.Sprintf("failed to delete resource from downstream %q", resourceToString(resourceForDown)))
+						return err
+					}
+				}
 			}
 		} else {
 			msg := fmt.Sprintf("downstream resource is nil even if there is no error %q", resourceToString(resourceForDown))
@@ -130,6 +147,11 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 		}
 	}
 	return nil
+}
+
+func (ds *DownSyncer) UnsyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	// It's OK to use same logic as SyncOne unless we execute specific actions for unsynced resources
+	return ds.SyncOne(resource, conversions)
 }
 
 func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
@@ -196,8 +218,12 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 	logger.V(3).Info("  list resources from upstream")
 	upstreamResourceList, err := upstreamClient.List(resourceForUp)
 	if err != nil {
-		logger.Error(err, "failed to list resource from upstream")
-		return err
+		if k8serrors.IsNotFound(err) {
+			upstreamResourceList = &unstructured.UnstructuredList{}
+		} else {
+			logger.Error(err, "failed to list resource from upstream")
+			return err
+		}
 	}
 
 	resourceForDown := convertToDownstream(resource, conversions)
@@ -209,12 +235,10 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 	}
 
 	logger.V(3).Info("  compute diff between upstream and downstream")
-	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList)
+	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList, setDownsyncAnnotation, hasDownsyncAnnotation)
 
 	logger.V(3).Info("  create resources in downstream")
 	for _, resource := range newResources {
-		resource.SetResourceVersion("")
-		resource.SetUID("")
 		applyConversion(&resource, resourceForDown)
 		logger.V(3).Info("  create " + resource.GetName())
 		if _, err := downstreamClient.Create(resourceForDown, &resource); err != nil {
@@ -224,9 +248,6 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 	}
 	logger.V(3).Info("  update resources in downstream")
 	for _, resource := range updatedResources {
-		resource.SetResourceVersion("")
-		resource.SetUID("")
-		resource.SetManagedFields(nil)
 		applyConversion(&resource, resourceForDown)
 		logger.V(3).Info("  update " + resource.GetName())
 		if _, err := downstreamClient.Update(resourceForDown, &resource); err != nil {
@@ -234,9 +255,21 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 			return err
 		}
 	}
-	// nothing to do for deletion for now
-	_ = deletedResources
+	logger.V(3).Info("  delete resources from downstream")
+	for _, resource := range deletedResources {
+		applyConversion(&resource, resourceForDown)
+		logger.V(3).Info("  delete " + resource.GetName())
+		if err := downstreamClient.Delete(resourceForDown, resource.GetName()); err != nil {
+			logger.Error(err, "failed to delete resource from downstream")
+			return err
+		}
+	}
 	return nil
+}
+
+func (ds *DownSyncer) UnsyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	// It's OK to use same logic as SyncMany unless we execute specific actions for unsynced resources
+	return ds.SyncMany(resource, conversions)
 }
 
 func (ds *DownSyncer) BackStatusMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
@@ -294,47 +327,10 @@ func findWithObject(target unstructured.Unstructured, resourceList *unstructured
 	return nil, false
 }
 
-func find(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) bool {
-	_, ok := findWithObject(target, resourceList)
-	return ok
+func setDownsyncAnnotation(resource *unstructured.Unstructured) {
+	setAnnotation(resource, "edge.kcp.io/downsynced", "true")
 }
 
-func diff(logger klog.Logger, upstreamResourceList *unstructured.UnstructuredList, downstreamResourceList *unstructured.UnstructuredList) (
-	[]unstructured.Unstructured,
-	[]unstructured.Unstructured,
-	[]unstructured.Unstructured,
-) {
-	newResources := []unstructured.Unstructured{}
-	updatedResources := []unstructured.Unstructured{}
-	deletedResources := []unstructured.Unstructured{}
-	for _, upstreamResource := range upstreamResourceList.Items {
-		if find(upstreamResource, downstreamResourceList) {
-			updatedResources = append(updatedResources, upstreamResource)
-		} else {
-			newResources = append(newResources, upstreamResource)
-		}
-	}
-	for _, downstreamResource := range downstreamResourceList.Items {
-		if !find(downstreamResource, upstreamResourceList) {
-			deletedResources = append(deletedResources, downstreamResource)
-		}
-	}
-
-	newResourceNames := []string{}
-	for _, resource := range newResources {
-		newResourceNames = append(newResourceNames, resource.GetName())
-	}
-	updatedResourceNames := []string{}
-	for _, resource := range updatedResources {
-		updatedResourceNames = append(updatedResourceNames, resource.GetName())
-	}
-	deletedResourceNames := []string{}
-	for _, resource := range deletedResources {
-		deletedResourceNames = append(deletedResourceNames, resource.GetName())
-	}
-	logger.V(3).Info(fmt.Sprintf("  new resource names: %v", newResourceNames))
-	logger.V(3).Info(fmt.Sprintf("  updated resource names: %v", updatedResourceNames))
-	logger.V(3).Info(fmt.Sprintf("  deleted resource names: %v", deletedResourceNames))
-
-	return newResources, updatedResources, deletedResources
+func hasDownsyncAnnotation(resource *unstructured.Unstructured) bool {
+	return hasAnnotation(resource, "edge.kcp.io/downsynced")
 }

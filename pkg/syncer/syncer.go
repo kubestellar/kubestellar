@@ -155,13 +155,20 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 		case <-ctx.Done():
 			return
 		case <-time.Tick(interval):
-			logger.V(2).Info("Sync ")
+			logger.V(2).Info(fmt.Sprintf("Sync with interval: %v", interval))
 			syncerConfigManager.Refresh()
-			_ = downSyncer.ReInitializeClients(syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
-			_ = upSyncer.ReInitializeClients(syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
-			sync(logger.WithValues("actor", "DownSyncer"), downSyncer, syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
-			syncStatus(logger.WithValues("actor", "DownSyncer"), downSyncer, syncConfigManager.GetDownSyncedResources(), syncConfigManager.GetConversions())
-			sync(logger.WithValues("actor", "UpSyncer"), upSyncer, syncConfigManager.GetUpSyncedResources(), syncConfigManager.GetConversions())
+			downSyncedResources := syncConfigManager.GetDownSyncedResources()
+			downUnsyncedResources := syncConfigManager.GetDownUnsyncedResources()
+			upSyncedReousrces := syncConfigManager.GetUpSyncedResources()
+			upUnsyncedReousrces := syncConfigManager.GetUpUnsyncedResources()
+			conversions := syncConfigManager.GetConversions()
+			_ = downSyncer.ReInitializeClients(downSyncedResources, conversions)
+			_ = upSyncer.ReInitializeClients(upSyncedReousrces, conversions)
+			sync(logger.WithValues("actor", "DownSyncer:Sync"), downSyncer, downSyncedResources, conversions)
+			sync(logger.WithValues("actor", "DownSyncer:Unsync"), downSyncer, downUnsyncedResources, conversions)
+			syncStatus(logger.WithValues("actor", "DownSyncer:Sync"), downSyncer, downSyncedResources, conversions)
+			sync(logger.WithValues("actor", "UpSyncer:Sync"), upSyncer, upSyncedReousrces, conversions)
+			sync(logger.WithValues("actor", "UpSyncer:Unsync"), upSyncer, upUnsyncedReousrces, conversions)
 		}
 	}
 }

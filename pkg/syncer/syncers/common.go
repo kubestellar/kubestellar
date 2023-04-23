@@ -166,3 +166,78 @@ func getClients(resource edgev1alpha1.EdgeSyncConfigResource, upstreamClients ma
 	}
 	return upstreamClient, downstreamClient, nil
 }
+
+func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, destResourceList *unstructured.UnstructuredList, setAnnotation func(resource *unstructured.Unstructured), hasAnnotation func(resource *unstructured.Unstructured) bool) (
+	[]unstructured.Unstructured,
+	[]unstructured.Unstructured,
+	[]unstructured.Unstructured,
+) {
+	newResources := []unstructured.Unstructured{}
+	updatedResources := []unstructured.Unstructured{}
+	deletedResources := []unstructured.Unstructured{}
+	for _, srcResource := range srcResourceList.Items {
+		destResource, ok := findWithObject(srcResource, destResourceList)
+		if ok {
+			srcResource.SetResourceVersion("")
+			srcResource.SetUID("")
+			srcResource.SetManagedFields(nil)
+			if hasAnnotation(destResource) {
+				setAnnotation(&srcResource)
+			}
+			updatedResources = append(updatedResources, srcResource)
+		} else {
+			srcResource.SetResourceVersion("")
+			srcResource.SetUID("")
+			setAnnotation(&srcResource)
+			newResources = append(newResources, srcResource)
+		}
+	}
+	for _, destResource := range destResourceList.Items {
+		_, ok := findWithObject(destResource, srcResourceList)
+		if !ok {
+			if hasAnnotation(&destResource) {
+				logger.V(3).Info(fmt.Sprintf("  %s is added to deletedResources since annotation is set.", destResource.GetName()))
+				deletedResources = append(deletedResources, destResource)
+			} else {
+				logger.V(3).Info(fmt.Sprintf("  %s is not added to deletedResources since annotation is not set.", destResource.GetName()))
+			}
+		}
+	}
+
+	newResourceNames := []string{}
+	for _, resource := range newResources {
+		newResourceNames = append(newResourceNames, resource.GetName())
+	}
+	updatedResourceNames := []string{}
+	for _, resource := range updatedResources {
+		updatedResourceNames = append(updatedResourceNames, resource.GetName())
+	}
+	deletedResourceNames := []string{}
+	for _, resource := range deletedResources {
+		deletedResourceNames = append(deletedResourceNames, resource.GetName())
+	}
+	logger.V(3).Info(fmt.Sprintf("  new resource names: %v", newResourceNames))
+	logger.V(3).Info(fmt.Sprintf("  updated resource names: %v", updatedResourceNames))
+	logger.V(3).Info(fmt.Sprintf("  deleted resource names: %v", deletedResourceNames))
+
+	return newResources, updatedResources, deletedResources
+}
+
+func setAnnotation(resource *unstructured.Unstructured, key string, value string) {
+	annotations := resource.GetAnnotations()
+	if annotations != nil {
+		annotations[key] = value
+	} else {
+		annotations = map[string]string{key: value}
+	}
+	resource.SetAnnotations(annotations)
+}
+
+func hasAnnotation(resource *unstructured.Unstructured, key string) bool {
+	annotations := resource.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+	_, ok := annotations[key]
+	return ok
+}
