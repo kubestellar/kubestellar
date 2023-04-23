@@ -92,3 +92,11 @@ func (c *Client) UpdateStatus(resource edgev1alpha1.EdgeSyncConfigResource, unst
 	}
 	return updatedObj, err
 }
+
+func (c *Client) Delete(resource edgev1alpha1.EdgeSyncConfigResource, name string) error {
+	if c.IsNamespaced() {
+		return c.ResourceClient.Namespace(resource.Namespace).Delete(context.Background(), name, v1.DeleteOptions{})
+	} else {
+		return c.ResourceClient.Delete(context.Background(), name, v1.DeleteOptions{})
+	}
+}

@@ -293,6 +293,11 @@ type StartedEdgeSyncerFixture struct {
 	*appliedEdgeSyncerFixture
 }
 
+func (sf *StartedEdgeSyncerFixture) DeleteRootComputeAPIBinding(t *testing.T) {
+	err := sf.UpstreamDynamicKubeClient.Cluster(sf.WorkspacePath).Resource(apibindingGVR).Delete(context.Background(), "kubernetes", v1.DeleteOptions{})
+	require.NoError(t, err)
+}
+
 // syncerConfigFromCluster reads the configuration needed to start an in-process
 // syncer from the resources applied to a cluster for a deployed syncer.
 func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namespace, syncerID string) *edgesyncer.SyncerConfig {
