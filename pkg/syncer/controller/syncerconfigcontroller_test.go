@@ -201,6 +201,27 @@ func TestSyncerConfig(t *testing.T) {
 			assertEqualArrayWithouOrder(t, tc.expected.downSyncedResources, downsyncedResources)
 			upsyncedResources := syncConfigManager.GetUpSyncedResources()
 			assertEqualArrayWithouOrder(t, tc.expected.upSyncedResources, upsyncedResources)
+
+			newSyncerConfig := *tc.syncerConfig.DeepCopy()
+			emptySyncerConfigSpec := edgev1alpha1.SyncerConfigSpec{
+				NamespaceScope: edgev1alpha1.NamespaceScopeDownsyncs{},
+				ClusterScope:   []edgev1alpha1.ClusterScopeDownsyncResource{},
+				Upsync:         []edgev1alpha1.UpsyncSet{},
+			}
+			newSyncerConfig.Spec = emptySyncerConfigSpec
+			_, err = syncerConfigClient.Update(ctx, &newSyncerConfig, metav1.UpdateOptions{})
+			assert.NoError(t, err)
+			require.Eventually(t, func() bool {
+				syncerConfigManager.Refresh()
+				downsyncedResources := syncConfigManager.GetDownSyncedResources()
+				upsyncedResources := syncConfigManager.GetUpSyncedResources()
+				return len(downsyncedResources) == 0 && len(upsyncedResources) == 0
+			}, wait.ForeverTestTimeout, 1*time.Second)
+
+			deleteDownsyncedResources := syncConfigManager.GetDownUnsyncedResources()
+			assertEqualArrayWithouOrder(t, tc.expected.downSyncedResources, deleteDownsyncedResources)
+			deleteUpsyncedResources := syncConfigManager.GetUpUnsyncedResources()
+			assertEqualArrayWithouOrder(t, tc.expected.upSyncedResources, deleteUpsyncedResources)
 		})
 	}
 }

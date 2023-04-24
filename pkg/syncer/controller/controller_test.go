@@ -72,6 +72,10 @@ func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource,
 	return nil
 }
 
+func (s *FakeSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+	return nil
+}
+
 func reInitializeClientsCallback(s FakeSyncer) error {
 	if s.reInitializedCount > 2 {
 		return nil
