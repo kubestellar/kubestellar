@@ -127,6 +127,24 @@ build-all:
 # 	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
 # 	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
 
+# build and push edge-syncer image by ko
+# e.g. usage:
+#      make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+# This example builds ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+.PHONY: build-edge-syncer-image
+build-edge-syncer-image: DOCKER_REPO ?= 
+build-edge-syncer-image: IMAGE_TAG ?= latest
+build-edge-syncer-image: ARCHS ?= linux/$(ARCH)
+build-edge-syncer-image: require-ko
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
+	@echo "$(SYNCER_IMAGE)"
+
+.PHONY: build-edge-syncer-image-local
+build-edge-syncer-image-local: require-ko
+	$(eval SYNCER_IMAGE=$(shell ko build --local --platform=linux/$(ARCH) ./cmd/syncer))
+	@echo "$(SYNCER_IMAGE)"
+
 install: WHAT ?= ./cmd/...
 install:
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go install -ldflags="$(LDFLAGS)" $(WHAT)
