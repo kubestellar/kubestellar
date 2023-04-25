@@ -41,8 +41,8 @@ fi
 objname="$1"
 shift
 
-if (( $(wc -w <<<"$objname") != 1 )); then
-    echo "$0: objname must be a single word" >&2
+if ! [[ "$objname" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ ]]; then
+    echo "$0: objname not valid, must match POSIX extended re '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$'" >& 2
     exit 1
 fi
 
@@ -51,14 +51,14 @@ if [ "$objname" == default ]; then
     exit 1
 fi
 
-if ! kubectl get SyncTarget $objname &> /dev/null; then
+if ! kubectl get SyncTarget "$objname" &> /dev/null; then
 (cat <<EOF
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: $objname
+  name: "$objname"
   labels:
-    id: $objname
+    id: "$objname"
 EOF
 ) | kubectl create -f - || {
     echo "$0: Creation of SyncTarget failed" >&2
@@ -66,7 +66,7 @@ EOF
 }
 fi
 
-if ! kubectl get Location $objname &> /dev/null; then
+if ! kubectl get Location "$objname" &> /dev/null; then
 (cat <<EOF
 apiVersion: scheduling.kcp.io/v1alpha1
 kind: Location
@@ -75,7 +75,7 @@ spec:
   instanceSelector:
     matchLabels: {"id":"$objname"}
 metadata:
-  name: $objname
+  name: "$objname"
 EOF
 ) | kubectl create -f - || {
     echo "$0: Creation of SyncTarget failed" >&2
@@ -88,8 +88,8 @@ if kubectl get Location default &> /dev/null; then
 fi
 
 
-stlabs=$(kubectl get SyncTarget $objname -o json | jq .metadata.labels)
-loclabs=$(kubectl get Location $objname -o json | jq .metadata.labels)
+stlabs=$(kubectl get SyncTarget "$objname" -o json | jq .metadata.labels)
+loclabs=$(kubectl get Location "$objname" -o json | jq .metadata.labels)
 
 while (( $# > 0 )); do
     key=$(cut -d= -f1 <<<"$1")
@@ -98,24 +98,28 @@ while (( $# > 0 )); do
 	echo "$0: syntax error for label name=value arg $1" >&2
 	exit 4
     fi
-    if [ "${1:0:1}" == "-" ]; then
-	echo "$0: label name must start with alphanumeric, not a dash" >&2
+    if ! [[ "$key" =~ ^[a-zA-Z0-9][a-zA-Z0-9_./-]*$ ]]; then
+	echo "$0: syntax error in key, must match '^[a-zA-Z0-9][a-zA-Z0-9_./-]*$' and Kubernetes restrictions" >&2
 	exit 4
     fi
-    if [ "$key" == id ]; then
+    if ! [[ "$val" =~ ^[a-zA-Z0-9]([a-zA-Z0-9_.-]{0,61}[a-zA-Z0-9])?$ ]]; then
+	echo "$0: syntax error in value, must match '^[a-zA-Z0-9]([a-zA-Z0-9_.-]{0,61}[a-zA-Z0-9])?$'" >&2
+	exit 4
+    fi
+        if [ "$key" == id ]; then
 	echo "$0: 'id' label may not be specified" >&2
 	exit 4
     fi
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	if ! kubectl label SyncTarget $objname "$1" ; then
+	if ! kubectl label SyncTarget "$objname" "$1" ; then
 	    echo "$0: failed to add label to SyncTarget" >&2
 	    exit 4
 	fi
     fi
     locval=$(jq -r <<<"$loclabs" ".[\"${key}\"]")
     if [ "$locval" != "$val" ]; then
-	if ! kubectl label Location $objname "$1" ; then
+	if ! kubectl label Location "$objname" "$1" ; then
 	    echo "$0: failed to add label to Location" >&2
 	    exit 4
 	fi

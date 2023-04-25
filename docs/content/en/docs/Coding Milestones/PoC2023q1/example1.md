@@ -702,7 +702,7 @@ metadata:
 
 Also check out the SinglePlacementSlice objects in
 `root:my-org:wmw-s`.  It should go similarly, but the `destinations`
-should include only the entry for florin.
+should include only the entry for guilder.
 
 ## Stage 3
 
