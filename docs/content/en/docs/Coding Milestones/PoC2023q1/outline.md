@@ -38,9 +38,9 @@ multi-cluster.  It is intended to demonstrate the following points.
 - Rule-based customization of desired state.
 - Propagation of reported state from edge to center.
 - Summarization of reported state in the center.
-- Return and/or summarization of reported state from associated
-  objects (e.g., ReplicaSet or Pod objects associated with a given
-  Deployment object).
+- Return and/or summarization of state from associated objects (e.g.,
+  ReplicaSet or Pod objects associated with a given Deployment
+  object).
 - The edge opens connections to the center, not vice-versa.
 - An edge computing platform "product" that can be deployed (as
   opposed to a service that is used).
@@ -72,40 +72,6 @@ first.
 Of the following features, customization will be needed before the
 others.
 
-### Self-sufficient edge clusters
-
-The driving implementation consideration here is the syncer between
-the mailbox workspace and the edge cluster.  At first we will use the
-regular TMC syncer, which does not do exactly what we ultimately want
-here (later we will complete development of an edge-mc specific syncer
-for this job, which will do what we want).  As a temporary compromise
-we accept the consequent limitations.
-
-The primary consequence is that the edge clusters will not be
-self-sufficient.  TMC will configure each container to talk to the
-mailbox workspace from which it was copied.  Thus, there will have to
-be continuous connectivity between the central kcp server and each
-edge cluster --- or the workload containers will have to deal with
-intermittent connectivity to the apiserver on their own.
-
-The effects of the temporary expedient of using the TNC syncer include
-changing the way a workload is projected from its workload management
-workspace to a mailbox workspace.  At first this will involve
-"re-naturing" the objects that were forcibly denatured by edge-mc (NOT
-the ones denatured by kcp), because the mailbox workspace is what they
-should affect.  Once we get the desired syncing to the edge cluster
-things will change, so that objects remain denatured in the mailbox
-workspace and the sync to the edge cluster does the re-naturing.
-
-Another consequence is lack of support for admission control plugins.
-While using the TMC syncer, an admission control plugin would affect
-the mailbox workspace but the servers for those webhooks would be
-running in the edge cluster; we do not want to take on the network and
-Service hacking necessary to make that work.
-
-Another consequence of the initial compromise is the way TMC writes
-status inforation to SyncTarget objects.
-
 ### Customization
 
 We can have a complete system that ignores customization, as long as
@@ -115,7 +81,7 @@ it is only used for workloads that need no customization.
 
 We can omit summarization at first.
 
-### Return and/or summarization of reported state from associated objects
+### Return and/or summarization of state from associated objects
 
 This will involve both defining a scalable interface for declaring
 what should be returned as well as implementing it.  This will
@@ -171,16 +137,14 @@ future, and then those resources will join the previous category.
 
 ## Design overview
 
-In very brief: the design approach is to reduce the edge placement
-problem to kcp's TMC problem, using as many "anycast" TMC Placement
-objects (each constrained to effectively be "unicast") as are needed
-to achieve the "multicast" semantics of an EdgePlacement object.  A
-central idea of the reduction is to maintain a unique _mailbox
-workspace_ in the center for each edge cluster.
-
-However: to fully realize the goals of this PoC we will have to use a
-modified version of TMC, which differs from today's TMC in ways
-summarized below in the [Syncers](#syncers) section.
+In very brief: the design approach is to achieve the multicast
+semantics of edge placement by two layers of activity.  Between the
+two layers sit _mailbox workspaces_: these exist in the center, and
+there is one for each edge cluster.  One layer of activity runs in the
+center and relates the edge placement problems to mailbox workspace
+contents.  The other layer is _syncers_, one in each edge cluster,
+that relate the corresponding mailbox contents with their local
+clusters.
 
 As in TMC, in this design we have _downsync_ and _upsync_ --- but they
 are a little more complicated here.  Downsync involves propagation of
@@ -635,26 +599,28 @@ version from the API group from the workload management workspace.
 ## Mailbox workspaces
 
 The mailbox controller maintains one mailbox workspace for each
-SyncTarget.  A mailbox workspace acts as a workload source for TMC,
-prescribing the workload to go to the corresponding edge pcluster and
-holding the corresponding TMC Placement object.
+SyncTarget.  A mailbox workspace acts as a workload source for the
+corresponding syncer, prescribing the workload to go to the
+corresponding edge cluster and the `SyncerConfig` object that guides
+the syncer.
 
 A mailbox workspace contains the following items.
 
 1. APIBindings (maintained by the mailbox controller) to APIExports of
    workload object types.
-2. Workload namespaces holding workload objects, post customization.
-3. A TMC Placement object.
+2. Workload objects, post customization in the case of downsynced
+   objects.
+3. A `SyncerConfig` object.
 
 ## Edge cluster
 
 Also called edge pcluster.
 
 One of these contains the following items.  FYI, these are the things
-in the YAML output by `kubectl kcp workload sync`.  The responsibility
-for creating and maintaining these objects is part of the problem of
-bootstrapping the workload management layer and is not among the
-things that this PoC takes a position on.
+in the YAML output by `kubectl kcp workload edge-sync`.  The
+responsibility for creating and maintaining these objects is part of
+the problem of bootstrapping the workload management layer and is not
+among the things that this PoC takes a position on.
 
 - A namespace that holds the syncer and associated objects.
 - A ServiceAccount that the syncer authenticates as when accessing the
@@ -673,9 +639,10 @@ things that this PoC takes a position on.
 ## Mailbox Controller
 
 This controller maintains one mailbox workspace per SyncTarget.  Each
-of these mailbox workspaces is used for a distinct TMC problem (e.g.,
-Placement object).  These workspaces are all children of the edge
-service provider workspace.
+of these mailbox workspaces is used for a distinct syncing problem:
+downsynced objects go here from their workload management workspaces,
+and upsynced objects go here from the edge cluster.  These workspaces
+are all children of the edge service provider workspace.
 
 ## Edge Scheduler
 
@@ -689,45 +656,43 @@ they are linked is TBD.
 
 ## Placement Translator
 
-This controller translates each EdgePlacement object into a collection
-of TMC Placement objects and corresponding related objects.  For each
-matching SinglePlacement, the placement translator maintains a TMC
-Placement object and copy of the workload --- customized as directed.
-Note that this involves sequencing constraints: CRDs and namespaces
-have to be created before anything that uses them, and deleted after
-everything that uses them.  Note also that everything that has to be
-denatured in the workload management workspace also has to be
-denatured in the mailbox workspace.
+This controller continually monitors all the EdgePlacement objects,
+SinglePlacementSlice objects, and related workload objects, and
+maintains the proper projections of those into mailbox workspace
+contents.  The customization, if any, is done in this process.  Note
+also that everything that has to be denatured in the workload
+management workspace also has to be denatured in the mailbox
+workspace.
 
 The job of the placement translator can be broken down into the
-following four parts.
+following five parts.
 
 - Resolve each EdgePlacement's "what" part to a list of particular
   workspace items (namespaces and non-namespaced objects).
+- Monitor the SinglePlacementSlice objects that report the scheduler's
+  resolutions of the "where" part of the EdgePlacement objects.
 - Maintain the association between the resolved "where" from the edge
   scheduler and the resolved what.
 - Maintain the copies, with customization, of the workload objects
   from source workspace to mailbox workspaces.
-- Maintain the TMC Placement objects that derive from the
-  EdgePlacement objects.
+- Maintain the SyncerConfig object in each mailbox workspace to direct
+  the corresponding syncer.
 
 ## Syncers
 
-While the first milestone in the roadmap uses plain unspoiled TMC,
-that will not achieve all that this PoC aims for.  Eventually this PoC
-will need something that is like TMC but differs in a few ways.
-Following is a list of differences, stated in terms of syncer behavior
---- but remember that this is not necessarily limited to just the
-syncer.
+In this PoC there is a 1:1:1 relation between edge cluster, mailbox
+workspace, and syncer.  The syncer runs in the edge cluster and does
+downsync from and upsync to the mailbox workspace.  The syncer
+monitors a SyncerConfig object in the mailbox workspace to know what
+to downsync and upsync.
 
-The EMC syncers will differ from the plain unspoiled TMC syncers in
-the following ways.
+For those familiar with kcp's TMC syncer, note that the edge syncer
+differs in the following ways.
 
 - Create self-sufficient edge clusters.
 - Re-nature objects that edge-mc forcibly denatures at the center.
 - Return reported state from associated objects.
-- (Maybe) not require the SyncTarget to identify all the resources
-  involved.
+- Does not access the SyncTarget object.
 
 ## Status Summarizer
 
@@ -759,12 +724,8 @@ This user also creates one or more edge clusters.
 
 For each of those edge clusters, this user creates the following.
 
-- a corresponding SyncTarget, with an annotation referring to the
-  following Secret object, in one of those inventory management
+- a corresponding SyncTarget, in one of those inventory management
   workspaces;
-- a Secret, in the same workspace, holding a kubeconfig that the
-  central automation will use to install the syncer in the edge
-  cluster;
 - a Location, in the same workspace, that matches only that
   SyncTarget.
 
