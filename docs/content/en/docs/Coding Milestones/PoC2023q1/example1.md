@@ -359,30 +359,39 @@ the edge scheduler react.  It has the following steps.
 
 ### Create and populate the workload management workspace for the common workload
 
-In this example, each workload description goes in its own workload
-management workspace.
-
 One of the workloads is called "common", because it will go to both
-edge clusters.
+edge clusters.  The other one is called "special".
 
-Create the "common" workload management workspace with the following
-commands.  For the sake of orderliness we choose to keep the two
-workload management workspaces under a common parent.
+In this example, each workload description goes in its own workload
+management workspace (WMW).  Start by creating a common parent for
+those two workspaces, with the following commands.
 
 ```shell
 kubectl ws root
 kubectl ws create my-org --enter
-kubectl ws create wmw-c --enter
 ```
 
-Next, make sure that the Kubernetes workload APIs are available in
-this workspace.  In a freshly created workspace of the expected type
-(`root:universal` in this case), the Kube workload APIs would not yet
-be available.  Use `kubectl` to create the following APIBinding object
---- which enables use of those Kubernetes APIs.
+Next, create the WMW for the common workload.  The following command
+will do that, if issued while "root:my-org" is the current workspace.
 
 ```shell
-kubectl apply -f - <<EOF
+scripts/ensure-wmw.sh wmw-c
+```
+
+This is equivalent to creating that workspace and then entering it and
+creating the following two `APIBinding` objects.
+
+```yaml
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIBinding
+metadata:
+  name: bind-espw
+spec:
+  reference:
+    export:
+      path: root:espw
+      name: edge.kcp.io
+---
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -392,7 +401,6 @@ spec:
     export:
       path: "root:compute"
       name: kubernetes
-EOF
 ```
 
 Next, use `kubectl` to create the following workload objects in that
@@ -453,23 +461,6 @@ spec:
 EOF
 ```
 
-Before or after the previous step, use `kubectl` to create the
-following APIBinding object --- which enables use of the edge API.
-
-```shell
-kubectl apply -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-espw
-spec:
-  reference:
-    export:
-      path: root:espw
-      name: edge.kcp.io
-EOF
-```
-
 Finally, use `kubectl` to create the following EdgePlacement object.
 Its "where predicate" (the `locationSelectors` array) has one label
 selector that matches both Location objects created earlier, thus
@@ -503,30 +494,11 @@ EOF
 
 ### Create and populate the workload management workspace for the special workload
 
-Use `kubectl` to create the workload management workspace for the
-special workload, using the following commands.
+Use the following commands to create the WMW for the special workload.
 
 ```shell
 kubectl ws root:my-org
-kubectl ws create wmw-s --enter
-```
-
-Next, make sure that the Kubernetes workload APIs are available in
-this workspace.  Use `kubectl` to create the following APIBinding
-object --- which enables use of those Kubernetes APIs.
-
-```shell
-kubectl apply -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-kube
-spec:
-  reference:
-    export:
-      path: "root:compute"
-      name: kubernetes
-EOF
+scripts/ensure-wmw.sh wmw-s
 ```
 
 Next, use `kubectl` to create the following workload objects in that workspace.
@@ -581,23 +553,6 @@ spec:
         configMap:
           name: httpd-htdocs
           optional: false
-EOF
-```
-
-Before or after the previous step, use `kubectl` to create the
-following APIBinding object --- which enables use of the edge API.
-
-```shell
-kubectl apply -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-espw
-spec:
-  reference:
-    export:
-      path: root:espw
-      name: edge.kcp.io
 EOF
 ```
 
