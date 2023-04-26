@@ -144,7 +144,7 @@ there is one for each edge cluster.  One layer of activity runs in the
 center and relates the edge placement problems to mailbox workspace
 contents.  The other layer is _syncers_, one in each edge cluster,
 that relate the corresponding mailbox contents with their local
-cluster.
+clusters.
 
 As in TMC, in this design we have _downsync_ and _upsync_ --- but they
 are a little more complicated here.  Downsync involves propagation of
