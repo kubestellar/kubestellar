@@ -153,3 +153,71 @@ chosen output file.
 ```shell
 KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 ```
+
+# Creating a Workload Management Workspace
+
+Such a workspace needs not only to be created but also populated with
+an `APIBinding` to the edge API and, if desired, an `APIBinding` to
+the Kubernetes containerized workload API.
+
+Invoke this script when the current kcp workspace is the parent of the
+desired workload management workspace (WMW).
+
+The default behavior is to include an `APIBinding` to the Kubernetes
+containerized workload API, and there are optional command line flags
+to control this behavior.
+
+This script works in idempotent style, doing whatever work remains to
+be done.
+
+```console
+$ scripts/ensure-wmw.sh -h
+Usage: kubectl ws parent; scripts/ensure-wmw.sh [--with-kube | --no-kube] wm_workspace_name
+
+$ kubectl ws .
+Current workspace is "root:my-org".
+
+$ scripts/ensure-wmw.sh example-wmw
+Current workspace is "root".
+Current workspace is "root:my-org".
+Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
+Workspace "example-wmw" (type root:universal) is ready to use.
+Current workspace is "root:my-org:example-wmw" (type root:universal).
+apibinding.apis.kcp.io/bind-espw created
+apibinding.apis.kcp.io/bind-kube created
+
+$ kubectl ws ..
+Current workspace is "root:my-org".
+
+$ scripts/ensure-wmw.sh example-wmw
+Current workspace is "root".
+Current workspace is "root:my-org".
+Current workspace is "root:my-org:example-wmw" (type root:universal).
+
+$ kubectl ws ..
+Current workspace is "root:my-org".
+
+$ scripts/ensure-wmw.sh example-wmw --no-kube
+Current workspace is "root".
+Current workspace is "root:my-org".
+Current workspace is "root:my-org:example-wmw" (type root:universal).
+apibinding.apis.kcp.io "bind-kube" deleted
+
+$ 
+```
+
+Deleting a WMW is done by simply deleting its `Workspace` object from
+the parent.
+
+```console
+$ kubectl ws .
+Current workspace is "root:my-org:example-wmw".
+
+$ kubectl ws ..
+Current workspace is "root:my-org".
+
+$ kubectl delete Workspace example-wmw
+workspace.tenancy.kcp.io "example-wmw" deleted
+
+$ 
+```
