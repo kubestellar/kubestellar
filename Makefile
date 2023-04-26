@@ -112,7 +112,7 @@ build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 #	ln -sf kubectl-workspace bin/kubectl-workspaces
 #	ln -sf kubectl-workspace bin/kubectl-ws
-	cp scripts/*.sh bin
+	cp scripts/*.sh bin/
 .PHONY: build
 
 .PHONY: build-all
