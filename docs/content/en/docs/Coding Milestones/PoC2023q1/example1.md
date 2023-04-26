@@ -1017,3 +1017,4 @@ SinglePlacementSlice for the common workload, creates a status summary
 object in the commonstuff namespace in the common workload workspace
 holding a summary of the corresponding Deployment objects.  Those are
 the `commond` Deployment objects in the two mailbox workspaces.
+
