@@ -201,14 +201,14 @@ section = ["HTML", "print", "RSS"]
     enable = false
 
   # These entries appear in the drop-down menu at the top of the website.
-  #[[params.versions]]
-  #  version = "master"
-  #  githubbranch = "master"
-  #  url = "https://master.kubeflow.org"
-  #[[params.versions]]
-  #  version = "v1.6"
-  #  githubbranch = "v1.6-branch"
-  #  url = "https://v1-6-branch.kubeflow.org"
+  [[params.versions]]
+    version = "main"
+    githubbranch = "main"
+    url = "https://main.kcp-edge.io"
+  [[params.versions]]
+    version = "v0.1"
+    githubbranch = "v0.1-branch"
+    url = "https://v0-1-branch.kcp-edge.org"
 
   # Links in footer
   [params.links]
