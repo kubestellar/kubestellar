@@ -204,11 +204,11 @@ section = ["HTML", "print", "RSS"]
   [[params.versions]]
     version = "main"
     githubbranch = "main"
-    url = "https://main.kcp-edge.io"
+    url = "https://docs.kcp-edge.io"
   [[params.versions]]
-    version = "v0.1"
-    githubbranch = "v0.1-branch"
-    url = "https://v0-1-branch.kcp-edge.org"
+    version = "v0.10"
+    githubbranch = "v0.10-branch"
+    url = "https://docs.kcp-edge.io/v0.10"
 
   # Links in footer
   [params.links]
