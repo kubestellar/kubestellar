@@ -24,7 +24,7 @@ fi
 kcpe_version="$1"
 target_os="$2"
 target_arch="$3"
-archname="kcp-edge_${kcpe_version}_${target_os}_${target_os}.tar.gz"
+archname="kcp-edge_${kcpe_version}_${target_os}_${target_arch}.tar.gz"
 
 if shasum -a 256 "$0" &> /dev/null
 then sumcmd="shasum -a 256"
