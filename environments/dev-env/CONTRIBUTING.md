@@ -49,17 +49,17 @@ cd kcp-edge
 make build
 ```
 
-#### 3. Create your own edge infrastructure (edge pclusters) - Bring Your Own Cluster (BYOC)
+#### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Cluster (BYOC)
 
-  - For example: create a kind cluster
+Create your edge cluster. In this example, we will use [kind](https://kind.sigs.k8s.io/) to create our edge cluster that we name “florin”:
 
-    ```bash
+    ```shell
     kind create cluster --name florin
     ```  
 
 #### 4. Deploy the kcp-edge platform:
 
-  * Step-1: download kcp binaries:
+  * Step-1: download kcp binaries for your platform:
 
     ```bash
     git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
