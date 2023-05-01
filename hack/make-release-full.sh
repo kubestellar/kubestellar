@@ -17,7 +17,7 @@
 # Usage: $0 KCPE_VERSION
 
 if [ $# != 1 ]; then
-    echo "$0 usage: KCPE_VERSION target_os target_arch" >&2
+    echo "$0 usage: KCPE_VERSION" >&2
     exit 1
 fi
 
@@ -26,7 +26,14 @@ kcpe_version="$1"
 set -e
 
 srcdir=$(dirname "$0")
-cd "$srcdir/.."
-#docker login quay.io
-KO_DOCKER_REPO=quay.io/kcpedge/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="$kcpe_version" ./cmd/syncer
-cd "$srcdir"
+./make-release-container.sh $kcpe_version
+
+os_names=( darwin darwin linux linux linux )
+arch_names=( arm64 amd64 arm64 amd64 ppc64le )
+length=${#os_names[@]}
+for (( i=0; i<length; i++ ));
+do
+	echo "${os_names[$i]} ${arch_names[$i]}"
+    ./make-release-platform-archive.sh $kcpe_version ${os_names[$i]} ${arch_names[$i]}
+done
+
