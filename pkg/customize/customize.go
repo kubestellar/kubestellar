@@ -38,7 +38,10 @@ func Customize(logger klog.Logger, input *unstructured.Unstructured, customizer 
 	}
 	output := input.DeepCopy()
 	outputU := output.UnstructuredContent()
-	defs := Definitions{loc.GetLabels(), loc.GetAnnotations()}
+	var defs Definitions
+	if loc != nil {
+		defs = Definitions{loc.GetLabels(), loc.GetAnnotations()}
+	}
 	if expandInput {
 		outputA := expandParameters(outputU, defs)
 		outputU = outputA.(map[string]any)
@@ -119,6 +122,7 @@ func expandString(input string, defs Definitions) string {
 		if found {
 			builder.WriteString(replacement)
 		} else {
+			// TODO: report this error condition
 			builder.WriteString("%(")
 			builder.WriteString(name)
 			builder.WriteString(")")

@@ -96,13 +96,13 @@ func main() {
 		neededArgs = 2
 	}
 
-	if fs.NArg() != neededArgs {
-		logger.Error(nil, "Wrong number of positional arguments", "needed", neededArgs, "got", fs.NArg())
+	if fs.NArg() < neededArgs || fs.NArg() > 2 {
+		logger.Error(nil, "Wrong number of positional arguments", "min", neededArgs, "max", 2, "got", fs.NArg())
 		os.Exit(1)
 	}
 
 	var location *schedulingv1alpha1.Location
-	if neededArgs > 1 {
+	if fs.NArg() > 1 {
 		obj, err := readObject(decoder, fs.Arg(1), &schedulingv1alpha1.Location{})
 		if err != nil {
 			logger.Error(err, "Failed to read Location", "locationFilename", fs.Arg(1))
