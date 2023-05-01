@@ -292,7 +292,7 @@ if [ $stage -eq 0 ] || [ $stage -gt 2 ]; then
     fi
 fi
 
-sleep 5
+sleep 10
 
 echo "****************************************"
 echo "Finished deploying kCP-EDGE controllers ...."
