@@ -36,9 +36,9 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
 
 #### 1. Clone the kcp-edge repo:
 
-    ```shell
-    git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
-    ```
+```shell
+git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
+```
 
 #### 2. Build the binaries:
 
@@ -56,27 +56,27 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
 
 #### 4. Deploy the kcp-edge platform:
 
-  * Step-1: Clone this repo:
+  * Step-1: download kcp binaries:
 
     ```bash
     git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
     ```
 
-  * Step-2: change into the following directory path:
+  * Step-2: start kcp
 
     ```bash
       cd edge-mc/environments/dev-env
     ```
 
-  * Step-3: Deploy kcp-edge
+  * Step-3: Deploy kcp-edge infra
 
     ```bash
-    ./install_edge-mc.sh --stage 0
+    ./kcp-edge.sh start
     ```
 
     This will start `kcp` and create/deploy the following components:
 
-    - 4 kcp workspaces: edge service provider workspace (`espw`), inventory management workspace (`imw`) and workload management workspace (`wmw`) under my-org workspace
+    - 1 kcp workspace: edge service provider workspace (`espw`)
 
     ```bash
     kubectl ws tree
@@ -84,10 +84,8 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
     └── root
         ├── compute
         ├── espw
-        ├── imw-1
-        └── my-org
-            └── wmw-1
     ```
+
     - 3 kcp-edge controllers: [edge-scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/), [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) and [placement-translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/)
 
     ```bash
