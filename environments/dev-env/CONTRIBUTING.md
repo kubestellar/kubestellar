@@ -29,22 +29,25 @@ Alternatively, run the following command for MacOS platform:
 brew install ko gcc jq make go@1.19 kind kubectl
 ```
 
-For Windows WSL/Ubuntu platform, follow the instructions [here](docs/README.md)
+For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_platform.md)
 
 
 ## Quickstart
 
+For a single-quick automation to deploy
+
 #### 1. Clone the kcp-edge repo:
 
 ```shell
-git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
+git clone https://github.com/kcp-dev/edge-mc.git  kcp-edge
 ```
 
-#### 2. Build the binaries:
+#### 2. Build the kcp-edge binaries:
 
-    ```shell
-      make build
-    ```
+```shell
+cd kcp-edge
+make build
+```
 
 #### 3. Create your own edge infrastructure (edge pclusters) - Bring Your Own Cluster (BYOC)
 
