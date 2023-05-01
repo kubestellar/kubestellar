@@ -26,7 +26,7 @@ kcpe_version="$1"
 set -e
 
 srcdir=$(dirname "$0")
-./make-release-container.sh $kcpe_version
+$srcdir/make-release-container.sh $kcpe_version
 
 os_names=( darwin darwin linux linux linux )
 arch_names=( arm64 amd64 arm64 amd64 ppc64le )
@@ -34,6 +34,6 @@ length=${#os_names[@]}
 for (( i=0; i<length; i++ ));
 do
 	echo "${os_names[$i]} ${arch_names[$i]}"
-    ./make-release-platform-archive.sh $kcpe_version ${os_names[$i]} ${arch_names[$i]}
+    $srcdir/make-release-platform-archive.sh $kcpe_version ${os_names[$i]} ${arch_names[$i]}
 done
 
