@@ -121,10 +121,17 @@ if kubectl get Workspace "$espw_name" &> /dev/null; then
    echo "espw workspace already exists -- using it:"
    kubectl ws "$espw_name"
 else 
-   kubectl ws create "$espw_name" --enter
-   kubectl create -f  ../../config/crds
-   kubectl create -f  ../../config/exports
-   echo "Finished Populate the espw with kcp edge crds and apiexports"
+   if [ $verbosity == 1 ]; then
+        kubectl ws create "$espw_name" --enter
+        kubectl create -f  ../../config/crds 
+        kubectl create -f  ../../config/exports
+        echo "Finished Populate the espw with kcp edge crds and apiexports"
+   else
+        kubectl ws create "$espw_name" --enter
+        kubectl create -f  ../../config/crds &> /dev/null
+        kubectl create -f  ../../config/exports &> /dev/null
+        echo "Finished Populate the espw with kcp edge crds and apiexports"
+   fi
 fi
 
 sleep 5
