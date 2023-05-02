@@ -184,17 +184,39 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
         └── imw-1
     ```
 
-  * Step-3: create the edge syncer manifest
+  * Step-3: Connect florin edge cluster with its mailbox workspace 
 
-    ```bash
-       ./build-edge-syncer.sh  --syncTarget sync-target-f
+    ```shell
+    kubectl ws root:espw
+    Current workspace is "root:espw".
 
-       -----------------------------------------------------------
-        Edge-syncer manifest created:  sync-target-f-syncer.yaml
-        Current workspace: root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
-       -----------------------------------------------------------
+    ../../scripts/mailbox-prep.sh florin
+
+    Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
+
+    Creating service account "kcp-edge-syncer-florin-5c4r0a44"
+    Creating cluster role "kcp-edge-syncer-florin-5c4r0a44" to give service account "kcp-edge-syncer-florin-5c4r0a44"
+
+    1. write and sync access to the synctarget "kcp-edge-syncer-florin-5c4r0a44"
+    2. write access to apiresourceimports.
+
+    Creating or updating cluster role binding "kcp-edge-syncer-florin-5c4r0a44" to bind service account "kcp-edge-syncer-florin-5c4r0a44" to cluster role "kcp-edge-syncer-florin-5c4r0a44".
+
+    Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-5c4r0a44". Use
+
+      KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
+
+    to apply it. Use
+
+      KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
+
+    to verify the syncer pod is running.
     ```
-    An edge syncer manifest yaml file is created in your current director: `sync-target-f-syncer.yaml`
+
+    An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
+    
+    On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge-syncer plugin and build it locally.
+   
 
   * Step-5: deploy the edge syncer to your edge pcluter
 
