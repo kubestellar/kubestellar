@@ -14,35 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 KCPE_VERSION target_os target_arch
+# Usage: $0 KCPE_VERSION
 
-if [ $# != 3 ]; then
+if [ $# != 1 ]; then
     echo "$0 usage: KCPE_VERSION target_os target_arch" >&2
     exit 1
 fi
 
 kcpe_version="$1"
-target_os="$2"
-target_arch="$3"
-archname="kcp-edge_${kcpe_version}_${target_os}_${target_arch}.tar.gz"
-
-if shasum -a 256 "$0" &> /dev/null
-then sumcmd="shasum -a 256"
-else sumcmd=sha256sum
-fi
 
 set -e
 
 srcdir=$(dirname "$0")
 cd "$srcdir/.."
-
-rm -rf bin/*
-make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/scheduler ./cmd/mailbox-controller ./cmd/placement-translator"
-mkdir -p build/release
-tar czf "build/release/$archname" --exclude bin/.gitignore bin README.md LICENSE
-cd build/release
-touch checksums256.txt
-grep -vw "$archname" checksums256.txt > /tmp/$$.txt || true
-$sumcmd "$archname" >> /tmp/$$.txt
-cp /tmp/$$.txt checksums256.txt
-rm /tmp/$$.txt
+#docker login quay.io
+KO_DOCKER_REPO=quay.io/kcpedge/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="$kcpe_version" ./cmd/syncer
+cd "$srcdir"
