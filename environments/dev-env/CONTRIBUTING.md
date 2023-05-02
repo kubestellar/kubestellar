@@ -36,13 +36,13 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_
 
 For a single-quick automation to deploy
 
-#### 1. Clone the kcp-edge repo:
+### 1. Clone the kcp-edge repo:
 
 ```shell
 git clone https://github.com/kcp-dev/edge-mc.git  kcp-edge
 ```
 
-#### 2. Build the kcp-edge binaries:
+### 2. Build the kcp-edge binaries:
 
 ```shell
 cd kcp-edge
@@ -56,7 +56,7 @@ export PATH="$PATH:$(pwd)/bin"
 ```
 
 
-#### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Cluster (BYOC)
+### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Cluster (BYOC)
 
 Create your edge cluster or bring your own k8s edge cluster. In this example, we will use [kind](https://kind.sigs.k8s.io/) to create an edge cluster that we name “florin”:
 
@@ -64,7 +64,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     kind create cluster --name florin
 ```  
 
-#### 4. Deploy the kcp-edge platform:
+### 4. Deploy the kcp-edge platform:
 
   * Step-1: download kcp binaries for your platform:
 
@@ -133,7 +133,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     user    11323   0.0  0.1 34892244  20780 s001  S     8:36PM   0:00.13 mailbox-controller --inventory-context=root --mbws-context=base -v=2
     ```
 
-#### 5. Connect your edge pcluster to the kcp-edge platform:
+### 5. Connect your edge pcluster to the kcp-edge platform:
 
   * Step-1: Populate the `imw`: enter the target workspace:
 
