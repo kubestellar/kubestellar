@@ -51,18 +51,30 @@ make build
 
 #### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Cluster (BYOC)
 
-Create your edge cluster. In this example, we will use [kind](https://kind.sigs.k8s.io/) to create our edge cluster that we name “florin”:
+Create your edge cluster or bring your own k8s edge cluster. In this example, we will use [kind](https://kind.sigs.k8s.io/) to create an edge cluster that we name “florin”:
 
-    ```shell
+```shell
     kind create cluster --name florin
-    ```  
+```  
 
 #### 4. Deploy the kcp-edge platform:
 
   * Step-1: download kcp binaries for your platform:
 
-    ```bash
-    git clone -b dev-env-v2 https://github.com/dumb0002/edge-mc.git
+    ```shell
+       VERSION=0.11.0 # choose the latest version (without v prefix)
+       OS=darwin   # or darwin
+       ARCH=amd64  # or amd64
+       curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kcp_${VERSION}_${OS}_${ARCH}.tar.gz" > kcp.tar.gz
+       curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kubectl-kcp-plugin_${VERSION}_${OS}_${ARCH}.tar.gz" > kubectl-kcp-plugin.tar.gz
+    ```
+
+    Extract kcp and kubectl-kcp-plugin and place all the files in the bin directories somewhere in your $PATH. For example:
+
+    ```shell
+    tar -xvf kcp.tar.gz
+    tar -xvf kubectl-kcp-plugin.tar.gz
+    export PATH="$PATH:$(pwd)/kcp/bin"'
     ```
 
   * Step-2: start kcp
