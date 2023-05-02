@@ -107,12 +107,12 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     - 1 kcp workspace: edge service provider workspace (`espw`)
 
-    ```shell
+    ```console
     kubectl ws tree
     .
-└── root
-    ├── compute
-    └── espw
+    └── root
+        ├── compute
+        └── espw
     ```
 
     - 3 kcp-edge controllers: [edge-scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/), [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) and [placement-translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/)
