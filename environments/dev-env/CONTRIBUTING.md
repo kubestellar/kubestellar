@@ -67,6 +67,8 @@ kind create cluster --name florin
   * Step-1: Download kcp binaries for your platform:
 
     ```shell
+       mkdir kcp
+       cd kcp
        VERSION=0.11.0 # choose the latest version (without v prefix)
        OS=darwin   # linux or darwin
        ARCH=amd64  # arm64 or amd64
@@ -79,7 +81,7 @@ kind create cluster --name florin
     ```shell
     tar -xvf kcp.tar.gz
     tar -xvf kubectl-kcp-plugin.tar.gz
-    export PATH="$PATH:$(pwd)/kcp/bin"
+    export PATH="$PATH:$(pwd)/bin"
     ```
 
   * Step-2: Start kcp
@@ -147,7 +149,7 @@ kind create cluster --name florin
   * Step-2: Create a syncTarget and location objects to represent your edge cluster (florin)
 
     ```console
-    ../../scripts/ensure-location.sh florin  env=prod
+    ensure-location.sh florin  env=prod
 
     synctarget.workload.kcp.io/florin created
     location.scheduling.kcp.io/florin created
@@ -188,7 +190,7 @@ kind create cluster --name florin
     kubectl ws root:espw
     Current workspace is "root:espw".
 
-    ../../scripts/mailbox-prep.sh florin
+    mailbox-prep.sh florin
 
     Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
 
@@ -258,7 +260,7 @@ kind create cluster --name florin
       kubectl ws root
       kubectl ws create my-org --enter
 
-      ../../scripts/ensure-wmw.sh wmw-1
+      ensure-wmw.sh wmw-1
 
       Current workspace is "root".
       Current workspace is "root:my-org".
