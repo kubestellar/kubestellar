@@ -25,11 +25,22 @@
 # Invoke this with the edge service provider workspace (ESPW) current,
 # and it will (if successful) terminate with the mailbox workspace current.
 
+# This script requires the edge-mc variant kubectl-kcp plugin to
+# already exist at ../bin/kubectl-kcpforedgesyncer.
+
 case "$1" in
     (-h|--help)
 	echo "$0 usage: (-o file_pathname | --syncer-image container_image_ref )* synctarget_name"
 	exit
 esac
+
+scriptdir="$(dirname "$0")"
+bindir="$(cd "$scriptdir"; cd ../bin; pwd)"
+
+if ! [ -x "$bindir/kubectl-kcpforedgesyncer" ]; then
+    echo "$0: $bindir/kubectl-kcpforedgesyncer does not exist; did you 'make build' or unpack a release archive here?" >&2
+    exit 2
+fi
 
 stname=""
 output=""
@@ -92,10 +103,4 @@ set -e
 
 kubectl ws "$mbws"
 
-scriptdir="$(dirname "$0")"
-
-"$scriptdir/ensure-syncer-plugin.sh"
-
-kcpdir="$scriptdir/../build/syncer-kcp"
-
-"$kcpdir/bin/kubectl-kcp" workload edge-sync "$stname" --syncer-image "$syncer_image" -o "$output"
+"$bindir/kubectl-kcpforedgesyncer" workload edge-sync "$stname" --syncer-image "$syncer_image" -o "$output"
