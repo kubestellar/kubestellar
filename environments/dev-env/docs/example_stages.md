@@ -1,4 +1,8 @@
-#### 3. Experiment with the kcp-edge 2023q1 PoC example scenarios:
+# KCP-Edge Example Scenarios:
+
+![Syncer effects](../../docs/content/en/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg "Stage 4 summary")
+
+This example involves two edge clusters and two workloads. One workload goes on both edge clusters and one workload goes on only one edge cluster. Nothing changes after the initial activity.
 
 In this quickstart example we will deploy `stage 3` described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). It creates the following components:
 
@@ -7,7 +11,7 @@ In this quickstart example we will deploy `stage 3` described in more details [h
 -  The placement translator reacts to the EdgePlacement objects in the workload management workspaces
 
 ```bash
-./install_edge-mc.sh --stage 3
+./install_edge-mc.sh --stage 4
 ```
 
 NB: if you're using a macOS, you may see pop-us messages similar to the one below while deploying kcp-edge: 
@@ -130,5 +134,5 @@ I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-
 #### 4. Delete a kcp-edge Poc2023q1 example stage:
 
 ```bash
-./delete_edge-mc.sh
+./clean_up.sh
 ```
