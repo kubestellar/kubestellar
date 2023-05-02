@@ -4,15 +4,15 @@
 <img src="https://github.com/kcp-dev/edge-mc/blob/main/docs/content/en/docs/Coding%20Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg" width="600" height="600">
 </p>
 
-In this example scenario we will deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We will call them “florin” and “guilder”. We will also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the `guilder` edge cluster. This example is described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
+In this example scenario we deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We call them “florin” and “guilder”. We also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the `guilder` edge cluster. This example is described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
 
-Run the following command to deploy 
+Run the following command to deploy our example scenario:
 
 ```shell
 ./install_edge-mc.sh --stage 4
 ```
 
-You can also explore others stages (e.g, 1, 2 or 3) describe [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
+NB: you can also explore others stages (e.g., 1, 2 or 3) described [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
 
 It creates the following components:
 
@@ -57,7 +57,7 @@ kubectl ws tree
         └── wmw-s
 ```
 
-#### Two synctargets and locations objects are created, one for each cluster
+#### Two synctargets and locations objects are created, one for each cluster:
 
 ```shell
 kubectl ws root:imw-1
@@ -76,7 +76,7 @@ sync-target-g   3m5s
 
 1. For workload common:
 
-```bash
+```shell
 kubectl ws root:my-org:wmw-c
 Current workspace is "root:my-org:wmw-c".
 
@@ -101,7 +101,7 @@ edge-placement-c   111s
 
 2. For workload special:
 
-```bash
+```shell
 kubectl ws root:my-org:wmw-s
 Current workspace is "root:my-org:wmw-s".
 
@@ -128,6 +128,6 @@ edge-placement-s   5m26s
 
 #### Clean up kcp-edge environment
 
-```bash
+```shell
 ./clean_up.sh
 ```
