@@ -66,7 +66,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
 ### 4. Deploy the kcp-edge platform:
 
-  * Step-1: download kcp binaries for your platform:
+  * Step-1: Download kcp binaries for your platform:
 
     ```shell
        VERSION=0.11.0 # choose the latest version (without v prefix)
@@ -84,7 +84,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     export PATH="$PATH:$(pwd)/kcp/bin"
     ```
 
-  * Step-2: start kcp
+  * Step-2: Start kcp
 
     ```shell
     kcp start >& kcp_log.txt &
@@ -135,9 +135,9 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
 ### 5. Connect your edge pcluster to the kcp-edge platform:
 
-  * Step-1: create inventory management workspace (`imw`)
+  * Step-1: Create inventory management workspace (`imw`)
 
-    ```shell
+    ```console
     kubectl ws root
     kubectl ws create imw-1 --enter
 
@@ -146,9 +146,9 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     Current workspace is "root:imw-1" (type root:organization).
     ```
     
-  * Step-2: create SyncTarget and Location objects to represent your edge cluster (florin)
+  * Step-2: Create a syncTarget and location objects to represent your edge cluster (florin)
 
-    ```shell
+    ```console
     ../../scripts/ensure-location.sh florin  env=prod
 
     synctarget.workload.kcp.io/florin created
@@ -159,7 +159,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     A location and synctarget objects will be created:
 
-    ```shell
+    ```console
     kubectl get locations,synctargets
     NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
     location.scheduling.kcp.io/florin   synctargets   0           1                    57s
@@ -171,7 +171,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
   
     The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `florin`:
 
-    ```shell
+    ```console
     kubectl ws root
     Current workspace is "root".
 
