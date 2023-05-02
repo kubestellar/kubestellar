@@ -31,9 +31,15 @@ brew install ko gcc jq make go@1.19 kind kubectl
 
 For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_platform.md)
 
+##  Contributing
+
+See the [contributing instructions](CONTRIBUTING.md) for detailed instructions on how to deploy and get started with our project.
+
+## Example Scenario
+
+See the [example scenario instructions](docs/example_stages.md) to quickly deploy a kcp-edge demo environment with two sample workloads and two edge clusters. 
 
 ## Quickstart
-
 
 ### 1. Download the kcp-edge binaries:
 
