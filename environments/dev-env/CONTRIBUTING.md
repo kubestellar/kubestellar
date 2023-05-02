@@ -318,60 +318,59 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     In the `wmw-1` workspace create the following `EdgePlacement` object: 
     
-      ```console
-      kubectl ws root:my-org:wmw-1
+    ```console
+    kubectl ws root:my-org:wmw-1
 
-      cat <<EOF | kubectl apply -f -
-        apiVersion: edge.kcp.io/v1alpha1
-        kind: EdgePlacement
-        metadata:
-          name: edge-placement-c
-        spec:
-          locationSelectors:
-          - matchLabels: {"env":"prod"}
-          namespaceSelector:
-            matchLabels: {"common":"si"}
-          nonNamespacedObjects:
-          - apiGroup: apis.kcp.io
-            resources: [ "apibindings" ]
-            resourceNames: [ "bind-kube" ]
-          upsync:
-          - apiGroup: "group1.test"
-            resources: ["sprockets", "flanges"]
-            namespaces: ["orbital"]
-            names: ["george", "cosmo"]
-          - apiGroup: "group2.test"
-            resources: ["cogs"]
-            names: ["william"]
-      EOF
-      ```
-    Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge pcluster.
+    cat <<EOF | kubectl apply -f -
+      apiVersion: edge.kcp.io/v1alpha1
+      kind: EdgePlacement
+      metadata:
+        name: edge-placement-c
+      spec:
+        locationSelectors:
+        - matchLabels: {"env":"prod"}
+        namespaceSelector:
+          matchLabels: {"common":"si"}
+        nonNamespacedObjects:
+        - apiGroup: apis.kcp.io
+          resources: [ "apibindings" ]
+          resourceNames: [ "bind-kube" ]
+        upsync:
+        - apiGroup: "group1.test"
+          resources: ["sprockets", "flanges"]
+          namespaces: ["orbital"]
+          names: ["george", "cosmo"]
+        - apiGroup: "group2.test"
+          resources: ["cogs"]
+          names: ["william"]
+    EOF
+    ```
+    Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
  
     In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/) will create a corresponding `SinglePlacementSlice` object:
 
-    ```bash
-        kubectl get SinglePlacementSlice -o yaml edge-placement-c
-
-        apiVersion: edge.kcp.io/v1alpha1
-        destinations:
-        - cluster: 2vsg1pyc1uqtyk40
-          locationName: location-f
-          syncTargetName: sync-target-f
-          syncTargetUID: b7acd821-319b-4061-be47-084fbce36f29
-        kind: SinglePlacementSlice
-        metadata:
-          annotations:
-            kcp.io/cluster: 19nyul7j8az21nkp
-          creationTimestamp: "2023-04-13T03:58:20Z"
-          generation: 1
-          name: edge-placement-c
-          ownerReferences:
-          - apiVersion: edge.kcp.io/v1alpha1
-            kind: EdgePlacement
-            name: edge-placement-c
-            uid: c3d718b8-9a2f-4a34-9b80-b98d091cff67
-          resourceVersion: "1088"
-          uid: b7a8e302-1532-4e48-a69e-910a9ac2aa62
+    ```console
+    kubectl get SinglePlacementSlice -o yaml edge-placement-c
+    apiVersion: edge.kcp.io/v1alpha1
+    destinations:
+    - cluster: 19igldm1mmolruzr
+      locationName: florin
+      syncTargetName: florin
+      syncTargetUID: 6b0309f0-84f3-4926-9344-81df2f989f69
+    kind: SinglePlacementSlice
+    metadata:
+      annotations:
+        kcp.io/cluster: 2aqjl32hksrd4nok
+      creationTimestamp: "2023-05-02T04:00:45Z"
+      generation: 1
+      name: edge-placement-c
+      ownerReferences:
+      - apiVersion: edge.kcp.io/v1alpha1
+        kind: EdgePlacement
+        name: edge-placement-c
+        uid: 3f20a0a4-ed9a-4114-960e-0aa3d42802e3
+      resourceVersion: "1161"
+      uid: 32882961-fb77-4a95-be92-1ad6b088d082
     ```
 
   * Step-4: Check that the workloads objects are copied to mailbox workspace:
@@ -379,128 +378,120 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
     ```bash
-      kubectl ws root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
-      Current workspace is "root:espw:1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303".
+    kubectl ws root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
+    Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69".
+    
+    kubectl get ns
+    NAME          STATUS   AGE
+    commonstuff   Active   4m
+    default       Active   114m
+    
+    kubectl -n commonstuff get deploy
+    NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+    nginx-deployment   0/3     0            0           4m7s
 
-      kubectl get ns
-      NAME          STATUS   AGE
-      commonstuff   Active   2m16s
-      default       Active   73m
-
-      kubectl -n commonstuff get deploy
-      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-      nginx-deployment   0/3     0            0           2m25s
-
-      kubectl get syncerConfig
-      NAME      AGE
-      the-one   21m
+    kubectl get syncerConfig
+    NAME      AGE
+    the-one   4m26s
     ```
 
     ```bash
-        kubectl get syncerConfig the-one -o yaml
-        apiVersion: edge.kcp.io/v1alpha1
-        kind: SyncerConfig
-        metadata:
-          annotations:
-            kcp.io/cluster: 32uj0ldbsw50x5np
-          creationTimestamp: "2023-04-19T16:06:03Z"
-          generation: 4
-          name: the-one
-          resourceVersion: "1150"
-          uid: 2f75a6b6-96ad-4cc6-8a53-2cfbcbf6ce84
-        spec:
-          clusterScope:
-          - apiVersion: v1alpha1
-            group: apis.kcp.io
-            objects:
-            - bind-kube
-            resource: apibindings
-          namespaceScope:
-            namespaces:
-            - commonstuff
-            resources:
-            - apiVersion: v1
-              group: rbac.authorization.k8s.io
-              resource: roles
-            - apiVersion: v1
-              group: coordination.k8s.io
-              resource: leases
-            - apiVersion: v1
-              group: ""
-              resource: limitranges
-            - apiVersion: v1
-              group: networking.k8s.io
-              resource: ingresses
-            - apiVersion: v1
-              group: ""
-              resource: endpoints
-            - apiVersion: v1
-              group: ""
-              resource: services
-            - apiVersion: v1
-              group: apps
-              resource: deployments
-            - apiVersion: v1
-              group: ""
-              resource: serviceaccounts
-            - apiVersion: v1
-              group: ""
-              resource: configmaps
-            - apiVersion: v1
-              group: ""
-              resource: secrets
-            - apiVersion: v1
-              group: ""
-              resource: resourcequotas
-            - apiVersion: v1
-              group: ""
-              resource: pods
-            - apiVersion: v1
-              group: rbac.authorization.k8s.io
-              resource: rolebindings
-          upsync:
-          - apiGroup: group1.test
-            names:
-            - george
-            - cosmo
-            namespaces:
-            - orbital
-            resources:
-            - sprockets
-            - flanges
-          - apiGroup: group2.test
-            names:
-            - william
-            resources:
-            - cogs
-        status: {}
+    kubectl get syncerConfig the-one -o yaml
+    apiVersion: edge.kcp.io/v1alpha1
+    kind: SyncerConfig
+    metadata:
+      annotations:
+        kcp.io/cluster: 1jaofi54318wchgc
+      creationTimestamp: "2023-05-02T04:00:45Z"
+      generation: 2
+      name: the-one
+      resourceVersion: "1163"
+      uid: 7f618cf8-7ead-49f3-b410-ed9d52f50fe1
+    spec:
+      namespaceScope:
+        namespaces:
+        - commonstuff
+        resources:
+        - apiVersion: v1
+          group: ""
+          resource: resourcequotas
+        - apiVersion: v1
+          group: apps
+          resource: deployments
+        - apiVersion: v1
+          group: ""
+          resource: limitranges
+        - apiVersion: v1
+          group: ""
+          resource: configmaps
+        - apiVersion: v1
+          group: ""
+          resource: services
+        - apiVersion: v1
+          group: networking.k8s.io
+          resource: ingresses
+        - apiVersion: v1
+          group: coordination.k8s.io
+          resource: leases
+        - apiVersion: v1
+          group: rbac.authorization.k8s.io
+          resource: roles
+        - apiVersion: v1
+          group: ""
+          resource: secrets
+        - apiVersion: v1
+          group: rbac.authorization.k8s.io
+          resource: rolebindings
+        - apiVersion: v1
+          group: ""
+          resource: pods
+        - apiVersion: v1
+          group: ""
+          resource: serviceaccounts
+      upsync:
+      - apiGroup: group1.test
+        names:
+        - george
+        - cosmo
+        namespaces:
+        - orbital
+        resources:
+        - sprockets
+        - flanges
+      - apiGroup: group2.test
+        names:
+        - william
+        resources:
+        - cogs
+    status: {}
     ```
 
   * Step-5: Check that the workloads are running in the edge pclusters:
 
+    ```bash
+    KUBECONFIG=$florin_kubeconfig kubectl get ns
 
-      ```bash
-          kubectl get ns
-          NAME                               STATUS   AGE
-          commonstuff                        Active   4m58s
-          default                            Active   49m
-          kcp-edge-syncer-the-one-2p3eqojn   Active   46m
-          kube-node-lease                    Active   49m
-          kube-public                        Active   49m
-          kube-system                        Active   49m
-          local-path-storage                 Active   48m
+    NAME                              STATUS   AGE
+    commonstuff                       Active   8m7s
+    default                           Active   86m
+    kcp-edge-syncer-florin-5c4r0a44   Active   85m
+    kube-node-lease                   Active   86m
+    kube-public                       Active   86m
+    kube-system                       Active   86m
+    local-path-storage                Active   86m
 
-          kubectl -n commonstuff get deploy
-          NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-          nginx-deployment   3/3     3            3           4m55s
+    KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deploy
+    NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+    nginx-deployment   3/3     3            3           8m37s
 
 
-          kubectl -n commonstuff get pods
-          NAME                                READY   STATUS    RESTARTS   AGE
-          nginx-deployment-7fb96c846b-6v6fq   1/1     Running   0          5m1s
-          nginx-deployment-7fb96c846b-f52qc   1/1     Running   0          5m1s
-          nginx-deployment-7fb96c846b-r85t6   1/1     Running   0          5m1s
-      ```
+    KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
+    NAME                                READY   STATUS    RESTARTS   AGE
+    nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
+    nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
+    nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
+    ```
+
 ### 6. Clean up your kcp-edge environment:
 
 ```shell
