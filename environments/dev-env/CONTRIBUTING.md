@@ -135,69 +135,43 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
 ### 5. Connect your edge pcluster to the kcp-edge platform:
 
-  * Step-1: Populate the `imw`: enter the target workspace:
+  * Step-1: create inventory management workspace (`imw`)
 
-    ```bash
-        kubectl ws root:imw-1
+    ```shell
+    kubectl ws root
+    kubectl ws create imw-1 --enter
+
+    Workspace "imw-1" (type root:organization) created. Waiting for it to be ready...
+    Workspace "imw-1" (type root:organization) is ready to use.
+    Current workspace is "root:imw-1" (type root:organization).
     ```
     
-  * Step-2: create a SyncTarget object to represent your edge pcluster. For example:
+  * Step-2: create SyncTarget and Location objects to represent your edge cluster (florin)
 
-    ```bash
-    cat <<EOF | kubectl apply -f -
-    apiVersion: workload.kcp.io/v1alpha1
-    kind: SyncTarget
-    metadata:
-      name: sync-target-f
-      labels:
-        example: si
-        extended: non
-    spec:
-      cells:
-        foo: bar
-    EOF
-    ```
+    ```shell
+    ../../scripts/ensure-location.sh florin  env=prod
 
-  * Step-3: create a Location object describing your edge pcluster. For example:
-
-    ```bash
-    cat <<EOF | kubectl apply -f -
-    apiVersion: scheduling.kcp.io/v1alpha1
-    kind: Location
-    metadata:
-      name: location-f
-      labels:
-        env: prod
-    spec:
-      resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
-      instanceSelector:
-        matchLabels: {"example":"si", "extended":"non"}
-    EOF
+    synctarget.workload.kcp.io/florin created
+    location.scheduling.kcp.io/florin created
+    synctarget.workload.kcp.io/florin labeled
+    location.scheduling.kcp.io/florin labeled
     ```
 
     A location and synctarget objects will be created:
 
-    ```bash
+    ```shell
     kubectl get locations,synctargets
-    NAME                                    RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-    location.scheduling.kcp.io/default      synctargets   0           1                    36s
-    location.scheduling.kcp.io/location-f   synctargets   0           1                    25s
+    NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
+    location.scheduling.kcp.io/florin   synctargets   0           1                    57s
 
-    NAME                                       AGE
-    synctarget.workload.kcp.io/sync-target-f   36s
+    NAME                                AGE
+    synctarget.workload.kcp.io/florin   58s
     ```
   
-    You can remove the default location object created:
+  
+    The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `florin`:
 
-    ```bash
-    kubectl delete location default
-    location.scheduling.kcp.io "default" deleted
-    ```
-
-
-    The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `sync-target-f`:
-
-    ```bash
+    ```shell
     kubectl ws root
     Current workspace is "root".
 
@@ -206,13 +180,11 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     └── root
         ├── compute
         ├── espw
-        │   └── 1q1p9rsh18rhjuy4-mb-2c1b6ce7-bc4a-4071-887d-871ba293f303
-        ├── imw-1
-        └── my-org
-            └── wmw-1
+        │   └── 19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
+        └── imw-1
     ```
 
-  * Step-4: create the edge syncer manifest
+  * Step-3: create the edge syncer manifest
 
     ```bash
        ./build-edge-syncer.sh  --syncTarget sync-target-f
