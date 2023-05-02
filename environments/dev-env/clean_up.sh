@@ -36,41 +36,21 @@ pkill -f kubectl-kcp-playground
 pkill -f kcp
 pkill -f mailbox-controller
 pkill -f placement-translator
-pkill -f cmd/scheduler/main.go # edge-scheduler
+pkill -f "scheduler -v 2" # edge-scheduler
 rm -rf $(pwd)/kcp
 rm -rf $(pwd)/edge-syncer
+rm -rf .kcp
 
 
-if [ -f "sync-target-f-syncer.yaml" ]; then
-      rm sync-target-f-syncer.yaml
-      echo "Deleted syncer manifest: sync-target-f-syncer.yaml"
+if [ !$(ls | grep syncer.sh | wc -l) == 0 ]; then
+      rm *syncer.yaml
+      echo "Deleted syncer manifest"
 fi 
 
-if [ -f "sync-target-g-syncer.yaml" ]; then
-      rm sync-target-g-syncer.yaml
-      echo "Deleted syncer manifest: sync-target-g-syncer.yaml"
+if [ !$(ls | grep log.txt | wc -l) == 0 ]; then
+      rm *log.txt
+      echo "Deleted log files"
 fi 
-
-if [ -f "placement-translator-log.txt" ]; then
-      rm placement-translator-log.txt
-      echo "Deleted log file: placement-translator-log.txt"
-fi 
-
-if [ -f "edge-scheduler-log.txt" ]; then
-      rm edge-scheduler-log.txt
-      echo "Deleted log file: edge-scheduler-log.txt"
-fi
-
-if [ -f "mailbox-controller-log.txt" ]; then
-      rm mailbox-controller-log.txt
-      echo "Deleted log file: mailbox-controller-log.txt"
-fi
-
-
-if [ -f "kcp-playground-log.txt" ]; then
-      rm kcp-playground-log.txt
-      echo "Deleted log file: kcp-playground-log.txt"
-fi
 
 rm -rf $(pwd)/kcp
 rm -rf $(pwd)/edge-syncer

@@ -71,10 +71,10 @@ then
 fi
 
 # Check edge-scheduler is already running
-if [ $(process_running scheduler) == "running" ]
+if [ $(process_running "scheduler -v 2") == "running" ]
 then
     echo "An older deployment of edge-scheduler is already running - terminating it ...."
-    pkill -f scheduler
+    pkill -f "scheduler -v 2"
 fi
 
 # Check placement-translator is already running
@@ -155,9 +155,8 @@ fi
 # Start the edge-mc scheduler
 sleep 3
 scheduler -v 2 --root-user kcp-admin  --root-cluster root  --sysadm-context system:admin  --sysadm-user shard-admin >& edge-scheduler-log.txt &
-message=$(wait_for_process scheduler)
 
-run_status=$(wait_for_process main)
+run_status=$(wait_for_process "scheduler -v 2")
 if [ $run_status -eq 0 ]; then
     echo " scheduler is running (log file: edge-scheduler-log.txt)"
 else
