@@ -43,13 +43,18 @@ See the [example scenario instructions](docs/example_stages.md) to quickly deplo
 
 ### 1. Download the kcp-edge binaries:
 
-```shell
 
+```shell
+VERSION=0.1.0 # choose the latest version (without v prefix)
+OS=darwin   # linux or darwin
+ARCH=amd64  # arm64 or amd64
+curl -sSfL "https://github.com/kcp-dev/edge-mc/releases/download/v${VERSION}/kcp-edge_v${VERSION}_${OS}_${ARCH}.tar.gz" > kcp-edge.tar.gz
 ```
 
-The kcp-edge binaries is created inside the `/bin` directory. Add this directory to your $PATH:
+Add the kcp edge `/bin` directory to your $PATH:
 
 ```shell
+tar -xvf kcp.tar.gz
 export PATH="$PATH:$(pwd)/bin"
 ```
 
