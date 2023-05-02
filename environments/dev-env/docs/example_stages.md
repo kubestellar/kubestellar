@@ -47,28 +47,27 @@ kubectl ws tree
 └── root
     ├── compute
     ├── espw
-    │   ├── limgjykhmrjeiwc6-mb-1c6d6132-4ef9-482e-bff5-ee7a70fb601e
-    │   └── limgjykhmrjeiwc6-mb-a1d8f1cd-6493-4480-8c5e-c7a3dd53600a
+    │   ├── 2r8mzyucyiogekve-mb-18bf4a12-e019-4520-954e-a2565fe991b5
+    │   └── 2r8mzyucyiogekve-mb-f366f9ba-a111-4c80-b418-1a7b3ce61ab9
     ├── imw-1
     └── my-org
         ├── wmw-c
         └── wmw-s
 ```
+
 The mailbox-controller created two mailbox workspace (`limgjykhmrjeiwc6-mb-1c6d6132-4ef9-482e-bff5-ee7a70fb601e` and `limgjykhmrjeiwc6-mb-a1d8f1cd-6493-4480-8c5e-c7a3dd53600a`) for the newly created SyncTargets: sync-target-f and sync-target-g
 
 #### Two synctargets and locations objects are created, one for each cluster:
 
 ```shell
-kubectl ws root:imw-1
-kubectl get locations
-NAME         RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-location-f   synctargets   0           1                    2m21s
-location-g   synctargets   0           1                    2m21s
+kubectl get locations,synctargets
+NAME                                    RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
+location.scheduling.kcp.io/location-f   synctargets   0           1                    3m2s
+location.scheduling.kcp.io/location-g   synctargets   0           1                    3m2s
 
-kubectl get synctargets
-NAME            AGE
-sync-target-f   3m6s
-sync-target-g   3m5s
+NAME                                       AGE
+synctarget.workload.kcp.io/sync-target-f   3m1s
+synctarget.workload.kcp.io/sync-target-g   3m1s
 ```
 
 #### Two workload management workspaces are created:
@@ -81,17 +80,25 @@ Current workspace is "root:my-org:wmw-c".
 
 kubectl get ns
 NAME          STATUS   AGE
-commonstuff   Active   99s
-default       Active   104s
+commonstuff   Active   4m57s
+default       Active   5m2s
 
 kubectl -n commonstuff get deploy
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commond   0/0     0            0           111s
+commond   0/0     0            0           5m24s
 
 kubectl -n commonstuff get configmaps
 NAME               DATA   AGE
-httpd-htdocs       1      117s
-kube-root-ca.crt   1      117s
+httpd-htdocs       1      5m42s
+kube-root-ca.crt   1      5m42s
+```
+
+An `EdgePlacement` object is created for the workload common. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`location-g` and `location-f` ) created earlier, thus directing the workload to both “florin” and “guilder” edge cluster.
+
+``` shell
+kubectl get edgeplacement
+NAME               AGE
+edge-placement-c   4m21s
 ```
 
 In response to the created EdgePlacement, the edge scheduler created a corresponding SinglePlacementSlice object:
@@ -99,7 +106,7 @@ In response to the created EdgePlacement, the edge scheduler created a correspon
 ```shell
 kubectl get SinglePlacementSlice
 NAME               AGE
-edge-placement-c   111s
+edge-placement-c   8m11s
 ```
 
 2. For workload special:
@@ -110,17 +117,25 @@ Current workspace is "root:my-org:wmw-s".
 
 kubectl get ns
 NAME           STATUS   AGE
-default        Active   5m1s
-specialstuff   Active   4m57s
+default        Active   6m28s
+specialstuff   Active   6m25s
 
 kubectl -n specialstuff  get deploy
 NAME       READY   UP-TO-DATE   AVAILABLE   AGE
-speciald   0/0     0            0           5m29s
+speciald   0/0     0            0           6m38s
 
 kubectl -n specialstuff  get configmaps
 NAME               DATA   AGE
-httpd-htdocs       1      5m35s
-kube-root-ca.crt   1      5m35s
+httpd-htdocs       1      6m54s
+kube-root-ca.crt   1      6m55s
+```
+
+An `EdgePlacement` object is created for the workload common. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object (`location-g`) created earlier, thus directing the workload to the “guilder” edge cluster.
+
+```shell
+kubectl get edgeplacement
+NAME               AGE
+edge-placement-s   7m13s
 ```
 
 Again, in response to the created EdgePlacement, the edge scheduler created a corresponding SinglePlacementSlice object:
@@ -128,12 +143,18 @@ Again, in response to the created EdgePlacement, the edge scheduler created a co
 ```shell
 kubectl get SinglePlacementSlice
 NAME               AGE
-edge-placement-s   5m26s
+edge-placement-s   7m41s
 ```
 
 #### Special and Common workloads are copied to their respective mailbox workspaces
 
-In response to the created EdgePlacement and SinglePlacementSlice objects, the placement translator copied the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+In response to the created `EdgePlacement` and `SinglePlacementSlice` objects, the placement translator copied the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+
+1. For workload common:
+
+
+2. For workload special:
+
 
 
 #### The workloads are synced into edge clusters via the edge-syncer:
