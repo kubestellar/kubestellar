@@ -53,7 +53,7 @@ export PATH="$PATH:$(pwd)/bin"
 Create your edge cluster or bring your own k8s edge cluster. In this example, we use [kind](https://kind.sigs.k8s.io/) to create an edge cluster that we name “florin”:
 
 ```shell
-    kind create cluster --name florin
+kind create cluster --name florin
 ```  
 
 ### 3. Deploy the kcp-edge platform:
