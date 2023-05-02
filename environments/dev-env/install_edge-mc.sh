@@ -183,6 +183,8 @@ elif [ $stage == 2 ]; then
     kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
 elif [ $stage == 3 ]; then
     kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
+elif [ $stage == 4 ]; then
+    kubectl kcp playground start -f test/kubectl-kcp-playground/examples/kcp-edge/poc2023q1-stage2.yaml >& ../kcp-playground-log.txt &
 fi 
 
 #####################################################
