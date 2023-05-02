@@ -214,7 +214,7 @@ local-path-storage                 local-path-provisioner             1/1     1 
 ```
 
 
-1. Guilder edge cluster: receives the `workload common` and the `workload special`
+2. Guilder edge cluster: receives the `workload common` and the `workload special`
 
 ```shell
 kubectl kcp playground use pcluster guilder 
