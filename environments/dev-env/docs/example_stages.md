@@ -93,7 +93,7 @@ httpd-htdocs       1      5m42s
 kube-root-ca.crt   1      5m42s
 ```
 
-An `EdgePlacement` object is created for the workload common. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`location-g` and `location-f` ) created earlier, thus directing the workload to both “florin” and “guilder” edge cluster.
+An `EdgePlacement` object is created for the workload common. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`location-g` and `location-f` ) created earlier, thus directing the workload to both “florin” and “guilder” edge clusters.
 
 ``` shell
 kubectl get edgeplacement
@@ -148,19 +148,102 @@ edge-placement-s   7m41s
 
 #### Special and Common workloads are copied to their respective mailbox workspaces
 
-In response to the created `EdgePlacement` and `SinglePlacementSlice` objects, the placement translator copied the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+In response to the created `EdgePlacement` and `SinglePlacementSlice` objects, the placement translator copied the workload prescriptions into the mailbox workspaces and created SyncerConfig objects there.
 
-1. For workload common:
+1. Mailbox workspace associated with Synctarget `sync-target-f`:
+
+```shell
+kubectl ws root:espw:2r8mzyucyiogekve-mb-18bf4a12-e019-4520-954e-a2565fe991b5
+Current workspace is "root:espw:2r8mzyucyiogekve-mb-18bf4a12-e019-4520-954e-a2565fe991b5".
+
+kubectl get ns
+NAME          STATUS   AGE
+commonstuff   Active   24m
+default       Active   24m
+
+kubectl get SyncerConfig
+NAME      AGE
+the-one   25m
+```
 
 
-2. For workload special:
+2. Mailbox workspace associated with Synctarget `sync-target-g`: 
 
+```shell
+kubectl get ns
+NAME           STATUS   AGE
+commonstuff    Active   29m
+specialstuff   Active   29m
+default        Active   29m
 
+kubectl get SyncerConfig
+NAME      AGE
+the-one   29m
+```
 
 #### The workloads are synced into edge clusters via the edge-syncer:
 
+1. Florin edge cluster: receives the `workload common`
+
+```shell
+cd kcp
+kubectl kcp playground use pcluster florin
+ 🔸  Current context in kubeconfig '.kcp-playground/playground.kubeconfig' is has been set to 'pcluster-florin-admin' 🏓
+
+kubectl get pods -A
+NAMESPACE                          NAME                                                READY   STATUS    RESTARTS   AGE
+commonstuff                        commond-7b5d7ddd77-bj47g                            1/1     Running   0          30m
+kcp-edge-syncer-the-one-20hyh1ri   kcp-edge-syncer-the-one-20hyh1ri-858d5d49b4-pblph   1/1     Running   0          31m
+kube-system                        coredns-565d847f94-tg7j2                            1/1     Running   0          32m
+kube-system                        coredns-565d847f94-wwsk7                            1/1     Running   0          32m
+kube-system                        etcd-florin-control-plane                           1/1     Running   0          32m
+kube-system                        kindnet-gl9wc                                       1/1     Running   0          32m
+kube-system                        kube-apiserver-florin-control-plane                 1/1     Running   0          32m
+kube-system                        kube-controller-manager-florin-control-plane        1/1     Running   0          32m
+kube-system                        kube-proxy-x9nr9                                    1/1     Running   0          32m
+kube-system                        kube-scheduler-florin-control-plane                 1/1     Running   0          32m
+local-path-storage                 local-path-provisioner-684f458cdd-8whx8             1/1     Running   0          32m
 
 
+kubectl get deploy -A
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           30m
+kcp-edge-syncer-the-one-20hyh1ri   kcp-edge-syncer-the-one-20hyh1ri   1/1     1            1           31m
+kube-system                        coredns                            2/2     2            2           33m
+local-path-storage                 local-path-provisioner             1/1     1            1           33m
+```
+
+
+1. Guilder edge cluster: receives the `workload common` and the `workload special`
+
+```shell
+kubectl kcp playground use pcluster guilder 
+ 🔸  Current context in kubeconfig '.kcp-playground/playground.kubeconfig' is has been set to 'pcluster-guilder-admin' 🏓
+
+kubectl get pods -A
+NAMESPACE                          NAME                                                READY   STATUS    RESTARTS   AGE
+commonstuff                        commond-7b5d7ddd77-ltrtc                            1/1     Running   0          34m
+kcp-edge-syncer-the-one-20dlc7rw   kcp-edge-syncer-the-one-20dlc7rw-76df8f5459-mwmk6   1/1     Running   0          35m
+kube-system                        coredns-565d847f94-cnngq                            1/1     Running   0          35m
+kube-system                        coredns-565d847f94-tdrgx                            1/1     Running   0          35m
+kube-system                        etcd-guilder-control-plane                          1/1     Running   0          36m
+kube-system                        kindnet-crbrp                                       1/1     Running   0          35m
+kube-system                        kube-apiserver-guilder-control-plane                1/1     Running   0          36m
+kube-system                        kube-controller-manager-guilder-control-plane       1/1     Running   0          36m
+kube-system                        kube-proxy-clr8m                                    1/1     Running   0          35m
+kube-system                        kube-scheduler-guilder-control-plane                1/1     Running   0          36m
+local-path-storage                 local-path-provisioner-684f458cdd-7md8s             1/1     Running   0          35m
+specialstuff                       speciald-7d5ff89f68-w84lw                           1/1     Running   0          34m
+ 
+
+kubectl get deploy -A
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           34m
+kcp-edge-syncer-the-one-20dlc7rw   kcp-edge-syncer-the-one-20dlc7rw   1/1     1            1           35m
+kube-system                        coredns                            2/2     2            2           36m
+local-path-storage                 local-path-provisioner             1/1     1            1           36m
+specialstuff                       speciald                           1/1     1            1           34m
+```
 
 #### Clean up kcp-edge environment
 
