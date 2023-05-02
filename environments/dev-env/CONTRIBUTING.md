@@ -49,7 +49,7 @@ cd kcp-edge
 make build
 ```
 
-The kcp-edge binaries will created inside the `/bin` directory. Add this directory to your $PATH:
+The kcp-edge binaries is created inside the `/bin` directory. Add this directory to your $PATH:
 
 ```shell
 export PATH="$PATH:$(pwd)/bin"
@@ -58,7 +58,7 @@ export PATH="$PATH:$(pwd)/bin"
 
 ### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Cluster (BYOC)
 
-Create your edge cluster or bring your own k8s edge cluster. In this example, we will use [kind](https://kind.sigs.k8s.io/) to create an edge cluster that we name “florin”:
+Create your edge cluster or bring your own k8s edge cluster. In this example, we use [kind](https://kind.sigs.k8s.io/) to create an edge cluster that we name “florin”:
 
 ```shell
     kind create cluster --name florin
@@ -112,7 +112,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     ./kcp-edge.sh start
     ```
 
-    This will create/deploy the following components:
+    The following components are created:
 
     - 1 kcp workspace: edge service provider workspace (`espw`)
 
@@ -157,7 +157,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     location.scheduling.kcp.io/florin labeled
     ```
 
-    A location and synctarget objects will be created:
+    A location and synctarget objects are created:
 
     ```console
     kubectl get locations,synctargets
@@ -254,21 +254,16 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
 ### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
-  * Step-1: Populate the `wmw` with your workload objects -  enter the target workspace: `wmw-1`
+  * Step-1: Create a workload management workspace (`wmw`):
   
-      ```bash
-        kubectl ws root:my-org:wmw-1
+      ```console
+      kubectl ws root
+      kubectl ws root:my-org:wmw-1
       ```
 
-    N.B: if your using the `florin` kind edge pcluster created in this example, then you should switch back to the kcp edge context first before executing the command above:
+  * Step-2: Deploy your workload in `wmw`. For example:
 
-      ```bash
-        kubectl config use-context shard-main-root
-      ```
-
-  * Step-2: deploy your workload. For example:
-
-      ```bash
+      ```console
       cat <<EOF | kubectl apply -f -
       apiVersion: v1
       kind: Namespace
@@ -303,7 +298,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     Check that your workload was deployed successfully: 
 
-    ```bash
+    ```console
         kubectl -n commonstuff get deploy
         NAME               READY   UP-TO-DATE   AVAILABLE   AGE
         nginx-deployment   0/3     0            0           13s
