@@ -131,7 +131,7 @@ kind create cluster --name florin
     user    11323   0.0  0.1 34892244  20780 s001  S     8:36PM   0:00.13 mailbox-controller --inventory-context=root --mbws-context=base -v=2
     ```
 
-### 5. Connect your edge pcluster to the kcp-edge platform:
+### 5. Connect your edge cluster to the kcp-edge platform:
 
   * Step-1: Create inventory management workspace (`imw`)
 
@@ -202,11 +202,11 @@ kind create cluster --name florin
 
     Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-5c4r0a44". Use
 
-      KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
+      KUBECONFIG=<edge-cluster-config> kubectl apply -f "florin-syncer.yaml"
 
     to apply it. Use
 
-      KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
+      KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
 
     to verify the syncer pod is running.
     ```
@@ -464,7 +464,7 @@ kind create cluster --name florin
     status: {}
     ```
 
-  * Step-5: Check that the workloads are running in the edge pclusters:
+  * Step-5: Check that the workloads are running in the edge clusters:
 
     ```console
     KUBECONFIG=$florin_kubeconfig kubectl get ns
