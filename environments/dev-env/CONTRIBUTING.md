@@ -273,38 +273,38 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
   * Step-2: Deploy your workload in `wmw-1`. For example:
 
-   ```console
-      kubectl apply -f - <<EOF
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: commonstuff
-        labels: {common: "si"}
-      ---
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: nginx-deployment
-        namespace: commonstuff
-        labels:
+    ```console
+    kubectl apply -f - <<EOF
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: commonstuff
+      labels: {common: "si"}
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: nginx-deployment
+      namespace: commonstuff
+      labels:
+        app: nginx
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
           app: nginx
-      spec:
-        replicas: 3
-        selector:
-          matchLabels:
+      template:
+        metadata:
+          labels:
             app: nginx
-        template:
-          metadata:
-            labels:
-              app: nginx
-          spec:
-            containers:
-            - name: nginx
-              image: nginx:1.14.2
-              ports:
-              - containerPort: 80
-      EOF
-      ```
+        spec:
+          containers:
+          - name: nginx
+            image: nginx:1.14.2
+            ports:
+            - containerPort: 80
+    EOF
+    ```
 
     Check that your workload was deployed successfully: 
 
