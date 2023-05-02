@@ -32,6 +32,12 @@ while (( $# > 0 )); do
     shift
 done
 
+# Check if docker is running
+if ! docker ps > /dev/null
+then
+  echo "Docker Not running ...."
+  exit
+fi
 
 # Check go version
 go_version=`go version | { read _ _ v _; echo ${v#go}; }`
