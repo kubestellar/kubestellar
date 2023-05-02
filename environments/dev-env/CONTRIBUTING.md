@@ -220,42 +220,35 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     For example: switch to the context of the florin kind cluster
 
-    ```bash
-       kubectl config use-context kind-florin
-       Switched to context "kind-florin".
-    ```
+    ```console
+    KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
 
-    Apply the edge syncer manifest:
-
-    ```bash
-      kubectl apply -f sync-target-g-syncer.yaml
-
-      namespace/kcp-edge-syncer-the-one-2p3eqojn created
-      serviceaccount/kcp-edge-syncer-the-one-2p3eqojn created
-      secret/kcp-edge-syncer-the-one-2p3eqojn-token created
-      clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-the-one-2p3eqojn created
-      clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-the-one-2p3eqojn created
-      role.rbac.authorization.k8s.io/kcp-edge-dns-the-one-2p3eqojn created
-      rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-the-one-2p3eqojn created
-      secret/kcp-edge-syncer-the-one-2p3eqojn created
-      deployment.apps/kcp-edge-syncer-the-one-2p3eqojn created
+    namespace/kcp-edge-syncer-florin-5c4r0a44 created
+    serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
+    secret/kcp-edge-syncer-florin-5c4r0a44-token created
+    clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
+    clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
+    role.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
+    rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
+    secret/kcp-edge-syncer-florin-5c4r0a44 created
+    deployment.apps/kcp-edge-syncer-florin-5c4r0a44 created
     ```
 
     Check that the edge syncer pod is running:
 
-    ```bash
-        kubectl get pods -A
-        NAMESPACE                          NAME                                                READY   STATUS    RESTARTS   AGE
-        kcp-edge-syncer-the-one-2p3eqojn   kcp-edge-syncer-the-one-2p3eqojn-6884cd645b-tn6s7   1/1     Running   0          2m16s
-        kube-system                        coredns-565d847f94-fw7vt                            1/1     Running   0          4m40s
-        kube-system                        coredns-565d847f94-kc4gk                            1/1     Running   0          4m40s
-        kube-system                        etcd-florin-control-plane                           1/1     Running   0          4m56s
-        kube-system                        kindnet-9vzg8                                       1/1     Running   0          4m40s
-        kube-system                        kube-apiserver-florin-control-plane                 1/1     Running   0          4m55s
-        kube-system                        kube-controller-manager-florin-control-plane        1/1     Running   0          4m55s
-        kube-system                        kube-proxy-qhprt                                    1/1     Running   0          4m40s
-        kube-system                        kube-scheduler-florin-control-plane                 1/1     Running   0          4m55s
-        local-path-storage                 local-path-provisioner-684f458cdd-bc5c4             1/1     Running   0          4m40s
+    ```console
+    kubectl get pods -A
+    NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
+    kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
+    kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
+    kube-system                       coredns-565d847f94-rj4s8                          1/1     Running   0          85s
+    kube-system                       etcd-florin-control-plane                         1/1     Running   0          99s
+    kube-system                       kindnet-l26qt                                     1/1     Running   0          85s
+    kube-system                       kube-apiserver-florin-control-plane               1/1     Running   0          100s
+    kube-system                       kube-controller-manager-florin-control-plane      1/1     Running   0          100s
+    kube-system                       kube-proxy-qzhx6                                  1/1     Running   0          85s
+    kube-system                       kube-scheduler-florin-control-plane               1/1     Running   0          99s
+    local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
     ``` 
 
 
