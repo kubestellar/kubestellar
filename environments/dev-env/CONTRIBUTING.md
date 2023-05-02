@@ -258,13 +258,23 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
   
       ```console
       kubectl ws root
-      kubectl ws root:my-org:wmw-1
+      kubectl ws create my-org --enter
+
+      ../../scripts/ensure-wmw.sh wmw-1
+
+      Current workspace is "root".
+      Current workspace is "root:my-org".
+      Workspace "wmw-1" (type root:universal) created. Waiting for it to be ready...
+      Workspace "wmw-1" (type root:universal) is ready to use.
+      Current workspace is "root:my-org:wmw-1" (type root:universal).
+      apibinding.apis.kcp.io/bind-espw created
+      apibinding.apis.kcp.io/bind-kube created
       ```
 
-  * Step-2: Deploy your workload in `wmw`. For example:
+  * Step-2: Deploy your workload in `wmw-1`. For example:
 
-      ```console
-      cat <<EOF | kubectl apply -f -
+   ```console
+      kubectl apply -f - <<EOF
       apiVersion: v1
       kind: Namespace
       metadata:
