@@ -106,7 +106,8 @@ sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 sudo dockerd & 
 ```   
 ### 4. You will now need to open a new Windows terminal (see step 2.4 above) to access the VM since dockerd is running in the foreground of this terminal 
-## In your new terminal, 
+
+In your new terminal, 
 
 #### 4.1 Install kind
 ```
@@ -127,6 +128,6 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 ### 5. Install kcp-edge 
 
-Refer to the instructions at [here](../README.md)
+Refer to the instructions [here](../README.md)
 
 
