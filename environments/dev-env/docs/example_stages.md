@@ -14,13 +14,11 @@ Run the following command to deploy our example scenario:
 
 NB: you can also explore others stages (e.g., 1, 2 or 3) described [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
 
-It creates the following components:
-
--  The infrastructure and the edge service provider workspace and lets that react to the inventory
--  Two workloads, called “common” and “special” and in response to each EdgePlacement, the edge scheduler creates the corresponding SinglePlacementSlice object.
--  The placement translator reacts to the EdgePlacement objects in the workload management workspaces
-- 
-
+It creates/deploys the following components:
+-  kcp with kcp-playground and edge-syncer plugins
+-  kcp-edge controllers: edge-scheduler, mailbox-controller and placement-translator
+-  two kind clusters: “florin” and “guilder”, each running a edge-syncer
+-  five workspaces: one edge server provider workspace, two inventory management workspaces, two workload management workspaces
 
 NB: if you're using a macOS, you may see pop-us messages similar to the one below while deploying kcp-edge: 
 
@@ -30,8 +28,8 @@ NB: if you're using a macOS, you may see pop-us messages similar to the one belo
 
 You can accept it or configure your firewall to suppress them by adding our kcp-edge components to the list of permitted apps.
 
+After the completion of the `install_edge-mc.sh` script, you should see an ouput similar to the one below:
 
-You should see an ouput similar to the one below:
 
 #### Two kind clusters:
 
@@ -56,6 +54,7 @@ kubectl ws tree
         ├── wmw-c
         └── wmw-s
 ```
+The mailbox-controller created two mailbox workspace (`limgjykhmrjeiwc6-mb-1c6d6132-4ef9-482e-bff5-ee7a70fb601e` and `limgjykhmrjeiwc6-mb-a1d8f1cd-6493-4480-8c5e-c7a3dd53600a`) for the newly created SyncTargets: sync-target-f and sync-target-g
 
 #### Two synctargets and locations objects are created, one for each cluster:
 
@@ -93,7 +92,11 @@ kubectl -n commonstuff get configmaps
 NAME               DATA   AGE
 httpd-htdocs       1      117s
 kube-root-ca.crt   1      117s
+```
 
+In response to the created EdgePlacement, the edge scheduler created a corresponding SinglePlacementSlice object:
+
+```shell
 kubectl get SinglePlacementSlice
 NAME               AGE
 edge-placement-c   111s
@@ -118,13 +121,25 @@ kubectl -n specialstuff  get configmaps
 NAME               DATA   AGE
 httpd-htdocs       1      5m35s
 kube-root-ca.crt   1      5m35s
+```
 
+Again, in response to the created EdgePlacement, the edge scheduler created a corresponding SinglePlacementSlice object:
+
+```shell
 kubectl get SinglePlacementSlice
 NAME               AGE
 edge-placement-s   5m26s
 ```
 
-#### Talk about syncer and workloads deployed at pclusters
+#### Special and Common workloads are copied to their respective mailbox workspaces
+
+In response to the created EdgePlacement and SinglePlacementSlice objects, the placement translator copied the workload prescriptions into the mailbox workspaces and create SyncerConfig objects there.
+
+
+#### The workloads are synced into edge clusters via the edge-syncer:
+
+
+
 
 #### Clean up kcp-edge environment
 
