@@ -54,7 +54,7 @@ curl -sSfL "https://github.com/kcp-dev/edge-mc/releases/download/v${VERSION}/kcp
 Add the kcp edge `/bin` directory to your $PATH:
 
 ```shell
-tar -xvf kcp.tar.gz
+tar -xvf kcp-edge.tar.gz
 export PATH="$PATH:$(pwd)/bin"
 ```
 
