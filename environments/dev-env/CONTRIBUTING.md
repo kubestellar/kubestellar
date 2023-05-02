@@ -321,28 +321,28 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     ```console
     kubectl ws root:my-org:wmw-1
 
-    cat <<EOF | kubectl apply -f -
-      apiVersion: edge.kcp.io/v1alpha1
-      kind: EdgePlacement
-      metadata:
-        name: edge-placement-c
-      spec:
-        locationSelectors:
-        - matchLabels: {"env":"prod"}
-        namespaceSelector:
-          matchLabels: {"common":"si"}
-        nonNamespacedObjects:
-        - apiGroup: apis.kcp.io
-          resources: [ "apibindings" ]
-          resourceNames: [ "bind-kube" ]
-        upsync:
-        - apiGroup: "group1.test"
-          resources: ["sprockets", "flanges"]
-          namespaces: ["orbital"]
-          names: ["george", "cosmo"]
-        - apiGroup: "group2.test"
-          resources: ["cogs"]
-          names: ["william"]
+    kubectl apply -f - <<EOF
+    apiVersion: edge.kcp.io/v1alpha1
+    kind: EdgePlacement
+    metadata:
+      name: edge-placement-c
+    spec:
+      locationSelectors:
+      - matchLabels: {"env":"prod"}
+      namespaceSelector:
+        matchLabels: {"common":"si"}
+      nonNamespacedObjects:
+      - apiGroup: apis.kcp.io
+        resources: [ "apibindings" ]
+        resourceNames: [ "bind-kube" ]
+      upsync:
+      - apiGroup: "group1.test"
+        resources: ["sprockets", "flanges"]
+        namespaces: ["orbital"]
+        names: ["george", "cosmo"]
+      - apiGroup: "group2.test"
+        resources: ["cogs"]
+        names: ["william"]
     EOF
     ```
     Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
@@ -377,7 +377,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
-    ```bash
+    ```console
     kubectl ws root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
     Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69".
     
@@ -395,7 +395,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     the-one   4m26s
     ```
 
-    ```bash
+    ```console
     kubectl get syncerConfig the-one -o yaml
     apiVersion: edge.kcp.io/v1alpha1
     kind: SyncerConfig
@@ -468,7 +468,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
   * Step-5: Check that the workloads are running in the edge pclusters:
 
-    ```bash
+    ```console
     KUBECONFIG=$florin_kubeconfig kubectl get ns
 
     NAME                              STATUS   AGE
