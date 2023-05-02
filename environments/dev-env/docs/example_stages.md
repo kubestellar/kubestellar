@@ -1,16 +1,18 @@
 # KCP-Edge Example Scenarios:
 
-![Syncer effects](https://github.com/kcp-dev/edge-mc/blob/main/docs/content/en/docs/Coding%20Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg)
+<!-- ![Syncer effects](https://github.com/kcp-dev/edge-mc/blob/main/docs/content/en/docs/Coding%20Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg) -->
 
-In this example scenario we will deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We will call them “florin” and “guilder”. We will also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the guilder edge cluster.
+<img src="https://github.com/kcp-dev/edge-mc/blob/main/docs/content/en/docs/Coding%20Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg" width="300" height="300">
 
-This example is described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
+In this example scenario we will deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We will call them “florin” and “guilder”. We will also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the `guilder` edge cluster. This example is described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
 
 Run the following command to deploy 
 
 ```shell
 ./install_edge-mc.sh --stage 4
 ```
+
+You can also explore others stages (e.g, 1, 2 or 3) describe [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
 
 It creates the following components:
 
@@ -31,7 +33,7 @@ You can accept it or configure your firewall to suppress them by adding our kcp-
 
 You should see an ouput similar to the one below:
 
-a) Two kind clusters:
+#### Two kind clusters:
 
 ```shell
 kind get clusters
@@ -39,7 +41,7 @@ florin
 guilder
 ```
 
-b) kcp-edge infra deployed:
+#### kcp-edge infra deployed:
 
 ```shell
 kubectl ws tree
@@ -55,7 +57,7 @@ kubectl ws tree
         └── wmw-s
 ```
 
-c) Two synctargets and locations objects are created, one for each cluster
+#### Two synctargets and locations objects are created, one for each cluster
 
 ```shell
 kubectl ws root:imw-1
@@ -70,7 +72,7 @@ sync-target-f   3m6s
 sync-target-g   3m5s
 ```
 
-d)  Two workload management workspaces are created:
+#### Two workload management workspaces are created:
 
 1. For workload common:
 
@@ -122,9 +124,9 @@ NAME               AGE
 edge-placement-s   5m26s
 ```
 
-3. Talk about syncer and workloads deployed at pclusters
+#### Talk about syncer and workloads deployed at pclusters
 
-#### 4. Clean up kcp-edge environment
+#### Clean up kcp-edge environment
 
 ```bash
 ./clean_up.sh
