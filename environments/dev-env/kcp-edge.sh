@@ -22,10 +22,8 @@ espw_name="espw"
 while (( $# > 0 )); do
     if [ "$1" == "start" ]; then
         install=1
-        shift
     elif [ "$1" == "stop" ]; then
         install=0
-        shift
     elif [ "$1" == "-v" ]; then
         verbosity=1
     fi 
@@ -47,7 +45,6 @@ if [ $(ver $go_version) -lt $(ver 1.19) ]; then
     echo "Update your go version"
 fi
 
-
 # Check if a given process name is running
 process_running() {
   SERVICE="$1"
@@ -58,6 +55,13 @@ process_running() {
       echo "stopped" 
   fi
 }
+
+# Check if kcp is running
+if [ $(process_running kcp) != "running" ]
+then
+    echo "kcp is not running - please start it ...."
+    exit
+fi
 
 # Check mailbox-controller is already running
 if [ $(process_running mailbox-controller) == "running" ]
