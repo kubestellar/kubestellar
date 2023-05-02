@@ -216,7 +216,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge syncer plugin and build it locally.
    
 
-  * Step-5: deploy the edge syncer to florin edge cluster
+  * Step-5: Deploy the edge syncer to florin edge cluster
 
     For example: switch to the context of the florin kind cluster
 
