@@ -70,8 +70,8 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     ```shell
        VERSION=0.11.0 # choose the latest version (without v prefix)
-       OS=darwin   # or darwin
-       ARCH=amd64  # or amd64
+       OS=darwin   # linux or darwin
+       ARCH=amd64  # arm64 or amd64
        curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kcp_${VERSION}_${OS}_${ARCH}.tar.gz" > kcp.tar.gz
        curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kubectl-kcp-plugin_${VERSION}_${OS}_${ARCH}.tar.gz" > kubectl-kcp-plugin.tar.gz
     ```
@@ -252,7 +252,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     ``` 
 
 
-### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
+### 6. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
   * Step-1: Create a workload management workspace (`wmw`):
   
@@ -492,7 +492,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
     ```
 
-### 6. Clean up your kcp-edge environment:
+### 7. Clean up your kcp-edge environment:
 
 ```shell
 ./clean_up.sh
