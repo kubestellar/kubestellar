@@ -107,7 +107,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     - 1 kcp workspace: edge service provider workspace (`espw`)
 
-    ```console
+    ```shell
     kubectl ws tree
     .
 └── root
