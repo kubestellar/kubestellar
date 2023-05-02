@@ -117,7 +117,7 @@ rm kind
 kind version
 ```
 
-#### So far we have ubuntu 22.04.1, docker, kind, go 1.19, ko, make, gcc, jq, 
+So far we have ubuntu 22.04.1, docker, kind, go 1.19, ko, make, gcc, jq, 
 
 #### 4.2 install kubectl
 ```
