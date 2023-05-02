@@ -74,22 +74,23 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     ```shell
     tar -xvf kcp.tar.gz
     tar -xvf kubectl-kcp-plugin.tar.gz
-    export PATH="$PATH:$(pwd)/kcp/bin"'
+    export PATH="$PATH:$(pwd)/kcp/bin"
     ```
 
   * Step-2: start kcp
 
-    ```bash
-      cd edge-mc/environments/dev-env
+    ```shell
+    kcp start >& kcp_log.txt &
     ```
 
   * Step-3: Deploy kcp-edge infra
-
+     
+    Run the following command inside the `kcp-edge/environments/dev-env` directory:
     ```bash
     ./kcp-edge.sh start
     ```
 
-    This will start `kcp` and create/deploy the following components:
+    This will create/deploy the following components:
 
     - 1 kcp workspace: edge service provider workspace (`espw`)
 
