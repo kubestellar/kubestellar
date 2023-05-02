@@ -213,12 +213,10 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     to verify the syncer pod is running.
     ```
 
-    An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
-    
-    On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge-syncer plugin and build it locally.
+    An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge syncer plugin and build it locally.
    
 
-  * Step-5: deploy the edge syncer to your edge pcluter
+  * Step-5: deploy the edge syncer to florin edge cluster
 
     For example: switch to the context of the florin kind cluster
 
@@ -261,7 +259,7 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
     ``` 
 
 
-#### 5. Bring Your Own Workload (BYOW) 
+### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
   * Step-1: Populate the `wmw` with your workload objects -  enter the target workspace: `wmw-1`
   
