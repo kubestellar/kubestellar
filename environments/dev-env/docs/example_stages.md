@@ -1,22 +1,28 @@
 # KCP-Edge Example Scenarios:
 
-![Syncer effects](../../docs/content/en/docs/coding-milestones/poc2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg "Stage 4 summary")
+![Syncer effects](../../../docs/content/en/docs/Coding\ Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg)
 
-This example involves two edge clusters and two workloads. One workload goes on both edge clusters and one workload goes on only one edge cluster. Nothing changes after the initial activity.
+In this example scenario we will deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We will call them “florin” and “guilder”. We will also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the guilder edge cluster.
 
-In this quickstart example we will deploy `stage 3` described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). It creates the following components:
+This example is described in more details [here](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/example1/). 
+
+Run the following command to deploy 
+
+```shell
+./install_edge-mc.sh --stage 4
+```
+
+It creates the following components:
 
 -  The infrastructure and the edge service provider workspace and lets that react to the inventory
 -  Two workloads, called “common” and “special” and in response to each EdgePlacement, the edge scheduler creates the corresponding SinglePlacementSlice object.
 -  The placement translator reacts to the EdgePlacement objects in the workload management workspaces
+- 
 
-```bash
-./install_edge-mc.sh --stage 4
-```
 
 NB: if you're using a macOS, you may see pop-us messages similar to the one below while deploying kcp-edge: 
 
-```bash
+```shell
   Do you want the application “kcp” to accept incoming network connections?
 ```
 
@@ -25,13 +31,17 @@ You can accept it or configure your firewall to suppress them by adding our kcp-
 
 You should see an ouput similar to the one below:
 
-```bash
+a) Two kind clusters:
+
+```shell
 kind get clusters
 florin
 guilder
 ```
 
-```bash
+b) kcp-edge infra deployed:
+
+```shell
 kubectl ws tree
 .
 └── root
@@ -45,8 +55,9 @@ kubectl ws tree
         └── wmw-s
 ```
 
+c) Two synctargets and locations objects are created, one for each cluster
 
-```bash
+```shell
 kubectl ws root:imw-1
 kubectl get locations
 NAME         RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
@@ -59,7 +70,9 @@ sync-target-f   3m6s
 sync-target-g   3m5s
 ```
 
-For workload common:
+d)  Two workload management workspaces are created:
+
+1. For workload common:
 
 ```bash
 kubectl ws root:my-org:wmw-c
@@ -84,7 +97,7 @@ NAME               AGE
 edge-placement-c   111s
 ```
 
-For workload special:
+2. For workload special:
 
 ```bash
 kubectl ws root:my-org:wmw-s
@@ -109,29 +122,9 @@ NAME               AGE
 edge-placement-s   5m26s
 ```
 
-For placement translator:
-```bash
+3. Talk about syncer and workloads deployed at pclusters
 
-kubectl ws root:my-org:wmw-c
-Current workspace is "root:my-org:wmw-c".
-
-kubectl get EdgePlacement
-NAME               AGE
-edge-placement-c   91s
-
-kubectl delete EdgePlacement edge-placement-c
-edgeplacement.edge.kcp.io "edge-placement-c" deleted
-```
-Placement translator logs:
-
-```bash
-:WorkspaceScheduled Status:True Severity: LastTransitionTime:2023-03-30 17:46:42 -0400 EDT Reason: Message:}] Initializers:[]}}
-I0330 17:47:01.732064   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-placement-c" val=map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}]
-I0330 17:47:01.732364   64918 main.go:119] "Receive" key="211ieqpc4xyydw2w:edge-placement-s" val=map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}]
-I0330 17:48:08.042551   64918 main.go:119] "Receive" key="2vh6tnanyw60negt:edge-placement-c" val=map[]
-```
-
-#### 4. Delete a kcp-edge Poc2023q1 example stage:
+#### 4. Clean up kcp-edge environment
 
 ```bash
 ./clean_up.sh
