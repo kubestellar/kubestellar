@@ -81,6 +81,9 @@ kind create cluster --name guilder --config guilder-config.yaml
 
 ### Start kcp
 
+Download and build or install [kcp](https://github.com/kcp-dev/kcp),
+according to your preference.
+
 In some shell that will be used only for this purpose, issue the `kcp
 start` command.  If you have junk from previous runs laying around,
 you should probably `rm -rf .kcp` first.
@@ -102,14 +105,26 @@ kubectl ws root
 kubectl ws create imw-1 --enter
 ```
 
+### Get edge-mc
+
+Download and build or install
+[edge-mc](https://github.com/kcp-dev/edge-mc), according to your
+preference.  That is, either (a) `git clone` the repo and then `make
+build` to populate its `bin` directory, or (b) fetch the binary
+archive appropriate for your machine from a release and unpack it
+(creating a `bin` directory).  In the following exhibited command
+lines, the commands described as "edge-mc commands" refer to programs
+in that `bin` directory.  You can either add it to your `$PATH` (as is
+assumed here) or invoke those programs by explicit pathnames.
+
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
-Use the following two commands. They label both florin and guilder
-with `env=prod`, and also label guilder with `extended=si`.
+Use the following two edge-mc commands. They label both florin and
+guilder with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
-scripts/ensure-location.sh florin  env=prod
-scripts/ensure-location.sh guilder env=prod extended=si
+ensure-location.sh florin  env=prod
+ensure-location.sh guilder env=prod extended=si
 ```
 
 Those two script invocations are equivalent to creating the following
@@ -184,10 +199,11 @@ kubectl create -f config/exports
 ### The mailbox controller
 
 Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can run it by hand as follows.
+Eventually.  In the meantime, you can use the edge-mc command shown
+here.
 
 ```console
-$ go run ./cmd/mailbox-controller -v=2
+$ mailbox-controller -v=2
 ...
 I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
 ...
@@ -235,27 +251,14 @@ apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
 
 ### Connect guilder edge cluster with its mailbox workspace
 
-The following command will (a) create, in the mailbox workspace for
-guilder, an identity and authorizations for the edge syncer and (b)
-write a file containing YAML for deploying the syncer in the guilder
-cluster.  The first time you run this command, it will (as shown here)
-`git clone` the repo contaiing the kubectl kcp plugin that does the
-actual work and build it.
+The following edge-mc command will (a) create, in the mailbox
+workspace for guilder, an identity and authorizations for the edge
+syncer and (b) write a file containing YAML for deploying the syncer
+in the guilder cluster.
 
 ```console
-$ scripts/mailbox-prep.sh guilder
+$ mailbox-prep.sh guilder
 Current workspace is "root:espw:apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" (type root:universal).
-Cloning into 'build/syncer-kcp'...
-remote: Enumerating objects: 47989, done.
-remote: Total 47989 (delta 0), reused 0 (delta 0), pack-reused 47989
-Receiving objects: 100% (47989/47989), 18.59 MiB | 12.91 MiB/s, done.
-Resolving deltas: 100% (31297/31297), done.
-branch 'emc' set up to track 'origin/emc'.
-Switched to a new branch 'emc'
-hack/verify-go-versions.sh
-GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build  -ldflags="-X k8s.io/client-go/pkg/version.gitCommit=11d1f3a8 -X k8s.io/client-go/pkg/version.gitTreeState=clean -X k8s.io/client-go/pkg/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/client-go/pkg/version.gitMajor=1 -X k8s.io/client-go/pkg/version.gitMinor=24 -X k8s.io/client-go/pkg/version.buildDate=2023-04-23T05:21:50Z -X k8s.io/component-base/version.gitCommit=11d1f3a8 -X k8s.io/component-base/version.gitTreeState=clean -X k8s.io/component-base/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/component-base/version.gitMajor=1 -X k8s.io/component-base/version.gitMinor=24 -X k8s.io/component-base/version.buildDate=2023-04-23T05:21:50Z -extldflags '-static'" -o bin ./cmd/kubectl-kcp
-ln -sf kubectl-workspace bin/kubectl-workspaces
-ln -sf kubectl-workspace bin/kubectl-ws
 Creating service account "kcp-edge-syncer-guilder-saaywsu5"
 Creating cluster role "kcp-edge-syncer-guilder-saaywsu5" to give service account "kcp-edge-syncer-guilder-saaywsu5"
 
@@ -311,7 +314,7 @@ Do the analogous stuff for the florin cluster.
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 
-$ scripts/mailbox-prep.sh florin
+$ mailbox-prep.sh florin
 Current workspace is "root:espw:apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" (type root:universal).
 Already on 'emc'
 Your branch is up to date with 'origin/emc'.
@@ -371,11 +374,12 @@ kubectl ws root
 kubectl ws create my-org --enter
 ```
 
-Next, create the WMW for the common workload.  The following command
-will do that, if issued while "root:my-org" is the current workspace.
+Next, create the WMW for the common workload.  The following edge-mc
+command will do that, if issued while "root:my-org" is the current
+workspace.
 
 ```shell
-scripts/ensure-wmw.sh wmw-c
+ensure-wmw.sh wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -494,11 +498,12 @@ EOF
 
 ### Create and populate the workload management workspace for the special workload
 
-Use the following commands to create the WMW for the special workload.
+Use `kubectl` and the following edge-mc command to create the WMW for
+the special workload.
 
 ```shell
 kubectl ws root:my-org
-scripts/ensure-wmw.sh wmw-s
+ensure-wmw.sh wmw-s
 ```
 
 Next, use `kubectl` to create the following workload objects in that workspace.
@@ -599,13 +604,13 @@ following resolutions of the "where" predicates.
 | edge-placement-s | guilder |
 
 Eventually there will be automation that conveniently runs the edge
-scheduler.  In the meantime, you can run it by hand with a command
-like the following.
+scheduler.  In the meantime, you can run it by hand: switch to the
+ESPW and invoke the edge-mc command that runs the scheduler.
 
 ```console
 $ kubectl ws root:espw
 Current workspace is "root:espw".
-$ go run ./cmd/scheduler
+$ scheduler
 I0423 01:33:37.036752   11305 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
 I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="edge-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
@@ -671,12 +676,13 @@ into the mailbox workspaces and create `SyncerConfig` objects there.
 TODO later: add customization
 
 Eventually there will be convenient automation running the placement
-translator.  In the meantime, you can run it manually as follows.
+translator.  In the meantime, you can run it manually: switch to the
+ESPW and use the edge-mc command that runs the placement translator.
 
 ```console
 $ kubectl ws root:espw
 Current workspace is "root:espw".
-$ go run ./cmd/placement-translator
+$ placement-translator
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
 ...
 ```

@@ -98,6 +98,11 @@ following script does those things and also outputs YAML to be used to
 install the syncer in the edge cluster.  Invoke this script with the
 edge service provider workspace current.
 
+This script assumes that either (a) you have cloned the edge-mc repo
+and done `make build` to populate its `bin` directory or (b) you have
+fetched a release binary archive and unpacked it to create its `bin`
+directory.
+
 ```console
 $ scripts/mailbox-prep.sh -h
 scripts/mailbox-prep.sh usage: (-o file_pathname | --syncer-image container_image_ref )* synctarget_name
@@ -107,17 +112,6 @@ Current workspace is "root:espw".
 
 $ scripts/mailbox-prep.sh demo1
 Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
-Cloning into 'build/syncer-kcp'...
-remote: Enumerating objects: 47989, done.
-remote: Total 47989 (delta 0), reused 0 (delta 0), pack-reused 47989
-Receiving objects: 100% (47989/47989), 18.59 MiB | 12.96 MiB/s, done.
-Resolving deltas: 100% (31297/31297), done.
-branch 'emc' set up to track 'origin/emc'.
-Switched to a new branch 'emc'
-hack/verify-go-versions.sh
-GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build  -ldflags="-X k8s.io/client-go/pkg/version.gitCommit=11d1f3a8 -X k8s.io/client-go/pkg/version.gitTreeState=clean -X k8s.io/client-go/pkg/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/client-go/pkg/version.gitMajor=1 -X k8s.io/client-go/pkg/version.gitMinor=24 -X k8s.io/client-go/pkg/version.buildDate=2023-04-22T06:00:42Z -X k8s.io/component-base/version.gitCommit=11d1f3a8 -X k8s.io/component-base/version.gitTreeState=clean -X k8s.io/component-base/version.gitVersion=v1.24.3+kcp-v0.0.0-11d1f3a8 -X k8s.io/component-base/version.gitMajor=1 -X k8s.io/component-base/version.gitMinor=24 -X k8s.io/component-base/version.buildDate=2023-04-22T06:00:42Z -extldflags '-static'" -o bin ./cmd/kubectl-kcp
-ln -sf kubectl-workspace bin/kubectl-workspaces
-ln -sf kubectl-workspace bin/kubectl-ws
 Creating service account "kcp-edge-syncer-demo1-28at01r3"
 Creating cluster role "kcp-edge-syncer-demo1-28at01r3" to give service account "kcp-edge-syncer-demo1-28at01r3"
 
@@ -136,10 +130,6 @@ to apply it. Use
 
 to verify the syncer pod is running.
 ```
-
-On the first usage this script will `git clone` the repo that has the
-source for this plugin and build it locally.  That will require `go`
-version 1.19 to be on your `$PATH`.
 
 Once that script has run, the YAML for the objects to create in the
 edge cluster is in your chosen output file.  The default for the
