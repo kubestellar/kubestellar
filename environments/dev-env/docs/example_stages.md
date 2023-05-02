@@ -1,6 +1,6 @@
 # KCP-Edge Example Scenarios:
 
-![Syncer effects](../../../docs/content/en/docs/Coding\ Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg)
+![Syncer effects](https://github.com/kcp-dev/edge-mc/blob/main/docs/content/en/docs/Coding%20Milestones/PoC2023q1/Edge-PoC-2023q1-Scenario-1-stage-4.svg)
 
 In this example scenario we will deploy two [kind](https://kind.sigs.k8s.io/) edge clusters. We will call them “florin” and “guilder”. We will also deploy two workloads (`special & common`). The common workload goes on both edge clusters and special workload goes on only into the guilder edge cluster.
 
