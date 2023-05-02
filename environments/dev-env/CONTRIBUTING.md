@@ -117,9 +117,9 @@ Create your edge cluster or bring your own k8s edge cluster. In this example, we
 
     - 3 kcp-edge controllers: [edge-scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/), [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) and [placement-translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/)
 
-    ```console
+    ```shell
     ps aux | grep -e mailbox-controller -e placement-translator -e cheduler
-    user     11344   0.1  0.1 34906508  28044 s001  S     8:36PM   0:00.43 placement-translator --allclusters-context system:admin -v=2
+    user    11344   0.1  0.1 34906508  28044 s001  S     8:36PM   0:00.43 placement-translator --allclusters-context system:admin -v=2
     user    11333   0.1  0.1 34885544  19536 s001  S     8:36PM   0:00.38 scheduler -v 2 --root-user kcp-admin --root-cluster root --sysadm-context system:admin --sysadm-user shard-admin
     user    11323   0.0  0.1 34892244  20780 s001  S     8:36PM   0:00.13 mailbox-controller --inventory-context=root --mbws-context=base -v=2
     ```
