@@ -44,7 +44,7 @@ fi
 
 stname=""
 output=""
-syncer_image="quay.io/kcpedge/syncer:dev-2023-04-18"
+syncer_image="quay.io/kcpedge/syncer:v0.1.0"
 
 while (( $# > 0 )); do
     case "$1" in
