@@ -34,8 +34,6 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_
 
 ## Quickstart
 
-For a single-quick automation to deploy
-
 ### 1. Clone the kcp-edge repo:
 
 ```shell
