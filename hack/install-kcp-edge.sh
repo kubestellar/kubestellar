@@ -55,6 +55,10 @@ get_latest_version() {
 	curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
+get_full_path() {
+	echo "$(cd "$1"; pwd)"
+}
+
 while (( $# > 0 )); do
     case "$1" in
 	(--version)
@@ -142,5 +146,5 @@ fi
 rm kcp-edge.tar.gz
 
 if [[ ! ":$PATH:" == *":$kcp_edge_folder:"* ]]; then
-	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$kcp_edge_folder/bin""
+	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_folder/bin)""
 fi
