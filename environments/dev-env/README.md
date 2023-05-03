@@ -114,7 +114,7 @@ kind create cluster --name florin
          
   Run the following command inside the `kcp-edge/environments/dev-env` directory:
   ```bash
-  kcp-edge.sh start
+  ./kcp-edge.sh start
   ```
 
   The following components are created:
