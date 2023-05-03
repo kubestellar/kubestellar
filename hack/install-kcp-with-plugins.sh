@@ -55,6 +55,10 @@ get_latest_version() {
 	curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
+get_full_path() {
+	echo "$(cd "$1"; pwd)"
+}
+
 while (( $# > 0 )); do
     case "$1" in
 	(--version)
@@ -147,5 +151,5 @@ rm kcp.tar.gz
 rm kcp-plugins.tar.gz
 
 if [[ ! ":$PATH:" == *":$kcp_folder:"* ]]; then
-	echo "Add KCP folder to your path: export PATH="\$PATH:$kcp_folder/bin""
+	echo "Add KCP folder to your path: export PATH="\$PATH:$(get_full_path $kcp_folder/bin)""
 fi
