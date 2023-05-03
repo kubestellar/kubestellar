@@ -1,0 +1,10 @@
+apiVersion: workload.kcp.io/v1alpha1
+kind: SyncTarget
+metadata:
+  name: sync-target-g
+  labels:
+    example: "si"
+    extended: "si"
+spec:
+  cells:
+    bar: baz
