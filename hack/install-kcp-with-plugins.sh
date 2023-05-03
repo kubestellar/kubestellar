@@ -150,6 +150,6 @@ fi
 rm kcp.tar.gz
 rm kcp-plugins.tar.gz
 
-if [[ ! ":$PATH:" == *":$kcp_folder:"* ]]; then
+if [[ ! ":$PATH:" == *":$(get_full_path $kcp_folder/bin):"* ]]; then
 	echo "Add KCP folder to your path: export PATH="\$PATH:$(get_full_path $kcp_folder/bin)""
 fi
