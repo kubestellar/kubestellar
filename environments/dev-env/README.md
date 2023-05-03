@@ -259,22 +259,22 @@ kind create cluster --name florin
 
 ### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
-  * Step-1: Create a workload management workspace (`wmw`):
+a) Create a workload management workspace (`wmw`):
   
-      ```console
-      kubectl ws root
-      kubectl ws create my-org --enter
+  ```console
+  kubectl ws root
+  kubectl ws create my-org --enter
 
-      ensure-wmw.sh wmw-1
+  ensure-wmw.sh wmw-1
 
-      Current workspace is "root".
-      Current workspace is "root:my-org".
-      Workspace "wmw-1" (type root:universal) created. Waiting for it to be ready...
-      Workspace "wmw-1" (type root:universal) is ready to use.
-      Current workspace is "root:my-org:wmw-1" (type root:universal).
-      apibinding.apis.kcp.io/bind-espw created
-      apibinding.apis.kcp.io/bind-kube created
-      ```
+  Current workspace is "root".
+  Current workspace is "root:my-org".
+  Workspace "wmw-1" (type root:universal) created. Waiting for it to be ready...
+  Workspace "wmw-1" (type root:universal) is ready to use.
+  Current workspace is "root:my-org:wmw-1" (type root:universal).
+  apibinding.apis.kcp.io/bind-espw created
+  apibinding.apis.kcp.io/bind-kube created
+  ```
 
   * Step-2: Deploy your workload in `wmw-1`. For example:
 
