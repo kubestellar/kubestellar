@@ -45,55 +45,55 @@ get_os_type() {
 
 get_arch_type() {
   case "$HOSTTYPE" in
-      x86_64*)	echo "amd64" ;;
+      x86_64*)    echo "amd64" ;;
       aarch64*) echo "arm64" ;;
       *)        echo "Unsupported architecture type: $HOSTTYPE" >&2 ; exit 1 ;;
   esac
 }
 
 get_latest_version() {
-	curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_full_path() {
-	echo "$(cd "$1"; pwd)"
+    echo "$(cd "$1"; pwd)"
 }
 
 while (( $# > 0 )); do
     case "$1" in
-	(--version)
-	    if (( $# > 1 ));
-	    then { kcp_edge_version="$2"; shift; }
-	    else { echo "$0: missing release version" >&2; exit 1; }
-	    fi;;
-	(--os)
-	    if (( $# > 1 ));
-	    then { kcp_edge_os="$2"; shift; }
-	    else { echo "$0: missing OS type" >&2; exit 1; }
-	    fi;;
-	(--arch)
-	    if (( $# > 1 ));
-	    then { kcp_edge_arch="$2"; shift; }
-	    else { echo "$0: missing architecture type" >&2; exit 1; }
-	    fi;;
-	(--folder)
-	    if (( $# > 1 ));
-	    then { kcp_edge_folder="$2"; shift; }
-	    else { echo "$0: missing installation folder" >&2; exit 1; }
-	    fi;;
-	(--create-folder)
+    (--version)
+        if (( $# > 1 ));
+        then { kcp_edge_version="$2"; shift; }
+        else { echo "$0: missing release version" >&2; exit 1; }
+        fi;;
+    (--os)
+        if (( $# > 1 ));
+        then { kcp_edge_os="$2"; shift; }
+        else { echo "$0: missing OS type" >&2; exit 1; }
+        fi;;
+    (--arch)
+        if (( $# > 1 ));
+        then { kcp_edge_arch="$2"; shift; }
+        else { echo "$0: missing architecture type" >&2; exit 1; }
+        fi;;
+    (--folder)
+        if (( $# > 1 ));
+        then { kcp_edge_folder="$2"; shift; }
+        else { echo "$0: missing installation folder" >&2; exit 1; }
+        fi;;
+    (--create-folder)
         kcp_edge_create_folder="true";;
-	(--verbose|-V)
+    (--verbose|-V)
         verbose="true";;
-	(-h|--help)
-	    echo "Usage: $0 [--version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
-	    exit 0;;
-	(-*)
-	    echo "$0: unknown flag" >&2 ; exit 1;
-	    exit 1;;
-	(*)
-	    echo "$0: unknown positional argument" >&2; exit 1;
-	    exit 1;;
+    (-h|--help)
+        echo "Usage: $0 [--version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
+        exit 0;;
+    (-*)
+        echo "$0: unknown flag" >&2 ; exit 1;
+        exit 1;;
+    (*)
+        echo "$0: unknown positional argument" >&2; exit 1;
+        exit 1;;
     esac
     shift
 done
@@ -102,49 +102,45 @@ if [ "$kcp_edge_version" == "" ]; then
     kcp_edge_version=$(get_latest_version)
 fi
 if [ "$kcp_edge_os" == "" ]; then
-	kcp_edge_os=$(get_os_type)
+    kcp_edge_os=$(get_os_type)
 fi
 if [ "$kcp_edge_arch" == "" ]; then
-	kcp_edge_arch=$(get_arch_type)
+    kcp_edge_arch=$(get_arch_type)
 fi
 if [ "$kcp_edge_folder" == "" ]; then
     kcp_edge_folder="$PWD/kcp-edge"
 fi
 
-if [ ! -d "$kcp_edge_folder" ]
-then
-    if [ "$kcp_edge_create_folder" == "true" ]
-    then
-		if [ $verbose == "true" ]
-		then
-			echo "Creating folder: $kcp_edge_folder"
-		fi
-        mkdir -p "$kcp_edge_folder"
-    else
-        echo "Specified folder does not exist: $kcp_edge_folder" >&2; exit 1;
+if [ -d "$kcp_edge_folder" ]; then :
+elif [ "$kcp_edge_create_folder" == "true" ]; then
+    if [ $verbose == "true" ] ; then
+        echo "Creating folder: $kcp_edge_folder"
     fi
-fi
-
-if [ $verbose == "true" ]
-then
-	echo "Downloading KCP-Edge $kcp_edge_version $kcp_edge_os/$kcp_edge_arch..."
-	curl -SL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+    mkdir -p "$kcp_edge_folder"
 else
-	curl -sSL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+    echo "Specified folder does not exist: $kcp_edge_folder" >&2; exit 1;
 fi
 
 if [ $verbose == "true" ]
 then
-	echo "Extracting archive to: $kcp_edge_folder"
+    echo "Downloading KCP-Edge $kcp_edge_version $kcp_edge_os/$kcp_edge_arch..."
+    curl -SL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+else
+    curl -sSL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+fi
+
+if [ $verbose == "true" ]
+then
+    echo "Extracting archive to: $kcp_edge_folder"
 fi
 tar -zxf kcp-edge.tar.gz -C $kcp_edge_folder
 
 if [ $verbose == "true" ]
 then
-	echo "Cleaning up..."
+    echo "Cleaning up..."
 fi
 rm kcp-edge.tar.gz
 
 if [[ ! ":$PATH:" == *":$(get_full_path $kcp_edge_folder/bin):"* ]]; then
-	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_edge_folder/bin)""
+    echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_edge_folder/bin)""
 fi
