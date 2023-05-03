@@ -107,7 +107,7 @@ require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
 build/syncer-kcp:
-	cd build && git clone https://github.com/yana1205/kcp syncer-kcp
+	mkdir -p build && cd build && git clone https://github.com/yana1205/kcp syncer-kcp
 
 build/syncer-kcp/pkg/cliplugins/workload/plugin/edgesync.go: build/syncer-kcp
 	cd build/syncer-kcp && git checkout emc
