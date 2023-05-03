@@ -60,22 +60,22 @@ while (( $# > 0 )); do
 	(--version)
 	    if (( $# > 1 ));
 	    then { kcp_version="$2"; shift; }
-	    else { echo "$0: missing release version" >&2; $0 -h; exit 1; }
+	    else { echo "$0: missing release version" >&2; exit 1; }
 	    fi;;
 	(--os)
 	    if (( $# > 1 ));
 	    then { kcp_os="$2"; shift; }
-	    else { echo "$0: missing OS type" >&2; $0 -h; exit 1; }
+	    else { echo "$0: missing OS type" >&2; exit 1; }
 	    fi;;
 	(--arch)
 	    if (( $# > 1 ));
 	    then { kcp_arch="$2"; shift; }
-	    else { echo "$0: missing architecture type" >&2; $0 -h; exit 1; }
+	    else { echo "$0: missing architecture type" >&2; exit 1; }
 	    fi;;
 	(--folder)
 	    if (( $# > 1 ));
 	    then { kcp_folder="$2"; shift; }
-	    else { echo "$0: missing installation folder" >&2; $0 -h; exit 1; }
+	    else { echo "$0: missing installation folder" >&2; exit 1; }
 	    fi;;
 	(--create-folder)
         kcp_create_folder="true";;
@@ -85,10 +85,10 @@ while (( $# > 0 )); do
 	    echo "Usage: $0 [--version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
 	    exit 0;;
 	(-*)
-	    echo "$0: unknown flag" >&2; $0 -h ; exit 1;
+	    echo "$0: unknown flag" >&2 ; exit 1;
 	    exit 1;;
 	(*)
-	    echo "$0: unknown positional argument" >&2; $0 -h; exit 1;
+	    echo "$0: unknown positional argument" >&2; exit 1;
 	    exit 1;;
     esac
     shift
@@ -117,7 +117,7 @@ then
 		fi
         mkdir -p "$kcp_folder"
     else
-        echo "Specified folder does not exist: $kcp_folder" >&2; $0 -h; exit 1;
+        echo "Specified folder does not exist: $kcp_folder" >&2; exit 1;
     fi
 fi
 
