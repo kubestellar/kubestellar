@@ -18,6 +18,7 @@ set -e
 install=""
 verbosity=0
 espw_name="espw"
+user_type="dev"
 
 while (( $# > 0 )); do
     if [ "$1" == "start" ]; then
@@ -26,6 +27,8 @@ while (( $# > 0 )); do
         install=0
     elif [ "$1" == "-v" ]; then
         verbosity=1
+    elif [ "$1" == "--user" ]; then
+        user_type=$2
     fi 
     shift
 done
@@ -127,14 +130,66 @@ if kubectl get Workspace "$espw_name" &> /dev/null; then
 else 
    if [ $verbosity == 1 ]; then
         kubectl ws create "$espw_name" --enter
-        kubectl create -f  ../../config/crds 
-        kubectl create -f  ../../config/exports
-        echo "Finished Populate the espw with kcp edge crds and apiexports"
+
+        if [ $user_type == "dev" ]; then
+            kubectl apply -f  ../../config/crds 
+            kubectl apply -f  ../../config/exports
+            echo "Finished populate the espw with kcp edge crds and apiexports"
+
+        elif [ $user_type == "kit" ]; then
+            # Apply CRDs
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_customizers.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_edgeplacements.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_singleplacementslices.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_syncerconfigs.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/meta.kcp.io_apiresources.yaml
+
+            # Apply Exports
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiexport-edge.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiexport-meta.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-apiresources.meta.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-customizers.edge.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-edgeplacements.edge.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-edgesyncconfigs.edge.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-singleplacementslices.edge.kcp.io.yaml
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-syncerconfigs.edge.kcp.io.yaml
+            echo "Finished populate the espw with kcp edge crds and apiexports"
+        else
+            echo "Unknown user type ..."
+            exit 1
+        fi 
    else
         kubectl ws create "$espw_name" --enter
-        kubectl create -f  ../../config/crds &> /dev/null
-        kubectl create -f  ../../config/exports &> /dev/null
-        echo "Finished Populate the espw with kcp edge crds and apiexports"
+
+        if [ $user_type == "dev" ]; then
+            kubectl apply -f  ../../config/crds 
+            kubectl apply -f  ../../config/exports
+            echo "Finished populate the espw with kcp edge crds and apiexports"
+
+        elif [ $user_type == "kit" ]; then
+            # Apply CRDs
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_customizers.yaml  &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_edgeplacements.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_singleplacementslices.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/edge.kcp.io_syncerconfigs.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/crds/meta.kcp.io_apiresources.yaml &> /dev/null
+
+            # Apply Exports
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiexport-edge.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiexport-meta.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-apiresources.meta.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-customizers.edge.kcp.io.yaml  &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-edgeplacements.edge.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-edgesyncconfigs.edge.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-singleplacementslices.edge.kcp.io.yaml &> /dev/null
+            kubectl apply -f https://raw.githubusercontent.com/kcp-dev/edge-mc/main/config/exports/apiresourceschema-syncerconfigs.edge.kcp.io.yaml &> /dev/null
+            echo "Finished populate the espw with kcp edge crds and apiexports"
+        else
+            echo "Unknown user type ..."
+            exit 1
+        fi 
    fi
 fi
 
