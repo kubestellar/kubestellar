@@ -237,7 +237,7 @@ kind create cluster --name florin
   Check that the edge syncer pod is running:
 
   ```console
-  kubectl get pods -A
+  KUBECONFIG=$florin_kubeconfig kubectl get pods -A
   NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
   kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
   kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
@@ -309,7 +309,7 @@ kind create cluster --name florin
   Check that your workload was deployed successfully: 
 
   ```console
-  kubectl -n commonstuff get deploy
+  kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           13s
   ```
@@ -377,16 +377,18 @@ kind create cluster --name florin
 
   In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
+  Use the command `kubectl ws root:espw tree` to obtain the name of your mailbox workspace (`<mailbox-workspace-name>`)
+
   ```console
-  kubectl ws root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
-  Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69".
+  kubectl ws root:espw:<mailbox-workspace-name>
+  Current workspace is "root:espw:<mailbox-workspace-name>.
   
   kubectl get ns
   NAME          STATUS   AGE
   commonstuff   Active   4m
   default       Active   114m
   
-  kubectl -n commonstuff get deploy
+  kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           4m7s
 
@@ -480,7 +482,7 @@ kind create cluster --name florin
   kube-system                       Active   86m
   local-path-storage                Active   86m
 
-  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deploy
+  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   3/3     3            3           8m37s
 
