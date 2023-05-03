@@ -387,7 +387,7 @@ kind create cluster --name florin
 
   ```console
   kubectl ws root:espw
-  $stname=florin
+  stname=florin
   mbws=$(kubectl get Workspace -o json | jq -r ".items | .[] | .metadata | select(.annotations [\"edge.kcp.io/sync-target-name\"] == \"$stname\") | .name")
   ```
 
