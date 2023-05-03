@@ -278,7 +278,7 @@ kind create cluster --name florin
 
 b) Deploy your workload in `wmw-1`. For example:
 
-    ```console
+   ```console
     kubectl apply -f - <<EOF
     apiVersion: v1
     kind: Namespace
@@ -308,16 +308,16 @@ b) Deploy your workload in `wmw-1`. For example:
             image: nginx:1.14.2
             ports:
             - containerPort: 80
-    EOF
-    ```
+   EOF
+   ```
 
-    Check that your workload was deployed successfully: 
+   Check that your workload was deployed successfully: 
 
-    ```console
+   ```console
     kubectl -n commonstuff get deploy
     NAME               READY   UP-TO-DATE   AVAILABLE   AGE
     nginx-deployment   0/3     0            0           13s
-    ```
+   ```
 
   * Step-3: Create the `EdgePlacement` object for your workload
 
