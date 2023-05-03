@@ -511,5 +511,5 @@ kind create cluster --name florin
 ### 6. Clean up your kcp-edge environment:
 
 ```shell
-clean_up.sh
+bash <(curl -s https://raw.githubusercontent.com/dumb0002/edge-mc/user-dev-kit/environments/dev-env/clean_up.sh)
 ```
