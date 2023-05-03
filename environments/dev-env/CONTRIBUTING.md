@@ -107,9 +107,10 @@ kind create cluster --name florin
 
   c) Deploy kcp-edge infra:
          
-  Run the following command to start kcp-edge:
+  Run the following command inside the `kcp-edge/environments/dev-env` directory:
+
   ```bash
-  kcp-edge.sh start
+  ./kcp-edge.sh start
   ```
 
   The following components are created:
@@ -505,5 +506,5 @@ kind create cluster --name florin
 ### 7. Clean up your kcp-edge environment:
 
 ```shell
-clean_up.sh
+./clean_up.sh
 ```
