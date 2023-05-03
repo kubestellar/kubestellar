@@ -8,7 +8,17 @@ In this example scenario we deploy two [kind](https://kind.sigs.k8s.io/) edge cl
 
 Run the following command to deploy our example scenario:
 
+1. Clone kcp-edge repo:
+
 ```shell
+git clone https://github.com/kcp-dev/edge-mc.git  kcp-edge
+```
+
+2. Deploy kcp-edge example scenario stage-4:
+
+```shell
+cd kcp-edge/environments/dev-env
+
 ./install_edge-mc.sh --stage 4
 ```
 
