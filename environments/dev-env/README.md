@@ -69,25 +69,25 @@ kind create cluster --name florin
 
 ### 3. Deploy the kcp-edge platform:
 
-    a) Download kcp binaries for your platform:
+  a) Download kcp binaries for your platform:
 
-    ```shell
-       mkdir kcp
-       cd kcp
-       VERSION=0.11.0 # choose the latest version (without v prefix)
-       OS=darwin   # linux or darwin
-       ARCH=amd64  # arm64 or amd64
-       curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kcp_${VERSION}_${OS}_${ARCH}.tar.gz" > kcp.tar.gz
-       curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kubectl-kcp-plugin_${VERSION}_${OS}_${ARCH}.tar.gz" > kubectl-kcp-plugin.tar.gz
-    ```
+  ```shell
+      mkdir kcp
+      cd kcp
+      VERSION=0.11.0 # choose the latest version (without v prefix)
+      OS=darwin   # linux or darwin
+      ARCH=amd64  # arm64 or amd64
+      curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kcp_${VERSION}_${OS}_${ARCH}.tar.gz" > kcp.tar.gz
+      curl -sSfL "https://github.com/kcp-dev/kcp/releases/download/v${VERSION}/kubectl-kcp-plugin_${VERSION}_${OS}_${ARCH}.tar.gz" > kubectl-kcp-plugin.tar.gz
+  ```
 
-    Extract kcp and kubectl-kcp-plugin and place all the files in the bin directories somewhere in your $PATH. For example:
+  Extract kcp and kubectl-kcp-plugin and place all the files in the bin directories somewhere in your $PATH. For example:
 
-    ```shell
-    tar -xvf kcp.tar.gz
-    tar -xvf kubectl-kcp-plugin.tar.gz
-    export PATH="$PATH:$(pwd)/bin"
-    ```
+  ```shell
+  tar -xvf kcp.tar.gz
+  tar -xvf kubectl-kcp-plugin.tar.gz
+  export PATH="$PATH:$(pwd)/bin"
+  ```
 
     b) Start kcp
 
