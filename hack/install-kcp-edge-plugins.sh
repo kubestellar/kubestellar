@@ -29,6 +29,10 @@ kcp_edge_folder=""
 kcp_edge_create_folder="false"
 verbose="false"
 
+get_full_path() {
+	echo "$(cd "$1"; pwd)"
+}
+
 while (( $# > 0 )); do
     case "$1" in
 	(--folder)
@@ -99,5 +103,5 @@ popd > /dev/null
 rm -rf kcp-edge-ws-plugins
 
 if [[ ! ":$PATH:" == *":$kcp_edge_folder:"* ]]; then
-	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$kcp_edge_folder""
+	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_edge_folder/bin)""
 fi
