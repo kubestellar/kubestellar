@@ -34,7 +34,7 @@ while (( $# > 0 )); do
 	(--folder)
 	    if (( $# > 1 ));
 	    then { kcp_edge_folder="$2"; shift; }
-	    else { echo "$0: missing installation folder" >&2; $0 -h; exit 1; }
+	    else { echo "$0: missing installation folder" >&2; exit 1; }
 	    fi;;
 	(--create-folder)
         kcp_edge_create_folder="true";;
@@ -44,10 +44,10 @@ while (( $# > 0 )); do
 	    echo "Usage: $0 [--folder installation_folder] [--create-folder] [-V|--verbose]"
 	    exit 0;;
 	(-*)
-	    echo "$0: unknown flag" >&2; $0 -h ; exit 1;
+	    echo "$0: unknown flag" >&2 ; exit 1;
 	    exit 1;;
 	(*)
-	    echo "$0: unknown positional argument" >&2; $0 -h; exit 1;
+	    echo "$0: unknown positional argument" >&2; exit 1;
 	    exit 1;;
     esac
     shift
@@ -67,7 +67,7 @@ then
 		fi
         mkdir -p "$kcp_edge_folder"
     else
-        echo "Specified folder does not exist: $kcp_edge_folder" >&2; $0 -h; exit 1;
+        echo "Specified folder does not exist: $kcp_edge_folder" >&2; exit 1;
     fi
 fi
 
