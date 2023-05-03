@@ -145,6 +145,6 @@ then
 fi
 rm kcp-edge.tar.gz
 
-if [[ ! ":$PATH:" == *":$kcp_edge_folder:"* ]]; then
+if [[ ! ":$PATH:" == *":$(get_full_path $kcp_edge_folder/bin):"* ]]; then
 	echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_edge_folder/bin)""
 fi
