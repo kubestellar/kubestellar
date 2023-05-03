@@ -259,243 +259,243 @@ kind create cluster --name florin
 
 ### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
- a) Create a workload management workspace (`wmw`):
+  a) Create a workload management workspace (`wmw`):
   
-    ```console
-    kubectl ws root
-    kubectl ws create my-org --enter
+  ```console
+  kubectl ws root
+  kubectl ws create my-org --enter
 
-    ensure-wmw.sh wmw-1
+  ensure-wmw.sh wmw-1
 
-    Current workspace is "root".
-    Current workspace is "root:my-org".
-    Workspace "wmw-1" (type root:universal) created. Waiting for it to be ready...
-    Workspace "wmw-1" (type root:universal) is ready to use.
-    Current workspace is "root:my-org:wmw-1" (type root:universal).
-    apibinding.apis.kcp.io/bind-espw created
-    apibinding.apis.kcp.io/bind-kube created
-    ```
+  Current workspace is "root".
+  Current workspace is "root:my-org".
+  Workspace "wmw-1" (type root:universal) created. Waiting for it to be ready...
+  Workspace "wmw-1" (type root:universal) is ready to use.
+  Current workspace is "root:my-org:wmw-1" (type root:universal).
+  apibinding.apis.kcp.io/bind-espw created
+  apibinding.apis.kcp.io/bind-kube created
+  ```
 
-b) Deploy your workload in `wmw-1`. For example:
+  b) Deploy your workload in `wmw-1`. For example:
 
-   ```console
-    kubectl apply -f - <<EOF
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: commonstuff
-      labels: {common: "si"}
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: nginx-deployment
-      namespace: commonstuff
-      labels:
+  ```console
+  kubectl apply -f - <<EOF
+  apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: commonstuff
+    labels: {common: "si"}
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: nginx-deployment
+    namespace: commonstuff
+    labels:
+      app: nginx
+  spec:
+    replicas: 3
+    selector:
+      matchLabels:
         app: nginx
-    spec:
-      replicas: 3
-      selector:
-        matchLabels:
+    template:
+      metadata:
+        labels:
           app: nginx
-      template:
-        metadata:
-          labels:
-            app: nginx
-        spec:
-          containers:
-          - name: nginx
-            image: nginx:1.14.2
-            ports:
-            - containerPort: 80
-   EOF
-   ```
+      spec:
+        containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+          - containerPort: 80
+  EOF
+  ```
 
-   Check that your workload was deployed successfully: 
+  Check that your workload was deployed successfully: 
 
-   ```console
-    kubectl -n commonstuff get deploy
-    NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-    nginx-deployment   0/3     0            0           13s
-   ```
+  ```console
+  kubectl -n commonstuff get deploy
+  NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+  nginx-deployment   0/3     0            0           13s
+  ```
 
-  * Step-3: Create the `EdgePlacement` object for your workload
+  c) Create the `EdgePlacement` object for your workload
 
-    In the `wmw-1` workspace create the following `EdgePlacement` object: 
-    
-    ```console
-    kubectl ws root:my-org:wmw-1
+  In the `wmw-1` workspace create the following `EdgePlacement` object: 
+  
+  ```console
+  kubectl ws root:my-org:wmw-1
 
-    kubectl apply -f - <<EOF
-    apiVersion: edge.kcp.io/v1alpha1
-    kind: EdgePlacement
-    metadata:
+  kubectl apply -f - <<EOF
+  apiVersion: edge.kcp.io/v1alpha1
+  kind: EdgePlacement
+  metadata:
+    name: edge-placement-c
+  spec:
+    locationSelectors:
+    - matchLabels: {"env":"prod"}
+    namespaceSelector:
+      matchLabels: {"common":"si"}
+    nonNamespacedObjects:
+    - apiGroup: apis.kcp.io
+      resources: [ "apibindings" ]
+      resourceNames: [ "bind-kube" ]
+    upsync:
+    - apiGroup: "group1.test"
+      resources: ["sprockets", "flanges"]
+      namespaces: ["orbital"]
+      names: ["george", "cosmo"]
+    - apiGroup: "group2.test"
+      resources: ["cogs"]
+      names: ["william"]
+  EOF
+  ```
+  Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
+
+  In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/) will create a corresponding `SinglePlacementSlice` object:
+
+  ```console
+  kubectl get SinglePlacementSlice -o yaml edge-placement-c
+  apiVersion: edge.kcp.io/v1alpha1
+  destinations:
+  - cluster: 19igldm1mmolruzr
+    locationName: florin
+    syncTargetName: florin
+    syncTargetUID: 6b0309f0-84f3-4926-9344-81df2f989f69
+  kind: SinglePlacementSlice
+  metadata:
+    annotations:
+      kcp.io/cluster: 2aqjl32hksrd4nok
+    creationTimestamp: "2023-05-02T04:00:45Z"
+    generation: 1
+    name: edge-placement-c
+    ownerReferences:
+    - apiVersion: edge.kcp.io/v1alpha1
+      kind: EdgePlacement
       name: edge-placement-c
-    spec:
-      locationSelectors:
-      - matchLabels: {"env":"prod"}
-      namespaceSelector:
-        matchLabels: {"common":"si"}
-      nonNamespacedObjects:
-      - apiGroup: apis.kcp.io
-        resources: [ "apibindings" ]
-        resourceNames: [ "bind-kube" ]
-      upsync:
-      - apiGroup: "group1.test"
-        resources: ["sprockets", "flanges"]
-        namespaces: ["orbital"]
-        names: ["george", "cosmo"]
-      - apiGroup: "group2.test"
-        resources: ["cogs"]
-        names: ["william"]
-    EOF
-    ```
-    Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
- 
-    In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/) will create a corresponding `SinglePlacementSlice` object:
+      uid: 3f20a0a4-ed9a-4114-960e-0aa3d42802e3
+    resourceVersion: "1161"
+    uid: 32882961-fb77-4a95-be92-1ad6b088d082
+  ```
 
-    ```console
-    kubectl get SinglePlacementSlice -o yaml edge-placement-c
-    apiVersion: edge.kcp.io/v1alpha1
-    destinations:
-    - cluster: 19igldm1mmolruzr
-      locationName: florin
-      syncTargetName: florin
-      syncTargetUID: 6b0309f0-84f3-4926-9344-81df2f989f69
-    kind: SinglePlacementSlice
-    metadata:
-      annotations:
-        kcp.io/cluster: 2aqjl32hksrd4nok
-      creationTimestamp: "2023-05-02T04:00:45Z"
-      generation: 1
-      name: edge-placement-c
-      ownerReferences:
-      - apiVersion: edge.kcp.io/v1alpha1
-        kind: EdgePlacement
-        name: edge-placement-c
-        uid: 3f20a0a4-ed9a-4114-960e-0aa3d42802e3
-      resourceVersion: "1161"
-      uid: 32882961-fb77-4a95-be92-1ad6b088d082
-    ```
+ d) Check that the workloads objects are copied to mailbox workspace:
 
-  * Step-4: Check that the workloads objects are copied to mailbox workspace:
+  In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
 
-    In response to the created EdgePlacement and SinglePlacementSlice objects, the [placement translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/) will copy the workload prescriptions into the mailbox workspaces and create `SyncerConfig` objects there.
+  ```console
+  kubectl ws root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
+  Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69".
+  
+  kubectl get ns
+  NAME          STATUS   AGE
+  commonstuff   Active   4m
+  default       Active   114m
+  
+  kubectl -n commonstuff get deploy
+  NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+  nginx-deployment   0/3     0            0           4m7s
 
-    ```console
-    kubectl ws root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
-    Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69".
-    
-    kubectl get ns
-    NAME          STATUS   AGE
-    commonstuff   Active   4m
-    default       Active   114m
-    
-    kubectl -n commonstuff get deploy
-    NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-    nginx-deployment   0/3     0            0           4m7s
+  kubectl get syncerConfig
+  NAME      AGE
+  the-one   4m26s
+  ```
 
-    kubectl get syncerConfig
-    NAME      AGE
-    the-one   4m26s
-    ```
+  ```console
+  kubectl get syncerConfig the-one -o yaml
+  apiVersion: edge.kcp.io/v1alpha1
+  kind: SyncerConfig
+  metadata:
+    annotations:
+      kcp.io/cluster: 1jaofi54318wchgc
+    creationTimestamp: "2023-05-02T04:00:45Z"
+    generation: 2
+    name: the-one
+    resourceVersion: "1163"
+    uid: 7f618cf8-7ead-49f3-b410-ed9d52f50fe1
+  spec:
+    namespaceScope:
+      namespaces:
+      - commonstuff
+      resources:
+      - apiVersion: v1
+        group: ""
+        resource: resourcequotas
+      - apiVersion: v1
+        group: apps
+        resource: deployments
+      - apiVersion: v1
+        group: ""
+        resource: limitranges
+      - apiVersion: v1
+        group: ""
+        resource: configmaps
+      - apiVersion: v1
+        group: ""
+        resource: services
+      - apiVersion: v1
+        group: networking.k8s.io
+        resource: ingresses
+      - apiVersion: v1
+        group: coordination.k8s.io
+        resource: leases
+      - apiVersion: v1
+        group: rbac.authorization.k8s.io
+        resource: roles
+      - apiVersion: v1
+        group: ""
+        resource: secrets
+      - apiVersion: v1
+        group: rbac.authorization.k8s.io
+        resource: rolebindings
+      - apiVersion: v1
+        group: ""
+        resource: pods
+      - apiVersion: v1
+        group: ""
+        resource: serviceaccounts
+    upsync:
+    - apiGroup: group1.test
+      names:
+      - george
+      - cosmo
+      namespaces:
+      - orbital
+      resources:
+      - sprockets
+      - flanges
+    - apiGroup: group2.test
+      names:
+      - william
+      resources:
+      - cogs
+  status: {}
+  ```
 
-    ```console
-    kubectl get syncerConfig the-one -o yaml
-    apiVersion: edge.kcp.io/v1alpha1
-    kind: SyncerConfig
-    metadata:
-      annotations:
-        kcp.io/cluster: 1jaofi54318wchgc
-      creationTimestamp: "2023-05-02T04:00:45Z"
-      generation: 2
-      name: the-one
-      resourceVersion: "1163"
-      uid: 7f618cf8-7ead-49f3-b410-ed9d52f50fe1
-    spec:
-      namespaceScope:
-        namespaces:
-        - commonstuff
-        resources:
-        - apiVersion: v1
-          group: ""
-          resource: resourcequotas
-        - apiVersion: v1
-          group: apps
-          resource: deployments
-        - apiVersion: v1
-          group: ""
-          resource: limitranges
-        - apiVersion: v1
-          group: ""
-          resource: configmaps
-        - apiVersion: v1
-          group: ""
-          resource: services
-        - apiVersion: v1
-          group: networking.k8s.io
-          resource: ingresses
-        - apiVersion: v1
-          group: coordination.k8s.io
-          resource: leases
-        - apiVersion: v1
-          group: rbac.authorization.k8s.io
-          resource: roles
-        - apiVersion: v1
-          group: ""
-          resource: secrets
-        - apiVersion: v1
-          group: rbac.authorization.k8s.io
-          resource: rolebindings
-        - apiVersion: v1
-          group: ""
-          resource: pods
-        - apiVersion: v1
-          group: ""
-          resource: serviceaccounts
-      upsync:
-      - apiGroup: group1.test
-        names:
-        - george
-        - cosmo
-        namespaces:
-        - orbital
-        resources:
-        - sprockets
-        - flanges
-      - apiGroup: group2.test
-        names:
-        - william
-        resources:
-        - cogs
-    status: {}
-    ```
+  e) Check that the workloads are running in the edge clusters:
 
-  * Step-5: Check that the workloads are running in the edge clusters:
+  ```console
+  KUBECONFIG=$florin_kubeconfig kubectl get ns
 
-    ```console
-    KUBECONFIG=$florin_kubeconfig kubectl get ns
+  NAME                              STATUS   AGE
+  commonstuff                       Active   8m7s
+  default                           Active   86m
+  kcp-edge-syncer-florin-5c4r0a44   Active   85m
+  kube-node-lease                   Active   86m
+  kube-public                       Active   86m
+  kube-system                       Active   86m
+  local-path-storage                Active   86m
 
-    NAME                              STATUS   AGE
-    commonstuff                       Active   8m7s
-    default                           Active   86m
-    kcp-edge-syncer-florin-5c4r0a44   Active   85m
-    kube-node-lease                   Active   86m
-    kube-public                       Active   86m
-    kube-system                       Active   86m
-    local-path-storage                Active   86m
-
-    KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deploy
-    NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-    nginx-deployment   3/3     3            3           8m37s
+  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deploy
+  NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+  nginx-deployment   3/3     3            3           8m37s
 
 
-    KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
-    NAME                                READY   STATUS    RESTARTS   AGE
-    nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
-    nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
-    nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
-    ```
+  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
+  NAME                                READY   STATUS    RESTARTS   AGE
+  nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
+  nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
+  nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
+  ```
 
 ### 6. Clean up your kcp-edge environment:
 
