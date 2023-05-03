@@ -242,7 +242,7 @@ kind create cluster --name florin
   Check that the edge syncer pod is running:
 
   ```console
-  kubectl get pods -A
+  KUBECONFIG=$florin_kubeconfig kubectl get pods -A
   NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
   kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
   kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
@@ -314,7 +314,7 @@ kind create cluster --name florin
   Check that your workload was deployed successfully: 
 
   ```console
-  kubectl -n commonstuff get deploy
+  kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           13s
   ```
@@ -391,7 +391,7 @@ kind create cluster --name florin
   commonstuff   Active   4m
   default       Active   114m
   
-  kubectl -n commonstuff get deploy
+  kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           4m7s
 
@@ -485,7 +485,7 @@ kind create cluster --name florin
   kube-system                       Active   86m
   local-path-storage                Active   86m
 
-  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deploy
+  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   3/3     3            3           8m37s
 
