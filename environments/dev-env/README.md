@@ -69,7 +69,7 @@ kind create cluster --name florin
 
 ### 3. Deploy the kcp-edge platform:
 
-  * a) Download kcp binaries for your platform:
+  a) Download kcp binaries for your platform:
 
     ```shell
        mkdir kcp
@@ -89,7 +89,7 @@ kind create cluster --name florin
     export PATH="$PATH:$(pwd)/bin"
     ```
 
-  * b) Start kcp
+  b) Start kcp
 
     ```shell
     kcp start >& kcp_log.txt &
