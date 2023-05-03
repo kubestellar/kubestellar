@@ -505,5 +505,5 @@ kind create cluster --name florin
 ### 7. Clean up your kcp-edge environment:
 
 ```shell
-./clean_up.sh
+clean_up.sh
 ```
