@@ -83,7 +83,7 @@ NAME          STATUS   AGE
 commonstuff   Active   4m57s
 default       Active   5m2s
 
-kubectl -n commonstuff get deploy
+kubectl -n commonstuff get deployment
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
 commond   0/0     0            0           5m24s
 
@@ -120,7 +120,7 @@ NAME           STATUS   AGE
 default        Active   6m28s
 specialstuff   Active   6m25s
 
-kubectl -n specialstuff  get deploy
+kubectl -n specialstuff  get deployment
 NAME       READY   UP-TO-DATE   AVAILABLE   AGE
 speciald   0/0     0            0           6m38s
 
@@ -205,7 +205,7 @@ kube-system                        kube-scheduler-florin-control-plane          
 local-path-storage                 local-path-provisioner-684f458cdd-8whx8             1/1     Running   0          32m
 
 
-kubectl get deploy -A
+kubectl get deployment -A
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                        commond                            1/1     1            1           30m
 kcp-edge-syncer-the-one-20hyh1ri   kcp-edge-syncer-the-one-20hyh1ri   1/1     1            1           31m
@@ -236,7 +236,7 @@ local-path-storage                 local-path-provisioner-684f458cdd-7md8s      
 specialstuff                       speciald-7d5ff89f68-w84lw                           1/1     Running   0          34m
  
 
-kubectl get deploy -A
+kubectl get deployment -A
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                        commond                            1/1     1            1           34m
 kcp-edge-syncer-the-one-20dlc7rw   kcp-edge-syncer-the-one-20dlc7rw   1/1     1            1           35m
