@@ -14,16 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 --create-folder --verbose
+# Usage: $0 --kcp-version v0.11.0 --kcp-edge-version v0.1.0 --imw imw-1 --wmw wmw-1
 
 # This script installs KCP-Edge binaries to a folder of choice
 #
 # Arguments:
-# [--version release_version] set a specific KCP-Edge release version, default: latest
+
+
+Usage: $0
+# [--kcp-version release_version] set a specific KCP release version, default: latest
+# [--kcp-edge-version release_version] set a specific KCP-Edge release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--folder installation_folder] sets the installation folder, default: $PWD/kcp-edge
 # [--create-folder] create the instllation folder, if it does not exist
+# [--bind address] bind to KCP public address for access from remote pcluster
+# [--imw name] create an inverntory management workspace under root
+# [--wmw name] create an worklowd management workspace under root
 # [-V|--verbose] verbose output
 
 set -e
@@ -146,7 +153,7 @@ while (( $# > 0 )); do
     (--verbose|-V)
         verbose="-V";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kcp-edge-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
+        echo "Usage: $0 [--kcp-version release_version] [--kcp-edge-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [--bind address] [--imw name] [--wmw name] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -183,7 +190,7 @@ if [ "$(kcp_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing kcp..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --folder  $folder/kcp --create-folder $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --folder  $folder/kcp --create-folder $verbose
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kcp/bin)
     fi
@@ -214,7 +221,7 @@ if [ "$(kcp_edge_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing kcp-edge..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kcp-edge.sh) --version $kcp_edge_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-edge.sh) --version $kcp_edge_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp-edge/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kcp-edge/bin)
     fi
@@ -263,8 +270,3 @@ if [ "$kcp_edge_wmw" != "" ]; then
         fi
     fi
 fi
-
-# echo "kcp installed? $(kcp_installed)"
-# echo "kcp running? $(kcp_running)"
-# echo "kcp-edge installed? $(kcp_edge_installed)"
-# echo "kcp-edge running? $(kcp_edge_running)"
