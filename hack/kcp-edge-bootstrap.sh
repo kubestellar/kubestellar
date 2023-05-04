@@ -210,7 +210,7 @@ if [ "$(kcp_running)" == "false" ]; then
     fi
     if [[ ! "$KUBECONFIG" == "$(pwd)/.kcp/admin.kubeconfig" ]]; then
         export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
-        echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
+        echo 'Set KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
     fi
     sleep 5
     until kubectl ws . &> /dev/null
