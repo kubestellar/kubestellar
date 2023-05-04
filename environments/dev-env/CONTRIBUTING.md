@@ -17,13 +17,13 @@
   - Windows WSL/Ubuntu
 
 
-Run the following script to install the required package (Linux or MacOS ):
+After cloning this repo (see quickstart), run the following script to install the required package (Linux or MacOS):
 
 ```bash
 ./install_req.sh
 ```
 
-Alternatively, run the following command for MacOS platform:
+On MacOS you could use the following command as an alternative to the above:
 
 ```bash
 brew install ko gcc jq make go@1.19 kind kubectl
@@ -37,7 +37,7 @@ For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_
 ### 1. Clone the kcp-edge repo:
 
 ```shell
-git clone https://github.com/kcp-dev/edge-mc.git  kcp-edge
+git clone https://github.com/kcp-dev/edge-mc.git
 ```
 
 ### 2. Build the kcp-edge binaries:
@@ -47,7 +47,7 @@ cd kcp-edge
 make build
 ```
 
-The kcp-edge binaries is created inside the `/bin` directory. Add this directory to your $PATH:
+The kcp-edge binaries is created inside the `./bin` directory. Add this directory to your $PATH:
 
 ```shell
 export PATH="$PATH:$(pwd)/bin"
@@ -107,7 +107,7 @@ kind create cluster --name florin
 
   c) Deploy kcp-edge infra:
          
-  Run the following command inside the `kcp-edge/environments/dev-env` directory:
+  Run the following command inside the `edge-mc/environments/dev-env` directory:
 
   ```bash
   ./kcp-edge.sh start
