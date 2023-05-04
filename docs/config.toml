@@ -226,7 +226,7 @@ section = ["HTML", "print", "RSS"]
       name = "YouTube Channel"
       url = "https://www.youtube.com/@kcp-edge"
       icon = "fab fa-youtube"
-      desc = "View recordings of past KCP-Edge community meetings"
+      desc = "Follow us on YouTube to view recordings of past KCP-Edge community meetings and demo days"
     [[params.links.user]]
       name = "Medium Blog Series"
       url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
