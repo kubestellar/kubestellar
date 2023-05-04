@@ -16,12 +16,14 @@
 
 # Usage: $0 --kcp-version v0.11.0 --kcp-edge-version v0.1.0 --imw imw-1 --wmw wmw-1
 
-# This script installs KCP-Edge binaries to a folder of choice
+# This script bootstrap KCP-Edge by ensuring that:
+# 1. kcp is installed
+# 2. kcp is running
+# 3. kcp-edge is installed
+# 4. kcp-edge is running
+# Additionally, this script allows to setup initial IMW and WMW workspaces.
 #
 # Arguments:
-
-
-Usage: $0
 # [--kcp-version release_version] set a specific KCP release version, default: latest
 # [--kcp-edge-version release_version] set a specific KCP-Edge release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
