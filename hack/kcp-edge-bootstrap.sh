@@ -208,14 +208,16 @@ if [ "$(kcp_running)" == "false" ]; then
     else
         kcp start --bind-address $kcp_address >& kcp_log.txt &
     fi
-    export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
+    if [[ ! "$KUBECONFIG" == "$(pwd)/.kcp/admin.kubeconfig" ]]; then
+        export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
+        echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
+    fi
     sleep 5
     until kubectl ws . &> /dev/null
     do
         sleep 1
     done
     sleep 10
-    echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
 fi
 
 # Ensure kcp-edge is installed
