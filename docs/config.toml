@@ -224,7 +224,7 @@ section = ["HTML", "print", "RSS"]
       #desc = "Follow us on Twitter to get the latest news!"
     [[params.links.user]]
       name = "YouTube Channel"
-      url = "https://www.youtube.com/playlist?list=PL1ALKGr_qZKc9jyv1EfOFNfoAJo9Q6Ebd"
+      url = "https://www.youtube.com/@kcp-edge"
       icon = "fab fa-youtube"
       desc = "View recordings of past KCP-Edge community meetings"
     [[params.links.user]]
