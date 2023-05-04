@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 (-o file_pathname | --syncer-image container_image_ref )* synctarget_name
+# Usage: $0 (-o file_pathname | --syncer-image container_image_ref | --espw-path workspace_path)* synctarget_name
 
 # Purpose: For the given SyncTarget, (a) prepare the corresponding
 # mailbox workspace for the syncer and (b) output the YAML that needs
@@ -22,15 +22,12 @@
 
 # Assumption: only one SyncTarget has the given name.
 
-# Invoke this with the edge service provider workspace (ESPW) current,
-# and it will (if successful) terminate with the mailbox workspace current.
-
 # This script requires the edge-mc variant kubectl-kcp plugin to
 # already exist at ../bin/kubectl-kcpforedgesyncer.
 
 case "$1" in
     (-h|--help)
-	echo "$0 usage: (-o file_pathname | --syncer-image container_image_ref )* synctarget_name"
+	echo "$0 usage: (-o file_pathname | --syncer-image container_image_ref | --espw-path workspace_path)* synctarget_name"
 	exit
 esac
 
@@ -45,6 +42,7 @@ fi
 stname=""
 output=""
 syncer_image="quay.io/kcpedge/syncer:v0.1.0"
+espw_path="root:espw"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -58,6 +56,14 @@ while (( $# > 0 )); do
 	    then { syncer_image="$2"; shift; }
 	    else { echo "$0: missing syncer image reference" >&2; exit 1; }
 	    fi;;
+	(--espw-path)
+	    if (( $# > 1 ));
+	    then { espw-path="$2"; shift; }
+	    else { echo "$0: missing edge service provider workspace path" >&2; exit 1; }
+	    fi;;
+	(-*)
+	    echo "$0: invalid flag $1" >&2
+	    exit 1;;
 	(*)
 	    if [ "$stname" != "" ]; then
 		echo "$0: too many positional arguments" >&2
@@ -77,8 +83,17 @@ if [ "$output" == "" ]; then
     output="$stname-syncer.yaml"
 fi
 
+if [ "$espw_path" != "." ] && ! [[ "$espw_path" =~ [a-z0-9].* ]]; then
+    echo "$0: espw-path ${espw_path@Q} is not valid" >&2
+    exit 1
+fi
+
+set -e
+
+kubectl ws "$espw_path"
+
 if ! kubectl get APIExport edge.kcp.io &> /dev/null ; then
-    echo "$0: it looks like the ESPW is not current" >&2
+    echo "$0: it looks like ${espw_path@Q} is not the edge service provider workspace" >&2
     exit 2
 fi
 
@@ -98,8 +113,6 @@ if [ $(wc -w <<<"$mbws") != 1 ]; then
     echo "$0: had trouble identifying the mailbox controller for SyncTarget $stname; what does \`kubectl get Workspace -o \"custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name']\"\` tell you?" >&2
     exit 6
 fi
-
-set -e
 
 kubectl ws "$mbws"
 

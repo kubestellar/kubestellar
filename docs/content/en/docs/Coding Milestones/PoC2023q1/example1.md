@@ -258,6 +258,7 @@ in the guilder cluster.
 
 ```console
 $ mailbox-prep.sh guilder
+Current workspace is "root:espw"
 Current workspace is "root:espw:apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" (type root:universal).
 Creating service account "kcp-edge-syncer-guilder-saaywsu5"
 Creating cluster role "kcp-edge-syncer-guilder-saaywsu5" to give service account "kcp-edge-syncer-guilder-saaywsu5"
@@ -315,6 +316,7 @@ $ kubectl ws root:espw
 Current workspace is "root:espw".
 
 $ mailbox-prep.sh florin
+Current workspace is "root:espw"
 Current workspace is "root:espw:apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" (type root:universal).
 Already on 'emc'
 Your branch is up to date with 'origin/emc'.

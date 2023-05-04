@@ -17,13 +17,13 @@ with making that pair of objects.  Invoke it when your current
 workspace is your chosen inventory management workspace.
 
 ```console
-$ scripts/ensure-location.sh -h
-scripts/ensure-location.sh usage: objname labelname=labelvalue...
+$ bin/ensure-location.sh -h
+bin/ensure-location.sh usage: objname labelname=labelvalue...
 
 $ kubectl ws root:imw-1
 Current workspace is "root:imw-1".
 
-$ scripts/ensure-location.sh demo1 foo=bar the-word=the-bird
+$ bin/ensure-location.sh demo1 foo=bar the-word=the-bird
 synctarget.workload.kcp.io/demo1 created
 location.scheduling.kcp.io/demo1 created
 synctarget.workload.kcp.io/demo1 labeled
@@ -72,17 +72,17 @@ usage of `ensure-location.sh`.  Invoke it with the inventory
 management workspace current.
 
 ```console
-$ scripts/remove-location.sh -h
-scripts/remove-location.sh usage: objname
+$ bin/remove-location.sh -h
+bin/remove-location.sh usage: objname
 
 $ kubectl ws root:imw-1
 Current workspace is "root:imw-1".
 
-$ scripts/remove-location.sh demo1
+$ bin/remove-location.sh demo1
 synctarget.workload.kcp.io "demo1" deleted
 location.scheduling.kcp.io "demo1" deleted
 
-$ scripts/remove-location.sh demo1
+$ bin/remove-location.sh demo1
 
 $ 
 ```
@@ -95,8 +95,7 @@ that, there is some work to do in the mailbox workspace to create a
 ServiceAccount for the syncer to authenticate as and create RBAC
 objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
-install the syncer in the edge cluster.  Invoke this script with the
-edge service provider workspace current.
+install the syncer in the edge cluster.
 
 This script assumes that either (a) you have cloned the edge-mc repo
 and done `make build` to populate its `bin` directory or (b) you have
@@ -104,13 +103,14 @@ fetched a release binary archive and unpacked it to create its `bin`
 directory.
 
 ```console
-$ scripts/mailbox-prep.sh -h
-scripts/mailbox-prep.sh usage: (-o file_pathname | --syncer-image container_image_ref )* synctarget_name
+$ bin/mailbox-prep.sh -h
+bin/mailbox-prep.sh usage: (-o file_pathname | --syncer-image container_image_ref | --espw-path workspace_path)* synctarget_name
 
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 
-$ scripts/mailbox-prep.sh demo1
+$ bin/mailbox-prep.sh demo1
+Current workspace is "root:espw"
 Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
 Creating service account "kcp-edge-syncer-demo1-28at01r3"
 Creating cluster role "kcp-edge-syncer-demo1-28at01r3" to give service account "kcp-edge-syncer-demo1-28at01r3"
@@ -161,13 +161,13 @@ This script works in idempotent style, doing whatever work remains to
 be done.
 
 ```console
-$ scripts/ensure-wmw.sh -h
-Usage: kubectl ws parent; scripts/ensure-wmw.sh [--with-kube | --no-kube] wm_workspace_name
+$ bin/ensure-wmw.sh -h
+Usage: kubectl ws parent; bin/ensure-wmw.sh [--with-kube | --no-kube] wm_workspace_name
 
 $ kubectl ws .
 Current workspace is "root:my-org".
 
-$ scripts/ensure-wmw.sh example-wmw
+$ bin/ensure-wmw.sh example-wmw
 Current workspace is "root".
 Current workspace is "root:my-org".
 Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
@@ -179,7 +179,7 @@ apibinding.apis.kcp.io/bind-kube created
 $ kubectl ws ..
 Current workspace is "root:my-org".
 
-$ scripts/ensure-wmw.sh example-wmw
+$ bin/ensure-wmw.sh example-wmw
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
@@ -187,7 +187,7 @@ Current workspace is "root:my-org:example-wmw" (type root:universal).
 $ kubectl ws ..
 Current workspace is "root:my-org".
 
-$ scripts/ensure-wmw.sh example-wmw --no-kube
+$ bin/ensure-wmw.sh example-wmw --no-kube
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
