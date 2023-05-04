@@ -261,11 +261,11 @@ if [ "$kcp_edge_wmw" != "" ]; then
     then
         if [ "$verbose" != "" ]; then
             kubectl ws root
-            ensure-wmw.sh wmw-1
+            ensure-wmw.sh $kcp_edge_wmw
             kubectl ws root
         else
             kubectl ws root > /dev/null
-            ensure-wmw.sh wmw-1 > /dev/null
+            ensure-wmw.sh $kcp_edge_wmw > /dev/null
             kubectl ws root > /dev/null
         fi
     fi
