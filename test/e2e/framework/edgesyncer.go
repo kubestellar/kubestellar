@@ -17,9 +17,15 @@ limitations under the License.
 package framework
 
 import (
+	"bytes"
 	"context"
 	"embed"
+	"errors"
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -133,7 +139,7 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 		"--output-file=-",
 	}
 
-	syncerYAML := framework.RunKcpCliPlugin(t, kubeconfigPath, pluginArgs)
+	syncerYAML := RunKcpCliPlugin(t, kubeconfigPath, pluginArgs)
 
 	var downstreamConfig *rest.Config
 	var downstreamKubeconfigPath string
@@ -382,4 +388,59 @@ func LoadFile(path string, embedded embed.FS, v interface{}) error {
 		return err
 	}
 	return yaml.Unmarshal(data, v)
+}
+
+// RunKcpCliPlugin runs the kcp workspace plugin with the provided subcommand and
+// returns the combined stderr and stdout output.
+func RunKcpCliPlugin(t *testing.T, kubeconfigPath string, subcommand []string) []byte {
+	t.Helper()
+
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	t.Cleanup(cancelFunc)
+
+	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcp")
+	kcpCliPluginCommand := []string{"go", "run", cmdPath}
+
+	cmdParts := append(kcpCliPluginCommand, subcommand...)
+	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
+
+	cmd.Env = os.Environ()
+	// TODO(marun) Consider configuring the workspace plugin with args instead of this env
+	cmd.Env = append(cmd.Env, fmt.Sprintf("KUBECONFIG=%s", kubeconfigPath))
+
+	t.Logf("running: KUBECONFIG=%s %s", kubeconfigPath, strings.Join(cmdParts, " "))
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		t.Logf("kcp plugin stdout:\n%s", stdout.String())
+		t.Logf("kcp plugin stderr:\n%s", stderr.String())
+	}
+	require.NoError(t, err, "error running kcp plugin command")
+	return stdout.Bytes()
+}
+
+// RepositoryDir returns the absolute path of <repo-dir>.
+func repositoryDir() string {
+	// Caller(0) returns the path to the calling test file rather than the path to this framework file. That
+	// precludes assuming how many directories are between the file and the repo root. It's therefore necessary
+	// to search in the hierarchy for an indication of a path that looks like the repo root.
+	_, sourceFile, _, _ := runtime.Caller(0)
+	currentDir := filepath.Dir(sourceFile)
+	for {
+		// go.mod should always exist in the repo root
+		if _, err := os.Stat(filepath.Join(currentDir, "go.mod")); err == nil {
+			break
+		} else if errors.Is(err, os.ErrNotExist) {
+			currentDir, err = filepath.Abs(filepath.Join(currentDir, ".."))
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			panic(err)
+		}
+	}
+	return currentDir
 }

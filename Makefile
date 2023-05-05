@@ -394,11 +394,9 @@ endif
 .PHONY: e2e-test-edge-syncer
 e2e-test-edge-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 # Please set a directory for kcp binaries contain edge-sync plugin (kubectl kcp workload edge-sync...). e.g. <your machine>/git/yana1205/kcp/bin
-e2e-test-edge-syncer: KCP_BIN_DIR ?=
 e2e-test-edge-syncer: TEST_ARGS ?= 
 e2e-test-edge-syncer: KIND_CLUSTER_NAME ?= e2e-kcp-edge 
 e2e-test-edge-syncer: e2e-test-edge-syncer-cleanup
-	export PATH="$(KCP_BIN_DIR):$$PATH" ; \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
