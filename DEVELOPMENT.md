@@ -8,7 +8,7 @@
    - make
    - go (version expected 1.19)
    - kind
-   - kubectl (versions: 1.23--1.25)
+   - kubectl (version range expected: 1.23-1.25)
 
 
 ## Supported OS Platforms 
