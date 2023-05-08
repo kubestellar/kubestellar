@@ -17,7 +17,7 @@
   - Windows WSL/Ubuntu
 
 
-After cloning this repo (see [instructions](###-1.-clone-the-kcp-edge-repo)), run the following script to install the required package (Linux or MacOS):
+After cloning this repo (see [instructions](#1-clone-the-kcp-edge-repo)), run the following script to install the required package (Linux or MacOS):
 
 ```bash
 hack/install_req.sh
