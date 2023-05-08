@@ -489,8 +489,16 @@ kind create cluster --name florin
   nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
   ```
 
-### 8. Clean up your kcp-edge environment:
+### 8. Install up your kcp-edge environment:
+
+To uninstall kcp-edge run the following command:
+
+```bash
+hack/kcp-edge.sh stop
+```
+
+To delete all the generated files (e.g., edge syncer manifests and logs files), remove kcp & kcp-edge run the following command:
 
 ```shell
-hack/clean_up.sh
+hack/clean-env.sh
 ```
