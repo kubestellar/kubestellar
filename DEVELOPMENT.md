@@ -32,7 +32,7 @@ brew install ko gcc jq make go@1.19 kind kubectl
 For Windows WSL/Ubuntu platform, follow the instructions [here](docs/wls_ubuntu_platform.md)
 
 
-## Setup Development Environment
+## Setup Instructions
 
 ### 1. Clone the kcp-edge repo:
 
