@@ -1,4 +1,4 @@
-# KCP-Edge Contributor Development Environment
+# KCP-Edge Contributor Instructions
 
 ## Required Packages:
    - ko: https://ko.build/install/ 
