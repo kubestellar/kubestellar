@@ -43,7 +43,7 @@ git clone https://github.com/kcp-dev/edge-mc.git
 ### 2. Build the kcp-edge binaries:
 
 ```shell
-cd kcp-edge
+cd edge-mc
 make build
 ```
 
@@ -65,6 +65,12 @@ kind create cluster --name florin
 ### 4. Deploy the kcp-edge platform:
 
   a) Download kcp binaries for your platform:
+
+  ```shell
+  hack/install-kcp-with-plugins.sh --version v0.11.0 --folder $(pwd)/kcp --create-folder
+  ```
+  
+  OR
 
   ```shell
   mkdir kcp
@@ -94,7 +100,7 @@ kind create cluster --name florin
   If you need to connect to a remote k8s edge cluster, you can bind kcp to the public interface of your virtual machine:
 
   ```shell
-  kcp start --bind-address <ip-address> >& kcp_log.txt &
+  kcp start [--bind-address <ip-address>] >& kcp_log.txt &
   ```
   
   This uses default 6443 port, just bind to a specific address
@@ -118,7 +124,7 @@ kind create cluster --name florin
   - 1 kcp workspace: edge service provider workspace (`espw`)
 
   ```console
-  kubectl ws tree
+  $ kubectl ws tree
   .
   └── root
       ├── compute
@@ -128,7 +134,7 @@ kind create cluster --name florin
   - 3 kcp-edge controllers: [edge-scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/), [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) and [placement-translator](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/placement-translator/)
 
   ```shell
-  ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
+  $ ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
   user    11344   0.1  0.1 34906508  28044 s001  S     8:36PM   0:00.43 placement-translator --allclusters-context system:admin -v=2
   user    11333   0.1  0.1 34885544  19536 s001  S     8:36PM   0:00.38 scheduler -v 2 --root-user kcp-admin --root-cluster root --sysadm-context system:admin --sysadm-user shard-admin
   user    11323   0.0  0.1 34892244  20780 s001  S     8:36PM   0:00.13 mailbox-controller --inventory-context=root --mbws-context=base -v=2
@@ -136,11 +142,11 @@ kind create cluster --name florin
 
 ### 5. Connect your edge cluster to the kcp-edge platform:
 
-  a) Create inventory management workspace (`imw`):
+  a) Create an inventory management workspace (`imw`):
 
   ```console
-  kubectl ws root
-  kubectl ws create imw-1 --enter
+  $ kubectl ws root
+  $ kubectl ws create imw-1 --enter
 
   Workspace "imw-1" (type root:organization) created. Waiting for it to be ready...
   Workspace "imw-1" (type root:organization) is ready to use.
@@ -150,7 +156,7 @@ kind create cluster --name florin
   b) Create a syncTarget and location objects to represent your edge cluster (florin):
 
   ```console
-  ensure-location.sh florin  env=prod
+  $ ensure-location.sh florin  env=prod
 
   synctarget.workload.kcp.io/florin created
   location.scheduling.kcp.io/florin created
@@ -158,10 +164,10 @@ kind create cluster --name florin
   location.scheduling.kcp.io/florin labeled
   ```
 
-  A location and synctarget objects are created:
+  The following commands list the objects that were created:
 
   ```console
-  kubectl get locations,synctargets
+  $ kubectl get locations,synctargets
   NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
   location.scheduling.kcp.io/florin   synctargets   0           1                    57s
 
@@ -170,13 +176,13 @@ kind create cluster --name florin
   ```
 
 
-  The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget: `florin`:
+  The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget (`florin`):
 
   ```console
-  kubectl ws root
+  $ kubectl ws root
   Current workspace is "root".
 
-  kubectl ws tree
+  $ kubectl ws tree
   .
   └── root
       ├── compute
@@ -188,10 +194,10 @@ kind create cluster --name florin
   c) Connect florin edge cluster with its mailbox workspace:
 
   ```shell
-  kubectl ws root:espw
+  $ kubectl ws root:espw
   Current workspace is "root:espw".
 
-  mailbox-prep.sh florin
+  $ mailbox-prep.sh florin
 
   Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
 
@@ -222,7 +228,7 @@ kind create cluster --name florin
   For example: switch to the context of the florin kind cluster
 
   ```console
-  KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+  $ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
 
   namespace/kcp-edge-syncer-florin-5c4r0a44 created
   serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
@@ -238,7 +244,7 @@ kind create cluster --name florin
   Check that the edge syncer pod is running:
 
   ```console
-  KUBECONFIG=$florin_kubeconfig kubectl get pods -A
+  $ KUBECONFIG=$florin_kubeconfig kubectl get pods -A
   NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
   kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
   kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
@@ -258,10 +264,10 @@ kind create cluster --name florin
   a) Create a workload management workspace (`wmw`):
   
   ```console
-  kubectl ws root
-  kubectl ws create my-org --enter
+  $ kubectl ws root
+  $ kubectl ws create my-org --enter
 
-  ensure-wmw.sh wmw-1
+  $ ensure-wmw.sh wmw-1
 
   Current workspace is "root".
   Current workspace is "root:my-org".
@@ -310,7 +316,7 @@ kind create cluster --name florin
   Check that your workload was deployed successfully: 
 
   ```console
-  kubectl -n commonstuff get deployment
+  $ kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           13s
   ```
@@ -320,7 +326,7 @@ kind create cluster --name florin
   In the `wmw-1` workspace create the following `EdgePlacement` object: 
   
   ```console
-  kubectl ws root:my-org:wmw-1
+  $ kubectl ws root:my-org:wmw-1
 
   kubectl apply -f - <<EOF
   apiVersion: edge.kcp.io/v1alpha1
@@ -351,7 +357,7 @@ kind create cluster --name florin
   In response to the created `EdgePlacement`, the edge [scheduler](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/edge-scheduler/) will create a corresponding `SinglePlacementSlice` object:
 
   ```console
-  kubectl get SinglePlacementSlice -o yaml edge-placement-c
+  $ kubectl get SinglePlacementSlice -o yaml edge-placement-c
   apiVersion: edge.kcp.io/v1alpha1
   destinations:
   - cluster: 19igldm1mmolruzr
@@ -381,33 +387,33 @@ kind create cluster --name florin
   Use the following commands to obtain the name of the mailbox workspace (`mbws`) associated with the SyncTarget created earlier 
 
   ```console
-  kubectl ws root:espw
-  stname=florin
-  mbws=$(kubectl get Workspace -o json | jq -r ".items | .[] | .metadata | select(.annotations [\"edge.kcp.io/sync-target-name\"] == \"$stname\") | .name")
+  $ kubectl ws root:espw
+  $ stname=florin
+  $ mbws=$(kubectl get Workspace -o json | jq -r ".items | .[] | .metadata | select(.annotations [\"edge.kcp.io/sync-target-name\"] == \"$stname\") | .name")
   ```
 
   Then check the objects created in the mailbox workspace:
 
   ```console
-  kubectl ws root:espw:$mbws
+  $ kubectl ws root:espw:$mbws
   Current workspace is "root:espw:$mbws
   
-  kubectl get ns
+  $ kubectl get ns
   NAME          STATUS   AGE
   commonstuff   Active   4m
   default       Active   114m
   
-  kubectl -n commonstuff get deployment
+  $ kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   0/3     0            0           4m7s
 
-  kubectl get syncerConfig
+  $ kubectl get syncerConfig
   NAME      AGE
   the-one   4m26s
   ```
 
   ```console
-  kubectl get syncerConfig the-one -o yaml
+  $ kubectl get syncerConfig the-one -o yaml
   apiVersion: edge.kcp.io/v1alpha1
   kind: SyncerConfig
   metadata:
@@ -480,7 +486,7 @@ kind create cluster --name florin
   e) Check that the workloads are running in the edge clusters:
 
   ```console
-  KUBECONFIG=$florin_kubeconfig kubectl get ns
+  $ KUBECONFIG=$florin_kubeconfig kubectl get ns
 
   NAME                              STATUS   AGE
   commonstuff                       Active   8m7s
@@ -491,12 +497,12 @@ kind create cluster --name florin
   kube-system                       Active   86m
   local-path-storage                Active   86m
 
-  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
+  $ KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
   NAME               READY   UP-TO-DATE   AVAILABLE   AGE
   nginx-deployment   3/3     3            3           8m37s
 
 
-  KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
+  $ KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
   NAME                                READY   STATUS    RESTARTS   AGE
   nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
   nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
