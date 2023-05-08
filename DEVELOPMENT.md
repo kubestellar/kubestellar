@@ -95,8 +95,6 @@ kind create cluster --name florin
 
 ### 5. Deploy the kcp-edge platform
          
-  Run the following command inside the `edge-mc/environments/dev-env` directory:
-
   ```bash
   hack/kcp-edge.sh start
   ```
