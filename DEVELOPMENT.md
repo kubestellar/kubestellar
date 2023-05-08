@@ -20,7 +20,7 @@
 After cloning this repo (see quickstart), run the following script to install the required package (Linux or MacOS):
 
 ```bash
-./install_req.sh
+hack/install_req.sh
 ```
 
 On MacOS you could use the following command as an alternative to the above:
@@ -116,7 +116,7 @@ kind create cluster --name florin
   Run the following command inside the `edge-mc/environments/dev-env` directory:
 
   ```bash
-  ./kcp-edge.sh start
+  hack/kcp-edge.sh start
   ```
 
   The following components are created:
