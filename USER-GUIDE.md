@@ -25,14 +25,14 @@ Detailed installation instructions for different operative systems are available
 
 ### b. `kcp`
 
-Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspace virtualization capability, we have to install `kcp` v0.11.0 binaries first by following the detailed installation instructions available [here](https://docs.kcp.io/kcp/main/) or by using the convenience script below:
+Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspace virtualization capability, we have to install `kcp` v0.11.0 binaries first by following the detailed installation instructions available [here](https://docs.kcp.io/kcp/main/) or by using the script below:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version v0.11.0 --folder $(pwd)/kcp --create-folder
 export PATH="$PATH:$(pwd)/kcp/bin"
 ```
 
-Run **kcp** with the following command:
+Start **kcp** with the following command:
 
 ```bash
 kcp start >& kcp_log.txt &
@@ -152,7 +152,7 @@ kind create cluster --name florin
 
 Detailed installation instructions for different operative systems are available here.
 
-### b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster
+### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
 
 Create a syncTarget and location objects to represent florin:
 
@@ -171,7 +171,7 @@ NAME                                AGE
 synctarget.workload.kcp.io/florin   58s
 ```
 
-Generate the edge syncer manifest
+Generate the edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
@@ -205,7 +205,7 @@ to verify the syncer pod is running.
 
 An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
 
-Now deploy the edge syncer to florin edge cluster:
+Now deploy the edge syncer to the `florin` edge cluster:
 
   
 ```shell
