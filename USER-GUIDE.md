@@ -138,13 +138,14 @@ ensure-wmw.sh "wmw-1"
 
 ## 4. Example deployment of nginx workload into a kind local cluster
 
-a. Stand up a local florin kind cluster
+ 
+### a. Stand up a local florin kind cluster
 
 ```shell
 kind create cluster --name florin
 ```  
 
-b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster
+### b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster
 
 Create a syncTarget and location objects to represent florin:
 
@@ -231,9 +232,7 @@ kube-system                       kube-scheduler-florin-control-plane           
 local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
 ``` 
 
-
-
-c. Create the nginx workload and edge placement to deploy it to the florin cluster
+### c. Create the nginx workload and edge placement to deploy it to the florin cluster
 ...
 
 ## 5. Cleanup the environment
