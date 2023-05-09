@@ -232,7 +232,7 @@ kube-system                       kube-scheduler-florin-control-plane           
 local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
 ``` 
 
-### c. Create the nginx workload and edge placement to deploy it to the florin cluster
+### c. Create the nginx workload and deploy it to the florin cluster
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
 
@@ -268,7 +268,7 @@ kubectl ws root:my-org:wmw-1
   EOF
 ```
 
-Deploy an nginx workload:
+Deploy the nginx workload:
 
 ```console
   kubectl apply -f - <<EOF
