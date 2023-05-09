@@ -136,7 +136,7 @@ ensure-wmw.sh "wmw-1"
 ```
 
 
-## 4. Example deployment of nginx workload into a *kind local cluster
+## 4. Example deployment of nginx workload into a kind local cluster
 
 a. Stand up a local florin kind cluster
 
@@ -170,7 +170,10 @@ kubectl ws root:espw
 mailbox-prep.sh florin
 ```
 
-```shell
+
+which should yield something like:
+
+```console
 Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
 
 Creating service account "kcp-edge-syncer-florin-5c4r0a44"
@@ -192,7 +195,9 @@ to apply it. Use
 to verify the syncer pod is running.
 ```
 
-An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. Now deploy the edge syncer to florin edge cluster:
+An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
+
+Now deploy the edge syncer to florin edge cluster:
 
   
 ```console
