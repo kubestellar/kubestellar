@@ -235,7 +235,7 @@ local-path-storage                local-path-provisioner-684f458cdd-75wv8       
 
 ### c. Create the nginx workload and deploy it to the florin cluster
 
-Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
+Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object (`florin`) created earlier, thus directing the workload to your edge cluster.
 
 In the `wmw-1` workspace create the following `EdgePlacement` object: 
   
@@ -269,7 +269,7 @@ kubectl ws root:my-org:wmw-1
   EOF
 ```
 
-Deploy the nginx workload. Note the namespace matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
+Deploy the nginx workload. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
 
 ```console
   kubectl apply -f - <<EOF
