@@ -79,7 +79,7 @@ which should yield something like:
 
 ## 2. Install and run **KCP-Edge**
 
-Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder of your current working directory using the following command:
+Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-edge.sh) --version v0.1.0 --folder $(pwd)/kcp-edge --create-folder
