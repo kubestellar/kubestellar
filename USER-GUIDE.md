@@ -304,7 +304,7 @@ Deploy the nginx workload:
   EOF
   ```
 
-Check that the workloads are running in the edge clusters:
+Check that the deployment was created in the florin edge clusters:
 
 ```console
 KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
@@ -316,6 +316,8 @@ which should yield something like:
 NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 nginx-deployment   3/3     3            3           8m37s
 ```
+
+Also, check that the pods are running in the florin edge clusters:
 
 ```console
 KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
