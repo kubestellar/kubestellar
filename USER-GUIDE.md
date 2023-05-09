@@ -269,7 +269,7 @@ kubectl ws root:my-org:wmw-1
   EOF
 ```
 
-Deploy the nginx workload:
+Deploy the nginx workload. Note the namespace matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
 
 ```console
   kubectl apply -f - <<EOF
