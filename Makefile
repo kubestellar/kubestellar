@@ -106,20 +106,13 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build/syncer-kcp:
-	mkdir -p build && cd build && git clone https://github.com/yana1205/kcp syncer-kcp
-
-build/syncer-kcp/pkg/cliplugins/workload/plugin/edgesync.go: build/syncer-kcp
-	cd build/syncer-kcp && git checkout emc
-
 build: WHAT ?= ./cmd/... 
 #./tmc/cmd/...
-build: require-jq require-go require-git verify-go-versions build/syncer-kcp/pkg/cliplugins/workload/plugin/edgesync.go ## Build the project
+build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 #	ln -sf kubectl-workspace bin/kubectl-workspaces
 #	ln -sf kubectl-workspace bin/kubectl-ws
 	cp scripts/*.sh bin/
-	cd build/syncer-kcp && make build WHAT=./cmd/kubectl-kcp && cp bin/kubectl-kcp ../../bin/kubectl-kcpforedgesyncer
 .PHONY: build
 
 .PHONY: build-all

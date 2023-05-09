@@ -29,7 +29,7 @@ import (
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	workloadcmd "github.com/kcp-dev/edge-mc/cmd/kubectl-kcp/cliplugins/workload/cmd"
+	workloadcmd "github.com/kcp-dev/edge-mc/cmd/kubectl-kcpforedgesyncer/cliplugins/workload/cmd"
 )
 
 var reEmptyLine = regexp.MustCompile(`(?m)([\w[:punct:]])[ ]*\n([\w[:punct:]])`)

@@ -22,7 +22,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/kcp-dev/edge-mc/cmd/kubectl-kcp/cmd"
+	"github.com/kcp-dev/edge-mc/cmd/kubectl-kcpforedgesyncer/cmd"
 )
 
 func main() {

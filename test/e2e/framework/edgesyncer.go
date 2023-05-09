@@ -435,7 +435,7 @@ func RunKcpCliPlugin(t *testing.T, kubeconfigPath string, subcommand []string) [
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)
 
-	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcp")
+	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcpforedgesyncer")
 	kcpCliPluginCommand := []string{"go", "run", cmdPath}
 
 	cmdParts := append(kcpCliPluginCommand, subcommand...)

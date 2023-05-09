@@ -23,7 +23,7 @@ import (
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 
-	"github.com/kcp-dev/edge-mc/cmd/kubectl-kcp/cliplugins/workload/plugin"
+	"github.com/kcp-dev/edge-mc/cmd/kubectl-kcpforedgesyncer/cliplugins/workload/plugin"
 )
 
 var (
