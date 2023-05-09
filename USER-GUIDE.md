@@ -352,11 +352,11 @@ nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
 To uninstall kcp-edge run the following command:
 
 ```bash
-hack/kcp-edge.sh stop
+kcp-edge.sh stop
 ```
 
 To delete all the generated files (e.g., edge syncer manifests and logs files), remove kcp & kcp-edge run the following command:
 
 ```shell
-hack/clean-env.sh
+clean-env.sh
 ```
