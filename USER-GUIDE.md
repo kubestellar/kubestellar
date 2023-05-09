@@ -203,8 +203,12 @@ Now deploy the edge syncer to florin edge cluster:
 
   
 ```console
-$ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+```
 
+which should yield something like:
+
+```console
 namespace/kcp-edge-syncer-florin-5c4r0a44 created
 serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
 secret/kcp-edge-syncer-florin-5c4r0a44-token created
