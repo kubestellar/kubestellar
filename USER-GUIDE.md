@@ -13,7 +13,7 @@ Table of contents:
     - [a stand up a local florin kind cluster](#a-stand-up-a-local-florin-kind-cluster)
     - [b. create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-create-a-sync-target-,-placement,-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
     - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
-  - [5. Cleanup the environmen)](#-5-Cleanup-the-environment)
+  - [5. Cleanup the environmen](#-5-Cleanup-the-environment)
 
 This guide is intended to show how to quickly bring up a **KCP-Edge** environment with its dependencies from a binary release.
 
