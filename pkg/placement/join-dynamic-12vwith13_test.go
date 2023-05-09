@@ -28,7 +28,7 @@ import (
 func TestDynamicJoin12VWith13(t *testing.T) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
-	exerciseDynamicJoin12VWith13W[int, string, float32, complex64, Empty](
+	exerciseDynamicJoin12VWith13W(
 		t,
 		logger,
 		NewMapMapFactory[Pair[int, string], complex64](nil),

@@ -1387,7 +1387,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 		clusterScopedObjects: NewMapMap[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](nil),
 	}
 	if have {
-		nses := MapKeySet[NamespaceName, Set[logicalcluster.Name]](nsds.GetIndex1to2())
+		nses := MapKeySet(nsds.GetIndex1to2())
 		ans.namespaces = MapSetCopy(TransformVisitable[NamespaceName, string](nses, func(ns NamespaceName) string { return string(ns) }))
 	} else {
 		ans.namespaces = NewEmptyMapSet[string]()
@@ -1399,7 +1399,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 			logger.Error(nil, "No ProjectionModeVals for namespaced resources")
 			nsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
-		nsrs := MapKeySet[metav1.GroupResource, Set[logicalcluster.Name]](nsrds.GetIndex1to2())
+		nsrs := MapKeySet(nsrds.GetIndex1to2())
 		ans.namespacedResources = MapSetCopy(TransformVisitable[metav1.GroupResource, edgeapi.NamespaceScopeDownsyncResource](nsrs, func(gr metav1.GroupResource) edgeapi.NamespaceScopeDownsyncResource {
 			pmv, ok := nsms.Get(gr)
 			if !ok {
@@ -1417,7 +1417,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 			logger.Error(nil, "No ProjectionModeVals for cluster-scoped resources")
 			nnsms = NewMapMap[metav1.GroupResource, ProjectionModeVal](nil)
 		}
-		objs := MapKeySet[GroupResourceInstance, Set[logicalcluster.Name]](nnsds.GetIndex1to2())
+		objs := MapKeySet(nnsds.GetIndex1to2())
 		objs.Visit(func(gri GroupResourceInstance) error {
 			gr := gri.First
 			rscMode := wp.resourceModes(gr)
@@ -1429,7 +1429,7 @@ func (wp *workloadProjector) syncerConfigRelations(destination SinglePlacement) 
 			if !ok {
 				logger.Error(nil, "Missing API version", "obj", gri)
 			}
-			cso := MapGetAdd[metav1.GroupResource, Pair[ProjectionModeVal, MutableSet[string /*object name*/]]](ans.clusterScopedObjects, gr,
+			cso := MapGetAdd(ans.clusterScopedObjects, gr,
 				true, func(metav1.GroupResource) Pair[ProjectionModeVal, MutableSet[string /*object name*/]] {
 					return NewPair[ProjectionModeVal, MutableSet[string]](pmv, NewEmptyMapSet[string /*object name*/]())
 				})

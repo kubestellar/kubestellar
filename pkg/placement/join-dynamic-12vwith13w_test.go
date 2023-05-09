@@ -85,7 +85,7 @@ func exerciseDynamicJoin12VWith13W[Col1, Col2, Col3, Val, Wal comparable](
 					return Pair[Triple[Col1, Col2, Col3], Pair[Val, Wal]]{}, false
 				},
 			)
-			MapAddAll[Triple[Col1, Col2, Col3], Pair[Val, Wal]](expectedJoin, vj)
+			MapAddAll(expectedJoin, vj)
 			MapEnumerateDifferences[Triple[Col1, Col2, Col3], Pair[Val, Wal]](expectedJoin, joinReceiver,
 				MapChangeReceiverFuncs[Triple[Col1, Col2, Col3], Pair[Val, Wal]]{
 					OnCreate: func(key Triple[Col1, Col2, Col3], val Pair[Val, Wal]) {

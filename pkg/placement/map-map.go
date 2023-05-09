@@ -19,13 +19,13 @@ package placement
 // NewMapMap makes a new Map implemented by a Map, optionally with a given observer.
 // For providing initial values see AddArgs, AddAllByVisit, MapMapCopy below.
 func NewMapMap[Key comparable, Val any](observer MapChangeReceiver[Key, Val]) MapMap[Key, Val] {
-	return MintMapMap[Key, Val](map[Key]Val{}, observer)
+	return MintMapMap(map[Key]Val{}, observer)
 }
 
 // NewMapMapFactory makes a func that returns new Map implemented by a Map, optionally with a given observer.
 // In other words, this is the curried form of NewMapMap.
 func NewMapMapFactory[Key comparable, Val any](observer MapChangeReceiver[Key, Val]) func() MutableMap[Key, Val] {
-	return func() MutableMap[Key, Val] { return NewMapMap[Key, Val](observer) }
+	return func() MutableMap[Key, Val] { return NewMapMap(observer) }
 }
 
 // MintMapMap takes the given map and obervers puts the MapMap seal of approval on them.
@@ -55,7 +55,7 @@ func (mm MapMap[Key, Val]) AddAllByVisit(what Visitable[Pair[Key, Val]]) MapMap[
 
 // MapMapCopy creates a new MapMap holding what the given Visitable reported at construction time.
 func MapMapCopy[Key comparable, Val any](observer MapChangeReceiver[Key, Val], other Visitable[Pair[Key, Val]]) MapMap[Key, Val] {
-	return NewMapMap[Key, Val](observer).AddAllByVisit(other)
+	return NewMapMap(observer).AddAllByVisit(other)
 }
 
 var _ MutableMap[int, string] = MapMap[int, string]{}

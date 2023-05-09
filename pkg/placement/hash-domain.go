@@ -127,13 +127,13 @@ var HashLogicalClusterName = NewTransformHashDomain[logicalcluster.Name, string]
 
 var HashClusterString = PairHashDomain[logicalcluster.Name, string](HashLogicalClusterName, HashDomainString{})
 
-var factorExternalName = NewFactorer[ExternalName, logicalcluster.Name, string](
+var factorExternalName = NewFactorer(
 	func(whole ExternalName) Pair[logicalcluster.Name, string] { return NewPair(whole.Cluster, whole.Name) },
 	func(parts Pair[logicalcluster.Name, string]) ExternalName {
 		return ExternalName{parts.First, parts.Second}
 	})
 
-var HashExternalName = NewTransformHashDomain[ExternalName, Pair[logicalcluster.Name, string]](factorExternalName.First, HashClusterString)
+var HashExternalName = NewTransformHashDomain(factorExternalName.First, HashClusterString)
 
 type HashUpsyncSet struct{}
 

@@ -121,12 +121,12 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		)
 
-		nsToGoLoseNamespace := NewSetChangeProjectorByMapMap[NamespaceDistributionTuple, SourceAndDestination, NamespaceName](
+		nsToGoLoseNamespace := NewSetChangeProjectorByMapMap(
 			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, SinglePlacement](), nsSrcAndDestAndLog)
 
 		nsToGo := SetWriterFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
 
-		sbo.namespacedWhatWhereFull = NewSetChangeProjectorByMapMap[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/](
+		sbo.namespacedWhatWhereFull = NewSetChangeProjectorByMapMap(
 			factorNamespacedWhatWhereFullKey, nsToGo)
 
 		clusterDistributionsReceiver := SetWriterFuncs[NonNamespacedDistributionTuple]{
@@ -194,17 +194,16 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			clusterChangeReceiver,
 		)
 
-		upsyncsRelay := SetWriterFuncs[Pair[SinglePlacement, edgeapi.UpsyncSet]]{
-			OnAdd: func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
+		upsyncsRelay := NewSetWriterFuncs(
+			func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
 				logger.V(4).Info("Upsyncs added", "tuple", tup)
 				return sbo.workloadProjectionSections.Upsyncs.Add(tup)
 			},
-			OnRemove: func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
+			func(tup Pair[SinglePlacement, edgeapi.UpsyncSet]) bool {
 				logger.V(4).Info("Upsyncs removed", "tuple", tup)
 				return sbo.workloadProjectionSections.Upsyncs.Remove(tup)
-			}}
-		sbo.upsyncsFull = NewSetChangeProjectorByHashMap[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement],
-			Pair[SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */](
+			})
+		sbo.upsyncsFull = NewSetChangeProjectorByHashMap(
 			factorUpsyncTuple,
 			upsyncsRelay,
 			PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),

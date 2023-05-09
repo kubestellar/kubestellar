@@ -85,7 +85,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	NamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	NonNamespacedDistributions := NewMapSet[NonNamespacedDistributionTuple]()
 	NonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
-	Upsyncs := NewHashSet[Pair[SinglePlacement, edgeapi.UpsyncSet]](PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
+	Upsyncs := NewHashSet(PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
 	projectionTracker := WorkloadProjectionSections{
 		NamespaceDistributions:          NamespaceDistributions,
 		NamespacedResourceDistributions: NamespacedResourceDistributions,
@@ -125,7 +125,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 			},
 		})
 
-	expectedUpsyncs := NewHashSet[Pair[SinglePlacement, edgeapi.UpsyncSet]](
+	expectedUpsyncs := NewHashSet(
 		PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
 		NewPair(sp1, ups1[0]),
 		NewPair(sp1, ups1[1]))

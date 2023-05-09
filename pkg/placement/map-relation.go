@@ -31,7 +31,7 @@ func NewMapRelation2[First, Second comparable](pairs ...Pair[First, Second]) Sin
 // by an index on the first column.
 // The representation is based on HashMaps.
 func NewHashRelation2[First, Second any](hashDomainFirst HashDomain[First], hashDomainSecond HashDomain[Second], pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
-	return NewSingleIndexedRelation2[First, Second](
+	return NewSingleIndexedRelation2(
 		func(First) MutableSet[Second] { return NewHashSet(hashDomainSecond) },
 		NewHashMap[First, MutableSet[Second]](hashDomainFirst)(nil),
 		pairs...,

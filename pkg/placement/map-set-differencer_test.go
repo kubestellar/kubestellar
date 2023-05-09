@@ -33,7 +33,7 @@ func TestMapSetDifferencer(t *testing.T) {
 	reportedNew := NewMapSet[int]()
 	reportToGone := SetWriterReverse[int](reportedGone)
 	checkingReceiver := SetWriterFork[int](false, reportedNew, reportToGone)
-	differ := NewSetDifferenceByMapAndEnum[MapSet[int], int](MapSetAsVisitable[int], checkingReceiver)
+	differ := NewSetDifferenceByMapAndEnum(MapSetAsVisitable[int], checkingReceiver)
 	current := NewMapSet[int]()
 	for iteration := 1; iteration < 100; iteration++ {
 		next := genSet()
