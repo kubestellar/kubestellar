@@ -233,6 +233,112 @@ local-path-storage                local-path-provisioner-684f458cdd-75wv8       
 ``` 
 
 ### c. Create the nginx workload and edge placement to deploy it to the florin cluster
-...
+
+Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object created earlier, thus directing the workload to your edge cluster.
+
+In the `wmw-1` workspace create the following `EdgePlacement` object: 
+  
+```console
+kubectl ws root:my-org:wmw-1
+```
+
+```console
+  kubectl apply -f - <<EOF
+  apiVersion: edge.kcp.io/v1alpha1
+  kind: EdgePlacement
+  metadata:
+    name: edge-placement-c
+  spec:
+    locationSelectors:
+    - matchLabels: {"env":"prod"}
+    namespaceSelector:
+      matchLabels: {"common":"si"}
+    nonNamespacedObjects:
+    - apiGroup: apis.kcp.io
+      resources: [ "apibindings" ]
+      resourceNames: [ "bind-kube" ]
+    upsync:
+    - apiGroup: "group1.test"
+      resources: ["sprockets", "flanges"]
+      namespaces: ["orbital"]
+      names: ["george", "cosmo"]
+    - apiGroup: "group2.test"
+      resources: ["cogs"]
+      names: ["william"]
+  EOF
+```
+
+Deploy an nginx workload:
+
+```console
+  kubectl apply -f - <<EOF
+  apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: commonstuff
+    labels: {common: "si"}
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: nginx-deployment
+    namespace: commonstuff
+    labels:
+      app: nginx
+  spec:
+    replicas: 3
+    selector:
+      matchLabels:
+        app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+          - containerPort: 80
+  EOF
+  ```
+
+Check that the workloads are running in the edge clusters:
+
+```console
+KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
+```
+
+which should yield something like:
+
+```console
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           8m37s
+```
+
+```console
+KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
+```
+
+which should yield something like:
+
+```console
+NAME                                READY   STATUS    RESTARTS   AGE
+nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
+nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
+nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
+```
 
 ## 5. Cleanup the environment
+
+To uninstall kcp-edge run the following command:
+
+```bash
+hack/kcp-edge.sh stop
+```
+
+To delete all the generated files (e.g., edge syncer manifests and logs files), remove kcp & kcp-edge run the following command:
+
+```shell
+hack/clean-env.sh
+```
