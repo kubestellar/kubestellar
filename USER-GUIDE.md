@@ -202,7 +202,7 @@ An edge syncer manifest yaml file is created in your current director: `florin-s
 Now deploy the edge syncer to florin edge cluster:
 
   
-```console
+```shell
 KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
 ```
 
@@ -223,7 +223,12 @@ deployment.apps/kcp-edge-syncer-florin-5c4r0a44 created
 Check that the edge syncer pod is running:
 
 ```console
-$ KUBECONFIG=$florin_kubeconfig kubectl get pods -A
+KUBECONFIG=$florin_kubeconfig kubectl get pods -A
+```
+
+which should yield something like:
+
+```console
 NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
 kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
 kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
