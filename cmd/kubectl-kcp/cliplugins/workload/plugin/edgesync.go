@@ -38,17 +38,13 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	apixv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	apix "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -314,35 +310,6 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return "", "", nil, fmt.Errorf("failed to create kubernetes client: %w", err)
-	}
-
-	apixClientSet, err := apix.NewForConfig(config)
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to create apiextension kubernetes client: %w", err)
-	}
-	crdByte, err := embeddedResources.ReadFile("edge.kcp.io_edgesyncconfigs.yaml")
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to load edgeSyncConfig CRD yaml: %w", err)
-	}
-	decoder := yaml.NewYAMLToJSONDecoder(bytes.NewReader(crdByte))
-
-	var u unstructured.Unstructured
-	err = decoder.Decode(&u)
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to decode edgeSyncConfig CRD yaml: %w", err)
-	}
-	var crd apixv1.CustomResourceDefinition
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u.Object, &crd)
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to convert to edgeSyncConfig CRD: %w", err)
-	}
-
-	_, err = apixClientSet.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, crd.Name, metav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		_, err = apixClientSet.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, &crd, metav1.CreateOptions{})
-		if err != nil {
-			return "", "", nil, fmt.Errorf("failed to create edgeSyncConfig CRD: %w", err)
-		}
 	}
 
 	var syncConfig *unstructured.Unstructured

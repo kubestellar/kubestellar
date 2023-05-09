@@ -83,6 +83,18 @@ var apibindingGVR = schema.GroupVersionResource{
 	Resource: "apibindings",
 }
 
+var edgeSyncConfigGVR = schema.GroupVersionResource{
+	Group:    "edge.kcp.io",
+	Version:  "v1alpha1",
+	Resource: "edgesyncconfigs",
+}
+
+var syncerConfigGVR = schema.GroupVersionResource{
+	Group:    "edge.kcp.io",
+	Version:  "v1alpha1",
+	Resource: "syncerconfigs",
+}
+
 type SyncerOption func(t *testing.T, fs *edgeSyncerFixture)
 
 func NewEdgeSyncerFixture(t *testing.T, server framework.RunningServer, path logicalcluster.Path) *edgeSyncerFixture {
@@ -118,33 +130,13 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	require.NoError(t, err)
 	_, kubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 
-	// Modify root:compute so that Syncer can update deployment.status
-	modifyRootCompute(t, upstreamRawConfig)
-
-	syncerImage := framework.TestConfig.SyncerImage()
-	if useDeployedSyncer {
-		require.NotZero(t, len(syncerImage), "--syncer-image must be specified if testing with a deployed syncer")
-	} else {
-		// The image needs to be a non-empty string for the plugin command but the value doesn't matter if not deploying a syncer.
-		syncerImage = "not-a-valid-image"
-	}
-
-	// Run the plugin command to enable the edge syncer and collect the resulting yaml
-	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
-	pluginArgs := []string{
-		"workload",
-		"edge-sync",
-		sf.edgeSyncTargetName,
-		"--syncer-image=" + syncerImage,
-		"--output-file=-",
-	}
-
-	syncerYAML := RunKcpCliPlugin(t, kubeconfigPath, pluginArgs)
-
 	var downstreamConfig *rest.Config
 	var downstreamKubeconfigPath string
+	syncerImage := framework.TestConfig.SyncerImage()
+
 	if useDeployedSyncer {
 		// Test code is not implemented yet
+		require.NotZero(t, len(syncerImage), "--syncer-image must be specified if testing with a deployed syncer")
 	} else {
 		// The syncer will target a logical cluster that is a child of the current workspace. A
 		// logical server provides as a lightweight approximation of a pcluster for tests that
@@ -152,29 +144,12 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 		downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
 		downstreamConfig = downstreamServer.BaseConfig(t)
 		downstreamKubeconfigPath = downstreamServer.KubeconfigPath()
+		syncerImage = "not-a-valid-image"
 	}
 
-	// Apply the yaml output from the plugin to the downstream server
-	framework.KubectlApply(t, downstreamKubeconfigPath, syncerYAML)
+	// Modify root:compute so that Syncer can update deployment.status
+	modifyRootCompute(t, upstreamRawConfig)
 
-	// Extract the configuration for an in-process syncer from the resources that were
-	// applied to the downstream server. This maximizes the parity between the
-	// configuration of a deployed and in-process syncer.
-	var syncerID string
-	for _, doc := range strings.Split(string(syncerYAML), "\n---\n") {
-		var manifest struct {
-			metav1.ObjectMeta `json:"metadata"`
-		}
-		err := yaml.Unmarshal([]byte(doc), &manifest)
-		require.NoError(t, err)
-		if manifest.Namespace != "" {
-			syncerID = manifest.Namespace
-			break
-		}
-	}
-	require.NotEmpty(t, syncerID, "failed to extract syncer namespace from yaml produced by plugin:\n%s", string(syncerYAML))
-
-	syncerConfig := syncerConfigFromCluster(t, downstreamConfig, syncerID, syncerID)
 	downstreamKubeClient, err := kubernetesclient.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
@@ -189,10 +164,17 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	require.NoError(t, err)
 
 	var syncerConfigCRDUnst *unstructured.Unstructured
-	err = LoadFile("testdata/edge.kcp.io_syncerconfigs.yaml", embedded, &syncerConfigCRDUnst)
+	err = LoadFile(repositoryDir()+"/config/crds/edge.kcp.io_syncerconfigs.yaml", &osReader{}, &syncerConfigCRDUnst)
 	require.NoError(t, err)
 	t.Logf("Create SyncerConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
 	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), syncerConfigCRDUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	var edgeSyncConfigCRDUnst *unstructured.Unstructured
+	err = LoadFile(repositoryDir()+"/config/crds/edge.kcp.io_edgesyncconfigs.yaml", &osReader{}, &edgeSyncConfigCRDUnst)
+	require.NoError(t, err)
+	t.Logf("Create EdgeSyncConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
+	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), edgeSyncConfigCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	var apibindingUnst *unstructured.Unstructured
@@ -223,6 +205,16 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 			t.Logf("error seen waiting for pods crd to become active: %v", err)
 			return false
 		}
+		_, err = upstreamDynamicKubeClient.Resource(edgeSyncConfigGVR).List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for EdgeSyncConfig API to be available: %v", err)
+			return false
+		}
+		_, err = upstreamDynamicKubeClient.Resource(syncerConfigGVR).List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for SyncerConfig API to be available: %v", err)
+			return false
+		}
 		return true
 	}, wait.ForeverTestTimeout, time.Millisecond*100)
 
@@ -231,6 +223,40 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	require.NoError(t, err)
 	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
 	require.NoError(t, err)
+
+	// Run the plugin command to enable the edge syncer and collect the resulting yaml
+	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
+	pluginArgs := []string{
+		"workload",
+		"edge-sync",
+		sf.edgeSyncTargetName,
+		"--syncer-image=" + syncerImage,
+		"--output-file=-",
+	}
+
+	syncerYAML := RunKcpCliPlugin(t, kubeconfigPath, pluginArgs)
+
+	// Apply the yaml output from the plugin to the downstream server
+	framework.KubectlApply(t, downstreamKubeconfigPath, syncerYAML)
+
+	// Extract the configuration for an in-process syncer from the resources that were
+	// applied to the downstream server. This maximizes the parity between the
+	// configuration of a deployed and in-process syncer.
+	var syncerID string
+	for _, doc := range strings.Split(string(syncerYAML), "\n---\n") {
+		var manifest struct {
+			metav1.ObjectMeta `json:"metadata"`
+		}
+		err := yaml.Unmarshal([]byte(doc), &manifest)
+		require.NoError(t, err)
+		if manifest.Namespace != "" {
+			syncerID = manifest.Namespace
+			break
+		}
+	}
+	require.NotEmpty(t, syncerID, "failed to extract syncer namespace from yaml produced by plugin:\n%s", string(syncerYAML))
+
+	syncerConfig := syncerConfigFromCluster(t, downstreamConfig, syncerID, syncerID)
 
 	return &appliedEdgeSyncerFixture{
 		edgeSyncerFixture: *sf,
@@ -382,7 +408,18 @@ func modifyRootCompute(t *testing.T, upstreamRawConfig clientcmdapi.Config) {
 	}
 }
 
-func LoadFile(path string, embedded embed.FS, v interface{}) error {
+type reader interface {
+	ReadFile(string) ([]byte, error)
+}
+
+type osReader struct {
+}
+
+func (o *osReader) ReadFile(name string) ([]byte, error) {
+	return os.ReadFile(name)
+}
+
+func LoadFile(path string, embedded reader, v interface{}) error {
 	data, err := embedded.ReadFile(path)
 	if err != nil {
 		return err
