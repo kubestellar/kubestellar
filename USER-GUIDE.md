@@ -89,8 +89,7 @@ export PATH="$PATH:$(pwd)/kcp-edge/bin"
 Start **KCP-Edge** with the following command:
 
 ```bash
-# NOTE: need to change the command below when merged into edge-mc or included in release binaries
-bash <(curl -s https://raw.githubusercontent.com/dumb0002/edge-mc/script/hack/kcp-edge.sh) start --user kit
+kcp-edge.sh start --user kit
 ```
 
 Check that `KCP-Edge` controllers are running with the following command:
