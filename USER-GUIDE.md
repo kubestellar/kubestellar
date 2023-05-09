@@ -1,4 +1,5 @@
-# **KCP-Edge** quick start
+# **KCP-Edge** User Guide
+
 
 Table of contents:
 
