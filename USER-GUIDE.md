@@ -150,7 +150,7 @@ ensure-wmw.sh "wmw-1"
 kind create cluster --name florin
 ```  
 
-Detailed installation instructions for different operative systems are available here.
+To install kind in your environment follow the instructions [here](https://kind.sigs.k8s.io/).
 
 ### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
 
