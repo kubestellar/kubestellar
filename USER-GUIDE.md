@@ -3,17 +3,17 @@
 
 Table of contents:
 
-- [**KCP-Edge** quick start](#kcp-edge-quick-start)
-  - [1. Install **KCP-Edge** pre-requisites](#1-install-kcp-edge-pre-requisites)
-    - [a. `kubectl`](#a-kubectl)
-    - [b. `kcp`](#b-kcp)
-  - [2. Install and run **KCP-Edge**](#2-install-and-run-kcp-edge)
-  - [3. Create a **KCP-Edge** Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#3-create-a-kcp-edge-inventory-management-workspace-imw)
-  - [4. Example deployment of nginx workload into a kind local cluster](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
-    - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
-    - [b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
-    - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
-  - [5. Cleanup the environment](#5-Cleanup-the-environment)
+- [1. Install **KCP-Edge** pre-requisites](#1-install-kcp-edge-pre-requisites)
+  - [a. `kubectl`](#a-kubectl)
+  - [b. `kcp`](#b-kcp)
+- [2. Install and run **KCP-Edge**](#2-install-and-run-kcp-edge)
+- [3. Create a **KCP-Edge** Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#3-create-a-kcp-edge-inventory-management-workspace-imw)
+- [4. Example deployment of nginx workload into a kind local cluster](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
+  - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
+  - [b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
+  - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
+- [5. Cleanup the environment](#5-Cleanup-the-environment)
+
 
 This guide is intended to show how to quickly bring up a **KCP-Edge** environment with its dependencies from a binary release.
 
