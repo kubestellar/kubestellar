@@ -157,7 +157,7 @@ To install kind in your environment follow the instructions [here](https://kind.
 Create a syncTarget and location objects to represent florin:
 
 ```shell
-kcp-edge --create_inv florin  env=prod    # replaces ensure-location.sh florin  env=prod
+kcp-edge --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
 ```
 
 The following commands list the objects that were created:
@@ -175,7 +175,7 @@ Generate the edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-kcp-edge --edge_syncer florin  # replaces: mailbox-prep.sh florin
+kcp-edge --syncer florin  # replaces: mailbox-prep.sh florin
 ```
 
 
