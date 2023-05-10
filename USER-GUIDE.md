@@ -12,7 +12,7 @@ This guide is intended to explain how KCP-Edge works with a detailed example.
 
 ### 1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
 
-Create your edge clusters or bring your own k8s edge clusters. In this example, we deploy only a single cluster using [kind](https://kind.sigs.k8s.io/). Our edge cluster is named “florin”:
+Bring your own k8s edge clusters. In this example, we deploy only a single cluster using [kind](https://kind.sigs.k8s.io/). Our edge cluster is named “florin”:
 
 ```shell
 kind create cluster --name florin
