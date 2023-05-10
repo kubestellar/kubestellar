@@ -65,13 +65,9 @@ In this case, the specified `<ip_address>` will appear in the generated `admin.k
 
 After few seconds, check that `kcp` is running using the command:
 
-```shell
-kubectl version --short
-```
-
-which should yield something like:
-
 ```console
+$ kubectl version --short
+
 Client Version: v1.25.3
 Kustomize Version: v4.5.7
 Server Version: v1.24.3+kcp-v0.11.0
@@ -79,13 +75,9 @@ Server Version: v1.24.3+kcp-v0.11.0
 
 Additionally, one can check the available virtual workspaces using the command:
 
-```bash
-kubectl ws tree
-```
+```console
+$ kubectl ws tree
 
-which should yield something like:
-
-```text
 .
 └── root
     └── compute
