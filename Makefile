@@ -106,20 +106,13 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build/syncer-kcp:
-	mkdir -p build && cd build && git clone https://github.com/yana1205/kcp syncer-kcp
-
-build/syncer-kcp/pkg/cliplugins/workload/plugin/edgesync.go: build/syncer-kcp
-	cd build/syncer-kcp && git checkout emc
-
 build: WHAT ?= ./cmd/... 
 #./tmc/cmd/...
-build: require-jq require-go require-git verify-go-versions build/syncer-kcp/pkg/cliplugins/workload/plugin/edgesync.go ## Build the project
+build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 #	ln -sf kubectl-workspace bin/kubectl-workspaces
 #	ln -sf kubectl-workspace bin/kubectl-ws
 	cp scripts/*.sh bin/
-	cd build/syncer-kcp && make build WHAT=./cmd/kubectl-kcp && cp bin/kubectl-kcp ../../bin/kubectl-kcpforedgesyncer
 .PHONY: build
 
 .PHONY: build-all
@@ -393,12 +386,9 @@ endif
 
 .PHONY: e2e-test-edge-syncer
 e2e-test-edge-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-# Please set a directory for kcp binaries contain edge-sync plugin (kubectl kcp workload edge-sync...). e.g. <your machine>/git/yana1205/kcp/bin
-e2e-test-edge-syncer: KCP_BIN_DIR ?=
 e2e-test-edge-syncer: TEST_ARGS ?= 
 e2e-test-edge-syncer: KIND_CLUSTER_NAME ?= e2e-kcp-edge 
 e2e-test-edge-syncer: e2e-test-edge-syncer-cleanup
-	export PATH="$(KCP_BIN_DIR):$$PATH" ; \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
@@ -414,16 +404,9 @@ e2e-test-edge-syncer-cleanup:
 	rm -rf $(WORK_DIR)/.kcp/.admin-token-store $(WORK_DIR)/.kcp/admin.kubeconfig
 	rm -rf $(WORK_DIR)/.kcp/apiserver.* $(WORK_DIR)/.kcp/sa.key
 
-# .PHONY: require-kind
-# require-kind:
-# 	kind get clusters | grep $(KIND_CLUSTER_NAME)
-# 	if [[ $$? == 0 ]];then \
-# 		kind get kubeconfig --name $(KIND_CLUSTER_NAME) > $(WORK_DIR)/.kcp/kind.kubeconfig.yaml ;\
-# 		echo kind cluster is ready ;\
-# 	else \
-# 	  mkdir -p "$(WORK_DIR)/.kcp" ;\
-# 	  kind create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig=$(WORK_DIR)/.kcp/kind.kubeconfig.yaml --wait 5m ;\
-# 	fi ;\
+.PHONY: test-syncer
+test-syncer:
+	$(GO_TEST) $(COUNT_ARG) `go list ./... | grep "/pkg/cliplugins\|/pkg/syncer"`
 
 .PHONY: test
 ifdef USE_GOTESTSUM
