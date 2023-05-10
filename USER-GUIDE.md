@@ -8,6 +8,7 @@
 
 ## Setup Instructions
 
+This guide is intended to explain how KCP-Edge works with a detailed example.
 
 ### 1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
 
