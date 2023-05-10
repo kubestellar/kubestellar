@@ -25,7 +25,7 @@ Detailed installation instructions for different operative systems are available
 
 ### b. `kcp`
 
-Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspace virtualization capability, we have to install `kcp` v0.11.0 binaries first by following the detailed installation instructions available [here](https://docs.kcp.io/kcp/main/) or by using the script below:
+Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspace virtualization capability, we have to install `kcp` v0.11.0 binaries first by following the detailed installation instructions available [on the kcp website](https://docs.kcp.io/kcp/main/#download-kcp) or by using the script below:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version v0.11.0 --folder $(pwd)/kcp --create-folder
