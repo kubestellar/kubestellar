@@ -154,7 +154,7 @@ kind create cluster --name florin
 
 ### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
 
-Create a syncTarget and location inventory objects to represent the edge cluster(`florin`):
+Create a syncTarget and location inventory objects to represent the edge cluster (`florin`):
 
 ```shell
 kcp-edge --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
