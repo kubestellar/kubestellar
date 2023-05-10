@@ -146,11 +146,11 @@ kcp-edge --create_wmw wmw-1  # replaces: ensure-wmw.sh "wmw-1"
  
 ### a. Stand up a local florin kind cluster
 
+To install kind in your environment follow the instructions [here](https://kind.sigs.k8s.io/). To use kind, you will also need to [install docker](https://docs.docker.com/get-docker/).
+
 ```shell
 kind create cluster --name florin
 ```  
-
-To install kind in your environment follow the instructions [here](https://kind.sigs.k8s.io/).
 
 ### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
 
