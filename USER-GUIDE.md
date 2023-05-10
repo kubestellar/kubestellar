@@ -137,7 +137,7 @@ Create an **WMW** named `wmw-1` in a `my-org` workspace with the following comma
 ```shell
 kubectl ws root
 kubectl ws create "my-org"
-kcp-edge --config_wmw wmw-1  # replaces: ensure-wmw.sh "wmw-1"
+kcp-edge --create_wmw wmw-1  # replaces: ensure-wmw.sh "wmw-1"
 ```
 
 
@@ -157,7 +157,7 @@ To install kind in your environment follow the instructions [here](https://kind.
 Create a syncTarget and location objects to represent florin:
 
 ```shell
-kcp-edge --config_location florin  env=prod    # replaces ensure-location.sh florin  env=prod
+kcp-edge --create_inv florin  env=prod    # replaces ensure-location.sh florin  env=prod
 ```
 
 The following commands list the objects that were created:
