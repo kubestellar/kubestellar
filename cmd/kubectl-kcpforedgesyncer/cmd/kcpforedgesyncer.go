@@ -42,8 +42,8 @@ func doc(s string) string {
 
 func KubectlKcpCommand() *cobra.Command {
 	root := &cobra.Command{
-		Use:   "kcp",
-		Short: "kubectl plugin for KCP",
+		Use:   "kcpforedgesyncer",
+		Short: "kubectl plugin for KCP for EdgeSyncer",
 		Long: doc(`
 			KCP is the easiest way to manage Kubernetes applications against one or
 			more clusters, by giving you a personal control plane that schedules your
@@ -53,7 +53,7 @@ func KubectlKcpCommand() *cobra.Command {
 			and enabling collaboration for individual teams without having access to
 			the underlying clusters.
 
-			This command provides KCP specific sub-command for kubectl.
+			This command provides KCP for EdgeSyncer specific sub-command for kubectl.
 		`),
 		SilenceUsage:  true,
 		SilenceErrors: true,
