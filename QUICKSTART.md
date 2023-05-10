@@ -70,26 +70,26 @@ which should yield something like:
 
 Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
 
-```bash
+```shell
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-edge.sh) --version v0.1.0 --folder $(pwd)/kcp-edge --create-folder
 export PATH="$PATH:$(pwd)/kcp-edge/bin"
 ```
 
 Start **KCP-Edge** with the following command:
 
-```bash
+```shell
 kcp-edge start --user kit
 ```
 
 Check that `KCP-Edge` controllers are running with the following command:
 
-```bash
+```shell
 ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
 ```
 
 which should yield something like:
 
-```text
+```console
 user     1892  0.0  0.3 747644 29628 pts/1    Sl   10:51   0:00 mailbox-controller --inventory-context=root --mbws-context=base -v=2
 user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 scheduler -v 2 --root-user kcp-admin --root-cluster root --sysadm-context system:admin --sysadm-user shard-admin
 user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator --allclusters-context system:admin -v=2
@@ -97,13 +97,13 @@ user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-transl
 
 Check that the Edge Service Provider Workspace (`espw`) is created with the following command:
 
-```bash
+```shell
 kubectl ws tree
 ```
 
 which should yield:
 
-```text
+```console
 .
 └── root
     ├── compute
@@ -115,7 +115,7 @@ which should yield:
 **IMW** are used by **KCP-Edge** to store *sync targets* and *placement* objects.
 Create an **IMW** named `imw-1` with the following command:
 
-```bash
+```shell
 kubectl ws root
 kubectl ws create "imw-1"
 ```
