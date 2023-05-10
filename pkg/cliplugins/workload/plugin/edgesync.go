@@ -53,7 +53,7 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/edge-mc/cmd/kubectl-kcpforedgesyncer/cliplugins/base"
+	"github.com/kcp-dev/edge-mc/pkg/cliplugins/base"
 	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	"github.com/kcp-dev/kcp/pkg/cliplugins/helpers"
 	"github.com/kcp-dev/logicalcluster/v3"

@@ -386,7 +386,6 @@ endif
 
 .PHONY: e2e-test-edge-syncer
 e2e-test-edge-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-# Please set a directory for kcp binaries contain edge-sync plugin (kubectl kcp workload edge-sync...). e.g. <your machine>/git/yana1205/kcp/bin
 e2e-test-edge-syncer: TEST_ARGS ?= 
 e2e-test-edge-syncer: KIND_CLUSTER_NAME ?= e2e-kcp-edge 
 e2e-test-edge-syncer: e2e-test-edge-syncer-cleanup
@@ -405,16 +404,9 @@ e2e-test-edge-syncer-cleanup:
 	rm -rf $(WORK_DIR)/.kcp/.admin-token-store $(WORK_DIR)/.kcp/admin.kubeconfig
 	rm -rf $(WORK_DIR)/.kcp/apiserver.* $(WORK_DIR)/.kcp/sa.key
 
-# .PHONY: require-kind
-# require-kind:
-# 	kind get clusters | grep $(KIND_CLUSTER_NAME)
-# 	if [[ $$? == 0 ]];then \
-# 		kind get kubeconfig --name $(KIND_CLUSTER_NAME) > $(WORK_DIR)/.kcp/kind.kubeconfig.yaml ;\
-# 		echo kind cluster is ready ;\
-# 	else \
-# 	  mkdir -p "$(WORK_DIR)/.kcp" ;\
-# 	  kind create cluster --name $(KIND_CLUSTER_NAME) --kubeconfig=$(WORK_DIR)/.kcp/kind.kubeconfig.yaml --wait 5m ;\
-# 	fi ;\
+.PHONY: test-syncer
+test-syncer:
+	$(GO_TEST) $(COUNT_ARG) `go list ./... | grep "/pkg/cliplugins\|/pkg/syncer"`
 
 .PHONY: test
 ifdef USE_GOTESTSUM

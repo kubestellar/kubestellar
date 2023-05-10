@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/evanphx/json-patch v5.6.0+incompatible
+	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0
 	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0
 	github.com/kcp-dev/client-go v0.0.0-20230126185145-aeff170a288b
@@ -139,7 +140,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
-	github.com/google/go-cmp v0.5.8
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
