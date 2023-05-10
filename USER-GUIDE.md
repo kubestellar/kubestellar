@@ -8,28 +8,8 @@
 
 ## Setup Instructions
 
-### 1. Clone the kcp-edge repo:
 
-```shell
-git clone https://github.com/kcp-dev/edge-mc.git
-```
-
-
-### 2. Build the kcp-edge binaries:
-
-```shell
-cd edge-mc
-make build
-```
-
-The kcp-edge binaries is created inside the `./bin` directory. Add this directory to your $PATH:
-
-```shell
-export PATH="$PATH:$(pwd)/bin"
-```
-
-
-### 3. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
+### 1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
 
 Create your edge clusters or bring your own k8s edge clusters. In this example, we deploy only a single cluster using [kind](https://kind.sigs.k8s.io/). Our edge cluster is named “florin”:
 
@@ -37,7 +17,7 @@ Create your edge clusters or bring your own k8s edge clusters. In this example, 
 kind create cluster --name florin
 ```  
 
-### 4. Install KCP
+### 2. Install KCP
 
 Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspace virtualization capability, we have to install `kcp` v0.11.0 binaries first by following the detailed installation instructions available [on the kcp website](https://docs.kcp.io/kcp/main/#download-kcp) or by using the script below:
 
@@ -83,7 +63,7 @@ $ kubectl ws tree
     └── compute
 ```
 
-### 5. Deploy the kcp-edge platform
+### 3. Deploy the kcp-edge platform
          
   Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
 
@@ -119,7 +99,7 @@ $ kubectl ws tree
   user    11323   0.0  0.1 34892244  20780 s001  S     8:36PM   0:00.13 mailbox-controller --inventory-context=root --mbws-context=base -v=2
   ```
 
-### 6. Connect your edge cluster to the kcp-edge platform:
+### 4. Connect your edge cluster to the kcp-edge platform:
 
   a) Create an inventory management workspace (`imw`):
 
@@ -238,7 +218,7 @@ $ kubectl ws tree
   ``` 
 
 
-### 7. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
+### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
 
   a) Create a workload management workspace (`wmw`):
   
@@ -488,7 +468,7 @@ $ kubectl ws tree
   nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
   ```
 
-### 8. Install up your kcp-edge environment:
+### 6. Install up your kcp-edge environment:
 
 To uninstall kcp-edge run the following command:
 
