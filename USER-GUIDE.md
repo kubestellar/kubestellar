@@ -115,7 +115,7 @@ $ kubectl ws tree
   b) Create a syncTarget and location objects to represent your edge cluster (florin):
 
   ```console
-  $ ensure-location.sh florin  env=prod
+  $ kcp-edge --create_inv_item florin  env=prod
 
   synctarget.workload.kcp.io/florin created
   location.scheduling.kcp.io/florin created
