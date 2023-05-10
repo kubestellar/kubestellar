@@ -156,7 +156,7 @@ $ kubectl ws tree
   $ kubectl ws root:espw
   Current workspace is "root:espw".
 
-  $ mailbox-prep.sh florin
+  $ kcp-edge --syncer florin
 
   Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
 
@@ -226,7 +226,7 @@ $ kubectl ws tree
   $ kubectl ws root
   $ kubectl ws create my-org --enter
 
-  $ ensure-wmw.sh wmw-1
+  $ kcp-edge --create_wmw wmw-1
 
   Current workspace is "root".
   Current workspace is "root:my-org".
@@ -473,11 +473,11 @@ $ kubectl ws tree
 To uninstall kcp-edge run the following command:
 
 ```bash
-hack/kcp-edge.sh stop
+kcp-edge stop
 ```
 
-To delete all the generated files (e.g., edge syncer manifests and logs files), remove kcp & kcp-edge run the following command:
+To uninstall kcp, kcp-edge and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
 
 ```shell
-hack/clean-env.sh
+kcp-edge cleanup
 ```
