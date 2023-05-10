@@ -219,9 +219,6 @@ spec:
     - commonstuff
     - specialstuff
     resources:
-    - apiVersion: v1alpha1
-      group: edge.kcp.io
-      resource: customizers
     - apiVersion: v1
       group: ""
       resource: limitranges
@@ -373,9 +370,6 @@ spec:
     - apiVersion: v1
       group: ""
       resource: configmaps
-    - apiVersion: v1alpha1
-      group: edge.kcp.io
-      resource: customizers
     - apiVersion: v1
       group: apps
       resource: deployments
