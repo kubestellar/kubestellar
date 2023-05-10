@@ -39,7 +39,7 @@ func MapSetCopy[Elt comparable](source Visitable[Elt]) MapSet[Elt] {
 }
 
 func MapSetCopier[Elt comparable]() Reducer[Elt, MapSet[Elt]] {
-	return StatefulReducer[Elt, MapSet[Elt], MapSet[Elt]](NewEmptyMapSet[Elt], MapSetAddNoResult[Elt], Identity1[MapSet[Elt]])
+	return StatefulReducer(NewEmptyMapSet[Elt], MapSetAddNoResult[Elt], Identity1[MapSet[Elt]])
 }
 
 func MapSetAsVisitable[Elt comparable](ms MapSet[Elt]) Visitable[Elt] { return ms }

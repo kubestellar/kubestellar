@@ -89,7 +89,7 @@ func NewSetBinder(
 		}
 
 		var downsyncJoinRightInput, upsyncJoinRightInput SetWriter[Pair[ExternalName, SinglePlacement]]
-		sb.downsyncJoinLeftInput, downsyncJoinRightInput = NewDynamicFullJoin12VWith13[ExternalName, WorkloadPartID, SinglePlacement, WorkloadPartDetails](sb.logger,
+		sb.downsyncJoinLeftInput, downsyncJoinRightInput = NewDynamicFullJoin12VWith13(sb.logger,
 			NewMappingReceiverFuncs(
 				func(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], workloadPartDetails WorkloadPartDetails) {
 					sb.logger.V(4).Info("Adding singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third, "details", workloadPartDetails)

@@ -17,7 +17,7 @@ limitations under the License.
 package placement
 
 func ResolvedWhatAsVisitable(rw WorkloadParts) Visitable[Pair[WorkloadPartID, WorkloadPartDetails]] {
-	return MintMapMap[WorkloadPartID, WorkloadPartDetails](rw, nil)
+	return MintMapMap(rw, nil)
 }
 
 func ResolvedWhereAsVisitable(rw ResolvedWhere) Visitable[SinglePlacement] { return rw }
@@ -72,11 +72,11 @@ var _ ResolvedWhereDifferencerConstructor = NewResolvedWhereDifferencer
 var _ DownsyncsDifferencerConstructor = NewWorkloadPartsDifferencer
 
 func NewResolvedWhereDifferencer(eltChangeReceiver SetWriter[SinglePlacement]) Receiver[ResolvedWhere] {
-	return NewSetDifferenceByMapAndEnum[ResolvedWhere, SinglePlacement](ResolvedWhereAsVisitable, eltChangeReceiver)
+	return NewSetDifferenceByMapAndEnum(ResolvedWhereAsVisitable, eltChangeReceiver)
 }
 
 func NewWorkloadPartsDifferencer(mappingReceiver MapChangeReceiver[WorkloadPartID, WorkloadPartDetails]) Receiver[WorkloadParts] {
-	return NewMapDifferenceByMapAndEnum[WorkloadParts, WorkloadPartID, WorkloadPartDetails](ResolvedWhatAsVisitable, mappingReceiver)
+	return NewMapDifferenceByMapAndEnum(ResolvedWhatAsVisitable, mappingReceiver)
 }
 
 func NewSetDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(SetType) Visitable[Elt], eltChangeReceiver SetWriter[Elt]) Receiver[SetType] {
@@ -90,7 +90,7 @@ func NewSetDifferenceByMapAndEnum[SetType any, Elt comparable](visitablize func(
 func NewMapDifferenceByMapAndEnum[MapType any, Key, Val comparable](visitablize func(MapType) Visitable[Pair[Key, Val]], mappingChangeReceiver MapChangeReceiver[Key, Val]) Receiver[MapType] {
 	return mapDifferenceByMapAndEnum[MapType, Key, Val]{
 		visitablize: visitablize,
-		current:     NewMapMap[Key, Val](mappingChangeReceiver),
+		current:     NewMapMap(mappingChangeReceiver),
 	}
 }
 
@@ -107,12 +107,12 @@ type mapDifferenceByMapAndEnum[MapType any, Key, Val comparable] struct {
 
 func (dme setDifferenceByMapAndEnum[SetType, Elt]) Receive(nextA SetType) {
 	nextS := dme.visitablize(nextA)
-	SetUpdateToMatch[Elt](dme.current, nextS, dme.eltChangeReceiver)
+	SetUpdateToMatch(dme.current, nextS, dme.eltChangeReceiver)
 }
 
 func (dme mapDifferenceByMapAndEnum[MapType, Key, Val]) Receive(nextA MapType) {
 	nextS := dme.visitablize(nextA)
-	MapUpdateToMatch[Key, Val](dme.current, nextS)
+	MapUpdateToMatch(dme.current, nextS)
 }
 
 func SetUpdateToMatch[Elt comparable](current MutableSet[Elt], target Visitable[Elt], eltChangeReceiver SetWriter[Elt]) {

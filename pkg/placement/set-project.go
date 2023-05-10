@@ -24,11 +24,11 @@ func NewSetChangeProjectorByMapMap[Whole any, PartA, PartB comparable](
 	factoring Factorer[Whole, PartA, PartB],
 	partAReceiver SetWriter[PartA],
 ) SetWriter[Whole] {
-	return NewSetChangeProjector[Whole, PartA, PartB](
+	return NewSetChangeProjector(
 		factoring,
 		partAReceiver,
 		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
-			return NewMapMap[PartA, MutableSet[PartB]](observer)
+			return NewMapMap(observer)
 		},
 		func(PartA) MutableSet[PartB] { return NewEmptyMapSet[PartB]() },
 	)
@@ -40,13 +40,13 @@ func NewSetChangeProjectorByHashMap[Whole, PartA, PartB any](
 	hashDomainA HashDomain[PartA],
 	hashDomainB HashDomain[PartB],
 ) SetWriter[Whole] {
-	return NewSetChangeProjector[Whole, PartA, PartB](
+	return NewSetChangeProjector(
 		factoring,
 		partAReceiver,
 		func(observer MapChangeReceiver[PartA, MutableSet[PartB]]) MutableMap[PartA, MutableSet[PartB]] {
 			return NewHashMap[PartA, MutableSet[PartB]](hashDomainA)(observer)
 		},
-		func(PartA) MutableSet[PartB] { return NewHashSet[PartB](hashDomainB) },
+		func(PartA) MutableSet[PartB] { return NewHashSet(hashDomainB) },
 	)
 }
 
@@ -62,7 +62,7 @@ func NewSetChangeProjector[Whole, PartA, PartB any](
 ) SetWriter[Whole] {
 	// indexerRep ignores the set of PartB and notifies partAReceiver of PartA set change
 	indexerRep := repMaker(MapKeySetReceiver[PartA, MutableSet[PartB]](partAReceiver))
-	indexer := NewGenericIndexedSet[Whole, PartA, PartB, MutableSet[PartB], Set[PartB]](
+	indexer := NewGenericIndexedSet(
 		// nil,
 		factoring,
 		innerSetFactory,

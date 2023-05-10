@@ -64,7 +64,7 @@ type SetWriter[Elt any] interface {
 	Remove(Elt) bool /* changed */
 }
 
-func NewSetWriterFuncs[Elt any](OnAdd, OnRemove func(Elt) bool) SetWriterFuncs[Elt] {
+func NewSetWriterFuncs[Elt any](OnAdd, OnRemove func(Elt) bool) SetWriter[Elt] {
 	return SetWriterFuncs[Elt]{OnAdd, OnRemove}
 }
 
@@ -433,7 +433,7 @@ func SetEqual[Elt any](set1, set2 Set[Elt]) bool {
 	if set1.LenIsCheap() {
 		return set1.Len() == set2.Len() && SetLessOrEqual(set1, set2)
 	}
-	return SetCompare[Elt](set1, set2).IsEqual()
+	return SetCompare(set1, set2).IsEqual()
 }
 
 func SetIntersection[Elt any](set1, set2 Set[Elt]) Set[Elt] {

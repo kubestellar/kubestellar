@@ -28,7 +28,7 @@ import (
 // of the join of those two tables --- in a passive stance (i.e., is in terms of the stream receivers).
 // Note: the uniformity of the input and output types means that this can be chained.
 func NewDynamicJoin12with13[ColX, ColY, ColZ comparable](logger klog.Logger, receiver SetWriter[Pair[ColY, ColZ]]) (SetWriter[Pair[ColX, ColY]], SetWriter[Pair[ColX, ColZ]]) {
-	indexerAsReceiver := NewSetChangeProjectorByMapMap[Triple[ColX, ColY, ColZ], Pair[ColY, ColZ], ColX](
+	indexerAsReceiver := NewSetChangeProjectorByMapMap(
 		TripleFactorerTo23and1[ColX, ColY, ColZ](),
 		receiver,
 	)
@@ -53,8 +53,8 @@ func NewDynamicFullJoin12with13Parametric[ColX, ColY, ColZ any](logger klog.Logg
 	dj := &dynamicJoin12with13[ColX, ColY, ColZ]{
 		logger:   logger,
 		receiver: receiver,
-		xyReln:   NewHashRelation2[ColX, ColY](hashDomainX, hashDomainY),
-		xzReln:   NewHashRelation2[ColX, ColZ](hashDomainX, hashDomainZ),
+		xyReln:   NewHashRelation2(hashDomainX, hashDomainY),
+		xzReln:   NewHashRelation2(hashDomainX, hashDomainZ),
 	}
 	dj.xyReln = Relation2WithObservers[ColX, ColY](dj.xyReln, extrapolateFwd1[ColX, ColY, ColZ]{dj.xzReln, receiver})
 	dj.xzReln = Relation2WithObservers[ColX, ColZ](dj.xzReln, extrapolateFwd1[ColX, ColZ, ColY]{dj.xyReln, TripleSetWriterReverse23[ColX, ColY, ColZ]{receiver}})

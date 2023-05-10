@@ -93,7 +93,7 @@ func TestFactorers(t *testing.T) {
 		gen.ExternalName(),
 		gen.ClusterName(),
 		gen.String()))
-	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name](
+	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer(
 		factorNamespacedJoinKeyLessNS,
 		gen.NamespacedJoinKeyLessnS(),
 		gen.ProjectionModeKey(),
@@ -110,11 +110,11 @@ func TestFactorers(t *testing.T) {
 		NewTriple(gen.ExternalName(), gen.UpsyncSet(), gen.SinglePlacement()),
 		NewPair(gen.SinglePlacement(), gen.UpsyncSet()),
 		gen.ExternalName()))
-	t.Run("PairFactorer", exerciseFactorer[Pair[int, string], int, string](PairFactorer[int, string](),
+	t.Run("PairFactorer", exerciseFactorer(PairFactorer[int, string](),
 		Pair[int, string]{rand.Intn(100) + 301, gen.String()},
 		rand.Intn(100)+3,
 		gen.String()))
-	t.Run("PairReverser", exerciseRotator[Pair[int, string], Pair[string, int]](PairReverser[int, string](),
+	t.Run("PairReverser", exerciseRotator(PairReverser[int, string](),
 		Pair[int, string]{rand.Intn(100) + 301, gen.String()},
 		Pair[string, int]{gen.String(), rand.Intn(100) + 301}))
 	t.Run("TripleFactorerTo23and1", exerciseFactorer(
@@ -127,7 +127,7 @@ func TestFactorers(t *testing.T) {
 		Triple[int, string, float32]{rand.Intn(100) + 200, gen.String(), rand.Float32()},
 		Pair[int, float32]{rand.Intn(100) - 200, rand.Float32()},
 		gen.String()))
-	t.Run("TripleReverser", exerciseRotator[Triple[int, string, float64], Triple[float64, string, int]](TripleReverser[int, string, float64](),
+	t.Run("TripleReverser", exerciseRotator(TripleReverser[int, string, float64](),
 		Triple[int, string, float64]{rand.Intn(100) + 301, gen.String(), rand.Float64()},
 		Triple[float64, string, int]{rand.Float64(), gen.String(), rand.Intn(100) + 301}))
 }

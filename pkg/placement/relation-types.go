@@ -85,7 +85,7 @@ func NewSingleIndexedRelation2[First, Second any](
 	secondSetFactory func(First) MutableSet[Second],
 	rep MutableMap[First, MutableSet[Second]],
 	pairs ...Pair[First, Second]) SingleIndexedRelation2[First, Second] {
-	wholeSet := NewGenericIndexedSet[Pair[First, Second], First, Second, MutableSet[Second], Set[Second]](
+	wholeSet := NewGenericIndexedSet(
 		PairFactorer[First, Second](),
 		secondSetFactory,
 		Identity1[MutableSet[Second]],
