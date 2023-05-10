@@ -93,8 +93,17 @@ which should yield something like:
 
 ### 5. Deploy the kcp-edge platform
          
-  ```bash
-  hack/kcp-edge.sh start
+  Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
+
+  ```shell
+  bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-edge.sh) --version v0.1.0 --folder $(pwd)/kcp-edge --create-folder
+  export PATH="$PATH:$(pwd)/kcp-edge/bin"
+  ```
+
+  Start **KCP-Edge** with the following command:
+
+  ```shell
+  kcp-edge start --user kit
   ```
 
   The following components are created:
