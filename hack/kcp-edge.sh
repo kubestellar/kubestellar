@@ -250,3 +250,4 @@ echo "****************************************"
 echo "Finished deploying kCP-EDGE controllers ...."
 echo "****************************************"
 kubectl ws root
+
