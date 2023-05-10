@@ -45,13 +45,16 @@ import (
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
+	schedulingv1a1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
+	schedulingv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	"github.com/kcp-dev/edge-mc/pkg/customize"
 )
 
 const SyncerConfigName = "the-one"
@@ -80,8 +83,12 @@ func NewWorkloadProjector(
 	resourceModes ResourceModes,
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
+	locationClusterInformer kcpcache.ScopeableSharedIndexInformer,
+	locationClusterLister schedulingv1a1listers.LocationClusterLister,
 	syncfgClusterInformer kcpcache.ScopeableSharedIndexInformer,
 	syncfgClusterLister edgev1a1listers.SyncerConfigClusterLister,
+	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer,
+	customizerClusterLister edgev1a1listers.CustomizerClusterLister,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
@@ -89,17 +96,21 @@ func NewWorkloadProjector(
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
-		ctx:                   ctx,
-		configConcurrency:     configConcurrency,
-		resourceModes:         resourceModes,
-		queue:                 workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		mbwsLister:            mbwsLister,
-		syncfgClusterInformer: syncfgClusterInformer,
-		syncfgClusterLister:   syncfgClusterLister,
-		edgeClusterClientset:  edgeClusterClientset,
-		dynamicClusterClient:  dynamicClusterClient,
-		nsClusterPreInformer:  nsClusterPreInformer,
-		nsClusterClient:       nsClusterClient,
+		ctx:                       ctx,
+		configConcurrency:         configConcurrency,
+		resourceModes:             resourceModes,
+		queue:                     workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		mbwsLister:                mbwsLister,
+		locationClusterInformer:   locationClusterInformer,
+		locationClusterLister:     locationClusterLister,
+		syncfgClusterInformer:     syncfgClusterInformer,
+		syncfgClusterLister:       syncfgClusterLister,
+		customizerClusterInformer: customizerClusterInformer,
+		customizerClusterLister:   customizerClusterLister,
+		edgeClusterClientset:      edgeClusterClientset,
+		dynamicClusterClient:      dynamicClusterClient,
+		nsClusterPreInformer:      nsClusterPreInformer,
+		nsClusterClient:           nsClusterClient,
 
 		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
 		clusterToMBWSName: WrapMapWithMutex[logicalcluster.Name, string](NewMapMap[logicalcluster.Name, string](nil)),
@@ -292,18 +303,22 @@ var _ Runnable = &workloadProjector{}
 //
 // The fields following the Mutex should only be accessed with the Mutex locked.
 type workloadProjector struct {
-	ctx                   context.Context
-	configConcurrency     int
-	resourceModes         ResourceModes
-	delay                 time.Duration // to slow down for debugging
-	queue                 workqueue.RateLimitingInterface
-	mbwsLister            tenancyv1a1listers.WorkspaceLister
-	syncfgClusterInformer kcpcache.ScopeableSharedIndexInformer
-	syncfgClusterLister   edgev1a1listers.SyncerConfigClusterLister
-	edgeClusterClientset  edgeclusterclientset.ClusterInterface
-	dynamicClusterClient  clusterdynamic.ClusterInterface
-	nsClusterPreInformer  kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient       kcpkubecorev1client.NamespaceClusterInterface
+	ctx                       context.Context
+	configConcurrency         int
+	resourceModes             ResourceModes
+	delay                     time.Duration // to slow down for debugging
+	queue                     workqueue.RateLimitingInterface
+	mbwsLister                tenancyv1a1listers.WorkspaceLister
+	locationClusterInformer   kcpcache.ScopeableSharedIndexInformer
+	locationClusterLister     schedulingv1a1listers.LocationClusterLister
+	syncfgClusterInformer     kcpcache.ScopeableSharedIndexInformer
+	syncfgClusterLister       edgev1a1listers.SyncerConfigClusterLister
+	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer
+	customizerClusterLister   edgev1a1listers.CustomizerClusterLister
+	edgeClusterClientset      edgeclusterclientset.ClusterInterface
+	dynamicClusterClient      clusterdynamic.ClusterInterface
+	nsClusterPreInformer      kcpkubecorev1informers.NamespaceClusterInformer
+	nsClusterClient           kcpkubecorev1client.NamespaceClusterInterface
 
 	mbwsNameToCluster MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
 	clusterToMBWSName MutableMap[logicalcluster.Name, string /*mailbox workspace name*/]
@@ -954,7 +969,7 @@ func (wp *workloadProjector) syncSourceToDest(ctx context.Context, logger klog.L
 				"newResourceVersion", asUpdated.GetResourceVersion())
 			return false
 		}
-		destObj = wpd.wp.xformForDestination(srcMRObject)
+		destObj = wpd.wp.xformForDestination(soRef.cluster, destination, srcMRObject)
 		time.Sleep(time.Second)
 		asCreated, err := rscClient.Create(ctx, destObj, metav1.CreateOptions{FieldManager: FieldManager})
 		if err != nil {
@@ -969,11 +984,18 @@ func (wp *workloadProjector) syncSourceToDest(ctx context.Context, logger klog.L
 const ProjectedLabelKey string = "edge.kcp.io/projected"
 const ProjectedLabelVal string = "yes"
 
-func (wp *workloadProjector) xformForDestination(srcObj mrObject) *unstructured.Unstructured {
+func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject) *unstructured.Unstructured {
 	srcObjU := srcObj.(*unstructured.Unstructured)
-	srcObjU = srcObjU.DeepCopy()
+	logger := klog.FromContext(wp.ctx).WithValues(
+		"sourceCluster", sourceCluster,
+		"destSP", destSP,
+		"destGVK", srcObjU.GroupVersionKind,
+		"namespace", srcObj.GetNamespace(),
+		"name", srcObj.GetName())
+	srcObjU = wp.customizeOrCopy(logger, sourceCluster, srcObjU, destSP, true)
 	destObjR := srcObjU.NewEmptyInstance()
 	destObj := destObjR.(*unstructured.Unstructured)
+	// customize.Customize(wp.ctx, srcObjU.UnstructuredContent(), customizer, log)
 	destObj.SetUnstructuredContent(srcObjU.UnstructuredContent())
 	destObj.SetManagedFields([]metav1.ManagedFieldsEntry{})
 	destObj.SetOwnerReferences([]metav1.OwnerReference{}) // we do not transport owner UIDs
@@ -992,13 +1014,14 @@ func (wp *workloadProjector) xformForDestination(srcObj mrObject) *unstructured.
 
 func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Name, destSP SinglePlacement,
 	srcObj mrObject, inputDest *unstructured.Unstructured) *unstructured.Unstructured {
+	srcObjU := srcObj.(*unstructured.Unstructured)
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
 		"destSP", destSP,
-		"destGVK", inputDest.GroupVersionKind,
+		"destGVK", srcObjU.GroupVersionKind,
 		"namespace", srcObj.GetNamespace(),
 		"name", srcObj.GetName())
-	srcObjU := srcObj.(*unstructured.Unstructured)
+	srcObjU = wp.customizeOrCopy(logger, sourceCluster, srcObjU, destSP, false)
 	outputDestR := inputDest.NewEmptyInstance()
 	outputDestU := outputDestR.(*unstructured.Unstructured)
 	inputDest = inputDest.DeepCopy() // because the following only swings the top-level pointer
@@ -1019,10 +1042,10 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 		}
 		return outputDest
 	}
-	if len(srcObj.GetAnnotations()) != 0 { // If nothing to merge then do not gratuitously change absent to empty map.
-		outputDestU.SetAnnotations(kvMerge("annotations", srcObj.GetAnnotations(), inputDest.GetAnnotations()))
+	if len(srcObjU.GetAnnotations()) != 0 { // If nothing to merge then do not gratuitously change absent to empty map.
+		outputDestU.SetAnnotations(kvMerge("annotations", srcObjU.GetAnnotations(), inputDest.GetAnnotations()))
 	}
-	mergedLabels := kvMerge("labels", srcObj.GetLabels(), inputDest.GetLabels())
+	mergedLabels := kvMerge("labels", srcObjU.GetLabels(), inputDest.GetLabels())
 	mergedLabels[ProjectedLabelKey] = ProjectedLabelVal
 	outputDestU.SetLabels(mergedLabels)
 	destContent := outputDestU.UnstructuredContent()
@@ -1037,6 +1060,44 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 	}
 	outputDestU.SetUnstructuredContent(destContent)
 	return outputDestU
+}
+
+func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logicalcluster.Name, srcObjU *unstructured.Unstructured, destSP edgeapi.SinglePlacement, insistCopy bool) *unstructured.Unstructured {
+	srcAnnotations := srcObjU.GetAnnotations()
+	expandParameters := srcAnnotations[edgeapi.ParameterExpansionAnnotationKey] == "true"
+	customizerRef := srcAnnotations[edgeapi.CustomizerAnnotationKey]
+	var customizer *edgeapi.Customizer
+	var err error
+	if len(customizerRef) != 0 {
+		refParts := strings.SplitN(customizerRef, "/", 2)
+		custNS := refParts[0]
+		custName := refParts[len(refParts)-1]
+		if len(refParts) == 1 {
+			custNS = srcObjU.GetNamespace()
+		}
+		customizer, err = wp.customizerClusterLister.Cluster(logicalcluster.Name(srcCluster)).Customizers(custNS).Get(custName)
+		if err != nil {
+			logger.Error(err, "Failed to find referenced Customizer")
+		} else {
+			expandParameters = expandParameters || customizer.Annotations[edgeapi.ParameterExpansionAnnotationKey] == "true"
+		}
+	}
+	var location *schedulingv1a1.Location
+	if expandParameters {
+		location, err = wp.locationClusterLister.Cluster(logicalcluster.Name(destSP.Cluster)).Get(destSP.LocationName)
+		if err != nil {
+			logger.Error(err, "Failed to find referenced Location")
+		}
+	}
+	if (len(customizerRef) != 0 || expandParameters) &&
+		(customizer != nil || len(customizerRef) == 0) &&
+		(location != nil || !expandParameters) {
+		return customize.Customize(logger, srcObjU, customizer, location)
+	}
+	if !insistCopy {
+		return srcObjU
+	}
+	return srcObjU.DeepCopy()
 }
 
 func kvIsSystem(which, key string) bool {

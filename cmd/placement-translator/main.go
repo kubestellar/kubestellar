@@ -56,6 +56,7 @@ import (
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
 	emcclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
@@ -107,6 +108,9 @@ func main() {
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
+	sspwClientOpts := NewClientOpts("sspw", "access to the scheduling service provider workspace")
+	sspwClientOpts.overrides.CurrentContext = "root"
+	sspwClientOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -137,6 +141,12 @@ func main() {
 	baseRestConfig, err := baseClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags", "which", baseClientOpts.which)
+		os.Exit(15)
+	}
+
+	sspwRestConfig, err := sspwClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "Failed to build config from flags", "which", sspwClientOpts.which)
 		os.Exit(20)
 	}
 
@@ -146,7 +156,7 @@ func main() {
 		os.Exit(25)
 	}
 
-	// Get client config for view of SyncTarget objects
+	// Get client config for view of APIExport of edge API
 	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of edge APIExport")
@@ -172,6 +182,7 @@ func main() {
 	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
 	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 	syncfgClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SyncerConfigs()
+	customizerClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Customizers()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
 	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
@@ -183,6 +194,22 @@ func main() {
 	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
 	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
+
+	// Get client config for view of APIExport of kcp scheduling API
+	schedViewConfig, err := configForViewOfExport(ctx, sspwRestConfig, "scheduling.kcp.io")
+	if err != nil {
+		logger.Error(err, "Failed to create client config for view of kcp scheduling APIExport")
+		os.Exit(60)
+	}
+	schedViewClusterClientset, err := kcpclusterclientset.NewForConfig(schedViewConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create cluster clientset for view of kcp scheduling APIExport")
+		os.Exit(65)
+	}
+
+	sspwInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedViewClusterClientset, resyncPeriod)
+	locationClusterPreInformer := sspwInformerFactory.Scheduling().V1alpha1().Locations()
+	var _ schedulingv1a1informers.LocationClusterInformer = locationClusterPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
@@ -210,11 +237,12 @@ func main() {
 
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer,
+	pt := placement.NewPlacementTranslator(concurrency, ctx, locationClusterPreInformer, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer, customizerClusterPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
+	sspwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
 	kubeClusterInformerFactory.Start(doneCh)
 	pt.Run()

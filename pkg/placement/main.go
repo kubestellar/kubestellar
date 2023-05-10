@@ -30,6 +30,7 @@ import (
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
+	schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
@@ -68,12 +69,15 @@ type placementTranslator struct {
 func NewPlacementTranslator(
 	numThreads int,
 	ctx context.Context,
+	locationClusterPreInformer schedulingv1a1informers.LocationClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	spsClusterPreInformer edgev1a1informers.SinglePlacementSliceClusterInformer,
 	// pre-informer on syncer config objects, should be in mailbox workspaces
 	syncfgClusterPreInformer edgev1a1informers.SyncerConfigClusterInformer,
+
+	customizerClusterPreInformer edgev1a1informers.CustomizerClusterInformer,
 	// pre-informer on Workspaces objects in the ESPW
 	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
 	// all-cluster clientset for kcp APIs,
@@ -117,7 +121,10 @@ func NewPlacementTranslator(
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes, pt.mbwsInformer, pt.mbwsLister,
-		pt.syncfgClusterInformer, pt.syncfgClusterLister, edgeClusterClientset, dynamicClusterClient,
+		locationClusterPreInformer.Informer(), locationClusterPreInformer.Lister(),
+		pt.syncfgClusterInformer, pt.syncfgClusterLister,
+		customizerClusterPreInformer.Informer(), customizerClusterPreInformer.Lister(),
+		edgeClusterClientset, dynamicClusterClient,
 		nsClusterPreInformer, nsClusterClient)
 
 	return pt
