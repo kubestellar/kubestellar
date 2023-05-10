@@ -20,7 +20,7 @@ kind create cluster --name florin
 
 ### 2. Install KCP
 
-Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspaces capability, we have to install `kcp` v0.11.0 binaries first. To install kcp follow the instructions available [on the kcp website](https://docs.kcp.io/kcp/main/#download-kcp). You can also use the script below:
+Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspaces capability, we first need to install `kcp` v0.11.0 binaries. To install kcp follow the instructions available [on the kcp website](https://docs.kcp.io/kcp/main/#download-kcp). You can also use the script below:
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version v0.11.0 --folder $(pwd)/kcp --create-folder
