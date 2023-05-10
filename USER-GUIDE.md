@@ -21,7 +21,7 @@ This guide is intended to show how to quickly bring up a **KCP-Edge** environmen
 
 ### a. `kubectl`
 
-Detailed installation instructions for different operative systems are available [here](https://kubernetes.io/docs/tasks/tools/).
+Detailed installation instructions for different operative systems are available [the kubectl installation instructions](https://kubernetes.io/docs/tasks/tools/).
 
 ### b. `kcp`
 
