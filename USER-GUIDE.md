@@ -175,7 +175,7 @@ Generate the edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-kcp-edge --edge_syncer florin  # mailbox-prep.sh florin
+kcp-edge --edge_syncer florin  # replaces: mailbox-prep.sh florin
 ```
 
 
