@@ -46,7 +46,7 @@ kubectl version --short
 
 which should yield something like:
 
-```text
+```console
 Client Version: v1.25.3
 Kustomize Version: v4.5.7
 Server Version: v1.24.3+kcp-v0.11.0
@@ -60,7 +60,7 @@ kubectl ws tree
 
 which should yield something like:
 
-```text
+```console
 .
 └── root
     └── compute
