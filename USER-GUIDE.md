@@ -39,7 +39,7 @@ kcp start >& kcp_log.txt &
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
 
-It should be noted that, when **kcp** is running with the command above, it listens to all of the host's non-loopback addresses and picks one to put in the generated `admin.kubeconfig` file. While this works fine in most cases, such as when using a kind cluster locally (see later), sometimes it may be necessary to specify a public/external ip address that can be reached by remote clusters. For this purpose, the following command should be used:
+It should be noted that, when **kcp** is running with the command above, it listens to all of the host's non-loopback addresses and picks one to put in the generated `admin.kubeconfig` file. While this works fine in most cases, such as when using a kind cluster locally (see later), sometimes it may be necessary to specify a public/external ip address that can be reached by remote clusters. For this purpose, the following commands should be used:
 
 
 ```bash
