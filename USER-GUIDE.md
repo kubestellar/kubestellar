@@ -355,7 +355,7 @@ To uninstall kcp-edge run the following command:
 kcp-edge stop
 ```
 
-To uninstall kpc, kcp-edge and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
+To uninstall kcp, kcp-edge and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
 
 ```shell
 kcp-edge cleanup
