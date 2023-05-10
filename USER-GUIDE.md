@@ -89,7 +89,7 @@ export PATH="$PATH:$(pwd)/kcp-edge/bin"
 Start **KCP-Edge** with the following command:
 
 ```bash
-kcp-edge.sh start --user kit
+kcp-edge start --user kit
 ```
 
 Check that `KCP-Edge` controllers are running with the following command:
@@ -134,10 +134,10 @@ kubectl ws create "imw-1"
 **WMW** are used by **KCP-Edge** to store *workloads* amd *edge placement* objects.
 Create an **WMW** named `wmw-1` in a `my-org` workspace with the following command:
 
-```bash
+```shell
 kubectl ws root
 kubectl ws create "my-org"
-ensure-wmw.sh "wmw-1"
+kcp-edge --config_wmw wmw-1  # replaces: ensure-wmw.sh "wmw-1"
 ```
 
 
@@ -156,8 +156,8 @@ To install kind in your environment follow the instructions [here](https://kind.
 
 Create a syncTarget and location objects to represent florin:
 
-```console
-ensure-location.sh florin  env=prod
+```shell
+kcp-edge --config_location florin  env=prod    # replaces ensure-location.sh florin  env=prod
 ```
 
 The following commands list the objects that were created:
@@ -175,7 +175,7 @@ Generate the edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-mailbox-prep.sh florin
+kcp-edge --edge_syncer florin  # mailbox-prep.sh florin
 ```
 
 
@@ -352,11 +352,11 @@ nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
 To uninstall kcp-edge run the following command:
 
 ```bash
-kcp-edge.sh stop
+kcp-edge stop
 ```
 
 To delete all the generated files (e.g., edge syncer manifests and logs files), remove kcp & kcp-edge run the following command:
 
 ```shell
-clean-env.sh
+kcp-edge cleanup
 ```
