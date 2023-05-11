@@ -301,7 +301,7 @@ NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 nginx-deployment   3/3     3            3           8m37s
 ```
 
-Lastly, let's check that workload is working in both clusters:
+Lastly, let's check that the workload is working in both clusters:
 
 For `florin`:
 
