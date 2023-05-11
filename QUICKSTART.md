@@ -182,6 +182,24 @@ local-path-storage                local-path-provisioner-684f458cdd-75wv8       
 
 ### c. Onboarding the guilder cluster
 
+Similary, repeat the steps in for the guilder cluster:
+
+
+```shell
+kcp-edge --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
+```
+
+Generate and apply the edge syncer manifest:
+
+```shell
+kubectl ws root:espw
+kcp-edge --syncer florin  # replaces: mailbox-prep.sh florin
+```
+
+```shell
+KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+```
+
 
 ### d. Create the nginx workload and deploy it to the florin cluster
 
