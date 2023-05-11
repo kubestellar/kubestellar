@@ -20,8 +20,11 @@ Table of contents:
   - [d. Deploy the edge syncer to florin edge cluster](#d-deploy-the-edge-syncer-to-florin-edge-cluster)
 - [5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW)](#5-deploy-a-workload-to-the-edge-cluster-bring-your-own-workload-byow)
   - [a. Create a workload management workspace (wmw)](#a-create-a-workload-management-workspace-wmw)
-  - [b. Deploy your workload in wmw-1](#b-create-a-synctarget-and-location-objects-to-represent-your-edge-cluster-florin)
-  - [c. Connect florin edge cluster with its mailbox workspace]
+  - [b. Deploy your workload in wmw-1](#b-deploy-your-workload-in-wmw-1)
+  - [c. Create the EdgePlacement object for your workload](#c-create-the-edgeplacement-object-for-your-workload)
+  - [d. Check that the workloads objects are copied to mailbox workspace](#d-check-that-the-workloads-objects-are-copied-to-mailbox-workspace)
+  - [e. Check that the workloads are running in the edge clusters](#e-check-that-the-workloads-are-running-in-the-edge-clusters)
+- [6. Cleanup the environment](#6-Cleanup-the-environment)
 
 
 This guide is intended to explain how KCP-Edge works with a detailed example.
