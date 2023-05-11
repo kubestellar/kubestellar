@@ -14,10 +14,11 @@ Table of contents:
 - [2. Install KCP](#2-install-kcp)
 - [3. Deploy the kcp-edge platform](#3-deploy-the-kcp-edge-platform)
 - [4. Connect your edge cluster to the kcp-edge platform](#4-connect-your-edge-cluster-to-the-kcp-edge-platform)
-  - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
-  - [b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
-  - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
-- [5. Cleanup the environment](#5-Cleanup-the-environment)
+  - [a. Create an inventory management workspace (imw)](#a-create-an-inventory-management-workspace-imw)
+  - [b. Create a syncTarget and location objects to represent your edge cluster (florin)](#b-create-a-synctarget-and-location-objects-to-represent-your-edge-cluster-florin)
+  - [c. Connect florin edge cluster with its mailbox workspace](#c-connect-florin-edge-cluster-with-its-mailbox-workspace)
+  - [d. Deploy the edge syncer to florin edge cluster](#d-deploy-the-edge-syncer-to-florin-edge-cluster)
+- [5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW)](#5-deploy-a-workload-to-the-edge-cluster-bring-your-own-workload-byow)
 
 
 This guide is intended to explain how KCP-Edge works with a detailed example.
