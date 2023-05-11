@@ -19,6 +19,9 @@ Table of contents:
   - [c. Connect florin edge cluster with its mailbox workspace](#c-connect-florin-edge-cluster-with-its-mailbox-workspace)
   - [d. Deploy the edge syncer to florin edge cluster](#d-deploy-the-edge-syncer-to-florin-edge-cluster)
 - [5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW)](#5-deploy-a-workload-to-the-edge-cluster-bring-your-own-workload-byow)
+  - [a. Create a workload management workspace (wmw)](#a-create-a-workload-management-workspace-wmw)
+  - [b. Deploy your workload in wmw-1](#b-create-a-synctarget-and-location-objects-to-represent-your-edge-cluster-florin)
+  - [c. Connect florin edge cluster with its mailbox workspace]
 
 
 This guide is intended to explain how KCP-Edge works with a detailed example.
@@ -251,7 +254,9 @@ apibinding.apis.kcp.io/bind-espw created
 apibinding.apis.kcp.io/bind-kube created
 ```
 
-#### b. Deploy your workload in `wmw-1`. For example:
+#### b. Deploy your workload in `wmw-1`:
+
+For example:
 
 ```console
 kubectl apply -f - <<EOF
