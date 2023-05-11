@@ -1,8 +1,8 @@
 # **KCP-Edge** Quickstart
 
 ## Required Packages:
-   - docker
-   - kind
+   - [docker](https://docs.docker.com/get-docker/)
+   - [kind](https://kind.sigs.k8s.io/)
    - kubectl (version range expected: 1.23-1.25)
 
 ## Setup Instructions
@@ -66,12 +66,18 @@ kubectl ws tree
         └── wmw-s
 ```
 
-## 2. Example deployment of nginx workload into a kind local cluster
+## 2. Example deployment of nginx workload into two kind local clusters
 
  
-### a. Stand up a local florin kind cluster
+### a. Stand up a local florin and guilder kind clusters
 
-To install kind in your environment follow the instructions [here](https://kind.sigs.k8s.io/). To use kind, you will also need to [install docker](https://docs.docker.com/get-docker/).
+Create the first edge cluster:
+
+```shell
+kind create cluster --name florin
+```  
+
+Create the second edge cluster:
 
 ```shell
 kind create cluster --name florin
