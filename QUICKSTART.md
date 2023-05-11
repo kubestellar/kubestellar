@@ -2,71 +2,17 @@
 
 Table of contents:
 
-- [1. Install **KCP-Edge** pre-requisites](#1-install-kcp-edge-pre-requisites)
-  - [a. `kubectl`](#a-kubectl)
-  - [b. `kcp`](#b-kcp)
-- [2. Install and run **KCP-Edge**](#2-install-and-run-kcp-edge)
-- [3. Create a **KCP-Edge** Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#3-create-a-kcp-edge-inventory-management-workspace-imw)
-- [4. Example deployment of nginx workload into a kind local cluster](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
+- [1. Install and run **KCP-Edge**](#1-install-kcp-edge-pre-requisites)
+- [2. Example deployment of nginx workload into a kind local cluster](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
   - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
   - [b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
   - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
-- [5. Cleanup the environment](#5-Cleanup-the-environment)
+- [3. Cleanup the environment](#5-Cleanup-the-environment)
 
 
 This guide is intended to show how to quickly bring up a **KCP-Edge** environment with its dependencies from a binary release.
 
-## 1. Install **KCP-Edge** pre-requisites
-
-### a. `kubectl`
-
-Detailed installation instructions for different operative systems are available [the kubectl installation instructions](https://kubernetes.io/docs/tasks/tools/).
-
-### b. `kcp`
-
-Since `KCP-Edge` leverages [`kcp`](kcp.io) logical workspaces capability, we first need to install `kcp` v0.11.0 binaries. To install kcp follow the instructions available [on the kcp website](https://docs.kcp.io/kcp/main/#download-kcp). You can also use the script below:
-
-```bash
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version v0.11.0 --folder $(pwd)/kcp --create-folder
-export PATH="$PATH:$(pwd)/kcp/bin"
-```
-
-Start **kcp** with the following command:
-
-```bash
-kcp start >& kcp_log.txt &
-export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
-```
-
-After few seconds, check that `kcp` is running using the command:
-
-```bash
-kubectl version --short
-```
-
-which should yield something like:
-
-```console
-Client Version: v1.25.3
-Kustomize Version: v4.5.7
-Server Version: v1.24.3+kcp-v0.11.0
-```
-
-Additionally, one can check the available virtual workspaces using the command:
-
-```bash
-kubectl ws tree
-```
-
-which should yield something like:
-
-```console
-.
-└── root
-    └── compute
-```
-
-## 2. Install and run **KCP-Edge**
+## 1. Install and run **KCP-Edge**
 
 Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
 
@@ -110,27 +56,7 @@ which should yield:
     └── espw
 ```
 
-## 3. Create a kcp-edge Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
-
-**IMW** are used by **KCP-Edge** to store *sync targets* and *placement* objects.
-Create an **IMW** named `imw-1` with the following command:
-
-```shell
-kubectl ws root
-kubectl ws create "imw-1"
-```
-
-**WMW** are used by **KCP-Edge** to store *workloads* amd *edge placement* objects.
-Create an **WMW** named `wmw-1` in a `my-org` workspace with the following command:
-
-```shell
-kubectl ws root
-kubectl ws create "my-org"
-kcp-edge --create_wmw wmw-1  # replaces: ensure-wmw.sh "wmw-1"
-```
-
-
-## 4. Example deployment of nginx workload into a kind local cluster
+## 2. Example deployment of nginx workload into a kind local cluster
 
  
 ### a. Stand up a local florin kind cluster
@@ -336,7 +262,7 @@ nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
 nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
 ```
 
-## 5. Cleanup the environment
+## 3. Cleanup the environment
 
 To uninstall kcp-edge run the following command:
 
