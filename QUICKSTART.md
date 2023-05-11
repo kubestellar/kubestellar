@@ -84,7 +84,7 @@ Create the second edge cluster:
 kind create cluster --name guilder
 ```  
 
-### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
+### b. Onboarding the florin cluster
 
 Create a syncTarget and location inventory objects to represent the edge cluster (`florin`):
 
@@ -180,7 +180,10 @@ kube-system                       kube-scheduler-florin-control-plane           
 local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
 ``` 
 
-### c. Create the nginx workload and deploy it to the florin cluster
+### c. Onboarding the guilder cluster
+
+
+### d. Create the nginx workload and deploy it to the florin cluster
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object (`florin`) created earlier, thus directing the workload to `florin` edge cluster.
 
