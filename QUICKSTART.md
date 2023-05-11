@@ -24,17 +24,14 @@ This guide is intended to show how to quickly bring up a **KCP-Edge** environmen
 Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-edge.sh) --version v0.1.0 --folder $(pwd)/kcp-edge --create-folder
-export PATH="$PATH:$(pwd)/kcp-edge/bin"
+bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/kcp-edge-bootstrap.sh) --kcp-version v0.11.0 --kcp-edge-version v0.1.0 --folder . --create-folder
+export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kcp-edge/bin"
+export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
 
-Start **KCP-Edge** with the following command:
+Check that `KCP-Edge` is running:
 
-```shell
-kcp-edge start --user kit
-```
-
-Check that `KCP-Edge` controllers are running with the following command:
+First, check that controllers are running with the following command:
 
 ```shell
 ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
