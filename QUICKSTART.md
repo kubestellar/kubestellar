@@ -182,22 +182,25 @@ local-path-storage                local-path-provisioner-684f458cdd-75wv8       
 
 ### c. Onboarding the guilder cluster
 
-Similary, repeat the steps in for the guilder cluster:
+Repeat the same steps for the guilder cluster:
 
+Create the inventory objects to represent `guilder` edge cluster:
 
 ```shell
-kcp-edge --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
+kcp-edge --create_inv_item guilder env=prod    # replaces ensure-location.sh florin  env=prod
 ```
 
-Generate and apply the edge syncer manifest:
+Generate edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
 kcp-edge --syncer florin  # replaces: mailbox-prep.sh florin
 ```
 
+Apply the edge syncer manifest:
+
 ```shell
-KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
