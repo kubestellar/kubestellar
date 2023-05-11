@@ -187,14 +187,14 @@ Repeat the same steps for the guilder cluster:
 First, create the inventory objects to represent `guilder` edge cluster:
 
 ```shell
-kcp-edge --create_inv_item guilder env=prod    # replaces ensure-location.sh florin  env=prod
+kcp-edge --create_inv_item guilder env=prod
 ```
 
 Second, generate edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-kcp-edge --syncer florin  # replaces: mailbox-prep.sh florin
+kcp-edge --syncer guilder
 ```
 
 Lastly, apply the edge syncer manifest:
