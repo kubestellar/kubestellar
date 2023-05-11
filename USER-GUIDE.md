@@ -481,7 +481,7 @@ nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
 nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
 ```
 
-### 6. Install up your kcp-edge environment:
+### 6. Cleanup the environment:
 
 To uninstall kcp-edge run the following command:
 
