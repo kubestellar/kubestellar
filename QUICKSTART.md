@@ -327,6 +327,8 @@ $ curl http://localhost:8082
 </html>
 ```
 
+Congratulations, you’ve just deployed a workload to two edge clusters using KCP-Edge! To learn more about KCP-Edge please visit our [User Guide](<place-holder>)
+
 ## 3. Cleanup the environment
 
 To uninstall kcp-edge run the following command:
