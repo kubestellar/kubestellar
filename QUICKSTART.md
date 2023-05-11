@@ -204,7 +204,7 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
-### d. Create the nginx workload and deploy it to the florin cluster
+### d. Create and deploy the nginx workload into florin and guilder clusters
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
@@ -275,7 +275,7 @@ Deploy the nginx workload. Note the namespace label matches the label in the nam
   EOF
   ```
 
-Check that the deployment was created in the florin edge cluster:
+Now, let's check that the deployment was created in the `florin` edge cluster:
 
 ```console
 KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
@@ -288,19 +288,43 @@ NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 nginx-deployment   3/3     3            3           8m37s
 ```
 
-Also, check that the pods are running in the florin edge cluster:
+Also, let's check that the deployment was created in the `guilder` edge cluster:
 
 ```console
-KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get pods
+KUBECONFIG=$guilder_kubeconfig kubectl -n commonstuff get deployment
 ```
 
 which should yield something like:
 
 ```console
-NAME                                READY   STATUS    RESTARTS   AGE
-nginx-deployment-7fb96c846b-2hkwt   1/1     Running   0          8m57s
-nginx-deployment-7fb96c846b-9lxtc   1/1     Running   0          8m57s
-nginx-deployment-7fb96c846b-k8pp7   1/1     Running   0          8m57s
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           8m37s
+```
+
+Lastly, let's check that workload is working in both clusters:
+
+For `florin`:
+
+```console
+$ curl http://localhost:8081
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a common web site.
+  </body>
+</html>
+```
+
+For `guilder`:
+
+```console
+$ curl http://localhost:8082
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a special web site.
+  </body>
+</html>
 ```
 
 ## 3. Cleanup the environment
