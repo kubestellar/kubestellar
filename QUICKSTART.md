@@ -80,7 +80,7 @@ kind create cluster --name florin
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name florin
+kind create cluster --name guilder
 ```  
 
 ### b. Create a sync target, placement and edge syncer for onboarding the created florin edge cluster
