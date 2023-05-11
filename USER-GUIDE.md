@@ -8,6 +8,18 @@
 
 ## Setup Instructions
 
+Table of contents:
+
+- [1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)](#1-create-your-own-edge-infrastructure-edge-clusters---bring-your-own-clusters-byoc)
+- [2. Install KCP](#2-install-kcp)
+- [3. Deploy the kcp-edge platform](#3-deploy-the-kcp-edge-platform)
+- [4. Connect your edge cluster to the kcp-edge platform](#4-connect-your-edge-cluster-to-the-kcp-edge-platform)
+  - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
+  - [b. Create a sync target, placement, and edge syncer for onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
+  - [c. Create the nginx workload and deploy it to the florin cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
+- [5. Cleanup the environment](#5-Cleanup-the-environment)
+
+
 This guide is intended to explain how KCP-Edge works with a detailed example.
 
 ### 1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
@@ -102,7 +114,7 @@ $ kubectl ws tree
 
 ### 4. Connect your edge cluster to the kcp-edge platform:
 
-  a) Create an inventory management workspace (`imw`):
+  #### a. Create an inventory management workspace (`imw`):
 
   ```console
   $ kubectl ws root
@@ -113,7 +125,7 @@ $ kubectl ws tree
   Current workspace is "root:imw-1" (type root:organization).
   ```
     
-  b) Create a syncTarget and location objects to represent your edge cluster (florin):
+  #### b. Create a syncTarget and location objects to represent your edge cluster (florin):
 
   ```console
   $ kcp-edge --create_inv_item florin  env=prod
@@ -151,7 +163,7 @@ $ kubectl ws tree
       └── imw-1
   ```
 
-  c) Connect florin edge cluster with its mailbox workspace:
+  #### c. Connect florin edge cluster with its mailbox workspace:
 
   ```shell
   $ kubectl ws root:espw
@@ -183,7 +195,7 @@ $ kubectl ws tree
   An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge syncer plugin and build it locally.
   
 
-  d) Deploy the edge syncer to florin edge cluster:
+  #### d. Deploy the edge syncer to florin edge cluster:
 
   For example: switch to the context of the florin kind cluster
 
