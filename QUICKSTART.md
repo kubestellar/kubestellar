@@ -45,7 +45,7 @@ user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 scheduler -v 2 -
 user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator --allclusters-context system:admin -v=2
 ```
 
-Check that the Edge Service Provider Workspace (`espw`) is created with the following command:
+Second, check that the Edge Service Provider Workspace (`espw`) is created with the following command:
 
 ```shell
 kubectl ws tree
