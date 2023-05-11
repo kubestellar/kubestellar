@@ -59,8 +59,7 @@ kubectl ws tree
 └── root
     ├── compute
     ├── espw
-    │   ├── 2r8mzyucyiogekve-mb-18bf4a12-e019-4520-954e-a2565fe991b5
-    │   └── 2r8mzyucyiogekve-mb-f366f9ba-a111-4c80-b418-1a7b3ce61ab9
+    │   
     ├── imw-1
     └── my-org
         ├── wmw-c
