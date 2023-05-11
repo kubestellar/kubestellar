@@ -206,7 +206,7 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 
 ### d. Create the nginx workload and deploy it to the florin cluster
 
-Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location object (`florin`) created earlier, thus directing the workload to `florin` edge cluster.
+Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
 In the `wmw-1` workspace create the following `EdgePlacement` object: 
   
