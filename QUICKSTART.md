@@ -5,6 +5,8 @@
    - kind
    - kubectl (version range expected: 1.23-1.25)
 
+## Setup Instructions
+
 Table of contents:
 
 - [1. Install and run **KCP-Edge**](#1-install-kcp-edge-pre-requisites)
