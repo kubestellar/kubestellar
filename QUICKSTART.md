@@ -3,7 +3,8 @@
 ## Required Packages:
    - [docker](https://docs.docker.com/get-docker/)
    - [kind](https://kind.sigs.k8s.io/)
-   - kubectl (version range expected: 1.23-1.25)
+   - [kubectl](https://kubernetes.io/docs/tasks/tools/)
+)(version range expected: 1.23-1.25)
 
 ## Setup Instructions
 
