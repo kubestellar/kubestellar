@@ -114,121 +114,121 @@ $ kubectl ws tree
 
 ### 4. Connect your edge cluster to the kcp-edge platform:
 
-  #### a. Create an inventory management workspace (`imw`):
+#### a. Create an inventory management workspace (`imw`):
 
-  ```console
-  $ kubectl ws root
-  $ kubectl ws create imw-1 --enter
+```console
+$ kubectl ws root
+$ kubectl ws create imw-1 --enter
 
-  Workspace "imw-1" (type root:organization) created. Waiting for it to be ready...
-  Workspace "imw-1" (type root:organization) is ready to use.
-  Current workspace is "root:imw-1" (type root:organization).
-  ```
-    
-  #### b. Create a syncTarget and location objects to represent your edge cluster (florin):
-
-  ```console
-  $ kcp-edge --create_inv_item florin  env=prod
-
-  synctarget.workload.kcp.io/florin created
-  location.scheduling.kcp.io/florin created
-  synctarget.workload.kcp.io/florin labeled
-  location.scheduling.kcp.io/florin labeled
-  ```
-
-  The following commands list the objects that were created:
-
-  ```console
-  $ kubectl get locations,synctargets
-  NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-  location.scheduling.kcp.io/florin   synctargets   0           1                    57s
-
-  NAME                                AGE
-  synctarget.workload.kcp.io/florin   58s
-  ```
-
-
-  The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget (`florin`):
-
-  ```console
-  $ kubectl ws root
-  Current workspace is "root".
-
-  $ kubectl ws tree
-  .
-  └── root
-      ├── compute
-      ├── espw
-      │   └── 19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
-      └── imw-1
-  ```
-
-  #### c. Connect florin edge cluster with its mailbox workspace:
-
-  ```shell
-  $ kubectl ws root:espw
-  Current workspace is "root:espw".
-
-  $ kcp-edge --syncer florin
-
-  Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
-
-  Creating service account "kcp-edge-syncer-florin-5c4r0a44"
-  Creating cluster role "kcp-edge-syncer-florin-5c4r0a44" to give service account "kcp-edge-syncer-florin-5c4r0a44"
-
-  1. write and sync access to the synctarget "kcp-edge-syncer-florin-5c4r0a44"
-  2. write access to apiresourceimports.
-
-  Creating or updating cluster role binding "kcp-edge-syncer-florin-5c4r0a44" to bind service account "kcp-edge-syncer-florin-5c4r0a44" to cluster role "kcp-edge-syncer-florin-5c4r0a44".
-
-  Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-5c4r0a44". Use
-
-    KUBECONFIG=<edge-cluster-config> kubectl apply -f "florin-syncer.yaml"
-
-  to apply it. Use
-
-    KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
-
-  to verify the syncer pod is running.
-  ```
-
-  An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge syncer plugin and build it locally.
+Workspace "imw-1" (type root:organization) created. Waiting for it to be ready...
+Workspace "imw-1" (type root:organization) is ready to use.
+Current workspace is "root:imw-1" (type root:organization).
+```
   
+#### b. Create a syncTarget and location objects to represent your edge cluster (florin):
 
-  #### d. Deploy the edge syncer to florin edge cluster:
+```console
+$ kcp-edge --create_inv_item florin  env=prod
 
-  For example: switch to the context of the florin kind cluster
+synctarget.workload.kcp.io/florin created
+location.scheduling.kcp.io/florin created
+synctarget.workload.kcp.io/florin labeled
+location.scheduling.kcp.io/florin labeled
+```
 
-  ```console
-  $ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+The following commands list the objects that were created:
 
-  namespace/kcp-edge-syncer-florin-5c4r0a44 created
-  serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
-  secret/kcp-edge-syncer-florin-5c4r0a44-token created
-  clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
-  clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
-  role.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
-  rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
-  secret/kcp-edge-syncer-florin-5c4r0a44 created
-  deployment.apps/kcp-edge-syncer-florin-5c4r0a44 created
-  ```
+```console
+$ kubectl get locations,synctargets
+NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
+location.scheduling.kcp.io/florin   synctargets   0           1                    57s
 
-  Check that the edge syncer pod is running:
+NAME                                AGE
+synctarget.workload.kcp.io/florin   58s
+```
 
-  ```console
-  $ KUBECONFIG=$florin_kubeconfig kubectl get pods -A
-  NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
-  kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
-  kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
-  kube-system                       coredns-565d847f94-rj4s8                          1/1     Running   0          85s
-  kube-system                       etcd-florin-control-plane                         1/1     Running   0          99s
-  kube-system                       kindnet-l26qt                                     1/1     Running   0          85s
-  kube-system                       kube-apiserver-florin-control-plane               1/1     Running   0          100s
-  kube-system                       kube-controller-manager-florin-control-plane      1/1     Running   0          100s
-  kube-system                       kube-proxy-qzhx6                                  1/1     Running   0          85s
-  kube-system                       kube-scheduler-florin-control-plane               1/1     Running   0          99s
-  local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
-  ``` 
+
+The [mailbox-controller](https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/) creates a mailbox workspace for the newly created SyncTarget (`florin`):
+
+```console
+$ kubectl ws root
+Current workspace is "root".
+
+$ kubectl ws tree
+.
+└── root
+    ├── compute
+    ├── espw
+    │   └── 19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69
+    └── imw-1
+```
+
+#### c. Connect florin edge cluster with its mailbox workspace:
+
+```shell
+$ kubectl ws root:espw
+Current workspace is "root:espw".
+
+$ kcp-edge --syncer florin
+
+Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
+
+Creating service account "kcp-edge-syncer-florin-5c4r0a44"
+Creating cluster role "kcp-edge-syncer-florin-5c4r0a44" to give service account "kcp-edge-syncer-florin-5c4r0a44"
+
+1. write and sync access to the synctarget "kcp-edge-syncer-florin-5c4r0a44"
+2. write access to apiresourceimports.
+
+Creating or updating cluster role binding "kcp-edge-syncer-florin-5c4r0a44" to bind service account "kcp-edge-syncer-florin-5c4r0a44" to cluster role "kcp-edge-syncer-florin-5c4r0a44".
+
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-5c4r0a44". Use
+
+  KUBECONFIG=<edge-cluster-config> kubectl apply -f "florin-syncer.yaml"
+
+to apply it. Use
+
+  KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
+
+to verify the syncer pod is running.
+```
+
+An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended. On the first usage above `mailbox-prep.sh` script will git clone the repo that has the source for edge syncer plugin and build it locally.
+
+
+#### d. Deploy the edge syncer to florin edge cluster:
+
+For example: switch to the context of the florin kind cluster
+
+```console
+$ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+
+namespace/kcp-edge-syncer-florin-5c4r0a44 created
+serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
+secret/kcp-edge-syncer-florin-5c4r0a44-token created
+clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
+clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
+role.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
+rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
+secret/kcp-edge-syncer-florin-5c4r0a44 created
+deployment.apps/kcp-edge-syncer-florin-5c4r0a44 created
+```
+
+Check that the edge syncer pod is running:
+
+```console
+$ KUBECONFIG=$florin_kubeconfig kubectl get pods -A
+NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
+kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
+kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
+kube-system                       coredns-565d847f94-rj4s8                          1/1     Running   0          85s
+kube-system                       etcd-florin-control-plane                         1/1     Running   0          99s
+kube-system                       kindnet-l26qt                                     1/1     Running   0          85s
+kube-system                       kube-apiserver-florin-control-plane               1/1     Running   0          100s
+kube-system                       kube-controller-manager-florin-control-plane      1/1     Running   0          100s
+kube-system                       kube-proxy-qzhx6                                  1/1     Running   0          85s
+kube-system                       kube-scheduler-florin-control-plane               1/1     Running   0          99s
+local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
+``` 
 
 
 ### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
