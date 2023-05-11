@@ -11,7 +11,7 @@ Table of contents:
 
 - [1. Install and run **KCP-Edge**](#1-install-kcp-edge-pre-requisites)
 - [2. Example deployment of nginx workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
-  - [a. Stand up a local florin kind cluster](#a-Stand-up-a-local-florin-kind-cluster)
+  - [a. Stand up a two local kind clusters: florin and guilder](#a-Stand-up-a-local-florin-kind-cluster)
   - [b. Onboarding the created florin edge cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
   - [c. Onboarding the created guilder edge cluster ](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
   - [c. Create the nginx workload and deploy it to the florin and guilder cluster](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
