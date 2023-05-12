@@ -1,8 +1,8 @@
-<img alt="KCP-Edge" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
+<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
 
 <br/>
 
-# KCP-Edge
+# KubeStellar
 ## Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/><br/><br/>
 [![GitHub Pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)&nbsp;&nbsp;&nbsp;
@@ -13,7 +13,7 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KCP--Edge-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-KCP-Edge is a subproject of kcp focusing on concerns arising from edge multicluster use cases:
+KubeStellar is an opensource project focused on concerns arising mutlicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
 
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
@@ -53,14 +53,14 @@ There are several ways to communicate with us:
     - [kcp-users](https://groups.google.com/g/kcp-users) for discussions among users and potential users
 - Subscribe to the [community calendar](https://calendar.google.com/calendar/embed?src=ujjomvk4fa9fgdaem32afgl7g0%40group.calendar.google.com) for community meetings and events
     - The kcp-dev mailing list is subscribed to this calendar
-- See recordings of past KCP-Edge community meetings on [YouTube](https://www.youtube.com/playlist?list=PL1ALKGr_qZKc9jyv1EfOFNfoAJo9Q6Ebd)
+- See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
 - See [upcoming](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1FN7AZ_Q1CQor6eK0gpuKwdGFNwYI517M?usp=sharing) to share design docs, notes, etc.
     - Members of the kcp-dev mailing list can view this drive
 - Read our [documentation](https://kcp-edge.io)
 - Follow us on:
-   - LinkedIn - [#kcpedge](https://www.linkedin.com/feed/hashtag/?keywords=kcpedge)
-   - Medium - [kcp-edge.medium.com](https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST)
+   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
+   - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)
    
    
 ## ❤️ Contributors
