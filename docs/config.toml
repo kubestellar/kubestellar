@@ -224,7 +224,7 @@ section = ["HTML", "print", "RSS"]
       #desc = "Follow us on Twitter to get the latest news!"
     [[params.links.user]]
       name = "YouTube Channel"
-      url = "https://www.youtube.com/@kcp-edge"
+      url = "https://www.youtube.com/@kubestellar"
       icon = "fab fa-youtube"
       desc = "Follow us on YouTube to view recordings of past KubeStellar community meetings and demo days"
     [[params.links.user]]
