@@ -3,7 +3,7 @@
 <br/>
 
 # KCP-Edge
-## Mutlicluster configuration management for Edge, Multi-Cloud, and Hybrid Cloud
+## Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/><br/><br/>
 [![GitHub Pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
