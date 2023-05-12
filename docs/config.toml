@@ -1,4 +1,4 @@
-baseURL = "https://docs.kcp-edge.io"
+baseURL = "https://docs.kubestellar.io"
 title = "KubeStellar"
 description = "Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud"
 
@@ -140,7 +140,7 @@ section = ["HTML", "print", "RSS"]
 
   # A link to latest version of the docs. Used in the "version-banner" partial to
   # point people to the main doc site.
-  url_latest_version = "https://docs.kcp-edge.io"
+  url_latest_version = "https://docs.kubestellar.io"
 
   # Repository configuration (URLs for in-page links to opening issues and suggesting changes)
   github_repo = "https://github.com/kcp-dev/edge-mc"
@@ -203,11 +203,11 @@ section = ["HTML", "print", "RSS"]
   [[params.versions]]
     version = "main"
     githubbranch = "main"
-    url = "https://docs.kcp-edge.io"
+    url = "https://docs.kubestellar.io"
   [[params.versions]]
     version = "v0.10"
     githubbranch = "v0.10-branch"
-    url = "https://docs.kcp-edge.io/v0.10"
+    url = "https://docs.kubestellar.io/v0.10"
 
   # Links in footer
   [params.links]
