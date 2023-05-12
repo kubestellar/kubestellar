@@ -3,7 +3,6 @@ title = "KubeStellar"
 description = "Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud"
 
 enableRobotsTXT = true
-
 publishDir = "public"
 
 ###############################################################################
