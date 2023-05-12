@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KCP Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path)* synctarget_name
+
+# Purpose: For the given SyncTarget, (a) prepare the corresponding
+# mailbox workspace for the syncer and (b) output the YAML that needs
+# to be created in the edge cluster to install the syncer there.
+
+# This script requires the `kcp-edge syncer-gen` kubectl plugin to
+# already exist at ../bin/kubectl-kcp_edge-syncer_gen.
+
+bindir="$(dirname "$0")"
+
+if ! [ -x "$bindir/kubectl-kcp_edge-syncer_gen" ]; then
+    echo "$0: $bindir/kubectl-kcp_edge-syncer_gen does not exist; did you 'make build' or unpack a release archive here?" >&2
+    exit 2
+fi
+
+imw=.
+espw="root:espw"
+stname=""
+output=""
+syncer_image="quay.io/kcpedge/syncer:v0.1.0"
+kubectl_flags=()
+
+while (( $# > 0 )); do
+    case "$1" in
+	(--imw)
+	    if (( $# >1 ))
+	    then imw="$2"; shift
+	    else echo "$0: missing IMW pathname" >&2; exit 1
+	    fi;;
+	(--espw)
+	    if (( $# >1 ))
+	    then espw="$2"; shift
+	    else echo "$0: missing ESPW pathname" >&2; exit 1
+	    fi;;
+	(--syncer-image)
+	    if (( $# >1 ))
+	    then syncer_image="$2"; shift
+	    else echo "$0: missing syncer image reference" >&2; exit 1
+	    fi;;
+	(-o)
+	    if (( $# >1 ))
+	    then output="$2"; shift
+	    else echo "$0: missing output filename" >&2; exit 1
+	    fi;;
+	(--context*)
+	    # TODO: support --context
+	    echo "$0: --context flag not supported" >&2; exit 1;;
+	(--*=*|-?=*)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
+	(-h)
+	    echo "Usage: kubectl kcp-edge prep-for-syncer (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name"
+	    exit 0;;
+	(--*|-?)
+	    if (( $# > 1 ))
+	    then kubectl_flags[${#kubectl_flags[*]}]="$1"
+		 kubectl_flags[${#kubectl_flags[*]}]="$2"
+		 shift
+	    else echo "$0: missing value for long flag $1" >&2; exit 1
+	    fi;;
+	(-*)
+	    echo "$0: flag syntax error" >&2
+	    exit 1;;
+	(*)
+	    if [ -z "$stname" ]
+	    then stname="$1"
+	    else echo "$0: too many positional arguments" >&2
+		 exit 1
+	    fi
+    esac
+    shift
+done
+
+if [ "$stname" == "" ]; then
+    echo "$0: SyncTarget name was not specified" >&2
+    exit 1
+fi
+
+if [ "$output" == "" ]; then
+    output="${stname}-syncer.yaml"
+fi
+
+set -e
+
+original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
+
+if [ "$imw" == "." ]
+then imw="$original_ws"
+elif ! [[ "$imw" =~ [a-z0-9].* ]]; then
+    echo "$0: imw ${espw@Q} is not valid" >&2
+    exit 1
+fi
+
+if [ "$espw" == "." ]
+then espw="$original_ws"
+elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
+    echo "$0: espw ${espw@Q} is not valid" >&2
+    exit 1
+fi
+
+trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
+
+kubectl ws "${kubectl_flags[@]}" "$imw"
+
+mbwsname=$(kubectl "${kubectl_flags[@]}" get SyncTarget "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+
+kubectl ws "${kubectl_flags[@]}" "$espw"
+
+if ! kubectl "${kubectl_flags[@]}" get APIExport edge.kcp.io &> /dev/null ; then
+    echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
+    exit 2
+fi
+
+if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+    sleep 15 # maybe the mailbox controller is slow, give it a chance
+fi
+
+if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+    echo "$0: did not find the mailbox workspace $mbwsname; is the mailbox controller running?" >&2
+    exit 5
+fi
+
+kubectl ws "${kubectl_flags[@]}" "$mbwsname"
+
+"$bindir/kubectl-kcp_edge-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"
