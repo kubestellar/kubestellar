@@ -39,7 +39,7 @@ cd "$srcdir/.."
 rm -rf bin/*
 make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/scheduler ./cmd/mailbox-controller ./cmd/placement-translator"
 mkdir -p build/release
-tar czf "build/release/$archname" --exclude bin/.gitignore bin README.md LICENSE
+tar czf "build/release/$archname" --exclude bin/.gitignore bin config examples README.md LICENSE
 cd build/release
 touch checksums256.txt
 grep -vw "$archname" checksums256.txt > /tmp/$$.txt || true
