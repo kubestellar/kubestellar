@@ -1,6 +1,6 @@
 baseURL = "https://docs.kcp-edge.io"
-title = "KCP-Edge"
-description = "Consistent, Heterogeneous, and Scalable Edge Configuration Management"
+title = "KubeStellar"
+description = "Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud"
 
 enableRobotsTXT = true
 
@@ -92,8 +92,8 @@ anchor = "smart"
 ###############################################################################
 [languages]
   [languages.en]
-    title = "KCP-Edge"
-    description = "Consistent, Heterogeneous, and Scalable Edge Configuration Management"
+    title = "KubeStellar"
+    description = "Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud"
     languageName ="English"
     # Weight used for sorting.
     weight = 1
@@ -119,7 +119,7 @@ anchor = "smart"
 section = ["HTML", "print", "RSS"]
 
 [params]
-  copyright = "KCP-Edge"
+  copyright = "KubeStellar"
   privacy_policy = "https://policies.google.com/privacy"
 
   # First one is picked as the Twitter card image if not set on page.
@@ -226,7 +226,7 @@ section = ["HTML", "print", "RSS"]
       name = "YouTube Channel"
       url = "https://www.youtube.com/@kcp-edge"
       icon = "fab fa-youtube"
-      desc = "Follow us on YouTube to view recordings of past KCP-Edge community meetings and demo days"
+      desc = "Follow us on YouTube to view recordings of past KubeStellar community meetings and demo days"
     [[params.links.user]]
       name = "Medium Blog Series"
       url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
