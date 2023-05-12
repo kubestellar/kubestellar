@@ -234,7 +234,7 @@ section = ["HTML", "print", "RSS"]
       desc = "Follow us on Medium to read about community developments"
     [[params.links.user]]
       name = "LinkedIn"
-      url = "https://www.linkedin.com/feed/hashtag/?keywords=kcpedge"
+      url = "https://www.linkedin.com/feed/hashtag/?keywords=kubestellar"
       icon = "fab fa-linkedin"
       desc = "See what others are saying about the community"
     #[[params.links.user]]
