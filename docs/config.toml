@@ -34,7 +34,7 @@ enableMissingTranslationPlaceholders = true
   [[menu.main]]
     name = "Blog"
     weight = 30
-    url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
+    url = "https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST"
     pre = "<i class='fa-brands fa-medium'></i>"
   [[menu.main]]
     name = "Documentation"
@@ -229,7 +229,7 @@ section = ["HTML", "print", "RSS"]
       desc = "Follow us on YouTube to view recordings of past KubeStellar community meetings and demo days"
     [[params.links.user]]
       name = "Medium Blog Series"
-      url = "https://medium.com/@kcp-edge/list/predefined:e785a0675051:READING_LIST"
+      url = "https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST"
       icon = "fab fa-medium"
       desc = "Follow us on Medium to read about community developments"
     [[params.links.user]]
