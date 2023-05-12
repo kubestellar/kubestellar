@@ -3,7 +3,7 @@
 <br/>
 
 # KCP-Edge
-## consistent, heterogeneous, and scalable edge configuration management
+## Mutlicluster configuration management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/><br/><br/>
 [![GitHub Pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
@@ -18,7 +18,7 @@ KCP-Edge is a subproject of kcp focusing on concerns arising from edge multiclus
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
 - Non-namespaced objects: need general support
-- Cardinality of destinations: A source object may propagate to many thousands of destinations. ​ 
+- Cardinality of destinations: A source object may propagate to many thousands of destinations. 
 
 ## Goals
 
