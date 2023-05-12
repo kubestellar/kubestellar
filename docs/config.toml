@@ -213,7 +213,7 @@ section = ["HTML", "print", "RSS"]
   [params.links]
     [[params.links.user]]
       name = "User mailing list"
-      url = "https://groups.google.com/g/kcp-users"
+      url = "https://groups.google.com/g/kubestellar-users"
       icon = "fa fa-envelope"
       desc = "Discussion and help from your fellow users"
     #[[params.links.user]]
@@ -254,7 +254,7 @@ section = ["HTML", "print", "RSS"]
       desc = "Chat with other project developers"
     [[params.links.developer]]
       name = "Developer mailing list"
-      url = "https://groups.google.com/g/kcp-dev"
+      url = "https://groups.google.com/g/kubestellar-dev"
       icon = "fa fa-envelope"
       desc = "Discuss development issues around the project"
 
