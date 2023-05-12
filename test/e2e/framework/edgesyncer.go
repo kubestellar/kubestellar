@@ -118,7 +118,7 @@ type edgeSyncerFixture struct {
 	edgeSyncTargetName string
 }
 
-// CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `workload edge-sync` CLI command,
+// CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kcp-edge syncer-gen` CLI command,
 // applies the edge-syncer-related resources in the physical cluster.
 func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedEdgeSyncerFixture {
 	t.Helper()
@@ -227,14 +227,12 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	// Run the plugin command to enable the edge syncer and collect the resulting yaml
 	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
 	pluginArgs := []string{
-		"workload",
-		"edge-sync",
 		sf.edgeSyncTargetName,
 		"--syncer-image=" + syncerImage,
 		"--output-file=-",
 	}
 
-	syncerYAML := RunKcpCliPlugin(t, kubeconfigPath, pluginArgs)
+	syncerYAML := RunKcpEdgeCliPlugin(t, kubeconfigPath, pluginArgs)
 
 	// Apply the yaml output from the plugin to the downstream server
 	framework.KubectlApply(t, downstreamKubeconfigPath, syncerYAML)
@@ -427,15 +425,15 @@ func LoadFile(path string, embedded reader, v interface{}) error {
 	return yaml.Unmarshal(data, v)
 }
 
-// RunKcpCliPlugin runs the kcp workspace plugin with the provided subcommand and
+// RunKcpEdgeCliPlugin runs the kcp workspace plugin with the provided subcommand and
 // returns the combined stderr and stdout output.
-func RunKcpCliPlugin(t *testing.T, kubeconfigPath string, subcommand []string) []byte {
+func RunKcpEdgeCliPlugin(t *testing.T, kubeconfigPath string, subcommand []string) []byte {
 	t.Helper()
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)
 
-	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcpforedgesyncer")
+	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcp_edge-syncer_gen")
 	kcpCliPluginCommand := []string{"go", "run", cmdPath}
 
 	cmdParts := append(kcpCliPluginCommand, subcommand...)
