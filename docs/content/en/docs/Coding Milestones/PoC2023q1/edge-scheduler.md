@@ -55,7 +55,7 @@ kubectl ws create edge --enter
 
 Install CRDs and APIExport.
 ```console
-kubectl apply -f ../kcp-edge/config/crds/ -f ../kcp-edge/config/exports/
+kubectl apply -f ../kcp-edge/config/exports/
 ```
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
