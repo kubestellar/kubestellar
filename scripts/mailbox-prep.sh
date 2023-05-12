@@ -23,7 +23,7 @@
 # Assumption: only one SyncTarget has the given name.
 
 # This script requires the edge-mc variant kubectl-kcp plugin to
-# already exist at ../bin/kubectl-kcpforedgesyncer.
+# already exist at ../bin/kubectl-kcp_edge-syncer_gen.
 
 case "$1" in
     (-h|--help)
@@ -34,8 +34,8 @@ esac
 scriptdir="$(dirname "$0")"
 bindir="$(cd "$scriptdir"; cd ../bin; pwd)"
 
-if ! [ -x "$bindir/kubectl-kcpforedgesyncer" ]; then
-    echo "$0: $bindir/kubectl-kcpforedgesyncer does not exist; did you 'make build' or unpack a release archive here?" >&2
+if ! [ -x "$bindir/kubectl-kcp_edge-syncer_gen" ]; then
+    echo "$0: $bindir/kubectl-kcp_edge-syncer_gen does not exist; did you 'make build' or unpack a release archive here?" >&2
     exit 2
 fi
 
@@ -116,4 +116,4 @@ fi
 
 kubectl ws "$mbws"
 
-"$bindir/kubectl-kcpforedgesyncer" workload edge-sync "$stname" --syncer-image "$syncer_image" -o "$output"
+"$bindir/kubectl-kcp_edge-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"

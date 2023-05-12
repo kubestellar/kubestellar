@@ -3,7 +3,6 @@ module github.com/kcp-dev/edge-mc
 go 1.19
 
 require (
-	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0

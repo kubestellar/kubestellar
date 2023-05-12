@@ -3,27 +3,30 @@
 ## Build image
 1. `ko build --local --platform=linux/$ARCH ./cmd/syncer`
 
-## Install CLI Plugin (kcp workload edge-sync)
-1. Clone `https://github.com/yana1205/kcp` and switch branch to `emc`
-1. Make
-1. The new plugin to generate bootstrap manifests for edge-syncer
+## Install CLI Plugin (kcp-edge syncer-gen)
+1. Run `make build` to build binaries
     ```
-    $ kubectl kcp workload -h       
-    Manages KCP sync targets
+    make build
+    ```
+1. The new plugin to generate bootstrap manifests for edge-syncer is available by adding the `./bin` directory
+    ```
+    Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a physical cluster.
 
     Usage:
-      kcp workload [flags]
-      kcp workload [command]
+      syncer-gen <name> --syncer-image <edge-syncer-image> -o <output-file> [flags]
 
-    Aliases:
-      workload, workloads
+    Examples:
 
-    Available Commands:
-      cordon      Mark sync target as unschedulable
-      drain       Start draining sync target in preparation for maintenance
-      edge-sync   Create a synctarget for Edge MC in kcp with service account and RBAC permissions. Output a manifest to deploy a syncer for the given sync target in a physical cluster.
-      sync        Create a synctarget in kcp with service account and RBAC permissions. Output a manifest to deploy a syncer for the given sync target in a physical cluster.
-      ...
+            # Setup workspace for syncer to interact and then install syncer on a physical cluster
+            kubectl kcp-edge syncer-gen <name> --syncer-image <edge-syncer-image> -o edge-syncer.yaml
+            KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f edge-syncer.yaml
+
+            # Directly apply the manifest
+            kubectl kcp-edge syncer-gen <name> --syncer-image <edge-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
+
+
+    Flags:
+    ...
     ```
  
 ## Edge Syncer feasibility verification
@@ -42,7 +45,7 @@
     ```
 1. Run edge-syncer registration command
     ```
-    $ kubectl kcp workload edge-sync pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/edge-syncer.yaml
+    $ kubectl kcp-edge sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/edge-syncer.yaml
     Creating service account "kcp-edge-syncer-pcluster1-1na3tqcd"
     Creating cluster role "kcp-edge-syncer-pcluster1-1na3tqcd" to give service account "kcp-edge-syncer-pcluster1-1na3tqcd"
 
