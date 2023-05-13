@@ -6,12 +6,12 @@ description: >-
   
 ---
 
-The Code of Conduct serves as a set of rules used by the KCP-Edge community to establish a safe, respectful and inclusive environment.
+The Code of Conduct serves as a set of rules used by the KubeStellar community to establish a safe, respectful and inclusive environment.
 
-## KCP-Edge Community Code of Conduct
-The KCP-Edge Community abides by the CNCF Code of Conduct.
+## KubeStellar Community Code of Conduct
+The KubeStellar Community abides by the CNCF Code of Conduct.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the KCP-Edge Code of Conduct Committee Chair [Andy Anderson](mailto:andy@clubanderson.com).
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the KubeStellar Code of Conduct Committee Chair [Andy Anderson](mailto:andy@clubanderson.com).
 
 ## Contributor Code of Conduct
 
@@ -31,7 +31,7 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 This code of conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior in KCP-Edge may be reported by contacting the KCP-Edge Code of Conduct Committee of Conduct Committee Chair [Andy Anderson](mailto:andy@clubanderson.com). For other projects, please contact a CNCF project maintainer or our mediator, Mishi Choudhary mishi@linux.com.
+Instances of abusive, harassing, or otherwise unacceptable behavior in KubeStellar may be reported by contacting the KubeStellar Code of Conduct Committee of Conduct Committee Chair [Andy Anderson](mailto:andy@clubanderson.com). For other projects, please contact a CNCF project maintainer or our mediator, Mishi Choudhary mishi@linux.com.
 
 This Code of Conduct is adapted from the Contributor Covenant (http://contributor-covenant.org), version 1.2.0, available at http://contributor-covenant.org/version/1/2/0/
 
