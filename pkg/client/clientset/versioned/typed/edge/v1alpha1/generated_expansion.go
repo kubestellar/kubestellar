@@ -24,6 +24,8 @@ type EdgePlacementExpansion interface{}
 
 type EdgeSyncConfigExpansion interface{}
 
+type LogicalClusterExpansion interface{}
+
 type SinglePlacementSliceExpansion interface{}
 
 type SyncerConfigExpansion interface{}
