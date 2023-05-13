@@ -192,10 +192,9 @@ kubectl ws create espw --enter
 This puts the definition and export of the edge-mc API in the edge
 service provider workspace.
 
-Use the following commands.
+Use the following command.
 
 ```shell
-kubectl create -f config/crds
 kubectl create -f config/exports
 ```
 
