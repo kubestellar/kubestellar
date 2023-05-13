@@ -10,17 +10,17 @@ The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects 
 {{% /pageinfo %}}
 
 ### Pre-requisite: 
-  You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from kcp-edge
+  You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from KubeStellar
 ```console
 brew install go
 ```
 
 ### Steps to try the edge scheduler
 
-#### Pull the kcp and kcp-edge source code, build the kubectl-ws binary, and start kcp
-open a terminal window(1) and clone the latest kcp-edge source:
+#### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+open a terminal window(1) and clone the latest KubeStellar source:
 ```console
-git clone https://github.com/kcp-dev/edge-mc kcp-edge
+git clone https://github.com/kcp-dev/edge-mc KubeStellar
 ```
 
 clone the v0.11.0 branch kcp source:
@@ -55,7 +55,7 @@ kubectl ws create edge --enter
 
 Install CRDs and APIExport.
 ```console
-kubectl apply -f ../kcp-edge/config/exports/
+kubectl apply -f ../KubeStellar/config/exports/
 ```
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
@@ -66,14 +66,14 @@ kubectl ws ~
 
 Bind APIs.
 ```console
-kubectl apply -f ../kcp-edge/config/imports/
+kubectl apply -f ../KubeStellar/config/imports/
 ```
 
 #### Run the Edge Scheduler in the ESPW
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
-cd ../kcp-edge
+cd ../KubeStellar
 go run cmd/scheduler/main.go -v 2
 ```
 
@@ -100,10 +100,10 @@ kubectl ws root:compute
 
 Create two Locations and two SyncTargets.
 ```console
-kubectl create -f ../kcp-edge/config/samples/location_prod.yaml
-kubectl create -f ../kcp-edge/config/samples/location_dev.yaml
-kubectl create -f ../kcp-edge/config/samples/synctarget_prod.yaml
-kubectl create -f ../kcp-edge/config/samples/synctarget_dev.yaml
+kubectl create -f ../KubeStellar/config/samples/location_prod.yaml
+kubectl create -f ../KubeStellar/config/samples/location_dev.yaml
+kubectl create -f ../KubeStellar/config/samples/synctarget_prod.yaml
+kubectl create -f ../KubeStellar/config/samples/synctarget_dev.yaml
 ```
 
 Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
@@ -124,7 +124,7 @@ synctarget.workload.kcp.io/prod   2m12s
 Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
 ```console
 kubectl ws ~
-kubectl create -f ../kcp-edge/config/samples/edgeplacement_test-1.yaml
+kubectl create -f ../KubeStellar/config/samples/edgeplacement_test-1.yaml
 ```
 
 The edge scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
@@ -168,7 +168,7 @@ EdgePlacement `test-1` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```console
-kubectl create -f ../kcp-edge/config/samples/edgeplacement_dev.yaml
+kubectl create -f ../KubeStellar/config/samples/edgeplacement_dev.yaml
 ```
 
 The corresponding SinglePlacementSlice has a shorter list of `destinations`:
