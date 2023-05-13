@@ -32,6 +32,7 @@ type EdgeV1alpha1Interface interface {
 	CustomizersGetter
 	EdgePlacementsGetter
 	EdgeSyncConfigsGetter
+	LogicalClustersGetter
 	SinglePlacementSlicesGetter
 	SyncerConfigsGetter
 }
@@ -51,6 +52,10 @@ func (c *EdgeV1alpha1Client) EdgePlacements() EdgePlacementInterface {
 
 func (c *EdgeV1alpha1Client) EdgeSyncConfigs() EdgeSyncConfigInterface {
 	return newEdgeSyncConfigs(c)
+}
+
+func (c *EdgeV1alpha1Client) LogicalClusters() LogicalClusterInterface {
+	return newLogicalClusters(c)
 }
 
 func (c *EdgeV1alpha1Client) SinglePlacementSlices() SinglePlacementSliceInterface {
