@@ -54,14 +54,14 @@ There are several ways to communicate with us:
 
 - The [`#kcp-dev` channel](https://app.slack.com/client/T09NY5SBT/C021U8WSAFK) in the [Kubernetes Slack workspace](https://slack.k8s.io)
 - Our mailing lists:
-    - [kcp-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
-    - [kcp-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
+    - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
+    - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
 - Subscribe to the [community calendar](https://calendar.google.com/calendar/embed?src=ujjomvk4fa9fgdaem32afgl7g0%40group.calendar.google.com) for community meetings and events
     - The kcp-dev mailing list is subscribed to this calendar
 - See recordings of past KubeStellar community meetings on [YouTube](https://www.youtube.com/@kubestellar)
 - See [upcoming](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
-- Browse the [shared Google Drive](https://drive.google.com/drive/folders/1FN7AZ_Q1CQor6eK0gpuKwdGFNwYI517M?usp=sharing) to share design docs, notes, etc.
-    - Members of the kcp-dev mailing list can view this drive
+- Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
+    - Members of the kubestellar-dev mailing list can view this drive
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://kubestellar.medium.com)
