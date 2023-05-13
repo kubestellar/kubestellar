@@ -8,16 +8,16 @@ weight: 2
 
 Dear Contributors,
 
-We are excited to invite you to join the first [KCP-Edge opensource community](https://github.com/kcp-dev/edge-mc) coding sprint. We will be focus on several key projects that are critical to the development of state-based edge solutions. Our collective work will be showcased to the opensource community on Thursday, April 27th.
+We are excited to invite you to join the first [KubeStellar opensource community](https://github.com/kcp-dev/edge-mc) coding sprint. We will be focus on several key projects that are critical to the development of state-based edge solutions. Our collective work will be showcased to the opensource community on Thursday, April 27th.
 
-This coding sprint will provide a great opportunity for you to showcase your skills, learn new techniques, and collaborate with other experienced engineers in the KCP-Edge community. We believe that your contributions will be invaluable in helping us achieve our goals and making a lasting impact in the field of state-based edge technology.
+This coding sprint will provide a great opportunity for you to showcase your skills, learn new techniques, and collaborate with other experienced engineers in the KubeStellar community. We believe that your contributions will be invaluable in helping us achieve our goals and making a lasting impact in the field of state-based edge technology.
 
 The coding sprint will be dedicated to completing the following workload management elements:
 
 - Implementing an edge scheduler and placement translator, including customization options,
-- Incorporating existing customization API into the [KCP-Edge repo](https://github.com/kcp-dev/edge-mc),
+- Incorporating existing customization API into the [KubeStellar repo](https://github.com/kcp-dev/edge-mc),
 - Investigating implementation of a status summarizer, starting with basic implicit status, and later adding programmed summarization,
-- Updating summarization API and integrating it into the [KCP-Edge repo](https://github.com/kcp-dev/edge-mc),
+- Updating summarization API and integrating it into the [KubeStellar repo](https://github.com/kcp-dev/edge-mc),
 - Defining the API for identifying associated objects and its interaction with summarization, and implementing these,
 - Streamlining the creation of workload management workspaces,
 - Examining the use of Postgresql through Kine instead of etcd for scalability,
