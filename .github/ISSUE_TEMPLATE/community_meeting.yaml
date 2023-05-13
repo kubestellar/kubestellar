@@ -1,6 +1,6 @@
-name: KCP-Edge Community Meeting Agenda
+name: KubeStellar Community Meeting Agenda
 description: Create a new weekly meeting agenda
-title: "KCP-Edge Community Meeting [DATE]"
+title: "KubeStellar Community Meeting [DATE]"
 labels:
   - community-meeting
 body:
