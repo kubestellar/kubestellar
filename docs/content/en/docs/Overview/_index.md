@@ -63,5 +63,5 @@ There are several ways to communicate with us:
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1FN7AZ_Q1CQor6eK0gpuKwdGFNwYI517M?usp=sharing) to share design docs, notes, etc.
     - Members of the kcp-dev mailing list can view this drive
 - Follow us on:
-   - LinkedIn - [#kcpedge](https://www.linkedin.com/feed/hashtag/?keywords=kcpedge)
+   - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://kubestellar.medium.com)
