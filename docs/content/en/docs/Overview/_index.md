@@ -15,8 +15,7 @@ Want to get involved? Check out our ['good first issue' list](https://github.com
 <br/>
 
 ## KubeStellar
-### Mutlicluster Configuration Management for 
-### Edge, Multi-Cloud, and Hybrid Cloud
+### Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/><br/>
 ## Overview
 KubeStellar is focused on concerns arising from edge multicluster use cases.  Edge-MC is the name of our opensource community repository.  The following are challenges with Kubernetes we are tackling, with the KubeStellar community, in the edge-mc repository:
