@@ -144,7 +144,7 @@ else
 fi
 
 if [ $verbose == "true" ]; then
-    echo "Cleaning up..."
+    echo "Removing downloaded archives..."
 fi
 
 rm kubestellar.tar.gz

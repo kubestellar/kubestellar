@@ -96,7 +96,6 @@ kubestellar_version=""
 os_type=""
 arch_type=""
 folder=""
-strip_bin="false"
 verbose=""
 kcp_address=""
 kubestellar_imw=""
@@ -147,7 +146,7 @@ while (( $# > 0 )); do
     (--verbose|-V)
         verbose="-V";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--strip-bin] [-V|--verbose]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -207,7 +206,7 @@ if [ "$(kcp_running)" == "false" ]; then
         sleep 1
     done
     sleep 10
-    echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
+    echo 'Please export KUBECONFIG with the command: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
 fi
 
 # Ensure KubeStellar is installed

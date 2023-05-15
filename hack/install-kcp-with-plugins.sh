@@ -150,7 +150,7 @@ else
 fi
 
 if [ $verbose == "true" ]; then
-    echo "Cleaning up..."
+    echo "Removing downloaded archives..."
 fi
 
 rm kcp.tar.gz
