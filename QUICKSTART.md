@@ -257,7 +257,7 @@ $ curl http://localhost:8082
 <!DOCTYPE html>
 <html>
   <body>
-    This is a special web site.
+    This is a common web site.
   </body>
 </html>
 ```
