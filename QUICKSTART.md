@@ -59,7 +59,7 @@ kubectl ws tree
 .
 └── root
     ├── compute
-    ├── espw
+    └── espw
 ```
 
 ## 2. Example deployment of nginx workload into two kind local clusters
@@ -69,13 +69,13 @@ kubectl ws tree
 Create the first edge cluster:
 
 ```shell
-kind create cluster --name florin
+kind create cluster --name florin --config examples/florin-config.yaml
 ```  
 
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name guilder
+kind create cluster --name guilder --config examples/guilder-config.yaml
 ```  
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
@@ -83,18 +83,18 @@ kind create cluster --name guilder
 IMW are used by KubeStellar to store inventory objects (sync targets and placement). Create an IMW named `example-imw` with the following command:
 
 ```shell
+kubectl config use-context root
 kubectl ws root
 kubectl ws create "example-imw"
 ```
 
-WMW are used by KubeStellar to store workloads and edge placement objects. Create an WMW named `example-wmw` in a my-org workspace with the following command:
+WMW are used by KubeStellar to store workloads and edge placement objects. Create an WMW named `example-wmw` in a `my-org` workspace with the following command:
 
 ```shell
 kubectl ws root
-kubectl ws create "my-org"
-ensure-wmw.sh "example-wmw"
+kubectl ws create "my-org" --enter
+kubectl kubestellar ensure wmw example-wmw
 ```
-
 
 ### c. Onboarding the clusters
 
