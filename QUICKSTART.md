@@ -1,4 +1,4 @@
-# **KCP-Edge** Quickstart
+# **KubeStellar** Quickstart
 
 ## Required Packages:
    - [docker](https://docs.docker.com/get-docker/)
@@ -9,28 +9,27 @@
 
 Table of contents:
 
-- [1. Install and run **KCP-Edge**](#1-install-kcp-edge-pre-requisites)
+- [1. Install and run **KubeStellar**](#1-install-kubestellar-pre-requisites)
 - [2. Example deployment of nginx workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
   - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-a-local-florin-kind-cluster)
-  - [b. Onboarding the florin cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
-  - [c. Onboarding the guilder cluster](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
-  - [d. Create and deploy the nginx workload into florin and guilder clusters](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
+  - [b. Onboarding the clusters](#b-Create-a-sync-target-placement-and-edge-syncer-for-onboarding-the-created-florin-edge-cluster)
+  - [c. Create and deploy the nginx workload into florin and guilder clusters](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
 - [3. Cleanup the environment](#5-Cleanup-the-environment)
 
 
-This guide is intended to show how to quickly bring up a **KCP-Edge** environment with its dependencies from a binary release.
+This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
 
-## 1. Install and run **KCP-Edge**
+## 1. Install and run *KubeStellar**
 
-Download the kcp **KCP-Edge** binaries and scripts into a `kcp-edge` subfolder in your current working directory using the following command:
+KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/kcp-edge-bootstrap.sh) --kcp-version v0.11.0 --kcp-edge-version v0.1.0 --folder . --create-folder
-export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kcp-edge/bin"
+bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/kubestellar-bootstrap.sh) --kcp-version v0.11.0 --kubestellar-version v0.1.0 --folder . --create-folder
+export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
 
-Check that `KCP-Edge` is running:
+Check that `KubeStellar` is running:
 
 First, check that controllers are running with the following command:
 
@@ -89,7 +88,7 @@ kind create cluster --name guilder
 Create a syncTarget and location inventory objects to represent the edge cluster (`florin`):
 
 ```shell
-kcp-edge --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
+kubestellar --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
 ```
 
 The following commands list the objects that were created:
@@ -107,7 +106,7 @@ Generate the edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-kcp-edge --syncer florin  # replaces: mailbox-prep.sh florin
+kubestellar --syncer florin  # replaces: mailbox-prep.sh florin
 ```
 
 
@@ -116,21 +115,21 @@ which should yield something like:
 ```console
 Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
 
-Creating service account "kcp-edge-syncer-florin-5c4r0a44"
-Creating cluster role "kcp-edge-syncer-florin-5c4r0a44" to give service account "kcp-edge-syncer-florin-5c4r0a44"
+Creating service account "kubestellar-syncer-florin-5c4r0a44"
+Creating cluster role "kubestellar-syncer-florin-5c4r0a44" to give service account "kubestellar-syncer-florin-5c4r0a44"
 
-1. write and sync access to the synctarget "kcp-edge-syncer-florin-5c4r0a44"
+1. write and sync access to the synctarget "kubestellar-syncer-florin-5c4r0a44"
 2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-florin-5c4r0a44" to bind service account "kcp-edge-syncer-florin-5c4r0a44" to cluster role "kcp-edge-syncer-florin-5c4r0a44".
+Creating or updating cluster role binding "kubestellar-syncer-florin-5c4r0a44" to bind service account "kubestellar-syncer-florin-5c4r0a44" to cluster role "kubestellar-syncer-florin-5c4r0a44".
 
-Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-5c4r0a44". Use
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-5c4r0a44". Use
 
   KUBECONFIG=<edge-cluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-5c4r0a44" kcp-edge-syncer-florin-5c4r0a44
+  KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kubestellar-syncer-florin-5c4r0a44" kubestellar-syncer-florin-5c4r0a44
 
 to verify the syncer pod is running.
 ```
@@ -147,15 +146,15 @@ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
 which should yield something like:
 
 ```console
-namespace/kcp-edge-syncer-florin-5c4r0a44 created
-serviceaccount/kcp-edge-syncer-florin-5c4r0a44 created
-secret/kcp-edge-syncer-florin-5c4r0a44-token created
-clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
-clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-5c4r0a44 created
-role.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
-rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-florin-5c4r0a44 created
-secret/kcp-edge-syncer-florin-5c4r0a44 created
-deployment.apps/kcp-edge-syncer-florin-5c4r0a44 created
+namespace/kubestellar-syncer-florin-5c4r0a44 created
+serviceaccount/kubestellar-syncer-florin-5c4r0a44 created
+secret/kubestellar-syncer-florin-5c4r0a44-token created
+clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-5c4r0a44 created
+clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-5c4r0a44 created
+role.rbac.authorization.k8s.io/kubestellar-dns-florin-5c4r0a44 created
+rolebinding.rbac.authorization.k8s.io/kubestellar-dns-florin-5c4r0a44 created
+secret/kubestellar-syncer-florin-5c4r0a44 created
+deployment.apps/kubestellar-syncer-florin-5c4r0a44 created
 ```
 
 Check that the edge syncer pod is running:
@@ -168,7 +167,7 @@ which should yield something like:
 
 ```console
 NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
-kcp-edge-syncer-florin-5c4r0a44   kcp-edge-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
+kubestellar-syncer-florin-5c4r0a44   kubestellar-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
 kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
 kube-system                       coredns-565d847f94-rj4s8                          1/1     Running   0          85s
 kube-system                       etcd-florin-control-plane                         1/1     Running   0          99s
@@ -187,14 +186,14 @@ Repeat the same steps for the guilder cluster:
 First, create the inventory objects to represent `guilder` edge cluster:
 
 ```shell
-kcp-edge --create_inv_item guilder env=prod
+kubestellar --create_inv_item guilder env=prod
 ```
 
 Second, generate edge syncer manifest:
 
 ```shell
 kubectl ws root:espw
-kcp-edge --syncer guilder
+kubestellar --syncer guilder
 ```
 
 Lastly, apply the edge syncer manifest:
@@ -277,7 +276,7 @@ Deploy the nginx workload. Note the namespace label matches the label in the nam
 
 Now, let's check that the deployment was created in the `florin` edge cluster:
 
-```console
+```shell
 KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
 ```
 
@@ -290,7 +289,7 @@ nginx-deployment   3/3     3            3           8m37s
 
 Also, let's check that the deployment was created in the `guilder` edge cluster:
 
-```console
+```shell
 KUBECONFIG=$guilder_kubeconfig kubectl -n commonstuff get deployment
 ```
 
@@ -327,18 +326,18 @@ $ curl http://localhost:8082
 </html>
 ```
 
-Congratulations, you’ve just deployed a workload to two edge clusters using KCP-Edge! To learn more about KCP-Edge please visit our [User Guide](<place-holder>)
+Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](<place-holder>)
 
 ## 3. Cleanup the environment
 
-To uninstall kcp-edge run the following command:
+To uninstall kubestellar run the following command:
 
 ```bash
-kcp-edge stop
+kubestellar stop
 ```
 
-To uninstall kcp, kcp-edge and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
+To uninstall kcp, kubestellar and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
 
 ```shell
-kcp-edge cleanup
+kubestellar cleanup
 ```
