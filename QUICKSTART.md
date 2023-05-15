@@ -179,7 +179,7 @@ Now, let's onboard the `guilder` cluster:
 kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
-Apply the edge syncer manifest:
+Apply the created edge syncer manifest:
 
 ```shell
 KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
