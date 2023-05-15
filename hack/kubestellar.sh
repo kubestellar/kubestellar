@@ -32,7 +32,6 @@ set -e
 install=""
 verbosity=0
 espw_name="espw"
-user_type="dev"
 
 while (( $# > 0 )); do
     if [ "$1" == "start" ]; then
@@ -41,9 +40,7 @@ while (( $# > 0 )); do
         install=0
     elif [ "$1" == "-v" ]; then
         verbosity=1
-    elif [ "$1" == "--user" ]; then
-        user_type=$2
-    fi 
+    fi
     shift
 done
 
@@ -132,7 +129,7 @@ wait_for_process(){
 }
 
 
-#(7): Start the edge-mc controllers
+# Start the edge-mc controllers
 echo "****************************************"
 echo "Launching KubeStellar ..."
 echo "****************************************"
