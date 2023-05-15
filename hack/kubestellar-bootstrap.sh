@@ -19,11 +19,16 @@
 # This script installs KCP-Edge binaries to a folder of choice
 #
 # Arguments:
-# [--version release_version] set a specific KCP-Edge release version, default: latest
+# [--kcp-version release] set a specific kcp release version, default: latest
+# [--kubestellar-version release] set a specific Kubestellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--folder installation_folder] sets the installation folder, default: $PWD/kcp-edge
+# [--folder name] sets the installation folder, default: $PWD/kcp-edge
 # [--create-folder] create the instllation folder, if it does not exist
+# [--strip-bin] remove the bin sub-folder
+# [--bind address] bind kcp to a specific ip address
+# [--imw name] create a Inventory Management Workspace (IMW)
+# [--wmw name] create a Workload Management Workspace (WMW)
 # [-V|--verbose] verbose output
 
 set -e
@@ -48,7 +53,7 @@ kcp_get_latest_version() {
     curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
-kcp_edge_installed() {
+kubestellar_installed() {
     if [[ "$(which mailbox-controller)" == "" || "$(which placement-translator)" == "" || "$(which scheduler)" == "" ]]; then
         echo "false"
     else
@@ -56,7 +61,7 @@ kcp_edge_installed() {
     fi
 }
 
-kcp_edge_running() {
+kubestellar_running() {
     if [[ "$(pgrep -f mailbox-controller)" == "" ||  "$(pgrep -f placement-translator)" == "" || "$(pgrep -f 'scheduler -v')" == "" ]]; then
         echo "false"
     else
@@ -64,7 +69,7 @@ kcp_edge_running() {
     fi
 }
 
-kcp_edge_get_latest_version() {
+kubestellar_get_latest_version() {
     curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
@@ -78,7 +83,7 @@ get_os_type() {
 
 get_arch_type() {
   case "$HOSTTYPE" in
-      x86_64*)    echo "amd64" ;;
+      x86_64*)  echo "amd64" ;;
       aarch64*) echo "arm64" ;;
       *)        echo "Unsupported architecture type: $HOSTTYPE" >&2 ; exit 1 ;;
   esac
@@ -89,15 +94,16 @@ get_full_path() {
 }
 
 kcp_version=""
-kcp_edge_version=""
+kubestellar_version=""
 os_type=""
 arch_type=""
 folder=""
 create_folder=""
+strip_bin="false"
 verbose=""
 kcp_address=""
-kcp_edge_imw=""
-kcp_edge_wmw=""
+kubestellar_imw=""
+kubestellar_wmw=""
 
 while (( $# > 0 )); do
     case "$1" in
@@ -106,9 +112,9 @@ while (( $# > 0 )); do
         then { kcp_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
         fi;;
-    (--kcp-edge-version)
+    (--kubestellar-version)
         if (( $# > 1 ));
-        then { kcp_edge_version="$2"; shift; }
+        then { kubestellar_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
         fi;;
     (--os)
@@ -128,12 +134,12 @@ while (( $# > 0 )); do
         fi;;
     (--imw)
         if (( $# > 1 ));
-        then { kcp_edge_imw="$2"; shift; }
+        then { kubestellar_imw="$2"; shift; }
         else { echo "$0: missing workspace name" >&2; exit 1; }
         fi;;
     (--wmw)
         if (( $# > 1 ));
-        then { kcp_edge_wmw="$2"; shift; }
+        then { kubestellar_wmw="$2"; shift; }
         else { echo "$0: missing workspace name" >&2; exit 1; }
         fi;;
     (--folder)
@@ -143,10 +149,12 @@ while (( $# > 0 )); do
         fi;;
     (--create-folder)
         create_folder="true";;
+    (--strip-bin)
+        strip_bin="true";;
     (--verbose|-V)
         verbose="-V";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kcp-edge-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [--strip-bin] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -162,8 +170,8 @@ if [ "$kcp_version" == "" ]; then
     kcp_version=$(kcp_get_latest_version)
 fi
 
-if [ "$kcp_edge_version" == "" ]; then
-    kcp_edge_version=$(kcp_edge_get_latest_version)
+if [ "$kubestellar_version" == "" ]; then
+    kubestellar_version=$(kubestellar_get_latest_version)
 fi
 
 if [ "$os_type" == "" ]; then
@@ -209,62 +217,54 @@ if [ "$(kcp_running)" == "false" ]; then
     echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
 fi
 
-# Ensure kcp-edge is installed
-if [ "$(kcp_edge_installed)" == "false" ]; then
+# Ensure Kubestellar is installed
+if [ "$(kubestellar_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Installing kcp-edge..."
+        echo "Installing Kubestellar..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kcp-edge.sh) --version $kcp_edge_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
-    if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp-edge/bin):"* ]]; then
-        export PATH=$PATH:$(get_full_path $folder/kcp-edge/bin)
+    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
+    if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
+        export PATH=$PATH:$(get_full_path $folder/kubestellar/bin)
     fi
 fi
 
-# Ensure kcp-edge is running
-if [ "$(kcp_edge_running)" == "false" ]; then
+# Ensure Kubestellar is running
+if [ "$(kubestellar_running)" == "false" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Starting kcp-edge..."
+        echo "Starting Kubestellar..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/dumb0002/edge-mc/user-dev-kit/environments/dev-env/kcp-edge.sh) start --user kit $verbose
+    kubestellar start --user kit $verbose
 fi
 
 # Ensure imw
-if [ "$kcp_edge_imw" != "" ]; then
+if [ "$kubestellar_imw" != "" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Ensuring IMW root:$kcp_edge_imw..."
+        echo "Ensuring IMW root:$kubestellar_imw..."
     fi
-    if ! kubectl ws root:$kcp_edge_imw &> /dev/null
+    if ! kubectl ws root:$kubestellar_imw &> /dev/null
     then
         if [ "$verbose" != "" ]; then
             kubectl ws root
-            kubectl ws create $kcp_edge_imw
+            kubectl ws create $kubestellar_imw
         else
             kubectl ws root > /dev/null
-            kubectl ws create $kcp_edge_imw > /dev/null
+            kubectl ws create $kubestellar_imw > /dev/null
         fi
     fi
 fi
 
 # Ensure wmw
-if [ "$kcp_edge_wmw" != "" ]; then
+if [ "$kubestellar_wmw" != "" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Ensuring WMW root:$kcp_edge_wmw..."
+        echo "Ensuring WMW root:$kubestellar_wmw..."
     fi
-    if ! kubectl ws root:$kcp_edge_wmw &> /dev/null
-    then
-        if [ "$verbose" != "" ]; then
-            kubectl ws root
-            ensure-wmw.sh wmw-1
-            kubectl ws root
-        else
-            kubectl ws root > /dev/null
-            ensure-wmw.sh wmw-1 > /dev/null
-            kubectl ws root > /dev/null
-        fi
+    if [ "$verbose" != "" ]; then
+        kubectl ws root
+        kubectl kubestellar ensure wmw $kubestellar_wmw
+        kubectl ws root
+    else
+        kubectl ws root > /dev/null
+        kubectl kubestellar ensure wmw $kubestellar_wmw > /dev/null
+        kubectl ws root > /dev/null
     fi
 fi
-
-# echo "kcp installed? $(kcp_installed)"
-# echo "kcp running? $(kcp_running)"
-# echo "kcp-edge installed? $(kcp_edge_installed)"
-# echo "kcp-edge running? $(kcp_edge_running)"
