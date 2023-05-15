@@ -25,8 +25,8 @@
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--folder name] sets the installation folder, default: $PWD/kcp-edge
 # [--bind address] bind kcp to a specific ip address
-# [--imw name] create a Inventory Management Workspace (IMW)
-# [--wmw name] create a Workload Management Workspace (WMW)
+# [--ensure-imw name] create a Inventory Management Workspace (IMW)
+# [--ensure-wmw name] create a Workload Management Workspace (WMW)
 # [-V|--verbose] verbose output
 
 set -e
@@ -128,12 +128,12 @@ while (( $# > 0 )); do
         then { kcp_address="$2"; shift; }
         else { echo "$0: missing ip address" >&2; exit 1; }
         fi;;
-    (--imw)
+    (--ensure-imw)
         if (( $# > 1 ));
         then { kubestellar_imw="$2"; shift; }
         else { echo "$0: missing workspace name" >&2; exit 1; }
         fi;;
-    (--wmw)
+    (--ensure-wmw)
         if (( $# > 1 ));
         then { kubestellar_wmw="$2"; shift; }
         else { echo "$0: missing workspace name" >&2; exit 1; }
