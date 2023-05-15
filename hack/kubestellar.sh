@@ -132,9 +132,9 @@ wait_for_process(){
 }
 
 
-#(7): Start the edge-mc controller
+#(7): Start the edge-mc controllers
 echo "****************************************"
-echo "Started deploying kubestellar infra ...."
+echo "Launching KubeStellar ..."
 echo "****************************************"
 
 
@@ -195,7 +195,7 @@ fi
 
 sleep 10
 echo "****************************************"
-echo "Finished deploying kubestellar controllers ...."
+echo "Finished launching KubeStellar ..."
 echo "****************************************"
 kubectl ws root
 
