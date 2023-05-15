@@ -10,11 +10,11 @@
 Table of contents:
 
 - [1. Install and run **KubeStellar**](#1-install-kubestellar-pre-requisites)
-- [2. Example deployment of nginx workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
+- [2. Example deployment of Apache HTTP Server workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
   - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-two-kind-clusters-florin-and-guilder)
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-onboarding-the-clusters)
   - [c. Onboarding the clusters](#b-onboarding-the-clusters)
-  - [d. Create and deploy the nginx workload into florin and guilder clusters](#c-Create-and-deploy-the-nginx-workload-into-florin-and-guilder-clusters)
+  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#c-Create-and-deploy-the-nginx-workload-into-florin-and-guilder-clusters)
 - [3. Cleanup the environment](#3-Cleanup-the-environment)
 
 
@@ -62,7 +62,7 @@ kubectl ws tree
     └── espw
 ```
 
-## 2. Example deployment of nginx workload into two kind local clusters
+## 2. Example deployment of Apache HTTP Server workload into two kind local clusters
 
 ### a. Stand up a local florin and guilder kind clusters
 
@@ -148,15 +148,13 @@ KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
 which should yield something like:
 
 ```console
-namespace/kubestellar-syncer-florin-5c4r0a44 created
-serviceaccount/kubestellar-syncer-florin-5c4r0a44 created
-secret/kubestellar-syncer-florin-5c4r0a44-token created
-clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-5c4r0a44 created
-clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-5c4r0a44 created
-role.rbac.authorization.k8s.io/kubestellar-dns-florin-5c4r0a44 created
-rolebinding.rbac.authorization.k8s.io/kubestellar-dns-florin-5c4r0a44 created
-secret/kubestellar-syncer-florin-5c4r0a44 created
-deployment.apps/kubestellar-syncer-florin-5c4r0a44 created
+namespace/kcp-edge-syncer-florin-1yi5q9c4 created
+serviceaccount/kcp-edge-syncer-florin-1yi5q9c4 created
+secret/kcp-edge-syncer-florin-1yi5q9c4-token created
+clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
+clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
+secret/kcp-edge-syncer-florin-1yi5q9c4 created
+deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
 ```
 
 Optionally, check that the edge syncer pod is running:
@@ -168,17 +166,18 @@ KUBECONFIG=$florin_kubeconfig kubectl get pods -A
 which should yield something like:
 
 ```console
-NAMESPACE                         NAME                                              READY   STATUS    RESTARTS   AGE
-kubestellar-syncer-florin-5c4r0a44   kubestellar-syncer-florin-5c4r0a44-bb8c8db4b-ng8sz   1/1     Running   0          30s
-kube-system                       coredns-565d847f94-kr2pw                          1/1     Running   0          85s
-kube-system                       coredns-565d847f94-rj4s8                          1/1     Running   0          85s
-kube-system                       etcd-florin-control-plane                         1/1     Running   0          99s
-kube-system                       kindnet-l26qt                                     1/1     Running   0          85s
-kube-system                       kube-apiserver-florin-control-plane               1/1     Running   0          100s
-kube-system                       kube-controller-manager-florin-control-plane      1/1     Running   0          100s
-kube-system                       kube-proxy-qzhx6                                  1/1     Running   0          85s
-kube-system                       kube-scheduler-florin-control-plane               1/1     Running   0          99s
-local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
+NAMESPACE                         NAME                                               READY   STATUS    RESTARTS   AGE
+kcp-edge-syncer-florin-1yi5q9c4   kcp-edge-syncer-florin-1yi5q9c4-77cb588c89-xc5qr   1/1     Running   0          12m
+kube-system                       coredns-565d847f94-92f4k                           1/1     Running   0          58m
+kube-system                       coredns-565d847f94-kgddm                           1/1     Running   0          58m
+kube-system                       etcd-florin-control-plane                          1/1     Running   0          58m
+kube-system                       kindnet-p8vkv                                      1/1     Running   0          58m
+kube-system                       kube-apiserver-florin-control-plane                1/1     Running   0          58m
+kube-system                       kube-controller-manager-florin-control-plane       1/1     Running   0          58m
+kube-system                       kube-proxy-jmxsg                                   1/1     Running   0          58m
+kube-system                       kube-scheduler-florin-control-plane                1/1     Running   0          58m
+local-path-storage                local-path-provisioner-684f458cdd-kw2xz            1/1     Running   0          58m
+
 ``` 
 
 Now, let's onboard the `guilder` cluster:
@@ -194,76 +193,22 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
-### e. Create and deploy the nginx workload into florin and guilder clusters
+### e. Create and deploy the Apache Server workload into florin and guilder clusters
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
 In the `wmw-1` workspace create the following `EdgePlacement` object: 
   
-```console
-kubectl ws root:my-org:wmw-1
+```shell
+kubectl ws root:my-org:example-wmw
+kubectl apply -f examples/common-placement.yaml
 ```
 
-```console
-  kubectl apply -f - <<EOF
-  apiVersion: edge.kcp.io/v1alpha1
-  kind: EdgePlacement
-  metadata:
-    name: edge-placement-c
-  spec:
-    locationSelectors:
-    - matchLabels: {"env":"prod"}
-    namespaceSelector:
-      matchLabels: {"common":"si"}
-    nonNamespacedObjects:
-    - apiGroup: apis.kcp.io
-      resources: [ "apibindings" ]
-      resourceNames: [ "bind-kube" ]
-    upsync:
-    - apiGroup: "group1.test"
-      resources: ["sprockets", "flanges"]
-      namespaces: ["orbital"]
-      names: ["george", "cosmo"]
-    - apiGroup: "group2.test"
-      resources: ["cogs"]
-      names: ["william"]
-  EOF
+Deploy the Apache HTTP Server workload. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
+
+```shell
+kubectl apply -f examples/common-workload.yaml
 ```
-
-Deploy the nginx workload. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
-
-```console
-  kubectl apply -f - <<EOF
-  apiVersion: v1
-  kind: Namespace
-  metadata:
-    name: commonstuff
-    labels: {common: "si"}
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: nginx-deployment
-    namespace: commonstuff
-    labels:
-      app: nginx
-  spec:
-    replicas: 3
-    selector:
-      matchLabels:
-        app: nginx
-    template:
-      metadata:
-        labels:
-          app: nginx
-      spec:
-        containers:
-        - name: nginx
-          image: nginx:1.14.2
-          ports:
-          - containerPort: 80
-  EOF
-  ```
 
 Now, let's check that the deployment was created in the `florin` edge cluster:
 
