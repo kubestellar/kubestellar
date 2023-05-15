@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 --create-folder --verbose
+# Usage: $0  --verbose
 
 # This script installs KCP-Edge binaries to a folder of choice
 #
@@ -24,7 +24,6 @@
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--folder name] sets the installation folder, default: $PWD/kcp-edge
-# [--create-folder] create the instllation folder, if it does not exist
 # [--strip-bin] remove the bin sub-folder
 # [--bind address] bind kcp to a specific ip address
 # [--imw name] create a Inventory Management Workspace (IMW)
@@ -98,7 +97,6 @@ kubestellar_version=""
 os_type=""
 arch_type=""
 folder=""
-create_folder=""
 strip_bin="false"
 verbose=""
 kcp_address=""
@@ -147,14 +145,12 @@ while (( $# > 0 )); do
         then { folder="$2"; shift; }
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
-    (--create-folder)
-        create_folder="true";;
     (--strip-bin)
         strip_bin="true";;
     (--verbose|-V)
         verbose="-V";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [--strip-bin] [-V|--verbose]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--strip-bin] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -191,7 +187,7 @@ if [ "$(kcp_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing kcp..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --folder  $folder/kcp --create-folder $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --folder  $folder/kcp --create-folder $verbose
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kcp/bin)
     fi
@@ -222,7 +218,7 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing Kubestellar..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kubestellar/bin)
     fi
