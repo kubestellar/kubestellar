@@ -11,9 +11,9 @@ Table of contents:
 
 - [1. Install and run **KubeStellar**](#1-install-kubestellar-pre-requisites)
 - [2. Example deployment of nginx workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
-  - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-a-local-florin-kind-cluster)
+  - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-two-kind-clusters-florin-and-guilder)
   - [b. Onboarding the clusters](#b-onboarding-the-clusters)
-  - [c. Create and deploy the nginx workload into florin and guilder clusters](#c-Create-the-nginx-workload-and-deploy-it-to-the-florin-cluster)
+  - [c. Create and deploy the nginx workload into florin and guilder clusters](#c-Create-and-deploy-the-nginx-workload-into-florin-and-guilder-clusters)
 - [3. Cleanup the environment](#3-Cleanup-the-environment)
 
 
