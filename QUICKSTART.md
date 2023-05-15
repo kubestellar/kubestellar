@@ -19,7 +19,7 @@ Table of contents:
 
 This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
 
-## 1. Install and run *KubeStellar**
+## 1. Install and run **KubeStellar**
 
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
@@ -83,9 +83,9 @@ Create the second edge cluster:
 kind create cluster --name guilder
 ```  
 
-### b. Onboarding the florin cluster
+### b. Onboarding the clusters
 
-Create a syncTarget and location inventory objects to represent the edge cluster (`florin`):
+Create a syncTarget and location inventory objects to represent the `florin` cluster:
 
 ```shell
 kubestellar --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
@@ -179,9 +179,7 @@ kube-system                       kube-scheduler-florin-control-plane           
 local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
 ``` 
 
-### c. Onboarding the guilder cluster
-
-Repeat the same steps for the guilder cluster:
+Repeat the same steps for the `guilder` cluster:
 
 First, create the inventory objects to represent `guilder` edge cluster:
 
@@ -203,7 +201,7 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
-### d. Create and deploy the nginx workload into florin and guilder clusters
+### c. Create and deploy the nginx workload into florin and guilder clusters
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
