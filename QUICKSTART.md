@@ -88,7 +88,7 @@ kind create cluster --name guilder
 Create a syncTarget and location inventory objects to represent the `florin` cluster:
 
 ```shell
-kubestellar --create_inv_item florin  env=prod    # replaces ensure-location.sh florin  env=prod
+kubectl kcp-edge prep-for-cluster --imw root:example-imw florin  env=prod
 ```
 
 The following commands list the objects that were created:
@@ -157,7 +157,7 @@ secret/kubestellar-syncer-florin-5c4r0a44 created
 deployment.apps/kubestellar-syncer-florin-5c4r0a44 created
 ```
 
-Check that the edge syncer pod is running:
+Optionally, check that the edge syncer pod is running:
 
 ```console
 KUBECONFIG=$florin_kubeconfig kubectl get pods -A
@@ -184,7 +184,7 @@ Repeat the same steps for the `guilder` cluster:
 First, create the inventory objects to represent `guilder` edge cluster:
 
 ```shell
-kubestellar --create_inv_item guilder env=prod
+kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
 Second, generate edge syncer manifest:
