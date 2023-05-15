@@ -213,27 +213,27 @@ kubectl apply -f examples/common-workload.yaml
 Now, let's check that the deployment was created in the `florin` edge cluster:
 
 ```shell
-KUBECONFIG=$florin_kubeconfig kubectl -n commonstuff get deployment
+KUBECONFIG=$florin_kubeconfig kubectl get deployments -A
 ```
 
 which should yield something like:
 
 ```console
-NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-nginx-deployment   3/3     3            3           8m37s
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff   commond   0/0     0            0           6m44s
 ```
 
 Also, let's check that the deployment was created in the `guilder` edge cluster:
 
 ```shell
-KUBECONFIG=$guilder_kubeconfig kubectl -n commonstuff get deployment
+KUBECONFIG=$guilder_kubeconfig kubectl get deployments -A
 ```
 
 which should yield something like:
 
 ```console
-NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-nginx-deployment   3/3     3            3           8m37s
+NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff   commond   0/0     0            0           6m44s
 ```
 
 Lastly, let's check that the workload is working in both clusters:
