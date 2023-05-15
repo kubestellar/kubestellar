@@ -19,11 +19,12 @@
 # This script installs Kubestellar binaries to a folder of choice
 #
 # Arguments:
-# [--version release_version] set a specific Kubestellar release version, default: latest
+# [--version release] set a specific Kubestellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--folder installation_folder] sets the installation folder, default: $PWD/kubestellar
+# [--folder name] sets the installation folder, default: $PWD/kubestellar
 # [--create-folder] create the instllation folder, if it does not exist
+# [--strip-bin] remove the bin sub-folder
 # [-V|--verbose] verbose output
 
 set -e
@@ -33,6 +34,7 @@ kubestellar_os=""
 kubestellar_arch=""
 kubestellar_folder=""
 kubestellar_create_folder="false"
+kubestellar_strip_bin="false"
 verbose="false"
 
 get_os_type() {
@@ -45,7 +47,7 @@ get_os_type() {
 
 get_arch_type() {
   case "$HOSTTYPE" in
-      x86_64*)    echo "amd64" ;;
+      x86_64*)  echo "amd64" ;;
       aarch64*) echo "arm64" ;;
       *)        echo "Unsupported architecture type: $HOSTTYPE" >&2 ; exit 1 ;;
   esac
@@ -83,10 +85,12 @@ while (( $# > 0 )); do
         fi;;
     (--create-folder)
         kubestellar_create_folder="true";;
+    (--strip-bin)
+        kubestellar_strip_bin="true";;
     (--verbose|-V)
         verbose="true";;
     (-h|--help)
-        echo "Usage: $0 [--version release_version] [--os linux|darwin] [--arch amd64|arm64] [--folder installation_folder] [--create-folder] [-V|--verbose]"
+        echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--folder name] [--create-folder] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -121,26 +125,30 @@ else
     echo "Specified folder does not exist: $kubestellar_folder" >&2; exit 1;
 fi
 
-if [ $verbose == "true" ]
-then
+if [ $verbose == "true" ]; then
     echo "Downloading Kubestellar $kubestellar_version $kubestellar_os/$kubestellar_arch..."
     curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 else
     curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 fi
 
-if [ $verbose == "true" ]
-then
+if [ $verbose == "true" ]; then
     echo "Extracting archive to: $kubestellar_folder"
 fi
-tar -zxf kubestellar.tar.gz -C $kubestellar_folder
+if [ $kubestellar_strip_bin == "true" ]; then
+    tar -C $kubestellar_folder -zxf kubestellar.tar.gz --wildcards --strip-components=1 bin/*
+    bin_folder=$(get_full_path "$kubestellar_folder")
+else
+    tar -C $kubestellar_folder -zxf kubestellar.tar.gz
+    bin_folder=$(get_full_path "$kubestellar_folder/bin")
+fi
 
-if [ $verbose == "true" ]
-then
+if [ $verbose == "true" ]; then
     echo "Cleaning up..."
 fi
+
 rm kubestellar.tar.gz
 
-if [[ ! ":$PATH:" == *":$(get_full_path $kubestellar_folder/bin):"* ]]; then
-    echo "Add Kubestellar folder to your path: export PATH="\$PATH:$(get_full_path $kubestellar_folder/bin)""
+if [[ ! ":$PATH:" == *":$bin_folder:"* ]]; then
+    echo "Add Kubestellar folder to your path: export PATH="\$PATH:$bin_folder""
 fi
