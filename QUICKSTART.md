@@ -187,13 +187,6 @@ First, create the inventory objects to represent `guilder` edge cluster:
 kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
-Second, generate edge syncer manifest:
-
-```shell
-kubectl ws root:espw
-kubestellar --syncer guilder
-```
-
 Lastly, apply the edge syncer manifest:
 
 ```shell
