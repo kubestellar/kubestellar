@@ -101,31 +101,39 @@ kubectl kubestellar ensure wmw example-wmw
 Let's begin by onboarding the `florin` cluster:
 
 ```shell
-kubectl kcp-edge prep-for-cluster --imw root:example-imw florin  env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw florin  env=prod
 ```
 
 which should yield something like:
 
 ```console
-Current workspace is "root:espw:19igldm1mmolruzr-mb-6b0309f0-84f3-4926-9344-81df2f989f69" (type root:universal).
+Current workspace is "root:example-imw".
+synctarget.workload.kcp.io/florin created
+location.scheduling.kcp.io/florin created
+synctarget.workload.kcp.io/florin labeled
+location.scheduling.kcp.io/florin labeled
+Current workspace is "root:example-imw".
+Current workspace is "root:espw".
+Current workspace is "root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a" (type root:universal).
+Creating service account "kcp-edge-syncer-florin-1yi5q9c4"
+Creating cluster role "kcp-edge-syncer-florin-1yi5q9c4" to give service account "kcp-edge-syncer-florin-1yi5q9c4"
 
-Creating service account "kubestellar-syncer-florin-5c4r0a44"
-Creating cluster role "kubestellar-syncer-florin-5c4r0a44" to give service account "kubestellar-syncer-florin-5c4r0a44"
+ 1. write and sync access to the synctarget "kcp-edge-syncer-florin-1yi5q9c4"
+ 2. write access to apiresourceimports.
 
-1. write and sync access to the synctarget "kubestellar-syncer-florin-5c4r0a44"
-2. write access to apiresourceimports.
+Creating or updating cluster role binding "kcp-edge-syncer-florin-1yi5q9c4" to bind service account "kcp-edge-syncer-florin-1yi5q9c4" to cluster role "kcp-edge-syncer-florin-1yi5q9c4".
 
-Creating or updating cluster role binding "kubestellar-syncer-florin-5c4r0a44" to bind service account "kubestellar-syncer-florin-5c4r0a44" to cluster role "kubestellar-syncer-florin-5c4r0a44".
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-1yi5q9c4". Use
 
-Wrote physical cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-5c4r0a44". Use
-
-  KUBECONFIG=<edge-cluster-config> kubectl apply -f "florin-syncer.yaml"
+  KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<edge-cluster-config> kubectl get deployment -n "kubestellar-syncer-florin-5c4r0a44" kubestellar-syncer-florin-5c4r0a44
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-1yi5q9c4" kcp-edge-syncer-florin-1yi5q9c4
 
 to verify the syncer pod is running.
+Current workspace is "root:example-imw".
+Current workspace is "root".
 ```
 
 An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
