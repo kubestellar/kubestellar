@@ -16,23 +16,23 @@
 
 # Usage: $0 --create-folder --verbose
 
-# This script installs KCP-Edge binaries to a folder of choice
+# This script installs Kubestellar binaries to a folder of choice
 #
 # Arguments:
-# [--version release_version] set a specific KCP-Edge release version, default: latest
+# [--version release_version] set a specific Kubestellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--folder installation_folder] sets the installation folder, default: $PWD/kcp-edge
+# [--folder installation_folder] sets the installation folder, default: $PWD/kubestellar
 # [--create-folder] create the instllation folder, if it does not exist
 # [-V|--verbose] verbose output
 
 set -e
 
-kcp_edge_version=""
-kcp_edge_os=""
-kcp_edge_arch=""
-kcp_edge_folder=""
-kcp_edge_create_folder="false"
+kubestellar_version=""
+kubestellar_os=""
+kubestellar_arch=""
+kubestellar_folder=""
+kubestellar_create_folder="false"
 verbose="false"
 
 get_os_type() {
@@ -63,26 +63,26 @@ while (( $# > 0 )); do
     case "$1" in
     (--version)
         if (( $# > 1 ));
-        then { kcp_edge_version="$2"; shift; }
+        then { kubestellar_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
         fi;;
     (--os)
         if (( $# > 1 ));
-        then { kcp_edge_os="$2"; shift; }
+        then { kubestellar_os="$2"; shift; }
         else { echo "$0: missing OS type" >&2; exit 1; }
         fi;;
     (--arch)
         if (( $# > 1 ));
-        then { kcp_edge_arch="$2"; shift; }
+        then { kubestellar_arch="$2"; shift; }
         else { echo "$0: missing architecture type" >&2; exit 1; }
         fi;;
     (--folder)
         if (( $# > 1 ));
-        then { kcp_edge_folder="$2"; shift; }
+        then { kubestellar_folder="$2"; shift; }
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
     (--create-folder)
-        kcp_edge_create_folder="true";;
+        kubestellar_create_folder="true";;
     (--verbose|-V)
         verbose="true";;
     (-h|--help)
@@ -98,49 +98,49 @@ while (( $# > 0 )); do
     shift
 done
 
-if [ "$kcp_edge_version" == "" ]; then
-    kcp_edge_version=$(get_latest_version)
+if [ "$kubestellar_version" == "" ]; then
+    kubestellar_version=$(get_latest_version)
 fi
-if [ "$kcp_edge_os" == "" ]; then
-    kcp_edge_os=$(get_os_type)
+if [ "$kubestellar_os" == "" ]; then
+    kubestellar_os=$(get_os_type)
 fi
-if [ "$kcp_edge_arch" == "" ]; then
-    kcp_edge_arch=$(get_arch_type)
+if [ "$kubestellar_arch" == "" ]; then
+    kubestellar_arch=$(get_arch_type)
 fi
-if [ "$kcp_edge_folder" == "" ]; then
-    kcp_edge_folder="$PWD/kcp-edge"
+if [ "$kubestellar_folder" == "" ]; then
+    kubestellar_folder="$PWD/kubestellar"
 fi
 
-if [ -d "$kcp_edge_folder" ]; then :
-elif [ "$kcp_edge_create_folder" == "true" ]; then
+if [ -d "$kubestellar_folder" ]; then :
+elif [ "$kubestellar_create_folder" == "true" ]; then
     if [ $verbose == "true" ] ; then
-        echo "Creating folder: $kcp_edge_folder"
+        echo "Creating folder: $kubestellar_folder"
     fi
-    mkdir -p "$kcp_edge_folder"
+    mkdir -p "$kubestellar_folder"
 else
-    echo "Specified folder does not exist: $kcp_edge_folder" >&2; exit 1;
+    echo "Specified folder does not exist: $kubestellar_folder" >&2; exit 1;
 fi
 
 if [ $verbose == "true" ]
 then
-    echo "Downloading KCP-Edge $kcp_edge_version $kcp_edge_os/$kcp_edge_arch..."
-    curl -SL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+    echo "Downloading Kubestellar $kubestellar_version $kubestellar_os/$kubestellar_arch..."
+    curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 else
-    curl -sSL -o kcp-edge.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kcp_edge_version}/kcp-edge_${kcp_edge_version}_${kcp_edge_os}_$kcp_edge_arch.tar.gz"
+    curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 fi
 
 if [ $verbose == "true" ]
 then
-    echo "Extracting archive to: $kcp_edge_folder"
+    echo "Extracting archive to: $kubestellar_folder"
 fi
-tar -zxf kcp-edge.tar.gz -C $kcp_edge_folder
+tar -zxf kubestellar.tar.gz -C $kubestellar_folder
 
 if [ $verbose == "true" ]
 then
     echo "Cleaning up..."
 fi
-rm kcp-edge.tar.gz
+rm kubestellar.tar.gz
 
-if [[ ! ":$PATH:" == *":$(get_full_path $kcp_edge_folder/bin):"* ]]; then
-    echo "Add KCP-Edge folder to your path: export PATH="\$PATH:$(get_full_path $kcp_edge_folder/bin)""
+if [[ ! ":$PATH:" == *":$(get_full_path $kubestellar_folder/bin):"* ]]; then
+    echo "Add Kubestellar folder to your path: export PATH="\$PATH:$(get_full_path $kubestellar_folder/bin)""
 fi

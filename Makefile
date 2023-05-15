@@ -35,17 +35,22 @@ CONTROLLER_GEN_BIN := controller-gen
 CONTROLLER_GEN := $(TOOLS_DIR)/$(CONTROLLER_GEN_BIN)-$(CONTROLLER_GEN_VER)
 export CONTROLLER_GEN # so hack scripts can use it
 
+API_GEN_VER := v0.0.0-20230124223207-cb8dd3c46470
+API_GEN_BIN := apigen
+API_GEN := $(TOOLS_DIR)/$(API_GEN_BIN)-$(API_GEN_VER)
+export API_GEN # so hack scripts can use it
+
 YAML_PATCH_VER ?= v0.0.11
 YAML_PATCH_BIN := yaml-patch
 YAML_PATCH := $(TOOLS_DIR)/$(YAML_PATCH_BIN)-$(YAML_PATCH_VER)
 export YAML_PATCH # so hack scripts can use it
 
-OPENSHIFT_GOIMPORTS_VER := c72f1dc2e3aacfa00aece3391d938c9bc734e791
+OPENSHIFT_GOIMPORTS_VER := 4cd858e694d7dfa32a2e697e0e4bab245c215cf3
 OPENSHIFT_GOIMPORTS_BIN := openshift-goimports
 OPENSHIFT_GOIMPORTS := $(TOOLS_DIR)/$(OPENSHIFT_GOIMPORTS_BIN)-$(OPENSHIFT_GOIMPORTS_VER)
 export OPENSHIFT_GOIMPORTS # so hack scripts can use it
 
-GOLANGCI_LINT_VER := v1.49.0
+GOLANGCI_LINT_VER := v1.50.1
 GOLANGCI_LINT_BIN := golangci-lint
 GOLANGCI_LINT := $(TOOLS_GOBIN_DIR)/$(GOLANGCI_LINT_BIN)-$(GOLANGCI_LINT_VER)
 
@@ -57,10 +62,15 @@ GOTESTSUM_VER := v1.8.1
 GOTESTSUM_BIN := gotestsum
 GOTESTSUM := $(abspath $(TOOLS_DIR))/$(GOTESTSUM_BIN)-$(GOTESTSUM_VER)
 
-LOGCHECK_VER := v0.2.0
+LOGCHECK_VER := v0.4.1
 LOGCHECK_BIN := logcheck
 LOGCHECK := $(TOOLS_GOBIN_DIR)/$(LOGCHECK_BIN)-$(LOGCHECK_VER)
 export LOGCHECK # so hack scripts can use it
+
+CODE_GENERATOR_VER := v2.0.0-alpha.1
+CODE_GENERATOR_BIN := code-generator
+CODE_GENERATOR := $(TOOLS_GOBIN_DIR)/$(CODE_GENERATOR_BIN)-$(CODE_GENERATOR_VER)
+export CODE_GENERATOR # so hack scripts can use it
 
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
@@ -84,7 +94,8 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.gitVersion=${GIT_VERSION} \
 	-X k8s.io/component-base/version.gitMajor=${KUBE_MAJOR_VERSION} \
 	-X k8s.io/component-base/version.gitMinor=${KUBE_MINOR_VERSION} \
-	-X k8s.io/component-base/version.buildDate=${BUILD_DATE}
+	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
+	-extldflags '-static'
 all: build
 .PHONY: all
 
@@ -95,26 +106,49 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/...
+build: WHAT ?= ./cmd/... 
+#./tmc/cmd/...
 build: require-jq require-go require-git verify-go-versions ## Build the project
-	GOOS=$(OS) GOARCH=$(ARCH) go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
+#	ln -sf kubectl-workspace bin/kubectl-workspaces
+#	ln -sf kubectl-workspace bin/kubectl-ws
+	cp scripts/* bin/
 .PHONY: build
 
 .PHONY: build-all
 build-all:
-	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT=./cmd/...
+	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...'
+#'  ./tmc/cmd/...'
 
-.PHONY: build-kind-images
-build-kind-images-ko: require-ko
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./cmd/syncer))
-	$(eval TEST_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./test/e2e/fixtures/kcp-test-image))
-build-kind-images: build-kind-images-ko
-	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
-	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
+# .PHONY: build-kind-images
+# build-kind-images-ko: require-ko
+# 	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./cmd/syncer))
+# 	$(eval TEST_IMAGE=$(shell KO_DOCKER_REPO=kind.local ko build --platform=linux/$(ARCH) ./test/e2e/fixtures/kcp-test-image))
+# build-kind-images: build-kind-images-ko
+# 	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
+# 	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
+
+# build and push edge-syncer image by ko
+# e.g. usage:
+#      make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+# This example builds ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+.PHONY: build-edge-syncer-image
+build-edge-syncer-image: DOCKER_REPO ?= 
+build-edge-syncer-image: IMAGE_TAG ?= latest
+build-edge-syncer-image: ARCHS ?= linux/$(ARCH)
+build-edge-syncer-image: require-ko
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
+	@echo "$(SYNCER_IMAGE)"
+
+.PHONY: build-edge-syncer-image-local
+build-edge-syncer-image-local: require-ko
+	$(eval SYNCER_IMAGE=$(shell ko build --local --platform=linux/$(ARCH) ./cmd/syncer))
+	@echo "$(SYNCER_IMAGE)"
 
 install: WHAT ?= ./cmd/...
 install:
-	GOOS=$(OS) GOARCH=$(ARCH) go install -ldflags="$(LDFLAGS)" $(WHAT)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go install -ldflags="$(LDFLAGS)" $(WHAT)
 	ln -sf $(INSTALL_GOBIN)/kubectl-workspace $(INSTALL_GOBIN)/kubectl-ws
 	ln -sf $(INSTALL_GOBIN)/kubectl-workspace $(INSTALL_GOBIN)/kubectl-workspaces
 .PHONY: install
@@ -128,9 +162,12 @@ $(STATICCHECK):
 $(LOGCHECK):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/logtools/logcheck $(LOGCHECK_BIN) $(LOGCHECK_VER)
 
+$(CODE_GENERATOR):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/code-generator/v2 $(CODE_GENERATOR_BIN) $(CODE_GENERATOR_VER)
+
 lint: $(GOLANGCI_LINT) $(STATICCHECK) $(LOGCHECK)
-	# $(GOLANGCI_LINT) run --timeout=10m -v ./...
-	# $(STATICCHECK) -checks ST1019,ST1005 ./...
+#	$(GOLANGCI_LINT) run ./...
+#	$(STATICCHECK) -checks ST1019,ST1005 ./...
 	./hack/verify-contextual-logging.sh
 .PHONY: lint
 
@@ -138,20 +175,23 @@ update-contextual-logging: $(LOGCHECK)
 	UPDATE=true ./hack/verify-contextual-logging.sh
 .PHONY: update-contextual-logging
 
-generate-docs:
-	go run hack/generate/cli-doc/gen-cli-doc.go
-	./hack/generate/crd-ref/run-crd-ref-gen.sh
+# generate-docs:
+# 	go run hack/generate/cli-doc/gen-cli-doc.go
+# 	./hack/generate/crd-ref/run-crd-ref-gen.sh
 
 vendor: ## Vendor the dependencies
 	go mod tidy
 	go mod vendor
 .PHONY: vendor
 
-tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS)
+tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
 
 $(CONTROLLER_GEN):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
+
+$(API_GEN):
+	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/kcp/cmd/apigen $(API_GEN_BIN) $(API_GEN_VER)
 
 $(YAML_PATCH):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/pivotal-cf/yaml-patch/cmd/yaml-patch $(YAML_PATCH_BIN) $(YAML_PATCH_VER)
@@ -159,9 +199,13 @@ $(YAML_PATCH):
 $(GOTESTSUM):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) gotest.tools/gotestsum $(GOTESTSUM_BIN) $(GOTESTSUM_VER)
 
-codegen: $(CONTROLLER_GEN) $(YAML_PATCH) ## Run the codegenerators
+crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
+	./hack/update-codegen-crds.sh
+.PHONY: crds
+
+codegen: crds $(CODE_GENERATOR)
 	go mod download
-	./hack/update-codegen.sh
+	./hack/update-codegen-clients.sh
 	$(MAKE) imports
 .PHONY: codegen
 
@@ -171,10 +215,25 @@ codegen: $(CONTROLLER_GEN) $(YAML_PATCH) ## Run the codegenerators
 verify-codegen:
 	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
 		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/kcp; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
 	fi
 
 	$(MAKE) codegen
+
+	if ! git diff --quiet HEAD; then \
+		git diff; \
+		echo "You need to run 'make codegen' to update generated files and commit them"; \
+		exit 1; \
+	fi
+
+.PHONY: verify-syncer-codegen
+verify-syncer-codegen:
+	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
+		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
+	fi
+
+	$(MAKE) syncer-codegen
 
 	if ! git diff --quiet HEAD; then \
 		git diff; \
@@ -186,8 +245,8 @@ $(OPENSHIFT_GOIMPORTS):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/openshift-eng/openshift-goimports $(OPENSHIFT_GOIMPORTS_BIN) $(OPENSHIFT_GOIMPORTS_VER)
 
 .PHONY: imports
-imports: $(OPENSHIFT_GOIMPORTS)
-	$(OPENSHIFT_GOIMPORTS) -m github.com/kcp-dev/kcp
+imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
+	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kcp-dev/edge-mc
 
 $(TOOLS_DIR)/verify_boilerplate.py:
 	mkdir -p $(TOOLS_DIR)
@@ -225,105 +284,129 @@ COMPLETE_SUITES_ARG = -args $(SUITES_ARG)
 endif
 
 
-.PHONY: test-e2e
-ifdef USE_GOTESTSUM
-test-e2e: $(GOTESTSUM)
-endif
-test-e2e: TEST_ARGS ?=
-test-e2e: WHAT ?= ./test/e2e...
-test-e2e: build-all
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) $(COMPLETE_SUITES_ARG)
+# .PHONY: test-e2e
+# ifdef USE_GOTESTSUM
+# test-e2e: $(GOTESTSUM)
+# endif
+# test-e2e: TEST_ARGS ?=
+# test-e2e: WHAT ?= ./test/e2e...
+# test-e2e: build-all
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) $(COMPLETE_SUITES_ARG)
 
-.PHONY: test-e2e-shared
-ifdef USE_GOTESTSUM
-test-e2e-shared: $(GOTESTSUM)
-endif
-test-e2e-shared: TEST_ARGS ?=
-test-e2e-shared: WHAT ?= ./test/e2e...
-test-e2e-shared: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-shared: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-shared: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-shared: require-kind build-all build-kind-images
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
+# .PHONY: test-e2e-shared
+# ifdef USE_GOTESTSUM
+# test-e2e-shared: $(GOTESTSUM)
+# endif
+# test-e2e-shared: TEST_ARGS ?=
+# test-e2e-shared: WHAT ?= ./test/e2e...
+# test-e2e-shared: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-shared: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-shared: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-shared: require-kind build-all build-kind-images
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+
+# .PHONY: test-e2e-shared-minimal
+# ifdef USE_GOTESTSUM
+# test-e2e-shared-minimal: $(GOTESTSUM)
+# endif
+# test-e2e-shared-minimal: TEST_ARGS ?=
+# test-e2e-shared-minimal: WHAT ?= ./test/e2e...
+# test-e2e-shared-minimal: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-shared-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-shared-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-shared-minimal: build-all
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --quiet --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server $(SUITES_ARG) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+
+# .PHONY: test-e2e-sharded
+# ifdef USE_GOTESTSUM
+# test-e2e-sharded: $(GOTESTSUM)
+# endif
+# test-e2e-sharded: TEST_ARGS ?=
+# test-e2e-sharded: WHAT ?= ./test/e2e...
+# test-e2e-sharded: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-sharded: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-sharded: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-sharded: require-kind build-all build-kind-images
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
+# 		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+
+# .PHONY: test-e2e-sharded-minimal
+# ifdef USE_GOTESTSUM
+# test-e2e-sharded-minimal: $(GOTESTSUM)
+# endif
+# test-e2e-sharded-minimal: TEST_ARGS ?=
+# test-e2e-sharded-minimal: WHAT ?= ./test/e2e...
+# test-e2e-sharded-minimal: WORK_DIR ?= .
+# ifdef ARTIFACT_DIR
+# test-e2e-sharded-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
+# else
+# test-e2e-sharded-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
+# endif
+# test-e2e-sharded-minimal: build-all
+# 	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
+# 	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
+# 	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --quiet --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
+# 	trap 'kill -TERM $$PID' TERM INT EXIT && \
+# 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+# 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
+# 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
+# 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+
+.PHONY: e2e-test-edge-syncer
+e2e-test-edge-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+e2e-test-edge-syncer: TEST_ARGS ?= 
+e2e-test-edge-syncer: KIND_CLUSTER_NAME ?= e2e-kcp-edge 
+e2e-test-edge-syncer: e2e-test-edge-syncer-cleanup
+	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
+	echo 'Starting test(s)' && \
+	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
+		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/edgesyncer/... $(TEST_ARGS) \
+		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites edge-syncer \
 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: test-e2e-shared-minimal
-ifdef USE_GOTESTSUM
-test-e2e-shared-minimal: $(GOTESTSUM)
-endif
-test-e2e-shared-minimal: TEST_ARGS ?=
-test-e2e-shared-minimal: WHAT ?= ./test/e2e...
-test-e2e-shared-minimal: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-shared-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-shared-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-shared-minimal: build-all
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/test-server --log-file-path="$(LOG_DIR)/kcp.log" $(TEST_SERVER_ARGS) 2>&1 & PID=$$! && echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server $(SUITES_ARG) \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+.PHONY: e2e-test-edge-syncer-cleanup
+e2e-test-edge-syncer-cleanup:
+	rm -rf $(WORK_DIR)/.kcp/etcd-server
+	rm -rf $(WORK_DIR)/.kcp/.admin-token-store $(WORK_DIR)/.kcp/admin.kubeconfig
+	rm -rf $(WORK_DIR)/.kcp/apiserver.* $(WORK_DIR)/.kcp/sa.key
 
-.PHONY: test-e2e-sharded
-ifdef USE_GOTESTSUM
-test-e2e-sharded: $(GOTESTSUM)
-endif
-test-e2e-sharded: TEST_ARGS ?=
-test-e2e-sharded: WHAT ?= ./test/e2e...
-test-e2e-sharded: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-sharded: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-sharded: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-sharded: require-kind build-all build-kind-images
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	kind get kubeconfig > "$(WORK_DIR)/.kcp/kind.kubeconfig"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
-		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
-
-.PHONY: test-e2e-sharded-minimal
-ifdef USE_GOTESTSUM
-test-e2e-sharded-minimal: $(GOTESTSUM)
-endif
-test-e2e-sharded-minimal: TEST_ARGS ?=
-test-e2e-sharded-minimal: WHAT ?= ./test/e2e...
-test-e2e-sharded-minimal: WORK_DIR ?= .
-ifdef ARTIFACT_DIR
-test-e2e-sharded-minimal: LOG_DIR ?= $(ARTIFACT_DIR)/kcp
-else
-test-e2e-sharded-minimal: LOG_DIR ?= $(WORK_DIR)/.kcp
-endif
-test-e2e-sharded-minimal: build-all
-	mkdir -p "$(LOG_DIR)" "$(WORK_DIR)/.kcp"
-	rm -f "$(WORK_DIR)/.kcp/admin.kubeconfig"
-	UNSAFE_E2E_HACK_DISABLE_ETCD_FSYNC=true NO_GORUN=1 ./bin/sharded-test-server --v=2 --log-dir-path="$(LOG_DIR)" --work-dir-path="$(WORK_DIR)" $(TEST_SERVER_ARGS) --number-of-shards=2 2>&1 & PID=$$!; echo "PID $$PID" && \
-	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
-	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
-	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
+.PHONY: test-syncer
+test-syncer:
+	$(GO_TEST) $(COUNT_ARG) `go list ./... | grep "/pkg/cliplugins\|/pkg/syncer"`
 
 .PHONY: test
 ifdef USE_GOTESTSUM
@@ -331,9 +414,9 @@ test: $(GOTESTSUM)
 endif
 test: WHAT ?= ./...
 # We will need to move into the sub package, of pkg/apis to run those tests.
-test: 
-##	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
-##	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
+test:
+# 	$(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $$(go list "$(WHAT)" | grep -v ./test/e2e/)
+# 	cd pkg/apis && $(GO_TEST) -race $(COUNT_ARG) -coverprofile=coverage.txt -covermode=atomic $(TEST_ARGS) $(WHAT)
 
 .PHONY: verify-k8s-deps
 verify-k8s-deps:

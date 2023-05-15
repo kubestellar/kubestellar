@@ -1,0 +1,17 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: dev
+spec:
+  locationSelectors:
+  - matchLabels:
+      env: dev
+  namespaceSelector:
+    matchLabels:
+      env: dev
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources:
+      - "apibindings"
+    resourceNames:
+      - "kubernetes"

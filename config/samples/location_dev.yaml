@@ -1,0 +1,15 @@
+---
+apiVersion: scheduling.kcp.io/v1alpha1
+kind: Location
+metadata:
+  name: dev
+  labels:
+    env: dev
+spec:
+  instanceSelector:
+    matchLabels:
+      env: dev
+  resource:
+    group: workload.kcp.io
+    resource: synctargets
+    version: v1alpha1

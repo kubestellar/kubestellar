@@ -1,0 +1,6 @@
+apiVersion: my.domain/v1alpha1
+kind: SampleUpsync
+metadata:
+  name: sample-upsync
+spec:
+  foo: bar upsync

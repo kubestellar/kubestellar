@@ -1,0 +1,73 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIResourceSchema
+metadata:
+  creationTimestamp: null
+  name: v230220-d814bdd.apiresources.meta.kcp.io
+spec:
+  group: meta.kcp.io
+  names:
+    kind: APIResource
+    listKind: APIResourceList
+    plural: apiresources
+    singular: apiresource
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      description: APIResource describes a kind of API object.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            group:
+              description: 'group is the preferred group of the resource. For subresources,
+                this may have a different value, for example: Scale".'
+              type: string
+            kind:
+              description: kind is the kind for the resource (e.g. 'Foo' is the kind
+                for a resource 'foo')
+              type: string
+            name:
+              description: name is the plural name of the resource.
+              type: string
+            namespaced:
+              description: namespaced indicates if a resource is namespaced or not.
+              type: boolean
+            singularName:
+              description: singularName is the singular name of the resource.  This
+                allows clients to handle plural and singular opaquely. The singularName
+                is more correct for reporting status on a single item and both singular
+                and plural are allowed from the kubectl CLI interface.
+              type: string
+            verbs:
+              description: verbs is a list of supported kube verbs (this includes
+                get, list, watch, create, update, patch, delete, deletecollection,
+                and proxy)
+              items:
+                type: string
+              type: array
+            version:
+              description: version is the preferred version of the resource.
+              type: string
+          required:
+          - kind
+          - name
+          - namespaced
+          - singularName
+          - verbs
+          type: object
+      type: object
+    served: true
+    storage: true
+    subresources: {}

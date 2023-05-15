@@ -1,0 +1,102 @@
+---
+#tasks file for roles/prometheus
+- name: check if node prometheus exist
+  stat:
+    path: "{{ prometheus_bin }}"
+  register: __check_prometheus_present
+
+- name: create prometheus user for prometheus server
+  user:
+    name: "{{ prometheus_user }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+
+- name: create prometheus config dir
+  file:
+    path: "{{ prometheus_dir_configuration }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+
+- name: create prometheus var dir
+  file:
+    path: "{{ prometheus_dir_var }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+
+- name: if prometheus exist get version
+  shell: "cat /etc/systemd/system/prometheus.service | grep Version | sed s/'.*Version '//g"
+  when: __check_prometheus_present.stat.exists == true
+  changed_when: false
+  register: __get_prometheus_version
+  
+- name: download and unzip node prometheus if not exist
+  unarchive:
+    src: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+    validate_certs: no
+
+- name: move files & binary to the final destination
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0755
+    remote_src: yes
+  with_items:
+    - { src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/prometheus", dest: "{{ prometheus_bin }}" }
+    - { src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/promtool", dest: "{{ prometheus_bin }}" }
+    - { src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/consoles", dest: "{{ prometheus_dir_configuration }}" }
+    - { src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/console_libraries", dest: "{{ prometheus_dir_configuration }}" }
+    - { src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml", dest: "{{ prometheus_dir_configuration }}" }
+  when: __check_prometheus_present.stat.exists == false or not __get_prometheus_version.stdout == prometheus_version
+
+- name: clean
+  file:
+    path: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64"
+    state: absent
+
+- name: install service for prometheus server
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: 0755
+  when: agent is undefined
+
+- name: install service for prometheus agent
+  template:
+    src: prometheus-agent.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: 0755
+  when: agent is defined
+
+- meta: flush_handlers
+
+- name: prometheus server configuration file
+  template:
+    src: prometheus-config.yaml.j2
+    dest: "{{ prometheus_dir_configuration }}/prometheus.yml"
+    mode: 0755
+    owner: prometheus
+    group: prometheus
+  notify: restart_prometheus
+  when: agent is undefined
+
+- name: prometheus agent configuration file
+  template:
+    src: prometheus-agent-config.yaml.j2
+    dest: "{{ prometheus_dir_configuration }}/prometheus.yml"
+    mode: 0755
+    owner: prometheus
+    group: prometheus
+  notify: restart_prometheus
+  when: agent is defined

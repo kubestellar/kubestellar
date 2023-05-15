@@ -1,0 +1,161 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgeSyncConfig
+metadata:
+  name: pcluster1
+spec:
+  downSyncedResources:
+  - kind: Namespace
+    name: kyverno
+    version: v1
+  - kind: ServiceAccount
+    name: kyverno
+    namespace: kyverno
+    version: v1
+  - kind: ConfigMap
+    name: kyverno
+    namespace: kyverno
+    version: v1
+  - kind: ConfigMap
+    name: kyverno-metrics
+    namespace: kyverno
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: admissionreports.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: backgroundscanreports.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: clusteradmissionreports.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: clusterbackgroundscanreports.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: clusterpolicies.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: clusterpolicyreports.wgpolicyk8s.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: generaterequests.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: policies.kyverno.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: policyreports.wgpolicyk8s.io
+    version: v1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    name: updaterequests.kyverno.io
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:admin-policies
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:admin-policyreport
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:admin-reports
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:admin-generaterequest
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:admin-updaterequest
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:userinfo
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:policies
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:view
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:generate
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:events
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: kyverno:webhook
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRoleBinding
+    name: kyverno
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: Role
+    name: kyverno:leaderelection
+    namespace: kyverno
+    version: v1
+  - group: rbac.authorization.k8s.io
+    kind: RoleBinding
+    name: kyverno:leaderelection
+    namespace: kyverno
+    version: v1
+  - kind: Service
+    name: kyverno-svc
+    namespace: kyverno
+    version: v1
+  - kind: Service
+    name: kyverno-svc-metrics
+    namespace: kyverno
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: kyverno
+    namespace: kyverno
+    version: v1
+  - kind: Pod
+    name: kyverno-test
+    version: v1
+  - group: kyverno.io
+    kind: Policy
+    name: sample-policy
+    namespace: default
+    version: v1
+  upSyncedResources:
+  - group: wgpolicyk8s.io
+    kind: PolicyReport
+    name: pol-sample-policy
+    namespace: default
+    version: v1alpha2
+  conversions:
+  - upstream:
+      group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: policyreports.wgpolicyk8s.io.denatured
+      version: v1
+    downstream:
+      group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      name: policyreports.wgpolicyk8s.io
+      version: v1

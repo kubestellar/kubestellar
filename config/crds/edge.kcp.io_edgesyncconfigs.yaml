@@ -1,0 +1,146 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: edgesyncconfigs.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: EdgeSyncConfig
+    listKind: EdgeSyncConfigList
+    plural: edgesyncconfigs
+    shortNames:
+    - esc
+    singular: edgesyncconfig
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: EdgeSyncConfigSpec defines the desired state of EdgeSyncConfig
+            properties:
+              conversions:
+                description: Conversions
+                items:
+                  description: Resource to be renatured
+                  properties:
+                    downstream:
+                      description: Resource representation in downstream
+                      properties:
+                        group:
+                          description: Group of down/up synced resource
+                          type: string
+                        kind:
+                          description: Kind of down/up synced resource
+                          type: string
+                        name:
+                          description: Name of down/up synced resource
+                          type: string
+                        namespace:
+                          description: Namespace of down/up synced resource if it's
+                            not cluster scoped resource
+                          type: string
+                        version:
+                          description: Version of down/up synced resource
+                          type: string
+                      type: object
+                    upstream:
+                      description: Resource representation in upstream
+                      properties:
+                        group:
+                          description: Group of down/up synced resource
+                          type: string
+                        kind:
+                          description: Kind of down/up synced resource
+                          type: string
+                        name:
+                          description: Name of down/up synced resource
+                          type: string
+                        namespace:
+                          description: Namespace of down/up synced resource if it's
+                            not cluster scoped resource
+                          type: string
+                        version:
+                          description: Version of down/up synced resource
+                          type: string
+                      type: object
+                  type: object
+                type: array
+              downSyncedResources:
+                description: Downsncyed resource list
+                items:
+                  description: Resource specifies down/up synced resource with exact
+                    GVK and name (and namespace if not cluster scoped resource)
+                  properties:
+                    group:
+                      description: Group of down/up synced resource
+                      type: string
+                    kind:
+                      description: Kind of down/up synced resource
+                      type: string
+                    name:
+                      description: Name of down/up synced resource
+                      type: string
+                    namespace:
+                      description: Namespace of down/up synced resource if it's not
+                        cluster scoped resource
+                      type: string
+                    version:
+                      description: Version of down/up synced resource
+                      type: string
+                  type: object
+                type: array
+              upSyncedResources:
+                description: Upsncyed resource list
+                items:
+                  description: Resource specifies down/up synced resource with exact
+                    GVK and name (and namespace if not cluster scoped resource)
+                  properties:
+                    group:
+                      description: Group of down/up synced resource
+                      type: string
+                    kind:
+                      description: Kind of down/up synced resource
+                      type: string
+                    name:
+                      description: Name of down/up synced resource
+                      type: string
+                    namespace:
+                      description: Namespace of down/up synced resource if it's not
+                        cluster scoped resource
+                      type: string
+                    version:
+                      description: Version of down/up synced resource
+                      type: string
+                  type: object
+                type: array
+            type: object
+          status:
+            description: EdgeSyncConfigStatus defines the observed state of EdgeSyncConfig
+            properties:
+              lastSyncerHeartbeatTime:
+                description: A timestamp indicating when the syncer last reported
+                  status.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true

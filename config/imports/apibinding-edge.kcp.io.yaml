@@ -1,0 +1,9 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIBinding
+metadata:
+  name: edge.kcp.io
+spec:
+  reference:
+    export:
+      name: edge.kcp.io
+      path: root:edge

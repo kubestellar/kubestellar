@@ -1,0 +1,75 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: singleplacementslices.edge.kcp.io
+spec:
+  group: edge.kcp.io
+  names:
+    kind: SinglePlacementSlice
+    listKind: SinglePlacementSliceList
+    plural: singleplacementslices
+    shortNames:
+    - sps
+    singular: singleplacementslice
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SinglePlacementSlice is the interface between "scheduling" and
+          syncing. For a given EdgePlacement object, the scheduler figures out which
+          Locations match that EdgePlacement and selects the SyncTarget to use within
+          that Location, then puts these results into some SinglePlacementSlice API
+          objects. We use potentially multiple API objects so that no one of them
+          has to get very big.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          destinations:
+            description: '`destinations` holds some of the results of scheduling.'
+            items:
+              description: SinglePlacement describes one Location that matches the
+                relevant EdgePlacement.
+              properties:
+                cluster:
+                  description: Cluster is the logicacluster.Name of the logical cluster
+                    that contains both the Location and the SyncTarget.
+                  type: string
+                locationName:
+                  type: string
+                syncTargetName:
+                  description: '`syncTargetName` identifies the relevant SyncTarget
+                    at the Location'
+                  type: string
+                syncTargetUID:
+                  description: UID is a type that holds unique ID values, including
+                    UUIDs.  Because we don't ONLY use UUIDs, this is an alias to string.  Being
+                    a type captures intent and helps make sure that UIDs and names
+                    do not get conflated.
+                  type: string
+              required:
+              - cluster
+              - locationName
+              - syncTargetName
+              - syncTargetUID
+              type: object
+            type: array
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+        required:
+        - destinations
+        type: object
+    served: true
+    storage: true

@@ -1,0 +1,8 @@
+---
+# defaults file for roles/prometheus
+prometheus_version: "2.42.0"
+prometheus_bin: "/usr/local/bin/"
+prometheus_user: "prometheus"
+prometheus_group: "{{ prometheus_user }}"
+prometheus_dir_configuration: "/etc/prometheus"
+prometheus_dir_var: "/var/lib/prometheus"
