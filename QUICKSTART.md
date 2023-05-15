@@ -179,15 +179,13 @@ kube-system                       kube-scheduler-florin-control-plane           
 local-path-storage                local-path-provisioner-684f458cdd-75wv8           1/1     Running   0          85s
 ``` 
 
-Repeat the same steps for the `guilder` cluster:
-
-First, create the inventory objects to represent `guilder` edge cluster:
+Now, let's onboard the `guilder` cluster:
 
 ```shell
 kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
-Lastly, apply the edge syncer manifest:
+Apply the edge syncer manifest:
 
 ```shell
 KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
