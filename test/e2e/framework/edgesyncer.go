@@ -118,7 +118,7 @@ type edgeSyncerFixture struct {
 	edgeSyncTargetName string
 }
 
-// CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kcp-edge syncer-gen` CLI command,
+// CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kubestellar syncer-gen` CLI command,
 // applies the edge-syncer-related resources in the physical cluster.
 func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedEdgeSyncerFixture {
 	t.Helper()
@@ -433,7 +433,7 @@ func RunKcpEdgeCliPlugin(t *testing.T, kubeconfigPath string, subcommand []strin
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)
 
-	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kcp_edge-syncer_gen")
+	cmdPath := filepath.Join(repositoryDir(), "cmd", "kubectl-kubestellar-syncer_gen")
 	kcpCliPluginCommand := []string{"go", "run", cmdPath}
 
 	cmdParts := append(kcpCliPluginCommand, subcommand...)

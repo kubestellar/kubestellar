@@ -59,7 +59,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kcp-edge prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
+	    echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
@@ -109,6 +109,6 @@ if [ "$imw" != "$original_ws" ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 
-"$bindir/kubectl-kcp_edge-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
+"$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
 
-"$bindir/kubectl-kcp_edge-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"
+"$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"

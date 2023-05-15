@@ -114,11 +114,11 @@ build` to populate its `bin` directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
 (creating a `bin` directory).  In the following exhibited command
 lines, the commands described as "edge-mc commands" and the commands
-that start with `kubectl kcp-edge` rely on the edge-mc `bin` directory
+that start with `kubectl kubestellar` rely on the edge-mc `bin` directory
 being on the `$PATH`.  Alternatively you could invoke them with
 explicit pathnames.  The kubectl plugin lines use fully specific
-executables (e.g., `kubectl kcp-edge prep-for-syncer` corresponds to
-`bin/kubectl-kcp_edge-prep_for_syncer`).
+executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
+`bin/kubectl-kubestellar-prep_for_syncer`).
 
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
@@ -126,8 +126,8 @@ Use the following two commands. They label both florin and guilder
 with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
-kubectl kcp-edge ensure location florin  env=prod
-kubectl kcp-edge ensure location guilder env=prod extended=si
+kubectl kubestellar ensure location florin  env=prod
+kubectl kubestellar ensure location guilder env=prod extended=si
 ```
 
 Those two script invocations are equivalent to creating the following
@@ -259,7 +259,7 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```console
-$ kubectl kcp-edge prep-for-syncer --imw root:imw-1 guilder
+$ kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
@@ -314,7 +314,7 @@ local-path-storage                 local-path-provisioner             1/1     1 
 Do the analogous stuff for the florin cluster.
 
 ```console
-$ kubectl kcp-edge prep-for-syncer --imw root:imw-1 florin
+$ kubectl kubestellar prep-for-syncer --imw root:imw-1 florin
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
@@ -377,7 +377,7 @@ Next, create the WMW for the common workload.  The following command
 will do that, if issued while "root:my-org" is the current workspace.
 
 ```shell
-kubectl kcp-edge ensure wmw wmw-c
+kubectl kubestellar ensure wmw wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -501,7 +501,7 @@ workload.
 
 ```shell
 kubectl ws root:my-org
-kubectl kcp-edge ensure wmw wmw-s
+kubectl kubestellar ensure wmw wmw-s
 ```
 
 Next, use `kubectl` to create the following workload objects in that workspace.

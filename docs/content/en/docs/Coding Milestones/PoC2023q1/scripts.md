@@ -24,13 +24,13 @@ inventory management workspace, or specify that workspace with the
 will be your chosen inventory management workspace.
 
 This command does not depend on the action of any of the edge-mc
-(KCP-Edge) controllers.
+(Kubestellar) controllers.
 
 ```console
-$ kubectl kcp-edge ensure location -h
-Usage: kubectl kcp-edge ensure location ($kubectl_flag | --imw ws_path)* objname labelname=labelvalue ...
+$ kubectl kubestellar ensure location -h
+Usage: kubectl kubestellar ensure location ($kubectl_flag | --imw ws_path)* objname labelname=labelvalue ...
 
-$ kubectl kcp-edge ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+$ kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo1 created
 location.scheduling.kcp.io/demo1 created
@@ -78,7 +78,7 @@ pre-existing Location.
 ## Removing SyncTarget/Location pairs
 
 The following script undoes whatever remains from a corresponding
-usage of `kubectl kcp-edge ensure location`.
+usage of `kubectl kubestellar ensure location`.
 
 This commad accepts all the global command-line options of `kubectl`
 excepting `--context`.
@@ -89,20 +89,20 @@ inventory management workspace, or specify that workspace with the
 will be your chosen inventory management workspace.
 
 This command does not depend on the action of any of the edge-mc
-(KCP-Edge) controllers.
+(Kubestellar) controllers.
 
 ```console
-$ kubectl kcp-edge remove location -h
-Usage: kubectl kcp-edge remove location ($kubectl_flag | --imw ws_path)* objname
+$ kubectl kubestellar remove location -h
+Usage: kubectl kubestellar remove location ($kubectl_flag | --imw ws_path)* objname
 
 $ kubectl ws root:imw-1
 Current workspace is "root:imw-1".
 
-$ kubectl kcp-edge remove location demo1
+$ kubectl kubestellar remove location demo1
 synctarget.workload.kcp.io "demo1" deleted
 location.scheduling.kcp.io "demo1" deleted
 
-$ kubectl kcp-edge remove location demo1
+$ kubectl kubestellar remove location demo1
 
 $ 
 ```
@@ -131,10 +131,10 @@ not found at first, this commandn will wait 15 seconds to give the
 controller a chance to create the mailbox workspace.
 
 ```console
-$ kubectl kcp-edge prep-for-syncer -h                     
-Usage: kubectl kcp-edge prep-for-syncer ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name
+$ kubectl kubestellar prep-for-syncer -h                     
+Usage: kubectl kubestellar prep-for-syncer ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name
 
-$ kubectl kcp-edge prep-for-syncer --imw root:imw-1 demo1
+$ kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
 Current workspace is "root:imw-1".
 Current workspace is "root:espw"
 Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
@@ -173,14 +173,14 @@ KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 
 # Edge cluster on-boarding
 
-The following command is a combination of `kubectl kcp-edge
-ensure-location` and `kubectl kcp-edge prep-for-syncer`.
+The following command is a combination of `kubectl kubestellar
+ensure-location` and `kubectl kubestellar prep-for-syncer`.
 
 ```console
-$ kubectl kcp-edge prep-for-cluster -h                              
-Usage: kubectl kcp-edge prep-for-cluster ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue...
+$ kubectl kubestellar prep-for-cluster -h                              
+Usage: kubectl kubestellar prep-for-cluster ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue...
 
-$ kubectl kcp-edge prep-for-cluster --imw root:imw-1 demo2 key1=val1
+$ kubectl kubestellar prep-for-cluster --imw root:imw-1 demo2 key1=val1
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo2 created
 location.scheduling.kcp.io/demo2 created
@@ -225,13 +225,13 @@ This script works in idempotent style, doing whatever work remains to
 be done.
 
 ```console
-$ kubectl kcp-edge ensure wmw -h
-Usage: kubectl ws parent; kubectl kcp-edge ensure wmw ($kubectl_flag | --with-kube boolean)* wm_workspace_name
+$ kubectl kubestellar ensure wmw -h
+Usage: kubectl ws parent; kubectl kubestellar ensure wmw ($kubectl_flag | --with-kube boolean)* wm_workspace_name
 
 $ kubectl ws .
 Current workspace is "root:my-org".
 
-$ kubectl kcp-edge ensure wmw example-wmw
+$ kubectl kubestellar ensure wmw example-wmw
 Current workspace is "root".
 Current workspace is "root:my-org".
 Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
@@ -243,7 +243,7 @@ apibinding.apis.kcp.io/bind-kube created
 $ kubectl ws ..
 Current workspace is "root:my-org".
 
-$ kubectl kcp-edge ensure wmw example-wmw
+$ kubectl kubestellar ensure wmw example-wmw
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
@@ -251,7 +251,7 @@ Current workspace is "root:my-org:example-wmw" (type root:universal).
 $ kubectl ws ..
 Current workspace is "root:my-org".
 
-$ kubectl kcp-edge ensure wmw example-wmw --with-kube false
+$ kubectl kubestellar ensure wmw example-wmw --with-kube false
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
@@ -283,19 +283,19 @@ completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.
 
 ```console
-$ kubectl kcp-edge remove wmw -h
-Usage: kubectl ws parent; kubectl kcp-edge remove wmw kubectl_flag... wm_workspace_name
+$ kubectl kubestellar remove wmw -h
+Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name
 
 $ kubectl ws root:my-org
 Current workspace is "root:my-org".
 
-$ kubectl kcp-edge remove wmw demo1
+$ kubectl kubestellar remove wmw demo1
 workspace.tenancy.kcp.io "demo1" deleted
 
 $ kubectl ws .
 Current workspace is "root:my-org".
 
-$ kubectl kcp-edge remove wmw demo1
+$ kubectl kubestellar remove wmw demo1
 
 $ 
 ```

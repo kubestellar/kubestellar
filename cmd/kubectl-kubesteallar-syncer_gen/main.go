@@ -49,7 +49,7 @@ func syncerGenCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "syncer-gen <name> --syncer-image <edge-syncer-image> -o <output-file>",
 		Short:        "Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a physical cluster.",
-		Example:      fmt.Sprintf(syncerGenExample, "kubectl kcp-edge"),
+		Example:      fmt.Sprintf(syncerGenExample, "kubectl kubestellar"),
 		SilenceUsage: true,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) != 1 {
