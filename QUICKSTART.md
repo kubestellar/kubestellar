@@ -59,16 +59,10 @@ kubectl ws tree
 └── root
     ├── compute
     ├── espw
-    │   
-    ├── imw-1
-    └── my-org
-        ├── wmw-c
-        └── wmw-s
 ```
 
 ## 2. Example deployment of nginx workload into two kind local clusters
 
- 
 ### a. Stand up a local florin and guilder kind clusters
 
 Create the first edge cluster:
@@ -83,7 +77,24 @@ Create the second edge cluster:
 kind create cluster --name guilder
 ```  
 
-### b. Onboarding the clusters
+### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+
+IMW are used by kcp-edge to store sync targets and placement objects. Create an IMW named imw-1 with the following command:
+
+```shell
+kubectl ws root
+kubectl ws create "imw-1"
+```
+
+WMW are used by kcp-edge to store workloads amd edge placement objects. Create an WMW named wmw-1 in a my-org workspace with the following command:
+
+```shell
+kubectl ws root
+kubectl ws create "my-org"
+ensure-wmw.sh "wmw-1"
+```
+ 
+### c. Onboarding the clusters
 
 Create a syncTarget and location inventory objects to represent the `florin` cluster:
 
@@ -192,7 +203,7 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
-### c. Create and deploy the nginx workload into florin and guilder clusters
+### e. Create and deploy the nginx workload into florin and guilder clusters
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
