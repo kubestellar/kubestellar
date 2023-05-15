@@ -16,10 +16,10 @@
 
 # Usage: $0 --create-folder --verbose
 
-# This script installs Kubestellar binaries to a folder of choice
+# This script installs KubeStellar binaries to a folder of choice
 #
 # Arguments:
-# [--version release] set a specific Kubestellar release version, default: latest
+# [--version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--folder name] sets the installation folder, default: $PWD/kubestellar
@@ -126,7 +126,7 @@ else
 fi
 
 if [ $verbose == "true" ]; then
-    echo "Downloading Kubestellar $kubestellar_version $kubestellar_os/$kubestellar_arch..."
+    echo "Downloading KubeStellar $kubestellar_version $kubestellar_os/$kubestellar_arch..."
     curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 else
     curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kcp-edge_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
@@ -150,5 +150,5 @@ fi
 rm kubestellar.tar.gz
 
 if [[ ! ":$PATH:" == *":$bin_folder:"* ]]; then
-    echo "Add Kubestellar folder to your path: export PATH="\$PATH:$bin_folder""
+    echo "Add KubeStellar folder to your path: export PATH="\$PATH:$bin_folder""
 fi

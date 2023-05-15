@@ -16,15 +16,14 @@
 
 # Usage: $0  --verbose
 
-# This script installs KCP-Edge binaries to a folder of choice
+# This script installs kcp and KubeStellar binaries to a folder of choice
 #
 # Arguments:
 # [--kcp-version release] set a specific kcp release version, default: latest
-# [--kubestellar-version release] set a specific Kubestellar release version, default: latest
+# [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--folder name] sets the installation folder, default: $PWD/kcp-edge
-# [--strip-bin] remove the bin sub-folder
 # [--bind address] bind kcp to a specific ip address
 # [--imw name] create a Inventory Management Workspace (IMW)
 # [--wmw name] create a Workload Management Workspace (WMW)
@@ -145,8 +144,6 @@ while (( $# > 0 )); do
         then { folder="$2"; shift; }
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
-    (--strip-bin)
-        strip_bin="true";;
     (--verbose|-V)
         verbose="-V";;
     (-h|--help)
@@ -213,10 +210,10 @@ if [ "$(kcp_running)" == "false" ]; then
     echo 'Export KUBECONFIG: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
 fi
 
-# Ensure Kubestellar is installed
+# Ensure KubeStellar is installed
 if [ "$(kubestellar_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Installing Kubestellar..."
+        echo "Installing KubeStellar..."
     fi
     bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --folder  $folder/kcp-edge --create-folder $verbose
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
@@ -224,10 +221,10 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     fi
 fi
 
-# Ensure Kubestellar is running
+# Ensure KubeStellar is running
 if [ "$(kubestellar_running)" == "false" ]; then
     if [ "$verbose" != "" ]; then
-        echo "Starting Kubestellar..."
+        echo "Starting KubeStellar..."
     fi
     kubestellar start --user kit $verbose
 fi
