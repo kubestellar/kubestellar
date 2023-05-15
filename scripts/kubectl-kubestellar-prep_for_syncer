@@ -20,13 +20,13 @@
 # mailbox workspace for the syncer and (b) output the YAML that needs
 # to be created in the edge cluster to install the syncer there.
 
-# This script requires the `kcp-edge syncer-gen` kubectl plugin to
-# already exist at ../bin/kubectl-kcp_edge-syncer_gen.
+# This script requires the `kubestellar syncer-gen` kubectl plugin to
+# already exist at ../bin/kubectl-kubestellar-syncer_gen.
 
 bindir="$(dirname "$0")"
 
-if ! [ -x "$bindir/kubectl-kcp_edge-syncer_gen" ]; then
-    echo "$0: $bindir/kubectl-kcp_edge-syncer_gen does not exist; did you 'make build' or unpack a release archive here?" >&2
+if ! [ -x "$bindir/kubectl-kubestellar-syncer_gen" ]; then
+    echo "$0: $bindir/kubectl-kubestellar-syncer_gen does not exist; did you 'make build' or unpack a release archive here?" >&2
     exit 2
 fi
 
@@ -65,7 +65,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kcp-edge prep-for-syncer (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name"
+	    echo "Usage: kubectl kubestellar prep-for-syncer (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
@@ -138,4 +138,4 @@ fi
 
 kubectl ws "${kubectl_flags[@]}" "$mbwsname"
 
-"$bindir/kubectl-kcp_edge-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"
+"$bindir/kubectl-kubestellar-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"

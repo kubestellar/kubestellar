@@ -29,7 +29,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kcp-edge remove wmw kubectl_flag... wm_workspace_name"
+	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))

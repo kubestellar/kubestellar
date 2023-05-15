@@ -65,7 +65,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kcp-edge ensure location (\$kubectl_flag | --imw ws_path)* objname labelname=labelvalue ..."
+	    echo "Usage: kubectl kubestellar ensure location (\$kubectl_flag | --imw ws_path)* objname labelname=labelvalue ..."
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))

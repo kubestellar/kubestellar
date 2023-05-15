@@ -35,7 +35,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kcp-edge remove location (\$kubectl_flag | --imw ws_path)* objname"
+	    echo "Usage: kubectl kubestellar remove location (\$kubectl_flag | --imw ws_path)* objname"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
