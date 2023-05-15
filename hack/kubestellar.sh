@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 (start or stop | --user dev or kit | -v
+# Usage: $0 (start or stop | -v)
 
 # Purpose: deploy the kubestellar platform. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
