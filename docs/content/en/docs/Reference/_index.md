@@ -7,7 +7,7 @@ description: >
 ---
 
 {{% pageinfo %}}
-This is a placeholder for KCP-Edge reference documentation.
+This is a placeholder for KubeStellar reference documentation.
 {{% /pageinfo %}}
 
 API, configuration, or other reference is included here. Anything that users need to look up is generated as reference docs created using Doxygen,
