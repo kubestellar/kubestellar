@@ -15,7 +15,7 @@
 
 # Usage: $0 (start or stop | --user dev or kit | -v
 
-# Purpose: deploy the kcp-edge platform. The following components are created"
+# Purpose: deploy the kcp-edge platform. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
 #           (b) 3 kcp-edge controllers: edge-scheduler, mailbox-controller and placement-translator
 
@@ -59,7 +59,7 @@ go_version=`go version | { read _ _ v _; echo ${v#go}; }`
 
 function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }
 if [ $(ver $go_version) -lt $(ver 1.19) ]; then
-    echo "Update your go version"
+    echo "Update your go version to at least 1.19"
 fi
 
 # Check if a given process name is running
