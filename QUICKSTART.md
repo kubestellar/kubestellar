@@ -80,19 +80,19 @@ kind create cluster --name guilder
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
-IMW are used by kcp-edge to store sync targets and placement objects. Create an IMW named imw-1 with the following command:
+IMW are used by KubeStellar to store inventory objects (sync targets and placement). Create an IMW named `example-imw` with the following command:
 
 ```shell
 kubectl ws root
-kubectl ws create "imw-1"
+kubectl ws create "example-imw"
 ```
 
-WMW are used by kcp-edge to store workloads amd edge placement objects. Create an WMW named wmw-1 in a my-org workspace with the following command:
+WMW are used by KubeStellar to store workloads and edge placement objects. Create an WMW named `example-wmw` in a my-org workspace with the following command:
 
 ```shell
 kubectl ws root
 kubectl ws create "my-org"
-ensure-wmw.sh "wmw-1"
+ensure-wmw.sh "example-wmw"
 ```
  
 ### c. Onboarding the clusters
