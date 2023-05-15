@@ -94,33 +94,15 @@ kubectl ws root
 kubectl ws create "my-org"
 ensure-wmw.sh "example-wmw"
 ```
- 
+
+
 ### c. Onboarding the clusters
 
-Create a syncTarget and location inventory objects to represent the `florin` cluster:
+Let's begin by onboarding the `florin` cluster:
 
 ```shell
 kubectl kcp-edge prep-for-cluster --imw root:example-imw florin  env=prod
 ```
-
-The following commands list the objects that were created:
-
-```console
-$ kubectl get locations,synctargets
-NAME                                RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-location.scheduling.kcp.io/florin   synctargets   0           1                    57s
-
-NAME                                AGE
-synctarget.workload.kcp.io/florin   58s
-```
-
-Generate the edge syncer manifest:
-
-```shell
-kubectl ws root:espw
-kubestellar --syncer florin  # replaces: mailbox-prep.sh florin
-```
-
 
 which should yield something like:
 
@@ -148,7 +130,7 @@ to verify the syncer pod is running.
 
 An edge syncer manifest yaml file is created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
 
-Now deploy the edge syncer to the `florin` edge cluster:
+Now le's deploy the edge syncer to the `florin` edge cluster:
 
   
 ```shell
