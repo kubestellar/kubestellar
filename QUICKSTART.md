@@ -14,7 +14,7 @@ Table of contents:
   - [a. Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
   - [c. Onboarding the clusters](#c-onboarding-the-clusters)
-  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#e-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
