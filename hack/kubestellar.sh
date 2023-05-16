@@ -22,7 +22,7 @@
 # Assumption: kcp server is running.
 
 # Requirements:
-#    KubeStellar bin sists the edge-mc binaries mailbox-controller, scheduler, placement-translator
+#    Download KubeStellar binaries
 #    KubeStellar controller binaries are on $PATH.
 
 
