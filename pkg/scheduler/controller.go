@@ -43,7 +43,7 @@ import (
 )
 
 const (
-	ControllerName = "edge-scheduler"
+	ControllerName = "kubestellar-scheduler"
 )
 
 type triggeringKind string

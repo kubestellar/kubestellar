@@ -1,21 +1,21 @@
 ---
-title: "Edge Scheduler"
+title: "KubeStellar Scheduler"
 date: 2023-03-27
 weight: 4
 description: >
 ---
 
 {{% pageinfo %}}
-The edge scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
+The scheduler monitors the EdgePlacement, Location, and SyncTarget objects and maintains the results of matching.
 {{% /pageinfo %}}
 
 ### Pre-requisite: 
-  You will need GO to compile and run kubectl-ws plugin from kcp and edgescheduler from KubeStellar
+  You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
 ```console
-brew install go
+brew install go@1.19
 ```
 
-### Steps to try the edge scheduler
+### Steps to try the scheduler
 
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest KubeStellar source:
@@ -69,20 +69,20 @@ Bind APIs.
 kubectl apply -f ../KubeStellar/config/imports/
 ```
 
-#### Run the Edge Scheduler in the ESPW
+#### Run the KubeStellar Scheduler against the ESPW
 Go to `root:edge` workspace and run the edge scheduler.
 ```console
 kubectl ws root:edge
 cd ../KubeStellar
-go run cmd/scheduler/main.go -v 2
+go run cmd/kubestellar-scheduler/main.go -v 2
 ```
 
 The outputs from the edge scheduler should be similar to:
 ```console
-I0327 17:14:42.222112   51241 scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
-I0327 17:14:42.225075   51241 scheduler.go:243] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io"
-I0327 17:14:42.226954   51241 scheduler.go:243] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/workload.kcp.io"
-I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="edge-scheduler"
+I0327 17:14:42.222112   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
+I0327 17:14:42.225075   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io"
+I0327 17:14:42.226954   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/workload.kcp.io"
+I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="kubestellar-scheduler"
 ```
 
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
@@ -127,7 +127,7 @@ kubectl ws ~
 kubectl create -f ../KubeStellar/config/samples/edgeplacement_test-1.yaml
 ```
 
-The edge scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
+The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
 ```console
 kubectl get sps test-1 -oyaml
 
@@ -197,6 +197,6 @@ metadata:
   uid: 9b8de087-21bc-4585-99cb-e6c03ba0a8ae
 ```
 
-Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the edge scheduler reacts.
+Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.
 
 Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)

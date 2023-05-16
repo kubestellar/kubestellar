@@ -70,7 +70,7 @@ The command line flags, beyond the basics, are as follows.
 To exercise it, do the following steps.
 
 Clone this repo, install kcp (the version for `github.com/kcp-dev/kcp` in `go.mod` is required) 
-and start a kcp server as described [here](edge-scheduler.md#steps-to-try-the-edge-scheduler).
+and start a kcp server as described [here](kubestellar-scheduler.md#steps-to-try-the-scheduler).
 
 Do the remaining steps in a separate shell, with
 `$KUBECONFIG` set to the admin config for that kcp server.  

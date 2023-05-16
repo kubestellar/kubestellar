@@ -644,7 +644,7 @@ downsynced objects go here from their workload management workspaces,
 and upsynced objects go here from the edge cluster.  These workspaces
 are all children of the edge service provider workspace.
 
-## Edge Scheduler
+## KubeStellar Scheduler
 
 This controller monitors the EdgePlacement, Location, and SyncTarget
 objects and maintains the results of matching.  For each EdgePlacement
@@ -671,7 +671,7 @@ following five parts.
   workspace items (namespaces and non-namespaced objects).
 - Monitor the SinglePlacementSlice objects that report the scheduler's
   resolutions of the "where" part of the EdgePlacement objects.
-- Maintain the association between the resolved "where" from the edge
+- Maintain the association between the resolved "where" from the
   scheduler and the resolved what.
 - Maintain the copies, with customization, of the workload objects
   from source workspace to mailbox workspaces.
@@ -737,7 +737,7 @@ user creates if the workload type did not already provide.
 
 - An APIBinding to the APIExport of `edge.kcp.io` from the edge
   service provider workspace.
-- For each of the Edge Scheduler, the Placement Translator, and the
+- For each of the Scheduler, the Placement Translator, and the
   Status Summarizer:
   - A ServiceAccount for that controller to authenticate as;
   - A ClusterRole granting the privileges needed by that controller;
