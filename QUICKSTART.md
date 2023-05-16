@@ -25,7 +25,7 @@ This guide is intended to show how to quickly bring up a **KubeStellar** environ
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/francostellari/edge-mc/main/hack/kubestellar-bootstrap.sh) --kcp-version v0.11.0 --kubestellar-version v0.1.0 --folder . --create-folder
+kubestellar-bootstrap.sh --kcp-version v0.11.0 --kubestellar-version v0.1.0 --folder .
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
@@ -193,7 +193,7 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 ```
 
 
-### e. Create and deploy the Apache Server workload into florin and guilder clusters
+### d. Create and deploy the Apache Server workload into florin and guilder clusters
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
