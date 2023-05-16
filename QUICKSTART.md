@@ -344,7 +344,7 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 To remove the example usage, delete the IMW and WMW and kind clusters run the following command:
 
 ```shell
-kubestellar remove
+kubestellar remove-example
 ```
 
 Stop and uninstall KubeStellar and kcp with the following commands:
