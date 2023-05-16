@@ -28,5 +28,5 @@ set -e
 srcdir=$(dirname "$0")
 cd "$srcdir/.."
 #docker login quay.io
-KO_DOCKER_REPO=quay.io/kcpedge/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="$kcpe_version" ./cmd/syncer
+KO_DOCKER_REPO=quay.io/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="$kcpe_version" ./cmd/syncer
 cd "$srcdir"
