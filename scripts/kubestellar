@@ -35,6 +35,8 @@ cleanup=0
 espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 while (( $# > 0 )); do
     case "$1" in
     (start)
@@ -103,10 +105,10 @@ then
 fi
 
 # Check kubestellar-scheduler is already running
-if [ $(process_running "scheduler -v 2") == "running" ]
+if [ $(process_running "kubestellar-scheduler") == "running" ]
 then
     echo "An older deployment of kubestellar-scheduler is already running - terminating it ...."
-    pkill -f "scheduler -v 2"
+    pkill -f "kubestellar-scheduler"
 fi
 
 # Check placement-translator is already running
@@ -123,6 +125,10 @@ if [ $install -eq 0 ]; then
       kubectl delete ws "$espw_name"
       echo "Deleted workspace: $espw_name"
    fi
+
+   pkill -f mailbox-controller
+   pkill -f placement-translator
+   pkill -f kubestellar-scheduler
    echo "kubestellar stopped ....."
    exit 0
 fi
@@ -159,13 +165,13 @@ if kubectl get Workspace "$espw_name" &> /dev/null; then
 else 
    if [ $verbosity == 1 ]; then
         kubectl ws create "$espw_name" --enter
-        kubectl apply -f  ./config/crds 
-        kubectl apply -f  ./config/exports
+        kubectl apply -f   $SCRIPT_DIR/../config/crds 
+        kubectl apply -f   $SCRIPT_DIR/../config/exports
         echo "Finished populate the espw with kubestellar crds and apiexports"
    else
         kubectl ws create "$espw_name" --enter
-        kubectl apply -f  ./config/crds &> /dev/null
-        kubectl apply -f  ./config/exports &> /dev/null
+        kubectl apply -f  $SCRIPT_DIR/../config/crds &> /dev/null
+        kubectl apply -f  $SCRIPT_DIR/../config/exports &> /dev/null
         echo "Finished populate the espw with kubestellar crds and apiexports"
    fi
 fi
@@ -191,9 +197,9 @@ fi
 
 # Start the kubestellar scheduler
 sleep 3
-scheduler -v 2 >& $log_folder/kubestellar-scheduler-log.txt &
+kubestellar-scheduler -v 2 >& $log_folder/kubestellar-scheduler-log.txt &
 
-run_status=$(wait_for_process "scheduler -v 2")
+run_status=$(wait_for_process "kubestellar-scheduler")
 if [ $run_status -eq 0 ]; then
     echo " scheduler is running (log file: $log_folder/kubestellar-scheduler-log.txt)"
 else
