@@ -25,7 +25,7 @@ This guide is intended to show how to quickly bring up a **KubeStellar** environ
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/bootstrap-kubestellar.sh) --kcp-version v0.11.0 --kubestellar-version v0.2.0 --folder .
+bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kcp-version v0.11.0 --kubestellar-version v0.2.0 --ensure-folder .
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
@@ -344,7 +344,7 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 To remove the example usage, delete the IMW and WMW and kind clusters run the following command:
 
 ```shell
-kubestellar remove-example
+
 ```
 
 Stop and uninstall KubeStellar following commands:
