@@ -17,7 +17,7 @@
 
 # Purpose: deploy the kubestellar platform. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
-#           (b) 3 kubestellar controllers: edge-scheduler, mailbox-controller and placement-translator
+#           (b) 3 kubestellar controllers: kubestellar-scheduler, mailbox-controller and placement-translator
 
 # Assumption: kcp server is running.
 
@@ -30,6 +30,8 @@ set -e
 
 install=""
 verbosity=0
+remove=0
+cleanup=0
 espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
 
@@ -39,6 +41,10 @@ while (( $# > 0 )); do
         install=1;; 
     (stop) 
         install=0;; 
+    (remove)
+        remove=0;;
+    (cleanup) 
+        cleanup=1;;
     (--log-folder)
         if (( $# > 1 ));
         then { log_folder="$2"; shift; }
@@ -64,7 +70,7 @@ done
 if ! docker ps > /dev/null
 then
   echo "Docker Not running ...."
-  exit
+  exit 1
 fi
 
 # Check go version
@@ -90,7 +96,7 @@ process_running() {
 if [ $(process_running kcp) != "running" ]
 then
     echo "kcp is not running - please start it ...."
-    exit
+    exit 1
 fi
 
 # Check mailbox-controller is already running
@@ -100,10 +106,10 @@ then
     pkill -f mailbox-controller
 fi
 
-# Check edge-scheduler is already running
+# Check kubestellar-scheduler is already running
 if [ $(process_running "scheduler -v 2") == "running" ]
 then
-    echo "An older deployment of edge-scheduler is already running - terminating it ...."
+    echo "An older deployment of kubestellar-scheduler is already running - terminating it ...."
     pkill -f "scheduler -v 2"
 fi
 
@@ -121,10 +127,17 @@ if [ $install -eq 0 ]; then
       kubectl delete ws "$espw_name"
       echo "Deleted workspace: $espw_name"
    fi
-   echo "kcp edge stopped ....."
-   exit
+   echo "kubestellar stopped ....."
+   exit 0
 fi
 
+if [ $remove -eq 1 ]; then
+  cleanup 
+fi
+
+if [ $cleanup -eq 1 ]; then
+  cleanup 
+fi
 
 wait_for_process(){
   status=$(process_running $1)
@@ -145,7 +158,7 @@ wait_for_process(){
 }
 
 
-# Start the edge-mc controllers
+# Start the kubestellar controllers
 echo "****************************************"
 echo "Launching KubeStellar ..."
 echo "****************************************"
@@ -159,12 +172,12 @@ else
         kubectl ws create "$espw_name" --enter
         kubectl apply -f  ./config/crds 
         kubectl apply -f  ./config/exports
-        echo "Finished populate the espw with kcp edge crds and apiexports"
+        echo "Finished populate the espw with kubestellar crds and apiexports"
    else
         kubectl ws create "$espw_name" --enter
         kubectl apply -f  ./config/crds &> /dev/null
         kubectl apply -f  ./config/exports &> /dev/null
-        echo "Finished populate the espw with kcp edge crds and apiexports"
+        echo "Finished populate the espw with kubestellar crds and apiexports"
    fi
 fi
 
@@ -179,24 +192,24 @@ mailbox-controller -v=2 >& $log_folder/mailbox-controller-log.txt &
 
 run_status=$(wait_for_process mailbox-controller)
 if [ $run_status -eq 0 ]; then
-    echo " mailbox-controller is running (log file: mailbox-controller-log.txt)"
+    echo " mailbox-controller is running (log file: $log_folder/mailbox-controller-log.txt)"
 else
     echo " mailbox-controller failed to start ..... exiting"
     sleep 2
-    exit
+    exit 1
 fi
 
 
-# Start the edge-mc scheduler
+# Start the kubestellar scheduler
 sleep 3
-scheduler -v 2 >& $log_folder/edge-scheduler-log.txt &
+scheduler -v 2 >& $log_folder/kubestellar-scheduler-log.txt &
 
 run_status=$(wait_for_process "scheduler -v 2")
 if [ $run_status -eq 0 ]; then
-    echo " scheduler is running (log file: edge-scheduler-log.txt)"
+    echo " scheduler is running (log file: $log_folder/kubestellar-scheduler-log.txt)"
 else
     echo " scheduler failed to start ..... exiting"
-    exit
+    exit 1
 fi
  
 # Start the Placement Translator
@@ -205,10 +218,10 @@ placement-translator --allclusters-context  "system:admin" -v=2 >& $log_folder/p
 
 run_status=$(wait_for_process placement-translator)
 if [ $run_status -eq 0 ]; then
-    echo " placement translator is running (log file: placement-translator-log.txt)"
+    echo " placement translator is running (log file: $log_folder/placement-translator-log.txt)"
 else
     echo " placement translator failed to start ..... exiting"
-    exit
+    exit 1
 fi
 
 sleep 10
