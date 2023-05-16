@@ -201,7 +201,7 @@ Create the `EdgePlacement` object for your workload. Its “where predicate” (
 
 In the `example-wmw` workspace create the following `EdgePlacement` object: 
   
-```console
+```shell
 kubectl ws root:my-org:example-wmw
 
 kubectl apply -f - <<EOF
@@ -347,8 +347,14 @@ To remove the example usage, delete the IMW and WMW and kind clusters run the fo
 kubestellar remove-example
 ```
 
-Stop and uninstall KubeStellar and kcp with the following commands:
+Stop and uninstall KubeStellar following commands:
 
 ```shell
 kubestellar stop
+```
+
+Stop and uninstall KubeStellar and kcp with the following commands:
+
+```shell
+remove-kubestellar
 ```
