@@ -15,7 +15,7 @@
 
 # Usage: $0 (start or stop | -v)
 
-# Purpose: deploy the kubestellar platform. The following components are created:
+# Purpose: control whether the controllers are running, setting up the ESPW if necessary.. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
 #           (b) 3 kubestellar controllers: kubestellar-scheduler, mailbox-controller and placement-translator
 
@@ -41,10 +41,6 @@ while (( $# > 0 )); do
         install=1;; 
     (stop) 
         install=0;; 
-    (remove)
-        remove=0;;
-    (cleanup) 
-        cleanup=1;;
     (--log-folder)
         if (( $# > 1 ));
         then { log_folder="$2"; shift; }
@@ -131,13 +127,6 @@ if [ $install -eq 0 ]; then
    exit 0
 fi
 
-if [ $remove -eq 1 ]; then
-  cleanup 
-fi
-
-if [ $cleanup -eq 1 ]; then
-  cleanup 
-fi
 
 wait_for_process(){
   status=$(process_running $1)

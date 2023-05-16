@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 (--clusters <list of kind cluster names> e.g, "florin guilder")
+# Usage: $0 (--clusters <list of kind cluster names> e.g, "florin guilder" | --folder < directory> )
 
 # Purpose: clean up environment by removing kcp & kcp-edge and
 # deleting all the generated files (e.g., edge syncer manifests and logs files)
@@ -24,10 +24,14 @@
 # are created at your current directory - where this script is executed
 
 clusters="florin guilder"
+parentDir="."
 
 while (( $# > 0 )); do
     if [ "$1" == "--clusters" ]; then
         clusters=$2
+        shift
+    elif [ "$1" == "--folder" ]; then
+        parentDir=$2
     fi 
     shift
 done
@@ -41,22 +45,22 @@ do
   fi
 done
 
-pkill -f kubectl-kcp-playground
+
 pkill -f kcp
 pkill -f mailbox-controller
 pkill -f placement-translator
 pkill -f "scheduler -v 2" # edge-scheduler
-rm -rf $(pwd)/kcp
-rm -rf $(pwd)/.kcp
+rm -rf $parentDir/kcp
+rm -rf $parentDir/.kcp
 
 
 if [ !$(ls | grep syncer.sh | wc -l) == 0 ]; then
-      rm $(pwd)/*syncer.yaml
+      rm $parentDir/*syncer.yaml
       echo "Deleted syncer manifest"
 fi 
 
 if [ !$(ls | grep log.txt | wc -l) == 0 ]; then
-      rm $(pwd)/*log.txt
+      rm $parentDir/*log.txt
       echo "Deleted log files"
 fi 
 
