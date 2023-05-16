@@ -125,10 +125,7 @@ if [ $install -eq 0 ]; then
       kubectl delete ws "$espw_name"
       echo "Deleted workspace: $espw_name"
    fi
-
-   pkill -f mailbox-controller
-   pkill -f placement-translator
-   pkill -f kubestellar-scheduler
+   
    echo "kubestellar stopped ....."
    exit 0
 fi

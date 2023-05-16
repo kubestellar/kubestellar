@@ -23,35 +23,25 @@
 # This script requires the kcp folders, logs and syncer manifest files
 # are created at your current directory - where this script is executed
 
-clusters="florin guilder"
+
 parentDir="."
 
 while (( $# > 0 )); do
-    if [ "$1" == "--clusters" ]; then
-        clusters=$2
-        shift
-    elif [ "$1" == "--folder" ]; then
+    if [ "$1" == "--folder" ]; then
         parentDir=$2
     fi 
     shift
-done
-
-# Deleting kind clusters
-for c in ${clusters[@]}
-do 
-  if [ $(kind get clusters | grep $c) > /dev/null 2>&1 ]; then
-     echo "Deleting kind cluster $c ...."
-     kind delete cluster --name $c > /dev/null 2>&1
-  fi
 done
 
 
 pkill -f kcp
 pkill -f mailbox-controller
 pkill -f placement-translator
-pkill -f "scheduler -v 2" # edge-scheduler
-rm -rf $parentDir/kcp
+pkill -f kubestellar-scheduler
 rm -rf $parentDir/.kcp
+rm -rf $parentDir/kcp
+rm -rf $parentDir/kubestellar
+rm -rf $parentDir/kubestellar-logs
 
 
 if [ !$(ls | grep syncer.sh | wc -l) == 0 ]; then
