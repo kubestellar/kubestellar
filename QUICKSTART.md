@@ -323,12 +323,12 @@ Lastly, let's check that the workload is working in both clusters:
 
 For `florin`:
 
-```console
+```shell
 curl http://localhost:8081
 ```
 which should yield:
 
-```
+```html
 <!DOCTYPE html>
 <html>
   <body>
@@ -344,7 +344,7 @@ curl http://localhost:8083
 ```
 which should yield:
 
-```
+```html
 <!DOCTYPE html>
 <html>
   <body>
