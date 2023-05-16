@@ -14,7 +14,7 @@ Table of contents:
   - [a. Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
   - [c. Onboarding the clusters](#c-onboarding-the-clusters)
-  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#e-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
@@ -25,7 +25,7 @@ This guide is intended to show how to quickly bring up a **KubeStellar** environ
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/hack/bootstrap-kubestellar.sh) --kcp-version v0.11.0 --kubestellar-version v0.2.0 --folder .
+bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kcp-version v0.11.0 --kubestellar-version v0.2.0 --ensure-folder .
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
@@ -35,7 +35,7 @@ Check that `KubeStellar` is running:
 First, check that controllers are running with the following command:
 
 ```shell
-ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
+ps aux | grep -e mailbox-controller -e placement-translator -e kubestellar-scheduler
 ```
 
 which should yield something like:
@@ -69,13 +69,13 @@ kubectl ws tree
 Create the first edge cluster:
 
 ```shell
-kind create cluster --name florin --config examples/florin-config.yaml
+kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
 ```  
 
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name guilder --config examples/guilder-config.yaml
+kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
 ```  
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
@@ -103,7 +103,7 @@ A WMW does not have to be created before the edge cluster is on-boarded; the WMW
 Let's begin by onboarding the `florin` cluster:
 
 ```shell
-kubectl kubestellar prep-for-cluster --imw root:example-imw florin  env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
 ```
 
 which should yield something like:
@@ -162,7 +162,7 @@ deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
 Optionally, check that the edge syncer pod is running:
 
 ```shell
-kubectl --context kind-florin kubectl get pods -A
+kubectl --context kind-florin get pods -A
 ```
 
 which should yield something like:
@@ -185,7 +185,7 @@ local-path-storage                local-path-provisioner-684f458cdd-kw2xz       
 Now, let's onboard the `guilder` cluster:
 
 ```shell
-kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
 Apply the created edge syncer manifest:
@@ -294,8 +294,11 @@ kubectl --context kind-florin get deployments -A
 which should yield something like:
 
 ```console
-NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff   commond   0/0     0            0           6m44s
+NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                       commond                           1/1     1            1           6m48s
+kcp-edge-syncer-florin-2upj1awn   kcp-edge-syncer-florin-2upj1awn   1/1     1            1           16m
+kube-system                       coredns                           2/2     2            2           28m
+local-path-storage                local-path-provisioner            1/1     1            1           28m
 ```
 
 Also, let's check that the deployment was created in the `guilder` edge cluster:
@@ -307,16 +310,23 @@ kubectl --context kind-guilder get deployments -A
 which should yield something like:
 
 ```console
-NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff   commond   0/0     0            0           6m44s
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           7m54s
+kcp-edge-syncer-guilder-6tuay5d6   kcp-edge-syncer-guilder-6tuay5d6   1/1     1            1           12m
+kube-system                        coredns                            2/2     2            2           27m
+local-path-storage                 local-path-provisioner             1/1     1            1           27m
 ```
 
 Lastly, let's check that the workload is working in both clusters:
 
 For `florin`:
 
-```console
-$ curl http://localhost:8081
+```shell
+curl http://localhost:8081
+```
+which should yield:
+
+```html
 <!DOCTYPE html>
 <html>
   <body>
@@ -327,8 +337,12 @@ $ curl http://localhost:8081
 
 For `guilder`:
 
-```console
-$ curl http://localhost:8082
+```shell
+curl http://localhost:8083
+```
+which should yield:
+
+```html
 <!DOCTYPE html>
 <html>
   <body>
@@ -341,19 +355,25 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 
 ## 3. Teardown the environment
 
-To remove the example usage, delete the IMW and WMW and kind clusters run the following command:
+To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ```shell
-kubestellar remove-example
+kubectl delete workspace example-imw
+kubectl ws root:my-org
+kubectl kubestellar remove wmw demo1
+kubectl ws root
+kubectl delete workspace my-org
+kind delete cluster --name florin
+kind delete cluster --name guilder
 ```
 
-Stop and uninstall KubeStellar following commands:
+Stop and uninstall KubeStellar use the following command:
 
 ```shell
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following commands:
+Stop and uninstall KubeStellar and kcp with the following command:
 
 ```shell
 remove-kubestellar
