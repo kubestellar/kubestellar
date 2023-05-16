@@ -21,8 +21,9 @@
 
 # Assumption: kcp server is running.
 
-# This script requires the edge-mc binaries mailbox-controller, scheduler, placement-translator
-# already exist at edge-mc/bin/
+# Requirements:
+#    KubeStellar bin sists the edge-mc binaries mailbox-controller, scheduler, placement-translator
+#    KubeStellar controller binaries are on $PATH.
 
 
 set -e
@@ -30,6 +31,7 @@ set -e
 install=""
 verbosity=0
 espw_name="espw"
+log_folder="$PWD/kubestellar-logs"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -168,7 +170,12 @@ fi
 
 sleep 5
 
-mailbox-controller --inventory-context=root --mbws-context=base -v=2 >& mailbox-controller-log.txt &
+# Create the logs directory
+if [[ ! -d $log_folder ]]; then
+    mkdir -p "$log_folder"
+fi
+
+mailbox-controller -v=2 >& $log_folder/mailbox-controller-log.txt &
 
 run_status=$(wait_for_process mailbox-controller)
 if [ $run_status -eq 0 ]; then
@@ -182,7 +189,7 @@ fi
 
 # Start the edge-mc scheduler
 sleep 3
-scheduler -v 2 --root-user kcp-admin  --root-cluster root  --sysadm-context system:admin  --sysadm-user shard-admin >& edge-scheduler-log.txt &
+scheduler -v 2 >& $log_folder/edge-scheduler-log.txt &
 
 run_status=$(wait_for_process "scheduler -v 2")
 if [ $run_status -eq 0 ]; then
@@ -194,7 +201,7 @@ fi
  
 # Start the Placement Translator
 sleep 3
-placement-translator --allclusters-context  "system:admin" -v=2 >& placement-translator-log.txt &
+placement-translator --allclusters-context  "system:admin" -v=2 >& $log_folder/placement-translator-log.txt &
 
 run_status=$(wait_for_process placement-translator)
 if [ $run_status -eq 0 ]; then
