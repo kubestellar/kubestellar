@@ -341,14 +341,14 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 
 ## 3. Teardown the environment
 
-To uninstall kubestellar run the following command:
-
-```bash
-kubestellar stop
-```
-
-To uninstall kcp, kubestellar and delete all the generated files (e.g., edge syncer manifests and logs files) run the following command:
+To remove the example usage, delete the IMW and WMW and kind clusters run the following command:
 
 ```shell
-kubestellar cleanup
+kubestellar remove
+```
+
+Stop and uninstall KubeStellar and kcp with the following commands:
+
+```shell
+kubestellar stop
 ```
