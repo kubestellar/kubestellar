@@ -9,13 +9,13 @@
 
 Table of contents:
 
-- [1. Install and run **KubeStellar**]()
-- [2. Example deployment of Apache HTTP Server workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
-  - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-two-kind-clusters-florin-and-guilder)
-  - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-onboarding-the-clusters)
+- [1. Install and run **KubeStellar**](#1-install-and-run-kubestellar)
+- [2. Example deployment of Apache HTTP Server workload into two kind local clusters](#2-example-deployment-of-apache-http-server-workload-into-two-kind-local-clusters)
+  - [a. Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
+  - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
   - [c. Onboarding the clusters](#b-onboarding-the-clusters)
-  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#c-Create-and-deploy-the-nginx-workload-into-florin-and-guilder-clusters)
-- [3. Cleanup the environment](#3-Cleanup-the-environment)
+  - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#e-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+- [3. Teardown the environment](#3-teardown-the-environment)
 
 
 This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
@@ -264,7 +264,7 @@ $ curl http://localhost:8082
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](<place-holder>)
 
-## 3. Cleanup the environment
+## 3. Teardown the environment
 
 To uninstall kubestellar run the following command:
 
