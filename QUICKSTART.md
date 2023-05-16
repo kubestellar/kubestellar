@@ -185,7 +185,7 @@ local-path-storage                local-path-provisioner-684f458cdd-kw2xz       
 Now, let's onboard the `guilder` cluster:
 
 ```shell
-kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
 Apply the created edge syncer manifest:
