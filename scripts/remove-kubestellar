@@ -37,7 +37,7 @@ done
 pkill -f kcp
 pkill -f mailbox-controller
 pkill -f placement-translator
-pkill -f "kubestellar-scheduler"
+pkill -f kubestellar-scheduler
 rm -rf $parentDir/.kcp
 rm -rf $parentDir/kcp
 rm -rf $parentDir/kubestellar
