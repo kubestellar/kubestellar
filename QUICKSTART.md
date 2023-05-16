@@ -72,11 +72,15 @@ Create the first edge cluster:
 kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
 ```  
 
+Note: if you already have a cluster named 'florin' from a previous installation of KubeStellar, please delete the florin cluster ('kind cluster delete florin') and create it using the instruction above.
+
 Create the second edge cluster:
 
 ```shell
 kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
 ```  
+
+Note: if you already have a cluster named 'guilder' from a previous installation of KubeStellar, please delete the guilder cluster ('kind cluster delete guilder') and create it using the instruction above.
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
@@ -103,6 +107,7 @@ A WMW does not have to be created before the edge cluster is on-boarded; the WMW
 Let's begin by onboarding the `florin` cluster:
 
 ```shell
+kubectl ws root
 kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
 ```
 
@@ -185,6 +190,7 @@ local-path-storage                local-path-provisioner-684f458cdd-kw2xz       
 Now, let's onboard the `guilder` cluster:
 
 ```shell
+kubectl ws root
 kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
@@ -334,6 +340,7 @@ which should yield:
   </body>
 </html>
 ```
+NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 minutes and attempt curl again.  It takes a minute for the Apache HTTP Server to synchronize and start.
 
 For `guilder`:
 
@@ -350,6 +357,8 @@ which should yield:
   </body>
 </html>
 ```
+
+NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 minutes and attempt curl again.  It takes a minute for the Apache HTTP Server to synchronize and start.
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](<place-holder>)
 
