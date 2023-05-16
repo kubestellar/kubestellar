@@ -1,5 +1,5 @@
-# Contributing to KCP-Edge
-Greetings! We are grateful for your interest in joining the KCP-Edge community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
+# Contributing to KubeStellar
+Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
 To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C021U8WSAFK).
 
@@ -59,13 +59,13 @@ Congratulations! Your pull request has been successfully merged! 👏
 If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
 
 ## Testing Locally
-Check out our [QUICKSTART](quickstart.md) guide to install a local KCP server and install the KCP-Edge components
+Check out our [QUICKSTART](quickstart.md) guide to install a local KCP server and install the KubeStellar components
 
 ## Licensing
-KCP-Edge is [Apache 2.0 licensed](LICENSE) and we accept contributions via
+KubeStellar is [Apache 2.0 licensed](LICENSE) and we accept contributions via
 GitHub pull requests.
 
-Please read the following guide if you're interested in contributing to KCP-Edge.
+Please read the following guide if you're interested in contributing to KubeStellar.
 
 ## Certificate of Origin
 
