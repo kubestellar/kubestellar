@@ -144,7 +144,7 @@ Now le's deploy the edge syncer to the `florin` edge cluster:
 
   
 ```shell
-KUBECONFIG=$florin_kubeconfig kubectl apply -f florin-syncer.yaml
+kubectl --context kind-florin apply -f florin-syncer.yaml
 ```
 
 which should yield something like:
@@ -161,8 +161,8 @@ deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
 
 Optionally, check that the edge syncer pod is running:
 
-```console
-KUBECONFIG=$florin_kubeconfig kubectl get pods -A
+```shell
+kubectl --context kind-florin kubectl get pods -A
 ```
 
 which should yield something like:
@@ -191,7 +191,7 @@ kubectl kcp-edge prep-for-cluster --imw root:example-imw guilder env=prod
 Apply the created edge syncer manifest:
 
 ```shell
-KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
+kubectl --context kind-guilder apply -f guilder-syncer.yaml
 ```
 
 
@@ -199,23 +199,96 @@ KUBECONFIG=$guilder_kubeconfig kubectl apply -f guilder-syncer.yaml
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
-In the `wmw-1` workspace create the following `EdgePlacement` object: 
+In the `example-wmw` workspace create the following `EdgePlacement` object: 
   
-```shell
+```console
 kubectl ws root:my-org:example-wmw
-kubectl apply -f examples/common-placement.yaml
+
+kubectl apply -f - <<EOF
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: edge-placement-c
+spec:
+  locationSelectors:
+  - matchLabels: {"env":"prod"}
+  namespaceSelector:
+    matchLabels: {"common":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
+  upsync:
+  - apiGroup: "group1.test"
+    resources: ["sprockets", "flanges"]
+    namespaces: ["orbital"]
+    names: ["george", "cosmo"]
+  - apiGroup: "group2.test"
+    resources: ["cogs"]
+    names: ["william"]
+EOF
 ```
 
-Deploy the Apache HTTP Server workload. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
+Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
 
-```shell
-kubectl apply -f examples/common-workload.yaml
+
+```console
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: commonstuff
+  labels: {common: "si"}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: commonstuff
+  name: httpd-htdocs
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <body>
+        This is a common web site.
+      </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: commonstuff
+  name: commond
+spec:
+  selector: {matchLabels: {app: common} }
+  template:
+    metadata:
+      labels: {app: common}
+    spec:
+      containers:
+      - name: httpd
+        image: library/httpd:2.4
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 8081
+          protocol: TCP
+        volumeMounts:
+        - name: htdocs
+          readOnly: true
+          mountPath: /usr/local/apache2/htdocs
+      volumes:
+      - name: htdocs
+        configMap:
+          name: httpd-htdocs
+          optional: false
+EOF
 ```
 
 Now, let's check that the deployment was created in the `florin` edge cluster:
 
 ```shell
-KUBECONFIG=$florin_kubeconfig kubectl get deployments -A
+kubectl --context kind-florin get deployments -A
 ```
 
 which should yield something like:
@@ -228,7 +301,7 @@ commonstuff   commond   0/0     0            0           6m44s
 Also, let's check that the deployment was created in the `guilder` edge cluster:
 
 ```shell
-KUBECONFIG=$guilder_kubeconfig kubectl get deployments -A
+kubectl --context kind-guilder get deployments -A
 ```
 
 which should yield something like:
