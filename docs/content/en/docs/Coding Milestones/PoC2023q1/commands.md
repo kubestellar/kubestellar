@@ -1,11 +1,55 @@
 ---
-title: "2023q1 PoC kubectl commands"
-linkTitle: "2023q1 PoC kubectl commands"
+title: "2023q1 PoC commands"
+linkTitle: "2023q1 PoC commands"
 weight: 100
 ---
 
-With the `bin` directory of this PoC on your `$PATH`, the following
-`kubectl` commands can be used.
+This PoC includes two sorts of commands for users to use.  Most are
+executables delivered in the `bin` directory.  The command lines
+exhibited below presume that you have added this `bin` directory to
+your `$PATH`.  Alternatively: most of these executables can be invoked
+directly using any pathname (not in your `$PATH`), with a couple of
+noted exceptions.
+
+The other sort of command for users is a `bash` script that is
+designed to be fetched from github and fed directly into `bash`.
+
+# Executables
+
+## Platform control
+
+The `kubestellar` command has two subcommands, one for setup and one
+for teardown.
+
+### Kubestellar start
+
+This subcommand is used after installation.
+This subcommand does two things:
+1. It creates and populates the edge service provider workspace (ESPW) if it does not already exist; and
+2. It stops any running kubesteallar controllers and then starts them all.
+
+```shell
+kubestellar start [flags]
+```
+
+The flags can appear before and/or after the subcommand.
+
+The available flags are as follows.
+
+- `-V` or `--verbose`: calls for more verbose output.  This is a
+  binary choice, not a matter of degree.
+- `--log-folder $pathname`: says where to put the logs from the
+  controllers.  Will be `mkdir -p` if absent.  Defaults to
+  `${PWD}/kubestellar-logs`.
+- `-h` or `--help`: print a brief usage message and terminate.
+
+### Kubestellar stop
+
+This subcommand undoes `kubestellar start`.  It stops any running
+controllers and deletes the ESPW.
+
+This command accepts all the same flags as `kubestellar start` but
+ignores the `--log-folder`.
 
 ## Creating SyncTarget/Location pairs
 
@@ -299,3 +343,113 @@ $ kubectl kubestellar remove wmw demo1
 
 $ 
 ```
+
+# Web-to-bash
+
+## Quick Setup
+
+This is a combination of some installation and setup steps, for use in
+[the
+QuickStart](https://github.com/kcp-dev/edge-mc/blob/main/QUICKSTART.md).
+
+The script can be read directly from
+https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh
+and does the following things.
+
+1. Downloads and installs kcp if it is not already evident on `$PATH`
+   (using [the script below](#install-kcp-and-its-kubectl-plugins).
+2. Starts a kcp server if one is not already running.
+3. Downloads and installs kubestellar if it is not already evident on
+   `$PATH` (using [the script below](#install-kubestellar).
+4. `kubestellar start` if the KubeStellar controllers are not already running.
+
+This script accepts the following command line flags; all are optional.
+
+- `--kubestellar-version $version`: specifies the release of
+  KubeStellar to use.  The default is the latest regular release.
+- `--kcp-version $version`: specifies the kcp release to use.  The
+  default is the one that works with the chosen release of
+  KubeStellar.
+- `--os $OS`: specifies the operating system to use in selecting the
+  executables to download and install.  Choices are `linux` and
+  `darwin`.  Autodetected if omitted.
+- `--arch $IAS`: specifies the instruction set architecture to use in
+  selecting the executables to download and install.  Choices are
+  `amd64` and `arm64`.  Autodetected if omitted.
+- `--bind-address $IPADDR`: directs that the kcp server (a) write that
+  address for itself in the kubeconfig file that it constructs and (b)
+  listens only at that address.  The default is to pick one of the
+  host's non-loopback addresses to write into the kubeconfig file and
+  not bind a listening address.
+- `--ensure-folder $install_parent_dir`: specifies the parent folder
+  for downloads.  Will be `mkdir -p`.  The default is the current
+  working directory.  The download of kcp, if any, will go in
+  `$install_parent_dir/kcp`.  The download of KubeStellar will go in
+  `$install_parent_dir/kubestellar`.
+
+Here "install" means only to (a) unpack the distribution archives into
+the relevant places under `$install_parent_dir` and (b) enhance the
+`PATH`, and `KUBECONFIG` in the case of kcp, environment variables in
+the shell running the script.  Of course, if you run the script in a
+subshell then those environment effects terminate with that subshell;
+this script also prints out messages showing how to update the
+environment in another shell.
+
+## Install kcp and its kubectl plugins
+
+This script is directly available at
+https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kcp-with-plugins.sh
+and does the following things.
+
+- Fetch and install the `kcp` server executable.
+- Fetch and install the kubectl plugins of kcp.
+
+This script accepts the following command line flags; all are
+optional.
+
+- `--version $version`: specifies the kcp release to use.  The default
+  is the latest.
+- `--OS $OS`: specifies the operating system to use in selecting the
+  executables to fetch and install.  Choices are `darwin` and `linux`.
+  Auto-detected if omitted.
+- `--arch $ARCH`: specifies the instruction set architecture to use in
+  selecting the executables to fetch and install.  Choices are `arm64`
+  and `amd64`.  Auto-detected if omitted.
+- `--ensure-folder $install_parent_dir`: specifies where to install
+  to.  This will be `mkdir -p`.  The default is `./kcp`.
+- `-V` or `--verbose`: incrases the verbosity of output.  This is a
+  binary thing, not a matter of degree.
+- `-h` or `--help`: print brief usage message and exit.
+
+Here install means only to unpack the downloaded archives, creating
+`$install_parent_dir/bin`.  If `$install_parent_dir/bin` is not
+already on your `$PATH` then this script will print out a message
+telling you to add it.
+
+## Install KubeStellar
+
+This script is direclty available at
+https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kubestellar.sh
+and will download and install KubeStellar.
+
+This script accepts the following command line arguments; all are
+optional.
+
+- `--version $version`: specifies the release of KubeStellar to use.
+  Defaults to the latest regular release.
+- `--OS $OS`: specifies the operating system to use in selecting the
+  executables to fetch and install.  Choices are `darwin` and `linux`.
+  Auto-detected if omitted.
+- `--arch $ARCH`: specifies the instruction set architecture to use in
+  selecting the executables to fetch and install.  Choices are `arm64`
+  and `amd64`.  Auto-detected if omitted.
+- `--ensure-folder $install_parent_dir`: specifies where to install
+  to.  This will be `mkdir -p`.  The default is `./kubestellar`.
+- `-V` or `--verbose`: incrases the verbosity of output.  This is a
+  binary thing, not a matter of degree.
+- `-h` or `--help`: print brief usage message and exit.
+
+Here install means only to unpack the downloaded archive, creating
+`$install_parent_dir/bin`.  If `$install_parent_dir/bin` is not
+already on your `$PATH` then this script will print out a message
+telling you to add it.
