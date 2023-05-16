@@ -24,8 +24,6 @@
 # This script requires the edge-mc binaries mailbox-controller, scheduler, placement-translator
 # already exist at edge-mc/bin/
 
-# This script requires that the parent directory is edge-mc to run in dev mode
-
 
 set -e
 
@@ -34,15 +32,31 @@ verbosity=0
 espw_name="espw"
 
 while (( $# > 0 )); do
-    if [ "$1" == "start" ]; then
-        install=1
-    elif [ "$1" == "stop" ]; then
-        install=0
-    elif [ "$1" == "-v" ]; then
-        verbosity=1
-    fi
+    case "$1" in
+    (start)
+        install=1;; 
+    (stop) 
+        install=0;; 
+    (--log-folder)
+        if (( $# > 1 ));
+        then { log_folder="$2"; shift; }
+        else { echo "$0: missing log folder" >&2; exit 1; }
+        fi;;
+    (--verbose|-V)
+        verbosity=1;;
+    (-h|--help)
+        echo "Usage: $0 [start| stop][--log-folder log_folder] [-V|--verbose]"
+        exit 0;;
+    (-*)
+        echo "$0: unknown flag" >&2 ; exit 1;
+        exit 1;;
+    (*)
+        echo "$0: unknown positional argument" >&2; exit 1;
+        exit 1;;
+    esac
     shift
 done
+
 
 # Check if docker is running
 if ! docker ps > /dev/null
