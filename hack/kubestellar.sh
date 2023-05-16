@@ -31,7 +31,7 @@ set -e
 install=""
 verbosity=0
 espw_name="espw"
-log_folder="$PWD/kubestellar-logs"
+log_folder=$(pwd)/kubestellar-logs
 
 while (( $# > 0 )); do
     case "$1" in
@@ -172,7 +172,7 @@ sleep 5
 
 # Create the logs directory
 if [[ ! -d $log_folder ]]; then
-    mkdir -p "$log_folder"
+    mkdir -p $log_folder
 fi
 
 mailbox-controller -v=2 >& $log_folder/mailbox-controller-log.txt &
