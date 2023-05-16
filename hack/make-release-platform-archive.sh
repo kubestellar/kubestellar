@@ -37,7 +37,7 @@ srcdir=$(dirname "$0")
 cd "$srcdir/.."
 
 rm -rf bin/*
-make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/scheduler ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubectl-kubesteallar-syncer_gen"
+make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/kubestellar-scheduler ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubectl-kubesteallar-syncer_gen"
 mkdir -p build/release
 tar czf "build/release/$archname" --exclude bin/.gitignore bin config examples README.md LICENSE
 cd build/release
