@@ -294,8 +294,12 @@ kubectl --context kind-florin get deployments -A
 which should yield something like:
 
 ```console
-NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff   commond   0/0     0            0           6m44s
+kubectl --context kind-florin get deployments -A
+NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                       commond                           1/1     1            1           6m48s
+kcp-edge-syncer-florin-2upj1awn   kcp-edge-syncer-florin-2upj1awn   1/1     1            1           16m
+kube-system                       coredns                           2/2     2            2           28m
+local-path-storage                local-path-provisioner            1/1     1            1           28m
 ```
 
 Also, let's check that the deployment was created in the `guilder` edge cluster:
@@ -307,8 +311,12 @@ kubectl --context kind-guilder get deployments -A
 which should yield something like:
 
 ```console
-NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff   commond   0/0     0            0           6m44s
+kubectl --context kind-guilder get deployments -A
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           7m54s
+kcp-edge-syncer-guilder-6tuay5d6   kcp-edge-syncer-guilder-6tuay5d6   1/1     1            1           12m
+kube-system                        coredns                            2/2     2            2           27m
+local-path-storage                 local-path-provisioner             1/1     1            1           27m
 ```
 
 Lastly, let's check that the workload is working in both clusters:
@@ -316,7 +324,11 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```console
-$ curl http://localhost:8081
+curl http://localhost:8081
+```
+which should yield:
+
+```
 <!DOCTYPE html>
 <html>
   <body>
@@ -327,8 +339,12 @@ $ curl http://localhost:8081
 
 For `guilder`:
 
-```console
-$ curl http://localhost:8082
+```shell
+curl http://localhost:8083
+```
+which should yield:
+
+```
 <!DOCTYPE html>
 <html>
   <body>
@@ -348,7 +364,7 @@ kubectl delete workspace example-imw
 kubectl ws root:my-org
 kubectl kubestellar remove wmw demo1
 kubectl ws root
-kubectl delete my-org
+kubectl delete workspace my-org
 kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
