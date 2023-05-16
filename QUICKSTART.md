@@ -35,7 +35,7 @@ Check that `KubeStellar` is running:
 First, check that controllers are running with the following command:
 
 ```shell
-ps aux | grep -e mailbox-controller -e placement-translator -e scheduler
+ps aux | grep -e mailbox-controller -e placement-translator -e kubestellar-scheduler
 ```
 
 which should yield something like:
@@ -69,13 +69,13 @@ kubectl ws tree
 Create the first edge cluster:
 
 ```shell
-kind create cluster --name florin --config examples/florin-config.yaml
+kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
 ```  
 
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name guilder --config examples/guilder-config.yaml
+kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
 ```  
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
@@ -103,7 +103,7 @@ A WMW does not have to be created before the edge cluster is on-boarded; the WMW
 Let's begin by onboarding the `florin` cluster:
 
 ```shell
-kubectl kubestellar prep-for-cluster --imw root:example-imw florin  env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
 ```
 
 which should yield something like:
@@ -162,7 +162,7 @@ deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
 Optionally, check that the edge syncer pod is running:
 
 ```shell
-kubectl --context kind-florin kubectl get pods -A
+kubectl --context kind-florin get pods -A
 ```
 
 which should yield something like:
@@ -341,19 +341,25 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 
 ## 3. Teardown the environment
 
-To remove the example usage, delete the IMW and WMW and kind clusters run the following command:
+To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ```shell
-
+kubectl delete workspace example-imw
+kubectl ws root:my-org
+kubectl kubestellar remove wmw demo1
+kubectl ws root
+kubectl delete my-org
+kind delete cluster --name florin
+kind delete cluster --name guilder
 ```
 
-Stop and uninstall KubeStellar following commands:
+Stop and uninstall KubeStellar use the following command:
 
 ```shell
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following commands:
+Stop and uninstall KubeStellar and kcp with the following command:
 
 ```shell
 remove-kubestellar
