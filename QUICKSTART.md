@@ -294,7 +294,6 @@ kubectl --context kind-florin get deployments -A
 which should yield something like:
 
 ```console
-kubectl --context kind-florin get deployments -A
 NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                       commond                           1/1     1            1           6m48s
 kcp-edge-syncer-florin-2upj1awn   kcp-edge-syncer-florin-2upj1awn   1/1     1            1           16m
@@ -311,7 +310,6 @@ kubectl --context kind-guilder get deployments -A
 which should yield something like:
 
 ```console
-kubectl --context kind-guilder get deployments -A
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                        commond                            1/1     1            1           7m54s
 kcp-edge-syncer-guilder-6tuay5d6   kcp-edge-syncer-guilder-6tuay5d6   1/1     1            1           12m
