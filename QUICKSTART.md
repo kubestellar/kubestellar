@@ -80,7 +80,7 @@ kind create cluster --name guilder --config examples/guilder-config.yaml
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
-IMW are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
+IMWs are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
 
 ```shell
 kubectl config use-context root
@@ -88,7 +88,7 @@ kubectl ws root
 kubectl ws create "example-imw"
 ```
 
-WMW are used by KubeStellar to store workload descriptions and `EdgePlacement` objects. Create an WMW named `example-wmw` in a `my-org` workspace with the following command:
+WMWs are used by KubeStellar to store workload descriptions and `EdgePlacement` objects. Create an WMW named `example-wmw` in a `my-org` workspace with the following command:
 
 ```shell
 kubectl ws root
@@ -140,7 +140,7 @@ Current workspace is "root".
 
 An edge syncer manifest yaml file was created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
 
-Now le's deploy the edge syncer to the `florin` edge cluster:
+Now let's deploy the edge syncer to the `florin` edge cluster:
 
   
 ```shell
