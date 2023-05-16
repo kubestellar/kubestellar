@@ -9,7 +9,7 @@
 
 Table of contents:
 
-- [1. Install and run **KubeStellar**](#1-install-kubestellar-pre-requisites)
+- [1. Install and run **KubeStellar**]()
 - [2. Example deployment of Apache HTTP Server workload into two kind local clusters](#4-Example-deployment-of-nginx-workload-into-a-kind-local-cluster)
   - [a. Stand up two kind clusters: florin and guilder](#a-Stand-up-two-kind-clusters-florin-and-guilder)
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-onboarding-the-clusters)
