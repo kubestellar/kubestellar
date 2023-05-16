@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 --create-folder --verbose
+# Usage: $0
 
 # This script installs KCP binaries and plugins to a folder of choice
 #
@@ -22,8 +22,7 @@
 # [--version release] set a specific KCP release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--folder name] sets the installation folder, default: $PWD/KCP
-# [--create-folder] create the installation folder, if it does not exist
+# [--ensure-folder name] sets the installation folder, default: $PWD/KCP
 # [--strip-bin] remove the bin sub-folder
 # [-V|--verbose] verbose output
 
@@ -32,8 +31,7 @@ set -e
 kcp_version=""
 kcp_os=""
 kcp_arch=""
-kcp_folder=""
-kcp_create_folder="false"
+folder=""
 strip_bin="false"
 verbose="false"
 
@@ -78,19 +76,17 @@ while (( $# > 0 )); do
         then { kcp_arch="$2"; shift; }
         else { echo "$0: missing architecture type" >&2; exit 1; }
         fi;;
-    (--folder)
+    (--ensure-folder)
         if (( $# > 1 ));
-        then { kcp_folder="$2"; shift; }
+        then { folder="$2"; shift; }
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
-    (--create-folder)
-        kcp_create_folder="true";;
     (--strip-bin)
         strip_bin="true";;
     (--verbose|-V)
         verbose="true";;
     (-h|--help)
-        echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--folder name] [--create-folder] [--strip-bin] [-V|--verbose]"
+        echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder name] [--strip-bin] [-V|--verbose]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -105,24 +101,25 @@ done
 if [ "$kcp_version" == "" ]; then
     kcp_version=$(get_latest_version)
 fi
+
 if [ "$kcp_os" == "" ]; then
     kcp_os=$(get_os_type)
 fi
+
 if [ "$kcp_arch" == "" ]; then
     kcp_arch=$(get_arch_type)
 fi
-if [ "$kcp_folder" == "" ]; then
-    kcp_folder="$PWD/kcp"
+
+if [ "$folder" == "" ]; then
+    folder="$PWD/kcp"
 fi
 
-if [ -d "$kcp_folder" ]; then :
-elif [ "$kcp_create_folder" == "true" ]; then
-    if [ $verbose == "true" ]; then
-        echo "Creating folder: $kcp_folder"
-    fi
-    mkdir -p "$kcp_folder"
+if [ -d "$folder" ]; then :
 else
-    echo "Specified folder does not exist: $kcp_folder" >&2; exit 1;
+    if [ $verbose == "true" ]; then
+        echo "Creating folder: $folder"
+    fi
+    mkdir -p "$folder"
 fi
 
 if [ $verbose == "true" ]; then
@@ -136,17 +133,17 @@ else
 fi
 
 if [ $verbose == "true" ]; then
-    echo "Extracting archive to: $kcp_folder"
+    echo "Extracting archive to: $folder"
 fi
 
 if [ $strip_bin == "true" ]; then
-    tar -C $kcp_folder -zxf kcp-plugins.tar.gz --wildcards --strip-components=1 bin/*
-    tar -C $kcp_folder -zxf kcp.tar.gz --wildcards --strip-components=1 bin/*
-    bin_folder=$(get_full_path "$kcp_folder")
+    tar -C $folder -zxf kcp-plugins.tar.gz --wildcards --strip-components=1 bin/*
+    tar -C $folder -zxf kcp.tar.gz --wildcards --strip-components=1 bin/*
+    bin_folder=$(get_full_path "$folder")
 else
-    tar -C $kcp_folder -zxf kcp-plugins.tar.gz
-    tar -C $kcp_folder -zxf kcp.tar.gz
-    bin_folder=$(get_full_path "$kcp_folder/bin")
+    tar -C $folder -zxf kcp-plugins.tar.gz
+    tar -C $folder -zxf kcp.tar.gz
+    bin_folder=$(get_full_path "$folder/bin")
 fi
 
 if [ $verbose == "true" ]; then
@@ -157,5 +154,5 @@ rm kcp.tar.gz
 rm kcp-plugins.tar.gz
 
 if [[ ! ":$PATH:" == *":$bin_folder:"* ]]; then
-    echo "Add KCP folder to your path: export PATH="\$PATH:$bin_folder""
+    echo "Add KCP folder to the path: export PATH="\$PATH:$bin_folder""
 fi
