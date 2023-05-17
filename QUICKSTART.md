@@ -367,6 +367,7 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ```shell
+rm florin-syncer.yaml guilder-syncer.yaml
 kubectl ws root
 kubectl delete workspace example-imw
 kubectl ws root:my-org
