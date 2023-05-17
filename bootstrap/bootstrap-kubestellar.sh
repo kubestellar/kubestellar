@@ -164,10 +164,10 @@ while (( $# > 0 )); do
         echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
-        echo "$0: unknown flag" >&2 ; exit 1;
+        echo "$0: unknown flag" >&2
         exit 1;;
     (*)
-        echo "$0: unknown positional argument" >&2; exit 1;
+        echo "$0: unknown positional argument" >&2
         exit 1;;
     esac
     shift
@@ -224,7 +224,7 @@ if [ "$(kcp_running)" == "false" ]; then
         sleep 1
     done
     sleep 10
-    echo 'Export KUBECONFIG with the command: export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"'
+    echo "Export KUBECONFIG with the command: export KUBECONFIG='$(pwd)/.kcp/admin.kubeconfig'"
 fi
 
 # Ensure KubeStellar is installed
