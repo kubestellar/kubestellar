@@ -47,6 +47,14 @@ kcp_running() {
     fi
 }
 
+kcp_ready() {
+    if [ "$(kubectl ws root:compute 2> /dev/null)" == "" ]; then
+        echo "false"
+    else
+        echo "true"
+    fi
+}
+
 kcp_get_latest_version() {
     curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
@@ -203,8 +211,8 @@ if [ "$(kcp_running)" == "false" ]; then
         kcp start --bind-address $kcp_address >& kcp_log.txt &
     fi
     export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
-    sleep 5
-    until kubectl ws . &> /dev/null
+    sleep 10
+    until $(kcp_ready)
     do
         sleep 1
     done
