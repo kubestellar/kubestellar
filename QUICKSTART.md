@@ -291,7 +291,7 @@ spec:
 EOF
 ```
 
-Now, let's check that the deployment was created in the `florin` edge cluster:
+Now, let's check that the deployment was created in the `florin` edge cluster - it may take a few 10s of seconds to appear:
 
 ```shell
 kubectl --context kind-florin get deployments -A
