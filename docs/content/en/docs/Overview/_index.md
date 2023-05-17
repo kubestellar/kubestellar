@@ -42,7 +42,7 @@ KubeStellar is focused on concerns arising from edge multicluster use cases.  Ed
 
 ## Quickstart
 
-Checkout our [Quickstart Guide](https://docs.kcp-edge.io/docs/getting-started/quickstart/)
+Checkout our [Quickstart Guide](https://docs.kubestellar.io/docs/getting-started/quickstart/)
 
 ## Contributing
 
