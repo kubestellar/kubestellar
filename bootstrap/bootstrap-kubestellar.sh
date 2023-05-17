@@ -101,8 +101,6 @@ kubestellar_imw=""
 kubestellar_wmw=""
 verbose=""
 
-echo "KubeStellar bootstrap started..."
-
 while (( $# > 0 )); do
     case "$1" in
     (--kcp-version)
