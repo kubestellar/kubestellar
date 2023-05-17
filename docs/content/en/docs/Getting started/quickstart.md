@@ -19,10 +19,10 @@ Table of contents:
 
 [1. Install and run KubeStellar](https://docs.kubestellar.io/docs/getting-started/quickstart/#1-install-and-run-kubestellar)<br />
 [2. Example deployment of Apache HTTP Server workload into two local kind clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)<br />
-    [a. Stand up two kind clusters: florin and guilder](https://docs.kubestellar.io/docs/getting-started/quickstart/#a-stand-up-two-kind-clusters-florin-and-guilder)<br />
-    [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](https://docs.kubestellar.io/docs/getting-started/quickstart/#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)<br />
-    [c. Onboarding the clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#c-onboarding-the-clusters)<br />
-    [d. Create and deploy the Apache Server workload into florin and guilder clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[a. Stand up two kind clusters: florin and guilder](https://docs.kubestellar.io/docs/getting-started/quickstart/#a-stand-up-two-kind-clusters-florin-and-guilder)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](https://docs.kubestellar.io/docs/getting-started/quickstart/#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c. Onboarding the clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#c-onboarding-the-clusters)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[d. Create and deploy the Apache Server workload into florin and guilder clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)<br />
 [3. Teardown the environment](https://docs.kubestellar.io/docs/getting-started/quickstart/#3-teardown-the-environment)<br />
 
 This guide is intended to show how to quickly bring up a KubeStellar environment with its dependencies from a binary release.
