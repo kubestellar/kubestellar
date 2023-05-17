@@ -159,7 +159,7 @@ while (( $# > 0 )); do
         verbose="-V";;
     (-X)
 	set -x
-	flagx="-X"
+	flagx="-X";;
     (-h|--help)
         echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose] [-X]"
         exit 0;;
