@@ -392,4 +392,4 @@ remove-kubestellar
 
 ## Demo
 
-<iframe width="500" height="300" src="https://www.youtube.com/watch?v=NMGH-bwsh7s>" frameborder="0" allowfullscreen></iframe>
+[![KubeStellar Demo](https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg)](https://www.youtube.com/watch?v=NMGH-bwsh7s)
