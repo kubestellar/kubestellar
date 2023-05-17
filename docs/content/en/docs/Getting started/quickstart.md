@@ -73,14 +73,14 @@ Create the first edge cluster:
 ```sh
 kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
 ```
-Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind cluster delete florin') and create it using the instruction above.
+Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind delete cluster --name florin') and create it using the instruction above.
 
 Create the second edge cluster:
 
 ```sh
 kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
 ```
-Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind cluster delete guilder') and create it using the instruction above.
+Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
@@ -89,7 +89,7 @@ IMWs are used by KubeStellar to store inventory objects (SyncTargets and Locatio
 ```sh
 kubectl config use-context root
 kubectl ws root
-kubectl ws create "example-imw"
+kubectl ws create example-imw
 ```
 WMWs are used by KubeStellar to store workload descriptions and EdgePlacement objects. Create an WMW named example-wmw in a my-org workspace with the following commands:
 
