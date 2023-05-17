@@ -92,10 +92,10 @@ while (( $# > 0 )); do
         echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder name] [--strip-bin] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
-        echo "$0: unknown flag" >&2 ; exit 1;
+        echo "$0: unknown flag" >&2
         exit 1;;
     (*)
-        echo "$0: unknown positional argument" >&2; exit 1;
+        echo "$0: unknown positional argument" >&2
         exit 1;;
     esac
     shift
