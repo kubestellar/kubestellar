@@ -25,7 +25,7 @@ This guide is intended to show how to quickly bring up a **KubeStellar** environ
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh)
+bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version latest
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
