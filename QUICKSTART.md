@@ -1,4 +1,4 @@
-# **KubeStellar** Quickstart
+<img src="contrib/logo/kubestellar-quickstart-demo.png" width="20%" height="205%" title="Kyst">
 
 ## Required Packages:
    - [docker](https://docs.docker.com/engine/install/)
@@ -389,3 +389,6 @@ Stop and uninstall KubeStellar and kcp with the following command:
 ```shell
 remove-kubestellar
 ```
+
+## Demo
+[![KubeStellar QuickStart Demo](https://www.youtube.com/watch?v=Tg_PA_ByzyU)
