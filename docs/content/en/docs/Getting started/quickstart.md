@@ -7,27 +7,27 @@ date: 2023-05-16
 description: >
 ---
 
-# Required Packages:
+## Required Packages:
 
 - [docker](https://docs.docker.com/engine/install/)
 - [kind](https://kind.sigs.k8s.io/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
 
-# Setup Instructions
+## Setup Instructions
 
 Table of contents:
 
 [1. Install and run KubeStellar](https://docs.kubestellar.io/docs/getting-started/quickstart/#1-install-and-run-kubestellar)
 [2. Example deployment of Apache HTTP Server workload into two local kind clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
     [a. Stand up two kind clusters: florin and guilder](https://docs.kubestellar.io/docs/getting-started/quickstart/#a-stand-up-two-kind-clusters-florin-and-guilder)
-    b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+    [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](https://docs.kubestellar.io/docs/getting-started/quickstart/#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
     c. Onboarding the clusters
     d. Create and deploy the Apache Server workload into florin and guilder clusters
 3. Teardown the environment
 
 This guide is intended to show how to quickly bring up a KubeStellar environment with its dependencies from a binary release.
 
-# 1. Install and run KubeStellar
+## 1. Install and run KubeStellar
 
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and KubeStellar binaries and scripts into a kubestellar subfolder in your current working directory using the following command:
 
@@ -64,9 +64,9 @@ kubectl ws tree
     ├── compute
     └── espw
 ```
-# 2. Example deployment of Apache HTTP Server workload into two local kind clusters
+## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
 
-## a. Stand up two kind clusters: florin and guilder
+### a. Stand up two kind clusters: florin and guilder
 
 Create the first edge cluster:
 
@@ -82,7 +82,7 @@ kind create cluster --name guilder --config  kubestellar/examples/guilder-config
 ```
 Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind cluster delete guilder') and create it using the instruction above.
 
-## b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
 IMWs are used by KubeStellar to store inventory objects (SyncTargets and Locations). Create an IMW named example-imw with the following command:
 
@@ -100,7 +100,7 @@ kubectl kubestellar ensure wmw example-wmw
 ```
 A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.
 
-## c. Onboarding the clusters
+### c. Onboarding the clusters
 
 Let's begin by onboarding the florin cluster:
 
@@ -188,7 +188,7 @@ Apply the created edge syncer manifest:
 ```sh
 kubectl --context kind-guilder apply -f guilder-syncer.yaml
 ``` 
-## d. Create and deploy the Apache Server workload into florin and guilder clusters
+### d. Create and deploy the Apache Server workload into florin and guilder clusters
 
 Create the EdgePlacement object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (florin and guilder) created earlier, thus directing the workload to both edge clusters.
 
@@ -341,7 +341,7 @@ NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and a
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our User Guide
 
-# 3. Teardown the environment
+## 3. Teardown the environment
 
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
