@@ -5,16 +5,15 @@ weight: 100
 ---
 
 This PoC includes two sorts of commands for users to use.  Most are
-executables delivered in the `bin` directory.  The command lines
-exhibited below presume that you have added this `bin` directory to
-your `$PATH`.  Alternatively: most of these executables can be invoked
-directly using any pathname (not in your `$PATH`), with a couple of
-noted exceptions.
-
-The other sort of command for users is a `bash` script that is
-designed to be fetched from github and fed directly into `bash`.
+executables delivered in the `bin` directory.  The other sort of
+command for users is a `bash` script that is designed to be fetched
+from github and fed directly into `bash`.
 
 # Executables
+
+The command lines exhibited below presume that you have added the
+`bin` directory to your `$PATH`.  Alternatively: these executables can
+be invoked directly using any pathname (not in your `$PATH`).
 
 ## Platform control
 
@@ -170,9 +169,8 @@ inventory management workspace, or specify that workspace with the
 will be what it was when the command started.
 
 This command will only succeed if the mailbox controller has created
-the mailbox workspace for the given SyncTarget.  If that workspace is
-not found at first, this commandn will wait 15 seconds to give the
-controller a chance to create the mailbox workspace.
+and conditioned the mailbox workspace for the given SyncTarget.  This
+command waits for 10 to 70 seconds for that to happen.
 
 ```console
 $ kubectl kubestellar prep-for-syncer -h                     
@@ -215,7 +213,7 @@ chosen output file.
 KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 ```
 
-# Edge cluster on-boarding
+## Edge cluster on-boarding
 
 The following command is a combination of `kubectl kubestellar
 ensure-location` and `kubectl kubestellar prep-for-syncer`.
@@ -252,7 +250,7 @@ to apply it. Use
 to verify the syncer pod is running.
 ```
 
-# Creating a Workload Management Workspace
+## Creating a Workload Management Workspace
 
 Such a workspace needs not only to be created but also populated with
 an `APIBinding` to the edge API and, if desired, an `APIBinding` to
@@ -304,7 +302,7 @@ apibinding.apis.kcp.io "bind-kube" deleted
 $ 
 ```
 
-# Removing a Workload Management Workspace
+## Removing a Workload Management Workspace
 
 Deleting a WMW can be done by simply deleting its `Workspace` object from
 the parent.
