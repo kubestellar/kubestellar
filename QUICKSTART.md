@@ -393,5 +393,5 @@ remove-kubestellar
 ## Demo
 
 <a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
- <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="240" height="180" border="10" />
+ <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="500" height="500" border="10" />
 </a>
