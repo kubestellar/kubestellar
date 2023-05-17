@@ -1,5 +1,8 @@
-<img src="contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="Kyst">
+<img src="contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart">
 
+## Estimated Time: 
+   ~3 minutes
+   
 ## Required Packages:
    - [docker](https://docs.docker.com/engine/install/)
    - [kind](https://kind.sigs.k8s.io/)
