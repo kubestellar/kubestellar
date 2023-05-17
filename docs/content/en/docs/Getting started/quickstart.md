@@ -19,7 +19,7 @@ Table of contents:
 
 [1. Install and run KubeStellar](https://docs.kubestellar.io/docs/getting-started/quickstart/#1-install-and-run-kubestellar)
 [2. Example deployment of Apache HTTP Server workload into two local kind clusters](https://docs.kubestellar.io/docs/getting-started/quickstart/#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
-    a. Stand up two kind clusters: florin and guilder
+    [a. Stand up two kind clusters: florin and guilder](https://docs.kubestellar.io/docs/getting-started/quickstart/#a-stand-up-two-kind-clusters-florin-and-guilder)
     b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
     c. Onboarding the clusters
     d. Create and deploy the Apache Server workload into florin and guilder clusters
