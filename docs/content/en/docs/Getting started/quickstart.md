@@ -29,7 +29,7 @@ Table of contents:
     
     d. Create and deploy the Apache Server workload into florin and guilder clusters
     
-3. Teardown the environment
+[3. Teardown the environment](https://docs.kubestellar.io/docs/getting-started/quickstart/#3-teardown-the-environment)
 
 This guide is intended to show how to quickly bring up a KubeStellar environment with its dependencies from a binary release.
 
