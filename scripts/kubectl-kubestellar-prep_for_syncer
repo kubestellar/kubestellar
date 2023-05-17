@@ -132,10 +132,37 @@ if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+    sleep 15 # maybe the mailbox controller is slow, give it another chance
+fi
+
+if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
     echo "$0: did not find the mailbox workspace $mbwsname; is the mailbox controller running?" >&2
     exit 5
 fi
 
-kubectl ws "${kubectl_flags[@]}" "$mbwsname"
+# Now that workspace _exists_, but is it _ready_?
+sleep 5
+
+if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+    sleep 15
+    if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+	sleep 15
+	kubectl ws "${kubectl_flags[@]}" "$mbwsname"
+    fi
+fi
+
+# Now the MBWS exists and is ready, but does it have the needed APIBinding?
+
+if ! kubectl get APIBinding bind-edge &> /dev/null; then
+    sleep 15
+    if ! kubectl get APIBinding bind-edge &> /dev/null; then
+	sleep 15
+	kubectl get APIBinding bind-edge > /dev/null
+    fi
+fi
+
+# Now the needed APIBinding exists, has it taken effect?
+sleep 5 # hope so
+
 
 "$bindir/kubectl-kubestellar-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"
