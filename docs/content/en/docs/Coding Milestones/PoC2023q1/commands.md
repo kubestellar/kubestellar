@@ -169,9 +169,8 @@ inventory management workspace, or specify that workspace with the
 will be what it was when the command started.
 
 This command will only succeed if the mailbox controller has created
-the mailbox workspace for the given SyncTarget.  If that workspace is
-not found at first, this commandn will wait 15 seconds to give the
-controller a chance to create the mailbox workspace.
+and conditioned the mailbox workspace for the given SyncTarget.  This
+command waits for 10 to 70 seconds for that to happen.
 
 ```console
 $ kubectl kubestellar prep-for-syncer -h                     
