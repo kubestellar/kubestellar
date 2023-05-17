@@ -1,220 +1,367 @@
 ---
 categories: ["Quickstart"]
 tags: ["start"]
-title: "KCP-Edge Quickstart Guide"
-linkTitle: "KCP-Edge Quickstart Guide"
-date: 2023-02-25
+title: "KubeStellar Quickstart Guide"
+linkTitle: "KubeStellar Quickstart Guide"
+date: 2023-05-16
 description: >
 ---
 
-{{% pageinfo %}}
-This page is under construction - please checkout [this blog post](https://medium.com/@dettori/toward-building-a-kubernetes-control-plane-for-the-edge-a79eaada5750) for a step-by-step guide to configuring kcp to operate as kcp-edge will work by default in the near future.
-{{% /pageinfo %}}
+# Required Packages:
 
-To use components from KCP-Edge you must:
-1. Install and configure KCP to create a working KCP environment
-2. Build KCP-Edge
+- [docker](https://docs.docker.com/engine/install/)
+- [kind](https://kind.sigs.k8s.io/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
 
-## 1. Install and Configure KCP
-### Prerequisites
+# Setup Instructions
 
-- go (download from https://golang.org/dl/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-- A Kubernetes cluster (for local testing, consider [kind](http://kind.sigs.k8s.io))
+Table of contents:
 
-### Download kcp
+1. Install and run KubeStellar
+2. Example deployment of Apache HTTP Server workload into two local kind clusters
+a. Stand up two kind clusters: florin and guilder
+b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+c. Onboarding the clusters
+d. Create and deploy the Apache Server workload into florin and guilder clusters
+3. Teardown the environment
+This guide is intended to show how to quickly bring up a KubeStellar environment with its dependencies from a binary release.
 
-Visit our [latest release page](https://github.com/kcp-dev/kcp/releases/latest) and download `kcp`
-and `kubectl-kcp-plugin` that match your operating system and architecture.
+# 1. Install and run KubeStellar
 
-Extract `kcp` and `kubectl-kcp-plugin` and place all the files in the `bin` directories somewhere in your `$PATH`.
+KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and KubeStellar binaries and scripts into a kubestellar subfolder in your current working directory using the following command:
 
-### Start kcp
-
-You can start kcp using this command:
-
-```shell
-kcp start
+```sh
+bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kcp-version v0.11.0 --kubestellar-version v0.2.0 --ensure-folder .
+export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
+export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
+Check that KubeStellar is running:
 
-This launches kcp in the foreground. You can press `ctrl-c` to stop it.
+First, check that controllers are running with the following command:
 
-To see a complete list of server options, run `kcp start options`.
-
-### Set your KUBECONFIG
-
-During its startup, kcp generates a kubeconfig in `.kcp/admin.kubeconfig`. Use this to connect to kcp and display the
-version to confirm it's working:
-
-```shell
-$ export KUBECONFIG=.kcp/admin.kubeconfig
-$ kubectl version
-WARNING: This version information is deprecated and will be replaced with the output from kubectl version --short.  Use --output=yaml|json to get the full version.
-Client Version: version.Info{Major:"1", Minor:"24", GitVersion:"v1.24.4", GitCommit:"95ee5ab382d64cfe6c28967f36b53970b8374491", GitTreeState:"clean", BuildDate:"2022-08-17T18:46:11Z", GoVersion:"go1.19", Compiler:"gc", Platform:"darwin/amd64"}
-Kustomize Version: v4.5.4
-Server Version: version.Info{Major:"1", Minor:"24", GitVersion:"v1.24.3+kcp-v0.8.0", GitCommit:"41863897", GitTreeState:"clean", BuildDate:"2022-09-02T18:10:37Z", GoVersion:"go1.18.5", Compiler:"gc", Platform:"darwin/amd64"}
+```sh
+ps aux | grep -e mailbox-controller -e placement-translator -e kubestellar-scheduler
 ```
+which should yield something like:
 
-### Configure kcp to sync to your cluster
+```sh
+user     1892  0.0  0.3 747644 29628 pts/1    Sl   10:51   0:00 mailbox-controller -v=2
+user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 scheduler -v 2 
+user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator -v=2
+```
+Second, check that the Edge Service Provider Workspace (espw) is created with the following command:
 
-kcp can't run pods by itself - it needs at least one physical cluster for that. For this example, we'll be using a
-local `kind` cluster.  It does not have to exist yet.
+```sh
+kubectl ws tree
+```
+which should yield:
 
-In this recipe we use the root workspace to hold the description of the workload and where it goes.  These usually would go elsewhere, but we use the root workspace here for simplicity.
+```sh
+kubectl ws tree
+.
+└── root
+    ├── compute
+    └── espw
+```
+# 2. Example deployment of Apache HTTP Server workload into two local kind clusters
 
-Run the following command to tell kcp about the `kind` cluster (replace the syncer image tag as needed; CI now puts built images in https://github.com/orgs/kcp-dev/packages):
+## a. Stand up two kind clusters: florin and guilder
 
-```shell
-$ kubectl kcp workload sync kind --syncer-image ghcr.io/kcp-dev/kcp/syncer:v0.10.0 -o syncer-kind-main.yaml
-Creating synctarget "kind"
-Creating service account "kcp-syncer-kind-25coemaz"
-Creating cluster role "kcp-syncer-kind-25coemaz" to give service account "kcp-syncer-kind-25coemaz"
+Create the first edge cluster:
 
- 1. write and sync access to the synctarget "kcp-syncer-kind-25coemaz"
+```sh
+kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
+```
+Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind cluster delete florin') and create it using the instruction above.
+
+Create the second edge cluster:
+
+```sh
+kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
+```
+Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind cluster delete guilder') and create it using the instruction above.
+
+## b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+
+IMWs are used by KubeStellar to store inventory objects (SyncTargets and Locations). Create an IMW named example-imw with the following command:
+
+```sh
+kubectl config use-context root
+kubectl ws root
+kubectl ws create "example-imw"
+```
+WMWs are used by KubeStellar to store workload descriptions and EdgePlacement objects. Create an WMW named example-wmw in a my-org workspace with the following commands:
+
+```sh
+kubectl ws root
+kubectl ws create my-org --enter
+kubectl kubestellar ensure wmw example-wmw
+```
+A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.
+
+## c. Onboarding the clusters
+
+Let's begin by onboarding the florin cluster:
+
+```sh
+kubectl ws root
+kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
+```
+which should yield something like:
+
+```sh
+Current workspace is "root:example-imw".
+synctarget.workload.kcp.io/florin created
+location.scheduling.kcp.io/florin created
+synctarget.workload.kcp.io/florin labeled
+location.scheduling.kcp.io/florin labeled
+Current workspace is "root:example-imw".
+Current workspace is "root:espw".
+Current workspace is "root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a" (type root:universal).
+Creating service account "kcp-edge-syncer-florin-1yi5q9c4"
+Creating cluster role "kcp-edge-syncer-florin-1yi5q9c4" to give service account "kcp-edge-syncer-florin-1yi5q9c4"
+
+ 1. write and sync access to the synctarget "kcp-edge-syncer-florin-1yi5q9c4"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-syncer-kind-25coemaz" to bind service account "kcp-syncer-kind-25coemaz" to cluster role "kcp-syncer-kind-25coemaz".
+Creating or updating cluster role binding "kcp-edge-syncer-florin-1yi5q9c4" to bind service account "kcp-edge-syncer-florin-1yi5q9c4" to cluster role "kcp-edge-syncer-florin-1yi5q9c4".
 
-Wrote physical cluster manifest to syncer-kind-main.yaml for namespace "kcp-syncer-kind-25coemaz". Use
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-1yi5q9c4". Use
 
-  KUBECONFIG=<pcluster-config> kubectl apply -f "syncer-kind-main.yaml"
+  KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-syncer-kind-25coemaz" kcp-syncer-kind-25coemaz
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-1yi5q9c4" kcp-edge-syncer-florin-1yi5q9c4
 
 to verify the syncer pod is running.
+Current workspace is "root:example-imw".
+Current workspace is "root".
 ```
+An edge syncer manifest yaml file was created in your current director: florin-syncer.yaml. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
 
-Next, we need to install the syncer pod on our `kind` cluster - this is what actually syncs content from kcp to the
-physical cluster. The kind cluster needs to be running by now. Run the following command:
-
-```shell
-$ KUBECONFIG=</path/to/kind/kubeconfig> kubectl apply -f "syncer-kind-main.yaml"
-namespace/kcp-syncer-kind-25coemaz created
-serviceaccount/kcp-syncer-kind-25coemaz created
-secret/kcp-syncer-kind-25coemaz-token created
-clusterrole.rbac.authorization.k8s.io/kcp-syncer-kind-25coemaz created
-clusterrolebinding.rbac.authorization.k8s.io/kcp-syncer-kind-25coemaz created
-secret/kcp-syncer-kind-25coemaz created
-deployment.apps/kcp-syncer-kind-25coemaz created
-```
-
-### Bind to workload APIs and create default placement
-
-If you are running kcp version v0.10.0 or higher, you will need to run the following commmand (continuing in the `root` workspace)
-to create a binding to the workload APIs export and a default placement for your physical cluster:
-
-```shell
-$ kubectl kcp bind compute root
-Binding APIExport "root:compute:kubernetes".
-placement placement-1pfxsevk created.
-Placement "placement-1pfxsevk" is ready.
-```
-
-### Create a deployment in kcp
-
-Let's create a deployment in our kcp workspace and see it get synced to our cluster:
-
-```shell
-$ kubectl create deployment --image=gcr.io/kuar-demo/kuard-amd64:blue --port=8080 kuard
-deployment.apps/kuard created
-```
-
-Once your cluster has pulled the image and started the pod, you should be able to verify the deployment is running in
-kcp:
-
-```shell
-$ kubectl get deployments
-NAME    READY   UP-TO-DATE   AVAILABLE   AGE
-kuard   1/1     1            1           3s
-```
-
-We are still working on adding support for `kubectl logs`, `kubectl exec`, and `kubectl port-forward` to kcp. For the
-time being, you can check directly in your cluster.
-
-kcp translates the names of namespaces in workspaces to unique names in a physical cluster. We first must get this
-translated name; if you're following along, your translated name might be different.
-
-```shell
-$ KUBECONFIG=</path/to/kind/kubeconfig> kubectl get pods --all-namespaces --selector app=kuard
-NAMESPACE          NAME                     READY   STATUS    RESTARTS   AGE
-kcp-26zq2mc2yajx   kuard-7d49c786c5-wfpcc   1/1     Running   0          4m28s
-```
-
-Now we can e.g. check the pod logs:
-
-```shell
-$ KUBECONFIG=</path/to/kind/kubeconfig> kubectl --namespace kcp-26zq2mc2yajx logs deployment/kuard | head
-2022/09/07 14:04:35 Starting kuard version: v0.10.0-blue
-2022/09/07 14:04:35 **********************************************************************
-2022/09/07 14:04:35 * WARNING: This server may expose sensitive
-2022/09/07 14:04:35 * and secret information. Be careful.
-2022/09/07 14:04:35 **********************************************************************
-2022/09/07 14:04:35 Config:
-{
-  "address": ":8080",
-  "debug": false,
-  "debug-sitedata-dir": "./sitedata",
-```
-
-## 2. Build and Install KCP-Edge
-To build and install KCP-Edge components:
-- clone the latest KCP-Edge [repository](https://github.com/kcp-dev/edge-mc)
-- make tools
-- make build
-- make install
-
-The [Makefile](Makefile) provides a set of targets to help simplify the build
-tasks.
-
+Now let's deploy the edge syncer to the florin edge cluster:
 
 ```sh
-make build
+kubectl --context kind-florin apply -f florin-syncer.yaml
 ```
+which should yield something like:
 
-The following targets can be used to lint, test and build the KCP-Edge controllers:
 ```sh
-make golint
-
-make test
-
-make install
+namespace/kcp-edge-syncer-florin-1yi5q9c4 created
+serviceaccount/kcp-edge-syncer-florin-1yi5q9c4 created
+secret/kcp-edge-syncer-florin-1yi5q9c4-token created
+clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
+clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
+secret/kcp-edge-syncer-florin-1yi5q9c4 created
+deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
 ```
+Optionally, check that the edge syncer pod is running:
 
+```sh
+kubectl --context kind-florin get pods -A
+```
+which should yield something like:
 
+```sh
+NAMESPACE                         NAME                                               READY   STATUS    RESTARTS   AGE
+kcp-edge-syncer-florin-1yi5q9c4   kcp-edge-syncer-florin-1yi5q9c4-77cb588c89-xc5qr   1/1     Running   0          12m
+kube-system                       coredns-565d847f94-92f4k                           1/1     Running   0          58m
+kube-system                       coredns-565d847f94-kgddm                           1/1     Running   0          58m
+kube-system                       etcd-florin-control-plane                          1/1     Running   0          58m
+kube-system                       kindnet-p8vkv                                      1/1     Running   0          58m
+kube-system                       kube-apiserver-florin-control-plane                1/1     Running   0          58m
+kube-system                       kube-controller-manager-florin-control-plane       1/1     Running   0          58m
+kube-system                       kube-proxy-jmxsg                                   1/1     Running   0          58m
+kube-system                       kube-scheduler-florin-control-plane                1/1     Running   0          58m
+local-path-storage                local-path-provisioner-684f458cdd-kw2xz            1/1     Running   0          58m
+```
+Now, let's onboard the guilder cluster:
 
-## Next steps
+```sh
+kubectl ws root
+kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
+```
+Apply the created edge syncer manifest:
 
-Thanks for checking out our quickstart!
+```sh
+kubectl --context kind-guilder apply -f guilder-syncer.yaml
+``` 
+## d. Create and deploy the Apache Server workload into florin and guilder clusters
 
-If you're interested in learning more about all the features KCP and KCP-Edge have to offer, please check out our additional
-documentation:
+Create the EdgePlacement object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (florin and guilder) created earlier, thus directing the workload to both edge clusters.
 
-### KCP
-- [Concepts](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/concepts.md) - a high level overview of kcp concepts
-- [Workspaces](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/workspaces.md) - a more thorough introduction on kcp's workspaces
-- [Locations & scheduling](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/locations-and-scheduling.md) - details on kcp's primitives that abstract over clusters
-- [Syncer](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/syncer.md) - information on running the kcp agent that syncs content between kcp and a physical cluster
-- [kubectl plugin](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/kubectl-kcp-plugin.md)
-- [Authorization](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/authorization.md) - how kcp manages access control to workspaces and content
-- [Virtual workspaces](https://github.com/kcp-dev/kcp/tree/main/docs/content/en/main/concepts/virtual-workspaces.md) - details on kcp's mechanism for virtual views of workspace content
+In the example-wmw workspace create the following EdgePlacement object:
 
-### KCP-Edge
-TBD
+```sh
+kubectl ws root:my-org:example-wmw
 
-## Contributing
+kubectl apply -f - <<EOF
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgePlacement
+metadata:
+  name: edge-placement-c
+spec:
+  locationSelectors:
+  - matchLabels: {"env":"prod"}
+  namespaceSelector:
+    matchLabels: {"common":"si"}
+  nonNamespacedObjects:
+  - apiGroup: apis.kcp.io
+    resources: [ "apibindings" ]
+    resourceNames: [ "bind-kube" ]
+  upsync:
+  - apiGroup: "group1.test"
+    resources: ["sprockets", "flanges"]
+    namespaces: ["orbital"]
+    names: ["george", "cosmo"]
+  - apiGroup: "group2.test"
+    resources: ["cogs"]
+    names: ["william"]
+EOF
+```
+Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (edge-placement-c) object created above.
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md).
+```sh
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: commonstuff
+  labels: {common: "si"}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: commonstuff
+  name: httpd-htdocs
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+      <body>
+        This is a common web site.
+      </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: commonstuff
+  name: commond
+spec:
+  selector: {matchLabels: {app: common} }
+  template:
+    metadata:
+      labels: {app: common}
+    spec:
+      containers:
+      - name: httpd
+        image: library/httpd:2.4
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 8081
+          protocol: TCP
+        volumeMounts:
+        - name: htdocs
+          readOnly: true
+          mountPath: /usr/local/apache2/htdocs
+      volumes:
+      - name: htdocs
+        configMap:
+          name: httpd-htdocs
+          optional: false
+EOF
+```
+Now, let's check that the deployment was created in the florin edge cluster:
 
-## Getting in touch
+```sh
+kubectl --context kind-florin get deployments -A
+```
+which should yield something like:
 
-There are several ways to communicate with us:
+```sh
+NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                       commond                           1/1     1            1           6m48s
+kcp-edge-syncer-florin-2upj1awn   kcp-edge-syncer-florin-2upj1awn   1/1     1            1           16m
+kube-system                       coredns                           2/2     2            2           28m
+local-path-storage                local-path-provisioner            1/1     1            1           28m
+```
+Also, let's check that the deployment was created in the guilder edge cluster:
 
-- The [`#kcp-dev` channel](https://app.slack.com/client/T09NY5SBT/C021U8WSAFK) in the [Kubernetes Slack workspace](https://slack.k8s.io)
-- Our mailing lists:
-    - [kcp-dev](https://groups.google.com/g/kcp-dev) for development discussions
+```sh
+kubectl --context kind-guilder get deployments -A
+```
+which should yield something like:
 
-## Additional references
+```sh
+NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+commonstuff                        commond                            1/1     1            1           7m54s
+kcp-edge-syncer-guilder-6tuay5d6   kcp-edge-syncer-guilder-6tuay5d6   1/1     1            1           12m
+kube-system                        coredns                            2/2     2            2           27m
+local-path-storage                 local-path-provisioner             1/1     1            1           27m
+```
+Lastly, let's check that the workload is working in both clusters:
 
-- [Let's Learn kcp - A minimal Kubernetes API server with Saiyam Pathak - July 7, 2021](https://www.youtube.com/watch?v=M4mn_LlCyzk)
+For florin:
+
+```sh
+curl http://localhost:8081
+```
+which should yield:
+
+```sh
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a common web site.
+  </body>
+</html>
+```
+NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 minutes and attempt curl again. It takes a minute for the Apache HTTP Server to synchronize and start.
+
+For guilder:
+
+```sh
+curl http://localhost:8083
+```
+which should yield:
+
+```sh
+<!DOCTYPE html>
+<html>
+  <body>
+    This is a common web site.
+  </body>
+</html>
+```
+NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again. It takes some time for the Apache HTTP Server to synchronize and start.
+
+Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our User Guide
+
+# 3. Teardown the environment
+
+To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
+
+```sh
+kubectl ws root
+kubectl delete workspace example-imw
+kubectl ws root:my-org
+kubectl kubestellar remove wmw demo1
+kubectl ws root
+kubectl delete workspace my-org
+kind delete cluster --name florin
+kind delete cluster --name guilder
+```
+Stop and uninstall KubeStellar use the following command:
+
+```sh
+kubestellar stop
+```
+Stop and uninstall KubeStellar and kcp with the following command:
+
+```sh
+remove-kubestellar
+``` 
+
