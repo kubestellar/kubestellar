@@ -364,7 +364,9 @@ and does the following things.
 This script accepts the following command line flags; all are optional.
 
 - `--kubestellar-version $version`: specifies the release of
-  KubeStellar to use.  The default is the latest regular release.
+  KubeStellar to use.  When using a specific version, include the
+  leading "v".  The default is the latest regular release, and the
+  value "latest" means the same thing.
 - `--kcp-version $version`: specifies the kcp release to use.  The
   default is the one that works with the chosen release of
   KubeStellar.

@@ -173,7 +173,7 @@ while (( $# > 0 )); do
     shift
 done
 
-if [ "$kcp_version" == "" ]; then
+if [ "$kcp_version" == "" ] || [ "$kcp_version" == latest ]; then
     kcp_version=$(kcp_get_latest_version)
 fi
 
