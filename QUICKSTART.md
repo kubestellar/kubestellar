@@ -1,4 +1,4 @@
-# **KubeStellar** Quickstart
+<img src="contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="Kyst">
 
 ## Required Packages:
    - [docker](https://docs.docker.com/engine/install/)
@@ -291,7 +291,7 @@ spec:
 EOF
 ```
 
-Now, let's check that the deployment was created in the `florin` edge cluster:
+Now, let's check that the deployment was created in the `florin` edge cluster - it may take a few 10s of seconds to appear:
 
 ```shell
 kubectl --context kind-florin get deployments -A
@@ -389,3 +389,9 @@ Stop and uninstall KubeStellar and kcp with the following command:
 ```shell
 remove-kubestellar
 ```
+
+## Demo Video
+
+<a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
+ <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
+</a>
