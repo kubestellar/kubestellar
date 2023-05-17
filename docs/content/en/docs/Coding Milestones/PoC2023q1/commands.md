@@ -386,6 +386,10 @@ This script accepts the following command line flags; all are optional.
   working directory.  The download of kcp, if any, will go in
   `$install_parent_dir/kcp`.  The download of KubeStellar will go in
   `$install_parent_dir/kubestellar`.
+- `-V` or `--verbose`: incrases the verbosity of output.  This is a
+  binary thing, not a matter of degree.
+- `-X`: makes the script `set -x` internally, for debugging.
+- `-h` or `--help`: print brief usage message and exit.
 
 Here "install" means only to (a) unpack the distribution archives into
 the relevant places under `$install_parent_dir` and (b) enhance the
@@ -419,6 +423,7 @@ optional.
   to.  This will be `mkdir -p`.  The default is `./kcp`.
 - `-V` or `--verbose`: incrases the verbosity of output.  This is a
   binary thing, not a matter of degree.
+- `-X`: makes the script `set -x` internally, for debugging.
 - `-h` or `--help`: print brief usage message and exit.
 
 Here install means only to unpack the downloaded archives, creating
@@ -447,6 +452,7 @@ optional.
   to.  This will be `mkdir -p`.  The default is `./kubestellar`.
 - `-V` or `--verbose`: incrases the verbosity of output.  This is a
   binary thing, not a matter of degree.
+- `-X`: makes the script `set -x` internally, for debugging.
 - `-h` or `--help`: print brief usage message and exit.
 
 Here install means only to unpack the downloaded archive, creating

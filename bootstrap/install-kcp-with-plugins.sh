@@ -25,6 +25,7 @@
 # [--ensure-folder name] sets the installation folder, default: $PWD/KCP
 # [--strip-bin] remove the bin sub-folder
 # [-V|--verbose] verbose output
+# [-X] `set -x`
 
 set -e
 
@@ -85,8 +86,10 @@ while (( $# > 0 )); do
         strip_bin="true";;
     (--verbose|-V)
         verbose="true";;
+    (-X)
+	set -x;;
     (-h|--help)
-        echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder name] [--strip-bin] [-V|--verbose]"
+        echo "Usage: $0 [--version release] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder name] [--strip-bin] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
