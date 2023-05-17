@@ -17,23 +17,12 @@ be invoked directly using any pathname (not in your `$PATH`).
 
 ## Platform control
 
-The `kubestellar` command has two subcommands, one for setup and one
-for teardown.
+The `kubestellar` command has three subcommands, one to finish setup
+and two for process control.
 
-### Kubestellar start
-
-This subcommand is used after installation.
-This subcommand does two things:
-1. It creates and populates the edge service provider workspace (ESPW) if it does not already exist; and
-2. It stops any running kubesteallar controllers and then starts them all.
-
-```shell
-kubestellar start [flags]
-```
-
-The flags can appear before and/or after the subcommand.
-
-The available flags are as follows.
+This command accepts the following command line flags, which can
+appear before and/or after the subcommand.  The `--log-folder` flag is
+only used in the `start` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -42,13 +31,27 @@ The available flags are as follows.
   `${PWD}/kubestellar-logs`.
 - `-h` or `--help`: print a brief usage message and terminate.
 
+
+### Kubestellar init
+
+This subcommand ensures that the edge service provider workspace
+(ESPW) exists and has the required contents.
+
+### Kubestellar start
+
+This subcommand is used after installation and `init`.
+
+This subcommand stops any running kubesteallar controllers and then
+starts them all.
+
+```shell
+kubestellar start [flags]
+```
+
 ### Kubestellar stop
 
-This subcommand undoes `kubestellar start`.  It stops any running
-controllers and deletes the ESPW.
-
-This command accepts all the same flags as `kubestellar start` but
-ignores the `--log-folder`.
+This subcommand undoes `kubestellar start`, stopping any running
+KubeStellar controllers.
 
 ## Creating SyncTarget/Location pairs
 
@@ -359,7 +362,8 @@ and does the following things.
 2. Starts a kcp server if one is not already running.
 3. Downloads and installs kubestellar if it is not already evident on
    `$PATH` (using [the script below](#install-kubestellar).
-4. `kubestellar start` if the KubeStellar controllers are not already running.
+4. `kubestellar init`.
+5. `kubestellar start` if the KubeStellar controllers are not already running.
 
 This script accepts the following command line flags; all are optional.
 

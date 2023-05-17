@@ -238,6 +238,8 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     fi
 fi
 
+kubestellar init  $verbose
+
 # Ensure KubeStellar is running
 if [ "$(kubestellar_running)" == "false" ]; then
     if [ "$verbose" != "" ]; then
