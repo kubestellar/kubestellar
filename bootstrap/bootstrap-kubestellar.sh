@@ -28,6 +28,7 @@
 # [--ensure-imw name] create a Inventory Management Workspace (IMW)
 # [--ensure-wmw name] create a Workload Management Workspace (WMW)
 # [-V|--verbose] verbose output
+# [-X] `set -x`
 
 set -e
 
@@ -108,6 +109,7 @@ kcp_address=""
 kubestellar_imw=""
 kubestellar_wmw=""
 verbose=""
+flagx=""
 
 echo "KubeStellar bootstrap started..."
 
@@ -155,8 +157,11 @@ while (( $# > 0 )); do
         fi;;
     (--verbose|-V)
         verbose="-V";;
+    (-X)
+	set -x
+	flagx="-X"
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -193,7 +198,7 @@ if [ "$(kcp_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing kcp..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --ensure-folder  $folder/kcp $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --ensure-folder  $folder/kcp $verbose $flagx
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kcp/bin)
     fi
@@ -227,7 +232,7 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing Kubestellar..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --ensure-folder  $folder/kubestellar $verbose
+    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --ensure-folder  $folder/kubestellar $verbose $flagx
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kubestellar/bin)
     fi
