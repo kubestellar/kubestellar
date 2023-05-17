@@ -392,4 +392,4 @@ remove-kubestellar
 
 ## Demo
 
-[![KubeStellar QuickStart Demo](https://www.youtube.com/watch?v=Tg_PA_ByzyU)
+<iframe width="500" height="300" src="https://www.youtube.com/watch?v=NMGH-bwsh7s>" frameborder="0" allowfullscreen></iframe>
