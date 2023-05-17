@@ -1,4 +1,4 @@
-<img src="contrib/logo/kubestellar-quickstart-demo.png" width="20%" height="205%" title="Kyst">
+<img src="contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="Kyst">
 
 ## Required Packages:
    - [docker](https://docs.docker.com/engine/install/)
@@ -391,4 +391,5 @@ remove-kubestellar
 ```
 
 ## Demo
+
 [![KubeStellar QuickStart Demo](https://www.youtube.com/watch?v=Tg_PA_ByzyU)
