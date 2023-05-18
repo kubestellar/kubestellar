@@ -25,7 +25,14 @@ This guide is intended to show how to quickly bring up a **KubeStellar** environ
 
 ## 1. Install and run **KubeStellar**
 
-KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
+KubeStellar works in the context of kcp, so to use KubeStellar you
+also need kcp. Download the kcp and **KubeStellar** binaries and
+scripts into a `kubestellar` subfolder in your current working
+directory using the following commands.  **NOTE**: the second time you
+try this you might run into [a
+bug](https://github.com/kcp-dev/edge-mc/issues/402); to be safe, make
+sure you completely tear down everything as [described
+below](#3-teardown-the-environment) before trying again.
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version latest
@@ -64,6 +71,13 @@ kubectl ws tree
     ├── compute
     └── espw
 ```
+
+**NOTE**: if you see the `compute` workspace but not the `espw`
+workspace then you may have hit [a known
+bug](https://github.com/kcp-dev/edge-mc/issues/402).  In this case you
+can recover by removing everything [as described
+below](#3-teardown-the-environment) and then starting over from the
+beginning.
 
 ## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
 
