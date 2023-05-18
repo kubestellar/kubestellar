@@ -29,7 +29,7 @@ Table of contents:
 
 This guide is intended to explain how KCP-Edge works with a detailed example.
 
-### 1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)
+### 1. Create your own edge infrastructure (edge clusters)
 
 Bring your own k8s edge clusters. In this example, we deploy only a single cluster using [kind](https://kind.sigs.k8s.io/). Our edge cluster is named “florin”:
 
@@ -238,7 +238,7 @@ local-path-storage                local-path-provisioner-684f458cdd-75wv8       
 ``` 
 
 
-### 5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW) 
+### 5. Deploy a workload to the edge cluster:
 
 #### a. Create a workload management workspace (`wmw`):
 
