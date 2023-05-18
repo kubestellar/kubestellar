@@ -284,6 +284,11 @@ if [ "$(kcp_running)" == "true" ]; then
         exit 3
     fi
     echo "Using 'KUBECONFIG=$KUBECONFIG'"
+    echo "Waiting for kcp to be ready... it may take a while"
+    until $(kcp_ready)
+    do
+        sleep 1
+    done
     if [ "$(kcp_version)" != "$kcp_version" ]; then
         echo "kcp installed version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
         exit 4
