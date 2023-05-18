@@ -10,7 +10,7 @@
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 <a href="https://app.slack.com/client/T09NY5SBT/C021U8WSAFK"> 
-    <img alt="Join Slack" src="https://img.shields.io/badge/KCP--Edge-Join%20Slack-blue?logo=slack">
+    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
 KubeStellar is an opensource project focused on concerns arising mutlicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
@@ -22,7 +22,7 @@ KubeStellar is an opensource project focused on concerns arising mutlicluster co
 
 ## Goals
 
-- collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
+- Collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
 - Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
 - Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
 
