@@ -284,8 +284,8 @@ if [ "$(kcp_running)" == "true" ]; then
         exit 3
     fi
     echo "Using 'KUBECONFIG=$KUBECONFIG'"
-    if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
-        echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+    if [ "$(kcp_version)" != "$kcp_version" ]; then
+        echo "kcp installed version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
         exit 4
     else
         echo "kcp version $(kcp_version) ... ok"
