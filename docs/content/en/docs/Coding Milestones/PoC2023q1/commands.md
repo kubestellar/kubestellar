@@ -50,6 +50,17 @@ controllers and deletes the ESPW.
 This command accepts all the same flags as `kubestellar start` but
 ignores the `--log-folder`.
 
+## Kubestellar-release
+
+This command just echoes the [semantic version](https://semver.org/)
+of the release used.  This command is only available in archives built
+for a release.  Following is an example usage.
+
+```console
+$ kubestellar-release
+v0.2.3-preview
+```
+
 ## Creating SyncTarget/Location pairs
 
 In this PoC, the interface between infrastructure and workload
