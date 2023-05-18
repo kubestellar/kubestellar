@@ -10,7 +10,7 @@
 
 Table of contents:
 
-- [1. Create your own edge infrastructure (edge clusters) - Bring Your Own Clusters (BYOC)](#1-create-your-own-edge-infrastructure-edge-clusters---bring-your-own-clusters-byoc)
+- [1. Create your own edge infrastructure (edge clusters)](#1-create-your-own-edge-infrastructure-edge-clusters)
 - [2. Install KCP](#2-install-kcp)
 - [3. Deploy the kcp-edge platform](#3-deploy-the-kcp-edge-platform)
 - [4. Connect your edge cluster to the kcp-edge platform](#4-connect-your-edge-cluster-to-the-kcp-edge-platform)
@@ -18,7 +18,7 @@ Table of contents:
   - [b. Create a syncTarget and location objects to represent your edge cluster (florin)](#b-create-a-synctarget-and-location-objects-to-represent-your-edge-cluster-florin)
   - [c. Connect florin edge cluster with its mailbox workspace](#c-connect-florin-edge-cluster-with-its-mailbox-workspace)
   - [d. Deploy the edge syncer to florin edge cluster](#d-deploy-the-edge-syncer-to-florin-edge-cluster)
-- [5. Deploy a workload to the edge cluster: Bring Your Own Workload (BYOW)](#5-deploy-a-workload-to-the-edge-cluster-bring-your-own-workload-byow)
+- [5. Deploy a workload to the edge cluster](#5-deploy-a-workload-to-the-edge-cluster)
   - [a. Create a workload management workspace (wmw)](#a-create-a-workload-management-workspace-wmw)
   - [b. Deploy your workload in wmw-1](#b-deploy-your-workload-in-wmw-1)
   - [c. Create the EdgePlacement object for your workload](#c-create-the-edgeplacement-object-for-your-workload)
