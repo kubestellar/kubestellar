@@ -359,7 +359,8 @@ and does the following things.
 2. Starts a kcp server if one is not already running.
 3. Downloads and installs kubestellar if it is not already evident on
    `$PATH` (using [the script below](#install-kubestellar).
-4. `kubestellar start` if the KubeStellar controllers are not already running.
+4. `kubestellar start` if the KubeStellar controllers are not already
+   running or the ESPW does not (yet) exist.
 
 This script accepts the following command line flags; all are optional.
 
