@@ -308,7 +308,7 @@ else
     sleep 10
     if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
         echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
-        exit 3
+        exit 4
     else
         echo "kcp version $(kcp_version) ... ok"
     fi
@@ -324,6 +324,10 @@ if [ "$(kubestellar_installed)" == "true" ]; then
     echo "KubeStellar found in the PATH at '$(which kubestellar)' ... skip installation."
 else
     echo "KubeStellar not found in the PATH."
+    if [ "$(kubestellar_running)" == "true" ]; then
+        echo "KubeStellar processes are running already ... add KubeStellar folder to the PATH or stop KubeStellar with \"kubestellar stop\" ... exiting."
+        exit 5
+    fi
     ensure_folder "$folder/kubestellar"
     kubestellar_folder=$(get_full_path "$folder/kubestellar")
     kubestellar_bin_folder="$kubestellar_folder/bin"
