@@ -205,9 +205,13 @@ section = ["HTML", "print", "RSS"]
     githubbranch = "main"
     url = "https://docs.kubestellar.io"
   [[params.versions]]
-    version = "v0.10"
-    githubbranch = "v0.10-branch"
-    url = "https://docs.kubestellar.io/v0.10"
+    version = "v0.1.0"
+    githubbranch = "v0.1.0"
+    url = "https://github.com/kcp-dev/edge-mc/tree/v0.1.0"
+  [[params.versions]]
+    version = "v0.2.2"
+    githubbranch = "v0.2.2"
+    url = "https://github.com/kcp-dev/edge-mc/tree/v0.2.2"
 
   # Links in footer
   [params.links]
