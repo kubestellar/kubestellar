@@ -351,7 +351,7 @@ if [ "$(kubestellar_running)" == "true" ]; then
     echo "KubeStellar processes are running ... ok"
     if ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
         echo "KubeStellar ESPW does not exists ... run 'kubestellar stop' first ... exiting!"
-        exit 5
+        exit 6
     else
         echo "KubeStellar ESPW found ... ok"
     fi
