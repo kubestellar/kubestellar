@@ -40,6 +40,21 @@ kcp_installed() {
     fi
 }
 
+kcp_download() {
+    if [ $verbose == "true" ]; then
+        curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+    else
+        curl -sSL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -sSL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+    fi
+}
+
+kcp_install() {
+    tar -C $kcp_folder -zxf kcp-plugins.tar.gz
+    tar -C $kcp_folder -zxf kcp.tar.gz
+}
+
 kcp_running() {
     if [ "$(pgrep -f 'kcp start')" == "" ]; then
         echo "false"
@@ -56,8 +71,22 @@ kcp_ready() {
     fi
 }
 
+kcp_version() {
+    echo "$(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+}
+
 kcp_get_latest_version() {
     curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+}
+
+kubeconfig_valid() {
+    if [ "$KUBECONFIG" == "" ]; then
+        echo "false"
+    elif [ -f "$KUBECONFIG" ]; then
+        echo "true"
+    else
+        echo "false"
+    fi
 }
 
 kubestellar_installed() {
@@ -66,6 +95,18 @@ kubestellar_installed() {
     else
         echo "true"
     fi
+}
+
+kubestellar_download() {
+    if [ $verbose == "true" ]; then
+        curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
+    else
+        curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
+    fi
+}
+
+kubestellar_install() {
+    tar -C $kubestellar_folder -zxf kubestellar.tar.gz
 }
 
 kubestellar_running() {
@@ -97,9 +138,19 @@ get_arch_type() {
 }
 
 get_full_path() {
+    # echo "check folder '$1'"
     echo "$(cd "$1"; pwd)"
 }
 
+ensure_folder() {
+    # echo "ensure folder '$1'"
+    if [ -d "$1" ]; then :
+    else
+        mkdir -p "$1"
+    fi
+}
+
+KCP_REQUIRED_VERSION="v0.11.0"
 kcp_version=""
 kubestellar_version=""
 os_type=""
@@ -108,10 +159,13 @@ folder=""
 kcp_address=""
 kubestellar_imw=""
 kubestellar_wmw=""
-verbose=""
+verbose="false"
 flagx=""
+user_exports=""
 
-echo "KubeStellar bootstrap started..."
+echo "************************************************"
+echo "KubeStellar bootstrap started"
+echo "************************************************"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -156,7 +210,7 @@ while (( $# > 0 )); do
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
     (--verbose|-V)
-        verbose="-V";;
+        verbose="true";;
     (-X)
 	set -x
 	flagx="-X";;
@@ -174,7 +228,7 @@ while (( $# > 0 )); do
 done
 
 if [ "$kcp_version" == "" ]; then
-    kcp_version=v0.11.0
+    kcp_version=$KCP_REQUIRED_VERSION
 fi
 
 if [ "$kubestellar_version" == "" ] || [ "$kubestellar_version" == latest ]; then
@@ -194,67 +248,122 @@ if [ "$folder" == "" ]; then
 fi
 
 # Ensure kcp is installed
-if [ "$(kcp_installed)" == "false" ]; then
-    if [ "$verbose" != "" ]; then
-        echo "Installing kcp..."
+echo "************************************************"
+echo "Ensure kcp is installed"
+echo "************************************************"
+if [ "$(kcp_installed)" == "true" ]; then
+    echo "kcp found in the PATH at '$(which kcp)' ... skip installation."
+else
+    echo "kcp not found in the PATH."
+    if [ "$(kcp_running)" == "true" ]; then
+        echo "kcp process is running already: pid=$(pgrep kcp) ... add kcp folder to the PATH or stop kcp ... exiting."
+        exit 2
     fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --ensure-folder  $folder/kcp $verbose $flagx
-    if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp/bin):"* ]]; then
-        export PATH=$PATH:$(get_full_path $folder/kcp/bin)
+    ensure_folder "$folder/kcp"
+    kcp_folder=$(get_full_path "$folder/kcp")
+    kcp_bin_folder="$kcp_folder/bin"
+    echo "Downloading kcp+plugins $kcp_version $os_type/$arch_type..."
+    kcp_download
+    echo "Installing kcp+plugins into '$kcp_folder'..."
+    kcp_install
+    if [[ ! ":$PATH:" == *":$kcp_bin_folder:"* ]]; then
+        export PATH=$kcp_bin_folder:$PATH
+        echo "Add kcp folder to the PATH: export PATH=\"$kcp_bin_folder:\$PATH\""
+        user_exports="$user_exports"$'\n'"export PATH=\"$kcp_bin_folder:\$PATH\""
     fi
 fi
 
 # Ensure kcp is running
-if [ "$(kcp_running)" == "false" ]; then
+echo "************************************************"
+echo "Ensure kcp is running"
+echo "************************************************"
+if [ "$(kcp_running)" == "true" ]; then
+    echo "kcp process is running already: pid=$(pgrep kcp) ... skip running."
+    if [ "$(kubeconfig_valid)" == "false" ]; then
+        echo "KUBECONFIG environment variable is not set correctly: KUBECONFIG='$KUBECONFIG' ... exiting!"
+        exit 3
+    fi
+    echo "Using 'KUBECONFIG=$KUBECONFIG'"
+    if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
+        echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+        exit 4
+    else
+        echo "kcp version $(kcp_version) ... ok"
+    fi
+else
     if [ "$kcp_address" == "" ]; then
-        if [ "$verbose" != "" ]; then
-            echo "Starting kcp..."
-        fi
+        echo "Running kcp... logfile=$PWD/kcp_log.txt"
         kcp start >& kcp_log.txt &
     else
-        if [ "$verbose" != "" ]; then
-            echo "Starting kcp bound to address $kcp_address..."
-        fi
+        echo "Running kcp bound to address $kcp_address... logfile=$PWD/kcp_log.txt"
         kcp start --bind-address $kcp_address >& kcp_log.txt &
     fi
-    export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
+    export KUBECONFIG="$PWD/.kcp/admin.kubeconfig"
+    echo "Waiting for kcp to be ready... it may take a while"
     sleep 10
     until $(kcp_ready)
     do
         sleep 1
     done
     sleep 10
-    echo "Export KUBECONFIG with the command: export KUBECONFIG='$(pwd)/.kcp/admin.kubeconfig'"
+    if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
+        echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+        exit 3
+    else
+        echo "kcp version $(kcp_version) ... ok"
+    fi
+    echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
+    user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
 fi
 
 # Ensure KubeStellar is installed
-if [ "$(kubestellar_installed)" == "false" ]; then
-    if [ "$verbose" != "" ]; then
-        echo "Installing Kubestellar..."
-    fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --ensure-folder  $folder/kubestellar $verbose $flagx
-    if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
-        export PATH=$PATH:$(get_full_path $folder/kubestellar/bin)
+echo "************************************************"
+echo "Ensure KubeStellar is installed"
+echo "************************************************"
+if [ "$(kubestellar_installed)" == "true" ]; then
+    echo "KubeStellar found in the PATH at '$(which kubestellar)' ... skip installation."
+else
+    echo "KubeStellar not found in the PATH."
+    ensure_folder "$folder/kubestellar"
+    kubestellar_folder=$(get_full_path "$folder/kubestellar")
+    kubestellar_bin_folder="$kubestellar_folder/bin"
+    echo "Downloading KubeStellar $kubestellar_version $os_type/$arch_type..."
+    kubestellar_download
+    echo "Installing KubeStellar into '$kubestellar_folder'..."
+    kubestellar_install
+    if [[ ! ":$PATH:" == *":$kubestellar_bin_folder:"* ]]; then
+        export PATH=$kubestellar_bin_folder:$PATH
+        echo "Add KubeStellar folder to the PATH: export PATH=\"$kubestellar_bin_folder:\$PATH\""
+        user_exports="$user_exports"$'\n'"export PATH=\"$kubestellar_bin_folder:\$PATH\""
     fi
 fi
 
-kubectl ws root
-
 # Ensure KubeStellar is running
-if [ "$(kubestellar_running)" == "false" ] || ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
-    if [ "$verbose" != "" ]; then
-        echo "Starting or restarting Kubestellar..."
+echo "************************************************"
+echo "Ensure KubeStellar is running"
+echo "************************************************"
+kubectl ws root > /dev/null
+if [ "$(kubestellar_running)" == "true" ]; then
+    echo "KubeStellar processes are running ... ok"
+    if ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
+        echo "KubeStellar ESPW does not exists ... run 'kubestellar stop' first ... exiting!"
+        exit 5
+    else
+        echo "KubeStellar ESPW found ... ok"
     fi
-    kubestellar start $verbose
+else
+    echo "Starting or restarting KubeStellar..."
+    if [ $verbose == "true" ]; then
+        kubestellar start -V
+    else
+        kubestellar start
+    fi
 fi
 
 # Ensure imw
 if [ "$kubestellar_imw" != "" ]; then
-    if [ "$verbose" != "" ]; then
-        echo "Ensuring IMW $kubestellar_imw..."
-    fi
-    if ! kubectl ws $kubestellar_imw &> /dev/null
-    then
+    echo "Ensuring IMW \"$kubestellar_imw\"..."
+    if ! kubectl ws $kubestellar_imw &> /dev/null ; then
         if [ "$verbose" != "" ]; then
             kubectl ws create $kubestellar_imw
         else
@@ -265,15 +374,27 @@ fi
 
 # Ensure wmw
 if [ "$kubestellar_wmw" != "" ]; then
-    if [ "$verbose" != "" ]; then
-        echo "Ensuring WMW $kubestellar_wmw..."
-    fi
-    if ! kubectl ws $kubestellar_imw &> /dev/null
-    then
+    echo "Ensuring WMW \"$kubestellar_wmw\"..."
+    if ! kubectl ws $kubestellar_imw &> /dev/null ; then
         if [ "$verbose" != "" ]; then
             kubectl kubestellar ensure wmw $kubestellar_wmw
         else
             kubectl kubestellar ensure wmw $kubestellar_wmw > /dev/null
         fi
     fi
+fi
+
+
+if [ "$verbose" == "true" ]; then
+    kubectl ws root
+    kubectl ws tree
+else
+    kubectl ws root > /dev/null
+fi
+
+echo "************************************************"
+echo "KubeStellar bootstrap completed succesfully"
+echo "************************************************"
+if [ "$user_exports" != "" ]; then
+    echo "Please create/update the following enviroment variables: $user_exports"
 fi
