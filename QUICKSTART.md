@@ -21,27 +21,37 @@ Table of contents:
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
-This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
+This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
 
 ## 1. Install and run **KubeStellar**
 
-KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
+KubeStellar works in the context of kcp, so to use KubeStellar you
+also need kcp. The first command below will (a) download unpack kcp
+and KubeStellar if they are not already on your `$PATH` and (b) launch
+them if they are not already running.  This command is more fully
+described in [its
+documentation](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/commands/#quick-setup).
+The launching of KubeStellar includes creating a kcp workspace called
+the "edge service provider workspace" (ESPW); the word "edge" is here
+because that was the original focus of KubeStellar.  The other two
+commands extend your shell environment on the assumption that both kcp
+and KubeStellar were downloaded and unpacked and kcp was not running.
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version latest
-export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
+export PATH="$(pwd)/kcp/bin:$(pwd)/kubestellar/bin:${PATH}"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
 
-Check that `KubeStellar` is running:
+You can check that `KubeStellar` is running as follows.
 
-First, check that controllers are running with the following command:
+First, check that controllers are running with the following command.
 
 ```shell
 ps aux | grep -e mailbox-controller -e placement-translator -e kubestellar-scheduler
 ```
 
-which should yield something like:
+That should yield something like the following.
 
 ```console
 user     1892  0.0  0.3 747644 29628 pts/1    Sl   10:51   0:00 mailbox-controller -v=2
@@ -49,7 +59,7 @@ user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 scheduler -v 2
 user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator -v=2
 ```
 
-Second, check that the Edge Service Provider Workspace (`espw`) is created with the following command:
+Second, check that the Edge Service Provider Workspace (`espw`) is created with the following command.
 
 ```shell
 kubectl ws tree
@@ -67,9 +77,21 @@ kubectl ws tree
 
 ## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
 
+In this example you will create two edge clusters and define one
+workload that will be distributed from the center to those edge
+clusters.  This example is similar to the one described more
+expansively [on the
+website](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/),
+but with the setup steps consolidated into the what you just did above
+and the special workload and summarization aspirations removed.
+
 ### a. Stand up two kind clusters: florin and guilder
 
-Create the first edge cluster:
+KubeStellar is focused on managing the API objects in edge clusters.
+The edge clusters are something that you bring to the party.
+
+Start this example usage by creating the first edge cluster with the
+following command.
 
 ```shell
 kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
@@ -87,7 +109,14 @@ Note: if you already have a cluster named 'guilder' from a previous exercise of 
 
 ### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
-IMWs are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
+KubeStellar needs succinct descriptions of the clusters, and we call
+this "inventory".  It goes in kcp workspaces that, when used in this
+role, are called "inventory management workspaces" (IMWs).
+
+Create an IMW named `example-imw` with the following commands.  The
+first one is needed because the `kind` commands above left your
+kubeconfig pointed at a `kind` context; this command switches to one
+of the contexts that `kcp` puts in the kubeconfig that it generates.
 
 ```shell
 kubectl config use-context root
@@ -95,7 +124,14 @@ kubectl ws root
 kubectl ws create example-imw
 ```
 
-WMWs are used by KubeStellar to store workload descriptions and `EdgePlacement` objects. Create an WMW named `example-wmw` in a `my-org` workspace with the following commands:
+In KubeStellar you prescribe a workload --- a collection of kube API
+objects --- by putting those objects into a kcp workspace that, when
+used in this role, is called a "workload management workspace" (WMW).
+These workspaces are also where you put the `EdgePlacement` control
+objects that prescribe which workloads go to which edge clusters.
+
+Create an WMW named `example-wmw` in a `my-org` workspace with the
+following commands.
 
 ```shell
 kubectl ws root
@@ -107,10 +143,21 @@ A WMW does not have to be created before the edge cluster is on-boarded; the WMW
 
 ### c. Onboarding the clusters
 
-Let's begin by onboarding the `florin` cluster:
+The next step is to make the connection between the edge clusters and
+KubeStellar.  This consists of three logically separable actions: (i)
+creating the inventory objects that describe the edge clusters (which
+depends only on the relevant object types being defined in the IMWs,
+no more), (ii) preparing the central componentry to accept the
+activity of the syncers, and (iii) deploying the syncers in the edge
+clusters.  KubeStellar has a convenient bundle of the first two, used
+here; unbundled versions are also avaiable (see [ensure
+location](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/commands/#creating-synctargetlocation-pairs)
+and
+[prep-for-syncer](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/commands/#syncer-preparation-and-installation)).
+
+Let's begin by onboarding the `florin` cluster using the following command.
 
 ```shell
-kubectl ws root
 kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
 ```
 
@@ -193,7 +240,6 @@ local-path-storage                local-path-provisioner-684f458cdd-kw2xz       
 Now, let's onboard the `guilder` cluster:
 
 ```shell
-kubectl ws root
 kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
 ```
 
@@ -205,6 +251,8 @@ kubectl --context kind-guilder apply -f guilder-syncer.yaml
 
 
 ### d. Create and deploy the Apache Server workload into florin and guilder clusters
+
+Finally you can prescribe your workload and where it should go.
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
@@ -381,13 +429,15 @@ kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
 
-Stop and uninstall KubeStellar use the following command:
+Stop the KubeStellar controllers and destroy the ESPW with the following command.
 
 ```shell
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following command:
+Finally, assuming you have followed all the above steps and not
+changed working directory, the following command will remove all
+remaining traces of the above activity.
 
 ```shell
 remove-kubestellar
