@@ -238,10 +238,12 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     fi
 fi
 
+kubectl ws root
+
 # Ensure KubeStellar is running
-if [ "$(kubestellar_running)" == "false" ]; then
+if [ "$(kubestellar_running)" == "false" ] || ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
     if [ "$verbose" != "" ]; then
-        echo "Starting Kubestellar..."
+        echo "Starting or restarting Kubestellar..."
     fi
     kubestellar start $verbose
 fi
