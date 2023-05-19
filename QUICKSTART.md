@@ -18,10 +18,11 @@ Table of contents:
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
   - [c. Onboarding the clusters](#c-onboarding-the-clusters)
   - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+  - [e. Carrying on](#e-carrying-on)
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
-This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
+This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
 
 ## 1. Install and run **KubeStellar**
 
@@ -66,6 +67,14 @@ kubectl ws tree
 ```
 
 ## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
+
+In this example you will create two edge clusters and define one
+workload that will be distributed from the center to those edge
+clusters.  This example is similar to the one described more
+expansively [on the
+website](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/),
+but with the some steps reorganized and combined and the special
+workload and summarization aspirations removed.
 
 ### a. Stand up two kind clusters: florin and guilder
 
@@ -194,7 +203,7 @@ Now, let's onboard the `guilder` cluster:
 
 ```shell
 kubectl ws root
-kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod extended=si
 ```
 
 Apply the created edge syncer manifest:
@@ -364,6 +373,14 @@ which should yield:
 NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again.  It takes some time for the Apache HTTP Server to synchronize and start.
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](<place-holder>)
+
+### e. Carrying on
+
+What you just did is part of the example [on the
+website](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/),
+but with the some steps reorganized and combined and the special
+workload and summarization aspiration removed.  You could continue
+from here, doing the steps for the special workload.
 
 ## 3. Teardown the environment
 
