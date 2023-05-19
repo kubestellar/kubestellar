@@ -21,7 +21,7 @@ Table of contents:
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
-This guide is intended to show how to quickly bring up a **KubeStellar** environment with its dependencies from a binary release.
+This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
 
 ## 1. Install and run **KubeStellar**
 
@@ -66,6 +66,14 @@ kubectl ws tree
 ```
 
 ## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
+
+In this example you will create two edge clusters and define one
+workload that will be distributed from the center to those edge
+clusters.  This example is similar to the one described more
+expansively [on the
+website](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/),
+but with the some steps reorganized and combined and the special
+workload and summarization aspirations removed.
 
 ### a. Stand up two kind clusters: florin and guilder
 
