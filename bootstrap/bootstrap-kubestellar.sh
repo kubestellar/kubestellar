@@ -262,7 +262,6 @@ else
     kcp_download
     echo "Installing kcp+plugins into '$kcp_folder'..."
     kcp_install
-    echo "Removing downloaded archives..."
     rm kcp.tar.gz kcp-plugins.tar.gz
     if [[ ! ":$PATH:" == *":$kcp_bin_folder:"* ]]; then
         export PATH=$kcp_bin_folder:$PATH
@@ -334,7 +333,6 @@ else
     kubestellar_download
     echo "Installing KubeStellar into '$kubestellar_folder'..."
     kubestellar_install
-    echo "Removing downloaded archives..."
     rm kubestellar.tar.gz
     if [[ ! ":$PATH:" == *":$kubestellar_bin_folder:"* ]]; then
         export PATH=$kubestellar_bin_folder:$PATH
