@@ -290,7 +290,7 @@ if [ "$(kcp_running)" == "true" ]; then
         sleep 1
     done
     if [ "$(kcp_version)" != "$kcp_version" ]; then
-        echo "kcp installed version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
+        echo "kcp running version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
         exit 4
     else
         echo "kcp version $(kcp_version) ... ok"
