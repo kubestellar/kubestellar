@@ -137,7 +137,7 @@ build-edge-syncer-image: DOCKER_REPO ?=
 build-edge-syncer-image: IMAGE_TAG ?= latest
 build-edge-syncer-image: ARCHS ?= linux/$(ARCH)
 build-edge-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags ./cmd/syncer
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer
 	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
