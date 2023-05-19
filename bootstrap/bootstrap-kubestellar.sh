@@ -33,7 +33,7 @@
 set -e
 
 kcp_installed() {
-    if [ "$(which kcp)" == "" ]; then
+    if [[ "$(which kcp)" == "" || "$(which kubectl-ws)" == "" ]]; then
         echo "false"
     else
         echo "true"
@@ -163,9 +163,7 @@ verbose="false"
 flagx=""
 user_exports=""
 
-echo "************************************************"
-echo "KubeStellar bootstrap started"
-echo "************************************************"
+echo "< KubeStellar bootstrap started >----------------"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -248,9 +246,7 @@ if [ "$folder" == "" ]; then
 fi
 
 # Ensure kcp is installed
-echo "************************************************"
-echo "Ensure kcp is installed"
-echo "************************************************"
+echo "< Ensure kcp is installed >----------------------"
 if [ "$(kcp_installed)" == "true" ]; then
     echo "kcp found in the PATH at '$(which kcp)' ... skip installation."
 else
@@ -266,6 +262,8 @@ else
     kcp_download
     echo "Installing kcp+plugins into '$kcp_folder'..."
     kcp_install
+    echo "Removing downloaded archives..."
+    rm kcp.tar.gz kcp-plugins.tar.gz
     if [[ ! ":$PATH:" == *":$kcp_bin_folder:"* ]]; then
         export PATH=$kcp_bin_folder:$PATH
         echo "Add kcp folder to the PATH: export PATH=\"$kcp_bin_folder:\$PATH\""
@@ -274,9 +272,7 @@ else
 fi
 
 # Ensure kcp is running
-echo "************************************************"
-echo "Ensure kcp is running"
-echo "************************************************"
+echo "< Ensure kcp is running >-----------------------"
 if [ "$(kcp_running)" == "true" ]; then
     echo "kcp process is running already: pid=$(pgrep kcp) ... skip running."
     if [ "$(kubeconfig_valid)" == "false" ]; then
@@ -322,9 +318,7 @@ else
 fi
 
 # Ensure KubeStellar is installed
-echo "************************************************"
-echo "Ensure KubeStellar is installed"
-echo "************************************************"
+echo "< Ensure KubeStellar is installed >-------------"
 if [ "$(kubestellar_installed)" == "true" ]; then
     echo "KubeStellar found in the PATH at '$(which kubestellar)' ... skip installation."
 else
@@ -340,6 +334,8 @@ else
     kubestellar_download
     echo "Installing KubeStellar into '$kubestellar_folder'..."
     kubestellar_install
+    echo "Removing downloaded archives..."
+    rm kubestellar.tar.gz
     if [[ ! ":$PATH:" == *":$kubestellar_bin_folder:"* ]]; then
         export PATH=$kubestellar_bin_folder:$PATH
         echo "Add KubeStellar folder to the PATH: export PATH=\"$kubestellar_bin_folder:\$PATH\""
@@ -348,9 +344,7 @@ else
 fi
 
 # Ensure KubeStellar is running
-echo "************************************************"
-echo "Ensure KubeStellar is running"
-echo "************************************************"
+echo "< Ensure KubeStellar is running >---------------"
 kubectl ws root > /dev/null
 if [ "$(kubestellar_running)" == "true" ]; then
     echo "KubeStellar processes are running ... ok"
@@ -401,9 +395,7 @@ else
     kubectl ws root > /dev/null
 fi
 
-echo "************************************************"
-echo "KubeStellar bootstrap completed succesfully"
-echo "************************************************"
+echo "< KubeStellar bootstrap completed succesfully >-"
 if [ "$user_exports" != "" ]; then
     echo "Please create/update the following enviroment variables: $user_exports"
 fi
