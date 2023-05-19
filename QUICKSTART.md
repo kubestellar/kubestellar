@@ -18,6 +18,7 @@ Table of contents:
   - [b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
   - [c. Onboarding the clusters](#c-onboarding-the-clusters)
   - [d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+  - [e. Carrying on](#e-carrying-on)
 - [3. Teardown the environment](#3-teardown-the-environment)
 
 
@@ -202,7 +203,7 @@ Now, let's onboard the `guilder` cluster:
 
 ```shell
 kubectl ws root
-kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod
+kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod extended=si
 ```
 
 Apply the created edge syncer manifest:
@@ -372,6 +373,14 @@ which should yield:
 NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again.  It takes some time for the Apache HTTP Server to synchronize and start.
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](<place-holder>)
+
+### e. Carrying on
+
+What you just did is part of the example [on the
+website](https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/),
+but with the some steps reorganized and combined and the special
+workload and summarization aspiration removed.  You could continue
+from here, doing the steps for the special workload.
 
 ## 3. Teardown the environment
 
