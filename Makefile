@@ -184,6 +184,9 @@ vendor: ## Vendor the dependencies
 	go mod vendor
 .PHONY: vendor
 
+VENVDIR=$(abspath docs/venv)
+REQUIREMENTS_TXT=docs/requirements.txt
+
 .PHONY: serve-docs
 serve-docs: venv
 	. $(VENV)/activate; \
