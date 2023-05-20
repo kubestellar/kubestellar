@@ -41,11 +41,11 @@ We are an opensource community focused on creating a flexible solution for chall
 
 ## Quickstart
 
-Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](/docs/getting-started/quickstart/)
+Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/)
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](/docs/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/release-v0.2.2/Contribution%20guidelines/CONTRIBUTING/) guide.
 
 ## Getting in touch
 
