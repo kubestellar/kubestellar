@@ -39,9 +39,9 @@ We are an opensource community focused on creating a flexible solution for chall
 - Status from many destinations​: Center clients may need a way to access status from individual edge copies
 - Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
-<!-- ## Quickstart -->
+## Quickstart
 
-<div class="grid cards" markdown>
+<!-- <div class="grid cards" markdown>
 
 -   :material-clock-fast:{ .lg .middle } __Try KubeStellar in ~3 minutes__
 
@@ -52,9 +52,9 @@ We are an opensource community focused on creating a flexible solution for chall
 
     [:octicons-arrow-right-24: Getting started](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/)
 
-</div>
+</div> -->
 
-<!-- Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/) -->
+Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/)
 
 ## Contributing
 
