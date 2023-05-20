@@ -1,4 +1,11 @@
-<img src="kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart">
+---
+title: "Overview"
+linkTitle: "Overview"
+---
+
+<img alt="" width="40%" height="40%" title="KubeStellar QuickStart" src="kubestellar-quickstart-demo.png" />
+
+<!-- <img src="kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart"> -->
 
 ## Estimated Time: 
    ~3 minutes
