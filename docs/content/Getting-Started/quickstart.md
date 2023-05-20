@@ -1,4 +1,4 @@
-<img src="contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart">
+<img src="https://github.com/kcp-dev/edge-mc/blob/main/contrib/logo/kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart">
 
 ## Estimated Time: 
    ~3 minutes
