@@ -11,9 +11,9 @@ on:
       - main
       - "release-*"
     paths:
-      - "cmd/**"
+#       - "cmd/**"
       - "docs/**"
-      - "pkg/**"
+#       - "pkg/**"
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
