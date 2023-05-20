@@ -49,7 +49,7 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 ## Getting in touch
 
-[Subscribe to the community calendar](https://calendar.google.com/calendar/embed?src=b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com&ctz=America%2FNew_York){ .md-button .md-button--primary }
+[Subscribe to the community calendar](https://calendar.google.com/calendar/ical/b3d65c92bed7a9884ef7fe9e3f6c8fed16f6fb2f811f5750f547567a5dd58fed%40group.calendar.google.com/public/basic.ics){ .md-button .md-button--primary }
 
 There are several ways to communicate with us:
 
