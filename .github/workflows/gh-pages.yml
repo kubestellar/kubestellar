@@ -3,7 +3,7 @@ name: github pages
 on:
   push:
     branches:
-      - old-main  # Set a branch that will trigger a deployment
+      - main  # Set a branch that will trigger a deployment
   pull_request:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
           # extended: true
 
       - name: Build
-        run: hugo -s docs --minify
+        run: hugo -s docs/old --minify
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
