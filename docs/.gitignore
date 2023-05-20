@@ -1,2 +1,3 @@
-node_modules
-public
+venv
+generated
+__pycache__
