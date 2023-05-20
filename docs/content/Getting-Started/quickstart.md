@@ -1,6 +1,6 @@
 ---
-title: "Overview"
-linkTitle: "Overview"
+title: "KubeStellar Quickstart Guide"
+linkTitle: "KubeStellar Quickstart Guide"
 ---
 
 <img alt="" width="40%" height="40%" title="KubeStellar QuickStart" src="kubestellar-quickstart-demo.png" />
