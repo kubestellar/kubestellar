@@ -70,11 +70,11 @@ plugins:
       languages:
         en:
           name: English
-  - redirects:
-        redirect_maps:
-            # 'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
-            # 'old/file.md': 'new/file.md'
-            # 'some_file.md': 'http://external.url.com/foobar'
+  # - redirects:
+  #       redirect_maps:
+  #           'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
+  #           'old/file.md': 'new/file.md'
+  #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
   # Code block highlighting
