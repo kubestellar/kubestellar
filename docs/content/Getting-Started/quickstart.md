@@ -3,9 +3,7 @@ title: "KubeStellar Quickstart Guide"
 linkTitle: "KubeStellar Quickstart Guide"
 ---
 
-<img alt="" width="40%" height="40%" title="KubeStellar QuickStart" src="kubestellar-quickstart-demo.png" />
-
-<!-- <img src="kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart"> -->
+<img src="kubestellar-quickstart-demo.png" width="40%" height="40%" title="KubeStellar QuickStart">
 
 ## Estimated Time: 
    ~3 minutes
