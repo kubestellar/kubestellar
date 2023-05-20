@@ -14,12 +14,18 @@ The command lines exhibited below presume that you have added the
 `bin` directory to your `$PATH`.  Alternatively: these executables can
 be invoked directly using any pathname (not in your `$PATH`).
 
+**NOTE**: all of the kubectl plugin usages described here certainly or
+potentially change the setting of which kcp workspace is "current" in
+your chosen kubeconfig file; for this reason, they are not suitable
+for executing concurrently with anything that depends on that setting
+in that file.
+
 ## Platform control
 
 The `kubestellar` command has two subcommands, one for setup and one
 for teardown.
 
-### Kubestellar start
+### KubeStellar start
 
 This subcommand is used after installation.
 This subcommand does two things:
@@ -41,7 +47,7 @@ The available flags are as follows.
   `${PWD}/kubestellar-logs`.
 - `-h` or `--help`: print a brief usage message and terminate.
 
-### Kubestellar stop
+### KubeStellar stop
 
 This subcommand undoes `kubestellar start`.  It stops any running
 controllers and deletes the ESPW.
@@ -49,7 +55,7 @@ controllers and deletes the ESPW.
 This command accepts all the same flags as `kubestellar start` but
 ignores the `--log-folder`.
 
-## Kubestellar-release
+## KubeStellar-release
 
 This command just echoes the [semantic version](https://semver.org/)
 of the release used.  This command is only available in archives built
@@ -68,21 +74,35 @@ cluster there is a unique pair of SyncTarget and Location objects in a
 so-called inventory management workspace.  The following command helps
 with making that pair of objects.
 
-This commad accepts all the global command-line options of `kubectl`
-excepting `--context`.
+The usage synopsis is as follows.
 
-Invoke this command when your current workspace is your chosen
-inventory management workspace, or specify that workspace with the
-`--imw` command line flag.  Upon completion, the current workspace
-will be your chosen inventory management workspace.
+```shell
+kubectl kubestellar ensure location flag... objname labelname=labelvalue...
+```
+
+Here `objname` is the name for the SyncTarget object and also the name
+for the Location object.  This commad ensures that these objects exist
+and have at least the given labels.
+
+The flags can also appear anywhere later on the command line.
+
+The acceptable flags include all those of `kubectl` except for
+`--context`.  This command also accepts the following flags.
+
+- `--imw workspace_path`: specifies which workspace to use as the
+  inventory management workspace.  The default value is the current
+  workspace.
+
+The current workspaces does not matter if the IMW is explicitly
+specified.  Upon completion, the current workspace will be your chosen
+IMW.
 
 This command does not depend on the action of any of the edge-mc
-(Kubestellar) controllers.
+(KubeStellar) controllers.
+
+An example usage follows.
 
 ```console
-$ kubectl kubestellar ensure location -h
-Usage: kubectl kubestellar ensure location ($kubectl_flag | --imw ws_path)* objname labelname=labelvalue ...
-
 $ kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo1 created
@@ -131,23 +151,16 @@ pre-existing Location.
 ## Removing SyncTarget/Location pairs
 
 The following script undoes whatever remains from a corresponding
-usage of `kubectl kubestellar ensure location`.
-
-This commad accepts all the global command-line options of `kubectl`
-excepting `--context`.
-
-Invoke this command when your current workspace is your chosen
-inventory management workspace, or specify that workspace with the
-`--imw` command line flag.  Upon completion, the current workspace
-will be your chosen inventory management workspace.
+usage of `kubectl kubestellar ensure location`.  It has all the same
+command line syntax and semantics except that the
+`labelname=labelvalue` pairs do not appear.
 
 This command does not depend on the action of any of the edge-mc
-(Kubestellar) controllers.
+(KubeStellar) controllers.
+
+The following sesssion demonstrates usage, including idemptotency.
 
 ```console
-$ kubectl kubestellar remove location -h
-Usage: kubectl kubestellar remove location ($kubectl_flag | --imw ws_path)* objname
-
 $ kubectl ws root:imw-1
 Current workspace is "root:imw-1".
 
@@ -170,22 +183,43 @@ objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
 install the syncer in the edge cluster.
 
-This commad accepts all the global command-line options of `kubectl`
-excepting `--context`.
+The usage synopsis is as follows.
 
-Invoke this command when your current workspace is your chosen
-inventory management workspace, or specify that workspace with the
-`--imw` command line flag.  Upon completion, the current workspace
-will be what it was when the command started.
+```shell
+kubectl kubestellar prep-for-syncer flag... synctarget_name
+```
+
+Here `synctarget_name` is the name of the `SyncTarget` object, in the
+relevant IMW, corresponding to the relevant edge cluster.
+
+The flags can also appear anywhere later on the command line.
+
+The acceptable flags include all those of `kubectl` except for
+`--context`.  This command also accepts the following flags.
+
+- `--imw workspace_path`: specifies which workspace holds the relevant
+  SyncTarget object.  The default value is the current workspace.
+- `--espw workspace_path`: specifies where to find the edge service
+  provider workspace.  The default is the standard location,
+  `root:espw`.
+- `--syncer-image image_ref`: specifies the container image that runs
+  the syncer.  The default is `quay.io/kubestellar/syncer:v0.2.1`.
+- `-o output_pathname`: specifies where to write the YAML definitions
+  of the API objects to create in the edge cluster in order to deploy
+  the syncer there.  The default is `synctarget_name +
+  "-syncer.yaml"`.
+
+The current workspaces does not matter if the IMW is explicitly
+specified.  Upon completion, the current workspace will be what it was
+when the command started.
 
 This command will only succeed if the mailbox controller has created
 and conditioned the mailbox workspace for the given SyncTarget.  This
-command waits for 10 to 70 seconds for that to happen.
+command will wait for 10 to 70 seconds for that to happen.
+
+An example usage follows.
 
 ```console
-$ kubectl kubestellar prep-for-syncer -h                     
-Usage: kubectl kubestellar prep-for-syncer ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name
-
 $ kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
 Current workspace is "root:imw-1".
 Current workspace is "root:espw"
@@ -226,12 +260,13 @@ KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 ## Edge cluster on-boarding
 
 The following command is a combination of `kubectl kubestellar
-ensure-location` and `kubectl kubestellar prep-for-syncer`.
+ensure-location` and `kubectl kubestellar prep-for-syncer`, and takes
+the union of their command line flags and arguments.  Upon completion,
+the kcp current workspace will be what it was at the start.
+
+An example usage follows.
 
 ```console
-$ kubectl kubestellar prep-for-cluster -h                              
-Usage: kubectl kubestellar prep-for-cluster ($kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue...
-
 $ kubectl kubestellar prep-for-cluster --imw root:imw-1 demo2 key1=val1
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo2 created
@@ -264,22 +299,46 @@ to verify the syncer pod is running.
 
 Such a workspace needs not only to be created but also populated with
 an `APIBinding` to the edge API and, if desired, an `APIBinding` to
-the Kubernetes containerized workload API.
+the Kubernetes API for management of containerized workloads.
 
-Invoke this script when the current kcp workspace is the parent of the
-desired workload management workspace (WMW).
+**NOTE**: currently, only a subset of the Kubernetes containerized
+workload management API is supported.  In particular, only the
+following object kinds are supported: `Deployment`, `Pod`, `Service`,
+`Ingress`.  To be clear: this is in addition to the generic object
+kinds that are supported; illustrative examples include RBAC objects,
+`CustomResourceDefinition`, and `ConfigMap`.  For a full description,
+see [the categorization in the design](../outline/#data-objects).
 
-The default behavior is to include an `APIBinding` to the Kubernetes
-containerized workload API, and there are optional command line flags
-to control this behavior.
+The usage synopsis for this command is as follows.
+
+```shell
+kubectl ws parent_pathname; kubectl kubestellar ensure wmw flag... wm_workspace_name
+```
+
+Here `parent_pathname` is the workspace pathame of the parent of the
+WMW, and `wm_workspace_name` is the name (not pathname, just a bare
+one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
+will be `parent_pathname:wm_workspace_name`.
+
+Upon completion, the WMW will be the current workspace.
+
+The flags can also appear anywhere later on the command line.
+
+The acceptable flags include all those of `kubectl` except for
+`--context`.  This command also accepts the following flags.
+
+- `--with-kube boolean`: specifies whether or not the WMW should
+  include an APIBinding to the Kubernetes API for management of
+  containeried workloads.
 
 This script works in idempotent style, doing whatever work remains to
 be done.
 
-```console
-$ kubectl kubestellar ensure wmw -h
-Usage: kubectl ws parent; kubectl kubestellar ensure wmw ($kubectl_flag | --with-kube boolean)* wm_workspace_name
+The following session shows some example usages, including
+demonstration of idempotency and changing whether the kube APIBinding
+is included.
 
+```console
 $ kubectl ws .
 Current workspace is "root:my-org".
 
