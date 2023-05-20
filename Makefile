@@ -184,6 +184,9 @@ vendor: ## Vendor the dependencies
 	go mod vendor
 .PHONY: vendor
 
+VENVDIR=$(abspath docs/venv)
+REQUIREMENTS_TXT=docs/requirements.txt
+
 .PHONY: serve-docs
 serve-docs: venv
 	. $(VENV)/activate; \
@@ -455,3 +458,5 @@ verify-modules: modules  ## Verify go modules are up to date
 .PHONY: help
 help: ## Show this help.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+include Makefile.venv
