@@ -17,7 +17,7 @@
 - [GitHub](https://github.com/kcp-dev/edge-mc): Development takes place here!
 - [Slack](https://app.slack.com/client/T09NY5SBT/C021U8WSAFK) in the [Kubernetes slack workspace](https://slack.k8s.io/): Chat with other project developers
 - [Developer mailing list](https://groups.google.com/g/kubestellar-dev): Discuss development issues around the project
-- You can find out how to contribute to KubeStellar in our [Contribution Guidelines](/latest/Contribution%20guidelines/CONTRIBUTING/)
+- You can find out how to contribute to KubeStellar in our [Contribution Guidelines](https://docs.kubestellar.io/latest/Contribution%20guidelines/CONTRIBUTING/)
 
 
 ### Community Meetings
