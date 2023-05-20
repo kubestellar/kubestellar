@@ -28,5 +28,7 @@ set -e
 srcdir=$(dirname "$0")
 cd "$srcdir/.."
 #docker login quay.io
-KO_DOCKER_REPO=quay.io/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="$kcpe_version" ./cmd/syncer
+GIT_COMMIT=$(git rev-parse --short HEAD || echo 'local')
+GIT_WARN=$( [ $(git status --porcelain=v2 | wc -l) == 0 ] || echo "-dirty")
+KO_DOCKER_REPO=quay.io/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64,... --bare --tags="${kcpe_version},git${GIT_COMMIT}${GIT_WARN}" ./cmd/syncer
 cd "$srcdir"
