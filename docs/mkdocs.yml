@@ -2,7 +2,6 @@ site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 edit_uri: blob/main/docs/content
 site_url: https://docs.kubestellar.io/
-# site_url: https://127.0.0.1/
 
 # Site content
 docs_dir: 'content'
