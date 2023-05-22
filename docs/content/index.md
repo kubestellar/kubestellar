@@ -50,15 +50,15 @@ We are an opensource community focused on creating a flexible solution for chall
     Install [`KubeStellar`](#) with our QuickStart Guide and get up
     and running in minutes
 
-    [:octicons-arrow-right-24: Getting started](/Getting-Started/quickstart/)
+    [:octicons-arrow-right-24: Getting started](Getting-Started/quickstart/)
 
 </div> -->
 
-Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](/Getting-Started/quickstart/)
+Do you have 3 minutes to try our solution?  Head on over to our [Quickstart Guide](Getting-Started/quickstart/)
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](Contribution%20guidelines/CONTRIBUTING/) guide.
 
 ## Getting in touch
 
