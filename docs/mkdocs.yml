@@ -34,6 +34,7 @@ theme:
 extra:
   homepage: https://docs.kubestellar.io/
   version:
+    default: latest
     # Enable mike for multi-version selection
     provider: mike
   analytics:
