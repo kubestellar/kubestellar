@@ -28,8 +28,9 @@
 
 set -e
 
-install=""
+subcommand=""
 verbosity=0
+verbdir="&> /dev/null"
 remove=0
 cleanup=0
 espw_name="espw"
@@ -39,17 +40,16 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 while (( $# > 0 )); do
     case "$1" in
-    (start)
-        install=1;; 
-    (stop) 
-        install=0;; 
+    (start|stop|init)
+        subcommand=$1;;
     (--log-folder)
         if (( $# > 1 ));
         then { log_folder="$2"; shift; }
         else { echo "$0: missing log folder" >&2; exit 1; }
         fi;;
     (--verbose|-V)
-        verbosity=1;;
+        verbosity=1
+	verbdir="";;
     (-h|--help)
         echo "Usage: $0 [start| stop][--log-folder log_folder] [-V|--verbose]"
         exit 0;;
@@ -63,20 +63,9 @@ while (( $# > 0 )); do
     shift
 done
 
-
-# Check if docker is running
-if ! docker ps > /dev/null
-then
-  echo "Docker Not running ...."
-  exit 1
-fi
-
-# Check go version
-go_version=`go version | { read _ _ v _; echo ${v#go}; }`
-
-function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }
-if [ $(ver $go_version) -lt $(ver 1.19) ]; then
-    echo "Update your go version to at least 1.19"
+if [ "$subcommand" == "" ]; then
+    echo "$0: missing a subcommand" >&2
+    exit 1
 fi
 
 # Check if a given process name is running
@@ -95,6 +84,24 @@ if [ $(process_running kcp) != "running" ]
 then
     echo "kcp is not running - please start it ...."
     exit 1
+fi
+
+function ensure_espw() {
+    if kubectl get Workspace "$espw_name" &> /dev/null; then
+	echo "espw workspace already exists -- using it:"
+	kubectl ws "$espw_name"
+    else 
+        kubectl ws create "$espw_name" --enter
+    fi
+    kubectl apply -f $SCRIPT_DIR/../config/exports $verbdir
+    echo "Finished populating the espw with kubestellar apiexports"   
+}
+
+kubectl ws root &> /dev/null
+
+if [ "$subcommand" == init ]; then
+    ensure_espw
+    exit
 fi
 
 # Check mailbox-controller is already running
@@ -118,18 +125,12 @@ then
     pkill -f placement-translator
 fi
 
-kubectl ws root &> /dev/null
-
-if [ $install -eq 0 ]; then 
-   if kubectl get Workspace "$espw_name" &> /dev/null; then
-      kubectl delete ws "$espw_name"
-      echo "Deleted workspace: $espw_name"
-   fi
-   
+if [ $subcommand == stop ]; then    
    echo "kubestellar stopped ....."
    exit 0
 fi
 
+ensure_espw
 
 wait_for_process(){
   status=$(process_running $1)
@@ -155,23 +156,6 @@ echo "****************************************"
 echo "Launching KubeStellar ..."
 echo "****************************************"
 
-
-if kubectl get Workspace "$espw_name" &> /dev/null; then
-   echo "espw workspace already exists -- using it:"
-   kubectl ws "$espw_name"
-else 
-   if [ $verbosity == 1 ]; then
-        kubectl ws create "$espw_name" --enter
-        kubectl apply -f   $SCRIPT_DIR/../config/crds 
-        kubectl apply -f   $SCRIPT_DIR/../config/exports
-        echo "Finished populate the espw with kubestellar crds and apiexports"
-   else
-        kubectl ws create "$espw_name" --enter
-        kubectl apply -f  $SCRIPT_DIR/../config/crds &> /dev/null
-        kubectl apply -f  $SCRIPT_DIR/../config/exports &> /dev/null
-        echo "Finished populate the espw with kubestellar crds and apiexports"
-   fi
-fi
 
 sleep 5
 
