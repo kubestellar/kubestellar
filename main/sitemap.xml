@@ -1,3 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+         <loc>None./</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/coding-milestone-invite-q1/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/commands/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/commands/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/edge-syncer/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/edge-syncer/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/example1/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/example1/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/kubestellar-scheduler/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/mailbox-controller/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/mailbox-controller/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/outline/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/outline/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/placement-translator/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/placement-translator/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/roadmap-uses/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/roadmap-uses/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/environments/_index/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/environments/_index/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/environments/cloud-env/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/environments/cloud-env/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCoding%20Milestones/PoC2023q1/environments/dev-env/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Coding%20Milestones/PoC2023q1/environments/dev-env/"/>
+         
+    </url>
+    <url>
+         <loc>NoneCommunity/_index/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Community/_index/"/>
+         
+    </url>
+    <url>
+         <loc>NoneContribution%20guidelines/CONTRIBUTING/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Contribution%20guidelines/CONTRIBUTING/"/>
+         
+    </url>
+    <url>
+         <loc>NoneContribution%20guidelines/LICENSE/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Contribution%20guidelines/LICENSE/"/>
+         
+    </url>
+    <url>
+         <loc>NoneContribution%20guidelines/coc/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Contribution%20guidelines/coc/"/>
+         
+    </url>
+    <url>
+         <loc>NoneGetting-Started/quickstart/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Getting-Started/quickstart/"/>
+         
+    </url>
+    <url>
+         <loc>NoneGetting-Started/user-guide/</loc>
+         <lastmod>2023-05-22</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="Noneen/Getting-Started/user-guide/"/>
+         
+    </url>
 </urlset>
