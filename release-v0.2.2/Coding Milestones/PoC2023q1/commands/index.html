@@ -89,18 +89,6 @@
     
       <div data-md-color-scheme="default" data-md-component="outdated" hidden>
         
-          <aside class="md-banner md-banner--warning">
-            <div class="md-banner__inner md-grid md-typeset">
-              
-  You're not viewing the latest release.
-  <a href="../latest/../../.."> 
-    <strong>Click here to go to latest release.</strong>
-  </a>
-
-            </div>
-            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
-          </aside>
-        
       </div>
     
     
@@ -535,6 +523,13 @@
   
     <nav class="md-nav" aria-label="Platform control">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kubestellar-init" class="md-nav__link">
+    Kubestellar init
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#kubestellar-start" class="md-nav__link">
@@ -1088,6 +1083,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#kubestellar-init" class="md-nav__link">
+    Kubestellar init
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#kubestellar-start" class="md-nav__link">
     KubeStellar start
   </a>
@@ -1200,17 +1202,14 @@ your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.</p>
 <h2 id="platform-control">Platform control</h2>
-<p>The <code>kubestellar</code> command has two subcommands, one for setup and one
-for teardown.</p>
-<h3 id="kubestellar-start">KubeStellar start</h3>
-<p>This subcommand is used after installation.
-This subcommand does two things:
-1. It creates and populates the edge service provider workspace (ESPW) if it does not already exist; and
-2. It stops any running kubesteallar controllers and then starts them all.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubestellar<span class="w"> </span>start<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+<p>The <code>kubestellar</code> command has three subcommands, one to finish setup
+and two for process control.</p>
+<p>The usage synopsis is as follows.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubestellar<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span><span class="w"> </span>subcommand<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 </code></pre></div>
-<p>The flags can appear before and/or after the subcommand.</p>
-<p>The available flags are as follows.</p>
+<p>This command accepts the following command line flags, which can
+appear before and/or after the subcommand.  The <code>--log-folder</code> flag is
+only used in the <code>start</code> subcommand.</p>
 <ul>
 <li><code>-V</code> or <code>--verbose</code>: calls for more verbose output.  This is a
   binary choice, not a matter of degree.</li>
@@ -1219,11 +1218,18 @@ This subcommand does two things:
   <code>${PWD}/kubestellar-logs</code>.</li>
 <li><code>-h</code> or <code>--help</code>: print a brief usage message and terminate.</li>
 </ul>
+<h3 id="kubestellar-init">Kubestellar init</h3>
+<p>This subcommand is used after installation to finish setup.</p>
+<p>This subcommand ensures that the edge service provider workspace
+(ESPW) exists and has the required contents.</p>
+<h3 id="kubestellar-start">KubeStellar start</h3>
+<p>This subcommand is used after installation or process stops.</p>
+<p>This subcommand stops any running kubesteallar controllers and then
+starts them all.  It also does the same thing as <code>kubestellar init</code>.</p>
 <h3 id="kubestellar-stop">KubeStellar stop</h3>
-<p>This subcommand undoes <code>kubestellar start</code>.  It stops any running
-controllers and deletes the ESPW.</p>
-<p>This command accepts all the same flags as <code>kubestellar start</code> but
-ignores the <code>--log-folder</code>.</p>
+<p>This subcommand undoes the primary function of <code>kubestellar start</code>,
+stopping any running KubeStellar controllers.  It does <em>not</em> tear down
+the ESPW.</p>
 <h2 id="kubestellar-release">KubeStellar-release</h2>
 <p>This command just echoes the <a href="https://semver.org/">semantic version</a>
 of the release used.  This command is only available in archives built
