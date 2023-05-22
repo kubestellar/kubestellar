@@ -32,7 +32,7 @@ theme:
   favicon: favicons/favicon.ico
 
 extra:
-  homepage: https://kubestellar.io/docs
+  homepage: https://docs.kubestellar.io/
   version:
     # Enable mike for multi-version selection
     provider: mike
