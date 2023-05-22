@@ -22,23 +22,18 @@ in that file.
 
 ## Platform control
 
-The `kubestellar` command has two subcommands, one for setup and one
-for teardown.
+The `kubestellar` command has three subcommands, one to finish setup
+and two for process control.
 
-### KubeStellar start
-
-This subcommand is used after installation.
-This subcommand does two things:
-1. It creates and populates the edge service provider workspace (ESPW) if it does not already exist; and
-2. It stops any running kubesteallar controllers and then starts them all.
+The usage synopsis is as follows.
 
 ```shell
-kubestellar start [flags]
+kubestellar [flags] subcommand [flags]
 ```
 
-The flags can appear before and/or after the subcommand.
-
-The available flags are as follows.
+This command accepts the following command line flags, which can
+appear before and/or after the subcommand.  The `--log-folder` flag is
+only used in the `start` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -47,13 +42,25 @@ The available flags are as follows.
   `${PWD}/kubestellar-logs`.
 - `-h` or `--help`: print a brief usage message and terminate.
 
+### Kubestellar init
+
+This subcommand is used after installation to finish setup.
+
+This subcommand ensures that the edge service provider workspace
+(ESPW) exists and has the required contents.
+
+### KubeStellar start
+
+This subcommand is used after installation or process stops.
+
+This subcommand stops any running kubesteallar controllers and then
+starts them all.  It also does the same thing as `kubestellar init`.
+
 ### KubeStellar stop
 
-This subcommand undoes `kubestellar start`.  It stops any running
-controllers and deletes the ESPW.
-
-This command accepts all the same flags as `kubestellar start` but
-ignores the `--log-folder`.
+This subcommand undoes the primary function of `kubestellar start`,
+stopping any running KubeStellar controllers.  It does _not_ tear down
+the ESPW.
 
 ## KubeStellar-release
 
