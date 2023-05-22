@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KCP Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: ensure that a workload management workspace exists and has
+# the needed APIBindings.
+
+# Usage: kubectl ws ensure name [--enter] [-V|--verbose]
+
+set -e
+
+get_cws() {
+    echo "$(kubectl ws . --short 2> /dev/null)"
+}
+
+echoerr() {
+    >&2 echo "$*"
+}
+
+enter="false"
+verbose="false"
+cws=$(get_cws)
+ws=""
+
+while (( $# > 0 )); do
+    case "$1" in
+	(--enter)
+	    enter="true";;
+	(-h|--help)
+	    echo "Usage: kubectl ws ensure name [--enter] [-h|--help] [-V|--verbose] [-X]"
+	    exit 0;;
+	(-V|--verbose)
+	    verbose="true";;
+	(-X)
+	    set -x;;
+	(-*)
+	    echoerr "$0: flag syntax error"
+	    exit 1;;
+	(*)
+	    if [ -z "$ws" ]; then
+            ws="$1"
+	    else
+            echoerr "$0: too many positional arguments"
+            exit 1
+	    fi;;
+    esac
+    shift
+done
+
+if [ "$verbose" == "true" ]; then
+    echo "Ensuring workspace tree \"$ws\"..."
+fi
+
+IFS=':' read -ra ws_array <<< "$ws"
+first_item="true"
+
+for item in "${ws_array[@]}"; do
+    # echo $item
+    case "$item" in
+    (root)
+        if [ "$first_item" == "true" ]; then
+            kubectl ws root 1> /dev/null
+        else
+            echoerr "\"root\" workspace can only be used at the beginning!"
+            exit 2
+        fi;;
+    (..)
+        if [ "$(get_cws)" != "root" ]; then
+            kubectl ws .. 1> /dev/null
+        else
+            echoerr "Cannot change to the parent of \"root\" workspace!"
+            exit 3
+        fi;;
+    (.)
+        ;; # nothing to do
+    (*)
+        if [ "$verbose" == "true" ]; then
+            if ! kubectl ws "$item" 2> /dev/null ; then
+                kubectl ws create "$item" --enter
+            fi
+        else
+            if ! kubectl ws "$item" &> /dev/null ; then
+                kubectl ws create "$item" --enter 1> /dev/null
+            fi
+        fi;;
+    esac
+    first_item="false"
+done
+
+if [ "$enter" != "true" ]; then
+    if [ "$verbose" == "true" ]; then
+        kubectl ws "$cws"
+    else
+        kubectl ws "$cws" 1> /dev/null
+    fi
+fi
