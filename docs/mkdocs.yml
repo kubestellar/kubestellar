@@ -1,7 +1,7 @@
 site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 edit_uri: blob/main/docs/content
-# site_url: https://docs.kubestellar.io/
+site_url: https://docs.kubestellar.io/
 # site_url: https://127.0.0.1/
 
 # Site content
@@ -32,7 +32,6 @@ theme:
   favicon: favicons/favicon.ico
 
 extra:
-  homepage: https://docs.kubestellar.io/
   version:
     default: latest
     # Enable mike for multi-version selection
@@ -56,8 +55,8 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  - mike:
-      version_selector: true
+  #- mike:
+  #    version_selector: true
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
@@ -80,8 +79,8 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
-  - attr_list
-  - md_in_html
+  #- attr_list
+  #- md_in_html
   # Code block highlighting
   - pymdownx.highlight:
       # Allows linking directly to specific lines in code blocks
