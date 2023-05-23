@@ -66,7 +66,7 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 There are several ways to communicate with us:
 
-- The [`#kcp-dev` channel](https://app.slack.com/client/T09NY5SBT/C021U8WSAFK) in the [Kubernetes Slack workspace](https://slack.k8s.io)
+- The [`#kubestellar-dev` channel](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://slack.k8s.io)
 - Our mailing lists:
     - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
     - [kubestellar-users](https://groups.google.com/g/kubestellar-users) for discussions among users and potential users
