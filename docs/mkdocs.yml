@@ -20,7 +20,7 @@ theme:
     - navigation.indexes
     - navigation.tabs
     # - navigation.tabs.sticky
-    - navigation.expand
+    # - navigation.expand
     - navigation.path
     # - navigation.tracking
     # Enable a copy button in code blocks
