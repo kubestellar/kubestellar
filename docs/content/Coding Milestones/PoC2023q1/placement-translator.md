@@ -85,13 +85,17 @@ takes the position that there might be other parties that create
 
 ## Usage
 
-The placement translator needs two kube client configurations.  One
+The placement translator needs three kube client configurations.  One
 points to the edge service provider workspace and provides authority
-to write into the mailbox workspaces.  The other points to the kcp
+to write into the mailbox workspaces.  Another points to the kcp
 server base (i.e., does not identify a particular logical cluster nor
 `*`) and is authorized to read all clusters.  In the kubeconfig
-created by `kcp start` the latter is satisfied by the context named
-`system:admin`.
+created by `kcp start` that is satisfied by the context named
+`system:admin`.  The third points to the "scheduling service provider
+workspace", the one that has the APIExport of `scheduling.kcp.io`.
+This is normally `root`, which has all the kcp APIExports, and the
+context named `root` in the kubeconfig created by `kcp start`
+satisfies this.
 
 The command line flags, beyond the basics, are as follows.  For a
 string parameter, if no default is explicitly stated then the default
@@ -104,11 +108,18 @@ command line parameters, then `$KUBECONFIG`, then `~/.kube/config`.
       --allclusters-context string       The name of the kubeconfig context to use for access to all clusters (default "system:admin")
       --allclusters-kubeconfig string    Path to the kubeconfig file to use for access to all clusters
       --allclusters-user string          The name of the kubeconfig user to use for access to all clusters
+
       --espw-cluster string              The name of the kubeconfig cluster to use for access to the edge service provider workspace
       --espw-context string              The name of the kubeconfig context to use for access to the edge service provider workspace
       --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace
       --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace
+
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10204)
+
+      --sspw-cluster string              The name of the kubeconfig cluster to use for access to the scheduling service provider workspace
+      --sspw-context string              The name of the kubeconfig context to use for access to the scheduling service provider workspace (default "root")
+      --sspw-kubeconfig string           Path to the kubeconfig file to use for access to the scheduling service provider workspace
+      --sspw-user string                 The name of the kubeconfig user to use for access to the scheduling service provider workspace
 ```
 
 ## Try It

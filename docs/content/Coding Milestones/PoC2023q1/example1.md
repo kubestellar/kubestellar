@@ -123,8 +123,8 @@ Use the following two commands. They label both florin and guilder
 with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
-kubectl kubestellar ensure location florin  env=prod
-kubectl kubestellar ensure location guilder env=prod extended=si
+kubectl kubestellar ensure location florin  loc-name=florin  env=prod
+kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
 ```
 
 Those two script invocations are equivalent to creating the following
@@ -137,6 +137,7 @@ metadata:
   name: florin
   labels:
     id: florin
+    loc-name: florin
     env: prod
 ---
 apiVersion: scheduling.kcp.io/v1alpha1
@@ -144,6 +145,7 @@ kind: Location
 metadata:
   name: florin
   labels:
+    loc-name: florin
     env: prod
 spec:
   resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
@@ -156,6 +158,7 @@ metadata:
   name: guilder
   labels:
     id: guilder
+    loc-name: guilder
     env: prod
     extended: si
 ---
@@ -164,6 +167,7 @@ kind: Location
 metadata:
   name: guilder
   labels:
+    loc-name: guilder
     env: prod
     extended: si
 spec:
@@ -420,20 +424,36 @@ kind: ConfigMap
 metadata:
   namespace: commonstuff
   name: httpd-htdocs
+  annotations:
+    edge.kcp.io/expand-parameters: "true"
 data:
   index.html: |
     <!DOCTYPE html>
     <html>
       <body>
         This is a common web site.
+        Running in %(loc-name).
       </body>
     </html>
+---
+apiVersion: edge.kcp.io/v1alpha1
+kind: Customizer
+metadata:
+  namespace: commonstuff
+  name: example-customizer
+  annotations:
+    edge.kcp.io/expand-parameters: "true"
+replacements:
+- path: "$.spec.template.spec.containers.0.env.0.value"
+  value: '"env is %(env)"'
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: commonstuff
   name: commond
+  annotations:
+    edge.kcp.io/customizer: example-customizer
 spec:
   selector: {matchLabels: {app: common} }
   template:
@@ -442,6 +462,9 @@ spec:
     spec:
       containers:
       - name: httpd
+        env:
+        - name: EXAMPLE_VAR
+          value: example value
         image: library/httpd:2.4
         ports:
         - name: http
@@ -516,20 +539,36 @@ kind: ConfigMap
 metadata:
   namespace: specialstuff
   name: httpd-htdocs
+  annotations:
+    edge.kcp.io/expand-parameters: "true"
 data:
   index.html: |
     <!DOCTYPE html>
     <html>
       <body>
         This is a special web site.
+        Running in %(loc-name).
       </body>
     </html>
+---
+apiVersion: edge.kcp.io/v1alpha1
+kind: Customizer
+metadata:
+  namespace: specialstuff
+  name: example-customizer
+  annotations:
+    edge.kcp.io/expand-parameters: "true"
+replacements:
+- path: "$.spec.template.spec.containers.0.env.0.value"
+  value: '"in %(env) env"'
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: specialstuff
   name: speciald
+  annotations:
+    edge.kcp.io/customizer: example-customizer
 spec:
   selector: {matchLabels: {app: special} }
   template:
@@ -538,6 +577,9 @@ spec:
     spec:
       containers:
       - name: httpd
+        env:
+        - name: EXAMPLE_VAR
+          value: example value
         image: library/httpd:2.4
         ports:
         - name: http
@@ -667,8 +709,6 @@ should include only the entry for guilder.
 In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
 into the mailbox workspaces and create `SyncerConfig` objects there.
-
-TODO later: add customization
 
 Eventually there will be convenient automation running the placement
 translator.  In the meantime, you can run it manually: switch to the
@@ -919,6 +959,22 @@ commonstuff                        commond                            1/1     1 
 specialstuff                       speciald                           1/1     1            1           8m55s
 ```
 
+Examining the common workload in the guilder cluster, for example,
+will show that the replacement-style customization happened.
+
+```console
+$ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
+...
+      containers:
+      - env:
+        - name: EXAMPLE_VAR
+          value: env is prod
+        image: library/httpd:2.4
+        imagePullPolicy: IfNotPresent
+        name: httpd
+...
+```
+
 Check that the common workload on the florin cluster is working.
 
 ```console
@@ -927,6 +983,7 @@ $ curl http://localhost:8081
 <html>
   <body>
     This is a common web site.
+    Running in florin.
   </body>
 </html>
 ```
@@ -939,6 +996,7 @@ $ curl http://localhost:8082
 <html>
   <body>
     This is a special web site.
+    Running in guilder.
   </body>
 </html>
 ```
@@ -951,9 +1009,11 @@ $ curl http://localhost:8083
 <html>
   <body>
     This is a common web site.
+    Running in guilder.
   </body>
 </html>
 ```
+
 
 ## Stage 5
 
