@@ -61,7 +61,7 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8083
+    hostPort: 8096
   - containerPort: 8082
     hostPort: 8082
 ```
@@ -1004,7 +1004,7 @@ $ curl http://localhost:8082
 Check that the common workload on the guilder cluster is working.
 
 ```console
-$ curl http://localhost:8083
+$ curl http://localhost:8096
 <!DOCTYPE html>
 <html>
   <body>
