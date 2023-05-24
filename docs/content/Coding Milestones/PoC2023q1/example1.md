@@ -46,12 +46,12 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8081
+    hostPort: 8094
 ```
 
 For the guilder cluster, which will get two workloads, create a file
 named `guilder-config.yaml` with the following contents.  The workload
-that uses hostPort 8081 goes in both clusters, while the workload that
+that uses hostPort 8094 goes in both clusters, while the workload that
 uses hostPort 8082 goes only in the guilder cluster.
 
 ```yaml
@@ -446,7 +446,7 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8081
+          hostPort: 8094
           protocol: TCP
         volumeMounts:
         - name: htdocs
@@ -922,7 +922,7 @@ specialstuff                       speciald                           1/1     1 
 Check that the common workload on the florin cluster is working.
 
 ```console
-$ curl http://localhost:8081
+$ curl http://localhost:8094
 <!DOCTYPE html>
 <html>
   <body>
