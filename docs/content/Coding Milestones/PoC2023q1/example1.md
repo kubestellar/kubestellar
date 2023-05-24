@@ -52,7 +52,7 @@ nodes:
 For the guilder cluster, which will get two workloads, create a file
 named `guilder-config.yaml` with the following contents.  The workload
 that uses hostPort 8081 goes in both clusters, while the workload that
-uses hostPort 8082 goes only in the guilder cluster.
+uses hostPort 8097 goes only in the guilder cluster.
 
 ```yaml
 kind: Cluster
@@ -63,7 +63,7 @@ nodes:
   - containerPort: 8081
     hostPort: 8096
   - containerPort: 8082
-    hostPort: 8082
+    hostPort: 8097
 ```
 
 Finally, create the two clusters with the following two commands,
@@ -584,7 +584,7 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8082
+          hostPort: 8097
           protocol: TCP
         volumeMounts:
         - name: htdocs
@@ -991,7 +991,7 @@ $ curl http://localhost:8081
 Check that the special workload on the guilder cluster is working.
 
 ```console
-$ curl http://localhost:8082
+$ curl http://localhost:8097
 <!DOCTYPE html>
 <html>
   <body>
