@@ -1149,13 +1149,17 @@ placement translator does not take full ownership of them, rather it
 takes the position that there might be other parties that create
 <code>Namespace</code> objects or rely on their existence.</p>
 <h2 id="usage">Usage</h2>
-<p>The placement translator needs two kube client configurations.  One
+<p>The placement translator needs three kube client configurations.  One
 points to the edge service provider workspace and provides authority
-to write into the mailbox workspaces.  The other points to the kcp
+to write into the mailbox workspaces.  Another points to the kcp
 server base (i.e., does not identify a particular logical cluster nor
 <code>*</code>) and is authorized to read all clusters.  In the kubeconfig
-created by <code>kcp start</code> the latter is satisfied by the context named
-<code>system:admin</code>.</p>
+created by <code>kcp start</code> that is satisfied by the context named
+<code>system:admin</code>.  The third points to the "scheduling service provider
+workspace", the one that has the APIExport of <code>scheduling.kcp.io</code>.
+This is normally <code>root</code>, which has all the kcp APIExports, and the
+context named <code>root</code> in the kubeconfig created by <code>kcp start</code>
+satisfies this.</p>
 <p>The command line flags, beyond the basics, are as follows.  For a
 string parameter, if no default is explicitly stated then the default
 is the empty string, which usually means "not specified here".  For
@@ -1165,11 +1169,18 @@ command line parameters, then <code>$KUBECONFIG</code>, then <code>~/.kube/confi
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">      --allclusters-context string       The name of the kubeconfig context to use for access to all clusters (default &quot;system:admin&quot;)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">      --allclusters-kubeconfig string    Path to the kubeconfig file to use for access to all clusters</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">      --allclusters-user string          The name of the kubeconfig user to use for access to all clusters</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">      --espw-cluster string              The name of the kubeconfig cluster to use for access to the edge service provider workspace</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">      --espw-context string              The name of the kubeconfig context to use for access to the edge service provider workspace</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">      --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">      --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">      --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10204)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">      --espw-cluster string              The name of the kubeconfig cluster to use for access to the edge service provider workspace</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">      --espw-context string              The name of the kubeconfig context to use for access to the edge service provider workspace</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">      --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">      --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">      --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10204)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="go">      --sspw-cluster string              The name of the kubeconfig cluster to use for access to the scheduling service provider workspace</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="go">      --sspw-context string              The name of the kubeconfig context to use for access to the scheduling service provider workspace (default &quot;root&quot;)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="go">      --sspw-kubeconfig string           Path to the kubeconfig file to use for access to the scheduling service provider workspace</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="go">      --sspw-user string                 The name of the kubeconfig user to use for access to the scheduling service provider workspace</span>
 </code></pre></div>
 <h2 id="try-it">Try It</h2>
 <p>The nascent placement translator can be exercised following the
