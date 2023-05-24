@@ -294,7 +294,7 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8081
+          hostPort: 8094
           protocol: TCP
         volumeMounts:
         - name: htdocs
@@ -345,7 +345,7 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```shell
-curl http://localhost:8081
+curl http://localhost:8094
 ```
 which should yield:
 
