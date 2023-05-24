@@ -294,7 +294,7 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8094
+          hostPort: 8081
           protocol: TCP
         volumeMounts:
         - name: htdocs
