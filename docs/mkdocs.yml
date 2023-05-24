@@ -1,0 +1,104 @@
+site_name: KubeStellar
+repo_url: https://github.com/kcp-dev/edge-mc
+edit_uri: edit/main/docs/content
+site_url: https://docs.kubestellar.io/
+
+# Site content
+docs_dir: 'content'
+# Where to generate
+site_dir: 'generated'
+
+theme:
+  name: material
+  language: en
+  # Common files such as images, stylesheets, theme overrides
+  custom_dir: 'overrides'
+  features:
+    - content.action.edit
+    - content.action.view
+    # Enable navigation section index pages, so we don't see Concepts > Concepts
+    - navigation.indexes
+    - navigation.tabs
+    # - navigation.tabs.sticky
+    # - navigation.expand
+    - navigation.path
+    # - navigation.tracking
+    # Enable a copy button in code blocks
+    - content.code.copy
+    # Enable annotations on specific lines in code blocks
+    - content.code.annotate
+  logo: logo.png
+  favicon: favicons/favicon.ico
+
+extra:
+  version:
+    default: latest
+    # Enable mike for multi-version selection
+    provider: mike
+  analytics:
+    provider: google
+    property: G-SR5TD1CXY7
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+
+plugins:
+  #- mike:
+  #    version_selector: true
+  # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
+  # Greater control over how navigation links are shown
+  - awesome-pages
+  # Docs site search
+  - search
+  # Use Jinja macros in .md files
+  - macros:
+      include_dir: 'overrides'
+      module_name: 'main'
+  # Configure multiple language support
+  - i18n:
+      default_language: en
+      languages:
+        en:
+          name: English
+  # - redirects:
+  #       redirect_maps:
+  #           'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
+  #           'old/file.md': 'new/file.md'
+  #           'some_file.md': 'http://external.url.com/foobar'
+
+markdown_extensions:
+  #- attr_list
+  #- md_in_html
+  # Code block highlighting
+  - pymdownx.highlight:
+      # Allows linking directly to specific lines in code blocks
+      anchor_linenums: true
+  # Inline code block highlighting
+  - pymdownx.inlinehilite
+  # Lets you embed content from another file
+  - pymdownx.snippets
+  # Arbitrary nesting of code/content blocks inside each other
+  - pymdownx.superfences
+  # Enable note/warning/etc. callouts
+  - admonition
+
+# Our CSS
+extra_css:
+  - stylesheets/kubestellar.css
+
+# Live reload if any of these change when running 'mkdocs serve'
+watch:
+  - mkdocs.yml
+  - content
+  - overrides
