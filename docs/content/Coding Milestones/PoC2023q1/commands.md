@@ -80,7 +80,7 @@ time.  If built by `make` then this is information conveyed by the
 Makefile; otherwise it is [the Kubernetes
 defaults](https://github.com/kubernetes/client-go/blob/master/pkg/version/base.go).
 
-It will either print one requested property to a JSON object
+It will either print one requested property or a JSON object
 containing many.
 
 ```console
