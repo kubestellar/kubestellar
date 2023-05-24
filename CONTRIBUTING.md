@@ -1,7 +1,7 @@
 # Contributing to KubeStellar
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C021U8WSAFK).
+To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C058SUSL5AA).
 
 We can't wait to collaborate with you!
 
@@ -56,7 +56,7 @@ Approvers will review your PR within a business day. A PR requires both an /lgtm
 
 Congratulations! Your pull request has been successfully merged! 👏
 
-If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
+If you have any questions about contributing, don't hesitate to reach out to us on the `kubestellar-dev` [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA).
 
 ## Testing Locally
 
@@ -65,9 +65,7 @@ local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
-there is a larger example in
-https://docs.kubestellar.io/docs/coding-milestones/poc2023q1/example1/
-.
+there is a larger example in https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/.
 
 ### Testing changes to the bootstrap script
 
