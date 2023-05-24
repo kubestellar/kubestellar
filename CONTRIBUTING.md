@@ -65,7 +65,7 @@ local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
-there is a larger example in https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/.
+there is a larger example in https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1/.
 
 ### Testing changes to the bootstrap script
 
