@@ -52,7 +52,7 @@ nodes:
 For the guilder cluster, which will get two workloads, create a file
 named `guilder-config.yaml` with the following contents.  The workload
 that uses hostPort 8081 goes in both clusters, while the workload that
-uses hostPort 8097 goes only in the guilder cluster.
+uses hostPort 8082 goes only in the guilder cluster.
 
 ```yaml
 kind: Cluster
