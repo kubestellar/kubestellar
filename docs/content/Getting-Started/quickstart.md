@@ -420,4 +420,3 @@ remove-kubestellar
 <a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
  <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
 </a>
-
