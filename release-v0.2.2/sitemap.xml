@@ -66,11 +66,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q3/outline/</loc>
-         <lastmod>2023-05-25</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/release-v0.2.2/Community/_index/</loc>
          <lastmod>2023-05-25</lastmod>
          <changefreq>daily</changefreq>
