@@ -111,6 +111,8 @@ nodes:
   extraPortMappings:
   - containerPort: 8081
     hostPort: 8096
+  - containerPort: 8082
+    hostPort: 8097
 EOF
 ```  
 
