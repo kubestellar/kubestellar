@@ -9,9 +9,10 @@ linkTitle: "KubeStellar Quickstart Guide"
    ~3 minutes
    
 ## Required Packages:
-   - [docker](https://docs.docker.com/engine/install/)
-   - [kind](https://kind.sigs.k8s.io/)
-   - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
+   - <a href="https://docs.docker.com/engine/install/" target="_blank">docker</a>
+   - <a href="https://kind.sigs.k8s.io/" target="_blank">kind</a>
+   - <a href="https://kubernetes.io/docs/tasks/tools/" target="_blank">kubectl</a> (version range expected: 1.23-1.25)
+   - <a href="https://stedolan.github.io/jq/download/" target="_blank">jq</a>
 
 ## Setup Instructions
 
