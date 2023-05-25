@@ -8,6 +8,40 @@ docs_dir: 'content'
 # Where to generate
 site_dir: 'generated'
 
+nav:
+  - Home: index.md
+  - QuickStart: Getting-Started/quickstart/
+  - Contributing: 
+      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+      - Code of Conduct: Contribution guidelines/coc.md
+      - License: Contribution guidelines/LICENSE.md
+  - Coding Milestones:
+      - PoC2023q1:
+          - Details: Coding Milestones/PoC2023q1/outline.md
+          - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
+          - Commands: Coding Milestones/PoC2023q1/commands.md
+          - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
+          - Extended Example: Coding Milestones/PoC2023q1/example1.md
+          - Processes:
+              - Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+              - Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
+              - Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
+          - Roadap: Coding Milestones/PoC2023q1/roadmap-uses.md
+          - Environments:
+              - Overview: Coding Milestones/PoC2023q1/environments/_index.md
+              - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
+              - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
+      # - PoC2023q3:
+      #     - Details: Coding Milestones/PoC2023q3/outline.md
+  - Community: Community/_index.md
+  - Getting Started:
+      - QuickStart: Getting-Started/quickstart.md
+      - Extended Example: Coding Milestones/PoC2023q1/example1.md
+      - User Guide: Getting-Started/user-guide.md
+  - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
+  # # - Auto generated:
+  #   - ... | auto-generated/*/*.md
+
 theme:
   name: material
   language: en
