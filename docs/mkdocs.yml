@@ -3,6 +3,9 @@ repo_url: https://github.com/kcp-dev/edge-mc
 edit_uri: edit/main/docs/content
 site_url: https://docs.kubestellar.io/
 
+ks_branch: 'main'
+ks_tag: 'latest'
+
 # Site content
 docs_dir: 'content'
 # Where to generate
