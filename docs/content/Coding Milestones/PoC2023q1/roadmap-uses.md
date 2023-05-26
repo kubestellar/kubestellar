@@ -1,15 +1,7 @@
----
-categories: ["Coding", "Sprints", "Milestones", "PoC"]
-tags: ["code","milestone","poc2023q1"] 
-title: "Possible Roadmaps for Particular Use Cases"
-linkTitle: "Roadmap Possibilities"
-weight: 2
----
-
 ## Background
 
 The outline [mentions features that need not be implement at
-first](outline/#development-roadmap).  In the following sections we
+first](../outline.md/#development-roadmap).  In the following sections we
 consider some particular use cases.
 
 ## MVI
