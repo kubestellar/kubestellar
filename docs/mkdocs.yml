@@ -99,6 +99,7 @@ plugins:
   # Docs site search
   - search
   # Use Jinja macros in .md files
+  - open-in-new-tab
   - macros:
       include_dir: 'overrides'
       module_name: 'main'
