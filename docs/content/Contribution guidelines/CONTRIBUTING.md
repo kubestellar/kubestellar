@@ -72,7 +72,8 @@ there is a larger example at [this link](/Coding%20Milestones/PoC2023q1/example1
 ### Testing changes to the bootstrap script
 
 The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh" target="_blank">bootstrap
-script</a> from the {{ config.ks_branch }} branch of
+script</a> 
+[bootstrap script](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh){.new-tab} from the {{ config.ks_branch }} branch of
 the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
