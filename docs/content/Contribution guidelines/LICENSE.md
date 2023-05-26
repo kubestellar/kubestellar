@@ -1,9 +1,3 @@
----
-title: "License"
-linkTitle: "License"
-weight: 10
----
-
 <center>Apache License</center>
 <center>Version 2.0, January 2004</center>
 <center>http://www.apache.org/licenses/</center>
