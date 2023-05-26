@@ -365,7 +365,7 @@ NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 min
 For `guilder`:
 
 ```shell
-curl http://localhost:8096
+curl http://localhost:8083
 ```
 which should yield:
 
