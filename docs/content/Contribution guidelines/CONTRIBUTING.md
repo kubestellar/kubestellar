@@ -71,7 +71,7 @@ there is a larger example at [this link](/Coding%20Milestones/PoC2023q1/example1
 
 ### Testing changes to the bootstrap script
 
-The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh" target="_blank">bootstrap
+The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh" target=_blank>bootstrap
 script</a> 
 [bootstrap script](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh){.new-tab} from the {{ config.ks_branch }} branch of
 the KubeStellar repo; if you want to contribute a change to that script then
