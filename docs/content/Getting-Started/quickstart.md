@@ -80,7 +80,7 @@ In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
 clusters.  This example is similar to the one described more
 expansively [on the
-website](/Coding%20Milestones/PoC2023q1/example1/),
+website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.
 
