@@ -116,7 +116,7 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
-  #- attr_list
+  - attr_list
   #- md_in_html
   # Code block highlighting
   - pymdownx.highlight:
