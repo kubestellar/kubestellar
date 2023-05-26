@@ -73,6 +73,31 @@ $ kubestellar-release
 v0.2.3-preview
 ```
 
+## Kubestellar-version
+
+This executable prints information about itself captured at build
+time.  If built by `make` then this is information conveyed by the
+Makefile; otherwise it is [the Kubernetes
+defaults](https://github.com/kubernetes/client-go/blob/master/pkg/version/base.go).
+
+It will either print one requested property or a JSON object
+containing many.
+
+```console
+$ kubestellar-version help
+Invalid component requested: "help"
+Usage: kubestellar-version [buildDate|gitCommit|gitTreeState|platform]
+
+$ kubestellar-version buildDate
+2023-05-19T02:54:01Z
+
+$ kubestellar-version gitCommit
+1747254b
+
+$ kubestellar-version          
+{"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
+```
+
 ## Creating SyncTarget/Location pairs
 
 In this PoC, the interface between infrastructure and workload
@@ -424,7 +449,7 @@ $
 
 This is a combination of some installation and setup steps, for use in
 [the
-QuickStart](/docs/getting-started/quickstart/).
+QuickStart](../../../Getting-Started/quickstart/).
 
 The script can be read directly from
 https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh
@@ -478,8 +503,7 @@ environment in another shell.
 
 ## Install kcp and its kubectl plugins
 
-This script is directly available at [https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kcp-with-plugins.sh)
-and does the following things.
+This script is directly available at [https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kcp-with-plugins.sh)and does the following things.
 
 - Fetch and install the `kcp` server executable.
 - Fetch and install the kubectl plugins of kcp.
@@ -510,7 +534,7 @@ telling you to add it.
 ## Install KubeStellar
 
 This script is direclty available at
-[https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh)
+[https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh)
 and will download and install KubeStellar.
 
 This script accepts the following command line arguments; all are

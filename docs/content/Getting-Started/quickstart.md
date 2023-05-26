@@ -9,10 +9,10 @@ linkTitle: "KubeStellar Quickstart Guide"
    ~3 minutes
    
 ## Required Packages:
-   - <a href="https://docs.docker.com/engine/install/" target="_blank">docker</a>
-   - <a href="https://kind.sigs.k8s.io/" target="_blank">kind</a>
-   - <a href="https://kubernetes.io/docs/tasks/tools/" target="_blank">kubectl</a> (version range expected: 1.23-1.25)
-   - <a href="https://stedolan.github.io/jq/download/" target="_blank">jq</a>
+  - [docker](https://docs.docker.com/engine/install/)
+  - [kind](https://kind.sigs.k8s.io/)
+  - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
+  - [jq](https://stedolan.github.io/jq/download/)
 
 ## Setup Instructions
 
@@ -35,7 +35,7 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
 ```shell
-bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version latest
+bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
@@ -78,7 +78,7 @@ In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
 clusters.  This example is similar to the one described more
 expansively [on the
-website](https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/),
+website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.
 
@@ -383,7 +383,7 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 ### e. Carrying on
 
 What you just did is part of the example [on the
-website](https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/),
+website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
 from here, doing the steps for the special workload.
