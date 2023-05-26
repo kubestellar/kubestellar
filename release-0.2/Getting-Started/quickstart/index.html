@@ -404,8 +404,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -456,20 +454,6 @@
     <li class="md-nav__item">
       <a href="../../Contribution%20guidelines/LICENSE/" class="md-nav__link">
         License
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Contribution guidelines/security" class="md-nav__link">
-        Security
       </a>
     </li>
   
@@ -1214,10 +1198,10 @@
 <p>~3 minutes</p>
 <h2 id="required-packages">Required Packages:</h2>
 <ul>
-<li><a href="https://docs.docker.com/engine/install/">docker</a></li>
-<li><a href="https://kind.sigs.k8s.io/">kind</a></li>
-<li><a href="https://kubernetes.io/docs/tasks/tools/">kubectl</a> (version range expected: 1.23-1.25)</li>
-<li><a href="https://stedolan.github.io/jq/download/">jq</a></li>
+<li><a href="https://docs.docker.com/engine/install/" target="_blank">docker</a></li>
+<li><a href="https://kind.sigs.k8s.io/" target="_blank">kind</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/" target="_blank">kubectl</a> (version range expected: 1.23-1.25)</li>
+<li><a href="https://stedolan.github.io/jq/download/" target="_blank">jq</a></li>
 </ul>
 <h2 id="setup-instructions">Setup Instructions</h2>
 <p>Table of contents:</p>
@@ -1234,7 +1218,7 @@
 <p>This guide is intended to show how to (1) quickly bring up a <strong>KubeStellar</strong> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
 <h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></h2>
 <p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/release-0.2/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.2.2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>latest
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/.kcp/admin.kubeconfig&quot;</span>
 </code></pre></div>
@@ -1261,7 +1245,7 @@
 <p>In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
 clusters.  This example is similar to the one described more
-expansively <a href="/Coding%20Milestones/PoC2023q1/example1/">on the
+expansively <a href="https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.</p>
@@ -1557,7 +1541,7 @@ which should yield:</p>
 <p>NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again.  It takes some time for the Apache HTTP Server to synchronize and start.</p>
 <p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="../user-guide/">User Guide</a></p>
 <h3 id="e-carrying-on">e. Carrying on</h3>
-<p>What you just did is part of the example <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
+<p>What you just did is part of the example <a href="https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
@@ -1663,12 +1647,10 @@ from here, doing the steps for the special workload.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.ce72ebac.min.js"></script>
-      
-        <script src="../../js/open_in_new_tab.js"></script>
       
     
   </body>

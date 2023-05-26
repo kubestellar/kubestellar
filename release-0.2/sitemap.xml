@@ -86,6 +86,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/security/</loc>
+         <lastmod>2023-05-26</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Getting-Started/quickstart/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
