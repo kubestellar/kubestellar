@@ -37,7 +37,7 @@ KubeStellar is an opensource project focused on concerns arising mutlicluster co
 
 ## Quickstart
 
-Checkout our [Quickstart Guide](https://docs.kubestellar.io/docs/getting-started/quickstart/)
+Checkout our [Quickstart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ## Contributing
 
