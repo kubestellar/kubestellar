@@ -10,7 +10,7 @@ This governance explains how the project is run.
 - [Code of Conduct Enforcement](#code-of-conduct)
 - [Security Response Team](#security-response-team)
 - [Voting](#voting)
-- [Modifying this Charter](modifying-this-charter)
+- [Modifying this Charter](#modifying-this-charter)
 
 ## Manifesto
  
