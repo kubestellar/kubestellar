@@ -1,4 +1,4 @@
-<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
+no<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
 
 <br/>
 
@@ -41,7 +41,7 @@ Checkout our [Quickstart Guide](https://docs.kubestellar.io/stable/Getting-Start
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](CONTRIBUTING.md) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide.
 
 ## Getting in touch
 
