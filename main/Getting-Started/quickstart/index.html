@@ -374,9 +374,127 @@
   
   
     <li class="md-nav__item">
-      <a href="./" class="md-nav__link">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          QuickStart
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         QuickStart
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#estimated-time" class="md-nav__link">
+    Estimated Time:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#required-packages" class="md-nav__link">
+    Required Packages:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-instructions" class="md-nav__link">
+    Setup Instructions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-install-and-run-kubestellar" class="md-nav__link">
+    1. Install and run KubeStellar
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters" class="md-nav__link">
+    2. Example deployment of Apache HTTP Server workload into two local kind clusters
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Example deployment of Apache HTTP Server workload into two local kind clusters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-stand-up-two-kind-clusters-florin-and-guilder" class="md-nav__link">
+    a. Stand up two kind clusters: florin and guilder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw" class="md-nav__link">
+    b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-onboarding-the-clusters" class="md-nav__link">
+    c. Onboarding the clusters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters" class="md-nav__link">
+    d. Create and deploy the Apache Server workload into florin and guilder clusters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-carrying-on" class="md-nav__link">
+    e. Carrying on
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-teardown-the-environment" class="md-nav__link">
+    3. Teardown the environment
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-video" class="md-nav__link">
+    Demo Video
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -397,6 +515,8 @@
       <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
       
       
+        
+          
         
           
         
@@ -454,6 +574,20 @@
     <li class="md-nav__item">
       <a href="../../Contribution%20guidelines/LICENSE/" class="md-nav__link">
         License
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Contribution%20guidelines/security/" class="md-nav__link">
+        Security
       </a>
     </li>
   
@@ -1252,10 +1386,10 @@
 <p>~3 minutes</p>
 <h2 id="required-packages">Required Packages:</h2>
 <ul>
-<li><a href="https://docs.docker.com/engine/install/" target="_blank">docker</a></li>
-<li><a href="https://kind.sigs.k8s.io/" target="_blank">kind</a></li>
-<li><a href="https://kubernetes.io/docs/tasks/tools/" target="_blank">kubectl</a> (version range expected: 1.23-1.25)</li>
-<li><a href="https://stedolan.github.io/jq/download/" target="_blank">jq</a></li>
+<li><a href="https://docs.docker.com/engine/install/">docker</a></li>
+<li><a href="https://kind.sigs.k8s.io/">kind</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/">kubectl</a> (version range expected: 1.23-1.25)</li>
+<li><a href="https://stedolan.github.io/jq/download/">jq</a></li>
 </ul>
 <h2 id="setup-instructions">Setup Instructions</h2>
 <p>Table of contents:</p>
@@ -1299,35 +1433,17 @@
 <p>In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
 clusters.  This example is similar to the one described more
-expansively <a href="https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/">on the
+expansively <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.</p>
 <h3 id="a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder</h3>
 <p>Create the first edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="s">kind: Cluster</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s">nodes:</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="s">- role: control-plane</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="s">  extraPortMappings:</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="s">  - containerPort: 8081</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="s">    hostPort: 8081</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w">  </span>kubestellar/examples/florin-config.yaml
 </code></pre></div>
 <p>Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind delete cluster --name florin') and create it using the instruction above.</p>
 <p>Create the second edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="s">kind: Cluster</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="s">nodes:</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="s">- role: control-plane</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="s">  extraPortMappings:</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="s">  - containerPort: 8081</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="s">    hostPort: 8096</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="s">  - containerPort: 8082</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="s">    hostPort: 8097</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w">  </span>kubestellar/examples/guilder-config.yaml
 </code></pre></div>
 <p>Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.</p>
 <h3 id="b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</h3>
@@ -1613,7 +1729,7 @@ which should yield:</p>
 <p>NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again.  It takes some time for the Apache HTTP Server to synchronize and start.</p>
 <p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="../user-guide/">User Guide</a></p>
 <h3 id="e-carrying-on">e. Carrying on</h3>
-<p>What you just did is part of the example <a href="https://docs.kubestellar.io/release-v0.2.2/Coding%20Milestones/PoC2023q1/example1/">on the
+<p>What you just did is part of the example <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
@@ -1624,7 +1740,7 @@ from here, doing the steps for the special workload.</p>
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
 <a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 <a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
 <a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
@@ -1719,10 +1835,12 @@ from here, doing the steps for the special workload.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+      
+        <script src="../../js/open_in_new_tab.js"></script>
       
     
   </body>
