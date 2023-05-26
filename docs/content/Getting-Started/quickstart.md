@@ -9,10 +9,10 @@ linkTitle: "KubeStellar Quickstart Guide"
    ~3 minutes
    
 ## Required Packages:
-   - <a href="https://docs.docker.com/engine/install/" target="_blank">docker</a>
-   - <a href="https://kind.sigs.k8s.io/" target="_blank">kind</a>
-   - <a href="https://kubernetes.io/docs/tasks/tools/" target="_blank">kubectl</a> (version range expected: 1.23-1.25)
-   - <a href="https://stedolan.github.io/jq/download/" target="_blank">jq</a>
+   - [docker](https://docs.docker.com/engine/install/)
+   - [kind](https://kind.sigs.k8s.io/)
+   - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
+   - [jq](https://stedolan.github.io/jq/download/)
 
 ## Setup Instructions
 
@@ -385,7 +385,7 @@ Congratulations, you’ve just deployed a workload to two edge clusters using ku
 ### e. Carrying on
 
 What you just did is part of the example [on the
-website](/Coding%20Milestones/PoC2023q1/example1/),
+website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
 from here, doing the steps for the special workload.
