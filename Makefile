@@ -187,6 +187,16 @@ vendor: ## Vendor the dependencies
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
 
+.PHONY: serve-docs
+serve-docs: venv
+	. $(VENV)/activate; \
+	VENV=$(VENV) REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/serve-docs.sh
+
+.PHONY: deploy-docs
+deploy-docs: venv
+	. $(VENV)/activate; \
+	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
+	
 $(CONTROLLER_GEN):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
 
