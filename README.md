@@ -37,11 +37,11 @@ KubeStellar is an opensource project focused on concerns arising mutlicluster co
 
 ## Quickstart
 
-Checkout our [Quickstart Guide](https://docs.kubestellar.io/latest/Getting-Started/quickstart/)
+Checkout our [Quickstart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/latest/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide.
 
 ## Getting in touch
 
