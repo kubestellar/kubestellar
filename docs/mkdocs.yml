@@ -3,6 +3,9 @@ repo_url: https://github.com/kcp-dev/edge-mc
 edit_uri: edit/main/docs/content
 site_url: https://docs.kubestellar.io/
 
+ks_branch: 'release-0.2'
+ks_tag: 'v0.2.2'
+
 # Site content
 docs_dir: 'content'
 # Where to generate
@@ -66,7 +69,7 @@ theme:
 
 extra:
   version:
-    default: latest
+    default: stable
     # Enable mike for multi-version selection
     provider: mike
   analytics:
