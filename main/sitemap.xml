@@ -127,6 +127,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/security/</loc>
+         <lastmod>2023-05-26</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/security/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
