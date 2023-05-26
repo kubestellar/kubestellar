@@ -1,150 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.kubestellar.io/main/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/commands/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/commands/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/edge-syncer/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/edge-syncer/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/mailbox-controller/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/outline/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/outline/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/placement-translator/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/placement-translator/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/roadmap-uses/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/roadmap-uses/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/_index/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/environments/_index/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/cloud-env/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/environments/cloud-env/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/environments/dev-env/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q3/outline/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q3/outline/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Community/_index/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/_index/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/CONTRIBUTING/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/LICENSE/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/LICENSE/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/coc/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/coc/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/security/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/security/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart/"/>
-         
     </url>
     <url>
          <loc>https://docs.kubestellar.io/main/Getting-Started/user-guide/</loc>
          <lastmod>2023-05-26</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/user-guide/"/>
-         
     </url>
 </urlset>
