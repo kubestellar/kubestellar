@@ -131,7 +131,7 @@ to the private Maintainer mailing list or alias in the code-of-conduct file.-->
 
 [Code of Conduct](./code-of-conduct.md)
 violations by community members will be discussed and resolved
-on the [private Maintainer mailing list](https://groups.google.com/g/kubestellar-dev-private).
+on the [private Maintainer mailing list](https://groups.google.com/u/1/g/kubestellar-dev-private).
 
 ## Security Response Team
 
@@ -149,7 +149,7 @@ holes and breaches according to the [security policy](./SECURITY.md).
 While most business in KubeStellar is conducted by "lazy consensus", periodically
 the Maintainers may need to vote on specific actions or changes.
 A vote can be taken on [the developer mailing list](https://groups.google.com/g/kubestellar-dev) or
-[the private Maintainer mailing list](https://groups.google.com/g/kubestellar-dev-private)
+[the private Maintainer mailing list](https://groups.google.com/u/1/g/kubestellar-dev-private)
 for security or conduct matters.  Votes may also be taken at the community call 
 meeting. Any Maintainer may demand a vote be taken.
 
