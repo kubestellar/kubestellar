@@ -449,7 +449,7 @@ $
 
 This is a combination of some installation and setup steps, for use in
 [the
-QuickStart](/docs/getting-started/quickstart/).
+QuickStart](../../../Getting-Started/quickstart/).
 
 The script can be read directly from
 https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh
@@ -503,7 +503,7 @@ environment in another shell.
 
 ## Install kcp and its kubectl plugins
 
-This script is directly available at [https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kcp-with-plugins.sh)
+This script is directly available at [https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kcp-with-plugins.sh)
 and does the following things.
 
 - Fetch and install the `kcp` server executable.
@@ -535,7 +535,7 @@ telling you to add it.
 ## Install KubeStellar
 
 This script is direclty available at
-[https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh)
+[https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh)
 and will download and install KubeStellar.
 
 This script accepts the following command line arguments; all are
