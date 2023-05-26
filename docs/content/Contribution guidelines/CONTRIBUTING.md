@@ -1,7 +1,7 @@
 # Contributing to KubeStellar
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C021U8WSAFK).
+To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
 
 We can't wait to collaborate with you!
 
@@ -9,7 +9,7 @@ We can't wait to collaborate with you!
 
 ### Prerequisites
 
-[Install Go](https://golang.org/doc/install) 1.19+.
+[Install Go](https://golang.org/doc/install/) 1.19+.
   Please note that the go language version numbers in these files must exactly agree:
   
     Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
@@ -19,7 +19,7 @@ We can't wait to collaborate with you!
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
-Check out our [Quickstart Guide](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/)
+Check out our [Quickstart Guide](../../Getting-Started/quickstart/)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
@@ -56,30 +56,27 @@ Approvers will review your PR within a business day. A PR requires both an /lgtm
 
 Congratulations! Your pull request has been successfully merged! 👏
 
-If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
+If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA/).
 
 ## Testing Locally
 
-Our [QUICKSTART](https://docs.kubestellar.io/release-v0.2.2/Getting-Started/quickstart/)
+Our [QUICKSTART](../../Getting-Started/quickstart/)
  guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
-there is a larger example at [this link](/docs/Coding%20Milestones/PoC2023q1/example1/)
-.
+there is a larger example at [this link](../../Coding%20Milestones/PoC2023q1/example1/).
 
 ### Testing changes to the bootstrap script
 
-The quickstart says to fetch the [bootstrap
-script](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/bootstrap-kubestellar.sh) from the main branch of
-the main repo; if you want to contribute a change to that script then
+The quickstart says to fetch the [bootstrap script](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) from the {{ config.ks_branch }} branch of
+the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
 to add the downloaded `bin` at the _front_ of your `$PATH` (contrary
 to [what the scripting currently tells
-you](https://github.com/kcp-dev/edge-mc/blob/main/bootstrap/install-kubestellar.sh)) so that your `git clone`'s
-`bin` does not shadow the one being tested.
+you](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh)) so that your `git clone`'s `bin` does not shadow the one being tested.
 
 Note that changes to the bootstrap script start being used by users as
 soon as your PR merges.  Since this script can only fetch a released

@@ -3,6 +3,9 @@ repo_url: https://github.com/kcp-dev/edge-mc
 edit_uri: edit/main/docs/content
 site_url: https://docs.kubestellar.io/
 
+ks_branch: 'release-0.2'
+ks_tag: 'v0.2.2'
+
 # Site content
 docs_dir: 'content'
 # Where to generate
@@ -10,11 +13,12 @@ site_dir: 'generated'
 
 nav:
   - Home: index.md
-  - QuickStart: Getting-Started/quickstart/
+  - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
+      - Security: Contribution guidelines/security.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
@@ -66,7 +70,7 @@ theme:
 
 extra:
   version:
-    default: latest
+    default: stable
     # Enable mike for multi-version selection
     provider: mike
   analytics:
@@ -96,6 +100,7 @@ plugins:
   # Docs site search
   - search
   # Use Jinja macros in .md files
+  - open-in-new-tab
   - macros:
       include_dir: 'overrides'
       module_name: 'main'
@@ -112,7 +117,7 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
-  #- attr_list
+  - attr_list
   #- md_in_html
   # Code block highlighting
   - pymdownx.highlight:
