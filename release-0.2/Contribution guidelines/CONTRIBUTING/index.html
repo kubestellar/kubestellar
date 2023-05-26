@@ -1177,11 +1177,11 @@
 
 <h1 id="contributing-to-kubestellar">Contributing to KubeStellar</h1>
 <p>Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.</p>
-<p>To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/" target="_blank">Slack channel</a>.</p>
+<p>To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/">Slack channel</a>.</p>
 <p>We can't wait to collaborate with you!</p>
 <h2 id="contributing-code">Contributing Code</h2>
 <h3 id="prerequisites">Prerequisites</h3>
-<p><a href="https://golang.org/doc/install/" target="_blank">Install Go</a>) 1.19+.
+<p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.
   Please note that the go language version numbers in these files must exactly agree:</p>
 <div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
 
@@ -1190,7 +1190,7 @@
 - In go.mod it is indicated by the &quot;go&quot; directive.
 - In the .github/workflows yaml files it is indicated by &quot;go-version&quot;
 </code></pre></div>
-<p>Check out our <a href="/Getting-Started/quickstart/">Quickstart Guide</a></p>
+<p>Check out our <a href="../../Getting-Started/quickstart/">Quickstart Guide</a></p>
 <h3 id="issues">Issues</h3>
 <p>Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.</p>
 <p>If you believe that there is a need for a fix and no existing issue covers it, feel free to create a new one.</p>
@@ -1198,7 +1198,7 @@
 <p>Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.</p>
 <p>To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.</p>
 <h3 id="committing">Committing</h3>
-<p>We encourage all contributors to adopt <a href="https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history" target="_blank">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
+<p>We encourage all contributors to adopt <a href="https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
 <p>A recommended format for final commit messages is as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 </code></pre></div>
@@ -1214,9 +1214,9 @@
 <p>Smaller pull requests are typically easier to review and merge than larger ones. If your pull request is big, it is always recommended to collaborate with the maintainers to find the best way to divide it.</p>
 <p>Approvers will review your PR within a business day. A PR requires both an /lgtm and then an /approve in order to get merged. You may /approve your own PR but you may not /lgtm it. Automation will add the PR it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available.</p>
 <p>Congratulations! Your pull request has been successfully merged! 👏</p>
-<p>If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/" target="_blank">Slack channel</a>.</p>
+<p>If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/">Slack channel</a></a>.</p>
 <h2 id="testing-locally">Testing Locally</h2>
-<p>Our <a href="/Getting-Started/quickstart/">QUICKSTART</a>
+<p>Our <a href="../../Getting-Started/quickstart/">QUICKSTART</a>
  guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
@@ -1225,15 +1225,13 @@ release archive.  The same example usage should work for you, and
 there is a larger example at <a href="/Coding%20Milestones/PoC2023q1/example1/">this link</a>
 .</p>
 <h3 id="testing-changes-to-the-bootstrap-script">Testing changes to the bootstrap script</h3>
-<p>The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/bootstrap-kubestellar.sh" target="_blank">bootstrap
-script</a> from the release-0.2 branch of
+<p>The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/bootstrap-kubestellar.sh">bootstrap script</a> from the release-0.2 branch of
 the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
 to add the downloaded <code>bin</code> at the <em>front</em> of your <code>$PATH</code> (contrary
-to <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/bootstrap-kubestellar.sh" target="_blank">what the scripting currently tells
-you</a>) so that your <code>git clone</code>'s
-<code>bin</code> does not shadow the one being tested.</p>
+to <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/bootstrap-kubestellar.sh">what the scripting currently tells
+you</a>) so that your <code>git clone</code>'s <code>bin</code> does not shadow the one being tested.</p>
 <p>Note that changes to the bootstrap script start being used by users as
 soon as your PR merges.  Since this script can only fetch a released
 version of the executables, changes to this script can not rely on any
@@ -1254,7 +1252,7 @@ GitHub pull requests.</p>
 <p>By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
-contribution. See the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/DCO" target="_blank">DCO</a> file for details.</p>
+contribution. See the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/DCO">DCO</a></a> file for details.</p>
 
 
   
@@ -1338,6 +1336,8 @@ contribution. See the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0
     
     
       <script src="../../assets/javascripts/bundle.b4d07000.min.js"></script>
+      
+        <script src="../../js/open_in_new_tab.js"></script>
       
     
   </body>
