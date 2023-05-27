@@ -9,8 +9,9 @@ no<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
-<a href="https://app.slack.com/client/T09NY5SBT/C021U8WSAFK"> 
-    <img alt="Join Slack" src="https://img.shields.io/badge/KCP--Edge-Join%20Slack-blue?logo=slack">
+[![Broken Links Crawler](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)
+<a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
+    <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
 KubeStellar is an opensource project focused on concerns arising mutlicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
