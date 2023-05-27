@@ -29,8 +29,8 @@ jobs:
     steps:
       - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.1
         with:
-          website_url: 'https://docs.kubestellar.io/${GITHUB_REF##*/}'
-          include_url_prefix: 'https://docs.kubestellar.io/${GITHUB_REF##*/}'
+          website_url: https://docs.kubestellar.io/${GITHUB_REF##*/}
+          include_url_prefix: https://docs.kubestellar.io/${GITHUB_REF##*/}
           resolve_before_filtering: 'true'
           verbose: 'true'
           max_retry_time: 30
