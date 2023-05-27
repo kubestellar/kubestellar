@@ -1,0 +1,38 @@
+name: Broken Links Crawler
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+  # Pushes to branches do the full build + deployment
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+#       - "cmd/**"
+      - "docs/**"
+#       - "pkg/**"
+      - ".github/workflows/docs-gen-and-push.yaml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  broken-links-crawler:
+    name: broken-links-crawler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.1
+        with:
+          website_url: 'https://docs.kubestellar.io/latest'
+          include_url_prefix: 'https://docs.kubestellar.io/latest'
+          resolve_before_filtering: 'true'
+          verbose: 'true'
+          max_retry_time: 30
+          max_retries: 5
+          max_depth: 1
