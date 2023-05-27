@@ -149,7 +149,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - The mailbox controller will put API Binding into the mailbox workspace.
 
 #### EdgeSyncConfig (will be replaced to SyncerConfig)
-- The example of EdgeSycnerConfig CR is [here](https://github.com/yana1205/edge-mc/blob/edge-syncer/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here](https://github.com/yana1205/edge-mc/blob/edge-syncer/pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
+- The example of EdgeSycnerConfig CR is [here](https://github.com/kcp-dev/edge-mc/blob/main/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here](https://github.com/kcp-dev/edge-mc/blob/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
 - The CR here is used from edge syncer. 
 - The CR is placed at mb-ws to define
   - object selector
