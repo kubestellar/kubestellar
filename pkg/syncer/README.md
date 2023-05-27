@@ -32,7 +32,7 @@
 ## Edge Syncer feasibility verification
 
 ### Register an edge-syncer on a p-cluster to connect a mailbox workspace specified by name
-1. Created a mailbox workspace following to https://docs.kcp-edge.io/docs/coding-milestones/poc2023q1/mailbox-controller/
+1. Created a mailbox workspace following to https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller/
     ```
     $ kubectl get Workspace
     NAME                                                       TYPE        REGION   PHASE   URL                                                                                                       AGE
