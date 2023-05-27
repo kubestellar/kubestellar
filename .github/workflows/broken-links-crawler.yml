@@ -43,6 +43,7 @@ jobs:
       - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.1
         with:
           website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
+          exclude_url_prefix: '.'
           resolve_before_filtering: 'true'
           verbose: 'true'
           max_retry_time: 30
