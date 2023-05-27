@@ -1339,14 +1339,14 @@
 </ul>
 <h2 id="setup-instructions">Setup Instructions</h2>
 <p>Table of contents:</p>
-<p><a href="#1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></a>
-<a href="#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">2. Example deployment of Apache HTTP Server workload into two local kind clusters</a>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder</a>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</a>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#c-onboarding-the-clusters">c. Onboarding the clusters</a>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters">d. Create and deploy the Apache Server workload into florin and guilder clusters</a>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#e-carrying-on">e. Carrying on</a>
-<a href="#3-teardown-the-environment">3. Teardown the environment</a></p>
+<p><a href="#1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></a></br>
+<a href="#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">2. Example deployment of Apache HTTP Server workload into two local kind clusters</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#c-onboarding-the-clusters">c. Onboarding the clusters</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters">d. Create and deploy the Apache Server workload into florin and guilder clusters</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#e-carrying-on">e. Carrying on</a></br>
+<a href="#3-teardown-the-environment">3. Teardown the environment</a></br></p>
 <p>This guide is intended to show how to (1) quickly bring up a <strong>KubeStellar</strong> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
 <h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></h2>
 <p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
