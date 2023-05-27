@@ -27,10 +27,22 @@ jobs:
     name: broken-links-crawler
     runs-on: ubuntu-latest
     steps:
+      - name: Get branch name (merge)
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+
+      - name: Get branch name (pull request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+
+      - name: Debug
+        run: echo ${{ env.BRANCH_NAME }}
+        
       - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.1
         with:
-          website_url: https://docs.kubestellar.io/${GITHUB_REF##*/}
-          include_url_prefix: https://docs.kubestellar.io/${GITHUB_REF##*/}
+          website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
           resolve_before_filtering: 'true'
           verbose: 'true'
           max_retry_time: 30
