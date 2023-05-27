@@ -44,7 +44,7 @@ jobs:
         with:
           website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
           include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
-          exclude_url_prefix: 'mailto:,https://drive.google.com,*/.,*/*#*'
+          exclude_url_prefix: 'mailto:,https://drive.google.com,*/.,*/#__*'
           resolve_before_filtering: 'true'
           verbose: 'true'
           max_retry_time: 30
