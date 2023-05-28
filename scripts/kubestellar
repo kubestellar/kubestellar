@@ -67,7 +67,7 @@ done
 # Check if docker is running
 if ! docker ps > /dev/null
 then
-  echo "Docker Not running ...."
+  echo "Docker not running, please start docker and try again."
   exit 1
 fi
 
