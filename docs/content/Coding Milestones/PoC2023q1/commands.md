@@ -503,7 +503,7 @@ environment in another shell.
 
 ## Install kcp and its kubectl plugins
 
-This script is directly available at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kcp-with-plugins.sh)and does the following things.
+This script is directly available at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kcp-with-plugins.sh) and does the following things.
 
 - Fetch and install the `kcp` server executable.
 - Fetch and install the kubectl plugins of kcp.
