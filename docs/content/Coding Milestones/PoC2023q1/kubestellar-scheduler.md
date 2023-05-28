@@ -16,7 +16,7 @@ brew install go@1.19
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest KubeStellar source:
 ```console
-git clone https://github.com/kcp-dev/edge-mc KubeStellar
+git clone {{ config.repo_url }} KubeStellar
 ```
 
 clone the v0.11.0 branch kcp source:
