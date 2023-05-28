@@ -161,4 +161,3 @@ Governance require a 2/3 vote of all Maintainers.
 
 Changes to this Governance and its supporting documents may be approved by a 
 2/3 vote of the Maintainers.
-
