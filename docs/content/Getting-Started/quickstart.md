@@ -87,7 +87,15 @@ workload and summarization aspirations removed.
 Create the first edge cluster:
 
 ```shell
-kind create cluster --name florin --config  kubestellar/examples/florin-config.yaml
+kind create cluster --name florin --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 8081
+    hostPort: 8094
+EOF
 ```  
 
 Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind delete cluster --name florin') and create it using the instruction above.
@@ -95,7 +103,17 @@ Note: if you already have a cluster named 'florin' from a previous exercise of K
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name guilder --config  kubestellar/examples/guilder-config.yaml
+kind create cluster --name guilder --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 8081
+    hostPort: 8096
+  - containerPort: 8082
+    hostPort: 8097
+EOF
 ```  
 
 Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.
@@ -346,7 +364,7 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```shell
-curl http://localhost:8081
+curl http://localhost:8094
 ```
 which should yield:
 
@@ -363,7 +381,7 @@ NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 min
 For `guilder`:
 
 ```shell
-curl http://localhost:8083
+curl http://localhost:8096
 ```
 which should yield:
 
