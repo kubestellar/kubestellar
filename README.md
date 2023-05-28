@@ -1,4 +1,4 @@
-no<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
+<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
 
 <br/>
 
@@ -23,7 +23,7 @@ KubeStellar is an opensource project focused on concerns arising mutlicluster co
 
 ## Goals
 
-- collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
+- Collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
 - Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
 - Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
 
