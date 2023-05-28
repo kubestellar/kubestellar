@@ -1,11 +1,6 @@
 ---
-categories: ["Coding", "Sprints", "Milesones", "PoC"]
-tags: ["code","milestone","poc2023q1"] 
 title: "Details"
-linkTitle: "Details"
-weight: 2
 ---
-
 
 Want to get involved? Check out our [good-first-issue list]({{ config.repo_url }}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
