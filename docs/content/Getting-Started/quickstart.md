@@ -94,7 +94,7 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8081
+    hostPort: 8094
 EOF
 ```  
 
@@ -364,7 +364,7 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```shell
-curl http://localhost:8081
+curl http://localhost:8094
 ```
 which should yield:
 
