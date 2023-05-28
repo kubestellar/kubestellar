@@ -70,13 +70,13 @@ there is a larger example at [this link](../../Coding%20Milestones/PoC2023q1/exa
 
 ### Testing changes to the bootstrap script
 
-The quickstart says to fetch the [bootstrap script](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) from the {{ config.ks_branch }} branch of
+The quickstart says to fetch the [bootstrap script]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) from the {{ config.ks_branch }} branch of
 the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
 to add the downloaded `bin` at the _front_ of your `$PATH` (contrary
 to [what the scripting currently tells
-you](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh)) so that your `git clone`'s `bin` does not shadow the one being tested.
+you]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh)) so that your `git clone`'s `bin` does not shadow the one being tested.
 
 Note that changes to the bootstrap script start being used by users as
 soon as your PR merges.  Since this script can only fetch a released
@@ -104,4 +104,4 @@ Please read the following guide if you're interested in contributing to KubeStel
 By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
-contribution. See the [DCO](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/DCO)</a> file for details.
+contribution. See the [DCO]({{ config.repo_url }}/blob/{{ config.ks_branch }}/DCO)</a> file for details.

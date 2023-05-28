@@ -22,7 +22,7 @@ possibilities.  They vary in two dimensions.
 
 #### Through view of workload APIExport and workload APIBindings
 
-As outlined in [PR 241](https://github.com/kcp-dev/edge-mc/pull/241):
+As outlined in [PR 241]({{ config.repo_url }}/pull/241):
 - the C2P team maintains CRDs, APIResourceSchemas, and an APIExport for
   the policy and report resources;
 - the C2P team puts those APIResourceSchemas and that APIExport in a
@@ -76,7 +76,7 @@ kind/resource is defined by those APIBindings.
 #### Through an API for consuming from mailboxes
 
 The C2P Controller uses the API proposed in [PR
-240](https://github.com/kcp-dev/edge-mc/pull/240) to read the report
+240]({{ config.repo_url }}/pull/240) to read the report
 objects from the mailbox workspaces.  This has the downside of
 exposing the mailbox workspaces as part of the edge-mc interface ---
 which they were NOT originally intended to be.

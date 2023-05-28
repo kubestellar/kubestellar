@@ -2,6 +2,7 @@ site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 site_url: https://docs.kubestellar.io/
 
+repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
 edit_uri: edit/release-0.2/docs/content
 ks_branch: 'release-0.2'
 ks_tag: 'v0.2.2'

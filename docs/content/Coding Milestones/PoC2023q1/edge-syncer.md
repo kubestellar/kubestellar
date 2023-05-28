@@ -36,7 +36,7 @@ In order for Syncer to sync resources between upstream (workspace) and doenstrea
 
 Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;`kubectl kcp workload edge-sync <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
 
-The source code of the command is [https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go).
+The source code of the command is [{{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go).
 
 The equivalent manual steps are as follows:
 1. Generate UUID for Syncer identification
@@ -134,7 +134,7 @@ To deploy resources to Edge clusters, create the following in workload managemen
   - Some objects are denatured if needed.
   - Other objects are as it is
 - APIExport/API Schema corresponding to CRD such as Kubernetes [ClusterPolicyReport](https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml).
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt [here](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/hack/update-codegen-crds.sh#L57)). 
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/hack/update-codegen-crds.sh#L57)). 
 - EdgePlacement
 
 ![edge-syncer deploy](images/edge-syncer-deploy.png)
@@ -149,7 +149,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - The mailbox controller will put API Binding into the mailbox workspace.
 
 #### EdgeSyncConfig (will be replaced to SyncerConfig)
-- The example of EdgeSycnerConfig CR is [here](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here](https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
+- The example of EdgeSycnerConfig CR is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
 - The CR here is used from edge syncer. 
 - The CR is placed at mb-ws to define
   - object selector
@@ -165,10 +165,10 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - This name is registered in the bootstrap manifests for Edge Syncer install and Edge Syncer is told to watch the CR of this name.
 - Currently Edge Syncer watches all CRs in the workspace
   - Edge Syncer merges them and decides which resources are down/up synced based on the merged information. 
-  - This behavior may be changed to only watching the default CR once Placement Translater is to be the component that generates the CR from EdgePlacement: [related issue](https://github.com/kcp-dev/edge-mc/pull/284#pullrequestreview-1375667129)
+  - This behavior may be changed to only watching the default CR once Placement Translater is to be the component that generates the CR from EdgePlacement: [related issue]({{ config.repo_url }}/pull/284#pullrequestreview-1375667129)
 
 #### SyncerConfig
-- The spec is defined in https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/pkg/apis/edge/v1alpha1/syncer-config.go
+- The spec is defined in {{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/apis/edge/v1alpha1/syncer-config.go
   - `namespaceScope` field is for namespace scoped objects.
     - `namespaces` is field for which namespaces to be downsynced.
     - `resources` is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.
@@ -181,7 +181,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
     - `resources` is an array of upsynced resource.
     - `namespaces` is an array of namespace for namespace objects.
     - `names` is an array of upsynced object name. Wildcard (`*`) is available.
-- The example CR is https://github.com/kcp-dev/edge-mc/blob/{{ config.ks_branch }}/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml
+- The example CR is {{ config.repo_url }}/blob/{{ config.ks_branch }}/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml
 - The CR is used from edge syncer
 - The CR is placed in mb-ws to define
   - object selector
