@@ -1,7 +1,7 @@
 # Contributing to KubeStellar
 Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.
 
-To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C021U8WSAFK).
+To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on [Slack](https://kubernetes.slack.com/archives/C058SUSL5AA).
 
 We can't wait to collaborate with you!
 
@@ -19,7 +19,7 @@ We can't wait to collaborate with you!
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
-Check out our [Quickstart Guide](quickstart.md)
+Check out our [Quickstart Guide](https://docs.kubestellar.io/main/Getting-Started/quickstart/)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
@@ -56,10 +56,43 @@ Approvers will review your PR within a business day. A PR requires both an /lgtm
 
 Congratulations! Your pull request has been successfully merged! 👏
 
-If you have any questions about contributing, don't hesitate to reach out to us on the KCP-dev [Slack channel](https://kubernetes.slack.com/archives/C021U8WSAFK).
+If you have any questions about contributing, don't hesitate to reach out to us on the `kubestellar-dev` [Slack channel](https://kubernetes.slack.com/archives/C058SUSL5AA).
 
 ## Testing Locally
-Check out our [QUICKSTART](quickstart.md) guide to install a local KCP server and install the KubeStellar components
+
+Our [QUICKSTART](https://docs.kubestellar.io/main/Getting-Started/quickstart/) guide shows a user how to install a
+local KCP server and install the KubeStellar components and run an
+example.  As a contributor you will want a different setup flow,
+including `git clone` of this repo instead of fetching and unpacking a
+release archive.  The same example usage should work for you, and
+there is a larger example in https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1/.
+
+### Testing changes to the bootstrap script
+
+The quickstart says to fetch the [bootstrap
+script](bootstrap/bootstrap-kubestellar.sh) from the main branch of
+the main repo; if you want to contribute a change to that script then
+you will need to test your changed version.  Just run your local copy
+(perhaps in a special testing directory, just to be safe) and be sure
+to add the downloaded `bin` at the _front_ of your `$PATH` (contrary
+to [what the scripting currently tells
+you](bootstrap/install-kubestellar.sh)) so that your `git clone`'s
+`bin` does not shadow the one being tested.
+
+Note that changes to the bootstrap script start being used by users as
+soon as your PR merges.  Since this script can only fetch a released
+version of the executables, changes to this script can not rely on any
+behavior of those executables that is not in the currently latest
+release.  Also, a change that restricts the range of usable releases
+needs to add checking for use of incompatible releases.
+
+### Testing the bootstrap script against an upcoming release
+
+Prior to making a new release, there needs to be testing that the
+current bootstrap script works with the exeutable behavior that will
+appear in the new release.  To support this we will add an option to
+the bootstrrap script that enables it to use a local release archive
+instead of fetching an archive of an actual release from github.
 
 ## Licensing
 KubeStellar is [Apache 2.0 licensed](LICENSE) and we accept contributions via
