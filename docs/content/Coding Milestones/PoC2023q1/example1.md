@@ -41,7 +41,7 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8081
+    hostPort: 8094
 ```
 
 For the guilder cluster, which will get two workloads, create a file
@@ -56,9 +56,9 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8083
+    hostPort: 8096
   - containerPort: 8082
-    hostPort: 8082
+    hostPort: 8097
 ```
 
 Finally, create the two clusters with the following two commands,
@@ -917,7 +917,7 @@ specialstuff                       speciald                           1/1     1 
 Check that the common workload on the florin cluster is working.
 
 ```shell
-$ curl http://localhost:8081
+$ curl http://localhost:8094
 <!DOCTYPE html>
 <html>
   <body>
@@ -929,7 +929,7 @@ $ curl http://localhost:8081
 Check that the special workload on the guilder cluster is working.
 
 ```shell
-$ curl http://localhost:8082
+$ curl http://localhost:8097
 <!DOCTYPE html>
 <html>
   <body>
@@ -941,7 +941,7 @@ $ curl http://localhost:8082
 Check that the common workload on the guilder cluster is working.
 
 ```shell
-$ curl http://localhost:8083
+$ curl http://localhost:8096
 <!DOCTYPE html>
 <html>
   <body>
