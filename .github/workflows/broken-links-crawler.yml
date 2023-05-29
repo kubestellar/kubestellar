@@ -40,7 +40,7 @@ jobs:
       - name: Debug
         run: echo ${{ env.BRANCH_NAME }}
         
-      - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.1
+      - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.2
         with:
           website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
           include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
