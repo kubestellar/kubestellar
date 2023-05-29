@@ -38,8 +38,10 @@ cd "$srcdir/.."
 
 rm -rf bin/*
 make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/kubestellar-scheduler ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubectl-kubestellar-syncer_gen"
+echo $'#!/usr/bin/env bash\necho' ${kcpe_version@Q} > bin/kubestellar-release
+chmod a+x bin/kubestellar-release
 mkdir -p build/release
-tar czf "build/release/$archname" --exclude bin/.gitignore bin config examples README.md LICENSE
+tar czf "build/release/$archname" --exclude bin/.gitignore bin config README.md LICENSE
 cd build/release
 touch checksums256.txt
 grep -vw "$archname" checksums256.txt > /tmp/$$.txt || true
