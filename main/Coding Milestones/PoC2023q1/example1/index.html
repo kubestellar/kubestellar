@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1/">
       
       
-        <link rel="prev" href="../../../Getting-Started/quickstart/">
+        <link rel="prev" href="../edge-syncer/">
       
       
-        <link rel="next" href="../../../Getting-Started/user-guide/">
+        <link rel="next" href="../kubestellar-scheduler/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
@@ -246,6 +246,8 @@
         
   
   
+    
+  
 
 
   
@@ -257,7 +259,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../outline/" class="md-tabs__link">
+      <a href="../outline/" class="md-tabs__link md-tabs__link--active">
         Coding Milestones
       </a>
     </li>
@@ -281,15 +283,13 @@
         
   
   
-    
-  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../../../Getting-Started/quickstart/" class="md-tabs__link md-tabs__link--active">
+      <a href="../../../Getting-Started/quickstart/" class="md-tabs__link">
         Getting Started
       </a>
     </li>
@@ -488,14 +488,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
       
       
         
@@ -510,7 +512,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Coding Milestones
@@ -521,14 +523,16 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
       
       
         
@@ -555,7 +559,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_4_1">
           <span class="md-nav__icon md-icon"></span>
           PoC2023q1
@@ -622,8 +626,10 @@
               
   
   
+    
   
-    <li class="md-nav__item">
+  
+    <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
@@ -1066,20 +1072,16 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
       
       
-        
-          
         
           
         
@@ -1092,7 +1094,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Getting Started
@@ -1108,188 +1110,6 @@
       <a href="../../../Getting-Started/quickstart/" class="md-nav__link">
         QuickStart
       </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-    
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Extended Example
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Extended Example
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#stage-1" class="md-nav__link">
-    Stage 1
-  </a>
-  
-    <nav class="md-nav" aria-label="Stage 1">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#create-two-kind-clusters" class="md-nav__link">
-    Create two kind clusters.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#start-kcp" class="md-nav__link">
-    Start kcp
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#create-an-inventory-management-workspace" class="md-nav__link">
-    Create an inventory management workspace.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get-edge-mc" class="md-nav__link">
-    Get edge-mc
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" class="md-nav__link">
-    Create SyncTarget and Location objects to represent the florin and guilder clusters
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#create-the-edge-service-provider-workspace" class="md-nav__link">
-    Create the edge service provider workspace
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#populate-the-edge-service-provider-workspace" class="md-nav__link">
-    Populate the edge service provider workspace
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-mailbox-controller" class="md-nav__link">
-    The mailbox controller
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#connect-guilder-edge-cluster-with-its-mailbox-workspace" class="md-nav__link">
-    Connect guilder edge cluster with its mailbox workspace
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#connect-florin-edge-cluster-with-its-mailbox-workspace" class="md-nav__link">
-    Connect florin edge cluster with its mailbox workspace
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#stage-2" class="md-nav__link">
-    Stage 2
-  </a>
-  
-    <nav class="md-nav" aria-label="Stage 2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#create-and-populate-the-workload-management-workspace-for-the-common-workload" class="md-nav__link">
-    Create and populate the workload management workspace for the common workload
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" class="md-nav__link">
-    Create and populate the workload management workspace for the special workload
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#edge-scheduling" class="md-nav__link">
-    Edge scheduling
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#stage-3" class="md-nav__link">
-    Stage 3
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#stage-4" class="md-nav__link">
-    Stage 4
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#stage-5" class="md-nav__link">
-    Stage 5
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
