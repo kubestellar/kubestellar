@@ -42,13 +42,16 @@ jobs:
 #         run: echo "$GITHUB_CONTEXT"
 
       - name: Branch name
-        run: echo workflow_dispatch - running on branch ${GITHUB_REF##*/}
+        shell: bash
+        run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+        id: extract_branch
         if: github.event_name != 'pull_request' && github.event_name != 'push'
+#         run: echo workflow_dispatch - running on branch ${GITHUB_REF##*/}
 
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/${GITHUB_REF##*/}
-          include_url_prefix: https://docs.kubestellar.io/${GITHUB_REF##*/}
+          website_url: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.branch }}
+          include_url_prefix: https://docs.kubestellar.io/${{ steps.extract_branch.outputs.branch }}
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
