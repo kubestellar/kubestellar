@@ -1,40 +1,35 @@
----
-title: "KubeStellar Syncer"
----
-
-
 ![edge-syncer drawio](images/edge-syncer-overview.png)
 
-#### Registering Edge Syncer on an Edge cluster
+#### Registering KubeStellar Syncer on an Edge cluster
 
 Edge-syncer can be deployed on Edge cluster easily by the following steps.
 
 1. Create SyncTarget and Location
     - Mailbox controller creates mailbox workspace automatically. 
 2. Get mailbox workspace name
-3. Use command to register edge-syncer and obtain yaml manifests to bootstrap Edge Syncer
+3. Use command to obtain yaml manifests to bootstrap KubeStellar Syncer
     ```console
     kubectl ws <mb-ws name>
-    bin/kubectl-kcpforedgesyncer workload edge-sync <Edge Sync Target name> --syncer-image <Edge Syncer Image> -o edge-syncer.yaml
+    bin/kubectl-kubestellar-syncer_gen <Edge Sync Target name> --syncer-image <KubeStellar Syncer image> -o edge-syncer.yaml
     ```
-    Here `bin/kubectl-kcpforedgesyncer` refers to a special variant of kcp's
+    Here `bin/kubectl-kubestellar-syncer_gen` refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
     the `bin` of edge-mc.
-    For the Edge Syncer image, please refer to the section to [Build Edge Syncer image](#build-edge-syncer-image)
+    For the KubeStellar Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:v0.2.2`. You can also create a syncer image from the source following [Build KubeStellar Syncer Image](#build-kubestellar-syncer-image).
 4. Deploy edge-syncer on an Edge cluster
 5. Syncer starts to run on the Edge cluster
-    - Edge Syncer starts watching and consuming SyncerConfig
+    - KubeStellar Syncer starts watching and consuming SyncerConfig
 
 The overall diagram is as follows:
 
 ![edge-syncer boot](images/edge-syncer-boot.png)
 
-#### What edge-sync plugin does
+#### What kubestellar syncer-gen plugin does
 
-In order for Syncer to sync resources between upstream (workspace) and doenstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (`kubectl kcp workload edge-sync`) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to `serviceAccountName` in the deployment manifest.
+In order for Syncer to sync resources between upstream (workspace) and doenstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (`kubectl kubestellar syncer-gen`) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to `serviceAccountName` in the deployment manifest.
 
-Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;`kubectl kcp workload edge-sync <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
+Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;`kubectl kubestellar syncer-gen <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
 
 The source code of the command is [{{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go).
 
@@ -112,9 +107,9 @@ The equivalent manual steps are as follows:
         ```
     c. Syncer image
         ```
-        image="quay.io/kcpedge/syncer:dev-2023-03-30"
+        image="quay.io/kubestellar/syncer:v0.2.2"
         ```
-9. Generate manifests to bootstrap Edge Syncer
+9. Generate manifests to bootstrap KubeStellar Syncer
     ```
     syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
     ```
@@ -160,11 +155,11 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
-- One CR is initially created by the command for Edge Syncer enablement in mb-ws (`kubectl kcp workload edge-syncer <name>`)
+- One CR is initially created by the command for KubeStellar Syncer enablement in mb-ws (`kubectl kubestellar syncer-gen <name>`)
   - The CR name is `<name>` and the contents are empty.
-  - This name is registered in the bootstrap manifests for Edge Syncer install and Edge Syncer is told to watch the CR of this name.
-- Currently Edge Syncer watches all CRs in the workspace
-  - Edge Syncer merges them and decides which resources are down/up synced based on the merged information. 
+  - This name is registered in the bootstrap manifests for KubeStellar Syncer install and KubeStellar Syncer is told to watch the CR of this name.
+- Currently KubeStellar Syncer watches all CRs in the workspace
+  - KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. 
   - This behavior may be changed to only watching the default CR once Placement Translater is to be the component that generates the CR from EdgePlacement: [related issue]({{ config.repo_url }}/pull/284#pullrequestreview-1375667129)
 
 #### SyncerConfig
@@ -192,8 +187,8 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
-- Currently Edge Syncer watches all CRs in the workspace
-  - Edge Syncer merges them and decides which resources are down/up synced based on the merged information. 
+- Currently KubeStellar Syncer watches all CRs in the workspace
+  - KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. 
 
 #### Downsyncing
 
@@ -231,7 +226,7 @@ We will verify if the design describled here could cover the following 4 scenari
 - I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by edge-syncer) 
 - I can deploy the denatured objects on mailbox workspace to Edge cluster by renaturing them automatically in edge-syncer. (workload deployment by renaturing)
 
-### Build Edge Syncer image
+### Build KubeStellar Syncer image
 
 Prerequisite
 - Install ko (https://ko.build/install/)
