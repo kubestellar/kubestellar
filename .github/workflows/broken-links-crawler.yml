@@ -42,8 +42,20 @@ jobs:
         
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
-          include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
+          website_url: https://docs.kubestellar.io/unstable
+          include_url_prefix: https://docs.kubestellar.io/unstable
+          exclude_url_prefix: 'mailto:,https://drive.google.com'
+          exclude_url_contained: '#__,/.,.svg'
+          resolve_before_filtering: 'true'
+          verbose: 'true'
+          max_retry_time: 30
+          max_retries: 5
+          max_depth: 4
+          
+      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+        with:
+          website_url: https://docs.kubestellar.io/stable
+          include_url_prefix: https://docs.kubestellar.io/stable
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
