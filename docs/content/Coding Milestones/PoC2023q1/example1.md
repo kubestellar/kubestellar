@@ -41,7 +41,7 @@ nodes:
 - role: control-plane
   extraPortMappings:
   - containerPort: 8081
-    hostPort: 8081
+    hostPort: 8094
 ```
 
 For the guilder cluster, which will get two workloads, create a file
@@ -973,7 +973,7 @@ $ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
 Check that the common workload on the florin cluster is working.
 
 ```shell
-$ curl http://localhost:8081
+$ curl http://localhost:8094
 <!DOCTYPE html>
 <html>
   <body>
