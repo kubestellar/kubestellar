@@ -40,6 +40,19 @@ jobs:
 #         env:
 #           GITHUB_CONTEXT: ${{ toJson(github) }}
 #         run: echo "$GITHUB_CONTEXT"
+
+      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+        with:
+          website_url: https://docs.kubestellar.io/${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          include_url_prefix: https://docs.kubestellar.io/${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          exclude_url_prefix: 'mailto:,https://drive.google.com'
+          exclude_url_contained: '#__,/.,.svg'
+          resolve_before_filtering: 'true'
+          verbose: 'true'
+          max_retry_time: 30
+          max_retries: 5
+          max_depth: 4
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
         
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
@@ -52,20 +65,7 @@ jobs:
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
-        if: github.event_name == 'pull_request'
-          
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
-        with:
-          website_url: https://docs.kubestellar.io/${{ github.event.inputs.branch }}
-          include_url_prefix: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
-          max_retry_time: 30
-          max_retries: 5
-          max_depth: 4
-        if: github.event_name != 'pull_request' && github.event_name != 'push'
+        if: github.event_name == 'pull_request' 
         
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
