@@ -27,23 +27,15 @@ jobs:
     name: broken-links-crawler
     runs-on: ubuntu-latest
     steps:
-      - name: Get branch name (merge)
-        if: github.event_name != 'pull_request'
-        shell: bash
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
-
-      - name: Get branch name (pull request)
-        if: github.event_name == 'pull_request'
-        shell: bash
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
-
-      - name: Debug
-        run: echo ${{ env.BRANCH_NAME }}
+#       - name: Dump GitHub context
+#         env:
+#           GITHUB_CONTEXT: ${{ toJson(github) }}
+#         run: echo "$GITHUB_CONTEXT"
         
-      - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.2
+      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
-          include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
+          website_url: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
+          include_url_prefix: https://docs.kubestellar.io/${{ github.event.pull_request.base.ref }}
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
@@ -51,3 +43,4 @@ jobs:
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
+          
