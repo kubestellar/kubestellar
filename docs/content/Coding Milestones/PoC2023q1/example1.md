@@ -1,8 +1,3 @@
----
-title: "2023q1 PoC Example Scenario"
-linkTitle: "2023q1 PoC Example Scenario"
----
-
 This doc attempts to show a simple example usage of the 2023q1 PoC.
 This doc is a work in progress.
 
@@ -201,7 +196,7 @@ Running the mailbox controller will be conveniently automated.
 Eventually.  In the meantime, you can use the edge-mc command shown
 here.
 
-```console
+```shell
 $ mailbox-controller -v=2
 ...
 I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
@@ -223,7 +218,7 @@ normally it would run continuously.
 
 You can get a listing of those mailbox workspaces as follows.
 
-```console
+```shell
 $ kubectl get Workspaces
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1   universal            Ready   https://192.168.58.123:6443/clusters/1najcltzt2nqax47   50s
@@ -233,7 +228,7 @@ NAME                                                       TYPE        REGION   
 More usefully, using custom columns you can get a listing that shows
 the _name_ of the associated SyncTarget.
 
-```console
+```shell
 $ kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
 NAME                                                       SYNCTARGET   CLUSTER
 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1   florin       1najcltzt2nqax47
@@ -243,7 +238,7 @@ NAME                                                       SYNCTARGET   CLUSTER
 Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
-```console
+```shell
 $ kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
 ```
@@ -255,7 +250,7 @@ guilder, an identity and authorizations for the edge syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
-```console
+```shell
 $ kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
@@ -285,7 +280,7 @@ The file written was, as mentioned in the output,
 cluster.  That will look something like the following; adjust as
 necessary to make kubectl manipulate **your** guilder cluster.
 
-```console
+```shell
 $ KUBECONFIG=~/.kube/config kubectl --context kind-guilder apply -f guilder-syncer.yaml
 namespace/kcp-edge-syncer-guilder-wfeig2lv created
 serviceaccount/kcp-edge-syncer-guilder-wfeig2lv created
@@ -298,7 +293,7 @@ deployment.apps/kcp-edge-syncer-guilder-wfeig2lv created
 
 You might check that the syncer is running, as follows.
 
-```console
+```shell
 $ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 kcp-edge-syncer-guilder-saaywsu5   kcp-edge-syncer-guilder-saaywsu5   1/1     1            1           52s
@@ -310,7 +305,7 @@ local-path-storage                 local-path-provisioner             1/1     1 
 
 Do the analogous stuff for the florin cluster.
 
-```console
+```shell
 $ kubectl kubestellar prep-for-syncer --imw root:imw-1 florin
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
@@ -337,7 +332,7 @@ Current workspace is "root:espw".
 
 And deploy the syncer in the florin cluster.
 
-```console
+```shell
 $ KUBECONFIG=~/.kube/config kubectl --context kind-florin apply -f florin-syncer.yaml 
 namespace/kcp-edge-syncer-florin-32uaph9l created
 serviceaccount/kcp-edge-syncer-florin-32uaph9l created
@@ -602,7 +597,7 @@ Eventually there will be automation that conveniently runs the
 scheduler.  In the meantime, you can run it by hand: switch to the
 ESPW and invoke the edge-mc command that runs the scheduler.
 
-```console
+```shell
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 $ kubestellar-scheduler
@@ -620,7 +615,7 @@ continually.
 
 Check out the SinglePlacementSlice objects as follows.
 
-```console
+```shell
 $ kubectl ws root:my-org:wmw-c
 Current workspace is "root:my-org:wmw-c".
 $ kubectl get SinglePlacementSlice -o yaml
@@ -674,7 +669,7 @@ Eventually there will be convenient automation running the placement
 translator.  In the meantime, you can run it manually: switch to the
 ESPW and use the edge-mc command that runs the placement translator.
 
-```console
+```shell
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 $ placement-translator
@@ -764,7 +759,7 @@ status: {}
 
 You can check that the workload got there too.
 
-```console
+```shell
 $ kubectl get ns
 NAME          STATUS   AGE
 commonstuff   Active   6m34s
@@ -778,7 +773,7 @@ commonstuff   commond   0/0     0            0           6m44s
 The guilder cluster gets both the common and special workloads.
 Examine guilder's `SyncerConfig` object and workloads as follows.
 
-```console
+```shell
 $ kubectl ws root:espw
 Current workspace is "root:espw".
 
@@ -888,7 +883,7 @@ workspace.  This is driven by the `SyncerConfig` object named
 Using the kubeconfig that `kind` modified, examine the florin cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
-```console
+```shell
 $ KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
 NAME                              STATUS   AGE
 commonstuff                       Active   6m51s
@@ -907,7 +902,7 @@ commonstuff                       commond                           1/1     1   
 Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.
 
-```console
+```shell
 $ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get ns | egrep NAME\|stuff
 NAME                               STATUS   AGE
 commonstuff                        Active   8m33s
@@ -921,7 +916,7 @@ specialstuff                       speciald                           1/1     1 
 
 Check that the common workload on the florin cluster is working.
 
-```console
+```shell
 $ curl http://localhost:8081
 <!DOCTYPE html>
 <html>
@@ -933,7 +928,7 @@ $ curl http://localhost:8081
 
 Check that the special workload on the guilder cluster is working.
 
-```console
+```shell
 $ curl http://localhost:8082
 <!DOCTYPE html>
 <html>
@@ -945,7 +940,7 @@ $ curl http://localhost:8082
 
 Check that the common workload on the guilder cluster is working.
 
-```console
+```shell
 $ curl http://localhost:8083
 <!DOCTYPE html>
 <html>
