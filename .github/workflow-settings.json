@@ -7,7 +7,7 @@
     "update TOC"
   ],
   "PROJECT": "KubeStellar",
-  "ISSUE_COLUMN": "To do",
+  "ISSUE_COLUMN": "Todo",
   "PR_COLUMN": "In progress",
   "PR_BODY_TITLE": "## Changes",
   "TOC_FOLDING": "1",
