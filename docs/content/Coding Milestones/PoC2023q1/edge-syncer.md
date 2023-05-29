@@ -21,7 +21,7 @@ Edge-syncer can be deployed on Edge cluster easily by the following steps.
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
     the `bin` of edge-mc.
-    For the Edge Syncer image, please refer to the section to [Build Edge Syncer image](#build-edge-syncer-image)
+    For the Edge Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:v0.2.2`. You can also create a syncer image from the source following [Build Edge Syncer Image](#build-edge-syncer-image).
 4. Deploy edge-syncer on an Edge cluster
 5. Syncer starts to run on the Edge cluster
     - Edge Syncer starts watching and consuming SyncerConfig
@@ -112,7 +112,7 @@ The equivalent manual steps are as follows:
         ```
     c. Syncer image
         ```
-        image="quay.io/kcpedge/syncer:dev-2023-03-30"
+        image="quay.io/kubestellar/syncer:v0.2.2"
         ```
 9. Generate manifests to bootstrap Edge Syncer
     ```
