@@ -1,8 +1,3 @@
----
-title: "KubeStellar Syncer"
----
-
-
 ![edge-syncer drawio](images/edge-syncer-overview.png)
 
 #### Registering KubeStellar Syncer on an Edge cluster
