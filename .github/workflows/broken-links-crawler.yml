@@ -50,4 +50,4 @@ jobs:
           verbose: 'true'
           max_retry_time: 30
           max_retries: 5
-          max_depth: 2
+          max_depth: 4
