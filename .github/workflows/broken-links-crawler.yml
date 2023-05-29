@@ -5,8 +5,6 @@ on:
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
-  # Pushes to branches do the full build + deployment
-  push:
     branches:
       - main
       - "release-*"
@@ -15,6 +13,17 @@ on:
       - "docs/**"
 #       - "pkg/**"
       - ".github/workflows/docs-gen-and-push.yaml"
+
+#   # Pushes to branches do the full build + deployment
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
   contents: write
