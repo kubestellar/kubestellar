@@ -3,9 +3,9 @@ repo_url: https://github.com/kcp-dev/edge-mc
 site_url: https://docs.kubestellar.io/
 
 repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
-edit_uri: edit/main/docs/content
-ks_branch: 'main'
-ks_tag: 'latest'
+edit_uri: edit/release-0.2/docs/content
+ks_branch: 'release-0.2'
+ks_tag: 'v0.2.2'
 
 # Site content
 docs_dir: 'content'
@@ -36,16 +36,16 @@ nav:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
-      - PoC2023q3:
-          - Details: Coding Milestones/PoC2023q3/outline.md
+      # - PoC2023q3:
+      #     - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
+      - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
   - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
   # # - Auto generated:
   #   - ... | auto-generated/*/*.md
-      # - Extended Example: Coding Milestones/PoC2023q1/example1.md
 
 theme:
   name: material
