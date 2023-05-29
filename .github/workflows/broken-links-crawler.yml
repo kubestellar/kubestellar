@@ -42,8 +42,8 @@ jobs:
         
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/unstable
-          include_url_prefix: https://docs.kubestellar.io/
+          website_url: https://docs.kubestellar.io/main
+          include_url_prefix: https://docs.kubestellar.io/main
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
@@ -54,8 +54,8 @@ jobs:
           
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/stable
-          include_url_prefix: https://docs.kubestellar.io/
+          website_url: https://docs.kubestellar.io/release-0.2
+          include_url_prefix: https://docs.kubestellar.io/release-0.2
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
