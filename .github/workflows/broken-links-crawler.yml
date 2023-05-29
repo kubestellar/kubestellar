@@ -52,7 +52,7 @@ jobs:
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
-          if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
           
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
@@ -65,5 +65,5 @@ jobs:
           max_retry_time: 30
           max_retries: 5
           max_depth: 4
-          if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request'
           
