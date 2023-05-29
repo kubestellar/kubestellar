@@ -22,15 +22,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternative Solutions
-      description: A clear and consise description of any alternative solutions or features that you've considered.
-      placeholder: I think another approach would be [...]
-    validations:
-      required: false
-
   - type: checkboxes
     id: contribute
     attributes:
