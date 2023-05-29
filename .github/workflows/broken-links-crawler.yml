@@ -31,6 +31,9 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: bash
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+  
+      - name: Debug
+        run: echo ${{ env.BRANCH_NAME_MERGE }}
 
       - name: Get branch name (pull request)
         if: github.event_name == 'pull_request'
@@ -38,12 +41,12 @@ jobs:
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
 
       - name: Debug
-        run: echo ${{ env.BRANCH_NAME }}
+        run: echo ${{ env.BRANCH_NAME_PULL }}
         
       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
         with:
-          website_url: https://docs.kubestellar.io/main
-          include_url_prefix: https://docs.kubestellar.io/main
+          website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME_MERGE }}
+          include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME_MERGE }}
           exclude_url_prefix: 'mailto:,https://drive.google.com'
           exclude_url_contained: '#__,/.,.svg'
           resolve_before_filtering: 'true'
@@ -52,14 +55,14 @@ jobs:
           max_retries: 5
           max_depth: 4
           
-      - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
-        with:
-          website_url: https://docs.kubestellar.io/release-0.2
-          include_url_prefix: https://docs.kubestellar.io/release-0.2
-          exclude_url_prefix: 'mailto:,https://drive.google.com'
-          exclude_url_contained: '#__,/.,.svg'
-          resolve_before_filtering: 'true'
-          verbose: 'true'
-          max_retry_time: 30
-          max_retries: 5
-          max_depth: 4
+#       - uses: ScholliYT/Broken-Links-Crawler-Action@fix-http-redirects
+#         with:
+#           website_url: https://docs.kubestellar.io/release-0.2
+#           include_url_prefix: https://docs.kubestellar.io/release-0.2
+#           exclude_url_prefix: 'mailto:,https://drive.google.com'
+#           exclude_url_contained: '#__,/.,.svg'
+#           resolve_before_filtering: 'true'
+#           verbose: 'true'
+#           max_retry_time: 30
+#           max_retries: 5
+#           max_depth: 4
