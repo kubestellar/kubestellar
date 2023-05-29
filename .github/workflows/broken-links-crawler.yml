@@ -1,0 +1,53 @@
+name: Broken Links Crawler
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+  # Pushes to branches do the full build + deployment
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+#       - "cmd/**"
+      - "docs/**"
+#       - "pkg/**"
+      - ".github/workflows/docs-gen-and-push.yaml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  broken-links-crawler:
+    name: broken-links-crawler
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch name (merge)
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+
+      - name: Get branch name (pull request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+
+      - name: Debug
+        run: echo ${{ env.BRANCH_NAME }}
+        
+      - uses: ScholliYT/Broken-Links-Crawler-Action@v3.2.2
+        with:
+          website_url: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
+          include_url_prefix: https://docs.kubestellar.io/${{ env.BRANCH_NAME }}
+          exclude_url_prefix: 'mailto:,https://drive.google.com'
+          exclude_url_contained: '#__,/.,.svg'
+          resolve_before_filtering: 'true'
+          verbose: 'true'
+          max_retry_time: 30
+          max_retries: 5
+          max_depth: 4
