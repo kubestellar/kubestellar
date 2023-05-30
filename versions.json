@@ -1,1 +1,1 @@
-[{"version": "v0.2", "title": "v0.2", "aliases": []}, {"version": "release-0.2", "title": "release-0.2", "aliases": ["stable"]}, {"version": "main", "title": "main", "aliases": ["latest", "unstable"]}]
+[{"version": "v0.2", "title": "v0.2", "aliases": []}, {"version": "release-0.2", "title": "release-0.2", "aliases": ["stable"]}, {"version": "main", "title": "main", "aliases": ["unstable", "latest"]}]
