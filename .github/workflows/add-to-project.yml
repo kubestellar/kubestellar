@@ -6,7 +6,7 @@ on:
       - opened
       - reopened
 env:
-  MY_GITHUB_TOKEN: ${{ secrets.GHP_ALL_PROJECT_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
   
 jobs:
   add-to-project:
