@@ -415,7 +415,7 @@ rm florin-syncer.yaml guilder-syncer.yaml
 kubectl ws root
 kubectl delete workspace example-imw
 kubectl ws root:my-org
-kubectl kubestellar remove wmw demo1
+kubectl kubestellar remove wmw example-wmw
 kubectl ws root
 kubectl delete workspace my-org
 kind delete cluster --name florin
