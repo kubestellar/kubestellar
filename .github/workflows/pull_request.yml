@@ -3,7 +3,9 @@ name: Pull Request
 on:
   pull_request:
     types: [opened]
-    
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+  
 jobs:
   assignAuthor:
     name: Assign author to PR
