@@ -3,4 +3,3 @@ title: "Details"
 ---
 
 # Coming Soon
-
