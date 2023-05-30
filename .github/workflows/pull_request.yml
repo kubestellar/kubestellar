@@ -9,4 +9,3 @@ jobs:
     steps:
       - name: Assign author to PR
         uses: technote-space/assign-author@v1
-
