@@ -18,7 +18,6 @@ jobs:
         with:
           PROJECT: ${{ env.PROJECT }}
           COLUMN: ${{ env.ISSUE_COLUMN }}
-          MILESTONE: ${{ env.MILESTONE }}
 
   assignAuthor:
     name: Assign author to issue
