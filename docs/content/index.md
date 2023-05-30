@@ -11,7 +11,7 @@ linkTitle: "Overview"
 
 ## Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
-[![Generate and push docs]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yaml/badge.svg)]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yaml)&nbsp;&nbsp;&nbsp;
+[![Generate and push docs]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier]({{ config.repo_url }}/actions/workflows/pr-verifier.yaml/badge.svg)]({{ config.repo_url }}/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
