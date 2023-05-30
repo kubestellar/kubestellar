@@ -1,0 +1,44 @@
+name: Generate and push docs
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+  # Pushes to branches do the full build + deployment
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+#       - "cmd/**"
+      - "docs/**"
+#       - "pkg/**"
+      - ".github/workflows/docs-gen-and-push.yaml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  generate-and-push:
+    name: Generate and push docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin gh-pages
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - run: make deploy-docs
