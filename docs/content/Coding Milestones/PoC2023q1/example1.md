@@ -922,6 +922,7 @@ $ curl http://localhost:8094
 <html>
   <body>
     This is a common web site.
+    Running in florin.
   </body>
 </html>
 ```
@@ -934,6 +935,7 @@ $ curl http://localhost:8097
 <html>
   <body>
     This is a special web site.
+    Running in guilder.
   </body>
 </html>
 ```
@@ -946,9 +948,11 @@ $ curl http://localhost:8096
 <html>
   <body>
     This is a common web site.
+    Running in guilder.
   </body>
 </html>
 ```
+
 
 ## Stage 5
 
