@@ -1254,7 +1254,7 @@
 <h4 id="what-kubestellar-syncer-gen-plugin-does">What kubestellar syncer-gen plugin does</h4>
 <p>In order for Syncer to sync resources between upstream (workspace) and doenstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (<code>kubectl kubestellar syncer-gen</code>) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.</p>
-<p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
+<p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
 <p>The equivalent manual steps are as follows:
 1. Generate UUID for Syncer identification
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uuidgen | tr &#39;[:upper:]&#39; &#39;[:lower:]&#39; | read syncer_id
@@ -1336,7 +1336,7 @@
   - Some objects are denatured if needed.
   - Other objects are as it is
 - APIExport/API Schema corresponding to CRD such as Kubernetes <a href="https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml">ClusterPolicyReport</a>.
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/hack/update-codegen-crds.sh#L57">here</a>). 
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt <a href="https://github.com/kcp-dev/edge-mc/blob/main/hack/update-codegen-crds.sh#L57">here</a>). 
 - EdgePlacement</p>
 <p><img alt="edge-syncer deploy" src="../images/edge-syncer-deploy.png" /></p>
 <p>After this, Edge-mc will put the following in the mailbox workspace.
@@ -1348,7 +1348,7 @@
   - The mailbox controller will put API Binding into the mailbox workspace.</p>
 <h4 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)</h4>
 <ul>
-<li>The example of EdgeSycnerConfig CR is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
+<li>The example of EdgeSycnerConfig CR is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kcp-dev/edge-mc/blob/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
 <li>The CR here is used from edge syncer. </li>
 <li>The CR is placed at mb-ws to define</li>
 <li>object selector</li>
@@ -1368,7 +1368,7 @@
 </ul>
 <h4 id="syncerconfig">SyncerConfig</h4>
 <ul>
-<li>The spec is defined in https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/apis/edge/v1alpha1/syncer-config.go</li>
+<li>The spec is defined in https://github.com/kcp-dev/edge-mc/blob/main/pkg/apis/edge/v1alpha1/syncer-config.go</li>
 <li><code>namespaceScope</code> field is for namespace scoped objects.<ul>
 <li><code>namespaces</code> is field for which namespaces to be downsynced.</li>
 <li><code>resources</code> is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.</li>
@@ -1387,7 +1387,7 @@
 <li><code>names</code> is an array of upsynced object name. Wildcard (<code>*</code>) is available.</li>
 </ul>
 </li>
-<li>The example CR is https://github.com/kcp-dev/edge-mc/blob/release-0.2/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml</li>
+<li>The example CR is https://github.com/kcp-dev/edge-mc/blob/main/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml</li>
 <li>The CR is used from edge syncer</li>
 <li>The CR is placed in mb-ws to define</li>
 <li>object selector</li>
