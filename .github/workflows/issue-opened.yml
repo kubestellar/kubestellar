@@ -13,6 +13,6 @@ jobs:
     - name: Assign new issues to the project
       uses: technote-space/create-project-card-action@v1
       with:
-        PROJECT: Backlog
+        PROJECT: KubeStellar
         COLUMN: Todo
         CHECK_ORG_PROJECT: true
