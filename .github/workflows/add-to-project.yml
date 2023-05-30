@@ -8,19 +8,6 @@ on:
 env:
   MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
   
-# jobs:
-#   add-to-project:
-#     name: Add issues to project
-#     runs-on: ubuntu-latest
-#     environment: projects
-#     steps:
-#       - name: add to project
-#         uses: actions/add-to-project@main
-#         with:
-#           project-url: https://github.com/orgs/kcp-dev/projects/12
-#           github-token: ${{ secrets.GHPROJECT_TOKEN_REPO }}
-
-
 jobs:
   create-update-project:
     name: Create/update project issue
@@ -28,7 +15,8 @@ jobs:
     steps:
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+#         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - uses: actions/checkout@v3
       - uses: actions/add-to-project@v0.3.0 # This adds the issue to the project
         with:
@@ -42,20 +30,3 @@ jobs:
           item-id: ${{ steps.add-project.outputs.itemId }} # Use the item-id output of the previous step
           field-keys: Status,Date Posted
           field-values: New,${{ steps.date.outputs.date }}
-          
-          
-#       - name: Assign NEW issues and NEW pull requests to project 2
-#         uses: srggrs/assign-one-project-github-action@1.2.1
-#         with:
-#           project: 'https://github.com/orgs/kcp-dev/projects/12'
-#           column_name: 'Todo'
-          
-#       - name: Move issue to 'To do' column
-#         uses: fojia/action-move-issues-to-column@master
-#         with:
-#           project: 'KubeStellar'
-#           column: 'Todo'
-#           owner: 'kcp-dev'
-#           type: 'org'
-#           github_token: ${{ secrets.GHPROJECT_TOKEN_REPO}}
-# #           marker: 'issue:todo'
