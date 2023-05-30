@@ -29,4 +29,4 @@ jobs:
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           item-id: ${{ steps.add-project.outputs.itemId }} # Use the item-id output of the previous step
           field-keys: Status,Date Posted
-          field-values: New,${{ steps.date.outputs.date }}
+          field-values: In Progress,${{ steps.date.outputs.date }}
