@@ -17,9 +17,12 @@ jobs:
           project-url: https://github.com/orgs/kcp-dev/projects/12
           github-token: ${{ secrets.GHPROJECT_TOKEN_REPO }}
       
-      - name: Move to In Progress
-        uses: kin/gh-action-move-issue-to-column@1.0
+      - name: Move issue to 'To do' column
+        uses: fojia/action-move-issues-to-column@master
         with:
-          access-token: "#{{ secrets.GHPROJECT_TOKEN_REPO }}"
-          project-name: "KubeStellar"
-          target-column: "Todo"
+          project: 'KubeStellar'
+          column: 'Todo'
+          owner: 'clubanderson'
+          type: 'org'
+          github_token: ${{ secrets.GHPROJECT_TOKEN_REPO}}
+#           marker: 'issue:todo'
