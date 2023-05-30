@@ -1,4 +1,4 @@
-name: Pull Request
+name: Add pull request to project and assign author
 
 on:
   pull_request:
