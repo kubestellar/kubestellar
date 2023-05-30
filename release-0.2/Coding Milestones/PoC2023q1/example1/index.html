@@ -1503,7 +1503,7 @@ host that hosts that container.</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">control-plane</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">extraPortMappings</span><span class="p">:</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8081</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8081</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8094</span>
 </code></pre></div>
 <p>For the guilder cluster, which will get two workloads, create a file
 named <code>guilder-config.yaml</code> with the following contents.  The workload
@@ -1515,9 +1515,9 @@ uses hostPort 8082 goes only in the guilder cluster.</p>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">control-plane</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">extraPortMappings</span><span class="p">:</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8081</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8083</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8096</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8082</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8082</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">hostPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8097</span>
 </code></pre></div>
 <p>Finally, create the two clusters with the following two commands,
 paying attention to <code>$KUBECONFIG</code> and, if that's empty,
@@ -2252,7 +2252,7 @@ Deployments.</p>
 <a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>specialstuff<span class="w">                       </span>speciald<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m55s
 </code></pre></div>
 <p>Check that the common workload on the florin cluster is working.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8081
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8094
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>&lt;html&gt;
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">  </span>&lt;body&gt;
@@ -2261,7 +2261,7 @@ Deployments.</p>
 <a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>&lt;/html&gt;
 </code></pre></div>
 <p>Check that the special workload on the guilder cluster is working.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8082
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8097
 <a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>&lt;html&gt;
 <a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">  </span>&lt;body&gt;
@@ -2270,7 +2270,7 @@ Deployments.</p>
 <a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>&lt;/html&gt;
 </code></pre></div>
 <p>Check that the common workload on the guilder cluster is working.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8083
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>$<span class="w"> </span>curl<span class="w"> </span>http://localhost:8096
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>&lt;html&gt;
 <a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">  </span>&lt;body&gt;
