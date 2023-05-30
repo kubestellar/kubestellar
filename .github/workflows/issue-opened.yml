@@ -18,6 +18,7 @@ jobs:
         with:
           PROJECT: ${{ env.PROJECT }}
           COLUMN: ${{ env.ISSUE_COLUMN }}
+          GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
 
   assignAuthor:
     name: Assign author to issue
