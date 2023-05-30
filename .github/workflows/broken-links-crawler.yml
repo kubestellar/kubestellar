@@ -12,7 +12,7 @@ on:
 #       - "cmd/**"
       - "docs/**"
 #       - "pkg/**"
-      - ".github/workflows/docs-gen-and-push.yaml"
+      - ".github/workflows/broken-links-crawler.yaml"
 
   # Pushes to branches do the full build + deployment
   push:
