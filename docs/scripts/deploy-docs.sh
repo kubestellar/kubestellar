@@ -33,11 +33,11 @@ else
     VERSION=${VERSION:-$(git rev-parse --abbrev-ref HEAD)}
   fi
 
-  if echo "$VERSION" | grep '^release-[0-9]'; then
-    VERSION=v$(echo "$VERSION" | cut -d - -f 2)
-  elif echo "$VERSION" | grep '^v[0-9]\+\.[0-9]\+'; then
-    VERSION=$(echo "$VERSION" | grep -o '^v[0-9]\+\.[0-9]\+')
-  fi
+#  if echo "$VERSION" | grep '^release-[0-9]'; then
+#    VERSION=v$(echo "$VERSION" | cut -d - -f 2)
+#  elif echo "$VERSION" | grep '^v[0-9]\+\.[0-9]\+'; then
+#    VERSION=$(echo "$VERSION" | grep -o '^v[0-9]\+\.[0-9]\+')
+#  fi
 fi
 
 MIKE_OPTIONS=()
