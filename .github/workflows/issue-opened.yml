@@ -1,28 +1,16 @@
+name: Add Issues to Project
+
 on:
   issues:
     types: [opened]
-
-name: Issue opened
+env:
+  GITHUB_API_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
 
 jobs:
-  assign:
-    name: Assign issues to project
+  add_to_project:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
     steps:
-      - uses: technote-space/load-config-action@v1
-        with:
-          CONFIG_FILENAME: workflow-settings.json, workflow-details.json
-          IGNORE_WARNING: 'true'
-      - uses: technote-space/create-project-card-action@v1
-        with:
-          PROJECT: ${{ env.PROJECT }}
-          COLUMN: ${{ env.ISSUE_COLUMN }}
-          GITHUB_TOKEN: ${{ secrets.NEW_ISSUE_ACTION_PAT }}
-
-  assignAuthor:
-    name: Assign author to issue
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - uses: technote-space/assign-author@v1
+    - name: Assign new issues to the project
+      uses: tcassou/project-bot@2.0.0
+      with:
+        project_url: 'https://github.com/orgs/kcp-dev/projects/12'
