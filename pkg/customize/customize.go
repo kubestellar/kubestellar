@@ -18,6 +18,7 @@ package customize
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 
@@ -48,13 +49,12 @@ func Customize(logger klog.Logger, input *unstructured.Unstructured, customizer 
 	}
 	output.SetUnstructuredContent(outputU)
 	if customizer != nil {
-		jrs := []jsonpath.Replacement{}
 		for _, repl := range customizer.Replacements {
 			where := repl.Path
 			if expandCustomizer {
 				where = expandString(where, defs)
 			}
-			jp, err := jsonpath.ParsePath(where)
+			jp, err := jsonpath.ParseString(where)
 			if err != nil {
 				logger.Error(err, "Failed to parse replacement path")
 				continue
@@ -69,14 +69,14 @@ func Customize(logger klog.Logger, input *unstructured.Unstructured, customizer 
 				logger.Error(err, "Failed to unmarshal replacement value", "replacementPath", repl.Path, "replacementValue", repl.Value, "valueStr", valueStr)
 				continue
 			}
-			jrs = append(jrs, jsonpath.Replacement{Path: jp, Value: valueAny})
+			outputAny := jsonpath.Apply(outputU, jp, true, func(any) any { return valueAny })
+			if ou, ok := outputAny.(map[string]any); ok {
+				outputU = ou
+			} else {
+				logger.Error(nil, "jsonpath.Apply returned unexpected type of object", "gotType", fmt.Sprintf("%T", outputAny), "gotValue", fmt.Sprintf("%#v", outputAny))
+			}
 		}
-		outputU, err := jsonpath.Update(outputU, jrs...)
-		if err != nil {
-			logger.Error(err, "Failed to do update")
-		} else {
-			output.SetUnstructuredContent(outputU)
-		}
+		output.SetUnstructuredContent(outputU)
 	}
 	return output
 }
