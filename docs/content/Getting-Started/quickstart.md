@@ -24,7 +24,7 @@ Table of contents:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c. Onboarding the clusters](#c-onboarding-the-clusters)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[e. Carrying on](#e-carrying-on)</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[e. Next Steps](#e-next-steps)</br>
 [3. Teardown the environment](#3-teardown-the-environment)</br>
 
 
@@ -380,7 +380,7 @@ NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and a
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](user-guide.md)
 
-### e. Carrying on
+### e. Next Steps
 
 What you just did is part of the example [on the
 website](../../Coding%20Milestones/PoC2023q1/example1/),
