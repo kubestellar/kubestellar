@@ -36,8 +36,8 @@ nav:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
-      # - PoC2023q3:
-      #     - Details: Coding Milestones/PoC2023q3/outline.md
+      - PoC2023q3:
+          - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
