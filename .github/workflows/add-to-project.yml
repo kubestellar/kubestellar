@@ -5,7 +5,9 @@ on:
     types:
       - opened
       - reopened
-
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.GHPROJECT_TOKEN_REPO }}
+  
 jobs:
   add-to-project:
     name: Add issues to project
