@@ -7,6 +7,7 @@
     "update TOC"
   ],
   "PROJECT": "KubeStellar",
+  "MILESTONE": "2023q3 PoC",
   "ISSUE_COLUMN": "Todo",
   "PR_COLUMN": "In progress",
   "PR_BODY_TITLE": "## Changes",
