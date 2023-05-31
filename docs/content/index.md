@@ -9,7 +9,7 @@ linkTitle: "Overview"
 <br/>
 <br/>
 
-## Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
+## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 [![Generate and push docs]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)&nbsp;&nbsp;&nbsp;
