@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#add-edge-mcs-workspaces-to-argo-cd-as-clusters" class="md-skip">
+        <a href="#add-kubestellars-workspaces-to-argo-cd-as-clusters" class="md-skip">
           Skip to content
         </a>
       
@@ -991,23 +991,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#add-edge-mcs-workspaces-to-argo-cd-as-clusters" class="md-nav__link">
-    Add edge-mc's workspaces to Argo CD as clusters
+  <a href="#add-kubestellars-workspaces-to-argo-cd-as-clusters" class="md-nav__link">
+    Add KubeStellar's workspaces to Argo CD as clusters
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-argo-cd-applications-against-edge-mcs-iwm" class="md-nav__link">
-    Create Argo CD Applications against edge-mc's IWM
+  <a href="#create-argo-cd-applications" class="md-nav__link">
+    Create Argo CD Applications
+  </a>
+  
+    <nav class="md-nav" aria-label="Create Argo CD Applications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-argo-cd-applications-against-kubestellars-iwm" class="md-nav__link">
+    Create Argo CD Applications against KubeStellar's IWM
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#create-argo-cd-application-against-edge-mcs-wmw" class="md-nav__link">
-    Create Argo CD Application against edge-mc's WMW
+        
+          <li class="md-nav__item">
+  <a href="#create-argo-cd-application-against-kubestellars-wmw" class="md-nav__link">
+    Create Argo CD Application against KubeStellar's WMW
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1221,23 +1234,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#add-edge-mcs-workspaces-to-argo-cd-as-clusters" class="md-nav__link">
-    Add edge-mc's workspaces to Argo CD as clusters
+  <a href="#add-kubestellars-workspaces-to-argo-cd-as-clusters" class="md-nav__link">
+    Add KubeStellar's workspaces to Argo CD as clusters
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-argo-cd-applications-against-edge-mcs-iwm" class="md-nav__link">
-    Create Argo CD Applications against edge-mc's IWM
+  <a href="#create-argo-cd-applications" class="md-nav__link">
+    Create Argo CD Applications
+  </a>
+  
+    <nav class="md-nav" aria-label="Create Argo CD Applications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-argo-cd-applications-against-kubestellars-iwm" class="md-nav__link">
+    Create Argo CD Applications against KubeStellar's IWM
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#create-argo-cd-application-against-edge-mcs-wmw" class="md-nav__link">
-    Create Argo CD Application against edge-mc's WMW
+        
+          <li class="md-nav__item">
+  <a href="#create-argo-cd-application-against-kubestellars-wmw" class="md-nav__link">
+    Create Argo CD Application against KubeStellar's WMW
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1274,13 +1300,16 @@
 
   <h1>ArgoCD</h1>
 
-<h4 id="add-edge-mcs-workspaces-to-argo-cd-as-clusters">Add edge-mc's workspaces to Argo CD as clusters</h4>
-<p>This includes the edge-mc Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
-The procedure for the two workspaces are similar.
-Let's take WMW as example:</p>
+<p>This document explains how to add KubeStellar's 'workspaces' as Argo CD's 'clusters'.</p>
+<h3 id="add-kubestellars-workspaces-to-argo-cd-as-clusters">Add KubeStellar's workspaces to Argo CD as clusters</h3>
+<p>As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are not identical with ordinary Kubernetes clusters.
+Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.</p>
+<p>For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
+The procedures are similar.
+Let's take WMW as an example:</p>
 <p>First, create <code>kube-system</code> namespace in the workspace.</p>
 <p>Second, make sure necessary apibindings exist in the workspace.
-For WMW, we need one for Kubernetes and one for edge-mc's edge API.</p>
+For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
 <p>Third, make sure the current context uses WMW, then identify the admin.kubeconfig.</p>
 <p>The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
@@ -1290,7 +1319,11 @@ For WMW, we need one for Kubernetes and one for edge-mc's edge API.</p>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">INFO[0001] ClusterRoleBinding &quot;argocd-manager-role-binding&quot; updated</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">Cluster &#39;https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo&#39; added</span>
 </code></pre></div></p>
-<h4 id="create-argo-cd-applications-against-edge-mcs-iwm">Create Argo CD Applications against edge-mc's IWM</h4>
+<h3 id="create-argo-cd-applications">Create Argo CD Applications</h3>
+<p>Once KubeStellar's workspaces are added, Argo CD Applications can be created as normal.
+There are a few examples listed <a href="https://github.com/edge-experiments/gitops-source/tree/main/edge-mc">here</a>,
+and the commands to use the examples are listed as follows.</p>
+<h4 id="create-argo-cd-applications-against-kubestellars-iwm">Create Argo CD Applications against KubeStellar's IWM</h4>
 <p>Create two Locations. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
@@ -1307,7 +1340,7 @@ For WMW, we need one for Kubernetes and one for edge-mc's edge API.</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">application &#39;synctargets&#39; created</span>
 </code></pre></div></p>
-<h4 id="create-argo-cd-application-against-edge-mcs-wmw">Create Argo CD Application against edge-mc's WMW</h4>
+<h4 id="create-argo-cd-application-against-kubestellars-wmw">Create Argo CD Application against KubeStellar's WMW</h4>
 <p>Create a Namespace. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
