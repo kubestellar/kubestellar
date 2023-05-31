@@ -106,38 +106,45 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Community/argocd/</loc>
+         <loc>https://docs.kubestellar.io/main/Community/partners/argocd/</loc>
          <lastmod>2023-05-31</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/argocd/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/argocd/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Community/fluxcd/</loc>
+         <loc>https://docs.kubestellar.io/main/Community/partners/fluxcd/</loc>
          <lastmod>2023-05-31</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/fluxcd/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/fluxcd/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Community/mvi/</loc>
+         <loc>https://docs.kubestellar.io/main/Community/partners/kyverno/</loc>
          <lastmod>2023-05-31</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/mvi/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/kyverno/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Community/openziti/</loc>
+         <loc>https://docs.kubestellar.io/main/Community/partners/mvi/</loc>
          <lastmod>2023-05-31</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/openziti/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/mvi/"/>
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Community/turbonomic/</loc>
+         <loc>https://docs.kubestellar.io/main/Community/partners/openziti/</loc>
          <lastmod>2023-05-31</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/turbonomic/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/openziti/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Community/partners/turbonomic/</loc>
+         <lastmod>2023-05-31</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Community/partners/turbonomic/"/>
          
     </url>
     <url>
