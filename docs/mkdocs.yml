@@ -40,11 +40,12 @@ nav:
           - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
   - Partners:
-      - ArgoCD: Community/argocd.md
-      - Turbonomic: Community/turbonomic.md
-      - MVI: Community/mvi.md
-      - FluxCD: Community/fluxcd.md
-      - OpenZiti: Community/openziti.md
+      - ArgoCD: Community/partners/argocd.md
+      - Turbonomic: Community/partners/turbonomic.md
+      - MVI: Community/partners/mvi.md
+      - FluxCD: Community/partners/fluxcd.md
+      - OpenZiti: Community/partners/openziti.md
+      - Kyverno: Community/partners/kyverno.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
