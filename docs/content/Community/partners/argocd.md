@@ -82,3 +82,7 @@ $ argocd app create edgeplacement \
 application 'edgeplacement' created
 ```
 
+# Other Resources
+Medium - [Sync 10,000 ArgoCD Applications in One Shot](https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b)<br/>
+Medium - [Sync 10,000 ArgoCD Applications in One Shot, by Yourself](https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad)<br/>
+Youtube - [ArgoCD Scale Experiment - KubeStellar Community Demo Day](https://www.youtube.com/watch?v=7XuEJF7--Sc&t=90s)
