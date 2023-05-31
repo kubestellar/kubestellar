@@ -1,12 +1,17 @@
-#### Add edge-mc's workspaces to Argo CD as clusters
-This includes the edge-mc Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
-The procedure for the two workspaces are similar.
-Let's take WMW as example:
+This document explains how to add KubeStellar's 'workspaces' as Argo CD's 'clusters'.
+
+### Add KubeStellar's workspaces to Argo CD as clusters
+As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are not identical with ordinary Kubernetes clusters.
+Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.
+
+For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
+The procedures are similar.
+Let's take WMW as an example:
 
 First, create `kube-system` namespace in the workspace.
 
 Second, make sure necessary apibindings exist in the workspace.
-For WMW, we need one for Kubernetes and one for edge-mc's edge API.
+For WMW, we need one for Kubernetes and one for KubeStellar's edge API.
 
 Third, make sure the current context uses WMW, then identify the admin.kubeconfig.
 
@@ -20,7 +25,12 @@ INFO[0001] ClusterRoleBinding "argocd-manager-role-binding" updated
 Cluster 'https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo' added
 ```
 
-#### Create Argo CD Applications against edge-mc's IWM
+### Create Argo CD Applications
+Once KubeStellar's workspaces are added, Argo CD Applications can be created as normal.
+There are a few examples listed [here](https://github.com/edge-experiments/gitops-source/tree/main/edge-mc),
+and the commands to use the examples are listed as follows.
+
+#### Create Argo CD Applications against KubeStellar's IWM
 Create two Locations. The command and output should be similar to
 ```console
 $ argocd app create locations \
@@ -41,7 +51,7 @@ $ argocd app create synctargets \
 application 'synctargets' created
 ```
 
-#### Create Argo CD Application against edge-mc's WMW
+#### Create Argo CD Application against KubeStellar's WMW
 Create a Namespace. The command and output should be similar to
 ```console
 $ argocd app create namespace \
