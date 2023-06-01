@@ -4,7 +4,7 @@ Onboarding and Offboarding Policy
 Effective Date: June 1st, 2023
 
 1. Introduction:
-The purpose of this policy is to ensure a smooth onboarding and offboarding process for members of the KubeStellar GitHub organization. This policy applies to all individuals joining or leaving the organization, including employees, contractors, and community contributors.
+The purpose of this policy is to ensure a smooth onboarding and offboarding process for members of the KubeStellar GitHub organization. This policy applies to all individuals joining or leaving the organization, including community contributors.
 
 2. Onboarding Process:
 2.1. Access Request:
