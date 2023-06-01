@@ -18,7 +18,11 @@ The purpose of this policy is to ensure a smooth onboarding and offboarding proc
 - The maintainers will evaluate the request based on the member's role, contributions, and adherence to the organization's code of conduct.
 - Upon approval, the member will receive an invitation to join the KubeStellar GitHub organization.
 
-2.3. Orientation:
+2.3. Getting Help:
+- The organization's maintainers are here to help contributors be efficient and confident in their collaboration effort. If you need help you can reach out to the maintainers on slack at the [KubeStellar-dev channel](https://kubernetes.slack.com/archives/C058SUSL5AA).
+- Be sure to join the [KubeStellar-dev Google Group](https://groups.google.com/g/kubestellar-dev) to get access to important artifacts like proposals, diagrams, and meeting invitations.
+
+2.4. Orientation:
 - Newly onboarded members will be provided with [contribution guidelines](https://github.com/kcp-dev/edge-mc/CONTRIBUTING.MD).
 - The guide will include instructions on how to access relevant repositories, participate in discussions, and contribute to ongoing projects.
 
