@@ -19,7 +19,7 @@ We can't wait to collaborate with you!
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
-Check out our [Quickstart Guide](https://docs.kubestellar.io/main/Getting-Started/quickstart/)
+Check out our [QuickStart Guide](https://docs.kubestellar.io/main/Getting-Started/quickstart/)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
