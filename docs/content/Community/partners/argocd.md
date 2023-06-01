@@ -30,7 +30,7 @@ Once KubeStellar's workspaces are added, Argo CD Applications can be created as 
 There are a few examples listed [here](https://github.com/edge-experiments/gitops-source/tree/main/edge-mc),
 and the commands to use the examples are listed as follows.
 
-#### Create Argo CD Applications against KubeStellar's IWM
+#### Create Argo CD Applications against KubeStellar's IMW
 Create two Locations. The command and output should be similar to
 ```console
 $ argocd app create locations \
