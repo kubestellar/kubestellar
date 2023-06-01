@@ -8,7 +8,7 @@ linkTitle: "KubeStellar Quickstart Guide"
 
 ## Demo Video
 
-Watch this video to see step-by-step demo of KubeStellar running and follow the instrunctions below to get your own KubeStellar quickly started.
+Watch this video to see a step-by-step demo of KubeStellar running and follow the instructions below to get your own KubeStellar started quickly.
 
 <a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
  <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
@@ -376,7 +376,7 @@ For `florin`:
 curl http://localhost:8094
 ```
 
-which may yield the error below depending how long it takes for Apache HTTP Server pod to get synchronized and running:
+which may yield the error below, depending on how long it takes for the Apache HTTP Server pod to get synchronized and running:
 
 ```console
 curl: (52) Empty reply from server
