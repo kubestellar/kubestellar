@@ -4,7 +4,7 @@ matrix:
     lang: en
   dictionary:
     wordlists:
-    - spellcheck/.wordlist.txt
+    - .github/spellcheck/.wordlist.txt
     encoding: utf-8
   pipeline:
   - pyspelling.filters.markdown:
