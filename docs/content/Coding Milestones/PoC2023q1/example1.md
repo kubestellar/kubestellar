@@ -9,6 +9,39 @@ This example is presented in stages.  The controllers involved are
 always maintaining relationships.  This document focuses on changes as
 they appear in this example.
 
+## Continuing from the QuickStart
+
+If you navigated here from the QuickStart, be sure that the environment that was created 
+in the QuickStart is completely removed. 
+
+To remove the environment, delete the IMW and WMW and kind clusters by running the following commands:
+
+```shell
+rm florin-syncer.yaml guilder-syncer.yaml
+kubectl ws root
+kubectl delete workspace example-imw
+kubectl ws root:my-org
+kubectl kubestellar remove wmw example-wmw
+kubectl ws root
+kubectl delete workspace my-org
+kind delete cluster --name florin
+kind delete cluster --name guilder
+```
+
+Stop and uninstall KubeStellar using the following command:
+
+```shell
+kubestellar stop
+```
+
+Stop and uninstall KubeStellar and kcp with the following command:
+
+```shell
+remove-kubestellar
+```
+
+Now you may continue with the Extended Example. 
+
 ## Stage 1
 
 ![Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
@@ -86,7 +119,10 @@ In the shell commands in all the following steps it is assumed that
 noted that the florin or guilder cluster is being accessed.
 
 It is also assumed that you have the usual kcp kubectl plugins on your
-`$PATH`.
+`$PATH`.  The `bin` directory added to your `$PATH` variable should contain `kcp`, 
+`kubectl-kcp`, and `kubectl-workspace`.  Additionally, if you move the bins 
+into a different directory, it’s helpful to do `ln -s kubectl-workspace 
+kubectl-ws` within that directory to create a symbolic link.
 
 ### Create an inventory management workspace.
 
@@ -230,7 +266,8 @@ NAME                                                       TYPE        REGION   
 ```
 
 More usefully, using custom columns you can get a listing that shows
-the _name_ of the associated SyncTarget.
+the _name_ of the associated SyncTarget.  It is helpful to store the names
+of the SyncTargets for use later on in this example.
 
 ```shell
 $ kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
@@ -721,7 +758,7 @@ After it stops logging stuff, wait another minute and then you can ^C
 it or use another shell to continue exploring.
 
 The florin cluster gets only the common workload.  Examine florin's
-`SyncerConfig` as follows.
+`SyncerConfig` as follows.  Utilize florin's name, which you stored in Stage 1, here. 
 
 ```shell
 $ kubectl ws 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
@@ -811,7 +848,8 @@ commonstuff   commond   0/0     0            0           6m44s
 ```
 
 The guilder cluster gets both the common and special workloads.
-Examine guilder's `SyncerConfig` object and workloads as follows.
+Examine guilder's `SyncerConfig` object and workloads as follows.  Be sure to use
+the name that you stored in Stage 1.
 
 ```shell
 $ kubectl ws root:espw
