@@ -106,7 +106,7 @@ kind create cluster --name guilder --config guilder-config.yaml
 
 ### Start kcp
 
-Download and build or install [kcp](https://github.com/kcp-dev/kcp),
+Download and build or install [kcp](https://github.com/kcp-dev/kcp/releases),
 according to your preference.
 
 In some shell that will be used only for this purpose, issue the `kcp
