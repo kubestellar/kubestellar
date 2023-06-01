@@ -422,7 +422,7 @@ from here, doing the steps for the special workload.
 
 ## 3. Teardown the environment
 
-To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
+To remove the example usage, delete the IMW and WMW and kind clusters by running the following commands:
 
 ```shell
 rm florin-syncer.yaml guilder-syncer.yaml
@@ -436,7 +436,7 @@ kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
 
-Stop and uninstall KubeStellar use the following command:
+Stop and uninstall KubeStellar using the following command:
 
 ```shell
 kubestellar stop
