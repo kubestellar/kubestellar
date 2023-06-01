@@ -17,7 +17,7 @@
 KubeStellar is an opensource project focused on concerns arising multicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
 
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
-- Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
+- Runtime interdependence: An edge location may need to operate independently of the center and other edge locations​
 - Non-namespaced objects: need general support
 - Cardinality of destinations: A source object may propagate to many thousands of destinations. 
 
