@@ -21,7 +21,7 @@ linkTitle: "Overview"
   </a>
 ## What is KubeStellar?
 
-We are an opensource community focused on creating a flexible solution for challenges associated with mutlicluster configuration management for edge, multi-cloud, and hybrid cloud:
+We are an opensource community focused on creating a flexible solution for challenges associated with multicluster configuration management for edge, multi-cloud, and hybrid cloud:
 
   - Disconnected Operation: clusters don't always have connectivity, we get it
 
