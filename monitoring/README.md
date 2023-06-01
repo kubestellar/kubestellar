@@ -4,7 +4,7 @@
 
 
 ### Description
-This example shows how to deploy monitoring tools (prometheus, grafana and node exporter) for KCP-Edge components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KCP edge. A Prometheus agent is deployed in the edge regions running the edge pclusters
+This example shows how to deploy monitoring tools (Prometheus, Grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KCP edge. A Prometheus agent is deployed in the edge regions running the edge pclusters
 
 1. Create your hosts file with the list of target hosts (KCP server & Edge pclusters)
 
@@ -17,7 +17,7 @@ This example shows how to deploy monitoring tools (prometheus, grafana and node 
 192.160.56.12
 ```
 
-2. Configure the prometheus targets endpoints:
+2. Configure the Prometheus targets endpoints:
 
 a) Prometheus Server: edit the file roles/prometheus/templates/prometheus-config.yaml.j2
 
@@ -72,7 +72,7 @@ remote_write:
 ```
 
 
-3. Install prometheus server, grafana and node exporter to the KCP server host using the following playbook:
+3. Install Prometheus server, grafana and node exporter to the KCP server host using the following playbook:
 
 ```
 - hosts: kcp-server
@@ -91,7 +91,7 @@ remote_write:
 ansible-playbook -i hosts monitoring-kcpServer.yaml
 ```
 
-4. Install prometheus agent and node exporter to an edge pcluster using the following playbook:
+4. Install Prometheus agent and node exporter to an edge pcluster using the following playbook:
 
 ```
 - hosts: edge-pclusters
