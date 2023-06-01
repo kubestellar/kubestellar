@@ -1,3 +1,3 @@
 ---
 # defaults file for roles/grafana
-grafana_admin_password: "kcp-edge"
+grafana_admin_password: ""
