@@ -19,7 +19,7 @@ We can't wait to collaborate with you!
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
-Check out our [Quickstart Guide](../../Getting-Started/quickstart/)
+Check out our [QuickStart Guide](../../Getting-Started/quickstart/)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
@@ -60,7 +60,7 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 ## Testing Locally
 
-Our [QUICKSTART](../../Getting-Started/quickstart/)
+Our [QuickStart](../../Getting-Started/quickstart/)
  guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
@@ -88,9 +88,9 @@ needs to add checking for use of incompatible releases.
 ### Testing the bootstrap script against an upcoming release
 
 Prior to making a new release, there needs to be testing that the
-current bootstrap script works with the exeutable behavior that will
+current bootstrap script works with the executable behavior that will
 appear in the new release.  To support this we will add an option to
-the bootstrrap script that enables it to use a local release archive
+the bootstrap script that enables it to use a local release archive
 instead of fetching an archive of an actual release from github.
 
 ## Licensing
