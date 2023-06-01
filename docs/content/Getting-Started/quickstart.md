@@ -5,6 +5,15 @@ linkTitle: "KubeStellar Quickstart Guide"
 
 <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar">
 
+
+## Demo Video
+
+Watch this video to see a step-by-step demo of KubeStellar running and follow the instructions below to get your own KubeStellar started quickly.
+
+<a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
+ <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
+</a>
+
 ## Estimated Time: 
    ~3 minutes
    
@@ -366,7 +375,14 @@ For `florin`:
 ```shell
 curl http://localhost:8094
 ```
-which should yield:
+
+which may yield the error below, depending on how long it takes for the Apache HTTP Server pod to get synchronized and running:
+
+```console
+curl: (52) Empty reply from server
+```
+
+If you are getting the error then wait 1-2 minutes and run `curl` again to see the expected result:
 
 ```html
 <!DOCTYPE html>
@@ -376,14 +392,13 @@ which should yield:
   </body>
 </html>
 ```
-NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait 2 minutes and attempt curl again.  It takes a minute for the Apache HTTP Server to synchronize and start.
 
 For `guilder`:
 
 ```shell
 curl http://localhost:8096
 ```
-which should yield:
+which should eventually yield:
 
 ```html
 <!DOCTYPE html>
@@ -394,7 +409,6 @@ which should yield:
 </html>
 ```
 
-NOTE: if you receive the error: 'curl: (52) Empty reply from server', wait and attempt curl again.  It takes some time for the Apache HTTP Server to synchronize and start.
 
 Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](user-guide.md)
 
