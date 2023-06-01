@@ -3,24 +3,24 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request:
-    branches:
-      - main
-      - "release-*"
-    paths:
-#       - "cmd/**"
-      - "docs/**"
-#       - "pkg/**"
-      - ".github/workflows/spellcheck_action.yaml"
-  push:
-    branches:
-      - main
-      - "release-*"
-    paths:
-#       - "cmd/**"
-      - "docs/**"
-#       - "pkg/**"
-      - ".github/workflows/spellcheck_action.yaml"
+#   pull_request:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/spellcheck_action.yaml"
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/spellcheck_action.yaml"
 
 jobs:
   build:
