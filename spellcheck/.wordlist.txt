@@ -217,6 +217,7 @@ usr
 volumeMounts
 pathname
 EdgeSyncConfig
+EdgeSyncConfigs
 UUID
 APISchema
 ClusterPolicyReport
@@ -275,6 +276,9 @@ EOL
 OLM
 PolicyReport
 Runtime
+apiexport
+clusterid
+ipaddr
 configMap
 testdata
 Customizer
@@ -326,3 +330,18 @@ ter
 prometheus
 grafana
 kubestellar
+Inclusivity
+CoC
+linenums
+edgesyncer
+ie
+quickstart
+locationName
+ownerReferences
+syncTargetName
+IncludeNamespaceObject
+ownerReferences
+yyyy
+Choudhary
+Mishi
+mishi
