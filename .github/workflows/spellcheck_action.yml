@@ -1,0 +1,38 @@
+name: Spellcheck Action
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+#   pull_request:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/spellcheck_action.yaml"
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/spellcheck_action.yaml"
+
+jobs:
+  build:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+    # The checkout step
+    - uses: actions/checkout@v3
+    - uses: rojopolis/spellcheck-github-actions@v0
+      name: Spellcheck
+      with:
+        config_path: .github/spellcheck/.spellcheck.yml # put path to configuration file here
+        task_name: Markdown
+#         source_files: docs/content/*
+
