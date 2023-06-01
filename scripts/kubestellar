@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 (start or stop | -v)
+# Usage: $0 (init or start or stop | -v)
 
 # Purpose: control whether the controllers are running, setting up the ESPW if necessary.. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
@@ -86,7 +86,55 @@ then
     exit 1
 fi
 
+# current ws at start does not matter, is root:compute on return
+function ensure_compute_status_updateable() {
+    kubectl ws root:compute &> /dev/null
+    kubectl apply -f - &> /dev/null <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: compute:apiexport:kubernetes:maximal-permission-policy-extended
+rules:
+- apiGroups:
+  - ""
+  - apps
+  - networking.k8s.io
+  resources:
+  - services/status
+  - pods/status
+  - ingresses/status
+  - deployments/status
+  verbs:
+  - update
+  - patch
+- apiGroups:
+  - apps
+  resources:
+  - deployments/scale
+  verbs:
+  - get
+  - update
+  - patch
+EOF
+    kubectl apply -f - &> /dev/null <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: compute:authenticated:apiexport:kubernetes:maximal-permission-policy-extended
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: compute:apiexport:kubernetes:maximal-permission-policy-extended
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: apis.kcp.io:binding:system:authenticated
+EOF
+}
+
+# current ws at start does not matter, is ESPW on return
 function ensure_espw() {
+    kubectl ws root &> /dev/null
     if kubectl get Workspace "$espw_name" &> /dev/null; then
 	echo "espw workspace already exists -- using it:"
 	kubectl ws "$espw_name"
@@ -97,9 +145,8 @@ function ensure_espw() {
     echo "Finished populating the espw with kubestellar apiexports"   
 }
 
-kubectl ws root &> /dev/null
-
 if [ "$subcommand" == init ]; then
+    ensure_compute_status_updateable
     ensure_espw
     exit
 fi
@@ -130,6 +177,7 @@ if [ $subcommand == stop ]; then
    exit 0
 fi
 
+ensure_compute_status_updateable
 ensure_espw
 
 wait_for_process(){
