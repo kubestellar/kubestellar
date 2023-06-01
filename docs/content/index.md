@@ -40,7 +40,7 @@ We are an opensource community focused on creating a flexible solution for chall
 - Status from many destinations​: Center clients may need a way to access status from individual edge copies
 - Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
-## Quickstart
+## QuickStart
 
 <!-- <div class="grid cards" markdown>
 
