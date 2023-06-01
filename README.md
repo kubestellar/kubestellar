@@ -36,9 +36,9 @@ KubeStellar is an opensource project focused on concerns arising multicluster co
 - Status from many destinations​: Center clients may need a way to access status from individual edge copies
 - Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
-## Quickstart
+## QuickStart
 
-Checkout our [Quickstart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
+Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ## Contributing
 
