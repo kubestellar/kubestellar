@@ -89,9 +89,9 @@ needs to add checking for use of incompatible releases.
 ### Testing the bootstrap script against an upcoming release
 
 Prior to making a new release, there needs to be testing that the
-current bootstrap script works with the exeutable behavior that will
+current bootstrap script works with the executable behavior that will
 appear in the new release.  To support this we will add an option to
-the bootstrrap script that enables it to use a local release archive
+the bootstrap script that enables it to use a local release archive
 instead of fetching an archive of an actual release from github.
 
 ## Licensing
