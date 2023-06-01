@@ -92,6 +92,7 @@ get_arch_type() {
   case "$HOSTTYPE" in
       x86_64*)  echo "amd64" ;;
       aarch64*) echo "arm64" ;;
+      arm64*)   echo "arm64" ;;
       *)        echo "Unsupported architecture type: $HOSTTYPE" >&2 ; exit 1 ;;
   esac
 }
