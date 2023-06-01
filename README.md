@@ -3,7 +3,7 @@
 <br/>
 
 # KubeStellar
-## Mutlicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
+## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/><br/><br/>
 [![GitHub Pages](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/gh-pages.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
@@ -14,7 +14,7 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-KubeStellar is an opensource project focused on concerns arising mutlicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
+KubeStellar is an opensource project focused on concerns arising multicluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
 
 - Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
 - Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
