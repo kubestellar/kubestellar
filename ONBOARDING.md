@@ -3,6 +3,8 @@ Onboarding and Offboarding Policy
 
 Effective Date: June 1st, 2023
 
+  At KubeStellar we love our contributors.  Our contributors can make various valuable contributions to our project. They can actively engage in code development by submitting pull requests, implementing new features, or fixing bugs. Additionally, contributors can assist with testing, CICD, documentation, providing clear and comprehensive guides, tutorials, and examples. Moreover, they can contribute to the project by participating in discussions, offering feedback, and helping to improve overall community engagement and collaboration.
+
 1. Introduction:
 The purpose of this policy is to ensure a smooth onboarding and offboarding process for members of the KubeStellar GitHub organization. This policy applies to all individuals joining or leaving the organization, including community contributors.
 
