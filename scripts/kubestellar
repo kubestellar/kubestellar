@@ -53,7 +53,7 @@ while (( $# > 0 )); do
     (-X)
 	set -x;;
     (-h|--help)
-        echo "Usage: $0 [init | start | stop][--log-folder log_folder] [-V|--verbose] [-X]"
+        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -106,15 +106,8 @@ rules:
   - pods/status
   - ingresses/status
   - deployments/status
-  verbs:
-  - update
-  - patch
-- apiGroups:
-  - apps
-  resources:
   - deployments/scale
   verbs:
-  - get
   - update
   - patch
 EOF
