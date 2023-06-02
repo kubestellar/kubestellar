@@ -1443,15 +1443,20 @@ only used in the <code>start</code> subcommand.</p>
 <ul>
 <li><code>-V</code> or <code>--verbose</code>: calls for more verbose output.  This is a
   binary choice, not a matter of degree.</li>
+<li><code>-X</code>: turns on echoing of script lines</li>
 <li><code>--log-folder $pathname</code>: says where to put the logs from the
   controllers.  Will be <code>mkdir -p</code> if absent.  Defaults to
   <code>${PWD}/kubestellar-logs</code>.</li>
 <li><code>-h</code> or <code>--help</code>: print a brief usage message and terminate.</li>
 </ul>
 <h3 id="kubestellar-init">Kubestellar init</h3>
-<p>This subcommand is used after installation to finish setup.</p>
-<p>This subcommand ensures that the edge service provider workspace
-(ESPW) exists and has the required contents.</p>
+<p>This subcommand is used after installation to finish setup and does
+two things.  One is to ensure that the edge service provider workspace
+(ESPW) exists and has the required contents.  The other is to ensure
+that the <code>root:compute</code> workspace has been extended with the RBAC
+objects that enable the syncer to propagate reported state for
+downsynced objects defined by the APIExport from that workspace of a
+subset of the Kubernetes API for managing containerized workloads.</p>
 <h3 id="kubestellar-start">KubeStellar start</h3>
 <p>This subcommand is used after installation or process stops.</p>
 <p>This subcommand stops any running kubestellar controllers and then
