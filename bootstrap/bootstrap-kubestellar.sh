@@ -394,7 +394,7 @@ else
     kubectl ws root > /dev/null
 fi
 
-echo "< KubeStellar bootstrap completed succesfully >-"
+echo "< KubeStellar bootstrap completed successfully >-"
 if [ "$user_exports" != "" ]; then
-    echo "Please create/update the following enviroment variables: $user_exports"
+    echo "Please create/update the following environment variables: $user_exports"
 fi
