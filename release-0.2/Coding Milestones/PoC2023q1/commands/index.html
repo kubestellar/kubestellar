@@ -1251,7 +1251,7 @@ only used in the <code>start</code> subcommand.</p>
 (ESPW) exists and has the required contents.</p>
 <h3 id="kubestellar-start">KubeStellar start</h3>
 <p>This subcommand is used after installation or process stops.</p>
-<p>This subcommand stops any running kubesteallar controllers and then
+<p>This subcommand stops any running kubestellar controllers and then
 starts them all.  It also does the same thing as <code>kubestellar init</code>.</p>
 <h3 id="kubestellar-stop">KubeStellar stop</h3>
 <p>This subcommand undoes the primary function of <code>kubestellar start</code>,
@@ -1294,7 +1294,7 @@ with making that pair of objects.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
 </code></pre></div>
 <p>Here <code>objname</code> is the name for the SyncTarget object and also the name
-for the Location object.  This commad ensures that these objects exist
+for the Location object.  This command ensures that these objects exist
 and have at least the given labels.</p>
 <p>The flags can also appear anywhere later on the command line.</p>
 <p>The acceptable flags include all those of <code>kubectl</code> except for
@@ -1357,7 +1357,7 @@ command line syntax and semantics except that the
 <code>labelname=labelvalue</code> pairs do not appear.</p>
 <p>This command does not depend on the action of any of the edge-mc
 (KubeStellar) controllers.</p>
-<p>The following sesssion demonstrates usage, including idemptotency.</p>
+<p>The following session demonstrates usage, including idempotency.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
@@ -1484,7 +1484,7 @@ see <a href="../outline/#data-objects">the categorization in the design</a>.</p>
 <p>The usage synopsis for this command is as follows.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>parent_pathname<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div>
-<p>Here <code>parent_pathname</code> is the workspace pathame of the parent of the
+<p>Here <code>parent_pathname</code> is the workspace pathname of the parent of the
 WMW, and <code>wm_workspace_name</code> is the name (not pathname, just a bare
 one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
 will be <code>parent_pathname:wm_workspace_name</code>.</p>
@@ -1495,7 +1495,7 @@ will be <code>parent_pathname:wm_workspace_name</code>.</p>
 <ul>
 <li><code>--with-kube boolean</code>: specifies whether or not the WMW should
   include an APIBinding to the Kubernetes API for management of
-  containeried workloads.</li>
+  containerized workloads.</li>
 </ul>
 <p>This script works in idempotent style, doing whatever work remains to
 be done.</p>
@@ -1594,10 +1594,10 @@ and does the following things.</p>
   KubeStellar.</li>
 <li><code>--os $OS</code>: specifies the operating system to use in selecting the
   executables to download and install.  Choices are <code>linux</code> and
-  <code>darwin</code>.  Autodetected if omitted.</li>
+  <code>darwin</code>.  Auto-detected if omitted.</li>
 <li><code>--arch $IAS</code>: specifies the instruction set architecture to use in
   selecting the executables to download and install.  Choices are
-  <code>amd64</code> and <code>arm64</code>.  Autodetected if omitted.</li>
+  <code>amd64</code> and <code>arm64</code>.  Auto-detected if omitted.</li>
 <li><code>--bind-address $IPADDR</code>: directs that the kcp server (a) write that
   address for itself in the kubeconfig file that it constructs and (b)
   listens only at that address.  The default is to pick one of the
@@ -1608,7 +1608,7 @@ and does the following things.</p>
   working directory.  The download of kcp, if any, will go in
   <code>$install_parent_dir/kcp</code>.  The download of KubeStellar will go in
   <code>$install_parent_dir/kubestellar</code>.</li>
-<li><code>-V</code> or <code>--verbose</code>: incrases the verbosity of output.  This is a
+<li><code>-V</code> or <code>--verbose</code>: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.</li>
 <li><code>-X</code>: makes the script <code>set -x</code> internally, for debugging.</li>
 <li><code>-h</code> or <code>--help</code>: print brief usage message and exit.</li>
@@ -1617,9 +1617,9 @@ and does the following things.</p>
 the relevant places under <code>$install_parent_dir</code> and (b) enhance the
 <code>PATH</code>, and <code>KUBECONFIG</code> in the case of kcp, environment variables in
 the shell running the script.  Of course, if you run the script in a
-subshell then those environment effects terminate with that subshell;
-this script also prints out messages showing how to update the
-environment in another shell.</p>
+sub-shell then those environment effects terminate with that
+sub-shell; this script also prints out messages showing how to update
+the environment in another shell.</p>
 <h2 id="install-kcp-and-its-kubectl-plugins">Install kcp and its kubectl plugins</h2>
 <p>This script is directly available at <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kcp-with-plugins.sh">https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh</a> and does the following things.</p>
 <ul>
@@ -1649,7 +1649,7 @@ optional.</p>
 already on your <code>$PATH</code> then this script will print out a message
 telling you to add it.</p>
 <h2 id="install-kubestellar">Install KubeStellar</h2>
-<p>This script is direclty available at
+<p>This script is directly available at
 <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh">https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh</a>
 and will download and install KubeStellar.</p>
 <p>This script accepts the following command line arguments; all are

@@ -1097,7 +1097,7 @@ the workspace (which is always <code>root</code>, as far as I know) that has thi
 APIExport and is authorized to read its view.  Another client config
 is needed to give read/write access to all the mailbox workspaces, so
 that the controller can create <code>APIBinding</code> objects to the edge
-APIExport in those workspaces; this should be a cliet config that is
+APIExport in those workspaces; this should be a client config that is
 able to read/write in all clusters.  For example, that is in the
 kubeconfig context named <code>base</code> in the kubeconfig created by <code>kcp
 start</code>.  Finally, the controller also needs a kube client config that
