@@ -106,6 +106,27 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Community/partners/argocd/</loc>
+         <lastmod>2023-06-02</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Community/partners/argocd/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Community/partners/kyverno/</loc>
+         <lastmod>2023-06-02</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Community/partners/kyverno/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Community/partners/turbonomic/</loc>
+         <lastmod>2023-06-02</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Community/partners/turbonomic/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/CONTRIBUTING/</loc>
          <lastmod>2023-06-02</lastmod>
          <changefreq>daily</changefreq>
