@@ -66,7 +66,7 @@ from the MBWS and making the following changes.
     the source is unchanged.
   - A destination annotation that has the same value as the
     corresponding annotation in the source is unchanged.
-  - A "system" annnotation is unchanged.  The system annotations are
+  - A "system" annotation is unchanged.  The system annotations are
     those whose key (a) starts with `kcp.io/` or other stuff followed
     by `.kcp.io/` and (b) does not start with `edge.kcp.io/`.
 - The source object's labels are merged into the destination object
@@ -146,7 +146,7 @@ controllers.
 
 First run the mailbox controller, long for it to create the mailbox
 workspaces; it does not need to keep running, you can ^C it.  This
-should not take long, and do not expect an explicit ackowledgement on
+should not take long, and do not expect an explicit acknowledgement on
 the console.  You can check for their existence by doing `kubectl get
 workspaces` while in the ESPW.
 
@@ -172,8 +172,8 @@ I0412 15:15:57.970192   94634 shared_informer.go:289] Caches are synced for wher
 I0412 15:15:57.972185   94634 map-types.go:338] "Put" map="where" key="r0bdh9oumjkoag3s:edge-placement-s" val="[&{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-s    e1b1033d-49f2-45e8-8a90-6d0295b644b6 1184 1 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:r0bdh9oumjkoag3s] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-s 0e718a31-db21-47f1-b789-cd55835b1418 <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"0e718a31-db21-47f1-b789-cd55835b1418\\\"}\":{}}}} }]} [{1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
 I0412 15:15:57.973740   94634 map-types.go:338] "Put" map="where" key="1i1weo8uoea04wxr:edge-placement-c" val="[&{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-c    c446ca9b-8937-4751-89ab-058bcfb079c1 1183 3 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:1i1weo8uoea04wxr] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-c c1e038b9-8bd8-4d22-8ab8-916e40c794d1 <nil> <nil>}] []  [{scheduler Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"c1e038b9-8bd8-4d22-8ab8-916e40c794d1\\\"}\":{}}}} }]} [{1xpg93182scl85te location-f sync-target-f e6efb8bd-6755-45ac-b44d-5d38f978f990} {1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
 ...
-I0412 15:15:58.173974   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:greoup1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group2.test Resources:[cogs] Namespaces:[] Names:[William]}]}
-I0412 15:15:58.180380   94634 map-types.go:338] "Put" map="what" key="r0bdh9oumjkoag3s:edge-placement-s" val={Downsync:map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:greoup1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group3.test Resources:[widgets] Namespaces:[] Names:[*]}]}
+I0412 15:15:58.173974   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:group1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group2.test Resources:[cogs] Namespaces:[] Names:[William]}]}
+I0412 15:15:58.180380   94634 map-types.go:338] "Put" map="what" key="r0bdh9oumjkoag3s:edge-placement-s" val={Downsync:map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:group1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group3.test Resources:[widgets] Namespaces:[] Names:[*]}]}
 ...
 ```
 
@@ -280,7 +280,7 @@ spec:
     - '*'
     resources:
     - widgets
-  - apiGroup: greoup1.test
+  - apiGroup: group1.test
     names:
     - george
     - cosmo
@@ -293,7 +293,7 @@ status: {}
 ```
 
 
-At this point you might veer off from the example sceario and try
+At this point you might veer off from the example scenario and try
 tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
@@ -411,7 +411,7 @@ spec:
     - '*'
     resources:
     - widgets
-  - apiGroup: greoup1.test
+  - apiGroup: group1.test
     names:
     - george
     - cosmo

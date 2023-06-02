@@ -185,7 +185,7 @@ includes the following things.
 
 - An APIExport of the edge API group.
 - The edge controllers: scheduler, placement translator, mailbox
-  controller, and status sumarizer.
+  controller, and status summarizer.
 
 ## Workload Management workspaces
 
@@ -373,7 +373,7 @@ this category.
 | v1 | Secret | true |
 | v1 | Service | true |
 
-Note that some `ConfigMap` and `Secret` objets are treated
+Note that some `ConfigMap` and `Secret` objects are treated
 differently, as explained in the next section.
 
 #### System infrastructure objects
@@ -517,7 +517,7 @@ an instance of this problem, the placement translator picks the
 highest version from this intersection.  Subsequently for the same API
 group, the placement translator sticks with its previous decision as
 long as that is still in the intersection.  If the previous choice is
-no longer avaiable, the highest version is picked.  This preference
+no longer available, the highest version is picked.  This preference
 for highest version is based on the expectation that rolling forward
 will be more common than rolling back; using the intersection ensures
 that both work (as long as the collection of sources has an overlap in
@@ -565,7 +565,7 @@ For the above, the most recently updated object is determined by
 parsing the ResourceVersion as an `int64` and picking the highest
 value.  This is meaningful under the assumption that all the source
 workspaces are from the same kcp server --- which will be true for
-this PoC but is not a resaonble assumption in general.  Also:
+this PoC but is not a reasonble assumption in general.  Also:
 interpreting ResourceVersion breaks a rule for Kubernetes clients ---
 but this is dismayingly common.  Beyond this PoC we could hope to do
 better by looking at the ManagedFields.  But currently kcp does not
@@ -743,7 +743,7 @@ workspace to describe the workload desired state.
 
 This user creates one or more EdgePlacement objects to say which
 workload goes where.  These may be accompanied by API objects that
-specify rule-baesd customization, specify how status is to be
+specify rule-based customization, specify how status is to be
 summarized.
 
 The edge-mc implementation propagates the desired state from center to
