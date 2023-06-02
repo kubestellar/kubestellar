@@ -42,6 +42,7 @@ fi
 
 MIKE_OPTIONS=()
 ALIAS_OPTIONS=()
+ALIAS_OPTIONS_LATEST=()
 
 if [[ -n "${REMOTE:-}" ]]; then
   MIKE_OPTIONS+=(--remote "$REMOTE")
@@ -58,6 +59,7 @@ if [[ -n "${CI:-}" ]]; then
     MIKE_OPTIONS+=(--rebase)
     if [ $VERSION == "main" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
+      ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
     else
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
     fi
@@ -68,4 +70,9 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
+
 mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}"
+
+if [ ${#ALIAS_OPTIONS_LATEST[@]} -gt 0 ]; then
+    mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS_LATEST[@]}"
+fi
