@@ -359,6 +359,7 @@ sublicense
 summarization
 summarizer
 syncTargetName
+syncTargetUID
 syncer
 syncer's
 syncerConfigsClusterInterface
