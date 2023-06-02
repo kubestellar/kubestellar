@@ -521,7 +521,7 @@ optional.
   and `amd64`.  Auto-detected if omitted.
 - `--ensure-folder $install_parent_dir`: specifies where to install
   to.  This will be `mkdir -p`.  The default is `./kcp`.
-- `-V` or `--verbose`: incrases the verbosity of output.  This is a
+- `-V` or `--verbose`: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.
 - `-X`: makes the script `set -x` internally, for debugging.
 - `-h` or `--help`: print brief usage message and exit.

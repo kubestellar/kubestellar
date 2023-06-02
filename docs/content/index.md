@@ -29,7 +29,7 @@ We are an opensource community focused on creating a flexible solution for chall
 
   - Small Locations: clusters can come in all shapes and sizes. MicroShift, K3s, and Kind can enable help small take part in a Kubernetes environment
 
-  - Different Types of Clouds: Edge, sovereign, regulated, high-performance, on-prem - we got you covered
+  - Different Types of Clouds: Edge, sovereign, regulated, high-performance, on-premise - we got you covered
 
 ## So, what are we working on to solve these challenges?
 
