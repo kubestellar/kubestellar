@@ -48,11 +48,6 @@ fi
 
 if [[ -n "${BRANCH:-}" ]]; then
   MIKE_OPTIONS+=(--branch "$BRANCH")
-  if [ $BRANCH == "main" ]; then
-    MIKE_OPTIONS+=(--update-aliases "$BRANCH" "stable")
-  else
-    MIKE_OPTIONS+=(--update-aliases "$BRANCH" "unstable")
-  fi
 fi
 
 if [[ -n "${CI:-}" ]]; then
@@ -64,6 +59,12 @@ if [[ -n "${CI:-}" ]]; then
   # Always set git user info in CI because even if we're not pushing, we need it
   git config user.name kcp-docs-bot
   git config user.email no-reply@kcp.io
+fi
+
+if [ $VERSION == "main" ]; then
+  MIKE_OPTIONS+=(--update-aliases "$VERSION" "stable")
+else
+  MIKE_OPTIONS+=(--update-aliases "$VERSION" "unstable")
 fi
 
 mike deploy "${MIKE_OPTIONS[@]}" "$VERSION"
