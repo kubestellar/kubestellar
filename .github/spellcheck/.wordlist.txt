@@ -7,6 +7,7 @@ APIConversion
 APIExport
 APIExport's
 APIExports
+APIExportEndpointSlice
 APIGroup
 APIResourceImport
 APIResourceImports
@@ -33,13 +34,17 @@ CSINode
 CSIStorageCapacity
 Camila
 Cardinality
+CertificateSigningRequest
 Choudhary
 ClusterPolicyReport
 ClusterRole
 ClusterRoleBinding
 ClusterScope
+ClusterWorkspace
 CoC
+ComponentStatus
 ConfigMap
+ControllerRevision
 CreationTimestamp
 CronJob
 CustomResourceDefinition
@@ -97,6 +102,8 @@ Licensor
 LimitRange
 LinkedIn
 ListMeta
+LocalSubjectAccessReview
+LogicalCluster
 MBWS
 MERCHANTABILITY
 MVI
@@ -117,6 +124,7 @@ Onboarding
 OpenShift
 OwnerReferences
 Paolo
+PartitionSet
 PermissionClaim
 PermissionClaims
 PersistentVolume
@@ -143,6 +151,8 @@ RuntimeClass
 SIG
 Scalability
 SelfLink
+SelfSubjectAccessReview
+SelfSubjectRulesReview
 ServiceAccount
 ServiceAccount's
 Silvera
@@ -153,6 +163,7 @@ StatefulSet
 Stellari
 StorageClass
 Subresource
+SubjectAccessReview
 Summarization
 SyncTarget
 SyncTargets
@@ -164,6 +175,7 @@ TCP
 TMC
 TODO
 Teardown
+TokenReview
 Turbonomic
 TypeMeta
 UID
@@ -173,6 +185,7 @@ Upsynced
 Upsyncing
 ValidatingWebhookConfiguration
 VolumeAttachment
+WorkspaceType
 WMW
 WMWs
 Youtube
@@ -239,6 +252,7 @@ faq
 george
 gitCommit
 gitTreeState
+gitVersion
 github
 googlegroups
 goVersion
@@ -303,6 +317,7 @@ onboarding
 opensource
 otherstuff
 ownerReferences
+oyaml
 pathname
 pathnames
 pre
