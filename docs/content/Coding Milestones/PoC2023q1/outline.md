@@ -565,7 +565,7 @@ For the above, the most recently updated object is determined by
 parsing the ResourceVersion as an `int64` and picking the highest
 value.  This is meaningful under the assumption that all the source
 workspaces are from the same kcp server --- which will be true for
-this PoC but is not a reasonble assumption in general.  Also:
+this PoC but is not a reasonable assumption in general.  Also:
 interpreting ResourceVersion breaks a rule for Kubernetes clients ---
 but this is dismayingly common.  Beyond this PoC we could hope to do
 better by looking at the ManagedFields.  But currently kcp does not
