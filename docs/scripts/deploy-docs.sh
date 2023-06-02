@@ -63,9 +63,9 @@ if [[ -n "${CI:-}" ]]; then
 fi
 
 if [ $VERSION == "main" ]; then
-  ALIAS_OPTIONS+=(--update-aliases "unstable")
+  ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
 else
-  ALIAS_OPTIONS+=(--update-aliases "stable")
+  ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
 fi
 
-mike deploy "${MIKE_OPTIONS[@]}" "$VERSION" "${ALIAS_OPTIONS[@]}"
+mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}"
