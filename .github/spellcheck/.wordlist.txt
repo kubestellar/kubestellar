@@ -236,6 +236,7 @@ dev
 discoverable
 dismayingly
 downsync
+downSyncedResources
 downsynced
 downsyncing
 dropdown
