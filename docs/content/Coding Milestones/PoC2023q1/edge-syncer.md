@@ -27,9 +27,9 @@ The overall diagram is as follows:
 
 #### What kubestellar syncer-gen plugin does
 
-In order for Syncer to sync resources between upstream (workspace) and doenstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (`kubectl kubestellar syncer-gen`) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to `serviceAccountName` in the deployment manifest.
+In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (`kubectl kubestellar syncer-gen`) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to `serviceAccountName` in the deployment manifest.
 
-Note: In addtion to that, the command creates EdgeSyncConfig CRD if not exist, and creates a deffault EdgeSyncConfig resource with the name specified in the command (;`kubectl kubestellar syncer-gen <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
+Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (;`kubectl kubestellar syncer-gen <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.
 
 The source code of the command is [{{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go).
 
@@ -129,7 +129,7 @@ To deploy resources to Edge clusters, create the following in workload managemen
   - Some objects are denatured if needed.
   - Other objects are as it is
 - APIExport/API Schema corresponding to CRD such as Kubernetes [ClusterPolicyReport](https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml).
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the sciprt [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/hack/update-codegen-crds.sh#L57)). 
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/hack/update-codegen-crds.sh#L57)). 
 - EdgePlacement
 
 ![edge-syncer deploy](images/edge-syncer-deploy.png)
@@ -144,7 +144,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - The mailbox controller will put API Binding into the mailbox workspace.
 
 #### EdgeSyncConfig (will be replaced to SyncerConfig)
-- The example of EdgeSycnerConfig CR is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
+- The example of EdgeSyncConfig CR is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml). Its CRD is [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/config/crds/edge.kcp.io_edgesyncconfigs.yaml).
 - The CR here is used from edge syncer. 
 - The CR is placed at mb-ws to define
   - object selector
@@ -154,13 +154,13 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - The CR is managed by edge-mc (placement transformer).
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
-- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
+- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.
 - One CR is initially created by the command for KubeStellar Syncer enablement in mb-ws (`kubectl kubestellar syncer-gen <name>`)
   - The CR name is `<name>` and the contents are empty.
   - This name is registered in the bootstrap manifests for KubeStellar Syncer install and KubeStellar Syncer is told to watch the CR of this name.
 - Currently KubeStellar Syncer watches all CRs in the workspace
   - KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. 
-  - This behavior may be changed to only watching the default CR once Placement Translater is to be the component that generates the CR from EdgePlacement: [related issue]({{ config.repo_url }}/pull/284#pullrequestreview-1375667129)
+  - This behavior may be changed to only watching the default CR once Placement Translator is to be the component that generates the CR from EdgePlacement: [related issue]({{ config.repo_url }}/pull/284#pullrequestreview-1375667129)
 
 #### SyncerConfig
 - The spec is defined in {{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/apis/edge/v1alpha1/syncer-config.go
@@ -186,7 +186,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - The CR is managed by edge-mc (placement translator).
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
-- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/splitted/merged according to further design discussion.
+- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.
 - Currently KubeStellar Syncer watches all CRs in the workspace
   - KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. 
 
@@ -220,7 +220,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - ~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in edge-mc.~ => Upsynced objects are accessed through Mailbox informer.
 
 #### Feasibility study
-We will verify if the design describled here could cover the following 4 scenarios. 
+We will verify if the design described here could cover the following 4 scenarios. 
 - I can register an edge-syncer on a Edge cluster to connect a mailbox workspace specified by name. (edge-syncer registration)
 - I can deploy Kyverno and its policy from mailbox workspace to Edge cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM. (workload deployment by edge-syncer's downsyncing)
 - I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by edge-syncer) 
@@ -245,7 +245,7 @@ $ make build-edge-syncer-image-local
 Edge-Syncer image:
 ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 ```
-`ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96` is the image stored in your local Docker registory.
+`ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96` is the image stored in your local Docker registry.
 
 You can also set a shell variable to the output of this Make task.
 
@@ -254,7 +254,7 @@ For example
 image=`make build-edge-syncer-image-local`
 ```
 
-#### How to build the image with multiple architectures and push it to Docker registory
+#### How to build the image with multiple architectures and push it to Docker registry
 1. `make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64`
 
 For example

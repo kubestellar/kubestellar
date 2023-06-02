@@ -1,4 +1,4 @@
-This command demonstrates the difficulty with all-custer access to
+This command demonstrates the difficulty with all-cluster access to
 resources not built into kcp.
 
 To see the demo, start in the `edge-mc` directory and any convenient

@@ -53,7 +53,7 @@ This subcommand ensures that the edge service provider workspace
 
 This subcommand is used after installation or process stops.
 
-This subcommand stops any running kubesteallar controllers and then
+This subcommand stops any running kubestellar controllers and then
 starts them all.  It also does the same thing as `kubestellar init`.
 
 ### KubeStellar stop
@@ -113,7 +113,7 @@ kubectl kubestellar ensure location flag... objname labelname=labelvalue...
 ```
 
 Here `objname` is the name for the SyncTarget object and also the name
-for the Location object.  This commad ensures that these objects exist
+for the Location object.  This command ensures that these objects exist
 and have at least the given labels.
 
 The flags can also appear anywhere later on the command line.
@@ -190,7 +190,7 @@ command line syntax and semantics except that the
 This command does not depend on the action of any of the edge-mc
 (KubeStellar) controllers.
 
-The following sesssion demonstrates usage, including idemptotency.
+The following session demonstrates usage, including idempotency.
 
 ```console
 $ kubectl ws root:imw-1
@@ -347,7 +347,7 @@ The usage synopsis for this command is as follows.
 kubectl ws parent_pathname; kubectl kubestellar ensure wmw flag... wm_workspace_name
 ```
 
-Here `parent_pathname` is the workspace pathame of the parent of the
+Here `parent_pathname` is the workspace pathname of the parent of the
 WMW, and `wm_workspace_name` is the name (not pathname, just a bare
 one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
 will be `parent_pathname:wm_workspace_name`.
@@ -361,7 +361,7 @@ The acceptable flags include all those of `kubectl` except for
 
 - `--with-kube boolean`: specifies whether or not the WMW should
   include an APIBinding to the Kubernetes API for management of
-  containeried workloads.
+  containerized workloads.
 
 This script works in idempotent style, doing whatever work remains to
 be done.
@@ -474,10 +474,10 @@ This script accepts the following command line flags; all are optional.
   KubeStellar.
 - `--os $OS`: specifies the operating system to use in selecting the
   executables to download and install.  Choices are `linux` and
-  `darwin`.  Autodetected if omitted.
+  `darwin`.  Auto-detected if omitted.
 - `--arch $IAS`: specifies the instruction set architecture to use in
   selecting the executables to download and install.  Choices are
-  `amd64` and `arm64`.  Autodetected if omitted.
+  `amd64` and `arm64`.  Auto-detected if omitted.
 - `--bind-address $IPADDR`: directs that the kcp server (a) write that
   address for itself in the kubeconfig file that it constructs and (b)
   listens only at that address.  The default is to pick one of the
@@ -488,7 +488,7 @@ This script accepts the following command line flags; all are optional.
   working directory.  The download of kcp, if any, will go in
   `$install_parent_dir/kcp`.  The download of KubeStellar will go in
   `$install_parent_dir/kubestellar`.
-- `-V` or `--verbose`: incrases the verbosity of output.  This is a
+- `-V` or `--verbose`: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.
 - `-X`: makes the script `set -x` internally, for debugging.
 - `-h` or `--help`: print brief usage message and exit.
@@ -497,9 +497,9 @@ Here "install" means only to (a) unpack the distribution archives into
 the relevant places under `$install_parent_dir` and (b) enhance the
 `PATH`, and `KUBECONFIG` in the case of kcp, environment variables in
 the shell running the script.  Of course, if you run the script in a
-subshell then those environment effects terminate with that subshell;
-this script also prints out messages showing how to update the
-environment in another shell.
+sub-shell then those environment effects terminate with that
+sub-shell; this script also prints out messages showing how to update
+the environment in another shell.
 
 ## Install kcp and its kubectl plugins
 
@@ -533,7 +533,7 @@ telling you to add it.
 
 ## Install KubeStellar
 
-This script is direclty available at
+This script is directly available at
 [{{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh)
 and will download and install KubeStellar.
 

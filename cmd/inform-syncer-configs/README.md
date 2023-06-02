@@ -25,7 +25,7 @@ exit status 2
 
 This command requires two kube client configurations.  One points at
 the edge service provider workspace (ESPW) with authorization to list
-and watch Workspace objects (the mailbox WOrkspaces) in that
+and watch Workspace objects (the mailbox Workspaces) in that
 workspace.  The other client config points at the server base with
 authorization to list and watch `SyncerConfig` objects from all
 clusters.
