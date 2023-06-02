@@ -42,7 +42,7 @@ maintain two copies of the Kyverno resource definitions.
 
 This is a bad choice because it is not consistent with the preferred
 way to demonstrate installation of Kyverno, which is to have Helm
-install Kyverno into the workload managemet workspace.
+install Kyverno into the workload management workspace.
 
 #### Through a new kind of view
 
@@ -67,7 +67,7 @@ we might try something more granular, but today is not that day.
 In each mailbox workspace, the corresponding APIBinding's [list of
 accepted
 PermissionClaims](https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/apis/apis/v1alpha1/types_apibinding.go#L81)
-has an etry for every resource downsynced or upsynced to that
+has an entry for every resource downsynced or upsynced to that
 workspace.
 
 As a consequence, the APIExport's view holds all the objects whose
