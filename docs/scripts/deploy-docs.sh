@@ -67,4 +67,4 @@ else
   MIKE_OPTIONS+=(--update-aliases "stable")
 fi
 
-mike deploy "${MIKE_OPTIONS[@]}" "$VERSION"
+mike deploy "$VERSION" "${MIKE_OPTIONS[@]}" 
