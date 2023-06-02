@@ -48,6 +48,11 @@ fi
 
 if [[ -n "${BRANCH:-}" ]]; then
   MIKE_OPTIONS+=(--branch "$BRANCH")
+  if [ $BRANCH == "main" ]; then
+    MIKE_OPTIONS+=(--update-aliases "$BRANCH" "stable")
+  else
+    MIKE_OPTIONS+=(--update-aliases "$BRANCH" "unstable")
+  fi
 fi
 
 if [[ -n "${CI:-}" ]]; then
