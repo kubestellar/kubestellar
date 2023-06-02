@@ -55,6 +55,7 @@ if [[ -n "${CI:-}" ]]; then
   if [[ "${GITHUB_EVENT_NAME:-}" == "push" ]]; then
     # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
     MIKE_OPTIONS+=(--push)
+    MIKE_OPTIONS+=(--rebase)
     if [ $VERSION == "main" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
     else
