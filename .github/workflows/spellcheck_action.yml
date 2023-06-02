@@ -12,15 +12,17 @@ on:
 #       - "docs/**"
 # #       - "pkg/**"
 #       - ".github/workflows/spellcheck_action.yaml"
-#   push:
-#     branches:
-#       - main
-#       - "release-*"
-#     paths:
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - ".github/workflows/spellcheck_action.yaml"
+      - ".github/spellcheck/.spellcheck.yml"
+      - ".github/spellcheck/.wordlist.yml"
 # #       - "cmd/**"
 #       - "docs/**"
 # #       - "pkg/**"
-#       - ".github/workflows/spellcheck_action.yaml"
 
 jobs:
   build:
