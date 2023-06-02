@@ -50,8 +50,10 @@ while (( $# > 0 )); do
     (--verbose|-V)
         verbosity=1
 	verbdir="";;
+    (-X)
+	set -x;;
     (-h|--help)
-        echo "Usage: $0 [start| stop][--log-folder log_folder] [-V|--verbose]"
+        echo "Usage: $0 [init | start | stop][--log-folder log_folder] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -141,7 +143,7 @@ function ensure_espw() {
     else 
         kubectl ws create "$espw_name" --enter
     fi
-    kubectl apply -f $SCRIPT_DIR/../config/exports $verbdir
+    eval kubectl apply -f "$SCRIPT_DIR/../config/exports" $verbdir
     echo "Finished populating the espw with kubestellar apiexports"   
 }
 

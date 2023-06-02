@@ -37,6 +37,7 @@ only used in the `start` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
+- `-X`: turns on echoing of script lines
 - `--log-folder $pathname`: says where to put the logs from the
   controllers.  Will be `mkdir -p` if absent.  Defaults to
   `${PWD}/kubestellar-logs`.
