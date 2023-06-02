@@ -1498,7 +1498,7 @@ the edge clusters".</p>
 maintain two copies of the Kyverno resource definitions.</p>
 <p>This is a bad choice because it is not consistent with the preferred
 way to demonstrate installation of Kyverno, which is to have Helm
-install Kyverno into the workload managemet workspace.</p>
+install Kyverno into the workload management workspace.</p>
 <h4 id="through-a-new-kind-of-view">Through a new kind of view</h4>
 <p>We could define a new kind of view that does what we want.</p>
 <h4 id="through-view-of-emc-apiexport-and-mailbox-apibindings">Through view of EMC APIExport and mailbox APIBindings</h4>
@@ -1517,7 +1517,7 @@ we might try something more granular, but today is not that day.</p>
 <p>In each mailbox workspace, the corresponding APIBinding's <a href="https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/apis/apis/v1alpha1/types_apibinding.go#L81">list of
 accepted
 PermissionClaims</a>
-has an etry for every resource downsynced or upsynced to that
+has an entry for every resource downsynced or upsynced to that
 workspace.</p>
 <p>As a consequence, the APIExport's view holds all the objects whose
 kind/resource is defined by those APIBindings.</p>
