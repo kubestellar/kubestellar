@@ -37,6 +37,7 @@ only used in the `start` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
+- `-X`: turns on echoing of script lines
 - `--log-folder $pathname`: says where to put the logs from the
   controllers.  Will be `mkdir -p` if absent.  Defaults to
   `${PWD}/kubestellar-logs`.
@@ -44,10 +45,13 @@ only used in the `start` subcommand.
 
 ### Kubestellar init
 
-This subcommand is used after installation to finish setup.
-
-This subcommand ensures that the edge service provider workspace
-(ESPW) exists and has the required contents.
+This subcommand is used after installation to finish setup and does
+two things.  One is to ensure that the edge service provider workspace
+(ESPW) exists and has the required contents.  The other is to ensure
+that the `root:compute` workspace has been extended with the RBAC
+objects that enable the syncer to propagate reported state for
+downsynced objects defined by the APIExport from that workspace of a
+subset of the Kubernetes API for managing containerized workloads.
 
 ### KubeStellar start
 
