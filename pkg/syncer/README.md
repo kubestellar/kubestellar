@@ -159,7 +159,7 @@
     ```
 
 ### See policy reports generated at p-cluster via API Export on workload management workspace.
-1. In the previous case, PolicyReport CRD is deployed as a CRD. In order to share the API across workspaces, we define PolicyReport API as APIBiinding
+1. In the previous case, PolicyReport CRD is deployed as a CRD. In order to share the API across workspaces, we define PolicyReport API as APIBinding
 1. Go to workload management workspace (`edge`)  
     ```
     $ kubectl kcp ws root:edge
