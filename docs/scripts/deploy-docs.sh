@@ -42,6 +42,7 @@ fi
 
 MIKE_OPTIONS=()
 ALIAS_OPTIONS=()
+ALIAS_OPTIONS_LATEST=()
 
 if [[ -n "${REMOTE:-}" ]]; then
   MIKE_OPTIONS+=(--remote "$REMOTE")
@@ -55,6 +56,13 @@ if [[ -n "${CI:-}" ]]; then
   if [[ "${GITHUB_EVENT_NAME:-}" == "push" ]]; then
     # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
     MIKE_OPTIONS+=(--push)
+    MIKE_OPTIONS+=(--rebase)
+    if [ $VERSION == "main" ]; then
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
+      ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
+    else
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
+    fi
   fi
 
   # Always set git user info in CI because even if we're not pushing, we need it
@@ -62,10 +70,9 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
-if [ $VERSION == "main" ]; then
-  ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
-else
-  ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
-fi
 
 mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}"
+
+if [ ${#ALIAS_OPTIONS_LATEST[@]} -gt 0 ]; then
+    mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS_LATEST[@]}"
+fi
