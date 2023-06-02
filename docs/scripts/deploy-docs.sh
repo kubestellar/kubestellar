@@ -41,6 +41,7 @@ else
 fi
 
 MIKE_OPTIONS=()
+ALIAS_OPTIONS=()
 
 if [[ -n "${REMOTE:-}" ]]; then
   MIKE_OPTIONS+=(--remote "$REMOTE")
@@ -62,9 +63,9 @@ if [[ -n "${CI:-}" ]]; then
 fi
 
 if [ $VERSION == "main" ]; then
-  MIKE_OPTIONS+=(--update-aliases "unstable")
+  ALIAS_OPTIONS+=(--update-aliases "unstable")
 else
-  MIKE_OPTIONS+=(--update-aliases "stable")
+  ALIAS_OPTIONS+=(--update-aliases "stable")
 fi
 
-mike deploy "$VERSION" "${MIKE_OPTIONS[@]}" 
+mike deploy "${MIKE_OPTIONS[@]}" "$VERSION" "${ALIAS_OPTIONS[@]}"
