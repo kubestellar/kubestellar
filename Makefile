@@ -200,7 +200,7 @@ deploy-docs: venv
 .PHONY: run-doc-shells
 run-doc-shells: venv
 	. $(VENV)/activate; \
-	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/run-doc-shells.sh /docs/content/Getting-Started/quickstart.md
+	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/run-doc-shells.sh content/Getting-Started/quickstart.md
 	
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
