@@ -77,7 +77,7 @@
     secret/kcp-edge-syncer-pcluster1-1na3tqcd created
     deployment.apps/kcp-edge-syncer-pcluster1-1na3tqcd created
     ```
-1. Edge Syncer successfully runs and interact with the emailbox workspace
+1. Edge Syncer successfully runs and interact with the mailbox workspace
     ```
     $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get pod -A
     NAMESPACE                            NAME                                                  READY   STATUS    RESTARTS   AGE
@@ -148,7 +148,7 @@
       NAME                                            PASS   FAIL   WARN   ERROR   SKIP   AGE
       policyreport.wgpolicyk8s.io/pol-sample-policy   0      1      0      0       0      56s
       ```
-  1. On the emailbox workspace
+  1. On the mailbox workspace
     ```
     $ kubectl get policy,policyreport
     NAME                              BACKGROUND   VALIDATE ACTION   READY
@@ -171,7 +171,7 @@
     apiresourceschema.apis.kcp.io/v0-0-1.policyreports.wgpolicyk8s.io created
     apiexport.apis.kcp.io/policy-report created
     ```
-1. Create APIBindings in the emailbox workspace
+1. Create APIBindings in the mailbox workspace
     ```
     $ kubectl kcp ws root:edge:1lkhy98o1f84q2a3-mb-528a4f03-cb9b-4121-aa57-28c58ed19f22
     ```
@@ -209,7 +209,7 @@
         name: policyreports.wgpolicyk8s.io
         version: v1
     ```
-1. Now I can get policy reports across emailbox workspaces by one-shot from an API exposed in `edge` workspace.
+1. Now I can get policy reports across mailbox workspaces by one-shot from an API exposed in `edge` workspace.
     ```
     $ kubectl kcp ws root:edge
     Current workspace is "root:edge".
