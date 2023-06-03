@@ -35,16 +35,16 @@ code_blocks+=("cd $REPO_ROOT/docs/scripts/")
 if [ -f "/etc/os-release" ]; then
   if [[ $(grep -i "ubuntu" /etc/os-release) ]]; then
     echo "The operating system is Ubuntu."
-    code_blocks+=('sudo apt-get install -y curl wget gnupg')
-    code_blocks+=('source /etc/os-release ; sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"2')
-    code_blocks+=('source /etc/os-release ; wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_${VERSION_ID}/Release.key -O- | sudo apt-key add -')
-    code_blocks+=('sudo apt update && sudo apt install -y podman && podman machine init && podman machine start')
-    code_blocks+=('sudo snap install go --classic')
-    code_blocks+=('go install sigs.k8s.io/kind@v0.17.0')
-    code_blocks+=('curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/')
-    code_blocks+=('sudo apt update && sudo apt install -y jq')
-    code_blocks+=('sudo apt update && sudo apt install -y kubectl')
-    code_blocks+=('alias docker=podman')
+    # code_blocks+=('sudo apt-get install -y curl wget gnupg')
+    # code_blocks+=('source /etc/os-release ; sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"2')
+    # code_blocks+=('source /etc/os-release ; wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_${VERSION_ID}/Release.key -O- | sudo apt-key add -')
+    # code_blocks+=('sudo apt update && sudo apt install -y podman && podman machine init && podman machine start')
+    # code_blocks+=('sudo snap install go --classic')
+    # code_blocks+=('go install sigs.k8s.io/kind@v0.17.0')
+    # code_blocks+=('curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/')
+    # code_blocks+=('sudo apt update && sudo apt install -y jq')
+    # code_blocks+=('sudo apt update && sudo apt install -y kubectl')
+    # code_blocks+=('alias docker=podman')
   fi
 else
   echo "The operating system is not Ubuntu."
