@@ -57,8 +57,13 @@ jobs:
         uses: dcarbone/install-jq-action@v1.0.1
 
       - name: Install docker
-        uses: papodaca/install-docker-action@main 
-      
+        uses: docker-practice/actions-setup-docker@master
+        timeout-minutes: 12
+        
+      - run: |
+          set -x
+          docker version
+
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
