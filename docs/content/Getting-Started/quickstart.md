@@ -373,7 +373,7 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```shell
-while [[ $(kubectl --context kind-florin get pod commond -n commonstuff -o jsonpath='{.status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8094
+while [[ $(kubectl --context kind-florin get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8094
 ```
 
 which may yield the error below, depending on how long it takes for the Apache HTTP Server pod to get synchronized and running:
@@ -396,7 +396,7 @@ If you are getting the error then wait 1-2 minutes and run `curl` again to see t
 For `guilder`:
 
 ```shell
-while [[ $(kubectl --context kind-guilder get pod commond -n commonstuff -o jsonpath='{.status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8096
+while [[ $(kubectl --context kind-guilder get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8096
 ```
 which should eventually yield:
 
