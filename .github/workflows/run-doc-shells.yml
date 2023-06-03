@@ -4,24 +4,22 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-#   pull_request:
-#     branches:
-#       - main
+  pull_request:
+    branches:
+      - main
 #       - "release-*"
-#     paths:
-# #       - "cmd/**"
-#       - "docs/**"
-# #       - "pkg/**"
-#       - ".github/workflows/docs-gen-and-push.yaml"
-#   push:
-#     branches:
-#       - main
+    paths:
+      - "docs/content/Getting-Started/quickstart.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - ".github/workflows/run-doc-shells.yml"
+  push:
+    branches:
+      - main
 #       - "release-*"
-#     paths:
-# #       - "cmd/**"
-#       - "docs/**"
-# #       - "pkg/**"
-#       - ".github/workflows/docs-gen-and-push.yaml"
+    paths:
+      - "docs/content/Getting-Started/quickstart.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - ".github/workflows/run-doc-shells.yml"
 
 permissions:
   contents: write
