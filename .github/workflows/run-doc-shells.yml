@@ -30,7 +30,7 @@ permissions:
 #   group: ${{ github.workflow }}
 
 jobs:
-  generate-and-push:
+  run-doc-shells:
     name: Run doc shells
     runs-on: ubuntu-latest
     steps:
