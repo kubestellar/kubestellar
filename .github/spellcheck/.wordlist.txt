@@ -195,8 +195,10 @@ api
 apibinding
 apibindings
 apiGroup
+apiGroups
 apiVersion
 apiexport
+apiextensions
 apiresourceimports
 apis
 apiserver
@@ -235,6 +237,7 @@ deployers
 dev
 discoverable
 dismayingly
+dns
 downsync
 downSyncedResources
 downsynced
@@ -280,6 +283,7 @@ jq
 json
 kcp
 kcp's
+ko
 kube
 kubeconfig
 kubectl
@@ -313,6 +317,7 @@ namespaces
 namespacessyncer
 natured
 nonNamespacedObjects
+nonResourceURLs
 ns
 onboarding
 opensource
@@ -321,6 +326,8 @@ ownerReferences
 oyaml
 pathname
 pathnames
+policyreport
+policyreports
 pre
 prometheus
 provisioner
@@ -337,6 +344,7 @@ resourceVersion
 resourcequotas
 rolebinding
 rolebindings
+roleRef
 rollout
 scalability
 scalable
@@ -385,6 +393,8 @@ volumeMounts
 watchall
 webhook
 webhooks
+wgpolicyk
+wgpolicyk8s
 william
 wmw
 workspace
