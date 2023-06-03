@@ -1,0 +1,55 @@
+name: Parse MD files for shell code blocks and run them
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+#   pull_request:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/docs-gen-and-push.yaml"
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/docs-gen-and-push.yaml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  generate-and-push:
+    name: Generate and push docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.11.1"
+          
+      - run: make run-docs-shells
