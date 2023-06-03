@@ -57,7 +57,7 @@ jobs:
         uses: dcarbone/install-jq-action@v1.0.1
 
       - name: Install yq
-        run: snap install yq --channel=v3/stable
+        uses: frenck/action-setup-yq@v1
 
       - name: Install docker
         uses: docker-practice/actions-setup-docker@master
