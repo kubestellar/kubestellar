@@ -1552,11 +1552,15 @@
   <h1>QuickStart</h1>
 
 <p><img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar"></p>
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-0-demo.md '&lt;!--quickstart-0-demo-start--&gt;' '&lt;!--quickstart-0-demo-end--&gt;' -->
+
 <h2 id="demo-video">Demo Video</h2>
 <p>Watch this video to see a step-by-step demo of KubeStellar running and follow the instructions below to get your own KubeStellar started quickly.</p>
 <p><a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
  <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
 </a></p>
+<!-- END INCLUDE -->
+
 <h2 id="estimated-time">Estimated Time:</h2>
 <p>~3 minutes</p>
 <h2 id="required-packages">Required Packages:</h2>
@@ -1577,6 +1581,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#e-next-steps">e. Next Steps</a></br>
 <a href="#3-teardown-the-environment">3. Teardown the environment</a></br></p>
 <p>This guide is intended to show how to (1) quickly bring up a <strong>KubeStellar</strong> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-1-install-and-run-kubestellar.md '&lt;!--quickstart-1-install-and-run-kubestellar-start--&gt;' '&lt;!--quickstart-1-install-and-run-kubestellar-end--&gt;' -->
+
 <h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></h2>
 <p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>latest
@@ -1602,6 +1608,8 @@
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="go">    ├── compute</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="go">    └── espw</span>
 </code></pre></div>
+<!-- END INCLUDE -->
+
 <h2 id="2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">2. Example deployment of Apache HTTP Server workload into two local kind clusters</h2>
 <p>In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
@@ -1610,6 +1618,8 @@ expansively <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.</p>
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters.md '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-end--&gt;' -->
+
 <h3 id="a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder</h3>
 <p>Create the first edge cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
@@ -1637,6 +1647,10 @@ workload and summarization aspirations removed.</p>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.</p>
+<!-- END INCLUDE -->
+
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end--&gt;' -->
+
 <h3 id="b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</h3>
 <p>IMWs are used by KubeStellar to store inventory objects (<code>SyncTargets</code> and <code>Locations</code>). Create an IMW named <code>example-imw</code> with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>root
@@ -1649,6 +1663,10 @@ workload and summarization aspirations removed.</p>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
+<!-- END INCLUDE -->
+
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end--&gt;' -->
+
 <h3 id="c-onboarding-the-clusters">c. Onboarding the clusters</h3>
 <p>Let's begin by onboarding the <code>florin</code> cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
@@ -1719,6 +1737,10 @@ workload and summarization aspirations removed.</p>
 <p>Apply the created edge syncer manifest:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
 </code></pre></div>
+<!-- END INCLUDE -->
+
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md '&lt;!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end--&gt;' -->
+
 <h3 id="d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters">d. Create and deploy the Apache Server workload into florin and guilder clusters</h3>
 <p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters.</p>
 <p>In the <code>example-wmw</code> workspace create the following <code>EdgePlacement</code> object: </p>
@@ -1919,13 +1941,17 @@ which should eventually yield:</p>
 <a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
-<p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="../user-guide/">User Guide</a></p>
+<p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="quickstart-subs/user-guide.md">User Guide</a></p>
+<!-- END INCLUDE -->
+
 <h3 id="e-next-steps">e. Next Steps</h3>
 <p>What you just did is part of the example <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
 from here, doing the steps for the special workload.</p>
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-3-teardown-the-environment.md '&lt;!--quickstart-3-teardown-the-environment-start--&gt;' '&lt;!--quickstart-3-teardown-the-environment-end--&gt;' -->
+
 <h2 id="3-teardown-the-environment">3. Teardown the environment</h2>
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml
@@ -1944,10 +1970,16 @@ from here, doing the steps for the special workload.</p>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>remove-kubestellar
 </code></pre></div>
+<!-- END INCLUDE -->
+
+<!-- BEGIN INCLUDE quickstart-subs/quickstart-0-demo.md '&lt;!--quickstart-0-demo-start--&gt;' '&lt;!--quickstart-0-demo-end--&gt;' -->
+
 <h2 id="demo-video_1">Demo Video</h2>
+<p>Watch this video to see a step-by-step demo of KubeStellar running and follow the instructions below to get your own KubeStellar started quickly.</p>
 <p><a href="https://www.youtube.com/watch?v=NMGH-bwsh7s" target="_blank">
  <img src="https://img.youtube.com/vi/NMGH-bwsh7s/0.jpg" alt="KubeStellar Demo" width="700" height="500" border="10" />
 </a></p>
+<!-- END INCLUDE -->
 
 
   

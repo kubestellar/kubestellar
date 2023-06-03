@@ -189,4 +189,53 @@
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/user-guide/"/>
          
     </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-0-demo/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-0-demo/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/</loc>
+         <lastmod>2023-06-03</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/"/>
+         
+    </url>
 </urlset>
