@@ -56,6 +56,9 @@ jobs:
       - name: Install jq
         uses: dcarbone/install-jq-action@v1.0.1
 
+      - name: Install yq
+        uses: chrisdickinson/setup-yq@latest
+
       - name: Install docker
         uses: docker-practice/actions-setup-docker@master
         timeout-minutes: 12
@@ -68,5 +71,6 @@ jobs:
         uses: azure/setup-kubectl@v3
         id: install
   
+
       - run: make run-doc-shells
       
