@@ -22,7 +22,9 @@ set -o xtrace
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
-FILE_LIST="$1"
+FILE_LIST=()
+IFS=', ' read -r -a FILE_LIST <<< "${MANIFEST}"
+
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
@@ -65,27 +67,30 @@ code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
 code_blocks+=('set -o xtrace')
 
-# read the readme file line by line
-while IFS= read -r line; do
-  # check if the line matches the pattern
-  if [[ $line =~ $stop_pattern ]]; then
-    inside_block=0
-  fi
-  if [[ $line =~ $start_pattern ]]; then
-    inside_block=1
-  fi
-  
-  if [[ $inside_block == 1 ]]; then
-    # remove the backticks from the code block
-    code_block="${line//\`\`\`shell/}"
-    code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
-    code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
-    code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
+for FILE_NAME in "${FILE_LIST[@]}"
+do
+  # read the readme file line by line
+  while IFS= read -r line; do
+    # check if the line matches the pattern
+    if [[ $line =~ $stop_pattern ]]; then
+      inside_block=0
+    fi
+    if [[ $line =~ $start_pattern ]]; then
+      inside_block=1
+    fi
+    
+    if [[ $inside_block == 1 ]]; then
+      # remove the backticks from the code block
+      code_block="${line//\`\`\`shell/}"
+      code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
+      code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
+      code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
 
-    # add the code block to the array
-    code_blocks+=("$code_block")
-  fi
-done < "$FILE_LIST"
+      # add the code block to the array
+      code_blocks+=("$code_block")
+    fi
+  done < "$REPO_ROOT/docs/$FILE_NAME"
+done
 
 generated_script_file="$REPO_ROOT/docs/scripts/generated_script.sh"
 echo "" > "$generated_script_file"

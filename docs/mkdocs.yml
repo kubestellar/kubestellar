@@ -109,6 +109,7 @@ plugins:
   - search
   # Use Jinja macros in .md files
   - open-in-new-tab
+  - include-markdown
   - macros:
       include_dir: 'overrides'
       module_name: 'main'
