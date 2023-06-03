@@ -55,9 +55,10 @@ else
 fi
 
 inside_block=0
-repo_raw_url='https://raw.githubusercontent.com/kcp-dev/edge-mc'
-ks_branch='main'
-ks_tag='latest'
+
+repo_raw_url=$(yq -r '.repo_raw_url' mkdocs.yml)
+ks_branch=$(yq -r '.ks_branch' mkdocs.yml)
+ks_tag=$(yq -r '.ks_tag' mkdocs.yml)
 
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
