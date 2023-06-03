@@ -31,7 +31,7 @@ concurrency:
 
 jobs:
   generate-and-push:
-    name: Generate and push docs
+    name: Run doc shells
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
