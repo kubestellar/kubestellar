@@ -59,6 +59,11 @@ repo_raw_url='https://raw.githubusercontent.com/kcp-dev/edge-mc'
 ks_branch='main'
 ks_tag='latest'
 
+code_blocks+=('set -o errexit')
+code_blocks+=('set -o nounset')
+code_blocks+=('set -o pipefail')
+code_blocks+=('set -o xtrace')
+
 # read the readme file line by line
 while IFS= read -r line; do
   # check if the line matches the pattern
