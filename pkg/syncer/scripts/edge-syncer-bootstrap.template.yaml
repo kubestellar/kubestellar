@@ -102,6 +102,7 @@ spec:
         - --from-kubeconfig=/kcp/kubeconfig
         - --sync-target-name=${syncer_id}
         - --sync-target-uid=${syncer_id}
+        - --from-cluster=${cluster_name}
         - --qps=30
         - --burst=30
         - --v=3
