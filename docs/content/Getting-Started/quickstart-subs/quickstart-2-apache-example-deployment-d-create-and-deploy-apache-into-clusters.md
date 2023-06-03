@@ -97,7 +97,7 @@ kubectl --context kind-florin get deployments -A
 
 which should yield something like:
 
-```console
+``` { .sh .no-copy }
 NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                       commond                           1/1     1            1           6m48s
 kcp-edge-syncer-florin-2upj1awn   kcp-edge-syncer-florin-2upj1awn   1/1     1            1           16m
@@ -113,7 +113,7 @@ kubectl --context kind-guilder get deployments -A
 
 which should yield something like:
 
-```console
+``` { .sh .no-copy }
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                        commond                            1/1     1            1           7m54s
 kcp-edge-syncer-guilder-6tuay5d6   kcp-edge-syncer-guilder-6tuay5d6   1/1     1            1           12m
@@ -131,7 +131,7 @@ while [[ $(kubectl --context kind-florin get pod -l "app=common" -n commonstuff 
 
 which may yield the error below, depending on how long it takes for the Apache HTTP Server pod to get synchronized and running:
 
-```console
+``` { .sh .no-copy }
 curl: (52) Empty reply from server
 ```
 

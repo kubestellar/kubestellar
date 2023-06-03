@@ -10,7 +10,7 @@ kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
 
 which should yield something like:
 
-```console
+``` { .sh .no-copy }
 Current workspace is "root:example-imw".
 synctarget.workload.kcp.io/florin created
 location.scheduling.kcp.io/florin created
@@ -51,7 +51,7 @@ kubectl --context kind-florin apply -f florin-syncer.yaml
 
 which should yield something like:
 
-```console
+``` { .sh .no-copy }
 namespace/kcp-edge-syncer-florin-1yi5q9c4 created
 serviceaccount/kcp-edge-syncer-florin-1yi5q9c4 created
 secret/kcp-edge-syncer-florin-1yi5q9c4-token created
@@ -69,7 +69,7 @@ kubectl --context kind-florin get pods -A
 
 which should yield something like:
 
-```console
+``` { .sh .no-copy }
 NAMESPACE                         NAME                                               READY   STATUS    RESTARTS   AGE
 kcp-edge-syncer-florin-1yi5q9c4   kcp-edge-syncer-florin-1yi5q9c4-77cb588c89-xc5qr   1/1     Running   0          12m
 kube-system                       coredns-565d847f94-92f4k                           1/1     Running   0          58m
