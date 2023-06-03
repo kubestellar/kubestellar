@@ -34,6 +34,7 @@ Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, 
 The source code of the command is [{{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go]({{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go).
 
 The equivalent manual steps are as follows:
+
 1. Generate UUID for Syncer identification
     ```
     uuidgen | tr '[:upper:]' '[:lower:]' | read syncer_id
@@ -43,6 +44,10 @@ The equivalent manual steps are as follows:
     ```
     kubectl ws create ws1 --enter
     ```
+    If you don't use a mailbox workspace created by KubeStellar but your own workspace, please create following custom resources in the workspace.
+      ```
+      kubectl create -f ./config/crds/edge.kcp.io_edgesyncconfigs.yaml,./config/crds/edge.kcp.io_syncerconfigs.yaml
+      ```
 3. Create a serviceaccount in the workspace
     ```
     cat << EOL | kubectl apply -f -
@@ -109,17 +114,17 @@ The equivalent manual steps are as follows:
         ```
         image="quay.io/kubestellar/syncer:v0.2.2"
         ```
+    d. Logical cluster name
+        ```
+        cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=":.metadata.annotations.kcp\.io\/cluster" --no-headers`
+        ```
 9. Generate manifests to bootstrap KubeStellar Syncer
     ```
-    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
+    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
     ```
     For debug purpose, you can extract kubeconfig.yaml of the upstream
     ```
-    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e "select(.kind == \"Secret\" and .metadata.name == \"$syncer_id\")" | yq .stringData.kubeconfig 
-    ```
-10. For now, EdgeSyncConfig API is required. Please create EdgeSyncConfig CRD in the workspace, if you run Syncer from the generated bootstrap manifest.
-    ```
-    kubectl create ./pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml
+    syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e "select(.kind == \"Secret\" and .metadata.name == \"$syncer_id\")" | yq .stringData.kubeconfig 
     ```
 
 #### Deploy workload objects from edge-mc to Edge cluster
