@@ -64,7 +64,7 @@ I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controlle
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
 open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
 ```shell
-sleep 30
+sleep 15
 cd ../kcp
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH

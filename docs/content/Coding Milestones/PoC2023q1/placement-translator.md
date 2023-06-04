@@ -1,8 +1,5 @@
 ---
 title: "Placement Translator"
-date: 2023-03-21
-weight: 4
-description: >
 ---
 
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
@@ -103,7 +100,7 @@ is the empty string, which usually means "not specified here".  For
 both kube client configurations, the usual rules apply: first consider
 command line parameters, then `$KUBECONFIG`, then `~/.kube/config`.
 
-```console
+``` { .bash .no-copy }
       --allclusters-cluster string       The name of the kubeconfig cluster to use for access to all clusters
       --allclusters-context string       The name of the kubeconfig context to use for access to all clusters (default "system:admin")
       --allclusters-kubeconfig string    Path to the kubeconfig file to use for access to all clusters
@@ -132,9 +129,9 @@ this scenario calls for, but they can be terminated after that.
 When you get to the step of "Populate the edge service provider
 workspace", it suffices to do the following.
 
-```console
-$ kubectl ws root:espw
-$ kubectl create -f config/exports
+```shell
+kubectl ws root:espw
+kubectl create -f config/exports
 ```
 
 Continue to follow the steps until the start of Stage 3 of the
@@ -159,9 +156,10 @@ should look like the following (possibly including some complaints,
 which do not necessarily indicate real problems because the subsequent
 success is not logged so profligately).
 
-```console
-$ go run ./cmd/placement-translator
-
+```shell
+go run ./cmd/placement-translator
+```
+``` { .bash .no-copy }
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
 I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
 I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
@@ -195,8 +193,10 @@ to mailbox workspace(s).
 You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
-```console
-$ kubectl get Workspace
+```shell
+kubectl get Workspace
+```
+``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19   universal            Ready   https://192.168.58.123:6443/clusters/12zzf3frkqz2yj39   36m
 1xpg93182scl85te-mb-e6efb8bd-6755-45ac-b44d-5d38f978f990   universal            Ready   https://192.168.58.123:6443/clusters/2v6wl3x41zxmpmhr   36m
@@ -206,11 +206,17 @@ Next switch to one of the mailbox workspaces (in my case I picked the
 one for the guilder cluster) and examine the `SyncerConfig` object.
 That should look like the following.
 
-```console
-$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```shell
+kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml                           
+```shell
+kubectl get SyncerConfig the-one -o yaml                           
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -297,16 +303,22 @@ At this point you might veer off from the example scenario and try
 tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
-```console
-$ kubectl ws root:work-c
-Current workspace is "root:work-c".
-$ kubectl delete EdgePlacement edge-placement-c
+```shell
+kubectl ws root:work-c
+```
+``` { .bash .no-copy }
+Current workspace is "root:work-c"
+```
+```shell
+kubectl delete EdgePlacement edge-placement-c
+```
+``` { .bash .no-copy }
 edgeplacement.edge.kcp.io "edge-placement-c" deleted
 ```
 
 That will cause the placement translator to log updates, as follows.
 
-```
+``` { .bash .no-copy }
 I0412 15:20:43.129842   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[] Upsync:[]}
 I0412 15:20:43.241674   94634 map-types.go:342] "Delete" map="where" key="1i1weo8uoea04wxr:edge-placement-c"
 ```
@@ -314,14 +326,24 @@ I0412 15:20:43.241674   94634 map-types.go:342] "Delete" map="where" key="1i1weo
 After that, the SyncerConfig in the florin mailbox should be empty, as
 in the following (you mailbox workspace names may be different).
 
-```console
-$ kubectl ws root:espw
+```shell
+kubectl ws root:espw
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw".
+```
 
-$ kubectl ws 2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f
+```shell
+kubectl ws 2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml
+```shell
+kubectl get SyncerConfig the-one -o yaml
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -341,13 +363,18 @@ And the SyncerConfig in the guilder mailbox workspace should reflect
 only the special workload.  That would look something like the
 following.
 
-```console
-$ kubectl ws root:espw
-
-$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```shell
+kubectl ws root:espw
+kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml                           
+```shell
+kubectl get SyncerConfig the-one -o yaml                           
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:

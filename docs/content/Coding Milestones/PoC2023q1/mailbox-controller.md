@@ -120,9 +120,10 @@ I0305 18:06:20.172169   85556 shared_informer.go:289] Caches are synced for mail
 I0305 18:06:20.172196   85556 main.go:210] "Informers synced"
 ```
 
-In a separate shell, create an inventory management workspace as follows.
+In a separate terminal window(3), create an inventory management workspace as follows.
 
 ```shell
+sleep 15
 kubectl ws \~
 kubectl ws create imw --enter
 ```
