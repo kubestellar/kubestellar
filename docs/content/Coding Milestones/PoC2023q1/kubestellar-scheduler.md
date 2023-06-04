@@ -30,7 +30,7 @@ export PATH=$(pwd)/bin:$PATH
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
-kcp start
+kcp start &
 ```
 
 #### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
@@ -67,7 +67,7 @@ Go to `root:edge` workspace and run the edge scheduler.
 ```shell
 kubectl ws root:edge
 cd ../KubeStellar
-go run cmd/kubestellar-scheduler/main.go -v 2
+go run cmd/kubestellar-scheduler/main.go -v 2 &
 ```
 
 The outputs from the edge scheduler should be similar to:
