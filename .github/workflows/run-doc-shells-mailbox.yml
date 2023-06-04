@@ -68,4 +68,4 @@ jobs:
         id: install
   
 
-      - run: make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md','content/Coding Milestones/PoC2023q1/mailbox-controller.md'" run-doc-shells
+      - run: make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md','content/Coding Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start.md','content/Coding Milestones/PoC2023q1/mailbox-controller.md'" run-doc-shells
