@@ -1,6 +1,4 @@
 <!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start-->
-### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
-
 IMWs are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
 
 ```shell

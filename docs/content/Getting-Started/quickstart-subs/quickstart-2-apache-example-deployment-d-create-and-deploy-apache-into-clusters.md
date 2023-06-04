@@ -1,6 +1,4 @@
 <!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->
-### d. Create and deploy the Apache Server workload into florin and guilder clusters
-
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
 In the `example-wmw` workspace create the following `EdgePlacement` object: 
@@ -129,13 +127,7 @@ For `florin`:
 while [[ $(kubectl --context kind-florin get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8094
 ```
 
-which may yield the error below, depending on how long it takes for the Apache HTTP Server pod to get synchronized and running:
-
-``` { .sh .no-copy }
-curl: (52) Empty reply from server
-```
-
-If you are getting the error then wait 1-2 minutes and run `curl` again to see the expected result:
+which should eventually yield:
 
 ```html
 <!DOCTYPE html>

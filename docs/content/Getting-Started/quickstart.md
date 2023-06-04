@@ -47,11 +47,20 @@ website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.
 
+### a. Stand up two kind clusters: florin and guilder
+
 {%
-   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters.md"
-   start="<!--quickstart-2-apache-example-deployment-a-kind-clusters-start-->"
-   end="<!--quickstart-2-apache-example-deployment-a-kind-clusters-end-->"
+   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin.md"
+   start="<!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-start-->"
+   end="<!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-end-->"
 %}
+
+{%
+   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder.md"
+   start="<!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-start-->"
+   end="<!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-end-->"
+%}
+### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md"
@@ -59,11 +68,15 @@ workload and summarization aspirations removed.
    end="<!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end-->"
 %}
 
+### c. Onboarding the clusters
+
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md"
    start="<!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start-->"
    end="<!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end-->"
 %}
+
+### d. Create and deploy the Apache Server workload into florin and guilder clusters
 
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md"
@@ -78,6 +91,8 @@ website](../../Coding%20Milestones/PoC2023q1/example1/),
 but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You could continue
 from here, doing the steps for the special workload.
+
+## 3. Teardown the environment
 
 {%
    include-markdown "quickstart-subs/quickstart-3-teardown-the-environment.md"

@@ -1,6 +1,4 @@
 <!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start-->
-### c. Onboarding the clusters
-
 Let's begin by onboarding the `florin` cluster:
 
 ```shell

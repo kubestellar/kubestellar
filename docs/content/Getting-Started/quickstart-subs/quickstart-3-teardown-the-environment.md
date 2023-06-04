@@ -1,6 +1,4 @@
 <!--quickstart-3-teardown-the-environment-start-->
-## 3. Teardown the environment
-
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ```shell
