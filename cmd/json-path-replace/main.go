@@ -28,40 +28,41 @@ import (
 func main() {
 	args := os.Args[1:]
 	if len(args)%2 != 0 {
-		fmt.Fprint(os.Stderr, "Usage: path replacement path replacement ... <input >output")
+		fmt.Fprint(os.Stderr, "Usage: path replacement path replacement ... <input >output\n")
 		os.Exit(1)
 	}
 	var data jsonpath.JSONValue
 	inputBytes, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read input: %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to read input: %v\n", err)
 		os.Exit(10)
 	}
 	err = json.Unmarshal(inputBytes, &data)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to parse input: %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to parse input: %v\n", err)
 		os.Exit(20)
 	}
 	for index := 0; index < len(args); index += 2 {
 		pathStr := args[index]
 		replacementStr := args[index+1]
-		parsed, err := jsonpath.ParseString(pathStr)
+		parsedPath, err := jsonpath.ParseString(pathStr)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to parse %dth JSONPath: %v", index/2, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse %dth JSONPath: %v\n", index/2, err)
 			os.Exit(30)
 		}
 		var replacementVal any
 		err = json.Unmarshal([]byte(replacementStr), &replacementVal)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to parse %dth replacement: %v", index/2, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse %dth replacement: %v\n", index/2, err)
 			os.Exit(31)
 		}
-		data = jsonpath.Apply(data, parsed, true, func(any) any { return replacementVal })
+		data = jsonpath.Apply(data, parsedPath, true, func(any) any { return replacementVal })
 	}
 	outputBytes, err := json.Marshal(data)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to marshal result: %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to marshal result: %v\n", err)
 		os.Exit(80)
 	}
 	os.Stdout.Write(outputBytes)
+	os.Stdout.Write([]byte{'\n'})
 }
