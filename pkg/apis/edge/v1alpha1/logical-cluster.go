@@ -20,12 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type ClusterProviderType string
-
-const (
-	KindProviderType ClusterProviderType = "kind"
-)
-
 // LogicalCluster represents a cluster.
 //
 // +crd
@@ -51,11 +45,8 @@ type LogicalCluster struct {
 
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
-	// ProviderType is the type of the provider of the cluster.
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="cluster is immutable"
-	ProviderType ClusterProviderType `json:"ProviderType"`
-
 	// ProviderName is the name of the provider of the cluster.
+	// The information for the provider can be found in the correspounding ClusterProviderInfo resource
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="cluster is immutable"
 	ProviderName string `json:"ProviderName"`
 

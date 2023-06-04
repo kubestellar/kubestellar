@@ -1,0 +1,9 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: EdgeCluster
+metadata:
+  name: dev3
+spec:
+  ClusterName: "fleet-test1"
+  URL: "127.0.0.1:45673"
+status:
+  ClusterConfig: "Initializing"

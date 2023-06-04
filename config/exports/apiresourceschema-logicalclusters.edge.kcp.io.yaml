@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230601-a969d6e8.logicalclusters.edge.kcp.io
+  name: v230605-10bf963c.logicalclusters.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -42,12 +42,8 @@ spec:
                 rule: self == oldSelf
             ProviderName:
               description: ProviderName is the name of the provider of the cluster.
-              type: string
-              x-kubernetes-validations:
-              - message: cluster is immutable
-                rule: self == oldSelf
-            ProviderType:
-              description: ProviderType is the type of the provider of the cluster.
+                The information for the provider can be found in the correspounding
+                ClusterProviderInfo resource
               type: string
               x-kubernetes-validations:
               - message: cluster is immutable
@@ -59,7 +55,6 @@ spec:
               type: string
           required:
           - ProviderName
-          - ProviderType
           type: object
         status:
           description: '`status` describes the status of the cluster object.'

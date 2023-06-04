@@ -10,5 +10,8 @@ spec:
   - v230317-d43d2d5.edgeplacements.edge.kcp.io
   - v230407-c87b2365.syncerconfigs.edge.kcp.io
   - v230413-5a4d4ba.edgesyncconfigs.edge.kcp.io
-  - v230601-a969d6e8.logicalclusters.edge.kcp.io
+  - v230605-10bf963c.clusterproviderinfods.edge.kcp.io
+  - v230605-10bf963c.clusterproviderinfos.edge.kcp.io
+  - v230605-10bf963c.logicalclusters.edge.kcp.io
+  - v230606-7d89df67.clusterproviderconfigs.edge.kcp.io
 status: {}

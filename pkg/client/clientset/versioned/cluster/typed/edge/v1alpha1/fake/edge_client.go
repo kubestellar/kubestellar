@@ -44,6 +44,10 @@ func (c *EdgeV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) edg
 	return &EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: clusterPath}
 }
 
+func (c *EdgeV1alpha1ClusterClient) ClusterProviderConfigs() kcpedgev1alpha1.ClusterProviderConfigClusterInterface {
+	return &clusterProviderConfigsClusterClient{Fake: c.Fake}
+}
+
 func (c *EdgeV1alpha1ClusterClient) Customizers() kcpedgev1alpha1.CustomizerClusterInterface {
 	return &customizersClusterClient{Fake: c.Fake}
 }
@@ -78,6 +82,10 @@ type EdgeV1alpha1Client struct {
 func (c *EdgeV1alpha1Client) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
+}
+
+func (c *EdgeV1alpha1Client) ClusterProviderConfigs() edgev1alpha1.ClusterProviderConfigInterface {
+	return &clusterProviderConfigsClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
 
 func (c *EdgeV1alpha1Client) Customizers(namespace string) edgev1alpha1.CustomizerInterface {

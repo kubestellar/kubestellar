@@ -1,0 +1,6 @@
+apiVersion: edge.kcp.io/v1alpha1
+kind: ClusterProviderConfig
+metadata:
+  name: dev2
+spec:
+  ProviderType: "kind"
