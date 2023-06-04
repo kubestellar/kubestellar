@@ -26,6 +26,8 @@ import (
 )
 
 type ClusterInterface interface {
+	// ClientProviderInfos returns a ClientProviderInfoClusterInformer
+	ClientProviderInfos() ClientProviderInfoClusterInformer
 	// Customizers returns a CustomizerClusterInformer
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
@@ -48,6 +50,11 @@ type version struct {
 // New returns a new ClusterInterface.
 func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalinterfaces.TweakListOptionsFunc) ClusterInterface {
 	return &version{factory: f, tweakListOptions: tweakListOptions}
+}
+
+// ClientProviderInfos returns a ClientProviderInfoClusterInformer
+func (v *version) ClientProviderInfos() ClientProviderInfoClusterInformer {
+	return &clientProviderInfoClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerClusterInformer
@@ -81,6 +88,8 @@ func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
 }
 
 type Interface interface {
+	// ClientProviderInfos returns a ClientProviderInfoInformer
+	ClientProviderInfos() ClientProviderInfoInformer
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
@@ -104,6 +113,11 @@ type scopedVersion struct {
 // New returns a new ClusterInterface.
 func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &scopedVersion{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// ClientProviderInfos returns a ClientProviderInfoInformer
+func (v *scopedVersion) ClientProviderInfos() ClientProviderInfoInformer {
+	return &clientProviderInfoScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerInformer

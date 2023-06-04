@@ -34,6 +34,7 @@ import (
 
 type EdgeV1alpha1ClusterInterface interface {
 	EdgeV1alpha1ClusterScoper
+	ClientProviderInfosClusterGetter
 	CustomizersClusterGetter
 	EdgePlacementsClusterGetter
 	EdgeSyncConfigsClusterGetter
@@ -55,6 +56,10 @@ func (c *EdgeV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) edg
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 	return c.clientCache.ClusterOrDie(clusterPath)
+}
+
+func (c *EdgeV1alpha1ClusterClient) ClientProviderInfos() ClientProviderInfoClusterInterface {
+	return &clientProviderInfosClusterInterface{clientCache: c.clientCache}
 }
 
 func (c *EdgeV1alpha1ClusterClient) Customizers() CustomizerClusterInterface {

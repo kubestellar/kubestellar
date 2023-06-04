@@ -88,6 +88,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericClusterInformer, error) {
 	switch resource {
 	// Group=edge.kcp.io, Version=V1alpha1
+	case edgev1alpha1.SchemeGroupVersion.WithResource("clientproviderinfos"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().ClientProviderInfos().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("customizers"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Customizers().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("edgeplacements"):
@@ -113,6 +115,9 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=edge.kcp.io, Version=V1alpha1
+	case edgev1alpha1.SchemeGroupVersion.WithResource("clientproviderinfos"):
+		informer := f.Edge().V1alpha1().ClientProviderInfos().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("customizers"):
 		informer := f.Edge().V1alpha1().Customizers().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil

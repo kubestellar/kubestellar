@@ -29,6 +29,10 @@ type FakeEdgeV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeEdgeV1alpha1) ClientProviderInfos() v1alpha1.ClientProviderInfoInterface {
+	return &FakeClientProviderInfos{c}
+}
+
 func (c *FakeEdgeV1alpha1) Customizers(namespace string) v1alpha1.CustomizerInterface {
 	return &FakeCustomizers{c, namespace}
 }
