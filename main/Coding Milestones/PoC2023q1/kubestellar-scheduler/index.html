@@ -1419,8 +1419,8 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
 </code></pre></div></p>
 <h4 id="create-the-workload-management-workspace-wmw-and-bind-it-to-the-espw-apis">Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs</h4>
-<p>Use the user home workspace (<code>~</code>) as the workload management workspace (WMW).
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="s1">&#39;~&#39;</span>
+<p>Use the user home workspace (\~) as the workload management workspace (WMW).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 </code></pre></div></p>
 <p>Bind APIs.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
@@ -1468,7 +1468,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <h4 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW</h4>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>test-1</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="s1">&#39;~&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_test-1.yaml
 </code></pre></div></p>
 <p>The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.

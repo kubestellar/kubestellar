@@ -113,6 +113,27 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-start/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-start/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q3/outline/</loc>
          <lastmod>2023-06-04</lastmod>
          <changefreq>daily</changefreq>
