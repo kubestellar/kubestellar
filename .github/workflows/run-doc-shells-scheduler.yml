@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   run-doc-shells:
-    name: Run doc shells - for QS e2e
+    name: Run doc shells - for scheduler e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
