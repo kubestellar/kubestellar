@@ -2,50 +2,32 @@
 title: "KubeStellar Scheduler"
 ---
 
-### Pre-requisite: 
-  You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-``` { .bash }
-brew install go@1.19
-```
+### Required Packages:
+  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
 
 ### Steps to try the scheduler
 
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest KubeStellar source:
-```shell
-git clone {{ config.repo_url }} KubeStellar
-```
-
-clone the v0.11.0 branch kcp source:
-```shell
-git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
-```
-build the kubectl-ws binary and include it in `$PATH`
-```shell
-cd kcp
-make build
-export PATH=$(pwd)/bin:$PATH
-```
-
-
-run kcp (kcp will spit out tons of information and stay running in this terminal window)
-```shell
-kcp start &
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md"
+   start="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-start-->"
+   end="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-end-->"
+%}
 
 #### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
 open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
-```shell
-sleep 30
-export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/bin:$PATH
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
+   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
+   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+%}
 
-Use workspace `root:edge` as the Edge Service Provider Workspace (ESPW).
-```shell
-kubectl ws root
-kubectl ws create edge --enter
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md"
+   start="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->"
+   end="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->"
+%}
 
 Install CRDs and APIExport.
 ```shell
@@ -55,7 +37,6 @@ kubectl apply -f ../KubeStellar/config/exports/
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
 Use the user home workspace (`~`) as the workload management workspace (WMW).
 ```shell
-set expand-tilde off
 kubectl ws '~'
 ```
 
