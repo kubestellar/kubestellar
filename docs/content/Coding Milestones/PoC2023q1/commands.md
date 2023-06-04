@@ -1,8 +1,3 @@
----
-title: "2023q1 PoC commands"
-linkTitle: "2023q1 PoC commands"
----
-
 This PoC includes two sorts of commands for users to use.  Most are
 executables delivered in the `bin` directory.  The other sort of
 command for users is a `bash` script that is designed to be fetched
@@ -27,7 +22,7 @@ and two for process control.
 
 The usage synopsis is as follows.
 
-```shell
+``` { .bash .no-copy }
 kubestellar [flags] subcommand [flags]
 ```
 
@@ -72,8 +67,10 @@ This command just echoes the [semantic version](https://semver.org/)
 of the release used.  This command is only available in archives built
 for a release.  Following is an example usage.
 
-```console
-$ kubestellar-release
+```shell
+kubestellar-release
+```
+``` { .bash .no-copy }
 v0.2.3-preview
 ```
 
@@ -87,18 +84,32 @@ defaults](https://github.com/kubernetes/client-go/blob/master/pkg/version/base.g
 It will either print one requested property or a JSON object
 containing many.
 
-```console
-$ kubestellar-version help
+```shell
+kubestellar-version help
+```
+``` { .bash .no-copy }
 Invalid component requested: "help"
 Usage: kubestellar-version [buildDate|gitCommit|gitTreeState|platform]
+```
 
-$ kubestellar-version buildDate
+```shell
+kubestellar-version buildDate
+```
+``` { .bash .no-copy }
 2023-05-19T02:54:01Z
+```
 
-$ kubestellar-version gitCommit
+```shell
+kubestellar-version gitCommit
+```
+``` { .bash .no-copy }
 1747254b
+```
 
-$ kubestellar-version          
+```shell
+kubestellar-version          
+```
+``` { .bash .no-copy }
 {"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
 ```
 
@@ -138,8 +149,10 @@ This command does not depend on the action of any of the edge-mc
 
 An example usage follows.
 
-```console
-$ kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+```shell
+kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo1 created
 location.scheduling.kcp.io/demo1 created
@@ -196,17 +209,23 @@ This command does not depend on the action of any of the edge-mc
 
 The following session demonstrates usage, including idempotency.
 
-```console
-$ kubectl ws root:imw-1
+```shell
+kubectl ws root:imw-1
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
+```
 
-$ kubectl kubestellar remove location demo1
+```shell
+kubectl kubestellar remove location demo1
+```
+``` { .bash .no-copy }
 synctarget.workload.kcp.io "demo1" deleted
 location.scheduling.kcp.io "demo1" deleted
+```
 
-$ kubectl kubestellar remove location demo1
-
-$ 
+```shell
+kubectl kubestellar remove location demo1
 ```
 
 ## Syncer preparation and installation
@@ -255,8 +274,10 @@ command will wait for 10 to 70 seconds for that to happen.
 
 An example usage follows.
 
-```console
-$ kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
+```shell
+kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 Current workspace is "root:espw"
 Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
@@ -302,8 +323,10 @@ the kcp current workspace will be what it was at the start.
 
 An example usage follows.
 
-```console
-$ kubectl kubestellar prep-for-cluster --imw root:imw-1 demo2 key1=val1
+```shell
+kubectl kubestellar prep-for-cluster --imw root:imw-1 demo2 key1=val1
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo2 created
 location.scheduling.kcp.io/demo2 created
@@ -374,11 +397,17 @@ The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube APIBinding
 is included.
 
-```console
-$ kubectl ws .
+```shell
+kubectl ws .
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl kubestellar ensure wmw example-wmw
+```shell
+kubectl kubestellar ensure wmw example-wmw
+```
+``` { .bash .no-copy }
 Current workspace is "root".
 Current workspace is "root:my-org".
 Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
@@ -386,25 +415,39 @@ Workspace "example-wmw" (type root:universal) is ready to use.
 Current workspace is "root:my-org:example-wmw" (type root:universal).
 apibinding.apis.kcp.io/bind-espw created
 apibinding.apis.kcp.io/bind-kube created
+```
 
-$ kubectl ws ..
+```shell
+kubectl ws ..
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl kubestellar ensure wmw example-wmw
+```shell
+kubectl kubestellar ensure wmw example-wmw
+```
+``` { .bash .no-copy }
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
+```
 
-$ kubectl ws ..
+```shell
+kubectl ws ..
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl kubestellar ensure wmw example-wmw --with-kube false
+```shell
+kubectl kubestellar ensure wmw example-wmw --with-kube false
+```
+``` { .bash .no-copy }
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
-apibinding.apis.kcp.io "bind-kube" deleted
-
-$ 
+apibinding.apis.kcp.io "bind-kube" deleted 
 ```
 
 ## Removing a Workload Management Workspace
@@ -412,39 +455,61 @@ $
 Deleting a WMW can be done by simply deleting its `Workspace` object from
 the parent.
 
-```console
-$ kubectl ws .
+```shell
+kubectl ws .
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org:example-wmw".
+```
 
-$ kubectl ws ..
+```shell
+kubectl ws ..
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl delete Workspace example-wmw
-workspace.tenancy.kcp.io "example-wmw" deleted
-
-$ 
+```shell
+kubectl delete Workspace example-wmw
+```
+``` { .bash .no-copy }
+workspace.tenancy.kcp.io "example-wmw" deleted 
 ```
 
 Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.
 
-```console
-$ kubectl kubestellar remove wmw -h
+```shell
+kubectl kubestellar remove wmw -h
+```
+``` { .bash .no-copy }
 Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name
+```
 
-$ kubectl ws root:my-org
+```shell
+kubectl ws root:my-org
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl kubestellar remove wmw demo1
+```shell
+kubectl kubestellar remove wmw demo1
+```
+``` { .bash .no-copy }
 workspace.tenancy.kcp.io "demo1" deleted
+```
 
-$ kubectl ws .
+```shell
+kubectl ws .
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org".
+```
 
-$ kubectl kubestellar remove wmw demo1
-
-$ 
+```shell
+kubectl kubestellar remove wmw demo1
 ```
 
 # Web-to-bash
