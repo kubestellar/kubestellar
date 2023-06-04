@@ -70,5 +70,13 @@ jobs:
         id: install
   
 
-      - run: make MANIFEST="content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md,content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters.md,content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md,content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md,content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md,content/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment.md" run-doc-shells
+      - run: |
+          make MANIFEST="'content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md', \
+            'content/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment.md'" \
+            run-doc-shells
       
