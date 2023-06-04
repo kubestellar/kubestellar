@@ -46,9 +46,9 @@ kubectl apply -f ../KubeStellar/config/imports/
 ```
 
 #### Run the KubeStellar Scheduler against the ESPW
-Go to `root:edge` workspace and run the edge scheduler.
+Go to `root:espw` workspace and run the edge scheduler.
 ```shell
-kubectl ws root:edge
+kubectl ws root:espw
 cd ../KubeStellar
 go run cmd/kubestellar-scheduler/main.go -v 2 &
 ```
