@@ -100,6 +100,7 @@ kubectl create -f ../KubeStellar/config/samples/location_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/location_dev.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_dev.yaml
+sleep 10
 ```
 
 Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
