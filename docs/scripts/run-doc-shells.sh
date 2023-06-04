@@ -23,8 +23,10 @@ REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
 FILE_LIST=()
-IFS=', ' read -r -a FILE_LIST <<< "${MANIFEST}"
+SAVEIFS=$IFS
 
+IFS=',' read -r -a FILE_LIST <<< "${MANIFEST}"
+echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
@@ -50,14 +52,15 @@ if [ -f "/etc/os-release" ]; then
   fi
 else
   echo "The operating system is not Ubuntu."
-  code_blocks+=("brew install podman && podman machine init && podman machine start")
-  code_blocks+=('alias docker=podman')
-  code_blocks+=('KIND_EXPERIMENTAL_PROVIDER=podman')
+  # code_blocks+=("brew install podman && podman machine init && podman machine start")
+  # code_blocks+=('alias docker=podman')
+  # code_blocks+=('KIND_EXPERIMENTAL_PROVIDER=podman')
 
 fi
 
 inside_block=0
 
+repo_url=$(yq -r ".repo_url" $REPO_ROOT/docs/mkdocs.yml)
 repo_raw_url=$(yq -r ".repo_raw_url" $REPO_ROOT/docs/mkdocs.yml)
 ks_branch=$(yq -r ".ks_branch" $REPO_ROOT/docs/mkdocs.yml)
 ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
@@ -69,6 +72,7 @@ code_blocks+=('set -o xtrace')
 
 for FILE_NAME in "${FILE_LIST[@]}"
 do
+  echo $FILE_NAME
   # read the readme file line by line
   while IFS= read -r line; do
     # check if the line matches the pattern
@@ -82,6 +86,7 @@ do
     if [[ $inside_block == 1 ]]; then
       # remove the backticks from the code block
       code_block="${line//\`\`\`shell/}"
+      code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
       code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
       code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
       code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
@@ -91,6 +96,8 @@ do
     fi
   done < "$REPO_ROOT/docs/$FILE_NAME"
 done
+
+IFS=$SAVEIFS
 
 generated_script_file="$REPO_ROOT/docs/scripts/generated_script.sh"
 echo "" > "$generated_script_file"
