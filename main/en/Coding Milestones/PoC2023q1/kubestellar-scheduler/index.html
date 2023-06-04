@@ -1397,7 +1397,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start--&gt;' '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end--&gt;' -->
 
 <p>Next, create the edge service provider workspace:</p>
-<p>Use workspace <code>root:edge</code> as the Edge Service Provider Workspace (ESPW).
+<p>Use workspace <code>root:espw</code> as the Edge Service Provider Workspace (ESPW).
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>edge<span class="w"> </span>--enter
 </code></pre></div></p>
@@ -1414,8 +1414,8 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
 </code></pre></div></p>
 <h4 id="run-the-kubestellar-scheduler-against-the-espw">Run the KubeStellar Scheduler against the ESPW</h4>
-<p>Go to <code>root:edge</code> workspace and run the edge scheduler.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:edge
+<p>Go to <code>root:espw</code> workspace and run the edge scheduler.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div></p>
