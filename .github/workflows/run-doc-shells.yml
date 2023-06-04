@@ -1,4 +1,4 @@
-name: Parse MD files for shell code blocks and run them
+name: Run Doc Shells - QS
 
 on:
   # So we can trigger manually if needed
