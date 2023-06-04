@@ -1378,7 +1378,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kcp<span class="w"> </span>start
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div></p>
 <h4 id="create-the-edge-service-provider-workspace-espw-and-populate-it-with-crds-and-apis">Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs</h4>
 <p>open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.
@@ -1403,7 +1403,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <p>Go to <code>root:edge</code> workspace and run the edge scheduler.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:edge
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 </code></pre></div></p>
 <p>The outputs from the edge scheduler should be similar to:
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>I0327<span class="w"> </span><span class="m">17</span>:14:42.222112<span class="w">   </span><span class="m">51241</span><span class="w"> </span>kubestellar-scheduler.go:243<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io&quot;</span>
