@@ -1428,6 +1428,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_dev.yaml
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_prod.yaml
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_dev.yaml
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
 <p>Note that kcp automatically creates a Location <code>default</code>. So there are 3 Locations and 2 SyncTargets in <code>root:compute</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>locations,synctargets
