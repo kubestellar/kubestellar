@@ -23,10 +23,10 @@ they appear in this example.
    end="<!--example1-start-kcp-end-->"
 %}
 
-'''shell
+```shell
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH
-'''
+```
 
 {%
    include-markdown "example1-subs/example1-post-kcp.md"
