@@ -134,10 +134,24 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start/</loc>
          <lastmod>2023-06-04</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-staart-without-cd-kubestellar/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-staart-without-cd-kubestellar/"/>
          
     </url>
     <url>
@@ -260,10 +274,17 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters/</loc>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin/</loc>
          <lastmod>2023-06-04</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder/"/>
          
     </url>
     <url>
