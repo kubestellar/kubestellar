@@ -1767,6 +1767,10 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
+<p>'''shell
+export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
+export PATH=$(pwd)/bin:$PATH
+'''</p>
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
 <h3 id="create-an-inventory-management-workspace">Create an inventory management workspace.</h3>
