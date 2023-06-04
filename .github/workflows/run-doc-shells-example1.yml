@@ -69,8 +69,8 @@ jobs:
   
 
       - run: |
-          make MANIFEST="'content/Coding Milestones/PoC2023q1/example1-pre-kcp.md'",\
-          'content/Coding Milestones/PoC2023q1/example1-start-kcp.md'",\
-          'content/Coding Milestones/PoC2023q1/example1-post-kcp.md'",\
-          'content/Coding Milestones/PoC2023q1/example1-post-espw.md'",\
+          make MANIFEST="'content/Coding Milestones/PoC2023q1/example1-pre-kcp.md',\
+          'content/Coding Milestones/PoC2023q1/example1-start-kcp.md',\
+          'content/Coding Milestones/PoC2023q1/example1-post-kcp.md',\
+          'content/Coding Milestones/PoC2023q1/example1-post-espw.md'" \
           run-doc-shells
