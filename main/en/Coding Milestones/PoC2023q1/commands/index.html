@@ -21,7 +21,7 @@
     
     
       
-        <title>2023q1 PoC commands - KubeStellar</title>
+        <title>Commands - KubeStellar</title>
       
     
     
@@ -134,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              2023q1 PoC commands
+              Commands
             
           </span>
         </div>
@@ -1435,7 +1435,7 @@ in that file.</p>
 <p>The <code>kubestellar</code> command has three subcommands, one to finish setup
 and two for process control.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubestellar<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span><span class="w"> </span>subcommand<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubestellar<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span><span class="w"> </span>subcommand<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 </code></pre></div>
 <p>This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The <code>--log-folder</code> flag is
@@ -1469,9 +1469,10 @@ the ESPW.</p>
 <p>This command just echoes the <a href="https://semver.org/">semantic version</a>
 of the release used.  This command is only available in archives built
 for a release.  Following is an example usage.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>kubestellar-release
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">v0.2.3-preview</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubestellar-release
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>v0.2.3-preview
+</code></pre></div></p>
 <h2 id="kubestellar-version">Kubestellar-version</h2>
 <p>This executable prints information about itself captured at build
 time.  If built by <code>make</code> then this is information conveyed by the
@@ -1479,19 +1480,23 @@ Makefile; otherwise it is <a href="https://github.com/kubernetes/client-go/blob/
 defaults</a>.</p>
 <p>It will either print one requested property or a JSON object
 containing many.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gp">$ </span>kubestellar-version<span class="w"> </span><span class="nb">help</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go">Invalid component requested: &quot;help&quot;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">Usage: kubestellar-version [buildDate|gitCommit|gitTreeState|platform]</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="gp">$ </span>kubestellar-version<span class="w"> </span>buildDate
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">2023-05-19T02:54:01Z</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="gp">$ </span>kubestellar-version<span class="w"> </span>gitCommit
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="go">1747254b</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="gp">$ </span>kubestellar-version<span class="w">          </span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="go">{&quot;major&quot;:&quot;1&quot;,&quot;minor&quot;:&quot;24&quot;,&quot;gitVersion&quot;:&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;,&quot;gitCommit&quot;:&quot;1747254b&quot;,&quot;gitTreeState&quot;:&quot;dirty&quot;,&quot;buildDate&quot;:&quot;2023-05-19T02:54:01Z&quot;,&quot;goVersion&quot;:&quot;go1.19.9&quot;,&quot;compiler&quot;:&quot;gc&quot;,&quot;platform&quot;:&quot;darwin/amd64&quot;}</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubestellar-version<span class="w"> </span><span class="nb">help</span>
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Invalid<span class="w"> </span>component<span class="w"> </span>requested:<span class="w"> </span><span class="s2">&quot;help&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Usage:<span class="w"> </span>kubestellar-version<span class="w"> </span><span class="o">[</span>buildDate<span class="p">|</span>gitCommit<span class="p">|</span>gitTreeState<span class="p">|</span>platform<span class="o">]</span>
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubestellar-version<span class="w"> </span>buildDate
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="m">2023</span>-05-19T02:54:01Z
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubestellar-version<span class="w"> </span>gitCommit
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>1747254b
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubestellar-version<span class="w">          </span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="o">{</span><span class="s2">&quot;major&quot;</span>:<span class="s2">&quot;1&quot;</span>,<span class="s2">&quot;minor&quot;</span>:<span class="s2">&quot;24&quot;</span>,<span class="s2">&quot;gitVersion&quot;</span>:<span class="s2">&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;</span>,<span class="s2">&quot;gitCommit&quot;</span>:<span class="s2">&quot;1747254b&quot;</span>,<span class="s2">&quot;gitTreeState&quot;</span>:<span class="s2">&quot;dirty&quot;</span>,<span class="s2">&quot;buildDate&quot;</span>:<span class="s2">&quot;2023-05-19T02:54:01Z&quot;</span>,<span class="s2">&quot;goVersion&quot;</span>:<span class="s2">&quot;go1.19.9&quot;</span>,<span class="s2">&quot;compiler&quot;</span>:<span class="s2">&quot;gc&quot;</span>,<span class="s2">&quot;platform&quot;</span>:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
+</code></pre></div></p>
 <h2 id="creating-synctargetlocation-pairs">Creating SyncTarget/Location pairs</h2>
 <p>In this PoC, the interface between infrastructure and workload
 management is inventory API objects.  Specifically, for each edge
@@ -1499,7 +1504,7 @@ cluster there is a unique pair of SyncTarget and Location objects in a
 so-called inventory management workspace.  The following command helps
 with making that pair of objects.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
 </code></pre></div>
 <p>Here <code>objname</code> is the name for the SyncTarget object and also the name
 for the Location object.  This command ensures that these objects exist
@@ -1518,41 +1523,42 @@ IMW.</p>
 <p>This command does not depend on the action of any of the edge-mc
 (KubeStellar) controllers.</p>
 <p>An example usage follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="go">synctarget.workload.kcp.io/demo1 created</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="go">location.scheduling.kcp.io/demo1 created</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="go">synctarget.workload.kcp.io/demo1 labeled</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="go">location.scheduling.kcp.io/demo1 labeled</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="go">synctarget.workload.kcp.io/demo1 labeled</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="go">location.scheduling.kcp.io/demo1 labeled</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>created
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
+</code></pre></div></p>
 <p>The above example shows using this script to create a SyncTarget and a
 Location named <code>demo1</code> with labels <code>foo=bar</code> and <code>the-word=the-bird</code>.
 This was equivalent to the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s">kind: SyncTarget</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="s">metadata:</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="s">  name: demo1</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="s">  labels:</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="s">    id: demo1</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="s">    the-word: the-bird</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="s">---</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="s">apiVersion: scheduling.kcp.io/v1alpha1</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="s">kind: Location</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="s">metadata:</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="s">  name: demo1</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="s">  labels:</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="s">    the-word: the-bird</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="s">spec:</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="s">  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="s">  instanceSelector:</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="s">    matchLabels: {&quot;id&quot;:&quot;demo1&quot;}</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s">kind: SyncTarget</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s">metadata:</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="s">  name: demo1</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="s">  labels:</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="s">    id: demo1</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="s">    the-word: the-bird</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="s">---</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="s">apiVersion: scheduling.kcp.io/v1alpha1</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="s">kind: Location</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="s">metadata:</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="s">  name: demo1</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="s">  labels:</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="s">    the-word: the-bird</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="s">spec:</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="s">  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="s">  instanceSelector:</span>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="s">    matchLabels: {&quot;id&quot;:&quot;demo1&quot;}</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>This command operates in idempotent style, making whatever changes (if
 any) are needed to move from the current state to the desired state.
@@ -1566,16 +1572,16 @@ command line syntax and semantics except that the
 <p>This command does not depend on the action of any of the edge-mc
 (KubeStellar) controllers.</p>
 <p>The following session demonstrates usage, including idempotency.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="go">synctarget.workload.kcp.io &quot;demo1&quot; deleted</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="go">location.scheduling.kcp.io &quot;demo1&quot; deleted</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="gp">$ </span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>synctarget.workload.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>location.scheduling.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
 <h2 id="syncer-preparation-and-installation">Syncer preparation and installation</h2>
 <p>The syncer runs in each edge cluster and also talks to the
@@ -1586,7 +1592,7 @@ objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
 install the syncer in the edge cluster.</p>
 <p>The usage synopsis is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>flag...<span class="w"> </span>synctarget_name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>flag...<span class="w"> </span>synctarget_name
 </code></pre></div>
 <p>Here <code>synctarget_name</code> is the name of the <code>SyncTarget</code> object, in the
 relevant IMW, corresponding to the relevant edge cluster.</p>
@@ -1613,29 +1619,30 @@ when the command started.</p>
 and conditioned the mailbox workspace for the given SyncTarget.  This
 command will wait for 10 to 70 seconds for that to happen.</p>
 <p>An example usage follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="go">Current workspace is &quot;root:espw&quot;</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="go">Current workspace is &quot;root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot; (type root:universal).</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="go">Creating service account &quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="go">Creating cluster role &quot;kcp-edge-syncer-demo1-28at01r3&quot; to give service account &quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="go"> 1. write and sync access to the synctarget &quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="go"> 2. write access to apiresourceimports.</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="go">Creating or updating cluster role binding &quot;kcp-edge-syncer-demo1-28at01r3&quot; to bind service account &quot;kcp-edge-syncer-demo1-28at01r3&quot; to cluster role &quot;kcp-edge-syncer-demo1-28at01r3&quot;.</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="go">Wrote physical cluster manifest to demo1-syncer.yaml for namespace &quot;kcp-edge-syncer-demo1-28at01r3&quot;. Use</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="go">  KUBECONFIG=&lt;pcluster-config&gt; kubectl apply -f &quot;demo1-syncer.yaml&quot;</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="go">to apply it. Use</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="go">  KUBECONFIG=&lt;pcluster-config&gt; kubectl get deployment -n &quot;kcp-edge-syncer-demo1-28at01r3&quot; kcp-edge-syncer-demo1-28at01r3</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="go">to verify the syncer pod is running.</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="go">Current workspace is &quot;root:espw&quot;.</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>.
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo1-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo1-syncer.yaml&quot;</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>kcp-edge-syncer-demo1-28at01r3
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+</code></pre></div></p>
 <p>Once that script has run, the YAML for the objects to create in the
 edge cluster is in your chosen output file.  The default for the
 output file is the name of the SyncTarget object with "-syncer.yaml"
@@ -1643,7 +1650,7 @@ appended.</p>
 <p>Create those objects with a command like the following; adjust as
 needed to configure <code>kubectl</code> to modify the edge cluster and read your
 chosen output file.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
 </code></pre></div>
 <h2 id="edge-cluster-on-boarding">Edge cluster on-boarding</h2>
 <p>The following command is a combination of <code>kubectl kubestellar
@@ -1651,33 +1658,34 @@ ensure-location</code> and <code>kubectl kubestellar prep-for-syncer</code>, and
 the union of their command line flags and arguments.  Upon completion,
 the kcp current workspace will be what it was at the start.</p>
 <p>An example usage follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="go">synctarget.workload.kcp.io/demo2 created</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="go">location.scheduling.kcp.io/demo2 created</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="go">synctarget.workload.kcp.io/demo2 labeled</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="go">location.scheduling.kcp.io/demo2 labeled</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="go">Current workspace is &quot;root:imw-1&quot;.</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="go">Current workspace is &quot;root:espw&quot;.</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="go">Current workspace is &quot;root:espw:1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7&quot; (type root:universal).</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="go">Creating service account &quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="go">Creating cluster role &quot;kcp-edge-syncer-demo2-15nq4e94&quot; to give service account &quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="go"> 1. write and sync access to the synctarget &quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="go"> 2. write access to apiresourceimports.</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="go">Creating or updating cluster role binding &quot;kcp-edge-syncer-demo2-15nq4e94&quot; to bind service account &quot;kcp-edge-syncer-demo2-15nq4e94&quot; to cluster role &quot;kcp-edge-syncer-demo2-15nq4e94&quot;.</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="go">Wrote physical cluster manifest to demo2-syncer.yaml for namespace &quot;kcp-edge-syncer-demo2-15nq4e94&quot;. Use</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="go">  KUBECONFIG=&lt;pcluster-config&gt; kubectl apply -f &quot;demo2-syncer.yaml&quot;</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="go">to apply it. Use</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="go">  KUBECONFIG=&lt;pcluster-config&gt; kubectl get deployment -n &quot;kcp-edge-syncer-demo2-15nq4e94&quot; kcp-edge-syncer-demo2-15nq4e94</span>
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="go">to verify the syncer pod is running.</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>created
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>created
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>labeled
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>labeled
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>.
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo2-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo2-syncer.yaml&quot;</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
+<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a>
+<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>kcp-edge-syncer-demo2-15nq4e94
+<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>
+<a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
+</code></pre></div></p>
 <h2 id="creating-a-workload-management-workspace">Creating a Workload Management Workspace</h2>
 <p>Such a workspace needs not only to be created but also populated with
 an <code>APIBinding</code> to the edge API and, if desired, an <code>APIBinding</code> to
@@ -1690,7 +1698,7 @@ kinds that are supported; illustrative examples include RBAC objects,
 <code>CustomResourceDefinition</code>, and <code>ConfigMap</code>.  For a full description,
 see <a href="../outline/#data-objects">the categorization in the design</a>.</p>
 <p>The usage synopsis for this command is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>parent_pathname<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>parent_pathname<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div>
 <p>Here <code>parent_pathname</code> is the workspace pathname of the parent of the
 WMW, and <code>wm_workspace_name</code> is the name (not pathname, just a bare
@@ -1710,69 +1718,76 @@ be done.</p>
 <p>The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube APIBinding
 is included.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="go">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="go">Workspace &quot;example-wmw&quot; (type root:universal) created. Waiting for it to be ready...</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="go">Workspace &quot;example-wmw&quot; (type root:universal) is ready to use.</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="go">Current workspace is &quot;root:my-org:example-wmw&quot; (type root:universal).</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="go">apibinding.apis.kcp.io/bind-espw created</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="go">apibinding.apis.kcp.io/bind-kube created</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>..
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="go">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="go">Current workspace is &quot;root:my-org:example-wmw&quot; (type root:universal).</span>
-<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>
-<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>..
-<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>
-<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
-<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="go">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="go">Current workspace is &quot;root:my-org:example-wmw&quot; (type root:universal).</span>
-<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="go">apibinding.apis.kcp.io &quot;bind-kube&quot; deleted</span>
-<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>
-<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="gp">$ </span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>created.<span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>it<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span>ready...
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>ready<span class="w"> </span>to<span class="w"> </span>use.
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>apibinding.apis.kcp.io/bind-espw<span class="w"> </span>created
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>apibinding.apis.kcp.io/bind-kube<span class="w"> </span>created
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kube&quot;</span><span class="w"> </span>deleted<span class="w"> </span>
+</code></pre></div></p>
 <h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace</h2>
 <p>Deleting a WMW can be done by simply deleting its <code>Workspace</code> object from
 the parent.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="go">Current workspace is &quot;root:my-org:example-wmw&quot;.</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>..
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="gp">$ </span>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="go">workspace.tenancy.kcp.io &quot;example-wmw&quot; deleted</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="gp">$ </span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted<span class="w"> </span>
+</code></pre></div></p>
 <p>Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="go">Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="go">workspace.tenancy.kcp.io &quot;demo1&quot; deleted</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="go">Current workspace is &quot;root:my-org&quot;.</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="gp">$ </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="gp">$ </span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>parent<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
 <h1 id="web-to-bash">Web-to-bash</h1>
 <h2 id="quick-setup">Quick Setup</h2>
