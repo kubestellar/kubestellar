@@ -1,0 +1,71 @@
+name: Run Doc Shells - Mailbox
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - main
+#       - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
+      - ".github/workflows/run-doc-shells-mailbox.yml"
+  push:
+    branches:
+      - main
+#       - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
+      - ".github/workflows/run-doc-shells-mailbox.yml"
+
+permissions:
+  contents: write
+
+# concurrency:
+#   group: ${{ github.workflow }}
+
+jobs:
+  run-doc-shells:
+    name: Run doc shells - for mailbox e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+#       - uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.10'
+#           cache: 'pip'
+
+#       - name: Install kind
+#         uses: engineerd/setup-kind@v0.5.0
+#         with:
+#           version: "v0.11.1"
+
+#       - name: Install jq
+#         uses: dcarbone/install-jq-action@v1.0.1
+
+#       - name: Install yq
+#         uses: frenck/action-setup-yq@v1
+
+#       - name: Install docker
+#         uses: docker-practice/actions-setup-docker@master
+#         timeout-minutes: 12
+        
+#       - run: |
+#           set -x
+#           docker version
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+  
+
+      - run: make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md','content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md','content/Coding Milestones/PoC2023q1/mailbox-controller.md'" run-doc-shells
