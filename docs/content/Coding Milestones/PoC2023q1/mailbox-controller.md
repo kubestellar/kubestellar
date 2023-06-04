@@ -87,9 +87,11 @@ open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig 
 
 After that, a run of the controller should look like the following.
 
-```shell
-go run ./cmd/mailbox-controller -v=2 &
-```
+{%
+   include-markdown "mailbox-controller-subs/mailbox-controller-process-start.md"
+   start="<!--mailbox-controller-process-start-start-->"
+   end="<!--mailbox-controller-process-start-end-->"
+%}
 ``` { .bash .no-copy }
 I0305 18:06:20.046741   85556 main.go:110] "Command line flag" add_dir_header="false"
 I0305 18:06:20.046954   85556 main.go:110] "Command line flag" alsologtostderr="false"
@@ -119,7 +121,6 @@ I0305 18:06:20.172196   85556 main.go:210] "Informers synced"
 In a separate terminal window(3), create an inventory management workspace as follows.
 
 ```shell
-sleep 15
 kubectl ws \~
 kubectl ws create imw --enter
 ```

@@ -152,9 +152,11 @@ should look like the following (possibly including some complaints,
 which do not necessarily indicate real problems because the subsequent
 success is not logged so profligately).
 
-```shell
-go run ./cmd/placement-translator &
-```
+{%
+   include-markdown "placement-translator-subs/placement-translator-process-start.md"
+   start="<!--placement-translator-process-start-start-->"
+   end="<!--placement-translator-process-start-end-->"
+%}
 ``` { .bash .no-copy }
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
 I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
@@ -190,7 +192,6 @@ You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
 ```shell
-sleep 15
 kubectl get workspace
 ```
 ``` { .bash .no-copy }

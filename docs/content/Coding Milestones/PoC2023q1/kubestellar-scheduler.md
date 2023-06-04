@@ -31,9 +31,9 @@ kubectl apply -f ../KubeStellar/config/exports/
 ```
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
-Use the user home workspace (`~`) as the workload management workspace (WMW).
+Use the user home workspace (\~) as the workload management workspace (WMW).
 ```shell
-kubectl ws '~'
+kubectl ws \~
 ```
 
 Bind APIs.
@@ -98,7 +98,7 @@ synctarget.workload.kcp.io/prod   2m12s
 #### Create some EdgePlacements in the WMW
 Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
 ```shell
-kubectl ws '~'
+kubectl ws \~
 kubectl create -f ../KubeStellar/config/samples/edgeplacement_test-1.yaml
 ```
 
