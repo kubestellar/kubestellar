@@ -4,6 +4,6 @@ Next, create the edge service provider workspace:
 Use workspace `root:espw` as the Edge Service Provider Workspace (ESPW).
 ```shell
 kubectl ws root
-kubectl ws create espw --enter
+kubectl ws create espw
 ```
 <!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->

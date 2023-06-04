@@ -26,29 +26,26 @@ open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig 
 %}
 
 Install CRDs and APIExport.
-```shell
-kubectl apply -f ../KubeStellar/config/exports/
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-exports.md"
+   start="<!--kubestellar-scheduler-exports-start-->"
+   end="<!--kubestellar-scheduler-exports-end-->"
+%}
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
-Use the user home workspace (\~) as the workload management workspace (WMW).
-```shell
-kubectl ws \~
-```
-
-Bind APIs.
-```shell
-kubectl apply -f ../KubeStellar/config/imports/
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-imports.md"
+   start="<!--kubestellar-scheduler-imports-start-->"
+   end="<!--kubestellar-scheduler-imports-end-->"
+%}
 
 #### Run the KubeStellar Scheduler against the ESPW
-Go to `root:espw` workspace and run the edge scheduler.
-```shell
-kubectl ws root:espw
-cd ../KubeStellar
-go run cmd/kubestellar-scheduler/main.go -v 2 &
-```
-
+Go to the `root:espw` workspace and run the edge scheduler.
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md"
+   start="<!--kubestellar-scheduler-process-start-start-->"
+   end="<!--kubestellar-scheduler-process-start-end-->"
+%}
 The outputs from the edge scheduler should be similar to:
 ``` { .bash .no-copy }
 I0327 17:14:42.222112   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
@@ -60,7 +57,6 @@ I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controlle
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
 open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
 ```shell
-sleep 15
 cd ../kcp
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH
