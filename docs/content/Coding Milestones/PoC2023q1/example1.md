@@ -34,7 +34,8 @@ file named `florin-config.yaml` with the following contents.  In a
 also a host (a Kubernetes node), while the `hostPort` is about the
 host that hosts that container.
 
-```yaml
+```shell
+cat > florin-config.yaml << EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -42,6 +43,7 @@ nodes:
   extraPortMappings:
   - containerPort: 8081
     hostPort: 8094
+EOF
 ```
 
 For the guilder cluster, which will get two workloads, create a file
@@ -49,7 +51,8 @@ named `guilder-config.yaml` with the following contents.  The workload
 that uses hostPort 8081 goes in both clusters, while the workload that
 uses hostPort 8082 goes only in the guilder cluster.
 
-```yaml
+```shell
+cat > guilder-config.yaml << EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -59,6 +62,7 @@ nodes:
     hostPort: 8096
   - containerPort: 8082
     hostPort: 8097
+EOF
 ```
 
 Finally, create the two clusters with the following two commands,
@@ -201,7 +205,9 @@ Eventually.  In the meantime, you can use the edge-mc command shown
 here.
 
 ```shell
-$ mailbox-controller -v=2
+mailbox-controller -v=2
+```
+``` { .bash .no-copy }
 ...
 I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
 ...
@@ -223,7 +229,9 @@ normally it would run continuously.
 You can get a listing of those mailbox workspaces as follows.
 
 ```shell
-$ kubectl get Workspaces
+kubectl get Workspaces
+```
+``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1   universal            Ready   https://192.168.58.123:6443/clusters/1najcltzt2nqax47   50s
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c   universal            Ready   https://192.168.58.123:6443/clusters/1y7wll1dz806h3sb   50s
@@ -233,7 +241,9 @@ More usefully, using custom columns you can get a listing that shows
 the _name_ of the associated SyncTarget.
 
 ```shell
-$ kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
+kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
+```
+``` { .bash .no-copy }
 NAME                                                       SYNCTARGET   CLUSTER
 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1   florin       1najcltzt2nqax47
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c   guilder      1y7wll1dz806h3sb
@@ -243,7 +253,9 @@ Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```shell
-$ kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
+kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
+```
+``` { .bash .no-copy }
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
 ```
 
@@ -255,7 +267,9 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```shell
-$ kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
+kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
@@ -285,7 +299,9 @@ cluster.  That will look something like the following; adjust as
 necessary to make kubectl manipulate **your** guilder cluster.
 
 ```shell
-$ KUBECONFIG=~/.kube/config kubectl --context kind-guilder apply -f guilder-syncer.yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder apply -f guilder-syncer.yaml
+```
+``` { .bash .no-copy }
 namespace/kcp-edge-syncer-guilder-wfeig2lv created
 serviceaccount/kcp-edge-syncer-guilder-wfeig2lv created
 secret/kcp-edge-syncer-guilder-wfeig2lv-token created
@@ -298,7 +314,9 @@ deployment.apps/kcp-edge-syncer-guilder-wfeig2lv created
 You might check that the syncer is running, as follows.
 
 ```shell
-$ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A
+```
+``` { .bash .no-copy }
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 kcp-edge-syncer-guilder-saaywsu5   kcp-edge-syncer-guilder-saaywsu5   1/1     1            1           52s
 kube-system                        coredns                            2/2     2            2           35m
@@ -310,7 +328,9 @@ local-path-storage                 local-path-provisioner             1/1     1 
 Do the analogous stuff for the florin cluster.
 
 ```shell
-$ kubectl kubestellar prep-for-syncer --imw root:imw-1 florin
+kubectl kubestellar prep-for-syncer --imw root:imw-1 florin
+```
+``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
@@ -337,7 +357,9 @@ Current workspace is "root:espw".
 And deploy the syncer in the florin cluster.
 
 ```shell
-$ KUBECONFIG=~/.kube/config kubectl --context kind-florin apply -f florin-syncer.yaml 
+KUBECONFIG=~/.kube/config kubectl --context kind-florin apply -f florin-syncer.yaml 
+```
+``` { .bash .no-copy }
 namespace/kcp-edge-syncer-florin-32uaph9l created
 serviceaccount/kcp-edge-syncer-florin-32uaph9l created
 secret/kcp-edge-syncer-florin-32uaph9l-token created
@@ -640,9 +662,15 @@ scheduler.  In the meantime, you can run it by hand: switch to the
 ESPW and invoke the edge-mc command that runs the scheduler.
 
 ```shell
-$ kubectl ws root:espw
+kubectl ws root:espw
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw".
-$ kubestellar-scheduler
+
+```shell
+kubestellar-scheduler
+```
+``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 kubestellar-scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
 I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
@@ -658,9 +686,16 @@ continually.
 Check out the SinglePlacementSlice objects as follows.
 
 ```shell
-$ kubectl ws root:my-org:wmw-c
+kubectl ws root:my-org:wmw-c
+```
+``` { .bash .no-copy }
 Current workspace is "root:my-org:wmw-c".
-$ kubectl get SinglePlacementSlice -o yaml
+```
+
+```shell
+kubectl get SinglePlacementSlice -o yaml
+```
+``` { .bash .no-copy }
 apiVersion: v1
 items:
 - apiVersion: edge.kcp.io/v1alpha1
@@ -710,9 +745,15 @@ translator.  In the meantime, you can run it manually: switch to the
 ESPW and use the edge-mc command that runs the placement translator.
 
 ```shell
-$ kubectl ws root:espw
+kubectl ws root:espw
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw".
-$ placement-translator
+```
+```shell
+placement-translator
+```
+``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
 ...
 ```
@@ -724,10 +765,16 @@ The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.
 
 ```shell
-$ kubectl ws 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+kubectl ws 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml
+```shell
+kubectl get SyncerConfig the-one -o yaml
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -800,12 +847,18 @@ status: {}
 You can check that the workload got there too.
 
 ```shell
-$ kubectl get ns
+kubectl get ns
+```
+``` { .bash .no-copy }
 NAME          STATUS   AGE
 commonstuff   Active   6m34s
 default       Active   32m
+```
 
-$ kubectl get deployments -A
+```shell
+kubectl get deployments -A
+```
+``` { .bash .no-copy }
 NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff   commond   0/0     0            0           6m44s
 ```
@@ -814,13 +867,23 @@ The guilder cluster gets both the common and special workloads.
 Examine guilder's `SyncerConfig` object and workloads as follows.
 
 ```shell
-$ kubectl ws root:espw
+kubectl ws root:espw
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw".
+```
 
-$ kubectl ws 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+```shell
+kubectl ws 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml
+```shell
+kubectl get SyncerConfig the-one -o yaml
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -895,7 +958,10 @@ spec:
     - cogs
 status: {}
 
-$ kubectl get deployments -A
+```shell
+kubectl get deployments -A
+```
+``` { .bash .no-copy }
 NAMESPACE      NAME       READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff    commond    0/0     0            0           6m1s
 specialstuff   speciald   0/0     0            0           5m58s
@@ -924,7 +990,9 @@ Using the kubeconfig that `kind` modified, examine the florin cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
 ```shell
-$ KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
+KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
+```
+``` { .bash .no-copy }
 NAME                              STATUS   AGE
 commonstuff                       Active   6m51s
 default                           Active   57m
@@ -933,8 +1001,12 @@ kube-node-lease                   Active   57m
 kube-public                       Active   57m
 kube-system                       Active   57m
 local-path-storage                Active   57m
+```
 
-$ KUBECONFIG=~/.kube/config kubectl --context kind-florin get deploy -A | egrep 'NAME|stuff'
+```shell
+KUBECONFIG=~/.kube/config kubectl --context kind-florin get deploy -A | egrep 'NAME|stuff'
+```
+``` { .bash .no-copy }
 NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                       commond                           1/1     1            1           7m59s
 ```
@@ -943,12 +1015,18 @@ Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.
 
 ```shell
-$ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get ns | egrep NAME\|stuff
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get ns | egrep NAME\|stuff
+```
+``` { .bash .no-copy }
 NAME                               STATUS   AGE
 commonstuff                        Active   8m33s
 specialstuff                       Active   8m33s
+```
 
-$ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A | egrep NAME\|stuff
+```shell
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A | egrep NAME\|stuff
+```
+``` { .bash .no-copy }
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
 commonstuff                        commond                            1/1     1            1           8m37s
 specialstuff                       speciald                           1/1     1            1           8m55s
@@ -958,7 +1036,9 @@ Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
 
 ```shell
-$ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
+kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
+```
+``` { .bash .no-copy }
 ...
       containers:
       - env:
@@ -973,7 +1053,9 @@ $ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
 Check that the common workload on the florin cluster is working.
 
 ```shell
-$ curl http://localhost:8094
+curl http://localhost:8094
+```
+``` { .bash .no-copy }
 <!DOCTYPE html>
 <html>
   <body>
@@ -986,7 +1068,9 @@ $ curl http://localhost:8094
 Check that the special workload on the guilder cluster is working.
 
 ```shell
-$ curl http://localhost:8097
+curl http://localhost:8097
+```
+``` { .bash .no-copy }
 <!DOCTYPE html>
 <html>
   <body>
@@ -999,7 +1083,9 @@ $ curl http://localhost:8097
 Check that the common workload on the guilder cluster is working.
 
 ```shell
-$ curl http://localhost:8096
+curl http://localhost:8096
+```
+``` { .bash .no-copy }
 <!DOCTYPE html>
 <html>
   <body>
