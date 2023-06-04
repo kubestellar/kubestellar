@@ -92,6 +92,34 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1-subs/example1-post-espw/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-post-espw/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1-subs/example1-post-kcp/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-post-kcp/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1-subs/example1-pre-kcp/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-pre-kcp/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1-subs/example1-start-kcp/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-start-kcp/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp/</loc>
          <lastmod>2023-06-04</lastmod>
          <changefreq>daily</changefreq>
