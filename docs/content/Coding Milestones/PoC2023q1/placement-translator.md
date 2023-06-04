@@ -153,7 +153,7 @@ which do not necessarily indicate real problems because the subsequent
 success is not logged so profligately).
 
 ```shell
-go run ./cmd/placement-translator
+go run ./cmd/placement-translator &
 ```
 ``` { .bash .no-copy }
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
@@ -190,7 +190,8 @@ You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
 ```shell
-kubectl get Workspace
+sleep 15
+kubectl get workspace
 ```
 ``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
@@ -203,7 +204,7 @@ one for the guilder cluster) and examine the `SyncerConfig` object.
 That should look like the following.
 
 ```shell
-kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
@@ -330,7 +331,7 @@ Current workspace is "root:espw".
 ```
 
 ```shell
-kubectl ws 2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
@@ -361,7 +362,7 @@ following.
 
 ```shell
 kubectl ws root:espw
-kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
