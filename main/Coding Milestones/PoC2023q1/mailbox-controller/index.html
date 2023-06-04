@@ -1478,9 +1478,10 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172169<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
 <a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172196<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:210<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Informers synced&quot;</span>
 </code></pre></div></p>
-<p>In a separate shell, create an inventory management workspace as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
+<p>In a separate terminal window(3), create an inventory management workspace as follows.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sleep<span class="w"> </span><span class="m">15</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
 </code></pre></div>
 <p>Then in that workspace, run the following command to create a <code>SyncTarget</code> object.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
