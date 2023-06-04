@@ -1,7 +1,3 @@
----
-title: "KubeStellar Quickstart Guide"
----
-
 <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar">
 
 {%

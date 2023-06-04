@@ -1,7 +1,3 @@
----
-title: "Mailbox Controller"
----
-
 ## Linking SyncTarget with Mailbox Workspace
 
 For a given SyncTarget T, the mailbox controller currently chooses the

@@ -1,8 +1,4 @@
----
-title: "KubeStellar Scheduler"
----
-
-### Required Packages:
+## Required Packages:
   - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
 
 ### Steps to try the scheduler

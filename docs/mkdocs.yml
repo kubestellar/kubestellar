@@ -28,9 +28,9 @@ nav:
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
           - Processes:
-              - Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
-              - Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
-              - Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
+              - KubeStellar Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+              - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
+              - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
           - Roadap: Coding Milestones/PoC2023q1/roadmap-uses.md
           - Environments:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md

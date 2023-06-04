@@ -1,7 +1,3 @@
----
-title: "Placement Translator"
----
-
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 
 ## Status
