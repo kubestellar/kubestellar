@@ -113,6 +113,20 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-exports/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-exports/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-imports/</loc>
+         <lastmod>2023-06-04</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-imports/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start/</loc>
          <lastmod>2023-06-04</lastmod>
          <changefreq>daily</changefreq>

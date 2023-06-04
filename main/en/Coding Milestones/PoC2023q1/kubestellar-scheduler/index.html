@@ -1393,6 +1393,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c1"># wait for KCP to initialize</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -1400,9 +1401,8 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <p>open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sleep<span class="w"> </span><span class="m">30</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -1411,26 +1411,39 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <p>Next, create the edge service provider workspace:</p>
 <p>Use workspace <code>root:espw</code> as the Edge Service Provider Workspace (ESPW).
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw<span class="w"> </span>--enter
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<p>Install CRDs and APIExport.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
-</code></pre></div></p>
+<p>Install CRDs and APIExport.</p>
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-exports.md '&lt;!--kubestellar-scheduler-exports-start--&gt;' '&lt;!--kubestellar-scheduler-exports-end--&gt;' -->
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
+</code></pre></div>
+<!-- END INCLUDE -->
+
 <h4 id="create-the-workload-management-workspace-wmw-and-bind-it-to-the-espw-apis">Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs</h4>
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-imports.md '&lt;!--kubestellar-scheduler-imports-start--&gt;' '&lt;!--kubestellar-scheduler-imports-end--&gt;' -->
+
 <p>Use the user home workspace (\~) as the workload management workspace (WMW).
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 </code></pre></div></p>
 <p>Bind APIs.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
 </code></pre></div></p>
+<!-- END INCLUDE -->
+
 <h4 id="run-the-kubestellar-scheduler-against-the-espw">Run the KubeStellar Scheduler against the ESPW</h4>
-<p>Go to <code>root:espw</code> workspace and run the edge scheduler.
+<p>Go to the <code>root:espw</code> workspace and run the edge scheduler.</p>
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md '&lt;!--kubestellar-scheduler-process-start-start--&gt;' '&lt;!--kubestellar-scheduler-process-start-end--&gt;' -->
+
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-</code></pre></div></p>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>sleep<span class="w"> </span><span class="m">15</span><span class="w">  </span><span class="c1"># wait a few seconds for the kubestellar scheduler to initialize</span>
+</code></pre></div>
+<!-- END INCLUDE -->
 <p>The outputs from the edge scheduler should be similar to:
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>I0327<span class="w"> </span><span class="m">17</span>:14:42.222112<span class="w">   </span><span class="m">51241</span><span class="w"> </span>kubestellar-scheduler.go:243<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io&quot;</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>I0327<span class="w"> </span><span class="m">17</span>:14:42.225075<span class="w">   </span><span class="m">51241</span><span class="w"> </span>kubestellar-scheduler.go:243<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;scheduling.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io&quot;</span>
@@ -1439,10 +1452,9 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <h4 id="create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets">Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets</h4>
 <p>open another terminal window(3) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sleep<span class="w"> </span><span class="m">15</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">cd</span><span class="w"> </span>../kcp
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span><span class="w"> </span>../kcp
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>Use workspace <code>root:compute</code> as the Inventory Management Workspace (IMW).
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:compute
