@@ -1,66 +1,121 @@
 ### Publishing a new KubeStellar release
 
-#### Note:
-You currently need write access to the [{{ config.repo_url }}]({{ config.repo_url }}) repository to perform these tasks.
-
-You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS).
-
-### Create git tags
-
 #### Prerequisite - make sure you have a GPG signing key
 
 https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key
 https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account
 https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key
 Create the tags
+#### Note:
+You currently need write access to the [{{ config.repo_url }}]({{ config.repo_url }}) repository to perform these tasks.
 
+You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS).
 
-- `git fetch` from the main KubeStellar repository [{{ config.repo_url }}]({{ config.repo_url }}) to ensure you have the latest commits
-- `git tag` the main module
-- If your git remote for [{{ config.repo_url }}]({{ config.repo_url }}) is named something other than upstream, change REF accordingly
-- If you are creating a release from a release branch, change main in REF accordingly, or you can make REF a commit hash.
+### Create a release-major.minor branch
+To create a release branch, identify the current 'release' branches' name (e.g. release-0.2).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.
 
+```shell
+git clone git@github.com:{{ config.repo_short_name }}.git
+cd {{ config.repo_default_path }}/docs
+git checkout main
+git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
-REF=upstream/main
-TAG=v1.2.3
+
+### Update the mkdocs.yml file
+The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
+
+```shell
+vi docs/mkdocs.yml
+```
+
+<b>before:</b>
+```shell title="mkdocs.yml"
+...
+ks_branch: 'release-0.2'
+ks_tag: 'v0.2.2'
+...
+```
+
+<b>after:</b>
+```shell title="mkdocs.yml"
+...
+ks_branch: 'release-0.2'
+ks_tag: 'v0.3.0'
+...
+```
+
+### Remove the current 'stable' alias using 'mike' (DANGER!)
+Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
+```shell
+mike delete stable # remove the 'stable' alias from the current 'release-<major>.<minor>' branches' doc set
+mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
+```
+
+
+### Push the new release branch
+```shell
+git add .
+git commit -m "new release version <major>.<minor>"
+git push -u origin release-<major>.<minor> replace <major>.<minor> with your incremented <major>.<minor> pair
+```
+
+### Update the 'stable' alias using 'mike'
+```shell
+mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
+mike deploy --push --rebase --update-aliases releae-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+```
+
+### Test your doc site
+Open a Chrome Incognito browser to [https://kubestellar.io](https://kubestellar.io) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
+
+### Create a build
+```shell
+./hack/make-release-full.sh v0.3.0
+```
+
+### Create a tagged release
+View the existing tags you have for the repo
+
+```shell
+git fetch --tags
+git tag
+```
+
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.2.2' to 'v0.3.0'
+
+```shell
+TAG=v0.3.0
+REF=release-0.3
 git tag --sign --message "$TAG" "$TAG" "$REF"
-Tag the pkg/sdk module, following the same logic as above for REF and TAG
+git push ??? "$TAG"  #TODO - not sure if this is right
 ```
 
-```
-REF=upstream/main
-TAG=v1.2.3
-git tag --sign --message "pkg/sdk/$TAG" "pkg/sdk/$TAG" "$REF"
-```
-Push the tags
+### Create a release in GH UI
+- Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
+- Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
+    - Select the new release branch you just created (release-0.3)
+    - Add a release title (v.0.3.0)
+    - Add some release notes
+    - Attach the binaries that were created in the 'make build-all' process above
+        - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
+        - GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'
 
-```
-REMOTE=upstream
-TAG=v1.2.3
-git push "$REMOTE" "$TAG" "pkg/sdk/$TAG"
-```
-If it's a new minor version
+    ![Release Example](gh-draft-new-release.png)
 
-If this is the first release of a new minor version (e.g. the last release was v0.7.x, and you are releasing the first 0.8.x version), follow the following steps.
+### Check that GH Workflows for docs are working
+Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
+[https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)
+[https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)
 
-Otherwise, you can skip to Review/edit/publish the release in GitHub
 
-### Create a release branch
 
-- Set REMOTE, REF, and VERSION as appropriate.
-```
-REMOTE=upstream
-REF="$REMOTE/main"
-VERSION=1.2
-git checkout -b "release-$VERSION" "$REF"
-git push "$REMOTE" "release-$VERSION"
-```
 
+<!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
 - Configure prow for the new release branch
 
     - Make sure you have openshift/release cloned
     - Create a new branch
-    - Copy ci-operator/config/kcp-dev/kcp/kcp-dev-kcp-main.yaml to ci-operator/config/kcp-dev/kcp/kcp-dev-kcp-release-<version>.yaml
+    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kcp-dev/edge-mc/kcp-dev-kcp-release-<version>.yaml
     - Edit the new file
     - Change main to the name of the release branch, such as release-0.8
 
@@ -72,7 +127,7 @@ Change latest to the name of the release branch
 
 ```
 promotion:
-  namespace: kcp
+  namespace: kubestellar
   tag: latest
   tag_by_commit: true
 ```
@@ -110,12 +165,13 @@ If this is a new minor release (e.g. v0.8.0), select the initial version of the 
 If this is a patch release (e.g. v0.8.7), select the previous patch release (e.g. v0.8.6)
 Click "Generate release notes"
 Publish the release
-Notify
+Notify -->
 
-- Create an email addressed to [kcp-dev@googlegroups.com](https://kubestellar.io/joinus) and [kcp-users@googlegroups.com](https://groups.google.com/g/kubestellar-users)
+
+### Create an email addressed to [kubestellar-dev@googlegroups.com](https://kubestellar.io/joinus) and [kubestellar-users@googlegroups.com](https://groups.google.com/g/kubestellar-users)
 
 ```
-Subject: [release] <version> e.g. [release] v0.8.0
+Subject: [release] <major><minor>
 ```
     - In the body, include noteworthy changes
     - Provide a link to the release in GitHub for the full release notes
