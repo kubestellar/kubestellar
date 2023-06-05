@@ -20,14 +20,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ClientProviderInfo represents a provider.
+// ClusterProviderInfo represents a provider.
 //
 // +crd
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:resource:scope=Cluster,shortName=ecl
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type ClientProviderInfo struct {
+type ClusterProviderInfo struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -36,15 +36,15 @@ type ClientProviderInfo struct {
 
 	// `spec` describes a provider.
 	// +optional
-	Spec ClientProviderInfoSpec `json:"spec,omitempty"`
+	Spec ClusterProviderInfoSpec `json:"spec,omitempty"`
 
 	// `status` describes the status of the cluster object.
 	// +optional
-	Status ClientProviderInfoStatus `json:"status"`
+	Status ClusterProviderInfoStatus `json:"status"`
 }
 
-// ClientProviderInfoSpec describes a cluster.
-type ClientProviderInfoSpec struct {
+// ClusterProviderInfoSpec describes a cluster.
+type ClusterProviderInfoSpec struct {
 	// ProviderType is the type of the provider of the cluster.
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="cluster is immutable"
 	ProviderType ClusterProviderType `json:"ProviderType"`
@@ -59,18 +59,18 @@ type ClientProviderInfoSpec struct {
 	Config string `json:"Config,omitempty"`
 }
 
-// ClientProviderInfoStatus describes a cluster.
-type ClientProviderInfoStatus struct {
+// ClusterProviderInfoStatus describes a cluster.
+type ClusterProviderInfoStatus struct {
 }
 
-// ClientProviderInfoList is the API type for a list of ClientProviderInfo
+// ClusterProviderInfoList is the API type for a list of ClusterProviderInfo
 //
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type ClientProviderInfoList struct {
+type ClusterProviderInfoList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClientProviderInfo `json:"items"`
+	Items           []ClusterProviderInfo `json:"items"`
 }
