@@ -196,7 +196,12 @@ serve-docs: venv
 deploy-docs: venv
 	. $(VENV)/activate; \
 	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
-	
+
+.PHONY: run-doc-shells
+run-doc-shells: venv
+	. $(VENV)/activate; \
+	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
+		
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
 
