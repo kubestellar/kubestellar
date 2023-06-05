@@ -60,7 +60,7 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 ## Testing Locally
 
-Our [QUICKSTART](https://docs.kubestellar.io/main/Getting-Started/quickstart/) guide shows a user how to install a
+Our [QUICKSTART](https://docs.kubestellar.io/{{ config.ks_branch }}/Getting-Started/quickstart/) guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
