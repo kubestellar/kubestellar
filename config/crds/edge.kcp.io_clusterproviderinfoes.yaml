@@ -5,15 +5,15 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: clusterproviderinfoes.edge.kcp.io
+  name: clusterproviderinfos.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
     kind: ClusterProviderInfo
     listKind: ClusterProviderInfoList
-    plural: clusterproviderinfoes
+    plural: clusterproviderinfos
     shortNames:
-    - ecl
+    - cpi
     singular: clusterproviderinfo
   scope: Cluster
   versions:

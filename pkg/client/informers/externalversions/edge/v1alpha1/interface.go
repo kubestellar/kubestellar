@@ -26,8 +26,8 @@ import (
 )
 
 type ClusterInterface interface {
-	// ClusterProviderInfos returns a ClusterProviderInfoClusterInformer
-	ClusterProviderInfos() ClusterProviderInfoClusterInformer
+	// ClusterProviderInfods returns a ClusterProviderInfodClusterInformer
+	ClusterProviderInfods() ClusterProviderInfodClusterInformer
 	// Customizers returns a CustomizerClusterInformer
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
@@ -52,9 +52,9 @@ func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalin
 	return &version{factory: f, tweakListOptions: tweakListOptions}
 }
 
-// ClusterProviderInfos returns a ClusterProviderInfoClusterInformer
-func (v *version) ClusterProviderInfos() ClusterProviderInfoClusterInformer {
-	return &clusterProviderInfoClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// ClusterProviderInfods returns a ClusterProviderInfodClusterInformer
+func (v *version) ClusterProviderInfods() ClusterProviderInfodClusterInformer {
+	return &clusterProviderInfodClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerClusterInformer
@@ -88,8 +88,8 @@ func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
 }
 
 type Interface interface {
-	// ClusterProviderInfos returns a ClusterProviderInfoInformer
-	ClusterProviderInfos() ClusterProviderInfoInformer
+	// ClusterProviderInfods returns a ClusterProviderInfodInformer
+	ClusterProviderInfods() ClusterProviderInfodInformer
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
@@ -115,9 +115,9 @@ func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace strin
 	return &scopedVersion{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ClusterProviderInfos returns a ClusterProviderInfoInformer
-func (v *scopedVersion) ClusterProviderInfos() ClusterProviderInfoInformer {
-	return &clusterProviderInfoScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// ClusterProviderInfods returns a ClusterProviderInfodInformer
+func (v *scopedVersion) ClusterProviderInfods() ClusterProviderInfodInformer {
+	return &clusterProviderInfodScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerInformer

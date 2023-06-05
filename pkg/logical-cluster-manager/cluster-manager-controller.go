@@ -153,7 +153,13 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig := key.(*v1alpha1apis.LogicalCluster)
 	clusterName := newClusterConfig.Spec.ClusterName
 
-	provider := clusterproviderclient.GetProviderClient(newClusterConfig.Spec.ProviderType, newClusterConfig.Spec.ProviderName)
+	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderInfods().Get(ctx, newClusterConfig.Spec.ProviderName, v1.GetOptions{})
+	if err != nil {
+		logger.Error(err, "failed to get ClusterProviderInfo.")
+		return err
+	}
+
+	provider := clusterproviderclient.GetProviderClient(providerInfo.Spec.ProviderType, newClusterConfig.Spec.ProviderName)
 
 	// Update status to NotReady
 	newClusterConfig.Status.Phase = v1alpha1apis.LogicalClusterPhaseNotReady
@@ -207,7 +213,13 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 	delClusterConfig := key.(*v1alpha1apis.LogicalCluster)
 	clusterName := delClusterConfig.Spec.ClusterName
 
-	provider := clusterproviderclient.GetProviderClient(delClusterConfig.Spec.ProviderType, delClusterConfig.Spec.ProviderName)
+	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderInfods().Get(ctx, delClusterConfig.Spec.ProviderName, v1.GetOptions{})
+	if err != nil {
+		logger.Error(err, "failed to get ClusterProviderInfo.")
+		return err
+	}
+
+	provider := clusterproviderclient.GetProviderClient(providerInfo.Spec.ProviderType, delClusterConfig.Spec.ProviderName)
 	err = provider.Delete(ctx, logical.Name(clusterName), opts)
 	if err != nil {
 		logger.Error(err, "failed to delete cluster")

@@ -18,7 +18,7 @@ limitations under the License.
 
 package v1alpha1
 
-type ClusterProviderInfoExpansion interface{}
+type ClusterProviderInfodExpansion interface{}
 
 type CustomizerExpansion interface{}
 

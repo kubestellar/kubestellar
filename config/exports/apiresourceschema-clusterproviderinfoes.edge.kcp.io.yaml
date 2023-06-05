@@ -2,15 +2,15 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230605-bd75a0af.clusterproviderinfoes.edge.kcp.io
+  name: v230605-10bf963c.clusterproviderinfos.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
     kind: ClusterProviderInfo
     listKind: ClusterProviderInfoList
-    plural: clusterproviderinfoes
+    plural: clusterproviderinfos
     shortNames:
-    - ecl
+    - cpi
     singular: clusterproviderinfo
   scope: Cluster
   versions:

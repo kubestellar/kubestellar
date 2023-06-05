@@ -20,14 +20,20 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type ClusterProviderType string
+
+const (
+	KindProviderType ClusterProviderType = "kind"
+)
+
 // ClusterProviderInfo represents a provider.
 //
 // +crd
 // +genclient
 // +genclient:nonNamespaced
-// +kubebuilder:resource:scope=Cluster,shortName=ecl
+// +kubebuilder:resource:scope=Cluster,shortName=cpi
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type ClusterProviderInfo struct {
+type ClusterProviderInfod struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -63,14 +69,14 @@ type ClusterProviderInfoSpec struct {
 type ClusterProviderInfoStatus struct {
 }
 
-// ClusterProviderInfoList is the API type for a list of ClusterProviderInfo
+// ClusterProviderInfodList is the API type for a list of ClusterProviderInfo
 //
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type ClusterProviderInfoList struct {
+type ClusterProviderInfodList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClusterProviderInfo `json:"items"`
+	Items           []ClusterProviderInfod `json:"items"`
 }
