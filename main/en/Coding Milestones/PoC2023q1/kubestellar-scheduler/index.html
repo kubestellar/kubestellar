@@ -1602,7 +1602,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c1"># wait for KCP to initialize</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
@@ -1651,7 +1651,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>sleep<span class="w"> </span><span class="m">15</span><span class="w">  </span><span class="c1"># wait a few seconds for the kubestellar scheduler to initialize</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>sleep<span class="w"> </span><span class="m">45</span><span class="w">  </span><span class="c1"># wait a few seconds for the kubestellar scheduler to initialize</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 <p>The outputs from the edge scheduler should be similar to:
@@ -1674,7 +1674,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_dev.yaml
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_prod.yaml
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_dev.yaml
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sleep<span class="w"> </span><span class="m">5</span>
 </code></pre></div></p>
 <p>Note that kcp automatically creates a Location <code>default</code>. So there are 3 Locations and 2 SyncTargets in <code>root:compute</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>locations,synctargets
@@ -1692,6 +1692,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>all2all</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_all2all.yaml
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>all2all<span class="w"> </span>-oyaml
@@ -1732,6 +1733,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:compute</code>.</p>
 <p>Create a more specific EdgePlacement which selects Locations labeled by <code>env: dev</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_dev.yaml
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The corresponding SinglePlacementSlice has a shorter list of <code>destinations</code>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>dev<span class="w"> </span>-oyaml
