@@ -737,6 +737,67 @@
     Testing/Running Docs
   </a>
   
+    <nav class="md-nav" aria-label="Testing/Running Docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-way-it-works" class="md-nav__link">
+    The way it works:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-gh-workflow" class="md-nav__link">
+    The GH Workflow:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-secret-sauce" class="md-nav__link">
+    The secret sauce:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-files-in-our-gh-pages-branch" class="md-nav__link">
+    Important files in our gh-pages branch
+  </a>
+  
+    <nav class="md-nav" aria-label="Important files in our gh-pages branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#indexhtml-and-homehtml" class="md-nav__link">
+    index.html and home.html
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cname" class="md-nav__link">
+    CNAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versionsjson" class="md-nav__link">
+    versions.json
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1528,6 +1589,67 @@
     Testing/Running Docs
   </a>
   
+    <nav class="md-nav" aria-label="Testing/Running Docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-way-it-works" class="md-nav__link">
+    The way it works:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-gh-workflow" class="md-nav__link">
+    The GH Workflow:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-secret-sauce" class="md-nav__link">
+    The secret sauce:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-files-in-our-gh-pages-branch" class="md-nav__link">
+    Important files in our gh-pages branch
+  </a>
+  
+    <nav class="md-nav" aria-label="Important files in our gh-pages branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#indexhtml-and-homehtml" class="md-nav__link">
+    index.html and home.html
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cname" class="md-nav__link">
+    CNAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versionsjson" class="md-nav__link">
+    versions.json
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1650,7 +1772,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <b>output:</b></p>
 </li>
 <li>
-<p>For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i><code>.bash</code></i></b> block with the <b><i>'.hide-me'</i></b> style:
+<p>For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style:
 <br/><b>code:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>``` { .bash .hide-me }
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mkdocs server # run this command in the automation, but do not show it to the reader
@@ -1659,7 +1781,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <b>output:</b></p>
 </li>
 <li>
-<p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> block <b>without</b> the <b><i>'.hide-me'</b></i> style:
+<p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
 <br/><b>code:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>``` { .bash }
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>mkdocs server
@@ -1670,7 +1792,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </code></pre></div></p>
 </li>
 <li>
-<p>For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances)
+<p>For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances), use the <b><i><code>.bash</code></i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
 <br/><b>code:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>``` { .bash .no-copy }
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
@@ -1685,7 +1807,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </code></pre></div></p>
 </li>
 <li>
-<p>For language-specific highlighting (yaml, etc.):
+<p>For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
 <br/><b>code:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>```yaml
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
@@ -1700,7 +1822,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </code></pre></div></p>
 </li>
 <li>
-<p>For a codeblock that has a title:
+<p>For a codeblock that has a title, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock:
 <br/><b>code:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>``` title=&quot;testing.sh&quot;
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>#!/bin/sh
@@ -1715,6 +1837,65 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </ul>
 <p>(other variations are possible, PR an update to the <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
 <h3 id="testingrunning-docs">Testing/Running Docs</h3>
+<p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
+<h4 id="the-way-it-works">The way it works:</h4>
+<ul>
+<li>create your .md file as you normally would</li>
+<li>add codeblocks that can be tested, tested but hidden, or not tested at all:<ul>
+<li>use <b><i>'shell'</i></b> to indicate code you want to be tested</li>
+<li>use <b><i>'.bash'</i></b> with the plain codeblock, and the <b><i>'.hide-md'</i></b> style for code you want to be tested, but hidden from the reader (some like this, but its not cool if you want others to run your instructions without hiccups)</li>
+<li>use plain codeblock (```) if you want to show sample output that is not to be tested</li>
+</ul>
+</li>
+<li>you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.</li>
+</ul>
+<h4 id="the-gh-workflow">The GH Workflow:</h4>
+<ul>
+<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml</a></li>
+</ul>
+<h4 id="the-secret-sauce">The secret sauce:</h4>
+<ul>
+<li>The code that makes all this possible is at <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh</a><ul>
+<li>This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks</li>
+<li>The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them</li>
+<li>It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.</li>
+</ul>
+</li>
+</ul>
+<p>All of this is invoke in a target in our <a href="https://github.com/kcp-dev/edge-mc/blob/main/Makefile">makefile</a>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>run-doc-shells:<span class="w"> </span>venv
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/run-doc-shells.sh
+</code></pre></div></p>
+<p>You give the path from that follows the 'https://github.com/kcp-dev/edge-mc/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:</p>
+<div class="highlight"><span class="filename">How to 'make' our run-doc-shells target</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make MANIFEST=&quot;&#39;content/Getting-Started/quickstart.md&#39;&quot; run-doc-shells
+</code></pre></div>
+<p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
+<h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch</h3>
+<h4 id="indexhtml-and-homehtml">index.html and home.html</h4>
+<p>In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our KubeStellar doc site hosted with <a href="https://godaddy.com">GoDaddy.com</a>.</p>
+<p><a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html</a>
+<a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html</a></p>
+<p>both files have content similar to:
+<div class="highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>KubeStellar<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;content-type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">&gt;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;refresh&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;0; URL=https://docs.kubestellar.io/stable&quot;</span> <span class="p">/&gt;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<p>Do not remove these files!</p>
+<h4 id="cname">CNAME</h4>
+<p>The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!</p>
+<p>the CNAME file must have the following content in it:
+<div class="highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docs.kubestellar.io
+</code></pre></div></p>
+<h4 id="versionsjson">versions.json</h4>
+<p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
+</code></pre></div>
 
 
   
