@@ -112,8 +112,6 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  #- mike:
-  #    version_selector: true
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages

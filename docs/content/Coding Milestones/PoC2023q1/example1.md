@@ -1,3 +1,5 @@
+[![Run Doc Shells - example1](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch={{config.ks_branch}})](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-example1.yml)
+
 This doc attempts to show a simple example usage of the 2023q1 PoC.
 This doc is a work in progress.
 
