@@ -2,6 +2,10 @@
     --md-primary-fg-color: #06c;
 }
 
+.hide-me {
+    display: none;
+}
+
 .md-sidebar--primary .md-sidebar__scrollwrap {
     border-right: 1px solid gainsboro;
 }

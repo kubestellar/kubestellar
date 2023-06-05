@@ -11,13 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/operations/release-management/">
       
       
+        <link rel="prev" href="../code-management/">
+      
+      
+        <link rel="next" href="../document-management/">
       
       <link rel="icon" href="../../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Release management - KubeStellar</title>
+        <title>Release Management - KubeStellar</title>
       
     
     
@@ -130,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Release management
+              Release Management
             
           </span>
         </div>
@@ -226,13 +230,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../../CONTRIBUTING/" class="md-tabs__link">
+      <a href="../../CONTRIBUTING/" class="md-tabs__link md-tabs__link--active">
         Contributing
       </a>
     </li>
@@ -409,16 +415,20 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
       
       
+        
+          
         
           
         
@@ -435,7 +445,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           Contributing
@@ -489,10 +499,284 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+          Security
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_4">
+          <span class="md-nav__icon md-icon"></span>
+          Security
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../security/" class="md-nav__link">
-        Security
+      <a href="../../security/security/" class="md-nav__link">
+        Policy
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security_contacts/" class="md-nav__link">
+        Contacts
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          Operations
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3_5">
+          <span class="md-nav__icon md-icon"></span>
+          Operations
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-management/" class="md-nav__link">
+        Code Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Release Management
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Release Management
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#publishing-a-new-kubestellar-release" class="md-nav__link">
+    Publishing a new KubeStellar release
+  </a>
+  
+    <nav class="md-nav" aria-label="Publishing a new KubeStellar release">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisite-make-sure-you-have-a-gpg-signing-key" class="md-nav__link">
+    Prerequisite - make sure you have a GPG signing key
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#note" class="md-nav__link">
+    Note:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-release-majorminor-branch" class="md-nav__link">
+    Create a release-major.minor branch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-the-mkdocsyml-file" class="md-nav__link">
+    Update the mkdocs.yml file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-the-current-stable-alias-using-mike-danger" class="md-nav__link">
+    Remove the current 'stable' alias using 'mike' (DANGER!)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#push-the-new-release-branch" class="md-nav__link">
+    Push the new release branch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-the-stable-alias-using-mike" class="md-nav__link">
+    Update the 'stable' alias using 'mike'
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-your-doc-site" class="md-nav__link">
+    Test your doc site
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-build" class="md-nav__link">
+    Create a build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-tagged-release" class="md-nav__link">
+    Create a tagged release
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-release-in-gh-ui" class="md-nav__link">
+    Create a release in GH UI
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-that-gh-workflows-for-docs-are-working" class="md-nav__link">
+    Check that GH Workflows for docs are working
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" class="md-nav__link">
+    Create an email addressed to kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../document-management/" class="md-nav__link">
+        Document Management
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -616,20 +900,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Coding%20Milestones/PoC2023q1/commands/" class="md-nav__link">
-        Commands
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/edge-syncer/" class="md-nav__link">
         KubeStellar-Syncer
       </a>
@@ -663,7 +933,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_6" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_5" >
       
       
         
@@ -675,13 +945,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_1_6" id="__nav_4_1_6_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_1_5" id="__nav_4_1_5_label" tabindex="0">
           Processes
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_6_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_1_6">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_5">
           <span class="md-nav__icon md-icon"></span>
           Processes
         </label>
@@ -694,7 +964,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
-        Sheduler
+        KubeStellar Sheduler
       </a>
     </li>
   
@@ -708,7 +978,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/mailbox-controller/" class="md-nav__link">
-        Mailbox Controller
+        KubeStellar Mailbox Controller
       </a>
     </li>
   
@@ -722,7 +992,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/placement-translator/" class="md-nav__link">
-        Placement Translator
+        KubeStellar Placement Translator
       </a>
     </li>
   
@@ -761,7 +1031,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_8" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_7" >
       
       
         
@@ -773,13 +1043,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_1_8" id="__nav_4_1_8_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4_1_7" id="__nav_4_1_7_label" tabindex="0">
           Environments
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_8_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_4_1_8">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_7">
           <span class="md-nav__icon md-icon"></span>
           Environments
         </label>
@@ -821,6 +1091,58 @@
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/environments/dev-env/" class="md-nav__link">
         Developer Environment
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_8" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_8" id="__nav_4_1_8_label" tabindex="0">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_8_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_8">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/commands/" class="md-nav__link">
+        Commands
       </a>
     </li>
   
@@ -1221,7 +1543,7 @@
   
 
 
-  <h1>Release management</h1>
+  <h1>Release Management</h1>
 
 <h3 id="publishing-a-new-kubestellar-release">Publishing a new KubeStellar release</h3>
 <h4 id="prerequisite-make-sure-you-have-a-gpg-signing-key">Prerequisite - make sure you have a GPG signing key</h4>
@@ -1231,10 +1553,10 @@ https://docs.github.com/en/authentication/managing-commit-signature-verification
 Create the tags</p>
 <h4 id="note">Note:</h4>
 <p>You currently need write access to the <a href="https://github.com/kcp-dev/edge-mc">https://github.com/kcp-dev/edge-mc</a> repository to perform these tasks.</p>
-<p>You also need an available team member with approval permissions from <a href="https://github.com/openshift/release/blob/master/ci-operator/config/{{ no such element: mkdocs.config.defaults.MkDocsConfig object['repo_short_name'] }}/OWNERS">https://github.com/openshift/release/blob/master/ci-operator/config/{{ no such element: mkdocs.config.defaults.MkDocsConfig object['repo_short_name'] }}/OWNERS</a>.</p>
+<p>You also need an available team member with approval permissions from <a href="https://github.com/openshift/release/blob/master/ci-operator/config/kcp-dev/edge-mc/OWNERS">https://github.com/openshift/release/blob/master/ci-operator/config/kcp-dev/edge-mc/OWNERS</a>.</p>
 <h3 id="create-a-release-majorminor-branch">Create a release-major.minor branch</h3>
 <p>To create a release branch, identify the current 'release' branches' name (e.g. release-0.2).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:<span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_short_name&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>.git
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
