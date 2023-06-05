@@ -14,6 +14,15 @@ There are many global variables defined in the [docs/mkdocs.yml]({{ config.repo_
     - ks_branch: {{ config.ks_branch }}
     - ks_tag: {{ config.ks_tag }}
 
+to use a variables/macro in your documentation reference like this:
+
+\{\{ config.<var_name\> \}\}
+
+and in context that can look something like this:
+
+bash <(curl -s \{\{ config.repo_raw_url \}\}/\{\{ config.ks_branch \}\}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version \{\{ config.ks_tag \}\}
+
+
 <b>note:</b><br /> 
 &nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](all-macros.md) <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our [Broken Links Crawler]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)<br />
