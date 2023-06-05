@@ -17,7 +17,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
@@ -31,6 +31,7 @@ echo ${FILE_LIST[0]}
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
 stop_pattern="^\`\`\`"
+include_pattern="\s*include-markdown\s*"
 
 # array to store the shell code blocks
 code_blocks=()
@@ -70,32 +71,51 @@ code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
 code_blocks+=('set -o xtrace')
 
-for FILE_NAME in "${FILE_LIST[@]}"
-do
-  echo $FILE_NAME
+function parse_file() 
+{
+  local file_name=$(echo $1 | sed 's/"//g')
+  local path_name=$(echo "${file_name%/*}/")
+
+  # echo $path_name
+  echo \#\#\# parsing $file_name  
   # read the readme file line by line
   while IFS= read -r line; do
     # check if the line matches the pattern
     if [[ $line =~ $stop_pattern ]]; then
-      inside_block=0
+      inside_block=0  # not inside a shell codeblock
     fi
     if [[ $line =~ $start_pattern ]]; then
-      inside_block=1
+      inside_block=1  # we are inside a shell codeblock
+    fi
+
+    if [[ $line =~ $include_pattern ]]; then
+      included_file_name=$(echo $line | sed 's/include-markdown \"//')
+      full_included_file_name=$(echo \"$REPO_ROOT/docs/$path_name$included_file_name)
+      parse_file "\"$path_name$included_file_name\""
     fi
     
     if [[ $inside_block == 1 ]]; then
       # remove the backticks from the code block
+      
       code_block="${line//\`\`\`shell/}"
       code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
       code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
       code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
       code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
+      echo $code_block
 
       # add the code block to the array
       code_blocks+=("$code_block")
     fi
-  done < "$REPO_ROOT/docs/$FILE_NAME"
+  done < "$REPO_ROOT/docs/$file_name"
+}
+
+for FILE_NAME in "${FILE_LIST[@]}"
+do
+  parse_file "\"$FILE_NAME\""
 done
+
+
 
 IFS=$SAVEIFS
 
@@ -109,6 +129,8 @@ done
 
 # make the generated script executable
 chmod +x "$generated_script_file"
+
+exit
 
 # run the generated script
 "$generated_script_file"
