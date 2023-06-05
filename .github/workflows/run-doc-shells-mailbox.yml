@@ -7,16 +7,18 @@ on:
   pull_request:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - ".github/workflows/run-doc-shells-mailbox.yml"
   push:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - ".github/workflows/run-doc-shells-mailbox.yml"
 
 permissions:

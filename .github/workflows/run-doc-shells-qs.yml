@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
@@ -15,7 +15,7 @@ on:
   push:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"

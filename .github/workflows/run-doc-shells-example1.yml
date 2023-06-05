@@ -7,16 +7,18 @@ on:
   pull_request:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - ".github/workflows/run-doc-shells-example1.yml"
   push:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - ".github/workflows/run-doc-shells-example1.yml"
 
 permissions:

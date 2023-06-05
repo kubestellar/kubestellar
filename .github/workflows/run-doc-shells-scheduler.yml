@@ -7,16 +7,18 @@ on:
   pull_request:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - ".github/workflows/run-doc-shells-scheduler.yml"
   push:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - ".github/workflows/run-doc-shells-scheduler.yml"
 
 permissions:
