@@ -175,8 +175,7 @@ you can ^C the scheduler once it has created those objects.
 
 Finally run the placement translator from the command line.  That
 should look like the following (possibly including some complaints,
-which do not necessarily indicate real problems because the subsequent
-success is not logged so profligately).
+which do not necessarily indicate real problems).
 
 {%
    include-markdown "placement-translator-subs/placement-translator-process-start-without-cd-kubestellar.md"
