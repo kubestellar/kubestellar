@@ -1,6 +1,6 @@
 <!--mailbox-controller-process-start-without-cd-kubestellar-start-->
 ```shell
 go run ./cmd/mailbox-controller -v=2 &
-sleep 15  # wait a few seconds for the mailbox controller to initialize
+sleep 45
 ```
 <!--mailbox-controller-process-start-without-cd-kubestellar-end-->
