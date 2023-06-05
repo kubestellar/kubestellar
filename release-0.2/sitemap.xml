@@ -260,6 +260,48 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/operations/all-macros/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/operations/all-macros/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/operations/code-management/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/operations/code-management/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/operations/document-management/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/operations/document-management/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/operations/release-management/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/operations/release-management/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/security/security/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/security/security/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/security/security_contacts/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/security/security_contacts/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Getting-Started/quickstart/</loc>
          <lastmod>2023-06-05</lastmod>
          <changefreq>daily</changefreq>
