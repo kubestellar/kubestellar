@@ -1,0 +1,50 @@
+name: Run Doc Shells - Scheduler
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - ".github/workflows/run-doc-shells-scheduler.yml"
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - ".github/workflows/run-doc-shells-scheduler.yml"
+
+permissions:
+  contents: write
+
+# concurrency:
+#   group: ${{ github.workflow }}
+
+jobs:
+  run-doc-shells:
+    name: Run doc shells - for scheduler e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+  
+      - run: |
+          make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'" \
+          run-doc-shells
