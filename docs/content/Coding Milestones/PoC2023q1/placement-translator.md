@@ -157,9 +157,21 @@ should not take long, and do not expect an explicit acknowledgement on
 the console.  You can check for their existence by doing `kubectl get
 workspaces` while in the ESPW.
 
+{%
+   include-markdown "mailbox-controller-subs/mailbox-controller-process-start.md"
+   start="<!--mailbox-controller-process-start-start-->"
+   end="<!--mailbox-controller-process-start-end-->"
+%}
+
 Next run the scheduler, long enough for it to create the
 SinglePlacementSlice objects.  Again, this should not take long, and
 you can ^C the scheduler once it has created those objects.
+
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-process-start-without-cd-kubestellar.md"
+   start="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-start-->"
+   end="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-end-->"
+%}
 
 Finally run the placement translator from the command line.  That
 should look like the following (possibly including some complaints,
@@ -167,9 +179,9 @@ which do not necessarily indicate real problems because the subsequent
 success is not logged so profligately).
 
 {%
-   include-markdown "placement-translator-subs/placement-translator-process-start.md"
-   start="<!--placement-translator-process-start-start-->"
-   end="<!--placement-translator-process-start-end-->"
+   include-markdown "placement-translator-subs/placement-translator-process-start-without-cd-kubestellar.md"
+   start="<!--placement-translator-process-start-without-cd-kubestellar-start-->"
+   end="<!--placement-translator-process-start-without-cd-kubestellar-end-->"
 %}
 ``` { .bash .no-copy }
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
