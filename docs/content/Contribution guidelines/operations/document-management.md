@@ -100,7 +100,7 @@ mkdocs serve
 <b>output:</b>
 
 
-- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> block with the <b><i>'.hide-me'</i></b> style:
+- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style:
 <br/><b>code:</b>
 ````
 ``` { .bash .hide-me }
@@ -110,7 +110,7 @@ mkdocs server # run this command in the automation, but do not show it to the re
 <b>output:</b>
 
 
-- For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> block <b>without</b> the <b><i>'.hide-me'</b></i> style:
+- For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
 <br/><b>code:</b>
 ````
 ``` { .bash }
@@ -122,7 +122,7 @@ mkdocs server
 mkdocs server
 ```
 
-- For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances)
+- For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances), use the <b><i>`.bash`</i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
 <br/><b>code:</b>
 ````
 ``` { .bash .no-copy }
@@ -138,7 +138,7 @@ I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for plac
 I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
 ```
 
-- For language-specific highlighting (yaml, etc.):
+- For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
 <br/><b>code:</b>
 ````
 ```yaml
@@ -154,7 +154,7 @@ nav:
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
 ```
 
-- For a codeblock that has a title:
+- For a codeblock that has a title, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock:
 <br/><b>code:</b>
 ````
 ``` title="testing.sh"
@@ -171,3 +171,71 @@ echo hello KubeStellar
 (other variations are possible, PR an update to the [kubestellar.css]({{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css) file and, once approved, use the style on the plain codeblock in your documentation.)
 
 ### Testing/Running Docs
+How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.
+
+#### The way it works:
+- create your .md file as you normally would
+- add codeblocks that can be tested, tested but hidden, or not tested at all:
+    - use <b><i>'shell'</i></b> to indicate code you want to be tested
+    - use <b><i>'.bash'</i></b> with the plain codeblock, and the <b><i>'.hide-md'</i></b> style for code you want to be tested, but hidden from the reader (some like this, but its not cool if you want others to run your instructions without hiccups)
+    - use plain codeblock (```) if you want to show sample output that is not to be tested
+- you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.
+
+#### The GH Workflow:
+- One example of the GH Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/run-doc-shells-qs.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/run-doc-shells-qs.yml)
+
+#### The secret sauce:
+- The code that makes all this possible is at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/run-doc-shells.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/run-doc-shells.sh)
+    - This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks
+    - The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them
+    - It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.
+
+All of this is invoke in a target in our [makefile]({{ config.repo_url }}/blob/{{config.ks_branch}}/Makefile)
+``` {.bash .no-copy}
+.PHONY: run-doc-shells
+run-doc-shells: venv
+	. $(VENV)/activate; \
+	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
+```
+
+You give the path from that follows the '{{config.repo_url}}/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:
+
+``` title="How to 'make' our run-doc-shells target"
+make MANIFEST="'content/Getting-Started/quickstart.md'" run-doc-shells
+```
+
+<b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.
+
+### Important files in our gh-pages branch
+#### index.html and home.html
+In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our {{ config.site_name }} doc site hosted with [GoDaddy.com](https://godaddy.com).
+
+[{{config.repo_url}}/blob/gh-pages/home.html]({{config.repo_url}}/blob/gh-pages/home.html)
+[{{config.repo_url}}/blob/gh-pages/index.html]({{config.repo_url}}/blob/gh-pages/index.html)
+
+both files have content similar to:
+```html title="index.html and home.html"
+<!DOCTYPE html>
+<html>
+<head>
+<title>KubeStellar</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" >
+<meta http-equiv="refresh" content="0; URL=https://docs.kubestellar.io/stable" />
+</head>
+```
+
+Do not remove these files!
+#### CNAME
+The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!
+
+the CNAME file must have the following content in it:
+```title="CNAME"
+docs.kubestellar.io
+```
+
+#### versions.json
+The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.
+
+```json
+[{"version": "release-0.2", "title": "release-0.2", "aliases": ["stable"]}, {"version": "{{config.ks_branch}}", "title": "{{config.ks_branch}}", "aliases": ["latest", "unstable"]}]
+```
