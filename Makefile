@@ -201,7 +201,7 @@ deploy-docs: venv
 run-doc-shells: venv
 	. $(VENV)/activate; \
 	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
-		
+	
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
 
