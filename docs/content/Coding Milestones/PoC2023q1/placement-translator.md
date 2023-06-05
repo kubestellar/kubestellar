@@ -1,3 +1,5 @@
+[![Run Doc Shells - placement-translator]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml)&nbsp;&nbsp;&nbsp;
+
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 
 ## Status

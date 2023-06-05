@@ -1,3 +1,4 @@
+[![Run Doc Shells - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml)&nbsp;&nbsp;&nbsp;
 ## Required Packages:
   - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
 

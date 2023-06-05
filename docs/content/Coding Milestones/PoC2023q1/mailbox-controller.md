@@ -1,3 +1,4 @@
+[![Run Doc Shells - mailbox-controller]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml)&nbsp;&nbsp;&nbsp;
 ## Linking SyncTarget with Mailbox Workspace
 
 For a given SyncTarget T, the mailbox controller currently chooses the
