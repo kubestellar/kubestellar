@@ -32,6 +32,8 @@ type ClusterInterface interface {
 	EdgePlacements() EdgePlacementClusterInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
 	EdgeSyncConfigs() EdgeSyncConfigClusterInformer
+	// LogicalClusters returns a LogicalClusterClusterInformer
+	LogicalClusters() LogicalClusterClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 	SinglePlacementSlices() SinglePlacementSliceClusterInformer
 	// SyncerConfigs returns a SyncerConfigClusterInformer
@@ -63,6 +65,11 @@ func (v *version) EdgeSyncConfigs() EdgeSyncConfigClusterInformer {
 	return &edgeSyncConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// LogicalClusters returns a LogicalClusterClusterInformer
+func (v *version) LogicalClusters() LogicalClusterClusterInformer {
+	return &logicalClusterClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 // SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 func (v *version) SinglePlacementSlices() SinglePlacementSliceClusterInformer {
 	return &singlePlacementSliceClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
@@ -80,6 +87,8 @@ type Interface interface {
 	EdgePlacements() EdgePlacementInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigInformer
 	EdgeSyncConfigs() EdgeSyncConfigInformer
+	// LogicalClusters returns a LogicalClusterInformer
+	LogicalClusters() LogicalClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceInformer
 	SinglePlacementSlices() SinglePlacementSliceInformer
 	// SyncerConfigs returns a SyncerConfigInformer
@@ -110,6 +119,11 @@ func (v *scopedVersion) EdgePlacements() EdgePlacementInformer {
 // EdgeSyncConfigs returns a EdgeSyncConfigInformer
 func (v *scopedVersion) EdgeSyncConfigs() EdgeSyncConfigInformer {
 	return &edgeSyncConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// LogicalClusters returns a LogicalClusterInformer
+func (v *scopedVersion) LogicalClusters() LogicalClusterInformer {
+	return &logicalClusterScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // SinglePlacementSlices returns a SinglePlacementSliceInformer
