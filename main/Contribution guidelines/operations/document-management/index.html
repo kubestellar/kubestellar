@@ -1704,6 +1704,10 @@
 - ks_branch: main
 - ks_tag: latest
 </code></pre></div>
+<p>to use a variables/macro in your documentation reference like this:</p>
+<p>{{ config.&lt;var_name> }}</p>
+<p>and in context that can look something like this:</p>
+<p>bash &lt;(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}</p>
 <p><b>note:</b><br /> 
 &nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
