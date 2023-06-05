@@ -29,7 +29,7 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml"
+```shell title="mkdocs.yml" hl_lines="2 3"
 ...
 ks_branch: 'release-0.2'
 ks_tag: 'v0.2.2'
@@ -37,7 +37,7 @@ ks_tag: 'v0.2.2'
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml"
+```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
 ks_branch: 'release-0.2'
 ks_tag: 'v0.3.0'
