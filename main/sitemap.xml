@@ -274,10 +274,31 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/governance/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/governance/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/onboarding/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/onboarding/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/security/</loc>
          <lastmod>2023-06-05</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/security/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/security_contacts/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/security_contacts/"/>
          
     </url>
     <url>
@@ -348,6 +369,13 @@
          <lastmod>2023-06-05</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/coming-soon/</loc>
+         <lastmod>2023-06-05</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/coming-soon/"/>
          
     </url>
 </urlset>
