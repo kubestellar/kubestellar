@@ -2,6 +2,9 @@ site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 site_url: https://docs.kubestellar.io/
 
+repo_short_name: kcp-dev/edge-mc
+repo_default_file_path: edge-mc
+docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
 edit_uri: edit/release-0.2/docs/content
 ks_branch: 'release-0.2'
@@ -19,23 +22,30 @@ nav:
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
-      - Security: Contribution guidelines/security.md
+      - Security: 
+          - Policy: Contribution guidelines/security/security.md
+          - Contacts: Contribution guidelines/security/security_contacts.md
+      - Operations: 
+          - Code Management: Contribution guidelines/operations/code-management.md
+          - Release Management: Contribution guidelines/operations/release-management.md
+          - Document Management: Contribution guidelines/operations/document-management.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
           - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
-          - Commands: Coding Milestones/PoC2023q1/commands.md
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
           - Processes:
-              - Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
-              - Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
-              - Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
+              - KubeStellar Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+              - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
+              - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
           - Roadap: Coding Milestones/PoC2023q1/roadmap-uses.md
           - Environments:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
+          - Reference:
+              - Commands: Coding Milestones/PoC2023q1/commands.md
       # - PoC2023q3:
       #     - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
@@ -101,8 +111,6 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  #- mike:
-  #    version_selector: true
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
@@ -110,6 +118,7 @@ plugins:
   - search
   # Use Jinja macros in .md files
   - open-in-new-tab
+  - include-markdown
   - macros:
       include_dir: 'overrides'
       module_name: 'main'
