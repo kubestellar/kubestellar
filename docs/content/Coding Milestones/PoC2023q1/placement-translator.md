@@ -141,7 +141,7 @@ workspace", it suffices to do the following.
 kubectl ws root
 kubectl ws create espw --enter
 kubectl ws root:espw
-kubectl create -f config/exports
+kubectl create -f ../KubeStellar/config/exports/
 ```
 
 Continue to follow the steps until the start of Stage 3 of the
