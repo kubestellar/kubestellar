@@ -521,7 +521,7 @@ This is a combination of some installation and setup steps, for use in
 QuickStart](../../../Getting-Started/quickstart/).
 
 The script can be read directly from
-{{ config.repo_raw_url }}/main/bootstrap/bootstrap-kubestellar.sh
+{{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh
 and does the following things.
 
 1. Downloads and installs kcp if it is not already evident on `$PATH`

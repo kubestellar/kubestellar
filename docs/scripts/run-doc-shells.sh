@@ -30,6 +30,7 @@ echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
+start_hidden_pattern="^\`\`\`\s*{\s*.bash\s*.hide-me\s*}"
 stop_pattern="^\`\`\`"
 include_pattern="\s*include-markdown\s*"
 
@@ -85,6 +86,9 @@ function parse_file()
       inside_block=0  # not inside a shell codeblock
     fi
     if [[ $line =~ $start_pattern ]]; then
+      inside_block=1  # we are inside a shell codeblock
+    fi
+    if [[ $line =~ $start_hidden_pattern ]]; then
       inside_block=1  # we are inside a shell codeblock
     fi
 

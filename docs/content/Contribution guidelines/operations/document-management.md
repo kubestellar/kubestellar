@@ -1,0 +1,173 @@
+##
+
+### Global Variables
+There are many global variables defined in the [docs/mkdocs.yml]({{ config.repo_raw_url }}/{{ config.ks_branch }}/docs/mkdocs.yml).  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking
+
+    - site_name: {{ config.site_name }}
+    - repo_url: {{ config.repo_url }}
+    - site_url: {{ config.site_url }}
+    - repo_default_file_path: {{ config.repo_default_path }}
+    - repo_short_name: {{ config.repo_short_name }}
+    - docs_url: {{ config.docs_url }}
+    - repo_raw_url: {{ config.repo_raw_url }}
+    - edit_uri: {{ config.edit_uri }}
+    - ks_branch: {{ config.ks_branch }}
+    - ks_tag: {{ config.ks_tag }}
+
+<b>note:</b><br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](all-macros.md) <br />
+&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our [Broken Links Crawler]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)<br />
+
+### Including external markdown
+We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:
+
+In your original markdown document, add a block that refers to the external markdown you want to include:
+![Include Markdown](./include-markdown-example.png)
+
+In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
+![Included Markdown](./included-markdown-example.png)
+
+for more information on the 'include-markdown' plugin for mkdocs look [here](https://github.com/mondeja/mkdocs-include-markdown-plugin)
+
+### Serving up documents locally
+You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.
+
+```shell
+git clone git@github.com:{{ config.repo_short_name }}.git
+cd {{ config.repo_default_path }}/docs
+git checkout {{ config.ks_branch }}
+```
+
+You can view and modify our documentation in the branch you have checked out by using `mkdocs serve` from [mkdocs](https://www.mkdocs.org):
+
+```shell
+pip install -r requirements.txt
+mkdocs serve
+```
+Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
+
+Another way to view (not modify - this method reflects what has been deployed to the `gh-pages` branch of our repo) all branches/versions of our documentation locally using 'mike' [mike for mkdocs](https://github.com/jimporter/mike):
+
+```shell
+git clone git@github.com:{{ config.repo_short_name }}.git
+cd {{ config.repo_default_path }}
+git checkout {{ config.ks_branch }}
+make serve-docs
+```
+Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
+
+### Supported aliases for our documentation
+We currently support 3 aliases for our documentation:
+
+    - from the release major.minor branch:
+        - [{{ config.docs_url }}/stable]({{ config.docs_url }}/stable)
+    - from the main branch:
+        - [{{ config.docs_url }}/unstable]({{ config.docs_url }}/unstable)
+        - [{{ config.docs_url }}/latest]({{ config.docs_url }}/latest)
+
+### Shortcut URLs
+We have a few shortcut urls that come in handy when referring others to our project:
+
+<b>note:</b> You need to join our mailing list first to get access to some of the links that follow ([{{ config.docs_url }}/joinus]({{ config.docs_url }}/joinus))
+
+- [{{ config.docs_url }}/agenda]({{ config.docs_url }}/agenda) - our community meeting agenda google doc
+- [{{ config.docs_url }}/blog]({{ config.docs_url }}/blog) - our medium reading list
+- [{{ config.docs_url }}/code]({{ config.docs_url }}/code) - our current GH repo (wherever that is)
+- [{{ config.docs_url }}/community]({{ config.docs_url }}/community) - our stable docs community page
+- [{{ config.docs_url }}/drive]({{ config.docs_url }}/drive) - our google drive
+- [{{ config.docs_url }}/joinus]({{ config.docs_url }}/joinus) - our dev mailing list where you join and get our invites
+- [{{ config.docs_url }}/join_us]({{ config.docs_url }}/join_us) - also, our dev mailing list
+- [{{ config.docs_url }}/linkedin]({{ config.docs_url }}/linkedin) - our linkedin filter (soon, our page)
+- [{{ config.docs_url }}/tv]({{ config.docs_url }}/tv) - our youtube channel
+- [{{ config.docs_url }}/youtube]({{ config.docs_url }}/tv) - also, our youtube channel
+- [{{ config.docs_url }}/infomercial]({{ config.docs_url }}/infomercial) - our infomercial that premieres on June 12th at 9am
+
+and.. the very important…
+- [{{ config.docs_url }}/quickstart]({{ config.docs_url }}/quickstart) - our 'stable' quickstart
+
+### Codeblocks
+mkdocs has some very helpful ways to include blocks of code in a style that makes it clear to our readers that console interaction is necessary in the documentation.  There are options to include a plain codeblock (```), shell (shell), console (console - no used in our documentation), language or format-specific (yaml, etc.), and others.  For more detailed information, checkout the [mkdocs information on codeblocks](https://squidfunk.github.io/mkdocs-material/reference/code-blocks/).
+
+Here are some examples of how we use codeblocks:
+
+- For a codeblock that can be 'tested' as part of our CI, use the <b><i>`shell`</i></b> block:
+<br/><b>code:</b>
+````
+```shell
+mkdocs serve
+```
+````
+<b>output:</b>
+
+
+- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> block with the <b><i>'.hide-me'</i></b> style:
+<br/><b>code:</b>
+````
+``` { .bash .hide-me }
+mkdocs server # run this command in the automation, but do not show it to the reader
+```
+````
+<b>output:</b>
+
+
+- For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> block <b>without</b> the <b><i>'.hide-me'</b></i> style:
+<br/><b>code:</b>
+````
+``` { .bash }
+mkdocs server
+```
+````
+<b>output:</b>
+``` { .bash }
+mkdocs server
+```
+
+- For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances)
+<br/><b>code:</b>
+````
+``` { .bash .no-copy }
+I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
+I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
+I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
+```
+````
+<b>output:</b>
+``` { .bash .no-copy }
+I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
+I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
+I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
+```
+
+- For language-specific highlighting (yaml, etc.):
+<br/><b>code:</b>
+````
+```yaml
+
+```
+````
+<b>output:</b>
+```yaml
+nav:
+  - Home: index.md
+  - QuickStart: Getting-Started/quickstart.md
+  - Contributing: 
+      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+```
+
+- For a codeblock that has a title:
+<br/><b>code:</b>
+````
+``` title="testing.sh"
+#!/bin/sh
+echo hello KubeStellar
+```
+````
+<b>output:</b>
+``` title="testing.sh"
+#!/bin/sh
+echo hello KubeStellar
+```
+
+(other variations are possible, PR an update to the [kubestellar.css]({{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css) file and, once approved, use the style on the plain codeblock in your documentation.)
+
+### Testing/Running Docs

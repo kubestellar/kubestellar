@@ -216,7 +216,7 @@ to mailbox workspace(s).
 You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
-```shell
+```shell 
 kubectl get workspace
 ```
 ``` { .bash .no-copy }

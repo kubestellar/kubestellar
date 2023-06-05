@@ -2,6 +2,9 @@ site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 site_url: https://docs.kubestellar.io/
 
+repo_short_name: kcp-dev/edge-mc
+repo_default_file_path: edge-mc
+docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
@@ -22,17 +25,16 @@ nav:
       - Governance: Contribution guidelines/governance.md
       - Onboarding: Contribution guidelines/onboarding.md
       - Security: 
-          - Policy: Contribution guidelines/security.md
-          - Contacts: Contribution guidelines/security_contacts.md
+          - Policy: Contribution guidelines/security/security.md
+          - Contacts: Contribution guidelines/security/security_contacts.md
       - Operations: 
-          - Code Management: common-subs/coming-soon.md
-          - Release Management: common-subs/coming-soon.md
-          - Document Management: common-subs/coming-soon.md
+          - Code Management: Contribution guidelines/operations/code-management.md
+          - Release Management: Contribution guidelines/operations/release-management.md
+          - Document Management: Contribution guidelines/operations/document-management.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
           - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
-          - Commands: Coding Milestones/PoC2023q1/commands.md
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
           - Processes:
@@ -44,6 +46,8 @@ nav:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
+          - Reference:
+              - Commands: Coding Milestones/PoC2023q1/commands.md
       - PoC2023q3:
           - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
