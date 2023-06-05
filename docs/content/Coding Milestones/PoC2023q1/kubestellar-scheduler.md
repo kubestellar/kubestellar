@@ -48,10 +48,10 @@ Go to the `root:espw` workspace and run the edge scheduler.
 %}
 The outputs from the edge scheduler should be similar to:
 ``` { .bash .no-copy }
-I0327 17:14:42.222112   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
-I0327 17:14:42.225075   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io"
-I0327 17:14:42.226954   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/workload.kcp.io"
-I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="kubestellar-scheduler"
+I0605 10:53:00.156100   29786 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kcp.io"
+I0605 10:53:00.157874   29786 scheduler.go:212] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io"
+I0605 10:53:00.159242   29786 scheduler.go:212] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io"
+I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controller="kubestellar-scheduler"
 ```
 
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
@@ -92,51 +92,51 @@ synctarget.workload.kcp.io/prod   2m12s
 ```
 
 #### Create some EdgePlacements in the WMW
-Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
+Go to Workload Management Workspace (WMW) and create an EdgePlacement `all2all`.
 ```shell
 kubectl ws \~
-kubectl create -f ../KubeStellar/config/samples/edgeplacement_test-1.yaml
+kubectl create -f ../KubeStellar/config/samples/edgeplacement_all2all.yaml
 ```
 
 The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
 ```shell
-kubectl get sps test-1 -oyaml
+kubectl get sps all2all -oyaml
 ```
 ``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 destinations:
-- cluster: f3il38atqno12hfd
+- cluster: 1yotsgod0d2p3xa5
   locationName: prod
   syncTargetName: prod
-  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
-- cluster: f3il38atqno12hfd
+  syncTargetUID: 13841ffd-33f2-4cf4-9114-6156f73aa5c8
+- cluster: 1yotsgod0d2p3xa5
   locationName: dev
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
-- cluster: f3il38atqno12hfd
-  locationName: default
-  syncTargetName: prod
-  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
-- cluster: f3il38atqno12hfd
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+- cluster: 1yotsgod0d2p3xa5
   locationName: default
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+- cluster: 1yotsgod0d2p3xa5
+  locationName: default
+  syncTargetName: prod
+  syncTargetUID: 13841ffd-33f2-4cf4-9114-6156f73aa5c8
 kind: SinglePlacementSlice
 metadata:
   annotations:
     kcp.io/cluster: kvdk2spgmbix
-  creationTimestamp: "2023-03-27T21:37:29Z"
+  creationTimestamp: "2023-06-05T14:55:20Z"
   generation: 1
-  name: test-1
+  name: all2all
   ownerReferences:
   - apiVersion: edge.kcp.io/v1alpha1
     kind: EdgePlacement
-    name: test-1
-    uid: 0c68724e-6d11-4cff-bd0a-8fa32c86caa9
-  resourceVersion: "877"
-  uid: 45ec86d7-bdf8-4c2d-bc02-087073a1ac17
+    name: all2all
+    uid: 31915018-6a25-4f01-943e-b8a0a0ed35ba
+  resourceVersion: "875"
+  uid: a2b8224d-5feb-40a1-adb2-67c07965f13b
 ```
-EdgePlacement `test-1` selects all the 3 Locations in `root:compute`.
+EdgePlacement `all2all` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```shell
@@ -150,24 +150,24 @@ kubectl get sps dev -oyaml
 ``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 destinations:
-- cluster: f3il38atqno12hfd
+- cluster: 1yotsgod0d2p3xa5
   locationName: dev
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
 kind: SinglePlacementSlice
 metadata:
   annotations:
     kcp.io/cluster: kvdk2spgmbix
-  creationTimestamp: "2023-03-27T21:40:52Z"
+  creationTimestamp: "2023-06-05T14:57:00Z"
   generation: 1
   name: dev
   ownerReferences:
   - apiVersion: edge.kcp.io/v1alpha1
     kind: EdgePlacement
     name: dev
-    uid: 6e9d608d-12cd-47cc-8887-3695199259ba
-  resourceVersion: "880"
-  uid: 9b8de087-21bc-4585-99cb-e6c03ba0a8ae
+    uid: 1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b
+  resourceVersion: "877"
+  uid: c9c0c2fc-d721-4c73-9788-e10711bad23a
 ```
 
 Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.
