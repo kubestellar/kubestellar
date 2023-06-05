@@ -77,22 +77,22 @@ We currently support 3 aliases for our documentation:
 ### Shortcut URLs
 We have a few shortcut urls that come in handy when referring others to our project:
 
-<b>note:</b> You need to join our mailing list first to get access to some of the links that follow ([{{ config.docs_url }}/joinus]({{ config.docs_url }}/joinus))
+<b>note:</b> You need to join our mailing list first to get access to some of the links that follow ([{{ config.docs_url }}/joinus](https://kubestellar.io/joinus))
 
-- [{{ config.docs_url }}/agenda]({{ config.docs_url }}/agenda) - our community meeting agenda google doc
-- [{{ config.docs_url }}/blog]({{ config.docs_url }}/blog) - our medium reading list
-- [{{ config.docs_url }}/code]({{ config.docs_url }}/code) - our current GH repo (wherever that is)
-- [{{ config.docs_url }}/community]({{ config.docs_url }}/community) - our stable docs community page
-- [{{ config.docs_url }}/drive]({{ config.docs_url }}/drive) - our google drive
-- [{{ config.docs_url }}/joinus]({{ config.docs_url }}/joinus) - our dev mailing list where you join and get our invites
-- [{{ config.docs_url }}/join_us]({{ config.docs_url }}/join_us) - also, our dev mailing list
-- [{{ config.docs_url }}/linkedin]({{ config.docs_url }}/linkedin) - our linkedin filter (soon, our page)
-- [{{ config.docs_url }}/tv]({{ config.docs_url }}/tv) - our youtube channel
-- [{{ config.docs_url }}/youtube]({{ config.docs_url }}/tv) - also, our youtube channel
-- [{{ config.docs_url }}/infomercial]({{ config.docs_url }}/infomercial) - our infomercial that premieres on June 12th at 9am
+- [https://kubestellar.io/agenda](https://kubestellar.io/agenda) - our community meeting agenda google doc
+- [https://kubestellar.io/blog](https://kubestellar.io/blog) - our medium reading list
+- [https://kubestellar.io/code](https://kubestellar.io/code) - our current GH repo (wherever that is)
+- [https://kubestellar.io/community](https://kubestellar.io/community) - our stable docs community page
+- [https://kubestellar.io/drive](https://kubestellar.io/drive) - our google drive
+- [https://kubestellar.io/joinus](https://kubestellar.io/joinus) - our dev mailing list where you join and get our invites
+- [https://kubestellar.io/join_us](https://kubestellar.io/join_us) - also, our dev mailing list
+- [https://kubestellar.io/linkedin](https://kubestellar.io/linkedin) - our linkedin filter (soon, our page)
+- [https://kubestellar.io/tv](https://kubestellar.io/tv) - our youtube channel
+- [https://kubestellar.io/youtube](https://kubestellar.io/tv) - also, our youtube channel
+- [https://kubestellar.io/infomercial](https://kubestellar.io/infomercial) - our infomercial that premieres on June 12th at 9am
 
 and.. the very important…
-- [{{ config.docs_url }}/quickstart]({{ config.docs_url }}/quickstart) - our 'stable' quickstart
+- [https://kubestellar.io/quickstart](https://kubestellar.io/quickstart) - our 'stable' quickstart
 
 ### Codeblocks
 mkdocs has some very helpful ways to include blocks of code in a style that makes it clear to our readers that console interaction is necessary in the documentation.  There are options to include a plain codeblock (```), shell (shell), console (console - no used in our documentation), language or format-specific (yaml, etc.), and others.  For more detailed information, checkout the [mkdocs information on codeblocks](https://squidfunk.github.io/mkdocs-material/reference/code-blocks/).
