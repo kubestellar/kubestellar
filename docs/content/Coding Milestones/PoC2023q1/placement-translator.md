@@ -122,6 +122,18 @@ scenario in [example1](../example1).  You will need to run the
 scheduler and mailbox controller long enough for them to create what
 this scenario calls for, but they can be terminated after that.
 
+{%
+   include-markdown "example1-subs/example1-pre-kcp.md"
+   start="<!--example1-pre-kcp-start-->"
+   end="<!--example1-pre-kcp-end-->"
+%}
+
+{%
+   include-markdown "example1-subs/example1-start-kcp.md"
+   start="<!--example1-start-kcp-start-->"
+   end="<!--example1-start-kcp-end-->"
+%}
+
 When you get to the step of "Populate the edge service provider
 workspace", it suffices to do the following.
 
