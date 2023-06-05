@@ -10,7 +10,7 @@
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)&nbsp;&nbsp;&nbsp;
-[![QuickStart test](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells.yml)&nbsp;&nbsp;&nbsp;
+[![QuickStart test](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-qs.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-qs.yml)&nbsp;&nbsp;&nbsp;
 [![Run Doc Shells - example1](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-example1.yml)
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
