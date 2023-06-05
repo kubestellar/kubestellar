@@ -73,7 +73,7 @@ kubectl create -f ../KubeStellar/config/samples/location_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/location_dev.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_dev.yaml
-sleep 10
+sleep 5
 ```
 
 Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
@@ -96,6 +96,7 @@ Go to Workload Management Workspace (WMW) and create an EdgePlacement `all2all`.
 ```shell
 kubectl ws \~
 kubectl create -f ../KubeStellar/config/samples/edgeplacement_all2all.yaml
+sleep 3
 ```
 
 The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
@@ -141,6 +142,7 @@ EdgePlacement `all2all` selects all the 3 Locations in `root:compute`.
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```shell
 kubectl create -f ../KubeStellar/config/samples/edgeplacement_dev.yaml
+sleep 3
 ```
 
 The corresponding SinglePlacementSlice has a shorter list of `destinations`:
