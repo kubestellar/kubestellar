@@ -1,3 +1,4 @@
+<!--onboarding-start-->
 KubeStellar GitHub Organization
 On-boarding and Off-boarding Policy
 
@@ -58,3 +59,4 @@ By joining the organization, all members agree to abide by the terms and guideli
 Andy Anderson (clubanderson)
 KubeStellar Maintainer
 June 1, 2023
+<!--onboarding-end-->

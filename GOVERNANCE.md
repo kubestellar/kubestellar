@@ -1,3 +1,4 @@
+<!--governance-start-->
 # KubeStellar Project Governance
 
 The KubeStellar project is dedicated to solving challenges stemming from
@@ -161,3 +162,4 @@ Governance require a 2/3 vote of all Maintainers.
 
 Changes to this Governance and its supporting documents may be approved by a 
 2/3 vote of the Maintainers.
+<!--governance-end-->
