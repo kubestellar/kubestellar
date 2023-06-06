@@ -161,12 +161,6 @@ Finally run the placement translator from the command line.  That
 should look like the following (possibly including some complaints,
 which do not necessarily indicate real problems).
 
-```shell
-kubectl ws root:espw
-```
-``` { .bash .no-copy }
-Current workspace is "root:espw".
-```
 {%
    include-markdown "placement-translator-subs/placement-translator-process-start-without-cd-kubestellar.md"
    start="<!--placement-translator-process-start-without-cd-kubestellar-start-->"
