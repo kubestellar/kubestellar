@@ -30,7 +30,7 @@ echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
-start_hidden_pattern="^\`\`\`\s*{\s*.bash\s*.hide-me\s*}"
+start_hidden_pattern="^\`\`\`.*{.bash.*.hide-me}"
 stop_pattern="^\`\`\`"
 include_pattern="\s*include-markdown\s*"
 
@@ -101,15 +101,23 @@ function parse_file()
     if [[ $inside_block == 1 ]]; then
       # remove the backticks from the code block
       
-      code_block="${line//\`\`\`shell/}"
-      code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
-      code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
-      code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
-      code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
-      echo $code_block
-
-      # add the code block to the array
-      code_blocks+=("$code_block")
+      if [[ $line =~ $start_pattern ]]; then
+        echo ignore this line
+      else
+        if [[ $line =~ $start_hidden_pattern ]]; then
+          echo ignote this line
+        else
+          # code_block="${line//\`\`\`shell/}"
+          code_block=$line
+          code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
+          code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
+          code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
+          code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
+          echo $code_block
+          # add the code block to the array
+          code_blocks+=("$code_block")
+        fi
+      fi
     fi
   done < "$REPO_ROOT/docs/$file_name"
 }
@@ -130,6 +138,8 @@ echo "" > "$generated_script_file"
 for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
+
+exit
 
 # make the generated script executable
 chmod +x "$generated_script_file"
