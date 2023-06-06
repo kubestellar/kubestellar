@@ -109,11 +109,11 @@ mkdocs serve
 <b>output:</b>
 
 
-- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style:
+- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
 <br/><b>code:</b>
 ````
-``` { .bash .hide-me }
-mkdocs server # run this command in the automation, but do not show it to the reader
+``` {.bash .hide-me}
+sleep 10
 ```
 ````
 <b>output:</b>
