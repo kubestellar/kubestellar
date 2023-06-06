@@ -588,7 +588,7 @@ Current workspace is "root:espw".
 ```
 ```shell
 go run ./cmd/placement-translator &
-sleep 45
+sleep 120
 ```
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
