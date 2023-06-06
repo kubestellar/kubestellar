@@ -800,6 +800,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#in-case-of-emergency" class="md-nav__link">
+    In case of emergency
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-recreate-the-gh-pages-branch" class="md-nav__link">
+    How to recreate the gh-pages branch
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1652,6 +1666,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#in-case-of-emergency" class="md-nav__link">
+    In case of emergency
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-recreate-the-gh-pages-branch" class="md-nav__link">
+    How to recreate the gh-pages branch
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1900,6 +1928,49 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
 </code></pre></div>
+<h3 id="in-case-of-emergency">In case of emergency</h3>
+<p>If you find yourself in a jam and the pages are not showing up at kubestellar.io or docs.kubestellar.io, check the following
+1) Is the index.html, home.html, CNAME, and versions.json file in the gh-pages branch alongside the folders for the compiled documents?  If not, then recreate those files as indicated above (except for versions.json which is programmatically created by 'mike').
+2) Is GitHub settings for 'Pages' for the domain pointing at the https://docs.kubestellar.io url?  If not, paste it in and check off 'enforce https'.  This can happen if the CNAME file goes missing from the gh-pages branch.</p>
+<h3 id="how-to-recreate-the-gh-pages-branch">How to recreate the gh-pages branch</h3>
+<p>To recreate the gh-pages branch, do the following:
+- checkout the gh-pages branch to your local system
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>gh-pages<span class="w"> </span>https://github.com/kcp-dev/edge-mc<span class="w"> </span>KubeStellar
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nb">cd</span><span class="w"> </span>KubeStellar
+</code></pre></div>
+- delete all files in the branch and push it to GitHub
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>*
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>git<span class="w"> </span>add<span class="p">;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;removing all gh-pages files&quot;</span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+</code></pre></div>
+-- switch to the 'main' branch
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>git<span class="w"> </span>pull
+</code></pre></div>
+- switch to /docs and run 'mike deploy' for the main branch for alias 'unstable' and 'latest'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>unstable
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>latest
+</code></pre></div>
+- switch to the 'release' branch and 'mike deploy' for the release branch for alias 'stable' (your release name will vary)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>release-0.2
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>git<span class="w"> </span>pull
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.2<span class="w"> </span>stable
+</code></pre></div>
+- switch back to the gh-pages branch and recreate the home.html, index.html, and CNAME files as needed (make sure you back out of the docs path first before switching to gh-pages because that path does not exist in that branch)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">cd</span><span class="w"> </span>..
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>git<span class="w"> </span>checkout<span class="w"> </span>gh-pages
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>git<span class="w"> </span>pull
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>vi<span class="w"> </span>index.html
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>vi<span class="w"> </span>home.html
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>vi<span class="w"> </span>CNAME
+</code></pre></div>
+- push the new files into gh-pages
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>git<span class="w"> </span>add<span class="w"> </span>.<span class="p">;</span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add index, home, and CNAME files&quot;</span><span class="p">;</span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+</code></pre></div>
+- go into the GitHub UI and go to the settings for the project and click on 'Pages' to add https://docs.kubestellar.io as the domain and check the box to enforce https.</p>
+<ul>
+<li>if the above did not work, then you might have an issue with the GoDaddy domain (expired, files missing, etc.)</li>
+</ul>
 
 
   
