@@ -236,7 +236,7 @@ spec:
       name: kubernetes
 ```
 ``` {.bash .hide-me}
-wait 15
+sleep 15
 ```
 
 Next, use `kubectl` to create the following workload objects in that
@@ -316,7 +316,7 @@ spec:
 EOF
 ```
 ``` {.bash .hide-me}
-wait 10
+sleep 10
 ```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
@@ -350,7 +350,7 @@ spec:
 EOF
 ```
 ``` {.bash .hide-me}
-wait 10
+sleep 10
 ```
 
 ### Create and populate the workload management workspace for the special workload
@@ -437,7 +437,7 @@ spec:
 EOF
 ```
 ``` {.bash .hide-me}
-wait 10
+sleep 10
 ```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
@@ -471,7 +471,7 @@ spec:
 EOF
 ```
 ``` {.bash .hide-me}
-wait 10
+sleep 10
 ```
 
 ### Edge scheduling
@@ -496,8 +496,8 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-kubestellar-scheduler &
-wait 45
+go run ./cmd/kubestellar-scheduler &
+sleep 45
 ```
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 kubestellar-scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
@@ -581,7 +581,7 @@ Current workspace is "root:espw".
 ```
 ```shell
 go run ./cmd/placement-translator &
-wait 45
+sleep 45
 ```
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
@@ -883,7 +883,7 @@ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
 Check that the common workload on the florin cluster is working.
 
 ``` {.bash .hide-me}
-wait 20
+sleep 20
 ```
 ```shell
 curl http://localhost:8094
@@ -900,7 +900,7 @@ curl http://localhost:8094
 
 Check that the special workload on the guilder cluster is working.
 ``` {.bash .hide-me}
-wait 10
+sleep 10
 ```
 ```shell
 curl http://localhost:8097
