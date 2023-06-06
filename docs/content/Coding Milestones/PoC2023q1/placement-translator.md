@@ -136,6 +136,12 @@ this scenario calls for, but they can be terminated after that.
    end="<!--example1-start-kcp-end-->"
 %}
 
+{%
+   include-markdown "placement-translator-subs/placement-translator-create-imw-and-build-kubestellar.md"
+   start="<!--placement-translator-create-imw-and-build-kubestellar-start-->"
+   end="<!--placement-translator-create-imw-and-build-kubestellar-end-->"
+%}
+
 When you get to the step of "Populate the edge service provider
 workspace", it suffices to do the following.
 
@@ -143,7 +149,7 @@ workspace", it suffices to do the following.
 kubectl ws root
 kubectl ws create espw --enter
 kubectl ws root:espw
-kubectl create -f ../KubeStellar/config/exports/
+kubectl create -f config/exports/
 ```
 
 Continue to follow the steps until the start of Stage 3 of the
