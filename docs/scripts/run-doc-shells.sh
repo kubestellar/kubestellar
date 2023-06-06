@@ -127,8 +127,6 @@ do
   parse_file "\"$FILE_NAME\""
 done
 
-
-
 IFS=$SAVEIFS
 
 generated_script_file="$REPO_ROOT/docs/scripts/generated_script.sh"
@@ -138,6 +136,8 @@ echo "" > "$generated_script_file"
 for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
+
+cat "$generated_script_file"
 
 # make the generated script executable
 chmod +x "$generated_script_file"
