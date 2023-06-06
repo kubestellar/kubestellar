@@ -441,4 +441,11 @@
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/coming-soon/"/>
          
     </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/pre-req/</loc>
+         <lastmod>2023-06-06</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/pre-req/"/>
+         
+    </url>
 </urlset>
