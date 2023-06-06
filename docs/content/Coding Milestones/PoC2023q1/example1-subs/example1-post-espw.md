@@ -66,10 +66,17 @@ Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```shell
-kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
+GUILDER_WS = $(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name')
 ```
 ``` { .bash .no-copy }
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+```
+
+```shell
+FLORIN_WS = $(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "florin") | .name')
+```
+``` { .bash .no-copy }
+1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
 ```
 
 ### Connect guilder edge cluster with its mailbox workspace
@@ -595,7 +602,7 @@ The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.
 
 ```shell
-kubectl ws 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+kubectl ws $FLORIN_WS
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
@@ -704,7 +711,7 @@ Current workspace is "root:espw".
 ```
 
 ```shell
-kubectl ws 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+kubectl ws $GUILDER_WS
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).

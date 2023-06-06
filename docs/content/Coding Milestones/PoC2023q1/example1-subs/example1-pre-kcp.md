@@ -2,7 +2,7 @@
 ![Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](../Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
 
 Stage 1 creates the infrastructure and the edge service provider
-workspace and lets that react to the inventory.  Then the edge syncers
+workspace (ESPW) and lets that react to the inventory.  Then the KubeStellar syncers
 are deployed, in the edge clusters and configured to work with the
 corresponding mailbox workspaces.  This stage has the following steps.
 
