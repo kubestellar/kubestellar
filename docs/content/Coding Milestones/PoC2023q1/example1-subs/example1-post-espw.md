@@ -891,7 +891,7 @@ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -n commonstu
 Check that the common workload on the florin cluster is working.
 
 ``` {.bash .hide-me}
-sleep 20
+sleep 10
 ```
 ```shell
 curl http://localhost:8094

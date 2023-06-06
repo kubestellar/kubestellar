@@ -3,6 +3,6 @@
 kubectl ws root:espw
 cd ../KubeStellar
 go run ./cmd/placement-translator &
-sleep 45
+sleep 120
 ```
 <!--placement-translator-process-start-end-->
