@@ -2242,7 +2242,7 @@ creating the following two <code>APIBinding</code> objects.</p>
 <a id="__codelineno-33-18" name="__codelineno-33-18" href="#__codelineno-33-18"></a><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;root:compute&quot;</span>
 <a id="__codelineno-33-19" name="__codelineno-33-19" href="#__codelineno-33-19"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kubernetes</span>
 </code></pre></div>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">15</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div></p>
 <p>Next, use <code>kubectl</code> to create the following workload objects in that
 workspace.  The workload in this example in an Apache httpd server
@@ -2318,7 +2318,7 @@ ConfigMap that is mounted as a volume for the httpd pod.</p>
 <a id="__codelineno-35-68" name="__codelineno-35-68" href="#__codelineno-35-68"></a><span class="s">          optional: false</span>
 <a id="__codelineno-35-69" name="__codelineno-35-69" href="#__codelineno-35-69"></a><span class="s">EOF</span>
 </code></pre></div>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
 <p>Finally, use <code>kubectl</code> to create the following EdgePlacement object.
 Its "where predicate" (the <code>locationSelectors</code> array) has one label
@@ -2348,7 +2348,7 @@ directing the common workload to both edge clusters.</p>
 <a id="__codelineno-37-22" name="__codelineno-37-22" href="#__codelineno-37-22"></a><span class="s">    names: [&quot;william&quot;]</span>
 <a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a><span class="s">EOF</span>
 </code></pre></div>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
 <h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload</h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
@@ -2427,7 +2427,7 @@ workload.</p>
 <a id="__codelineno-40-68" name="__codelineno-40-68" href="#__codelineno-40-68"></a><span class="s">          optional: false</span>
 <a id="__codelineno-40-69" name="__codelineno-40-69" href="#__codelineno-40-69"></a><span class="s">EOF</span>
 </code></pre></div>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
 <p>Finally, use <code>kubectl</code> to create the following EdgePlacement object.
 Its "where predicate" (the <code>locationSelectors</code> array) has one label
@@ -2457,7 +2457,7 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 <a id="__codelineno-42-22" name="__codelineno-42-22" href="#__codelineno-42-22"></a><span class="s">    names: [&quot;*&quot;]</span>
 <a id="__codelineno-42-23" name="__codelineno-42-23" href="#__codelineno-42-23"></a><span class="s">EOF</span>
 </code></pre></div>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
 <h3 id="edge-scheduling">Edge scheduling</h3>
 <p>In response to each EdgePlacement, the scheduler will create a
@@ -2488,8 +2488,8 @@ ESPW and invoke the edge-mc command that runs the scheduler.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>kubestellar-scheduler<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="nb">wait</span><span class="w"> </span><span class="m">45</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/kubestellar-scheduler<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>kubestellar-scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io&quot;</span>
 <a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>...
@@ -2554,7 +2554,7 @@ ESPW and use the edge-mc command that runs the placement translator.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/placement-translator<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a><span class="nb">wait</span><span class="w"> </span><span class="m">45</span>
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>I0423<span class="w"> </span><span class="m">01</span>:39:56.362722<span class="w">   </span><span class="m">11644</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
 <a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>...
@@ -2802,7 +2802,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-80-9" name="__codelineno-80-9" href="#__codelineno-80-9"></a>...
 </code></pre></div></p>
 <p>Check that the common workload on the florin cluster is working.</p>
-<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">20</span>
+<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>sleep<span class="w"> </span><span class="m">20</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a>curl<span class="w"> </span>http://localhost:8094
 </code></pre></div>
@@ -2815,7 +2815,7 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-83-7" name="__codelineno-83-7" href="#__codelineno-83-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <p>Check that the special workload on the guilder cluster is working.
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="nb">wait</span><span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>curl<span class="w"> </span>http://localhost:8097
 </code></pre></div>
