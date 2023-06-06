@@ -32,15 +32,9 @@ make build
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
+export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
+export PATH=$(pwd)/bin:$PATH
 kcp start &
 sleep 30 
-```
-
-```shell
-ls -alrt
-cd ..
-ls -alrt
-export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/kcp/bin:$PATH
 ```
 <!--example1-start-kcp-end-->
