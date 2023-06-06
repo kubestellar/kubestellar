@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#status" class="md-skip">
+        <a href="#required-packages" class="md-skip">
           Skip to content
         </a>
       
@@ -911,6 +911,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#required-packages" class="md-nav__link">
+    Required Packages:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#status" class="md-nav__link">
     Status
   </a>
@@ -1552,6 +1559,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#required-packages" class="md-nav__link">
+    Required Packages:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#status" class="md-nav__link">
     Status
   </a>
@@ -1722,13 +1736,29 @@
 
   <h1>KubeStellar Placement Translator</h1>
 
-<p><a href="https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-placement.yml"><img alt="Run Doc Shells - placement-translator" src="https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
+<!-- BEGIN INCLUDE ../../common-subs/save-some-time.md '&lt;!--save-some-time-start--&gt;' '&lt;!--save-some-time-end--&gt;' -->
+
 <div class="highlight"><span class="filename">save some time - run this document, just like we do in our testing, on your local environment</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone -n -b main https://github.com/kcp-dev/edge-mc --depth 1 KubeStellar-placement-translator
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cd KubeStellar-placement-translator
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git restore --staged Makefile Makefile.venv go.mod docs
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git checkout Makefile Makefile.venv go.mod docs
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>make MANIFEST=&quot;&#39;content/common-subs/pre-req.md&#39;,&#39;content/Coding Milestones/PoC2023q1/placement-translator.md&#39;&quot; run-doc-shells
 </code></pre></div>
+<!-- END INCLUDE -->
+<p><a href="https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-placement.yml"><img alt="Run Doc Shells - placement-translator" src="https://github.com/kcp-dev/edge-mc/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
+<!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
+
+<h2 id="required-packages">Required Packages:</h2>
+<ul>
+<li><a href="https://docs.docker.com/engine/install/">docker</a></li>
+<li><a href="https://kind.sigs.k8s.io/">kind</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/">kubectl</a> (version range expected: 1.23-1.25)</li>
+<li><a href="https://stedolan.github.io/jq/download/">jq</a></li>
+</ul>
+<!-- END INCLUDE -->
+<ul>
+<li><a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</li>
+</ul>
 <p>The placement translator runs in the center and translates EMC placement problems into edge sync problems.</p>
 <h2 id="status">Status</h2>
 <p>The placement translator is a work in progress.  It maintains
