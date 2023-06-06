@@ -139,8 +139,6 @@ for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
 
-exit
-
 # make the generated script executable
 chmod +x "$generated_script_file"
 
