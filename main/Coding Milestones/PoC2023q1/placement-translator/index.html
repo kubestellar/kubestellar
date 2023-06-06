@@ -1805,12 +1805,10 @@ workspaces; it does not need to keep running, you can ^C it.  This
 should not take long, and do not expect an explicit acknowledgement on
 the console.  You can check for their existence by doing <code>kubectl get
 workspaces</code> while in the ESPW.</p>
-<!-- BEGIN INCLUDE mailbox-controller-subs/mailbox-controller-process-start.md '&lt;!--mailbox-controller-process-start-start--&gt;' '&lt;!--mailbox-controller-process-start-end--&gt;' -->
+<!-- BEGIN INCLUDE mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar.md '&lt;!--mailbox-controller-process-start-without-cd-kubestellar-start--&gt;' '&lt;!--mailbox-controller-process-start-without-cd-kubestellar-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>sleep<span class="w"> </span><span class="m">45</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
