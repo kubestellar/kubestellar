@@ -48,7 +48,8 @@ go run ./cmd/mailbox-controller -v=2 &
 sleep 45
 kubectl get Workspaces
 kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
-kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name'
+GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name')
+FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "florin") | .name')
 kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder apply -f guilder-syncer.yaml
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A
@@ -256,12 +257,12 @@ kubectl get SinglePlacementSlice -o yaml
 kubectl ws root:espw
 go run ./cmd/placement-translator &
 sleep 45
-kubectl ws 1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+kubectl ws $FLORIN_WS
 kubectl get SyncerConfig the-one -o yaml
 kubectl get ns
 kubectl get deployments -A
 kubectl ws root:espw
-kubectl ws 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+kubectl ws $GUILDER_WS
 kubectl get SyncerConfig the-one -o yaml
 kubectl get deployments -A
 KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns

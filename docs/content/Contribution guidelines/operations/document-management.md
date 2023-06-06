@@ -99,62 +99,64 @@ mkdocs has some very helpful ways to include blocks of code in a style that make
 
 Here are some examples of how we use codeblocks:
 
-- For a codeblock that can be 'tested' as part of our CI, use the <b><i>`shell`</i></b> block:
-<br/><b>code:</b>
+- For a codeblock that can be 'tested' (and seen by the reader) as part of our CI, use the <b><i>`shell`</i></b> block:
+<br/><b>codeblock:</b>
 ````
 ```shell
 mkdocs serve
 ```
 ````
-<b>output:</b>
+<b>as seen by reader:</b>
+```shell
+mkdocs serve
+```
+<br/>
 
-
-- For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
-<br/><b>code:</b>
+- For a codeblock that should be 'tested', BUT <b>not</b> seen by the reader, use the <b><i>`.bash`</i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
+<br/><b>codeblock:</b>
 ````
 ``` {.bash .hide-me}
 sleep 10
 ```
 ````
-<b>output:</b>
-
+<b>as seen by reader:</b>
+```
+```
+<br/>
 
 - For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i>`.bash`</i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
-<br/><b>code:</b>
+<br/><b>codeblock:</b>
 ````
-``` { .bash }
+``` {.bash}
 mkdocs server
 ```
 ````
-<b>output:</b>
-``` { .bash }
+<b>as seen by reader:</b>
+``` {.bash}
 mkdocs server
 ```
+<br/>
 
-- For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances), use the <b><i>`.bash`</i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
-<br/><b>code:</b>
-````
-``` { .bash .no-copy }
+- For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i>`.bash`</i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
+<br/><b>codeblock:</b>
+```` {.bash .no-copy}
+``` {.bash .no-copy}
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
 I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
 I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
 ```
 ````
-<b>output:</b>
-``` { .bash .no-copy }
+<b>as seen by reader:</b>
+``` {.bash .no-copy}
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
 I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
 I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
 ```
+<br/>
 
 - For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
-<br/><b>code:</b>
+<br/><b>codeblock:</b>
 ````
-```yaml
-
-```
-````
-<b>output:</b>
 ```yaml
 nav:
   - Home: index.md
@@ -162,20 +164,31 @@ nav:
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
 ```
+````
+<b>as seen by reader:</b>
+```yaml
+nav:
+  - Home: index.md
+  - QuickStart: Getting-Started/quickstart.md
+  - Contributing: 
+      - Guidelines: Contribution guidelines/CONTRIBUTING.md
+```
+<br/>
 
-- For a codeblock that has a title, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock:
-<br/><b>code:</b>
+- For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
+<br/><b>codeblock:</b>
 ````
-``` title="testing.sh"
+``` {.bash .hide-me} title="testing.sh"
 #!/bin/sh
 echo hello KubeStellar
 ```
 ````
-<b>output:</b>
+<b>as seen by reader:</b>
 ``` title="testing.sh"
 #!/bin/sh
 echo hello KubeStellar
 ```
+<br/>
 
 (other variations are possible, PR an update to the [kubestellar.css]({{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css) file and, once approved, use the style on the plain codeblock in your documentation.)
 
