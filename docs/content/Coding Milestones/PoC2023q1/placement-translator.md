@@ -3,17 +3,19 @@ short_name: placement-translator
 manifest_name: 'content/Coding Milestones/PoC2023q1/placement-translator.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 [![Run Doc Shells - placement-translator]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml)&nbsp;&nbsp;&nbsp;
-
-
-``` title="save some time - run this document, just like we do in our testing, on your local environment"
-git clone -n -b {{config.ks_branch}} {{config.repo_url}} --depth 1 {{config.site_name}}-{{page.meta.short_name}}
-cd {{config.site_name}}-{{page.meta.short_name}}
-git restore --staged Makefile Makefile.venv go.mod docs
-git checkout Makefile Makefile.venv go.mod docs
-make MANIFEST="'{{page.meta.pre_req_name}}','{{page.meta.manifest_name}}'" run-doc-shells
-```
-
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
+  
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 
 ## Status

@@ -68,7 +68,7 @@ ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
-code_blocks+=('set -o xtrace')
+# code_blocks+=('set -o xtrace')
 
 function parse_file() 
 {
