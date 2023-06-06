@@ -588,7 +588,6 @@ Current workspace is "root:espw".
 ```
 ```shell
 go run ./cmd/placement-translator &
-sleep 120
 ```
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
@@ -604,13 +603,26 @@ The florin cluster gets only the common workload.  Examine florin's
 ```shell
 kubectl ws $FLORIN_WS
 ```
+
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
+```
+``` {.bash .no-copy}
+let iter=0
+while ! kubectl get SyncerConfig the-one -o yaml 2>/dev/null; do
+    sleep 10
+    let iter=iter+1
+    if (( iter > 20 )); then
+        echo "command 'kubectl get SyncerConfig the-one -o yaml' failed" >&2
+        exit 86
+    fi
+done
 ```
 
 ```shell
 kubectl get SyncerConfig the-one -o yaml
 ```
+
 ``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
