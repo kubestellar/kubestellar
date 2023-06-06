@@ -64,7 +64,6 @@ if docker info >/dev/null 2>&1; then
     echo "Docker is started"
 else
     if [ "$os_type" == "darwin" ]; then
-      source ./zshrc
       open --background -a Docker
     fi
 fi
