@@ -17,8 +17,8 @@ Eventually.  In the meantime, you can use the edge-mc command shown
 here.
 
 ```shell
-mailbox-controller -v=2 &
-wait 60
+go run ./cmd/mailbox-controller -v=2 &
+sleep 45
 ```
 ``` { .bash .no-copy }
 ...

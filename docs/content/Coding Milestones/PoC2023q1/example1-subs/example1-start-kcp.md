@@ -34,7 +34,8 @@ run kcp (kcp will spit out tons of information and stay running in this terminal
 ```shell
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH
-kcp start &> /dev/null &
+kcp start &
 sleep 30 
 ```
 <!--example1-start-kcp-end-->
+<!-- > /dev/null & -->
