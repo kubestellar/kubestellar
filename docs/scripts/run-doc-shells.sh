@@ -60,8 +60,6 @@ else
 
 fi
 
-inside_block=0
-
 repo_url=$(yq -r ".repo_url" $REPO_ROOT/docs/mkdocs.yml)
 repo_raw_url=$(yq -r ".repo_raw_url" $REPO_ROOT/docs/mkdocs.yml)
 ks_branch=$(yq -r ".ks_branch" $REPO_ROOT/docs/mkdocs.yml)
@@ -74,6 +72,7 @@ code_blocks+=('set -o xtrace')
 
 function parse_file() 
 {
+  local inside_block=0
   local file_name=$(echo $1 | sed 's/"//g')
   local path_name=$(echo "${file_name%/*}/")
 
