@@ -57,7 +57,7 @@ type ClusterProviderConfigSpec struct {
 
 	// TODO: this should be stored as a secret!
 	// Config is the provider config
-	// +kubebuilder:format:uri
+	// +kubebuilder
 	Config string `json:"Config,omitempty"`
 }
 
