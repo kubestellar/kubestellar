@@ -1,7 +1,6 @@
 [![Run Doc Shells - example1]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml)
 
-This doc attempts to show a simple example usage of the 2023q1 PoC.
-This doc is a work in progress.
+This doc shows a detailed example usage of the KubeStellar components.
 
 This example involves two edge clusters and two workloads.  One
 workload goes on both edge clusters and one workload goes on only one
