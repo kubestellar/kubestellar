@@ -137,47 +137,24 @@ this scenario calls for, but they can be terminated after that.
 %}
 
 {%
-   include-markdown "placement-translator-subs/placement-translator-create-imw-and-build-kubestellar.md"
-   start="<!--placement-translator-create-imw-and-build-kubestellar-start-->"
-   end="<!--placement-translator-create-imw-and-build-kubestellar-end-->"
+   include-markdown "example1-subs/example1-post-kcp.md"
+   start="<!--example1-post-kcp-start-->"
+   end="<!--example1-post-kcp-end-->"
 %}
-
-When you get to the step of "Populate the edge service provider
-workspace", it suffices to do the following.
-
-```shell
-kubectl ws root
-kubectl ws create espw --enter
-kubectl create -f config/exports/
-```
 
 Continue to follow the steps until the start of Stage 3 of the
 exercise.
 
-Next make sure you run `kubectl ws root:espw` to enter the edge
-service provider workspace, then you will be ready to run the edge
-controllers.
-
-First run the mailbox controller, long for it to create the mailbox
-workspaces; it does not need to keep running, you can ^C it.  This
-should not take long, and do not expect an explicit acknowledgement on
-the console.  You can check for their existence by doing `kubectl get
-workspaces` while in the ESPW.
-
 {%
-   include-markdown "mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar.md"
-   start="<!--mailbox-controller-process-start-without-cd-kubestellar-start-->"
-   end="<!--mailbox-controller-process-start-without-cd-kubestellar-end-->"
+   include-markdown "example1-subs/example1-stage-1b.md"
+   start="<!--example1-stage-1b-start-->"
+   end="<!--example1-stage-1b-end-->"
 %}
 
-Next run the scheduler, long enough for it to create the
-SinglePlacementSlice objects.  Again, this should not take long, and
-you can ^C the scheduler once it has created those objects.
-
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-process-start-without-cd-kubestellar.md"
-   start="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-start-->"
-   end="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-end-->"
+   include-markdown "example1-subs/example1-stage-2.md"
+   start="<!--example1-stage-2-start-->"
+   end="<!--example1-stage-2-end-->"
 %}
 
 Finally run the placement translator from the command line.  That
