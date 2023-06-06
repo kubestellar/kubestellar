@@ -178,7 +178,7 @@ nav:
 - For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
 <br/><b>codeblock:</b>
 ````
-``` {.bash .hide-me} title="testing.sh"
+``` title="testing.sh"
 #!/bin/sh
 echo hello KubeStellar
 ```
@@ -251,7 +251,7 @@ Do not remove these files!
 The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!
 
 the CNAME file must have the following content in it:
-```title="CNAME"
+``` title="CNAME"
 docs.kubestellar.io
 ```
 
