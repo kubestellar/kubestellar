@@ -311,7 +311,7 @@ tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
 ```shell
-kubectl ws root:wmw-c
+kubectl ws root:my-org:wmw-c
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:work-c"
