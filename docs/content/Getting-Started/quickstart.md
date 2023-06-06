@@ -1,8 +1,3 @@
----
-title: "KubeStellar Quickstart Guide"
-linkTitle: "KubeStellar Quickstart Guide"
----
-
 <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar">
 
 
@@ -410,7 +405,7 @@ which should eventually yield:
 ```
 
 
-Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](user-guide.md)
+Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](../user-guide.md)
 
 ### e. Next Steps
 
