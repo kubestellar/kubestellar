@@ -65,6 +65,7 @@ if docker info >/dev/null 2>&1; then
 else
     if [ "$os_type" == "darwin" ]; then
       open --background -a Docker
+      sleep 30
     fi
 fi
 
