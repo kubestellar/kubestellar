@@ -165,9 +165,9 @@ the console.  You can check for their existence by doing `kubectl get
 workspaces` while in the ESPW.
 
 {%
-   include-markdown "mailbox-controller-subs/mailbox-controller-process-start.md"
-   start="<!--mailbox-controller-process-start-start-->"
-   end="<!--mailbox-controller-process-start-end-->"
+   include-markdown "mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar.md"
+   start="<!--mailbox-controller-process-start-without-cd-kubestellar-start-->"
+   end="<!--mailbox-controller-process-start-without-cd-kubestellar-end-->"
 %}
 
 Next run the scheduler, long enough for it to create the
