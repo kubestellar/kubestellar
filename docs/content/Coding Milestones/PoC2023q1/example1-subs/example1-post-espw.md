@@ -607,17 +607,12 @@ kubectl ws $FLORIN_WS
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 ```
-``` {.bash .hide-me}
-let iter=0 || true
-while ! kubectl get SyncerConfig the-one -o yaml 2>/dev/null; do
-    sleep 10
-    let iter=iter+1
-    if (( iter > 20 )); then
-        echo "command 'kubectl get SyncerConfig the-one -o yaml' failed" >&2
-        exit 86
-    fi
-done
-```
+
+{%
+   include-markdown "../../../common-subs/check-command-syncerconfig-the-one.md"
+   start="<!--check-command-syncerconfig-the-one-start-->"
+   end="<!--check-command-syncerconfig-the-one-end-->"
+%}
 
 ```shell
 kubectl get SyncerConfig the-one -o yaml
