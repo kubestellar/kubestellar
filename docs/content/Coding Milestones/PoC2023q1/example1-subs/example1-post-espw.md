@@ -607,7 +607,7 @@ kubectl ws $FLORIN_WS
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 ```
-``` {.bash .no-copy}
+``` {.bash .hide-me}
 let iter=0
 while ! kubectl get SyncerConfig the-one -o yaml 2>/dev/null; do
     sleep 10
