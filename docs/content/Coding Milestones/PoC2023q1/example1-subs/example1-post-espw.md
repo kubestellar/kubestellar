@@ -17,7 +17,8 @@ Eventually.  In the meantime, you can use the edge-mc command shown
 here.
 
 ```shell
-mailbox-controller -v=2
+mailbox-controller -v=2 &
+wait 45
 ```
 ``` { .bash .no-copy }
 ...
@@ -480,7 +481,8 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-kubestellar-scheduler
+kubestellar-scheduler &
+wait 45
 ```
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 kubestellar-scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
@@ -563,7 +565,8 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-placement-translator
+placement-translator &
+wait 45
 ```
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator

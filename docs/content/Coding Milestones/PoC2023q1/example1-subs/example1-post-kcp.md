@@ -23,6 +23,11 @@ explicit pathnames.  The kubectl plugin lines use fully specific
 executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
+```shell
+git clone {{config.repo_url}} kubestellar
+cd kubestellar
+export PATH=$(pwd)/bin:$PATH
+```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands. They label both florin and guilder
