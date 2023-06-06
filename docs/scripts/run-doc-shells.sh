@@ -139,8 +139,6 @@ done
 
 cat "$generated_script_file"
 
-exit
-
 # make the generated script executable
 chmod +x "$generated_script_file"
 
