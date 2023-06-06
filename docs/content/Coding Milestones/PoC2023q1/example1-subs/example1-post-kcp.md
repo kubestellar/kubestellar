@@ -11,7 +11,7 @@ kubectl ws create imw-1 --enter
 ### Get edge-mc
 
 Download and build or install
-[edge-mc]({{ config.repo_url }}), according to your
+[edge-mc](https://github.com/kcp-dev/edge-mc), according to your
 preference.  That is, either (a) `git clone` the repo and then `make
 build` to populate its `bin` directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it

@@ -478,7 +478,7 @@ kubectl ws root:espw
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw".
-
+```
 ```shell
 kubestellar-scheduler
 ```

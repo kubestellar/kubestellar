@@ -34,7 +34,7 @@ export PATH=$(pwd)/bin:$PATH
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
 kcp start &
-sleep 30  # wait for KCP to initialize
+sleep 30 
 ```
 
 ```shell
