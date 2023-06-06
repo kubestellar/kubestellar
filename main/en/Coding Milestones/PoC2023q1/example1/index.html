@@ -2557,7 +2557,6 @@ ESPW and use the edge-mc command that runs the placement translator.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/placement-translator<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>sleep<span class="w"> </span><span class="m">120</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>I0423<span class="w"> </span><span class="m">01</span>:39:56.362722<span class="w">   </span><span class="m">11644</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
 <a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>...
@@ -2566,183 +2565,193 @@ ESPW and use the edge-mc command that runs the placement translator.</p>
 it or use another shell to continue exploring.</p>
 <p>The florin cluster gets only the common workload.  Examine florin's
 <code>SyncerConfig</code> as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$FLORIN_WS</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$FLORIN_WS</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>kind:<span class="w"> </span>SyncerConfig
-<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a>metadata:
-<a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a><span class="w">  </span>annotations:
-<a id="__codelineno-61-5" name="__codelineno-61-5" href="#__codelineno-61-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>12299slctppnhjnn
-<a id="__codelineno-61-6" name="__codelineno-61-6" href="#__codelineno-61-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
-<a id="__codelineno-61-7" name="__codelineno-61-7" href="#__codelineno-61-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">3</span>
-<a id="__codelineno-61-8" name="__codelineno-61-8" href="#__codelineno-61-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
-<a id="__codelineno-61-9" name="__codelineno-61-9" href="#__codelineno-61-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1323&quot;</span>
-<a id="__codelineno-61-10" name="__codelineno-61-10" href="#__codelineno-61-10"></a><span class="w">  </span>uid:<span class="w"> </span>8840fee6-37dc-407e-ad01-2ad59389d4ff
-<a id="__codelineno-61-11" name="__codelineno-61-11" href="#__codelineno-61-11"></a>spec:
-<a id="__codelineno-61-12" name="__codelineno-61-12" href="#__codelineno-61-12"></a><span class="w">  </span>namespaceScope:
-<a id="__codelineno-61-13" name="__codelineno-61-13" href="#__codelineno-61-13"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-61-14" name="__codelineno-61-14" href="#__codelineno-61-14"></a><span class="w">    </span>-<span class="w"> </span>commonstuff
-<a id="__codelineno-61-15" name="__codelineno-61-15" href="#__codelineno-61-15"></a><span class="w">    </span>resources:
-<a id="__codelineno-61-16" name="__codelineno-61-16" href="#__codelineno-61-16"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-17" name="__codelineno-61-17" href="#__codelineno-61-17"></a><span class="w">      </span>group:<span class="w"> </span>networking.k8s.io
-<a id="__codelineno-61-18" name="__codelineno-61-18" href="#__codelineno-61-18"></a><span class="w">      </span>resource:<span class="w"> </span>ingresses
-<a id="__codelineno-61-19" name="__codelineno-61-19" href="#__codelineno-61-19"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-20" name="__codelineno-61-20" href="#__codelineno-61-20"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
-<a id="__codelineno-61-21" name="__codelineno-61-21" href="#__codelineno-61-21"></a><span class="w">      </span>resource:<span class="w"> </span>roles
-<a id="__codelineno-61-22" name="__codelineno-61-22" href="#__codelineno-61-22"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-23" name="__codelineno-61-23" href="#__codelineno-61-23"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-24" name="__codelineno-61-24" href="#__codelineno-61-24"></a><span class="w">      </span>resource:<span class="w"> </span>configmaps
-<a id="__codelineno-61-25" name="__codelineno-61-25" href="#__codelineno-61-25"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-26" name="__codelineno-61-26" href="#__codelineno-61-26"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-27" name="__codelineno-61-27" href="#__codelineno-61-27"></a><span class="w">      </span>resource:<span class="w"> </span>limitranges
-<a id="__codelineno-61-28" name="__codelineno-61-28" href="#__codelineno-61-28"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-29" name="__codelineno-61-29" href="#__codelineno-61-29"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-30" name="__codelineno-61-30" href="#__codelineno-61-30"></a><span class="w">      </span>resource:<span class="w"> </span>secrets
-<a id="__codelineno-61-31" name="__codelineno-61-31" href="#__codelineno-61-31"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-32" name="__codelineno-61-32" href="#__codelineno-61-32"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
-<a id="__codelineno-61-33" name="__codelineno-61-33" href="#__codelineno-61-33"></a><span class="w">      </span>resource:<span class="w"> </span>rolebindings
-<a id="__codelineno-61-34" name="__codelineno-61-34" href="#__codelineno-61-34"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-35" name="__codelineno-61-35" href="#__codelineno-61-35"></a><span class="w">      </span>group:<span class="w"> </span>apps
-<a id="__codelineno-61-36" name="__codelineno-61-36" href="#__codelineno-61-36"></a><span class="w">      </span>resource:<span class="w"> </span>deployments
-<a id="__codelineno-61-37" name="__codelineno-61-37" href="#__codelineno-61-37"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-38" name="__codelineno-61-38" href="#__codelineno-61-38"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-39" name="__codelineno-61-39" href="#__codelineno-61-39"></a><span class="w">      </span>resource:<span class="w"> </span>pods
-<a id="__codelineno-61-40" name="__codelineno-61-40" href="#__codelineno-61-40"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-41" name="__codelineno-61-41" href="#__codelineno-61-41"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-42" name="__codelineno-61-42" href="#__codelineno-61-42"></a><span class="w">      </span>resource:<span class="w"> </span>serviceaccounts
-<a id="__codelineno-61-43" name="__codelineno-61-43" href="#__codelineno-61-43"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-44" name="__codelineno-61-44" href="#__codelineno-61-44"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-45" name="__codelineno-61-45" href="#__codelineno-61-45"></a><span class="w">      </span>resource:<span class="w"> </span>services
-<a id="__codelineno-61-46" name="__codelineno-61-46" href="#__codelineno-61-46"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-47" name="__codelineno-61-47" href="#__codelineno-61-47"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-61-48" name="__codelineno-61-48" href="#__codelineno-61-48"></a><span class="w">      </span>resource:<span class="w"> </span>resourcequotas
-<a id="__codelineno-61-49" name="__codelineno-61-49" href="#__codelineno-61-49"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-61-50" name="__codelineno-61-50" href="#__codelineno-61-50"></a><span class="w">      </span>group:<span class="w"> </span>coordination.k8s.io
-<a id="__codelineno-61-51" name="__codelineno-61-51" href="#__codelineno-61-51"></a><span class="w">      </span>resource:<span class="w"> </span>leases
-<a id="__codelineno-61-52" name="__codelineno-61-52" href="#__codelineno-61-52"></a><span class="w">  </span>upsync:
-<a id="__codelineno-61-53" name="__codelineno-61-53" href="#__codelineno-61-53"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
-<a id="__codelineno-61-54" name="__codelineno-61-54" href="#__codelineno-61-54"></a><span class="w">    </span>names:
-<a id="__codelineno-61-55" name="__codelineno-61-55" href="#__codelineno-61-55"></a><span class="w">    </span>-<span class="w"> </span>george
-<a id="__codelineno-61-56" name="__codelineno-61-56" href="#__codelineno-61-56"></a><span class="w">    </span>-<span class="w"> </span>cosmo
-<a id="__codelineno-61-57" name="__codelineno-61-57" href="#__codelineno-61-57"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-61-58" name="__codelineno-61-58" href="#__codelineno-61-58"></a><span class="w">    </span>-<span class="w"> </span>orbital
-<a id="__codelineno-61-59" name="__codelineno-61-59" href="#__codelineno-61-59"></a><span class="w">    </span>resources:
-<a id="__codelineno-61-60" name="__codelineno-61-60" href="#__codelineno-61-60"></a><span class="w">    </span>-<span class="w"> </span>sprockets
-<a id="__codelineno-61-61" name="__codelineno-61-61" href="#__codelineno-61-61"></a><span class="w">    </span>-<span class="w"> </span>flanges
-<a id="__codelineno-61-62" name="__codelineno-61-62" href="#__codelineno-61-62"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
-<a id="__codelineno-61-63" name="__codelineno-61-63" href="#__codelineno-61-63"></a><span class="w">    </span>names:
-<a id="__codelineno-61-64" name="__codelineno-61-64" href="#__codelineno-61-64"></a><span class="w">    </span>-<span class="w"> </span>william
-<a id="__codelineno-61-65" name="__codelineno-61-65" href="#__codelineno-61-65"></a><span class="w">    </span>resources:
-<a id="__codelineno-61-66" name="__codelineno-61-66" href="#__codelineno-61-66"></a><span class="w">    </span>-<span class="w"> </span>cogs
-<a id="__codelineno-61-67" name="__codelineno-61-67" href="#__codelineno-61-67"></a>status:<span class="w"> </span><span class="o">{}</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">iter</span><span class="o">=</span><span class="m">0</span>
+<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="w">    </span><span class="nb">let</span><span class="w"> </span><span class="nv">iter</span><span class="o">=</span>iter+1
+<a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>iter<span class="w"> </span>&gt;<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;command &#39;kubectl get SyncerConfig the-one -o yaml&#39; failed&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a><span class="w">        </span><span class="nb">exit</span><span class="w"> </span><span class="m">86</span>
+<a id="__codelineno-60-8" name="__codelineno-60-8" href="#__codelineno-60-8"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-60-9" name="__codelineno-60-9" href="#__codelineno-60-9"></a><span class="k">done</span>
 </code></pre></div></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>kind:<span class="w"> </span>SyncerConfig
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>metadata:
+<a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="w">  </span>annotations:
+<a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>12299slctppnhjnn
+<a id="__codelineno-62-6" name="__codelineno-62-6" href="#__codelineno-62-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
+<a id="__codelineno-62-7" name="__codelineno-62-7" href="#__codelineno-62-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">3</span>
+<a id="__codelineno-62-8" name="__codelineno-62-8" href="#__codelineno-62-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
+<a id="__codelineno-62-9" name="__codelineno-62-9" href="#__codelineno-62-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1323&quot;</span>
+<a id="__codelineno-62-10" name="__codelineno-62-10" href="#__codelineno-62-10"></a><span class="w">  </span>uid:<span class="w"> </span>8840fee6-37dc-407e-ad01-2ad59389d4ff
+<a id="__codelineno-62-11" name="__codelineno-62-11" href="#__codelineno-62-11"></a>spec:
+<a id="__codelineno-62-12" name="__codelineno-62-12" href="#__codelineno-62-12"></a><span class="w">  </span>namespaceScope:
+<a id="__codelineno-62-13" name="__codelineno-62-13" href="#__codelineno-62-13"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-62-14" name="__codelineno-62-14" href="#__codelineno-62-14"></a><span class="w">    </span>-<span class="w"> </span>commonstuff
+<a id="__codelineno-62-15" name="__codelineno-62-15" href="#__codelineno-62-15"></a><span class="w">    </span>resources:
+<a id="__codelineno-62-16" name="__codelineno-62-16" href="#__codelineno-62-16"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-17" name="__codelineno-62-17" href="#__codelineno-62-17"></a><span class="w">      </span>group:<span class="w"> </span>networking.k8s.io
+<a id="__codelineno-62-18" name="__codelineno-62-18" href="#__codelineno-62-18"></a><span class="w">      </span>resource:<span class="w"> </span>ingresses
+<a id="__codelineno-62-19" name="__codelineno-62-19" href="#__codelineno-62-19"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-20" name="__codelineno-62-20" href="#__codelineno-62-20"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
+<a id="__codelineno-62-21" name="__codelineno-62-21" href="#__codelineno-62-21"></a><span class="w">      </span>resource:<span class="w"> </span>roles
+<a id="__codelineno-62-22" name="__codelineno-62-22" href="#__codelineno-62-22"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-23" name="__codelineno-62-23" href="#__codelineno-62-23"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-24" name="__codelineno-62-24" href="#__codelineno-62-24"></a><span class="w">      </span>resource:<span class="w"> </span>configmaps
+<a id="__codelineno-62-25" name="__codelineno-62-25" href="#__codelineno-62-25"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-26" name="__codelineno-62-26" href="#__codelineno-62-26"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-27" name="__codelineno-62-27" href="#__codelineno-62-27"></a><span class="w">      </span>resource:<span class="w"> </span>limitranges
+<a id="__codelineno-62-28" name="__codelineno-62-28" href="#__codelineno-62-28"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-29" name="__codelineno-62-29" href="#__codelineno-62-29"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-30" name="__codelineno-62-30" href="#__codelineno-62-30"></a><span class="w">      </span>resource:<span class="w"> </span>secrets
+<a id="__codelineno-62-31" name="__codelineno-62-31" href="#__codelineno-62-31"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-32" name="__codelineno-62-32" href="#__codelineno-62-32"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
+<a id="__codelineno-62-33" name="__codelineno-62-33" href="#__codelineno-62-33"></a><span class="w">      </span>resource:<span class="w"> </span>rolebindings
+<a id="__codelineno-62-34" name="__codelineno-62-34" href="#__codelineno-62-34"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-35" name="__codelineno-62-35" href="#__codelineno-62-35"></a><span class="w">      </span>group:<span class="w"> </span>apps
+<a id="__codelineno-62-36" name="__codelineno-62-36" href="#__codelineno-62-36"></a><span class="w">      </span>resource:<span class="w"> </span>deployments
+<a id="__codelineno-62-37" name="__codelineno-62-37" href="#__codelineno-62-37"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-38" name="__codelineno-62-38" href="#__codelineno-62-38"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-39" name="__codelineno-62-39" href="#__codelineno-62-39"></a><span class="w">      </span>resource:<span class="w"> </span>pods
+<a id="__codelineno-62-40" name="__codelineno-62-40" href="#__codelineno-62-40"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-41" name="__codelineno-62-41" href="#__codelineno-62-41"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-42" name="__codelineno-62-42" href="#__codelineno-62-42"></a><span class="w">      </span>resource:<span class="w"> </span>serviceaccounts
+<a id="__codelineno-62-43" name="__codelineno-62-43" href="#__codelineno-62-43"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-44" name="__codelineno-62-44" href="#__codelineno-62-44"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-45" name="__codelineno-62-45" href="#__codelineno-62-45"></a><span class="w">      </span>resource:<span class="w"> </span>services
+<a id="__codelineno-62-46" name="__codelineno-62-46" href="#__codelineno-62-46"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-47" name="__codelineno-62-47" href="#__codelineno-62-47"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-62-48" name="__codelineno-62-48" href="#__codelineno-62-48"></a><span class="w">      </span>resource:<span class="w"> </span>resourcequotas
+<a id="__codelineno-62-49" name="__codelineno-62-49" href="#__codelineno-62-49"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-62-50" name="__codelineno-62-50" href="#__codelineno-62-50"></a><span class="w">      </span>group:<span class="w"> </span>coordination.k8s.io
+<a id="__codelineno-62-51" name="__codelineno-62-51" href="#__codelineno-62-51"></a><span class="w">      </span>resource:<span class="w"> </span>leases
+<a id="__codelineno-62-52" name="__codelineno-62-52" href="#__codelineno-62-52"></a><span class="w">  </span>upsync:
+<a id="__codelineno-62-53" name="__codelineno-62-53" href="#__codelineno-62-53"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
+<a id="__codelineno-62-54" name="__codelineno-62-54" href="#__codelineno-62-54"></a><span class="w">    </span>names:
+<a id="__codelineno-62-55" name="__codelineno-62-55" href="#__codelineno-62-55"></a><span class="w">    </span>-<span class="w"> </span>george
+<a id="__codelineno-62-56" name="__codelineno-62-56" href="#__codelineno-62-56"></a><span class="w">    </span>-<span class="w"> </span>cosmo
+<a id="__codelineno-62-57" name="__codelineno-62-57" href="#__codelineno-62-57"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-62-58" name="__codelineno-62-58" href="#__codelineno-62-58"></a><span class="w">    </span>-<span class="w"> </span>orbital
+<a id="__codelineno-62-59" name="__codelineno-62-59" href="#__codelineno-62-59"></a><span class="w">    </span>resources:
+<a id="__codelineno-62-60" name="__codelineno-62-60" href="#__codelineno-62-60"></a><span class="w">    </span>-<span class="w"> </span>sprockets
+<a id="__codelineno-62-61" name="__codelineno-62-61" href="#__codelineno-62-61"></a><span class="w">    </span>-<span class="w"> </span>flanges
+<a id="__codelineno-62-62" name="__codelineno-62-62" href="#__codelineno-62-62"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
+<a id="__codelineno-62-63" name="__codelineno-62-63" href="#__codelineno-62-63"></a><span class="w">    </span>names:
+<a id="__codelineno-62-64" name="__codelineno-62-64" href="#__codelineno-62-64"></a><span class="w">    </span>-<span class="w"> </span>william
+<a id="__codelineno-62-65" name="__codelineno-62-65" href="#__codelineno-62-65"></a><span class="w">    </span>resources:
+<a id="__codelineno-62-66" name="__codelineno-62-66" href="#__codelineno-62-66"></a><span class="w">    </span>-<span class="w"> </span>cogs
+<a id="__codelineno-62-67" name="__codelineno-62-67" href="#__codelineno-62-67"></a>status:<span class="w"> </span><span class="o">{}</span>
+</code></pre></div>
 <p>You can check that the workload got there too.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ns
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ns
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>NAME<span class="w">          </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>commonstuff<span class="w">   </span>Active<span class="w">   </span>6m34s
-<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>default<span class="w">       </span>Active<span class="w">   </span>32m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>NAME<span class="w">          </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>commonstuff<span class="w">   </span>Active<span class="w">   </span>6m34s
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>default<span class="w">       </span>Active<span class="w">   </span>32m
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">      </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>commonstuff<span class="w">   </span>commond<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m44s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">      </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>commonstuff<span class="w">   </span>commond<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m44s
 </code></pre></div></p>
 <p>The guilder cluster gets both the common and special workloads.
 Examine guilder's <code>SyncerConfig</code> object and workloads as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$GUILDER_WS</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$GUILDER_WS</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>kind:<span class="w"> </span>SyncerConfig
-<a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a>metadata:
-<a id="__codelineno-71-4" name="__codelineno-71-4" href="#__codelineno-71-4"></a><span class="w">  </span>annotations:
-<a id="__codelineno-71-5" name="__codelineno-71-5" href="#__codelineno-71-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>yk9a66vjms1pi8hu
-<a id="__codelineno-71-6" name="__codelineno-71-6" href="#__codelineno-71-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
-<a id="__codelineno-71-7" name="__codelineno-71-7" href="#__codelineno-71-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-71-8" name="__codelineno-71-8" href="#__codelineno-71-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
-<a id="__codelineno-71-9" name="__codelineno-71-9" href="#__codelineno-71-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1325&quot;</span>
-<a id="__codelineno-71-10" name="__codelineno-71-10" href="#__codelineno-71-10"></a><span class="w">  </span>uid:<span class="w"> </span>3da056c7-0d5c-45a3-9d91-d04f04415f30
-<a id="__codelineno-71-11" name="__codelineno-71-11" href="#__codelineno-71-11"></a>spec:
-<a id="__codelineno-71-12" name="__codelineno-71-12" href="#__codelineno-71-12"></a><span class="w">  </span>namespaceScope:
-<a id="__codelineno-71-13" name="__codelineno-71-13" href="#__codelineno-71-13"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-71-14" name="__codelineno-71-14" href="#__codelineno-71-14"></a><span class="w">    </span>-<span class="w"> </span>commonstuff
-<a id="__codelineno-71-15" name="__codelineno-71-15" href="#__codelineno-71-15"></a><span class="w">    </span>-<span class="w"> </span>specialstuff
-<a id="__codelineno-71-16" name="__codelineno-71-16" href="#__codelineno-71-16"></a><span class="w">    </span>resources:
-<a id="__codelineno-71-17" name="__codelineno-71-17" href="#__codelineno-71-17"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-18" name="__codelineno-71-18" href="#__codelineno-71-18"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-19" name="__codelineno-71-19" href="#__codelineno-71-19"></a><span class="w">      </span>resource:<span class="w"> </span>services
-<a id="__codelineno-71-20" name="__codelineno-71-20" href="#__codelineno-71-20"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-21" name="__codelineno-71-21" href="#__codelineno-71-21"></a><span class="w">      </span>group:<span class="w"> </span>apps
-<a id="__codelineno-71-22" name="__codelineno-71-22" href="#__codelineno-71-22"></a><span class="w">      </span>resource:<span class="w"> </span>deployments
-<a id="__codelineno-71-23" name="__codelineno-71-23" href="#__codelineno-71-23"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-24" name="__codelineno-71-24" href="#__codelineno-71-24"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-25" name="__codelineno-71-25" href="#__codelineno-71-25"></a><span class="w">      </span>resource:<span class="w"> </span>pods
-<a id="__codelineno-71-26" name="__codelineno-71-26" href="#__codelineno-71-26"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-27" name="__codelineno-71-27" href="#__codelineno-71-27"></a><span class="w">      </span>group:<span class="w"> </span>coordination.k8s.io
-<a id="__codelineno-71-28" name="__codelineno-71-28" href="#__codelineno-71-28"></a><span class="w">      </span>resource:<span class="w"> </span>leases
-<a id="__codelineno-71-29" name="__codelineno-71-29" href="#__codelineno-71-29"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-30" name="__codelineno-71-30" href="#__codelineno-71-30"></a><span class="w">      </span>group:<span class="w"> </span>networking.k8s.io
-<a id="__codelineno-71-31" name="__codelineno-71-31" href="#__codelineno-71-31"></a><span class="w">      </span>resource:<span class="w"> </span>ingresses
-<a id="__codelineno-71-32" name="__codelineno-71-32" href="#__codelineno-71-32"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-33" name="__codelineno-71-33" href="#__codelineno-71-33"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-34" name="__codelineno-71-34" href="#__codelineno-71-34"></a><span class="w">      </span>resource:<span class="w"> </span>limitranges
-<a id="__codelineno-71-35" name="__codelineno-71-35" href="#__codelineno-71-35"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-36" name="__codelineno-71-36" href="#__codelineno-71-36"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-37" name="__codelineno-71-37" href="#__codelineno-71-37"></a><span class="w">      </span>resource:<span class="w"> </span>serviceaccounts
-<a id="__codelineno-71-38" name="__codelineno-71-38" href="#__codelineno-71-38"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-39" name="__codelineno-71-39" href="#__codelineno-71-39"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
-<a id="__codelineno-71-40" name="__codelineno-71-40" href="#__codelineno-71-40"></a><span class="w">      </span>resource:<span class="w"> </span>rolebindings
-<a id="__codelineno-71-41" name="__codelineno-71-41" href="#__codelineno-71-41"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-42" name="__codelineno-71-42" href="#__codelineno-71-42"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-43" name="__codelineno-71-43" href="#__codelineno-71-43"></a><span class="w">      </span>resource:<span class="w"> </span>configmaps
-<a id="__codelineno-71-44" name="__codelineno-71-44" href="#__codelineno-71-44"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-45" name="__codelineno-71-45" href="#__codelineno-71-45"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-46" name="__codelineno-71-46" href="#__codelineno-71-46"></a><span class="w">      </span>resource:<span class="w"> </span>secrets
-<a id="__codelineno-71-47" name="__codelineno-71-47" href="#__codelineno-71-47"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-48" name="__codelineno-71-48" href="#__codelineno-71-48"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
-<a id="__codelineno-71-49" name="__codelineno-71-49" href="#__codelineno-71-49"></a><span class="w">      </span>resource:<span class="w"> </span>roles
-<a id="__codelineno-71-50" name="__codelineno-71-50" href="#__codelineno-71-50"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-71-51" name="__codelineno-71-51" href="#__codelineno-71-51"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-71-52" name="__codelineno-71-52" href="#__codelineno-71-52"></a><span class="w">      </span>resource:<span class="w"> </span>resourcequotas
-<a id="__codelineno-71-53" name="__codelineno-71-53" href="#__codelineno-71-53"></a><span class="w">  </span>upsync:
-<a id="__codelineno-71-54" name="__codelineno-71-54" href="#__codelineno-71-54"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
-<a id="__codelineno-71-55" name="__codelineno-71-55" href="#__codelineno-71-55"></a><span class="w">    </span>names:
-<a id="__codelineno-71-56" name="__codelineno-71-56" href="#__codelineno-71-56"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
-<a id="__codelineno-71-57" name="__codelineno-71-57" href="#__codelineno-71-57"></a><span class="w">    </span>resources:
-<a id="__codelineno-71-58" name="__codelineno-71-58" href="#__codelineno-71-58"></a><span class="w">    </span>-<span class="w"> </span>widgets
-<a id="__codelineno-71-59" name="__codelineno-71-59" href="#__codelineno-71-59"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
-<a id="__codelineno-71-60" name="__codelineno-71-60" href="#__codelineno-71-60"></a><span class="w">    </span>names:
-<a id="__codelineno-71-61" name="__codelineno-71-61" href="#__codelineno-71-61"></a><span class="w">    </span>-<span class="w"> </span>george
-<a id="__codelineno-71-62" name="__codelineno-71-62" href="#__codelineno-71-62"></a><span class="w">    </span>-<span class="w"> </span>cosmo
-<a id="__codelineno-71-63" name="__codelineno-71-63" href="#__codelineno-71-63"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-71-64" name="__codelineno-71-64" href="#__codelineno-71-64"></a><span class="w">    </span>-<span class="w"> </span>orbital
-<a id="__codelineno-71-65" name="__codelineno-71-65" href="#__codelineno-71-65"></a><span class="w">    </span>resources:
-<a id="__codelineno-71-66" name="__codelineno-71-66" href="#__codelineno-71-66"></a><span class="w">    </span>-<span class="w"> </span>sprockets
-<a id="__codelineno-71-67" name="__codelineno-71-67" href="#__codelineno-71-67"></a><span class="w">    </span>-<span class="w"> </span>flanges
-<a id="__codelineno-71-68" name="__codelineno-71-68" href="#__codelineno-71-68"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
-<a id="__codelineno-71-69" name="__codelineno-71-69" href="#__codelineno-71-69"></a><span class="w">    </span>names:
-<a id="__codelineno-71-70" name="__codelineno-71-70" href="#__codelineno-71-70"></a><span class="w">    </span>-<span class="w"> </span>william
-<a id="__codelineno-71-71" name="__codelineno-71-71" href="#__codelineno-71-71"></a><span class="w">    </span>resources:
-<a id="__codelineno-71-72" name="__codelineno-71-72" href="#__codelineno-71-72"></a><span class="w">    </span>-<span class="w"> </span>cogs
-<a id="__codelineno-71-73" name="__codelineno-71-73" href="#__codelineno-71-73"></a>status:<span class="w"> </span><span class="o">{}</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>kind:<span class="w"> </span>SyncerConfig
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a>metadata:
+<a id="__codelineno-72-4" name="__codelineno-72-4" href="#__codelineno-72-4"></a><span class="w">  </span>annotations:
+<a id="__codelineno-72-5" name="__codelineno-72-5" href="#__codelineno-72-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>yk9a66vjms1pi8hu
+<a id="__codelineno-72-6" name="__codelineno-72-6" href="#__codelineno-72-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
+<a id="__codelineno-72-7" name="__codelineno-72-7" href="#__codelineno-72-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-72-8" name="__codelineno-72-8" href="#__codelineno-72-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
+<a id="__codelineno-72-9" name="__codelineno-72-9" href="#__codelineno-72-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1325&quot;</span>
+<a id="__codelineno-72-10" name="__codelineno-72-10" href="#__codelineno-72-10"></a><span class="w">  </span>uid:<span class="w"> </span>3da056c7-0d5c-45a3-9d91-d04f04415f30
+<a id="__codelineno-72-11" name="__codelineno-72-11" href="#__codelineno-72-11"></a>spec:
+<a id="__codelineno-72-12" name="__codelineno-72-12" href="#__codelineno-72-12"></a><span class="w">  </span>namespaceScope:
+<a id="__codelineno-72-13" name="__codelineno-72-13" href="#__codelineno-72-13"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-72-14" name="__codelineno-72-14" href="#__codelineno-72-14"></a><span class="w">    </span>-<span class="w"> </span>commonstuff
+<a id="__codelineno-72-15" name="__codelineno-72-15" href="#__codelineno-72-15"></a><span class="w">    </span>-<span class="w"> </span>specialstuff
+<a id="__codelineno-72-16" name="__codelineno-72-16" href="#__codelineno-72-16"></a><span class="w">    </span>resources:
+<a id="__codelineno-72-17" name="__codelineno-72-17" href="#__codelineno-72-17"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-18" name="__codelineno-72-18" href="#__codelineno-72-18"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-19" name="__codelineno-72-19" href="#__codelineno-72-19"></a><span class="w">      </span>resource:<span class="w"> </span>services
+<a id="__codelineno-72-20" name="__codelineno-72-20" href="#__codelineno-72-20"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-21" name="__codelineno-72-21" href="#__codelineno-72-21"></a><span class="w">      </span>group:<span class="w"> </span>apps
+<a id="__codelineno-72-22" name="__codelineno-72-22" href="#__codelineno-72-22"></a><span class="w">      </span>resource:<span class="w"> </span>deployments
+<a id="__codelineno-72-23" name="__codelineno-72-23" href="#__codelineno-72-23"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-24" name="__codelineno-72-24" href="#__codelineno-72-24"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-25" name="__codelineno-72-25" href="#__codelineno-72-25"></a><span class="w">      </span>resource:<span class="w"> </span>pods
+<a id="__codelineno-72-26" name="__codelineno-72-26" href="#__codelineno-72-26"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-27" name="__codelineno-72-27" href="#__codelineno-72-27"></a><span class="w">      </span>group:<span class="w"> </span>coordination.k8s.io
+<a id="__codelineno-72-28" name="__codelineno-72-28" href="#__codelineno-72-28"></a><span class="w">      </span>resource:<span class="w"> </span>leases
+<a id="__codelineno-72-29" name="__codelineno-72-29" href="#__codelineno-72-29"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-30" name="__codelineno-72-30" href="#__codelineno-72-30"></a><span class="w">      </span>group:<span class="w"> </span>networking.k8s.io
+<a id="__codelineno-72-31" name="__codelineno-72-31" href="#__codelineno-72-31"></a><span class="w">      </span>resource:<span class="w"> </span>ingresses
+<a id="__codelineno-72-32" name="__codelineno-72-32" href="#__codelineno-72-32"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-33" name="__codelineno-72-33" href="#__codelineno-72-33"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-34" name="__codelineno-72-34" href="#__codelineno-72-34"></a><span class="w">      </span>resource:<span class="w"> </span>limitranges
+<a id="__codelineno-72-35" name="__codelineno-72-35" href="#__codelineno-72-35"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-36" name="__codelineno-72-36" href="#__codelineno-72-36"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-37" name="__codelineno-72-37" href="#__codelineno-72-37"></a><span class="w">      </span>resource:<span class="w"> </span>serviceaccounts
+<a id="__codelineno-72-38" name="__codelineno-72-38" href="#__codelineno-72-38"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-39" name="__codelineno-72-39" href="#__codelineno-72-39"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
+<a id="__codelineno-72-40" name="__codelineno-72-40" href="#__codelineno-72-40"></a><span class="w">      </span>resource:<span class="w"> </span>rolebindings
+<a id="__codelineno-72-41" name="__codelineno-72-41" href="#__codelineno-72-41"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-42" name="__codelineno-72-42" href="#__codelineno-72-42"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-43" name="__codelineno-72-43" href="#__codelineno-72-43"></a><span class="w">      </span>resource:<span class="w"> </span>configmaps
+<a id="__codelineno-72-44" name="__codelineno-72-44" href="#__codelineno-72-44"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-45" name="__codelineno-72-45" href="#__codelineno-72-45"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-46" name="__codelineno-72-46" href="#__codelineno-72-46"></a><span class="w">      </span>resource:<span class="w"> </span>secrets
+<a id="__codelineno-72-47" name="__codelineno-72-47" href="#__codelineno-72-47"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-48" name="__codelineno-72-48" href="#__codelineno-72-48"></a><span class="w">      </span>group:<span class="w"> </span>rbac.authorization.k8s.io
+<a id="__codelineno-72-49" name="__codelineno-72-49" href="#__codelineno-72-49"></a><span class="w">      </span>resource:<span class="w"> </span>roles
+<a id="__codelineno-72-50" name="__codelineno-72-50" href="#__codelineno-72-50"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-72-51" name="__codelineno-72-51" href="#__codelineno-72-51"></a><span class="w">      </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-72-52" name="__codelineno-72-52" href="#__codelineno-72-52"></a><span class="w">      </span>resource:<span class="w"> </span>resourcequotas
+<a id="__codelineno-72-53" name="__codelineno-72-53" href="#__codelineno-72-53"></a><span class="w">  </span>upsync:
+<a id="__codelineno-72-54" name="__codelineno-72-54" href="#__codelineno-72-54"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
+<a id="__codelineno-72-55" name="__codelineno-72-55" href="#__codelineno-72-55"></a><span class="w">    </span>names:
+<a id="__codelineno-72-56" name="__codelineno-72-56" href="#__codelineno-72-56"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
+<a id="__codelineno-72-57" name="__codelineno-72-57" href="#__codelineno-72-57"></a><span class="w">    </span>resources:
+<a id="__codelineno-72-58" name="__codelineno-72-58" href="#__codelineno-72-58"></a><span class="w">    </span>-<span class="w"> </span>widgets
+<a id="__codelineno-72-59" name="__codelineno-72-59" href="#__codelineno-72-59"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
+<a id="__codelineno-72-60" name="__codelineno-72-60" href="#__codelineno-72-60"></a><span class="w">    </span>names:
+<a id="__codelineno-72-61" name="__codelineno-72-61" href="#__codelineno-72-61"></a><span class="w">    </span>-<span class="w"> </span>george
+<a id="__codelineno-72-62" name="__codelineno-72-62" href="#__codelineno-72-62"></a><span class="w">    </span>-<span class="w"> </span>cosmo
+<a id="__codelineno-72-63" name="__codelineno-72-63" href="#__codelineno-72-63"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-72-64" name="__codelineno-72-64" href="#__codelineno-72-64"></a><span class="w">    </span>-<span class="w"> </span>orbital
+<a id="__codelineno-72-65" name="__codelineno-72-65" href="#__codelineno-72-65"></a><span class="w">    </span>resources:
+<a id="__codelineno-72-66" name="__codelineno-72-66" href="#__codelineno-72-66"></a><span class="w">    </span>-<span class="w"> </span>sprockets
+<a id="__codelineno-72-67" name="__codelineno-72-67" href="#__codelineno-72-67"></a><span class="w">    </span>-<span class="w"> </span>flanges
+<a id="__codelineno-72-68" name="__codelineno-72-68" href="#__codelineno-72-68"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
+<a id="__codelineno-72-69" name="__codelineno-72-69" href="#__codelineno-72-69"></a><span class="w">    </span>names:
+<a id="__codelineno-72-70" name="__codelineno-72-70" href="#__codelineno-72-70"></a><span class="w">    </span>-<span class="w"> </span>william
+<a id="__codelineno-72-71" name="__codelineno-72-71" href="#__codelineno-72-71"></a><span class="w">    </span>resources:
+<a id="__codelineno-72-72" name="__codelineno-72-72" href="#__codelineno-72-72"></a><span class="w">    </span>-<span class="w"> </span>cogs
+<a id="__codelineno-72-73" name="__codelineno-72-73" href="#__codelineno-72-73"></a>status:<span class="w"> </span><span class="o">{}</span>
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>commonstuff<span class="w">    </span>commond<span class="w">    </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m1s
-<a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a>specialstuff<span class="w">   </span>speciald<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>5m58s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>commonstuff<span class="w">    </span>commond<span class="w">    </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m1s
+<a id="__codelineno-74-3" name="__codelineno-74-3" href="#__codelineno-74-3"></a>specialstuff<span class="w">   </span>speciald<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>5m58s
 </code></pre></div></p>
 <h2 id="stage-4">Stage 4</h2>
 <p><img alt="Syncer effects" src="../Edge-PoC-2023q1-Scenario-1-stage-4.svg" title="Stage 4 summary" /></p>
@@ -2759,86 +2768,86 @@ workspace.  This is driven by the <code>SyncerConfig</code> object named
 <code>the-one</code> in that mailbox workspace.</p>
 <p>Using the kubeconfig that <code>kind</code> modified, examine the florin cluster.
 Find just the <code>commonstuff</code> namespace and the <code>commond</code> Deployment.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a>NAME<span class="w">                              </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>commonstuff<span class="w">                       </span>Active<span class="w">   </span>6m51s
-<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>default<span class="w">                           </span>Active<span class="w">   </span>57m
-<a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>kcp-edge-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
-<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>kube-node-lease<span class="w">                   </span>Active<span class="w">   </span>57m
-<a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a>kube-public<span class="w">                       </span>Active<span class="w">   </span>57m
-<a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a>kube-system<span class="w">                       </span>Active<span class="w">   </span>57m
-<a id="__codelineno-75-8" name="__codelineno-75-8" href="#__codelineno-75-8"></a>local-path-storage<span class="w">                </span>Active<span class="w">   </span>57m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>NAME<span class="w">                              </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>commonstuff<span class="w">                       </span>Active<span class="w">   </span>6m51s
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a>default<span class="w">                           </span>Active<span class="w">   </span>57m
+<a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a>kcp-edge-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
+<a id="__codelineno-76-5" name="__codelineno-76-5" href="#__codelineno-76-5"></a>kube-node-lease<span class="w">                   </span>Active<span class="w">   </span>57m
+<a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a>kube-public<span class="w">                       </span>Active<span class="w">   </span>57m
+<a id="__codelineno-76-7" name="__codelineno-76-7" href="#__codelineno-76-7"></a>kube-system<span class="w">                       </span>Active<span class="w">   </span>57m
+<a id="__codelineno-76-8" name="__codelineno-76-8" href="#__codelineno-76-8"></a>local-path-storage<span class="w">                </span>Active<span class="w">   </span>57m
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>NAMESPACE<span class="w">                         </span>NAME<span class="w">                              </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>commonstuff<span class="w">                       </span>commond<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>7m59s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>NAMESPACE<span class="w">                         </span>NAME<span class="w">                              </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>commonstuff<span class="w">                       </span>commond<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>7m59s
 </code></pre></div></p>
 <p>Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
-<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-80-2" name="__codelineno-80-2" href="#__codelineno-80-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
+<a id="__codelineno-80-3" name="__codelineno-80-3" href="#__codelineno-80-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>NAMESPACE<span class="w">                          </span>NAME<span class="w">                               </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-81-2" name="__codelineno-81-2" href="#__codelineno-81-2"></a>commonstuff<span class="w">                        </span>commond<span class="w">                            </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m37s
-<a id="__codelineno-81-3" name="__codelineno-81-3" href="#__codelineno-81-3"></a>specialstuff<span class="w">                       </span>speciald<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m55s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a>NAMESPACE<span class="w">                          </span>NAME<span class="w">                               </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-82-2" name="__codelineno-82-2" href="#__codelineno-82-2"></a>commonstuff<span class="w">                        </span>commond<span class="w">                            </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m37s
+<a id="__codelineno-82-3" name="__codelineno-82-3" href="#__codelineno-82-3"></a>specialstuff<span class="w">                       </span>speciald<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m55s
 </code></pre></div></p>
 <p>Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>...
-<a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a><span class="w">      </span>containers:
-<a id="__codelineno-83-3" name="__codelineno-83-3" href="#__codelineno-83-3"></a><span class="w">      </span>-<span class="w"> </span>env:
-<a id="__codelineno-83-4" name="__codelineno-83-4" href="#__codelineno-83-4"></a><span class="w">        </span>-<span class="w"> </span>name:<span class="w"> </span>EXAMPLE_VAR
-<a id="__codelineno-83-5" name="__codelineno-83-5" href="#__codelineno-83-5"></a><span class="w">          </span>value:<span class="w"> </span>env<span class="w"> </span>is<span class="w"> </span>prod
-<a id="__codelineno-83-6" name="__codelineno-83-6" href="#__codelineno-83-6"></a><span class="w">        </span>image:<span class="w"> </span>library/httpd:2.4
-<a id="__codelineno-83-7" name="__codelineno-83-7" href="#__codelineno-83-7"></a><span class="w">        </span>imagePullPolicy:<span class="w"> </span>IfNotPresent
-<a id="__codelineno-83-8" name="__codelineno-83-8" href="#__codelineno-83-8"></a><span class="w">        </span>name:<span class="w"> </span>httpd
-<a id="__codelineno-83-9" name="__codelineno-83-9" href="#__codelineno-83-9"></a>...
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a>...
+<a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a><span class="w">      </span>containers:
+<a id="__codelineno-84-3" name="__codelineno-84-3" href="#__codelineno-84-3"></a><span class="w">      </span>-<span class="w"> </span>env:
+<a id="__codelineno-84-4" name="__codelineno-84-4" href="#__codelineno-84-4"></a><span class="w">        </span>-<span class="w"> </span>name:<span class="w"> </span>EXAMPLE_VAR
+<a id="__codelineno-84-5" name="__codelineno-84-5" href="#__codelineno-84-5"></a><span class="w">          </span>value:<span class="w"> </span>env<span class="w"> </span>is<span class="w"> </span>prod
+<a id="__codelineno-84-6" name="__codelineno-84-6" href="#__codelineno-84-6"></a><span class="w">        </span>image:<span class="w"> </span>library/httpd:2.4
+<a id="__codelineno-84-7" name="__codelineno-84-7" href="#__codelineno-84-7"></a><span class="w">        </span>imagePullPolicy:<span class="w"> </span>IfNotPresent
+<a id="__codelineno-84-8" name="__codelineno-84-8" href="#__codelineno-84-8"></a><span class="w">        </span>name:<span class="w"> </span>httpd
+<a id="__codelineno-84-9" name="__codelineno-84-9" href="#__codelineno-84-9"></a>...
 </code></pre></div></p>
 <p>Check that the common workload on the florin cluster is working.</p>
-<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a>sleep<span class="w"> </span><span class="m">10</span>
+<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>curl<span class="w"> </span>http://localhost:8094
+<div class="highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>curl<span class="w"> </span>http://localhost:8094
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
-<a id="__codelineno-86-2" name="__codelineno-86-2" href="#__codelineno-86-2"></a>&lt;html&gt;
-<a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-86-4" name="__codelineno-86-4" href="#__codelineno-86-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
-<a id="__codelineno-86-5" name="__codelineno-86-5" href="#__codelineno-86-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>florin.
-<a id="__codelineno-86-6" name="__codelineno-86-6" href="#__codelineno-86-6"></a><span class="w">  </span>&lt;/body&gt;
-<a id="__codelineno-86-7" name="__codelineno-86-7" href="#__codelineno-86-7"></a>&lt;/html&gt;
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a>&lt;html&gt;
+<a id="__codelineno-87-3" name="__codelineno-87-3" href="#__codelineno-87-3"></a><span class="w">  </span>&lt;body&gt;
+<a id="__codelineno-87-4" name="__codelineno-87-4" href="#__codelineno-87-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-87-5" name="__codelineno-87-5" href="#__codelineno-87-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>florin.
+<a id="__codelineno-87-6" name="__codelineno-87-6" href="#__codelineno-87-6"></a><span class="w">  </span>&lt;/body&gt;
+<a id="__codelineno-87-7" name="__codelineno-87-7" href="#__codelineno-87-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <p>Check that the special workload on the guilder cluster is working.
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a>sleep<span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a>curl<span class="w"> </span>http://localhost:8097
+<div class="highlight"><pre><span></span><code><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a>curl<span class="w"> </span>http://localhost:8097
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
-<a id="__codelineno-89-2" name="__codelineno-89-2" href="#__codelineno-89-2"></a>&lt;html&gt;
-<a id="__codelineno-89-3" name="__codelineno-89-3" href="#__codelineno-89-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-89-4" name="__codelineno-89-4" href="#__codelineno-89-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>special<span class="w"> </span>web<span class="w"> </span>site.
-<a id="__codelineno-89-5" name="__codelineno-89-5" href="#__codelineno-89-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
-<a id="__codelineno-89-6" name="__codelineno-89-6" href="#__codelineno-89-6"></a><span class="w">  </span>&lt;/body&gt;
-<a id="__codelineno-89-7" name="__codelineno-89-7" href="#__codelineno-89-7"></a>&lt;/html&gt;
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<a id="__codelineno-90-2" name="__codelineno-90-2" href="#__codelineno-90-2"></a>&lt;html&gt;
+<a id="__codelineno-90-3" name="__codelineno-90-3" href="#__codelineno-90-3"></a><span class="w">  </span>&lt;body&gt;
+<a id="__codelineno-90-4" name="__codelineno-90-4" href="#__codelineno-90-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>special<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-90-5" name="__codelineno-90-5" href="#__codelineno-90-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
+<a id="__codelineno-90-6" name="__codelineno-90-6" href="#__codelineno-90-6"></a><span class="w">  </span>&lt;/body&gt;
+<a id="__codelineno-90-7" name="__codelineno-90-7" href="#__codelineno-90-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <p>Check that the common workload on the guilder cluster is working.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a>curl<span class="w"> </span>http://localhost:8096
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>curl<span class="w"> </span>http://localhost:8096
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
-<a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a>&lt;html&gt;
-<a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-91-4" name="__codelineno-91-4" href="#__codelineno-91-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
-<a id="__codelineno-91-5" name="__codelineno-91-5" href="#__codelineno-91-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
-<a id="__codelineno-91-6" name="__codelineno-91-6" href="#__codelineno-91-6"></a><span class="w">  </span>&lt;/body&gt;
-<a id="__codelineno-91-7" name="__codelineno-91-7" href="#__codelineno-91-7"></a>&lt;/html&gt;
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<a id="__codelineno-92-2" name="__codelineno-92-2" href="#__codelineno-92-2"></a>&lt;html&gt;
+<a id="__codelineno-92-3" name="__codelineno-92-3" href="#__codelineno-92-3"></a><span class="w">  </span>&lt;body&gt;
+<a id="__codelineno-92-4" name="__codelineno-92-4" href="#__codelineno-92-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-92-5" name="__codelineno-92-5" href="#__codelineno-92-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
+<a id="__codelineno-92-6" name="__codelineno-92-6" href="#__codelineno-92-6"></a><span class="w">  </span>&lt;/body&gt;
+<a id="__codelineno-92-7" name="__codelineno-92-7" href="#__codelineno-92-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <!--example1-post-espw-stop-->
 <!-- END INCLUDE -->
