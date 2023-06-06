@@ -102,10 +102,10 @@ function parse_file()
       # remove the backticks from the code block
       
       if [[ $line =~ $start_pattern ]]; then
-        echo ignore this line
+        echo ignore this line: $line
       else
         if [[ $line =~ $start_hidden_pattern ]]; then
-          echo ignote this line
+          echo ignote this line: $line
         else
           # code_block="${line//\`\`\`shell/}"
           code_block=$line
