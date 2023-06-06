@@ -183,6 +183,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-create-imw-and-build-kubestellar/</loc>
+         <lastmod>2023-06-06</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-create-imw-and-build-kubestellar/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-start-without-cd-kubestellar/</loc>
          <lastmod>2023-06-06</lastmod>
          <changefreq>daily</changefreq>
