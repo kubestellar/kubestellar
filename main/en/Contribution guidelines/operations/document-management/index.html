@@ -1,0 +1,1991 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/operations/document-management/">
+      
+      
+        <link rel="prev" href="../release-management/">
+      
+      
+        <link rel="next" href="../../../Coding%20Milestones/PoC2023q1/outline/">
+      
+      <link rel="icon" href="../../../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
+    
+    
+      
+        <title>Document Management - KubeStellar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.402914a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/kubestellar.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+
+  <script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-SR5TD1CXY7",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+  
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the stable release.
+  <a href="../latest/../../../..">
+    <strong>Click here to go to the stable release</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KubeStellar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Document Management
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kcp-dev/edge-mc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../" class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../Getting-Started/quickstart/" class="md-tabs__link">
+      QuickStart
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CONTRIBUTING/" class="md-tabs__link md-tabs__link--active">
+        Contributing
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/outline/" class="md-tabs__link">
+        Coding Milestones
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../Community/_index/" class="md-tabs__link">
+      Community
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Community/partners/argocd/" class="md-tabs__link">
+        Partners
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-tabs__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-tabs__link">
+      Blog
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../../logo.png" alt="logo">
+
+    </a>
+    KubeStellar
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kcp-dev/edge-mc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-nav__link">
+        QuickStart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        Guidelines
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coc/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LICENSE/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../governance/" class="md-nav__link">
+        Governance
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../onboarding/" class="md-nav__link">
+        Onboarding
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          Security
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_6">
+          <span class="md-nav__icon md-icon"></span>
+          Security
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security/" class="md-nav__link">
+        Policy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/security_contacts/" class="md-nav__link">
+        Contacts
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          Operations
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Operations
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-management/" class="md-nav__link">
+        Code Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-management/" class="md-nav__link">
+        Release Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Document Management
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Document Management
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    
+  </a>
+  
+    <nav class="md-nav" aria-label="">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    Global Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#including-external-markdown" class="md-nav__link">
+    Including external markdown
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-up-documents-locally" class="md-nav__link">
+    Serving up documents locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-aliases-for-our-documentation" class="md-nav__link">
+    Supported aliases for our documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shortcut-urls" class="md-nav__link">
+    Shortcut URLs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codeblocks" class="md-nav__link">
+    Codeblocks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testingrunning-docs" class="md-nav__link">
+    Testing/Running Docs
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing/Running Docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-way-it-works" class="md-nav__link">
+    The way it works:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-gh-workflow" class="md-nav__link">
+    The GH Workflow:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-secret-sauce" class="md-nav__link">
+    The secret sauce:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-files-in-our-gh-pages-branch" class="md-nav__link">
+    Important files in our gh-pages branch
+  </a>
+  
+    <nav class="md-nav" aria-label="Important files in our gh-pages branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#indexhtml-and-homehtml" class="md-nav__link">
+    index.html and home.html
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cname" class="md-nav__link">
+    CNAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versionsjson" class="md-nav__link">
+    versions.json
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Coding Milestones
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Coding Milestones
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+          PoC2023q1
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1">
+          <span class="md-nav__icon md-icon"></span>
+          PoC2023q1
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/outline/" class="md-nav__link">
+        Details
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
+        Inivitation to Contribute
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/edge-syncer/" class="md-nav__link">
+        KubeStellar-Syncer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/example1/" class="md-nav__link">
+        Extended Example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_5" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_5" id="__nav_4_1_5_label" tabindex="0">
+          Processes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          Processes
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Sheduler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/mailbox-controller/" class="md-nav__link">
+        KubeStellar Mailbox Controller
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/placement-translator/" class="md-nav__link">
+        KubeStellar Placement Translator
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
+        Roadmap
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_7" id="__nav_4_1_7_label" tabindex="0">
+          Environments
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_7">
+          <span class="md-nav__icon md-icon"></span>
+          Environments
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/environments/_index/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/environments/cloud-env/" class="md-nav__link">
+        Cloud Environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/environments/dev-env/" class="md-nav__link">
+        Developer Environment
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_8" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_8" id="__nav_4_1_8_label" tabindex="0">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_8_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_8">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/commands/" class="md-nav__link">
+        Commands
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+          PoC2023q3
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          PoC2023q3
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
+        Details
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/_index/" class="md-nav__link">
+        Community
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          Partners
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Partners
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/argocd/" class="md-nav__link">
+        ArgoCD
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/turbonomic/" class="md-nav__link">
+        Turbonomic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/mvi/" class="md-nav__link">
+        MVI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/fluxcd/" class="md-nav__link">
+        FluxCD
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/openziti/" class="md-nav__link">
+        OpenZiti
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/kyverno/" class="md-nav__link">
+        Kyverno
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-nav__link">
+        QuickStart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Coding%20Milestones/PoC2023q1/example1/" class="md-nav__link">
+        Extended Example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/user-guide/" class="md-nav__link">
+        User Guide
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-nav__link">
+        Blog
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    
+  </a>
+  
+    <nav class="md-nav" aria-label="">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    Global Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#including-external-markdown" class="md-nav__link">
+    Including external markdown
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-up-documents-locally" class="md-nav__link">
+    Serving up documents locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-aliases-for-our-documentation" class="md-nav__link">
+    Supported aliases for our documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shortcut-urls" class="md-nav__link">
+    Shortcut URLs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codeblocks" class="md-nav__link">
+    Codeblocks
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testingrunning-docs" class="md-nav__link">
+    Testing/Running Docs
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing/Running Docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-way-it-works" class="md-nav__link">
+    The way it works:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-gh-workflow" class="md-nav__link">
+    The GH Workflow:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-secret-sauce" class="md-nav__link">
+    The secret sauce:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#important-files-in-our-gh-pages-branch" class="md-nav__link">
+    Important files in our gh-pages branch
+  </a>
+  
+    <nav class="md-nav" aria-label="Important files in our gh-pages branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#indexhtml-and-homehtml" class="md-nav__link">
+    index.html and home.html
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cname" class="md-nav__link">
+    CNAME
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#versionsjson" class="md-nav__link">
+    versions.json
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/kcp-dev/edge-mc/edit/main/docs/content/Contribution guidelines/operations/document-management.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/kcp-dev/edge-mc/raw/main/docs/content/Contribution guidelines/operations/document-management.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
+    </a>
+  
+
+
+  <h1>Document Management</h1>
+
+<h2 id="_1"></h2>
+<h3 id="global-variables">Global Variables</h3>
+<p>There are many global variables defined in the <a href="https://raw.githubusercontent.com/kcp-dev/edge-mc/main/docs/mkdocs.yml">docs/mkdocs.yml</a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking</p>
+<div class="highlight"><pre><span></span><code>- site_name: KubeStellar
+- repo_url: https://github.com/kcp-dev/edge-mc
+- site_url: https://docs.kubestellar.io/main
+- repo_default_file_path: {{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;repo_default_path&#39;] }}
+- repo_short_name: kcp-dev/edge-mc
+- docs_url: https://docs.kubestellar.io
+- repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
+- edit_uri: edit/main/docs/content/
+- ks_branch: main
+- ks_tag: latest
+</code></pre></div>
+<p>to use a variables/macro in your documentation reference like this:</p>
+<p>{{ config.&lt;var_name> }}</p>
+<p>and in context that can look something like this:</p>
+<p>bash &lt;(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}</p>
+<p><b>note:</b><br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br />
+&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
+<h3 id="including-external-markdown">Including external markdown</h3>
+<p>We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:</p>
+<p>In your original markdown document, add a block that refers to the external markdown you want to include:
+<img alt="Include Markdown" src="../include-markdown-example.png" /></p>
+<p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
+<img alt="Included Markdown" src="../included-markdown-example.png" /></p>
+<p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
+<h3 id="serving-up-documents-locally">Serving up documents locally</h3>
+<p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+</code></pre></div>
+<p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org">mkdocs</a>:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mkdocs<span class="w"> </span>serve
+</code></pre></div>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+<p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
+</code></pre></div>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+<h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation</h3>
+<p>We currently support 3 aliases for our documentation:</p>
+<div class="highlight"><pre><span></span><code>- from the release major.minor branch:
+    - [https://docs.kubestellar.io/stable](https://docs.kubestellar.io/stable)
+- from the main branch:
+    - [https://docs.kubestellar.io/unstable](https://docs.kubestellar.io/unstable)
+    - [https://docs.kubestellar.io/latest](https://docs.kubestellar.io/latest)
+</code></pre></div>
+<h3 id="shortcut-urls">Shortcut URLs</h3>
+<p>We have a few shortcut urls that come in handy when referring others to our project:</p>
+<p><b>note:</b> You need to join our mailing list first to get access to some of the links that follow (<a href="https://kubestellar.io/joinus">https://docs.kubestellar.io/joinus</a>)</p>
+<ul>
+<li><a href="https://kubestellar.io/agenda">https://kubestellar.io/agenda</a> - our community meeting agenda google doc</li>
+<li><a href="https://kubestellar.io/blog">https://kubestellar.io/blog</a> - our medium reading list</li>
+<li><a href="https://kubestellar.io/code">https://kubestellar.io/code</a> - our current GH repo (wherever that is)</li>
+<li><a href="https://kubestellar.io/community">https://kubestellar.io/community</a> - our stable docs community page</li>
+<li><a href="https://kubestellar.io/drive">https://kubestellar.io/drive</a> - our google drive</li>
+<li><a href="https://kubestellar.io/joinus">https://kubestellar.io/joinus</a> - our dev mailing list where you join and get our invites</li>
+<li><a href="https://kubestellar.io/join_us">https://kubestellar.io/join_us</a> - also, our dev mailing list</li>
+<li><a href="https://kubestellar.io/linkedin">https://kubestellar.io/linkedin</a> - our linkedin filter (soon, our page)</li>
+<li><a href="https://kubestellar.io/tv">https://kubestellar.io/tv</a> - our youtube channel</li>
+<li><a href="https://kubestellar.io/tv">https://kubestellar.io/youtube</a> - also, our youtube channel</li>
+<li><a href="https://kubestellar.io/infomercial">https://kubestellar.io/infomercial</a> - our infomercial that premieres on June 12th at 9am</li>
+</ul>
+<p>and.. the very important…
+- <a href="https://kubestellar.io/quickstart">https://kubestellar.io/quickstart</a> - our 'stable' quickstart</p>
+<h3 id="codeblocks">Codeblocks</h3>
+<p>mkdocs has some very helpful ways to include blocks of code in a style that makes it clear to our readers that console interaction is necessary in the documentation.  There are options to include a plain codeblock (```), shell (shell), console (console - no used in our documentation), language or format-specific (yaml, etc.), and others.  For more detailed information, checkout the <a href="https://squidfunk.github.io/mkdocs-material/reference/code-blocks/">mkdocs information on codeblocks</a>.</p>
+<p>Here are some examples of how we use codeblocks:</p>
+<ul>
+<li>
+<p>For a codeblock that can be 'tested' as part of our CI, use the <b><i><code>shell</code></i></b> block:
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>```shell
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>mkdocs serve
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>```
+</code></pre></div>
+<b>output:</b></p>
+</li>
+<li>
+<p>For a codeblock that should be 'tested', BUT <b>not</b> shown, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style:
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>``` { .bash .hide-me }
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mkdocs server # run this command in the automation, but do not show it to the reader
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>```
+</code></pre></div>
+<b>output:</b></p>
+</li>
+<li>
+<p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>``` { .bash }
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>mkdocs server
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>```
+</code></pre></div>
+<b>output:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdocs<span class="w"> </span>server
+</code></pre></div></p>
+</li>
+<li>
+<p>For a codeblock that should not be 'tested' and not include a 'copy' icon (great for output-only instances), use the <b><i><code>.bash</code></i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>``` { .bash .no-copy }
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>```
+</code></pre></div>
+<b>output:</b>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
+</code></pre></div></p>
+</li>
+<li>
+<p>For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>```yaml
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>```
+</code></pre></div>
+<b>output:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">nav</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Home</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">QuickStart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Getting-Started/quickstart.md</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Contributing</span><span class="p">:</span><span class="w"> </span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Guidelines</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution guidelines/CONTRIBUTING.md</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>For a codeblock that has a title, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock:
+<br/><b>code:</b>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>``` title=&quot;testing.sh&quot;
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>#!/bin/sh
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>echo hello KubeStellar
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>```
+</code></pre></div>
+<b>output:</b>
+<div class="highlight"><span class="filename">testing.sh</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>#!/bin/sh
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>echo hello KubeStellar
+</code></pre></div></p>
+</li>
+</ul>
+<p>(other variations are possible, PR an update to the <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
+<h3 id="testingrunning-docs">Testing/Running Docs</h3>
+<p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
+<h4 id="the-way-it-works">The way it works:</h4>
+<ul>
+<li>create your .md file as you normally would</li>
+<li>add codeblocks that can be tested, tested but hidden, or not tested at all:<ul>
+<li>use <b><i>'shell'</i></b> to indicate code you want to be tested</li>
+<li>use <b><i>'.bash'</i></b> with the plain codeblock, and the <b><i>'.hide-md'</i></b> style for code you want to be tested, but hidden from the reader (some like this, but its not cool if you want others to run your instructions without hiccups)</li>
+<li>use plain codeblock (```) if you want to show sample output that is not to be tested</li>
+</ul>
+</li>
+<li>you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.</li>
+</ul>
+<h4 id="the-gh-workflow">The GH Workflow:</h4>
+<ul>
+<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml</a></li>
+</ul>
+<h4 id="the-secret-sauce">The secret sauce:</h4>
+<ul>
+<li>The code that makes all this possible is at <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh</a><ul>
+<li>This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks</li>
+<li>The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them</li>
+<li>It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.</li>
+</ul>
+</li>
+</ul>
+<p>All of this is invoke in a target in our <a href="https://github.com/kcp-dev/edge-mc/blob/main/Makefile">makefile</a>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>run-doc-shells:<span class="w"> </span>venv
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/run-doc-shells.sh
+</code></pre></div></p>
+<p>You give the path from that follows the 'https://github.com/kcp-dev/edge-mc/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:</p>
+<div class="highlight"><span class="filename">How to 'make' our run-doc-shells target</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make MANIFEST=&quot;&#39;content/Getting-Started/quickstart.md&#39;&quot; run-doc-shells
+</code></pre></div>
+<p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
+<h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch</h3>
+<h4 id="indexhtml-and-homehtml">index.html and home.html</h4>
+<p>In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our KubeStellar doc site hosted with <a href="https://godaddy.com">GoDaddy.com</a>.</p>
+<p><a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html</a>
+<a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html</a></p>
+<p>both files have content similar to:
+<div class="highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>KubeStellar<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;content-type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">&gt;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;refresh&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;0; URL=https://docs.kubestellar.io/stable&quot;</span> <span class="p">/&gt;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<p>Do not remove these files!</p>
+<h4 id="cname">CNAME</h4>
+<p>The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!</p>
+<p>the CNAME file must have the following content in it:
+<div class="highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docs.kubestellar.io
+</code></pre></div></p>
+<h4 id="versionsjson">versions.json</h4>
+<p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
+</code></pre></div>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81Z"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14Z"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+      
+        <script src="../../../../js/open_in_new_tab.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1998 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/edge-syncer/">
+      
+      
+        <link rel="prev" href="../coding-milestone-invite-q1/">
+      
+      
+        <link rel="next" href="../example1/">
+      
+      <link rel="icon" href="../../../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
+    
+    
+      
+        <title>KubeStellar-Syncer - KubeStellar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.402914a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/kubestellar.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+
+  <script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-SR5TD1CXY7"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-SR5TD1CXY7",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-SR5TD1CXY7",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+  
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#registering-kubestellar-syncer-on-an-edge-cluster" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the stable release.
+  <a href="../latest/../../../..">
+    <strong>Click here to go to the stable release</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../" title="KubeStellar" class="md-header__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            KubeStellar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              KubeStellar-Syncer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kcp-dev/edge-mc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../" class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../Getting-Started/quickstart/" class="md-tabs__link">
+      QuickStart
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Contribution%20guidelines/CONTRIBUTING/" class="md-tabs__link">
+        Contributing
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../outline/" class="md-tabs__link md-tabs__link--active">
+        Coding Milestones
+      </a>
+    </li>
+  
+
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../Community/_index/" class="md-tabs__link">
+      Community
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Community/partners/argocd/" class="md-tabs__link">
+        Partners
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-tabs__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-tabs__link">
+      Blog
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../" title="KubeStellar" class="md-nav__button md-logo" aria-label="KubeStellar" data-md-component="logo">
+      
+  <img src="../../../../logo.png" alt="logo">
+
+    </a>
+    KubeStellar
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kcp-dev/edge-mc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-nav__link">
+        QuickStart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/CONTRIBUTING/" class="md-nav__link">
+        Guidelines
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/coc/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/LICENSE/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/governance/" class="md-nav__link">
+        Governance
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/onboarding/" class="md-nav__link">
+        Onboarding
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          Security
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_6">
+          <span class="md-nav__icon md-icon"></span>
+          Security
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/security/security/" class="md-nav__link">
+        Policy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/security/security_contacts/" class="md-nav__link">
+        Contacts
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+          Operations
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_7">
+          <span class="md-nav__icon md-icon"></span>
+          Operations
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/operations/code-management/" class="md-nav__link">
+        Code Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/operations/release-management/" class="md-nav__link">
+        Release Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/operations/document-management/" class="md-nav__link">
+        Document Management
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Coding Milestones
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Coding Milestones
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+          PoC2023q1
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_4_1">
+          <span class="md-nav__icon md-icon"></span>
+          PoC2023q1
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outline/" class="md-nav__link">
+        Details
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coding-milestone-invite-q1/" class="md-nav__link">
+        Inivitation to Contribute
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          KubeStellar-Syncer
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        KubeStellar-Syncer
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#registering-kubestellar-syncer-on-an-edge-cluster" class="md-nav__link">
+    Registering KubeStellar Syncer on an Edge cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-kubestellar-syncer-gen-plugin-does" class="md-nav__link">
+    What kubestellar syncer-gen plugin does
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" class="md-nav__link">
+    Deploy workload objects from edge-mc to Edge cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgesyncconfig-will-be-replaced-to-syncerconfig" class="md-nav__link">
+    EdgeSyncConfig (will be replaced to SyncerConfig)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syncerconfig" class="md-nav__link">
+    SyncerConfig
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#downsyncing" class="md-nav__link">
+    Downsyncing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#renaturing-may-not-scope-in-poc2023q1-since-no-usage" class="md-nav__link">
+    Renaturing (May not scope in PoC2023q1 since no usage)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-of-reported-state" class="md-nav__link">
+    Return of reported state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-upsyncing" class="md-nav__link">
+    Resource Upsyncing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feasibility-study" class="md-nav__link">
+    Feasibility study
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-kubestellar-syncer-image" class="md-nav__link">
+    Build KubeStellar Syncer image
+  </a>
+  
+    <nav class="md-nav" aria-label="Build KubeStellar Syncer image">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-in-your-local" class="md-nav__link">
+    How to build the image in your local
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" class="md-nav__link">
+    How to build the image with multiple architectures and push it to Docker registry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example1/" class="md-nav__link">
+        Extended Example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_5" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_5" id="__nav_4_1_5_label" tabindex="0">
+          Processes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          Processes
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Sheduler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mailbox-controller/" class="md-nav__link">
+        KubeStellar Mailbox Controller
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../placement-translator/" class="md-nav__link">
+        KubeStellar Placement Translator
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap-uses/" class="md-nav__link">
+        Roadmap
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_7" id="__nav_4_1_7_label" tabindex="0">
+          Environments
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_7">
+          <span class="md-nav__icon md-icon"></span>
+          Environments
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environments/_index/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environments/cloud-env/" class="md-nav__link">
+        Cloud Environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environments/dev-env/" class="md-nav__link">
+        Developer Environment
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_8" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_1_8" id="__nav_4_1_8_label" tabindex="0">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_8_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_1_8">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/" class="md-nav__link">
+        Commands
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+          PoC2023q3
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          PoC2023q3
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../PoC2023q3/outline/" class="md-nav__link">
+        Details
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/_index/" class="md-nav__link">
+        Community
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          Partners
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Partners
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/argocd/" class="md-nav__link">
+        ArgoCD
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/turbonomic/" class="md-nav__link">
+        Turbonomic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/mvi/" class="md-nav__link">
+        MVI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/fluxcd/" class="md-nav__link">
+        FluxCD
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/openziti/" class="md-nav__link">
+        OpenZiti
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Community/partners/kyverno/" class="md-nav__link">
+        Kyverno
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/quickstart/" class="md-nav__link">
+        QuickStart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example1/" class="md-nav__link">
+        Extended Example
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/user-guide/" class="md-nav__link">
+        User Guide
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank" class="md-nav__link">
+        Blog
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#registering-kubestellar-syncer-on-an-edge-cluster" class="md-nav__link">
+    Registering KubeStellar Syncer on an Edge cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-kubestellar-syncer-gen-plugin-does" class="md-nav__link">
+    What kubestellar syncer-gen plugin does
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" class="md-nav__link">
+    Deploy workload objects from edge-mc to Edge cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgesyncconfig-will-be-replaced-to-syncerconfig" class="md-nav__link">
+    EdgeSyncConfig (will be replaced to SyncerConfig)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syncerconfig" class="md-nav__link">
+    SyncerConfig
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#downsyncing" class="md-nav__link">
+    Downsyncing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#renaturing-may-not-scope-in-poc2023q1-since-no-usage" class="md-nav__link">
+    Renaturing (May not scope in PoC2023q1 since no usage)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-of-reported-state" class="md-nav__link">
+    Return of reported state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-upsyncing" class="md-nav__link">
+    Resource Upsyncing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feasibility-study" class="md-nav__link">
+    Feasibility study
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-kubestellar-syncer-image" class="md-nav__link">
+    Build KubeStellar Syncer image
+  </a>
+  
+    <nav class="md-nav" aria-label="Build KubeStellar Syncer image">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-in-your-local" class="md-nav__link">
+    How to build the image in your local
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" class="md-nav__link">
+    How to build the image with multiple architectures and push it to Docker registry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+    <a href="https://github.com/kcp-dev/edge-mc/edit/main/docs/content/Coding Milestones/PoC2023q1/edge-syncer.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/kcp-dev/edge-mc/raw/main/docs/content/Coding Milestones/PoC2023q1/edge-syncer.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
+    </a>
+  
+
+
+  <h1>KubeStellar-Syncer</h1>
+
+<p><img alt="edge-syncer drawio" src="../images/edge-syncer-overview.png" /></p>
+<h4 id="registering-kubestellar-syncer-on-an-edge-cluster">Registering KubeStellar Syncer on an Edge cluster</h4>
+<p>Edge-syncer can be deployed on Edge cluster easily by the following steps.</p>
+<ol>
+<li>Create SyncTarget and Location<ul>
+<li>Mailbox controller creates mailbox workspace automatically. </li>
+</ul>
+</li>
+<li>Get mailbox workspace name</li>
+<li>Use command to obtain yaml manifests to bootstrap KubeStellar Syncer
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">kubectl ws &lt;mb-ws name&gt;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">bin/kubectl-kubestellar-syncer_gen &lt;Edge Sync Target name&gt; --syncer-image &lt;KubeStellar Syncer image&gt; -o edge-syncer.yaml</span>
+</code></pre></div>
+    Here <code>bin/kubectl-kubestellar-syncer_gen</code> refers to a special variant of KubeStellar's
+    kubectl plugin that includes the implementation of the functionality needed
+    here.  This variant, under the special name shown here, is a normal part of
+    the <code>bin</code> of edge-mc.
+    For the KubeStellar Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:v0.2.2</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar Syncer Image</a>.</li>
+<li>Deploy edge-syncer on an Edge cluster</li>
+<li>Syncer starts to run on the Edge cluster<ul>
+<li>KubeStellar Syncer starts watching and consuming SyncerConfig</li>
+</ul>
+</li>
+</ol>
+<p>The overall diagram is as follows:</p>
+<p><img alt="edge-syncer boot" src="../images/edge-syncer-boot.png" /></p>
+<h4 id="what-kubestellar-syncer-gen-plugin-does">What kubestellar syncer-gen plugin does</h4>
+<p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (<code>kubectl kubestellar syncer-gen</code>) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
+<p>Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (;<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.</p>
+<p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
+<p>The equivalent manual steps are as follows:
+1. Generate UUID for Syncer identification
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uuidgen | tr &#39;[:upper:]&#39; &#39;[:lower:]&#39; | read syncer_id
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>syncer_id=&quot;syncer-$syncer_id&quot;
+</code></pre></div>
+2. Go to a workspace (It's exactly a mailbox workspace in the case of Edge MC)
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl ws create ws1 --enter
+</code></pre></div>
+3. Create a serviceaccount in the workspace
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cat &lt;&lt; EOL | kubectl apply -f -
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>apiVersion: v1
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>kind: ServiceAccount
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>metadata:
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  name: $syncer_id
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>EOL
+</code></pre></div>
+4. Create clusterrole and clusterrolebinding to bind the serviceaccount to the role
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cat &lt;&lt; EOL | kubectl apply -f -
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>apiVersion: rbac.authorization.k8s.io/v1
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>kind: ClusterRole
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>metadata:
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  name: $syncer_id
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>rules:
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>- apiGroups: [&quot;*&quot;]
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  resources: [&quot;*&quot;]
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  verbs: [&quot;*&quot;]
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>- nonResourceURLs: [&quot;/&quot;]
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  verbs: [&quot;access&quot;]
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>---
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>apiVersion: rbac.authorization.k8s.io/v1
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>kind: ClusterRoleBinding
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>metadata:
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>  name: $syncer_id
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>roleRef:
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>  apiGroup: rbac.authorization.k8s.io
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>  kind: ClusterRole
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  name: $syncer_id
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>subjects:
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>- apiGroup: &quot;&quot;
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  kind: ServiceAccount
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>  name: $syncer_id
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>  namespace: default
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>EOL
+</code></pre></div>
+5. Get the serviceaccount token that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl get secret -o custom-columns=&quot;:.metadata.name&quot;| grep $syncer_id | read secret_name
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl get secret $secret_name -o jsonpath=&#39;{.data.token}&#39; | base64 -d | read token
+</code></pre></div>
+6. Get the certificates that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.certificate-authority-data&quot; | read cacrt
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>echo $cacrt
+</code></pre></div>
+7. Get the server host and port that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.server&quot; | sed -e &#39;s|https://\(.*\):\([^/]*\)/.*|\1 \2|g&#39; | read host port
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>echo $host, $port
+</code></pre></div>
+8. Set some other parameters</br>
+    a. server_url of KCP from host and port
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>server_url=&quot;https://$host:$port&quot;
+</code></pre></div>
+    b. downstream_namespace where Syncer Pod runs
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>downstream_namespace=&quot;kcp-edge-$syncer_id&quot;
+</code></pre></div>
+    c. Syncer image
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>image=&quot;quay.io/kubestellar/syncer:v0.2.2&quot;
+</code></pre></div>
+9. Generate manifests to bootstrap KubeStellar Syncer
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
+</code></pre></div>
+    For debug purpose, you can extract kubeconfig.yaml of the upstream
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e &quot;select(.kind == \&quot;Secret\&quot; and .metadata.name == \&quot;$syncer_id\&quot;)&quot; | yq .stringData.kubeconfig 
+</code></pre></div>
+10. For now, EdgeSyncConfig API is required. Please create EdgeSyncConfig CRD in the workspace, if you run Syncer from the generated bootstrap manifest.
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl create ./pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml
+</code></pre></div></p>
+<h4 id="deploy-workload-objects-from-edge-mc-to-edge-cluster">Deploy workload objects from edge-mc to Edge cluster</h4>
+<p>To deploy resources to Edge clusters, create the following in workload management workspace
+- workload objects
+  - Some objects are denatured if needed.
+  - Other objects are as it is
+- APIExport/API Schema corresponding to CRD such as Kubernetes <a href="https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml">ClusterPolicyReport</a>.
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kcp-dev/edge-mc/blob/main/hack/update-codegen-crds.sh#L57">here</a>). 
+- EdgePlacement</p>
+<p><img alt="edge-syncer deploy" src="../images/edge-syncer-deploy.png" /></p>
+<p>After this, Edge-mc will put the following in the mailbox workspace.
+- Workload objects (both denatured one and not-denatured one)
+- SyncerConfig CR</p>
+<p><strong>TODO</strong>: This is something we should clarify..e.g. which existing controller(s) in edge-mc will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
+  - The placement translator will put the workload objects and syncer config into the mailbox workspaces.
+  - The placement translator will create syncer config based on the EdgePlacement objects and what they match.
+  - The mailbox controller will put API Binding into the mailbox workspace.</p>
+<h4 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)</h4>
+<ul>
+<li>The example of EdgeSyncConfig CR is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kcp-dev/edge-mc/blob/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
+<li>The CR here is used from edge syncer. </li>
+<li>The CR is placed at mb-ws to define</li>
+<li>object selector</li>
+<li>need of renaturing</li>
+<li>need of returning reported states of downsynced objects</li>
+<li>need of delete propagation for downsyncing</li>
+<li>The CR is managed by edge-mc (placement transformer).</li>
+<li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>This should be changed to be generated according to EdgePlacement spec. </li>
+<li>This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.</li>
+<li>One CR is initially created by the command for KubeStellar Syncer enablement in mb-ws (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>)</li>
+<li>The CR name is <code>&lt;name&gt;</code> and the contents are empty.</li>
+<li>This name is registered in the bootstrap manifests for KubeStellar Syncer install and KubeStellar Syncer is told to watch the CR of this name.</li>
+<li>Currently KubeStellar Syncer watches all CRs in the workspace</li>
+<li>KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
+<li>This behavior may be changed to only watching the default CR once Placement Translator is to be the component that generates the CR from EdgePlacement: <a href="https://github.com/kcp-dev/edge-mc/pull/284#pullrequestreview-1375667129">related issue</a></li>
+</ul>
+<h4 id="syncerconfig">SyncerConfig</h4>
+<ul>
+<li>The spec is defined in https://github.com/kcp-dev/edge-mc/blob/main/pkg/apis/edge/v1alpha1/syncer-config.go</li>
+<li><code>namespaceScope</code> field is for namespace scoped objects.<ul>
+<li><code>namespaces</code> is field for which namespaces to be downsynced.</li>
+<li><code>resources</code> is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.</li>
+</ul>
+</li>
+<li><code>clusterScope</code> field is for cluster scoped objects<ul>
+<li>It's an array of <code>apiVersion</code>, <code>group</code>, <code>resource</code>, and <code>objects</code>.</li>
+<li><code>objects</code> can be specified by wildcard (<code>*</code>) meaning all objects.</li>
+</ul>
+</li>
+<li><code>upsync</code> field is for upsynced objects including both namespace and cluster scoped objects.<ul>
+<li>It's an array of <code>apiGroup</code>, <code>resources</code>, <code>namespaces</code>, and <code>names</code>.</li>
+<li><code>apiGroup</code> is group.</li>
+<li><code>resources</code> is an array of upsynced resource.</li>
+<li><code>namespaces</code> is an array of namespace for namespace objects.</li>
+<li><code>names</code> is an array of upsynced object name. Wildcard (<code>*</code>) is available.</li>
+</ul>
+</li>
+<li>The example CR is https://github.com/kcp-dev/edge-mc/blob/main/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml</li>
+<li>The CR is used from edge syncer</li>
+<li>The CR is placed in mb-ws to define</li>
+<li>object selector</li>
+<li>need of renaturing (May not scope in PoC2023q1)</li>
+<li>need of returning reported states of downsynced objects (May not scope in PoC2023q1)</li>
+<li>need of delete propagation for downsyncing (May not scope in PoC2023q1)</li>
+<li>The CR is managed by edge-mc (placement translator).</li>
+<li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>This should be changed to be generated according to EdgePlacement spec. </li>
+<li>This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.</li>
+<li>Currently KubeStellar Syncer watches all CRs in the workspace</li>
+<li>KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
+</ul>
+<h4 id="downsyncing">Downsyncing</h4>
+<ul>
+<li>Edge syncer does downsyncing, which copy workload objects on mailbox workspace to Edge cluster</li>
+<li>If workload objects are deleted on mailbox workspace, the corresponding objects on the Edge cluster will be also deleted according to SyncerConfig. </li>
+<li>SyncerConfig specifies which objects should be downsynced.</li>
+<li>object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation</li>
+<li>Cover cluster-scope objects and CRD</li>
+<li>CRD needs to be denatured if downsyncing is required. (May not scope in PoC2023q1 since no usage)</li>
+<li>Renaturing is applied if required (specified in SyncerConfig). (May not scope in PoC2023q1 since no usage)</li>
+<li>Current implementation is using polling to detect changes on mailbox workspace, but will be changed to use Informers. </li>
+</ul>
+<h4 id="renaturing-may-not-scope-in-poc2023q1-since-no-usage">Renaturing (May not scope in PoC2023q1 since no usage)</h4>
+<ul>
+<li>Edge syncer does renaturing, which converts workload objects to different forms of objects on a Edge cluster. </li>
+<li>The conversion rules (downstream/upstream mapping) is specified in SyncerConfig.</li>
+<li>Some objects need to be denatured. </li>
+<li>CRD needs to be denatured when conflicting with APIBinding.</li>
+</ul>
+<h4 id="return-of-reported-state">Return of reported state</h4>
+<ul>
+<li>Edge syncer return the reported state of downsynced objects at Edge cluster to the status of objects on the mailbox workspace periodically. </li>
+<li>TODO: Failing to returning reported state of some resources (e.g. deployment and service). Need more investigation. </li>
+<li>reported state returning on/off is configurable in SyncerConfig. (default is on)</li>
+</ul>
+<h4 id="resource-upsyncing">Resource Upsyncing</h4>
+<ul>
+<li>Edge syncer does upsyncing resources at Edge cluster to the corresponding mailbox workspace periodically. </li>
+<li>SyncerConfig specifies which objects should be upsynced from Edge cluster.</li>
+<li>object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation (, and more such as ownership reference?)</li>
+<li>Upsyncing CRD is out of scope for now. This means when upsyncing a CR, corresponding APIBinding (not CRD) is available on the mailbox workspace. This limitation might be revisited later. </li>
+<li>~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in edge-mc.~ =&gt; Upsynced objects are accessed through Mailbox informer.</li>
+</ul>
+<h4 id="feasibility-study">Feasibility study</h4>
+<p>We will verify if the design described here could cover the following 4 scenarios. 
+- I can register an edge-syncer on a Edge cluster to connect a mailbox workspace specified by name. (edge-syncer registration)
+- I can deploy Kyverno and its policy from mailbox workspace to Edge cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM. (workload deployment by edge-syncer's downsyncing)
+- I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by edge-syncer) 
+- I can deploy the denatured objects on mailbox workspace to Edge cluster by renaturing them automatically in edge-syncer. (workload deployment by renaturing)</p>
+<h3 id="build-kubestellar-syncer-image">Build KubeStellar Syncer image</h3>
+<p>Prerequisite
+- Install ko (https://ko.build/install/)</p>
+<h4 id="how-to-build-the-image-in-your-local">How to build the image in your local</h4>
+<ol>
+<li><code>make build-edge-syncer-image-local</code>
+e.g.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>$ make build-edge-syncer-image-local
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>2023/04/24 11:50:40 Adding tag latest
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>2023/04/24 11:50:40 Added tag latest
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>Edge-Syncer image:
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+</code></pre></div>
+<code>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96</code> is the image stored in your local Docker registry.</li>
+</ol>
+<p>You can also set a shell variable to the output of this Make task.</p>
+<p>For example
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>image=`make build-edge-syncer-image-local`
+</code></pre></div></p>
+<h4 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry</h4>
+<ol>
+<li><code>make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
+</ol>
+<p>For example
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a>Edge-Syncer image
+<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+</code></pre></div>
+<code>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510</code> is the image pushed to the registry.</p>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81Z"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14Z"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              Thanks for your feedback! Help us improve this page by using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.ce72ebac.min.js"></script>
+      
+        <script src="../../../../js/open_in_new_tab.js"></script>
+      
+    
+  </body>
+</html>
