@@ -37,7 +37,10 @@ sleep 30
 ```
 
 ```shell
+ls -alrt
+cd ..
+ls -alrt
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/bin:$PATH
+export PATH=$(pwd)/kcp/bin:$PATH
 ```
 <!--example1-start-kcp-end-->

@@ -26,6 +26,7 @@ executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
 ```shell
 git clone {{config.repo_url}} kubestellar
 cd kubestellar
+make build
 export PATH=$(pwd)/bin:$PATH
 ```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
