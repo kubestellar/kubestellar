@@ -1,6 +1,7 @@
 ---
 short_name: placement-translator
 manifest_name: 'content/Coding Milestones/PoC2023q1/placement-translator.md'
+pre_req_name: 'content/common-subs/pre-req.md'
 ---
 [![Run Doc Shells - placement-translator]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml)&nbsp;&nbsp;&nbsp;
 
@@ -10,7 +11,7 @@ git clone -n -b {{config.ks_branch}} {{config.repo_url}} --depth 1 {{config.site
 cd {{config.site_name}}-{{page.meta.short_name}}
 git restore --staged Makefile Makefile.venv go.mod docs
 git checkout Makefile Makefile.venv go.mod docs
-make MANIFEST="'content/common-subs/pre-req.md','{{page.meta.manifest_name}}'" run-doc-shells
+make MANIFEST="'{{page.meta.pre_req_name}}','{{page.meta.manifest_name}}'" run-doc-shells
 ```
 
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.

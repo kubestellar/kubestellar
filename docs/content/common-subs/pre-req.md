@@ -1,4 +1,7 @@
 ```shell
+os_type=""
+arch_type=""
+folder=""
 get_os_type() {
   case "$OSTYPE" in
       linux*)   echo "linux" ;;
