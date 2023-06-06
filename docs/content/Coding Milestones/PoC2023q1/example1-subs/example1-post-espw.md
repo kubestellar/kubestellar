@@ -18,7 +18,7 @@ here.
 
 ```shell
 mailbox-controller -v=2 &
-wait 45
+wait 60
 ```
 ``` { .bash .no-copy }
 ...
