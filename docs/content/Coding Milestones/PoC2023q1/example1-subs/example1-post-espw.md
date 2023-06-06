@@ -787,6 +787,7 @@ spec:
     resources:
     - cogs
 status: {}
+```
 
 ```shell
 kubectl get deployments -A
