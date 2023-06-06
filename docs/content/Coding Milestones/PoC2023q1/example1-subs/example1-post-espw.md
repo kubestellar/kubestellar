@@ -312,6 +312,9 @@ spec:
           optional: false
 EOF
 ```
+``` {.bash .hide-me}
+wait 10
+```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
 Its "where predicate" (the `locationSelectors` array) has one label
@@ -342,6 +345,9 @@ spec:
     resources: ["cogs"]
     names: ["william"]
 EOF
+```
+``` {.bash .hide-me}
+wait 10
 ```
 
 ### Create and populate the workload management workspace for the special workload
@@ -427,6 +433,9 @@ spec:
           optional: false
 EOF
 ```
+``` {.bash .hide-me}
+wait 10
+```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
 Its "where predicate" (the `locationSelectors` array) has one label
@@ -457,6 +466,9 @@ spec:
     resources: ["widgets"]
     names: ["*"]
 EOF
+```
+``` {.bash .hide-me}
+wait 10
 ```
 
 ### Edge scheduling
@@ -867,6 +879,9 @@ kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
 
 Check that the common workload on the florin cluster is working.
 
+``` {.bash .hide-me}
+wait 20
+```
 ```shell
 curl http://localhost:8094
 ```
@@ -881,7 +896,9 @@ curl http://localhost:8094
 ```
 
 Check that the special workload on the guilder cluster is working.
-
+``` {.bash .hide-me}
+wait 10
+```
 ```shell
 curl http://localhost:8097
 ```
