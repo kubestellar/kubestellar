@@ -235,6 +235,9 @@ spec:
       path: "root:compute"
       name: kubernetes
 ```
+``` {.bash .hide-me}
+wait 15
+```
 
 Next, use `kubectl` to create the following workload objects in that
 workspace.  The workload in this example in an Apache httpd server
