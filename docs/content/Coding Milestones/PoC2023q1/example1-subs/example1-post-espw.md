@@ -874,7 +874,7 @@ Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
 
 ```shell
-kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
 ```
 ``` { .bash .no-copy }
 ...
