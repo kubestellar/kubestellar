@@ -4,26 +4,31 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request:
-    branches:
-      - main
-      - "release-*"
-    paths:
-#       - "cmd/**"
-      - "docs/**"
-#       - "pkg/**"
-      - ".github/workflows/broken-links-crawler.yaml"
+  workflow_run:
+    workflows: ["Generate and push docs"]
+    types:
+      - completed
 
-  # Pushes to branches do the full build + deployment
-  push:
-    branches:
-      - main
-      - "release-*"
-    paths:
-#       - "cmd/**"
-      - "docs/**"
-#       - "pkg/**"
-      - ".github/workflows/docs-gen-and-push.yaml"
+#   pull_request:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/broken-links-crawler.yaml"
+
+#   # Pushes to branches do the full build + deployment
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+# #       - "cmd/**"
+#       - "docs/**"
+# #       - "pkg/**"
+#       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
   contents: write
