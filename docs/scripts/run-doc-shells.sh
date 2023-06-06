@@ -17,7 +17,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
@@ -138,6 +138,8 @@ for code_block in "${code_blocks[@]}"; do
 done
 
 cat "$generated_script_file"
+
+exit
 
 # make the generated script executable
 chmod +x "$generated_script_file"
