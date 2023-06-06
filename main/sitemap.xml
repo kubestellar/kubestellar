@@ -407,6 +407,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/check-command-syncerconfig-the-one/</loc>
+         <lastmod>2023-06-06</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/check-command-syncerconfig-the-one/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/coming-soon/</loc>
          <lastmod>2023-06-06</lastmod>
          <changefreq>daily</changefreq>
