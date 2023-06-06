@@ -155,5 +155,5 @@ which should eventually yield:
 ```
 
 
-Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](../user-guide)
+Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](../../user-guide)
 <!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end-->
