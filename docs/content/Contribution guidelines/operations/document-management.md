@@ -248,3 +248,54 @@ The versions.json file contains the version and alias information required by 'm
 ```json
 [{"version": "release-0.2", "title": "release-0.2", "aliases": ["stable"]}, {"version": "{{config.ks_branch}}", "title": "{{config.ks_branch}}", "aliases": ["latest", "unstable"]}]
 ```
+
+### In case of emergency
+If you find yourself in a jam and the pages are not showing up at kubestellar.io or docs.kubestellar.io, check the following
+1) Is the index.html, home.html, CNAME, and versions.json file in the gh-pages branch alongside the folders for the compiled documents?  If not, then recreate those files as indicated above (except for versions.json which is programmatically created by 'mike').
+2) Is GitHub settings for 'Pages' for the domain pointing at the https://docs.kubestellar.io url?  If not, paste it in and check off 'enforce https'.  This can happen if the CNAME file goes missing from the gh-pages branch.
+
+### How to recreate the gh-pages branch
+To recreate the gh-pages branch, do the following:
+- checkout the gh-pages branch to your local system
+```shell
+git clone -b gh-pages {{ config.repo_url }} KubeStellar
+cd KubeStellar
+```
+- delete all files in the branch and push it to GitHub
+```shell
+rm -rf *
+git add; git commit -m "removing all gh-pages files"; git push -u origin gh-pages
+```
+-- switch to the 'main' branch
+```shell
+git checkout main
+git pull
+```
+- switch to /docs and run 'mike deploy' for the main branch for alias 'unstable' and 'latest'
+```shell
+cd docs
+mike deploy --push --rebase --update-aliases main unstable
+mike deploy --push --rebase --update-aliases main latest
+```
+- switch to the 'release' branch and 'mike deploy' for the release branch for alias 'stable' (your release name will vary)
+```shell
+git checkout release-0.2
+git pull
+mike deploy --push --rebase --update-aliases release-0.2 stable
+```
+- switch back to the gh-pages branch and recreate the home.html, index.html, and CNAME files as needed (make sure you back out of the docs path first before switching to gh-pages because that path does not exist in that branch)
+```shell
+cd ..
+git checkout gh-pages
+git pull
+vi index.html
+vi home.html
+vi CNAME
+```
+- push the new files into gh-pages
+```shell
+git add .;git commit -m "add index, home, and CNAME files";git push -u origin gh-pages
+```
+- go into the GitHub UI and go to the settings for the project and click on 'Pages' to add https://docs.kubestellar.io as the domain and check the box to enforce https.
+
+- if the above did not work, then you might have an issue with the GoDaddy domain (expired, files missing, etc.)
