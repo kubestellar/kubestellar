@@ -29,8 +29,8 @@ type FakeEdgeV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeEdgeV1alpha1) ClusterProviderInfods() v1alpha1.ClusterProviderInfodInterface {
-	return &FakeClusterProviderInfods{c}
+func (c *FakeEdgeV1alpha1) ClusterProviderConfigs() v1alpha1.ClusterProviderConfigInterface {
+	return &FakeClusterProviderConfigs{c}
 }
 
 func (c *FakeEdgeV1alpha1) Customizers(namespace string) v1alpha1.CustomizerInterface {

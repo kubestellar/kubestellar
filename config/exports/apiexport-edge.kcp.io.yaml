@@ -13,4 +13,5 @@ spec:
   - v230605-10bf963c.clusterproviderinfods.edge.kcp.io
   - v230605-10bf963c.clusterproviderinfos.edge.kcp.io
   - v230605-10bf963c.logicalclusters.edge.kcp.io
+  - v230606-7d89df67.clusterproviderconfigs.edge.kcp.io
 status: {}
