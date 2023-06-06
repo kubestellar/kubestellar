@@ -30,7 +30,7 @@ echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
-start_hidden_pattern="^\`\`\` {.bash .hide-me}"
+start_hidden_pattern="^\`\`\` \{\.bash \.hide-me\}"
 stop_pattern="^\`\`\`"
 include_pattern="\s*include-markdown\s*"
 
