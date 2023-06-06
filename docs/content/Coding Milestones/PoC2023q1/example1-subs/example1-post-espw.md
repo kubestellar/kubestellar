@@ -588,6 +588,7 @@ Current workspace is "root:espw".
 ```
 ```shell
 go run ./cmd/placement-translator &
+sleep 120
 ```
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
@@ -607,12 +608,6 @@ kubectl ws $FLORIN_WS
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 ```
-
-{%
-   include-markdown "../../../common-subs/check-command-syncerconfig-the-one.md"
-   start="<!--check-command-syncerconfig-the-one-start-->"
-   end="<!--check-command-syncerconfig-the-one-end-->"
-%}
 
 ```shell
 kubectl get SyncerConfig the-one -o yaml

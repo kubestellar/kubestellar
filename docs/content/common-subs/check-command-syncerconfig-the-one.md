@@ -9,6 +9,7 @@ while ! kubectl get SyncerConfig the-one -o yaml; do
     fi
     sleep $increment
     let slept=slept+increment
+    echo slept
 done
 ```
 <!--check-command-syncerconfig-the-one-start-->
