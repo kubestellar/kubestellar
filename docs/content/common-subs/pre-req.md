@@ -51,4 +51,60 @@ fi
 echo $os_type
 echo $arch_type
 echo $folder
+
+if command -v docker >/dev/null 2>&1; then
+    echo "Docker is installed"
+else
+    if [ "$os_type" == "darwin" ]; then
+      brew install docker
+    fi
+fi
+
+if docker info >/dev/null 2>&1; then
+    echo "Docker is started"
+else
+    if [ "$os_type" == "darwin" ]; then
+      source ./zshrc
+      open --background -a Docker
+    fi
+fi
+
+if command -v go >/dev/null 2>&1; then
+    echo "GO is installed"
+else
+    if [ "$os_type" == "darwin" ]; then
+      brew install go@1.19
+    fi
+fi
+
+if command -v kubectl >/dev/null 2>&1; then
+    echo "kubectl is installed"
+else
+    if [ "$os_type" == "darwin" ]; then
+      brew install kubectl
+    fi
+fi
+
+if command -v jq >/dev/null 2>&1; then
+    echo "jq is installed"
+else
+    if [ "$os_type" == "darwin" ]; then
+      brew install jq
+    fi
+fi
+
+if command -v kind >/dev/null 2>&1; then
+    echo "kind is installed"
+else
+    if [ "$os_type" == "darwin" ]; then
+      brew install kind
+    fi
+fi
+
+ps -ef | grep mailbox-controller | grep -v grep | awk '{print $2}' | xargs kill
+ps -ef | grep kubestellar-scheduler | grep -v grep | awk '{print $2}' | xargs kill
+ps -ef | grep placement-translator | grep -v grep | awk '{print $2}' | xargs kill
+ps -ef | grep kcp | grep -v grep | awk '{print $2}' | xargs kill
+kind delete cluster --name florin
+kind delete cluster --name guilder
 ```
