@@ -90,6 +90,11 @@ type EdgePlacementSpec struct {
 	// An object matches `upsync` if and only if it matches at least one member of `upsync`.
 	// +optional
 	Upsync []UpsyncSet `json:"upsync,omitempty"`
+
+	// SummarizerName, if non-empty, holds the name of a Summarizer object that prescribes
+	// how to create corresponding summary objects.
+	// +optional
+	SummarizerName string `json:"summarizerName"`
 }
 
 // NonNamespacedObjectReferenceSet specifies a set of non-namespaced objects
