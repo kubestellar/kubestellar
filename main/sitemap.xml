@@ -449,6 +449,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/remove-all/</loc>
+         <lastmod>2023-06-07</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/remove-all/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/required-packages/</loc>
          <lastmod>2023-06-07</lastmod>
          <changefreq>daily</changefreq>
