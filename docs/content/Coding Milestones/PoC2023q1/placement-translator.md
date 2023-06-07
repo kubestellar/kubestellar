@@ -471,3 +471,11 @@ spec:
     - flanges
 status: {}
 ```
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

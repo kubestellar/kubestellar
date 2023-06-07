@@ -70,3 +70,10 @@ object in the commonstuff namespace in the common workload workspace
 holding a summary of the corresponding Deployment objects.  Those are
 the `commond` Deployment objects in the two mailbox workspaces.
 
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

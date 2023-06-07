@@ -1,4 +1,4 @@
-<!--quickstart-3-teardown-the-environment-start-->
+<!--teardown-the-environment-start-->
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ```shell
@@ -24,4 +24,4 @@ Stop and uninstall KubeStellar and kcp with the following command:
 ```shell
 remove-kubestellar
 ```
-<!--quickstart-3-teardown-the-environment-end-->
+<!--teardown-the-environment-end-->

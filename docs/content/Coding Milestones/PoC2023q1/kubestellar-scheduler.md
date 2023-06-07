@@ -188,3 +188,11 @@ metadata:
 Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.
 
 Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

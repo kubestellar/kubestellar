@@ -86,9 +86,9 @@ workload and summarization aspirations removed.
 ## 3. Teardown the environment
 
 {%
-   include-markdown "quickstart-subs/quickstart-3-teardown-the-environment.md"
-   start="<!--quickstart-3-teardown-the-environment-start-->"
-   end="<!--quickstart-3-teardown-the-environment-end-->"
+   include-markdown "../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
 %}
 
 ## 4. Next Steps
