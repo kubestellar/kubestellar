@@ -1,7 +1,7 @@
 <!--teardown-the-environment-start-->
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
-```shell
+``` {.bash}
 rm florin-syncer.yaml guilder-syncer.yaml || true
 kubectl ws root
 kubectl delete workspace example-imw
@@ -15,13 +15,13 @@ kind delete cluster --name guilder
 
 Stop and uninstall KubeStellar use the following command:
 
-```shell
+``` {.bash}
 kubestellar stop
 ```
 
 Stop and uninstall KubeStellar and kcp with the following command:
 
-```shell
+``` {.bash}
 remove-kubestellar
 ```
 <!--teardown-the-environment-end-->

@@ -1,4 +1,4 @@
-```shell
+``` {.bash}
 os_type=""
 arch_type=""
 folder=""
@@ -106,6 +106,6 @@ ps -ef | grep kubestellar-scheduler | grep -v grep | awk '{print $2}' | xargs ki
 ps -ef | grep placement-translator | grep -v grep | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
 ps -ef | grep kcp | grep -v grep | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
 ps -ef | grep 'exe/main -v 2' | grep -v grep | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
-kind delete cluster --name florin
-kind delete cluster --name guilder
+kind delete cluster --name florin || true
+kind delete cluster --name guilder || true
 ```
