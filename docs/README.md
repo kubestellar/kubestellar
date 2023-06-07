@@ -54,17 +54,17 @@ bash <(curl -s \{\{ config.repo_raw_url \}\}/\{\{ config.ks_branch \}\}/bootstra
 
 
 <b>note:</b><br /> 
-&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](all-macros.md) <br />
+&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](./content/Contribution%20guidelines/operations/all-macros.md) <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br />
 
 ### Including external markdown
 We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:
 
 In your original markdown document, add a block that refers to the external markdown you want to include:
-![Include Markdown](./include-markdown-example.png)
+![Include Markdown](./content/Contribution%20guidelines/operations/include-markdown-example.png)
 
 In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
-![Included Markdown](./included-markdown-example.png)
+![Included Markdown](./content/Contribution%20guidelines/operations/included-markdown-example.png)
 
 for more information on the 'include-markdown' plugin for mkdocs look [here](https://github.com/mondeja/mkdocs-include-markdown-plugin)
 
