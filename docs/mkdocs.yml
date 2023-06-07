@@ -38,7 +38,7 @@ nav:
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
           - Processes:
-              - KubeStellar Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+              - KubeStellar Scheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
               - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
           - Roadmap: Coding Milestones/PoC2023q1/roadmap-uses.md
