@@ -1,3 +1,19 @@
+/*
+Copyright 2022 The KubeStellar Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package mcclient
 
 // kubestellar cluster-aware client impl
@@ -19,13 +35,13 @@ import (
 	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	ksinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	mcclient "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
+	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
 	"github.com/kcp-dev/edge-mc/pkg/mcclient/listwatch"
 )
 
 type KubestellarClusterInterface interface {
 	// Cluster returns clientset for given cluster.
-	Cluster(name string) (client mcclient.Interface)
+	Cluster(name string) (client mcclientset.Interface)
 	// ConfigForCluster returns rest config for given cluster.
 	ConfigForCluster(name string) (*rest.Config, error)
 	// CrossClusterListWatch returns cross-cluster ListWatch
@@ -34,11 +50,11 @@ type KubestellarClusterInterface interface {
 
 type multiClusterClient struct {
 	configs    map[string]*rest.Config
-	clientsets map[string]*mcclient.Clientset
+	clientsets map[string]*mcclientset.Clientset
 	lock       sync.Mutex
 }
 
-func (mcc *multiClusterClient) Cluster(name string) mcclient.Interface {
+func (mcc *multiClusterClient) Cluster(name string) mcclientset.Interface {
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	clientset, ok := mcc.clientsets[name]
@@ -72,15 +88,20 @@ func (mcc *multiClusterClient) CrossClusterListWatch(gv schema.GroupVersion, res
 }
 
 var client *multiClusterClient
+var clientLock = &sync.Mutex{}
 
 // NewMultiCluster creates new multi-cluster client and starts collecting cluster configs
 func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (KubestellarClusterInterface, error) {
+	clientLock.Lock()
+	defer clientLock.Unlock()
+
 	if client != nil {
 		return client, nil
 	}
+
 	client = &multiClusterClient{
 		configs:    make(map[string]*rest.Config),
-		clientsets: make(map[string]*mcclient.Clientset),
+		clientsets: make(map[string]*mcclientset.Clientset),
 		lock:       sync.Mutex{},
 	}
 	managerClientset, err := ksclientset.NewForConfig(managerConfig)
@@ -137,7 +158,7 @@ func (mcc *multiClusterClient) handleAdd(clusterInfo *v1alpha1.LogicalCluster) {
 	defer mcc.lock.Unlock()
 	mcc.configs[clusterInfo.Name] = config
 
-	cs, err := mcclient.NewForConfig(config)
+	cs, err := mcclientset.NewForConfig(config)
 	if err != nil {
 		//ES: do we want to try again ? how ?
 		// should we delete  the config as well ?
