@@ -12,6 +12,6 @@
     # done? remove everything 
     make MANIFEST="content/common-subs/remove-all.md" run-doc-shells
     cd ../
-    rm -r {{config.site_name}}-{{page.meta.short_name}}
+    rm -rf {{config.site_name}}-{{page.meta.short_name}}
     ```
 <!--save-some-time-end-->
