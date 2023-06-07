@@ -1601,7 +1601,13 @@
 </code></pre></div>
 <div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo apt-get install jq
 </code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</p>
+<code>title="GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
+curl -L "https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz" -o go.tar.gz
+tar -C /usr/local -xzf go.tar.gz
+rm go.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' &gt;&gt; /etc/profile
+source /etc/profile
+go version</code></p>
 </div>
 <div class="tabbed-block">
 <p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
