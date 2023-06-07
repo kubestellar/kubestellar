@@ -10,11 +10,24 @@
 
 .md-typeset h1 {
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 700;
     /* color: #06c; */
 }
 .md-typeset h2 {
     font-size: 20px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h3 {
+    font-size: 18px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h4 {
+    font-size: 16px;
+    /* font-weight: 200; */
     /* color: #06c; */
 }
 
