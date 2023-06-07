@@ -7,4 +7,9 @@
     git checkout Makefile Makefile.venv go.mod docs
     make MANIFEST="'{{page.meta.pre_req_name}}','{{page.meta.manifest_name}}'" run-doc-shells
     ```
+
+    ```
+    # done? remove everything 
+    make MANIFEST="content/common-subs/remove-all.md" run-doc-shells
+    ```
 <!--save-some-time-end-->
