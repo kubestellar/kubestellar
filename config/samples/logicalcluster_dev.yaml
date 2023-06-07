@@ -3,7 +3,6 @@ kind: LogicalCluster
 metadata:
   name: dev2
 spec:
-  ProviderType: "kind"
-  ProviderName: "kind-cluster-name"
+  ProviderName: "dev2"
   ClusterName: "kind-fleet-test2"
   URL: "127.0.0.1:45673"

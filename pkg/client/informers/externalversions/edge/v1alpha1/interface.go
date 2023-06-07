@@ -26,6 +26,8 @@ import (
 )
 
 type ClusterInterface interface {
+	// ClusterProviderDescs returns a ClusterProviderDescClusterInformer
+	ClusterProviderDescs() ClusterProviderDescClusterInformer
 	// Customizers returns a CustomizerClusterInformer
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
@@ -48,6 +50,11 @@ type version struct {
 // New returns a new ClusterInterface.
 func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalinterfaces.TweakListOptionsFunc) ClusterInterface {
 	return &version{factory: f, tweakListOptions: tweakListOptions}
+}
+
+// ClusterProviderDescs returns a ClusterProviderDescClusterInformer
+func (v *version) ClusterProviderDescs() ClusterProviderDescClusterInformer {
+	return &clusterProviderDescClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerClusterInformer
@@ -81,6 +88,8 @@ func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
 }
 
 type Interface interface {
+	// ClusterProviderDescs returns a ClusterProviderDescInformer
+	ClusterProviderDescs() ClusterProviderDescInformer
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
@@ -104,6 +113,11 @@ type scopedVersion struct {
 // New returns a new ClusterInterface.
 func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &scopedVersion{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// ClusterProviderDescs returns a ClusterProviderDescInformer
+func (v *scopedVersion) ClusterProviderDescs() ClusterProviderDescInformer {
+	return &clusterProviderDescScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerInformer
