@@ -31,7 +31,7 @@ The structure of `docs` is as follows:
 | requirements.txt            | List of Python modules used to build the site.                                    |
 
 ### Global Variables
-There are many global variables defined in the [docs/mkdocs.yml]({{ config.repo_raw_url }}/{{ config.ks_branch }}/docs/mkdocs.yml).  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking
+There are many global variables defined in the <a href="{{ config.repo_raw_url }}/{{ config.ks_branch }}/docs/mkdocs.yml">docs/mkdocs.yml<a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking
 
     - site_name: {{ config.site_name }}
     - repo_url: {{ config.repo_url }}
