@@ -1,5 +1,5 @@
 ---
-short_name: kubestellar-example1
+short_name: example1
 manifest_name: 'content/Coding Milestones/PoC2023q1/example1.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---

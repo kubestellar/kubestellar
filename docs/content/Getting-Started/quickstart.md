@@ -27,8 +27,8 @@ Table of contents:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c. Onboarding the clusters](#c-onboarding-the-clusters)</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[e. Next Steps](#e-next-steps)</br>
 [3. Teardown the environment](#3-teardown-the-environment)</br>
+[4. Next Steps](#4-next-steps)</br>
 
 
 This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
@@ -86,14 +86,6 @@ workload and summarization aspirations removed.
    end="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end-->"
 %}
 
-### e. Next Steps
-
-What you just did is part of the example [on the
-website](../../Coding%20Milestones/PoC2023q1/example1/),
-but with the some steps reorganized and combined and the special
-workload and summarization aspiration removed.  You could continue
-from here, doing the steps for the special workload.
-
 ## 3. Teardown the environment
 
 {%
@@ -101,6 +93,15 @@ from here, doing the steps for the special workload.
    start="<!--quickstart-3-teardown-the-environment-start-->"
    end="<!--quickstart-3-teardown-the-environment-end-->"
 %}
+
+## 4. Next Steps
+
+What you just did is a shortened version of the 
+[more detailed example](../../Coding%20Milestones/PoC2023q1/example1/) on the website,
+but with the some steps reorganized and combined and the special
+workload and summarization aspiration removed.  You can continue
+from here, learning more details about what you did in the QuickStart,
+and adding on some more steps for the special workload.
 
 {%
    include-markdown "quickstart-subs/quickstart-0-demo.md"
