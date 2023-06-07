@@ -37,6 +37,10 @@ spec:
           spec:
             description: '`spec` describes a provider.'
             properties:
+              ClusterPrefixForDiscovery:
+                description: ClusterPrefixForDiscovery contains the prefix used during
+                  cluster discovery.
+                type: string
               Config:
                 description: 'TODO: this should be stored as a secret! Config is the
                   provider config'
