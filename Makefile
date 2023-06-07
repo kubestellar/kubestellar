@@ -197,6 +197,10 @@ deploy-docs: venv
 	. $(VENV)/activate; \
 	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
 
+.PHONY: docs-ecutable
+docs-ecutable: 
+	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
+
 .PHONY: run-doc-shells
 run-doc-shells: venv
 	. $(VENV)/activate; \
