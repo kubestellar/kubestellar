@@ -29,6 +29,7 @@ import (
 
 type EdgeV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	ClusterProviderDescsGetter
 	CustomizersGetter
 	EdgePlacementsGetter
 	EdgeSyncConfigsGetter
@@ -40,6 +41,10 @@ type EdgeV1alpha1Interface interface {
 // EdgeV1alpha1Client is used to interact with features provided by the edge.kcp.io group.
 type EdgeV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *EdgeV1alpha1Client) ClusterProviderDescs() ClusterProviderDescInterface {
+	return newClusterProviderDescs(c)
 }
 
 func (c *EdgeV1alpha1Client) Customizers(namespace string) CustomizerInterface {
