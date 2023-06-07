@@ -421,13 +421,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/</loc>
-         <lastmod>2023-06-07</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/check-command-syncerconfig-the-one/</loc>
          <lastmod>2023-06-07</lastmod>
          <changefreq>daily</changefreq>
@@ -467,6 +460,13 @@
          <lastmod>2023-06-07</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/save-some-time/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/teardown-the-environment/</loc>
+         <lastmod>2023-06-07</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/teardown-the-environment/"/>
          
     </url>
 </urlset>

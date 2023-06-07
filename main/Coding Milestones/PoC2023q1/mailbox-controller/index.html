@@ -919,13 +919,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#required-packages" class="md-nav__link">
-    Required Packages:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#steps-to-try-the-mailbox-controller" class="md-nav__link">
     Steps to try the mailbox controller
   </a>
@@ -954,6 +947,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teardown-the-environment" class="md-nav__link">
+    Teardown the environment
+  </a>
   
 </li>
       
@@ -1497,13 +1497,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#required-packages" class="md-nav__link">
-    Required Packages:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#steps-to-try-the-mailbox-controller" class="md-nav__link">
     Steps to try the mailbox controller
   </a>
@@ -1532,6 +1525,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teardown-the-environment" class="md-nav__link">
+    Teardown the environment
+  </a>
   
 </li>
       
@@ -1690,10 +1690,6 @@ consume the <code>Workspace</code> objects from there.</p>
 <a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">      </span>--workload-user<span class="w"> </span>string<span class="w">             </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 </code></pre></div>
 <h2 id="try-it">Try It</h2>
-<h3 id="required-packages">Required Packages:</h3>
-<ul>
-<li><a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</li>
-</ul>
 <h3 id="steps-to-try-the-mailbox-controller">Steps to try the mailbox controller</h3>
 <h4 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp</h4>
 <p>open a terminal window(1) and clone the latest KubeStellar source:</p>
@@ -1811,6 +1807,27 @@ controller wait for it to be gone and then re-create it.</p>
 and watch the mailbox controller react as follows.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
+<h2 id="teardown-the-environment">Teardown the environment</h2>
+<!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
+
+<p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+</code></pre></div>
+<p>Stop and uninstall KubeStellar use the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubestellar<span class="w"> </span>stop
+</code></pre></div>
+<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>remove-kubestellar
+</code></pre></div>
+<!-- END INCLUDE -->
 
 
   
