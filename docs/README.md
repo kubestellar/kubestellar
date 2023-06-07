@@ -55,7 +55,7 @@ bash <(curl -s \{\{ config.repo_raw_url \}\}/\{\{ config.ks_branch \}\}/bootstra
 
 <b>note:</b><br /> 
 &nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at [mkdocs information](all-macros.md) <br />
-&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our [Broken Links Crawler]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br />
 
 ### Including external markdown
 We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:
@@ -220,7 +220,7 @@ echo hello KubeStellar
 ```
 <br/>
 
-(other variations are possible, PR an update to the [kubestellar.css]({{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css) file and, once approved, use the style on the plain codeblock in your documentation.)
+(other variations are possible, PR an update to the <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)
 
 ### Testing/Running Docs
 How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.
@@ -242,7 +242,7 @@ How do we ensure that our documented examples work?  Simple, we 'execute' our do
     - The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them
     - It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.
 
-All of this is invoke in a target in our [makefile]({{ config.repo_url }}/blob/{{config.ks_branch}}/Makefile)
+All of this is invoke in a target in our <a href="{{ config.repo_url }}/blob/{{config.ks_branch}}/Makefile">Makefile</a>
 ``` {.bash .no-copy}
 .PHONY: run-doc-shells
 run-doc-shells: venv
@@ -262,8 +262,8 @@ make MANIFEST="'content/Getting-Started/quickstart.md'" run-doc-shells
 #### index.html and home.html
 In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our {{ config.site_name }} doc site hosted with [GoDaddy.com](https://godaddy.com).
 
-[{{config.repo_url}}/blob/gh-pages/home.html]({{config.repo_url}}/blob/gh-pages/home.html)
-[{{config.repo_url}}/blob/gh-pages/index.html]({{config.repo_url}}/blob/gh-pages/index.html)
+<a href="{{config.repo_url}}/blob/gh-pages/home.html">{{config.repo_url}}/blob/gh-pages/home.html</a>
+<a href="{{config.repo_url}}/blob/gh-pages/index.html">{{config.repo_url}}/blob/gh-pages/index.html</a>
 
 both files have content similar to:
 ```html title="index.html and home.html"
