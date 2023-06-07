@@ -47,5 +47,5 @@ jobs:
 
       - run: |
           make MANIFEST="'content/Getting-Started/quickstart.md'" \
-          run-doc-shells
+          docs-ecutable
       

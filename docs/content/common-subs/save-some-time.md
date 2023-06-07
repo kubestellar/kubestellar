@@ -5,12 +5,12 @@
     cd {{config.site_name}}-{{page.meta.short_name}}
     git restore --staged Makefile Makefile.venv go.mod docs
     git checkout Makefile Makefile.venv go.mod docs
-    make MANIFEST="'{{page.meta.pre_req_name}}','{{page.meta.manifest_name}}'" run-doc-shells
+    make MANIFEST="'{{page.meta.pre_req_name}}','{{page.meta.manifest_name}}'" docs-ecutable
     ```
 
     ```
     # done? remove everything
-    make MANIFEST="content/common-subs/remove-all.md" run-doc-shells
+    make MANIFEST="content/common-subs/remove-all.md" docs-ecutable
     cd ../
     rm -rf {{config.site_name}}-{{page.meta.short_name}}
     ```

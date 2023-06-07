@@ -47,4 +47,4 @@ jobs:
   
       - run: |
           make MANIFEST="'content/Coding Milestones/PoC2023q1/example1.md'" \
-          run-doc-shells
+          docs-ecutable
