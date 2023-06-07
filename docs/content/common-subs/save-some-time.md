@@ -9,7 +9,7 @@
     ```
 
     ```
-    # done? remove everything 
+    # done? remove everything  
     make MANIFEST="content/common-subs/remove-all.md" run-doc-shells
     cd ../
     rm -rf {{config.site_name}}-{{page.meta.short_name}}
