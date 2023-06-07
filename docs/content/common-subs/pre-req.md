@@ -1,4 +1,4 @@
-``` {.bash}
+```shell
 os_type=""
 arch_type=""
 folder=""
