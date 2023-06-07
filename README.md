@@ -8,8 +8,6 @@
 
 ## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
-[![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
-[![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 
 [![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
