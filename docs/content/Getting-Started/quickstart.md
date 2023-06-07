@@ -1,22 +1,19 @@
 [![QuickStart test]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml)&nbsp;&nbsp;&nbsp;
-
 <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar">
-
 {%
    include-markdown "quickstart-subs/quickstart-0-demo.md"
    start="<!--quickstart-0-demo-start-->"
    end="<!--quickstart-0-demo-end-->"
 %}
 
-## Estimated Time: 
-   ~3 minutes
+!!! tip "Estimated Time:" 
+    ~3 minutes
    
-## Required Packages:
-  - [docker](https://docs.docker.com/engine/install/)
-  - [kind](https://kind.sigs.k8s.io/)
-  - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
-  - [jq](https://stedolan.github.io/jq/download/)
-
+{%
+   include-markdown "../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
 ## Setup Instructions
 
 Table of contents:

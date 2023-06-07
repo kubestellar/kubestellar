@@ -67,6 +67,9 @@ nav:
   #   - ... | auto-generated/*/*.md
 
 theme:
+  font:
+    text: 'SapceMono'
+    code: 'Roboto Mono'
   name: material
   language: en
   # Common files such as images, stylesheets, theme overrides
@@ -80,6 +83,7 @@ theme:
     # - navigation.tabs.sticky
     # - navigation.expand
     - navigation.path
+    - navigation.footer
     # - navigation.tracking
     # Enable a copy button in code blocks
     - content.code.copy
@@ -89,6 +93,24 @@ theme:
   favicon: favicons/favicon.ico
 
 extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: 'https://github.com/kcp-dev/edge-mc'
+      name: KubeStellar on GitHub
+    - icon: fontawesome/brands/linkedin
+      link: 'https://www.linkedin.com/feed/hashtag/?keywords=kubestellar'
+      name: KubeStellar on LinkedIn
+    - icon: fontawesome/brands/medium
+      link: 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST'
+    - icon: fontawesome/brands/YouTube
+      link: 'https://www.youtube.com/@kubestellar'
+      name: KubeStellar on YouTube
+    - icon: fontawesome/brands/slack
+      link: 'https://kubernetes.slack.com/archives/C058SUSL5AA'
+      name: KubeStellar on Slack
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:kubestellar-dev@google.groups.com
+      name: Email us
   version:
     default: stable
     # Enable mike for multi-version selection
@@ -149,6 +171,8 @@ markdown_extensions:
   - pymdownx.snippets
   # Arbitrary nesting of code/content blocks inside each other
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
   # Enable note/warning/etc. callouts
   - admonition
 

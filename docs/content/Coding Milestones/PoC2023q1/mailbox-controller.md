@@ -3,19 +3,17 @@ short_name: mailbox-controller
 manifest_name: 'content/Coding Milestones/PoC2023q1/mailbox-controller.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-{%
-   include-markdown "../../common-subs/save-some-time.md"
-   start="<!--save-some-time-start-->"
-   end="<!--save-some-time-end-->"
-%}
 [![Run Doc Shells - mailbox-controller]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"
    end="<!--required-packages-end-->"
 %}
-  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 ## Linking SyncTarget with Mailbox Workspace
 
 For a given SyncTarget T, the mailbox controller currently chooses the

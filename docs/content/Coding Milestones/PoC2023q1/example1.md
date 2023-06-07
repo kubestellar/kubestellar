@@ -3,18 +3,17 @@ short_name: example1
 manifest_name: 'content/Coding Milestones/PoC2023q1/example1.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-{%
-   include-markdown "../../common-subs/save-some-time.md"
-   start="<!--save-some-time-start-->"
-   end="<!--save-some-time-end-->"
-%}
 [![Run Doc Shells - example1]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml)
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"
    end="<!--required-packages-end-->"
 %}
-  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 
 This doc shows a detailed example usage of the KubeStellar components.
 

@@ -1,5 +1,21 @@
+/* @font-face {
+    font-family: "SpaceMono";
+    src:url(https://fonts.cdnfonts.com/css/space-mono) ;
+} */
+
+
 :root {
     --md-primary-fg-color: #06c;
+}
+
+.md-typeset h1 {
+    font-size: 22px;
+    font-weight: 600;
+    /* color: #06c; */
+}
+.md-typeset h2 {
+    font-size: 20px;
+    /* color: #06c; */
 }
 
 .hide-me {

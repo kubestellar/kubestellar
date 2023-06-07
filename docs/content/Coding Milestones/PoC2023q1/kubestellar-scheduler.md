@@ -3,19 +3,17 @@ short_name: kubestellar-scheduler
 manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-{%
-   include-markdown "../../common-subs/save-some-time.md"
-   start="<!--save-some-time-start-->"
-   end="<!--save-some-time-end-->"
-%}
 [![Run Doc Shells - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"
    end="<!--required-packages-end-->"
 %}
-  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 ### Steps to try the scheduler
 
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
