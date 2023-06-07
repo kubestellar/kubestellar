@@ -1,10 +1,9 @@
 <!--readme-for-root-start-->
-<br/>
-<br/>
-<br/>
+<img alt="KubeStellar" width="500px" align="left" src="KubeStellar with Logo.png" />
 
+# KubeStellar
 ## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
-<br/>
+<br/><br/><br/>
 [![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
