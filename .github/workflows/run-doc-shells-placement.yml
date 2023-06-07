@@ -7,16 +7,22 @@ on:
   pull_request:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - ".github/workflows/run-doc-shells-placement.yml"
   push:
     branches:
       - main
-#       - "release-*"
+      - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
+      - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - ".github/workflows/run-doc-shells-placement.yml"
 
 permissions:

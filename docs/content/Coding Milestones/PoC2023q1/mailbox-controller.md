@@ -1,3 +1,19 @@
+---
+short_name: mailbox-controller
+manifest_name: 'content/Coding Milestones/PoC2023q1/mailbox-controller.md'
+pre_req_name: 'content/common-subs/pre-req.md'
+---
+[![Run Doc Shells - mailbox-controller]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml)&nbsp;&nbsp;&nbsp;
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 ## Linking SyncTarget with Mailbox Workspace
 
 For a given SyncTarget T, the mailbox controller currently chooses the
@@ -55,10 +71,6 @@ The command line flags, beyond the basics, are as follows.
 ```
 
 ## Try It
-
-### Required Packages:
-  - [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-
 ### Steps to try the mailbox controller
 
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
@@ -187,3 +199,11 @@ and watch the mailbox controller react as follows.
 ``` { .bash .no-copy }
 I0305 18:08:44.380421   85556 main.go:352] "Deleted unwanted workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

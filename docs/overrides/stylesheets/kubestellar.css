@@ -1,5 +1,38 @@
+/* @font-face {
+    font-family: "SpaceMono";
+    src:url(https://fonts.cdnfonts.com/css/space-mono) ;
+} */
+
+
 :root {
     --md-primary-fg-color: #06c;
+}
+
+.md-typeset h1 {
+    font-size: 22px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+.md-typeset h2 {
+    font-size: 20px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h3 {
+    font-size: 18px;
+    font-weight: 700;
+    /* color: #06c; */
+}
+
+.md-typeset h4 {
+    font-size: 16px;
+    /* font-weight: 200; */
+    /* color: #06c; */
+}
+
+.hide-me {
+    display: none;
 }
 
 .md-sidebar--primary .md-sidebar__scrollwrap {

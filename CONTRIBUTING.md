@@ -19,7 +19,7 @@ We can't wait to collaborate with you!
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
-Check out our [QuickStart Guide](https://docs.kubestellar.io/main/Getting-Started/quickstart/)
+Check out our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
@@ -60,12 +60,12 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 ## Testing Locally
 
-Our [QUICKSTART](https://docs.kubestellar.io/main/Getting-Started/quickstart/) guide shows a user how to install a
+Our [QUICKSTART](https://docs.kubestellar.io/stable/Getting-Started/quickstart/) guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
-there is a larger example in https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1/.
+there is a larger example in https://docs.kubestellar.io/stable/Coding%20Milestones/PoC2023q1/example1/.
 
 ### Testing changes to the bootstrap script
 

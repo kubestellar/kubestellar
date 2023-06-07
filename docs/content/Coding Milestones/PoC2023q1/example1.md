@@ -1,5 +1,21 @@
-This doc attempts to show a simple example usage of the 2023q1 PoC.
-This doc is a work in progress.
+---
+short_name: example1
+manifest_name: 'content/Coding Milestones/PoC2023q1/example1.md'
+pre_req_name: 'content/common-subs/pre-req.md'
+---
+[![Run Doc Shells - example1]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml)
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
+
+This doc shows a detailed example usage of the KubeStellar components.
 
 This example involves two edge clusters and two workloads.  One
 workload goes on both edge clusters and one workload goes on only one
@@ -54,3 +70,10 @@ object in the commonstuff namespace in the common workload workspace
 holding a summary of the corresponding Deployment objects.  Those are
 the `commond` Deployment objects in the two mailbox workspaces.
 
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

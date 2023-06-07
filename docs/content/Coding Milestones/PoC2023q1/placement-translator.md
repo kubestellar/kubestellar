@@ -1,3 +1,20 @@
+---
+short_name: placement-translator
+manifest_name: 'content/Coding Milestones/PoC2023q1/placement-translator.md'
+pre_req_name: 'content/common-subs/pre-req.md'
+---
+[![Run Doc Shells - placement-translator]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-placement.yml)&nbsp;&nbsp;&nbsp;
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
+
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 
 ## Status
@@ -134,49 +151,30 @@ this scenario calls for, but they can be terminated after that.
    end="<!--example1-start-kcp-end-->"
 %}
 
-When you get to the step of "Populate the edge service provider
-workspace", it suffices to do the following.
-
-```shell
-kubectl ws root
-kubectl ws create espw --enter
-kubectl ws root:espw
-kubectl create -f ../KubeStellar/config/exports/
-```
+{%
+   include-markdown "example1-subs/example1-post-kcp.md"
+   start="<!--example1-post-kcp-start-->"
+   end="<!--example1-post-kcp-end-->"
+%}
 
 Continue to follow the steps until the start of Stage 3 of the
 exercise.
 
-Next make sure you run `kubectl ws root:espw` to enter the edge
-service provider workspace, then you will be ready to run the edge
-controllers.
-
-First run the mailbox controller, long for it to create the mailbox
-workspaces; it does not need to keep running, you can ^C it.  This
-should not take long, and do not expect an explicit acknowledgement on
-the console.  You can check for their existence by doing `kubectl get
-workspaces` while in the ESPW.
-
 {%
-   include-markdown "mailbox-controller-subs/mailbox-controller-process-start.md"
-   start="<!--mailbox-controller-process-start-start-->"
-   end="<!--mailbox-controller-process-start-end-->"
+   include-markdown "example1-subs/example1-stage-1b.md"
+   start="<!--example1-stage-1b-start-->"
+   end="<!--example1-stage-1b-end-->"
 %}
 
-Next run the scheduler, long enough for it to create the
-SinglePlacementSlice objects.  Again, this should not take long, and
-you can ^C the scheduler once it has created those objects.
-
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-process-start-without-cd-kubestellar.md"
-   start="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-start-->"
-   end="<!--kubestellar-scheduler-process-start-without-cd-kubestellar-end-->"
+   include-markdown "example1-subs/example1-stage-2.md"
+   start="<!--example1-stage-2-start-->"
+   end="<!--example1-stage-2-end-->"
 %}
 
 Finally run the placement translator from the command line.  That
 should look like the following (possibly including some complaints,
-which do not necessarily indicate real problems because the subsequent
-success is not logged so profligately).
+which do not necessarily indicate real problems).
 
 {%
    include-markdown "placement-translator-subs/placement-translator-process-start-without-cd-kubestellar.md"
@@ -217,7 +215,7 @@ to mailbox workspace(s).
 You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
-```shell
+```shell 
 kubectl get workspace
 ```
 ``` { .bash .no-copy }
@@ -328,7 +326,7 @@ tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
 ```shell
-kubectl ws root:work-c
+kubectl ws root:my-org:wmw-c
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:work-c"
@@ -473,3 +471,11 @@ spec:
     - flanges
 status: {}
 ```
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

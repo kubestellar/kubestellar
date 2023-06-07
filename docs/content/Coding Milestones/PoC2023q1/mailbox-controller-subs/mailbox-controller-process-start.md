@@ -3,6 +3,6 @@
 kubectl ws root:espw
 cd ../KubeStellar
 go run ./cmd/mailbox-controller -v=2 &
-sleep 15  # wait a few seconds for the mailbox controller to initialize
+sleep 45
 ```
 <!--mailbox-controller-process-start-end-->

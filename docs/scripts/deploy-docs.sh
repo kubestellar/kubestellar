@@ -65,6 +65,18 @@ if [[ -n "${CI:-}" ]]; then
     fi
   fi
 
+  if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
+    # Only push to gh-pages if we're in GitHub Actions (CI is set) and we have a non-PR event.
+    MIKE_OPTIONS+=(--push)
+    MIKE_OPTIONS+=(--rebase)
+    if [ $VERSION == "main" ]; then
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "unstable")
+      ALIAS_OPTIONS_LATEST+=(--update-aliases "$VERSION" "latest")
+    else
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
+    fi
+  fi
+
   # Always set git user info in CI because even if we're not pushing, we need it
   git config user.name kcp-docs-bot
   git config user.email no-reply@kcp.io

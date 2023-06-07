@@ -17,7 +17,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
@@ -30,6 +30,7 @@ echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
+start_hidden_pattern="^\`\`\` \{\.bash \.hide-me\}"
 stop_pattern="^\`\`\`"
 include_pattern="\s*include-markdown\s*"
 
@@ -59,8 +60,6 @@ else
 
 fi
 
-inside_block=0
-
 repo_url=$(yq -r ".repo_url" $REPO_ROOT/docs/mkdocs.yml)
 repo_raw_url=$(yq -r ".repo_raw_url" $REPO_ROOT/docs/mkdocs.yml)
 ks_branch=$(yq -r ".ks_branch" $REPO_ROOT/docs/mkdocs.yml)
@@ -69,10 +68,11 @@ ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
-code_blocks+=('set -o xtrace')
+# code_blocks+=('set -o xtrace')
 
 function parse_file() 
 {
+  local inside_block=0
   local file_name=$(echo $1 | sed 's/"//g')
   local path_name=$(echo "${file_name%/*}/")
 
@@ -87,6 +87,9 @@ function parse_file()
     if [[ $line =~ $start_pattern ]]; then
       inside_block=1  # we are inside a shell codeblock
     fi
+    if [[ $line =~ $start_hidden_pattern ]]; then
+      inside_block=1  # we are inside a shell codeblock
+    fi
 
     if [[ $line =~ $include_pattern ]]; then
       included_file_name=$(echo $line | sed 's/include-markdown \"//')
@@ -97,15 +100,23 @@ function parse_file()
     if [[ $inside_block == 1 ]]; then
       # remove the backticks from the code block
       
-      code_block="${line//\`\`\`shell/}"
-      code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
-      code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
-      code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
-      code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
-      echo $code_block
-
-      # add the code block to the array
-      code_blocks+=("$code_block")
+      if [[ $line =~ $start_pattern ]]; then
+        echo ignore this line: $line
+      else
+        if [[ $line =~ $start_hidden_pattern ]]; then
+          echo ignote this line: $line
+        else
+          # code_block="${line//\`\`\`shell/}"
+          code_block=$line
+          code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
+          code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
+          code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
+          code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
+          echo $code_block
+          # add the code block to the array
+          code_blocks+=("$code_block")
+        fi
+      fi
     fi
   done < "$REPO_ROOT/docs/$file_name"
 }
@@ -114,8 +125,6 @@ for FILE_NAME in "${FILE_LIST[@]}"
 do
   parse_file "\"$FILE_NAME\""
 done
-
-
 
 IFS=$SAVEIFS
 
@@ -126,6 +135,8 @@ echo "" > "$generated_script_file"
 for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
+
+cat "$generated_script_file"
 
 # make the generated script executable
 chmod +x "$generated_script_file"

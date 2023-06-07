@@ -1,3 +1,4 @@
+<!--governance-start-->
 # KubeStellar Project Governance
 
 The KubeStellar project is dedicated to solving challenges stemming from
@@ -142,7 +143,7 @@ contributors to handle it. The Maintainers will review who is assigned to this
 at least once a year.
 
 The Security Response Team is responsible for handling all reports of security 
-holes and breaches according to the [security policy](https://docs.kubestellar.io/main/Contribution%20guidelines/security/).
+holes and breaches according to the [security policy](https://docs.kubestellar.io/main/Contribution%20guidelines/security/security/).
 
 ## Voting
 
@@ -161,3 +162,4 @@ Governance require a 2/3 vote of all Maintainers.
 
 Changes to this Governance and its supporting documents may be approved by a 
 2/3 vote of the Maintainers.
+<!--governance-end-->

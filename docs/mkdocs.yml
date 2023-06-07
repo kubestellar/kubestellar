@@ -2,6 +2,9 @@ site_name: KubeStellar
 repo_url: https://github.com/kcp-dev/edge-mc
 site_url: https://docs.kubestellar.io/
 
+repo_short_name: kcp-dev/edge-mc
+repo_default_file_path: edge-mc
+docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
@@ -19,23 +22,32 @@ nav:
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
-      - Security: Contribution guidelines/security.md
+      - Governance: Contribution guidelines/governance.md
+      - Onboarding: Contribution guidelines/onboarding.md
+      - Security: 
+          - Policy: Contribution guidelines/security/security.md
+          - Contacts: Contribution guidelines/security/security_contacts.md
+      - Operations: 
+          - Code Management: Contribution guidelines/operations/code-management.md
+          - Release Management: Contribution guidelines/operations/release-management.md
+          - Document Management: Contribution guidelines/operations/document-management.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
           - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
-          - Commands: Coding Milestones/PoC2023q1/commands.md
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
           - Processes:
-              - KubeStellar Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+              - KubeStellar Scheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
               - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
-          - Roadap: Coding Milestones/PoC2023q1/roadmap-uses.md
+          - Roadmap: Coding Milestones/PoC2023q1/roadmap-uses.md
           - Environments:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
+          - Reference:
+              - Commands: Coding Milestones/PoC2023q1/commands.md
       - PoC2023q3:
           - Details: Coding Milestones/PoC2023q3/outline.md
   - Community: Community/_index.md
@@ -55,6 +67,9 @@ nav:
   #   - ... | auto-generated/*/*.md
 
 theme:
+  font:
+    text: 'SapceMono'
+    code: 'Roboto Mono'
   name: material
   language: en
   # Common files such as images, stylesheets, theme overrides
@@ -68,6 +83,7 @@ theme:
     # - navigation.tabs.sticky
     # - navigation.expand
     - navigation.path
+    - navigation.footer
     # - navigation.tracking
     # Enable a copy button in code blocks
     - content.code.copy
@@ -77,6 +93,24 @@ theme:
   favicon: favicons/favicon.ico
 
 extra:
+  # social:
+  #   - icon: fontawesome/brands/github
+  #     link: 'https://github.com/kcp-dev/edge-mc'
+  #     name: KubeStellar on GitHub
+  #   - icon: fontawesome/brands/linkedin
+  #     link: 'https://www.linkedin.com/feed/hashtag/?keywords=kubestellar'
+  #     name: KubeStellar on LinkedIn
+  #   - icon: fontawesome/brands/medium
+  #     link: 'https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST'
+  #   - icon: fontawesome/brands/YouTube
+  #     link: 'https://www.youtube.com/@kubestellar'
+  #     name: KubeStellar on YouTube
+  #   - icon: fontawesome/brands/slack
+  #     link: 'https://kubernetes.slack.com/archives/C058SUSL5AA'
+  #     name: KubeStellar on Slack
+  #   - icon: fontawesome/solid/paper-plane
+  #     link: mailto:kubestellar-dev@google.groups.com
+  #     name: Email us
   version:
     default: stable
     # Enable mike for multi-version selection
@@ -100,8 +134,6 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  #- mike:
-  #    version_selector: true
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
@@ -109,6 +141,7 @@ plugins:
   - search
   # Use Jinja macros in .md files
   - open-in-new-tab
+  # - external-markdown
   - include-markdown
   - macros:
       include_dir: 'overrides'
@@ -138,6 +171,8 @@ markdown_extensions:
   - pymdownx.snippets
   # Arbitrary nesting of code/content blocks inside each other
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
   # Enable note/warning/etc. callouts
   - admonition
 

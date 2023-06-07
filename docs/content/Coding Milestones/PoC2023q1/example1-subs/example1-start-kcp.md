@@ -28,17 +28,14 @@ build the kubectl-ws binary and include it in `$PATH`
 ```shell
 cd kcp
 make build
-export PATH=$(pwd)/bin:$PATH
 ```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
-kcp start &
-sleep 30  # wait for KCP to initialize
-```
-
-```shell
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH
+kcp start &> /dev/null &
+sleep 30 
 ```
 <!--example1-start-kcp-end-->
+<!-- > /dev/null & -->
