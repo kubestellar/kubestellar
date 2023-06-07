@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#overview" class="md-skip">
           Skip to content
         </a>
       
@@ -683,11 +683,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    
+  <a href="#overview" class="md-nav__link">
+    Overview
   </a>
   
-    <nav class="md-nav" aria-label="">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    File structure
+  </a>
+  
+    <nav class="md-nav" aria-label="File structure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -816,6 +823,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#publishing-workflow" class="md-nav__link">
+    Publishing Workflow
+  </a>
   
 </li>
       
@@ -1549,11 +1563,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    
+  <a href="#overview" class="md-nav__link">
+    Overview
   </a>
   
-    <nav class="md-nav" aria-label="">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-structure" class="md-nav__link">
+    File structure
+  </a>
+  
+    <nav class="md-nav" aria-label="File structure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1685,6 +1706,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#publishing-workflow" class="md-nav__link">
+    Publishing Workflow
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1718,9 +1746,70 @@
 
   <h1>Document Management</h1>
 
-<h2 id="_1"></h2>
+<!-- BEGIN INCLUDE ../../../README.md '&lt;!--readme-for-documentation-start--&gt;' '&lt;!--readme-for-documentation-end--&gt;' -->
+
+<h2 id="overview">Overview</h2>
+<p>Our documentation is powered by <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a> with some 
+additional plugins and tools:</p>
+<ul>
+<li><a href="https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin">awesome-pages plugin</a></li>
+<li><a href="https://mkdocs-macros-plugin.readthedocs.io/en/latest/">macros plugin</a></li>
+<li><a href="https://github.com/jimporter/mike">mike</a> for multiple version support</li>
+</ul>
+<p>We have support in place for multiple languages (i18n), although we currently only have documentation in English. If 
+you're interested in contributing translations, please let us know!</p>
+<h2 id="file-structure">File structure</h2>
+<p>All documentation-related items live in <code>docs</code> (with the small exception of various <code>make</code> targets and some helper 
+scripts in <code>hack</code>).</p>
+<p>The structure of <code>docs</code> is as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>config/$language/mkdocs.yml</td>
+<td>Language-specific <code>mkdocs</code> configuration.</td>
+</tr>
+<tr>
+<td>content/$language</td>
+<td>Language-specific website content.</td>
+</tr>
+<tr>
+<td>generated/branch</td>
+<td>All generated content for all languages for the current version.</td>
+</tr>
+<tr>
+<td>generated/branch/$language</td>
+<td>Generated content for a single language. Never added to git.</td>
+</tr>
+<tr>
+<td>generated/branch/index.html</td>
+<td>Minimal index for the current version that redirects to the default language (en)</td>
+</tr>
+<tr>
+<td>overrides</td>
+<td>Global (not language-specific) content.</td>
+</tr>
+<tr>
+<td>Dockerfile</td>
+<td>Builds the kubestellar-docs image containing mkdocs + associated tooling.</td>
+</tr>
+<tr>
+<td>mkdocs.yml</td>
+<td>Minimal <code>mkdocs</code> configuration for <code>mike</code> for multi-version support.</td>
+</tr>
+<tr>
+<td>requirements.txt</td>
+<td>List of Python modules used to build the site.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="global-variables">Global Variables</h3>
-<p>There are many global variables defined in the <a href="https://raw.githubusercontent.com/kcp-dev/edge-mc/main/docs/mkdocs.yml">docs/mkdocs.yml</a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking</p>
+<p>There are many global variables defined in the <a href="../../../https://raw.githubusercontent.com/kcp-dev/edge-mc/main/docs/mkdocs.yml">docs/mkdocs.yml</a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking</p>
 <div class="highlight"><pre><span></span><code>- site_name: KubeStellar
 - repo_url: https://github.com/kcp-dev/edge-mc
 - site_url: https://docs.kubestellar.io/main
@@ -1737,14 +1826,14 @@
 <p>and in context that can look something like this:</p>
 <p>bash &lt;(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}</p>
 <p><b>note:</b><br /> 
-&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br />
-&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
+&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../../../all-macros.md">mkdocs information</a> <br />
+&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="../../../https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
 <h3 id="including-external-markdown">Including external markdown</h3>
 <p>We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:</p>
 <p>In your original markdown document, add a block that refers to the external markdown you want to include:
-<img alt="Include Markdown" src="../include-markdown-example.png" /></p>
+<img alt="Include Markdown" src="../../../include-markdown-example.png" /></p>
 <p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
-<img alt="Included Markdown" src="../included-markdown-example.png" /></p>
+<img alt="Included Markdown" src="../../../included-markdown-example.png" /></p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
 <h3 id="serving-up-documents-locally">Serving up documents locally</h3>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
@@ -1752,7 +1841,7 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
-<p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org">mkdocs</a>:</p>
+<p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
@@ -1767,10 +1856,10 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation</h3>
 <p>We currently support 3 aliases for our documentation:</p>
 <div class="highlight"><pre><span></span><code>- from the release major.minor branch:
-    - [https://docs.kubestellar.io/stable](https://docs.kubestellar.io/stable)
+    - [https://docs.kubestellar.io/stable](../../../https://docs.kubestellar.io/stable)
 - from the main branch:
-    - [https://docs.kubestellar.io/unstable](https://docs.kubestellar.io/unstable)
-    - [https://docs.kubestellar.io/latest](https://docs.kubestellar.io/latest)
+    - [https://docs.kubestellar.io/unstable](../../../https://docs.kubestellar.io/unstable)
+    - [https://docs.kubestellar.io/latest](../../../https://docs.kubestellar.io/latest)
 </code></pre></div>
 <h3 id="shortcut-urls">Shortcut URLs</h3>
 <p>We have a few shortcut urls that come in handy when referring others to our project:</p>
@@ -1881,7 +1970,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <br/></p>
 </li>
 </ul>
-<p>(other variations are possible, PR an update to the <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
+<p>(other variations are possible, PR an update to the <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
 <h3 id="testingrunning-docs">Testing/Running Docs</h3>
 <p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
 <h4 id="the-way-it-works">The way it works:</h4>
@@ -1897,18 +1986,18 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </ul>
 <h4 id="the-gh-workflow">The GH Workflow:</h4>
 <ul>
-<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml</a></li>
+<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml</a></li>
 </ul>
 <h4 id="the-secret-sauce">The secret sauce:</h4>
 <ul>
-<li>The code that makes all this possible is at <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh</a><ul>
+<li>The code that makes all this possible is at <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh</a><ul>
 <li>This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks</li>
 <li>The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them</li>
 <li>It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.</li>
 </ul>
 </li>
 </ul>
-<p>All of this is invoke in a target in our <a href="https://github.com/kcp-dev/edge-mc/blob/main/Makefile">makefile</a>
+<p>All of this is invoke in a target in our <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/Makefile">makefile</a>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>run-doc-shells:<span class="w"> </span>venv
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
@@ -1920,9 +2009,9 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
 <h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch</h3>
 <h4 id="indexhtml-and-homehtml">index.html and home.html</h4>
-<p>In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our KubeStellar doc site hosted with <a href="https://godaddy.com">GoDaddy.com</a>.</p>
-<p><a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html</a>
-<a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html</a></p>
+<p>In the 'gh-pages' branch there are two(2) important files that redirect the github docs url to our KubeStellar doc site hosted with <a href="https://godaddy.com/../../..">GoDaddy.com</a>.</p>
+<p><a href="../../../https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html</a>
+<a href="../../../https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html</a></p>
 <p>both files have content similar to:
 <div class="highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
@@ -1985,6 +2074,10 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <ul>
 <li>if the above did not work, then you might have an issue with the GoDaddy domain (expired, files missing, etc.)</li>
 </ul>
+<h2 id="publishing-workflow">Publishing Workflow</h2>
+<p>All documentation building and publishing is done using GitHub Actions in
+<a href="../../../../.github/workflows/docs-gen-and-push.yaml">docs-gen-and-push.yaml</a>. The overall sequence is:</p>
+<!-- END INCLUDE -->
 
 
   
