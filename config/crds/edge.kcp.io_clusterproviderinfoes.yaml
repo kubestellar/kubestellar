@@ -5,22 +5,22 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: clusterproviderconfigs.edge.kcp.io
+  name: clusterproviderinfoes.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
-    kind: ClusterProviderConfig
-    listKind: ClusterProviderConfigList
-    plural: clusterproviderconfigs
+    kind: ClusterProviderInfo
+    listKind: ClusterProviderInfoList
+    plural: clusterproviderinfoes
     shortNames:
     - cpc
-    singular: clusterproviderconfig
+    singular: clusterproviderinfo
   scope: Cluster
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: ClusterProviderConfig represents a provider.
+        description: ClusterProviderInfo represents a provider.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation

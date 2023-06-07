@@ -2,21 +2,21 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230606-7d89df67.clusterproviderconfigs.edge.kcp.io
+  name: v230607-5ad95b0d.clusterproviderinfoes.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
-    kind: ClusterProviderConfig
-    listKind: ClusterProviderConfigList
-    plural: clusterproviderconfigs
+    kind: ClusterProviderInfo
+    listKind: ClusterProviderInfoList
+    plural: clusterproviderinfoes
     shortNames:
     - cpc
-    singular: clusterproviderconfig
+    singular: clusterproviderinfo
   scope: Cluster
   versions:
   - name: v1alpha1
     schema:
-      description: ClusterProviderConfig represents a provider.
+      description: ClusterProviderInfo represents a provider.
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation

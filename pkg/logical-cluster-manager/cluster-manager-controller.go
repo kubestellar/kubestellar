@@ -153,7 +153,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig := key.(*v1alpha1apis.LogicalCluster)
 	clusterName := newClusterConfig.Spec.ClusterName
 
-	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderConfigs().Get(ctx, newClusterConfig.Spec.ProviderName, v1.GetOptions{})
+	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderInfos().Get(ctx, newClusterConfig.Spec.ProviderName, v1.GetOptions{})
 	if err != nil {
 		logger.Error(err, "failed to get ClusterProviderInfo.")
 		return err
@@ -213,7 +213,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 	delClusterConfig := key.(*v1alpha1apis.LogicalCluster)
 	clusterName := delClusterConfig.Spec.ClusterName
 
-	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderConfigs().Get(ctx, delClusterConfig.Spec.ProviderName, v1.GetOptions{})
+	providerInfo, err := c.clusterclientset.EdgeV1alpha1().ClusterProviderInfos().Get(ctx, delClusterConfig.Spec.ProviderName, v1.GetOptions{})
 	if err != nil {
 		logger.Error(err, "failed to get ClusterProviderInfo.")
 		return err

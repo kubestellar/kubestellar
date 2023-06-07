@@ -29,7 +29,7 @@ import (
 
 type EdgeV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	ClusterProviderConfigsGetter
+	ClusterProviderInfosGetter
 	CustomizersGetter
 	EdgePlacementsGetter
 	EdgeSyncConfigsGetter
@@ -43,8 +43,8 @@ type EdgeV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *EdgeV1alpha1Client) ClusterProviderConfigs() ClusterProviderConfigInterface {
-	return newClusterProviderConfigs(c)
+func (c *EdgeV1alpha1Client) ClusterProviderInfos() ClusterProviderInfoInterface {
+	return newClusterProviderInfos(c)
 }
 
 func (c *EdgeV1alpha1Client) Customizers(namespace string) CustomizerInterface {
