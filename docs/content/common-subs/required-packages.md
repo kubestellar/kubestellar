@@ -25,7 +25,7 @@
         apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64; chmod +x ./kind; mv ./kind /usr/local/bin
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl; chmod +x kubectl; mv ./kubectl /usr/local/bin/kubectl
