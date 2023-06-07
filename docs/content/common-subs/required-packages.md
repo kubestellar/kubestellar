@@ -28,7 +28,7 @@
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl; chmod +x kubectl; mv ./kubectl /usr/local/bin/kubectl
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
@@ -36,13 +36,13 @@
         [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
     === "Centos7"
         ``` title="docker - https://docs.docker.com/engine/install/"
-        yum -y install epel-release ; yum -y install docker ; systemctl enable --now docker ;systemctl status docker
+        yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64; chmod +x ./kind; mv ./kind /usr/local/bin
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64 && chmod +x ./kind && mv ./kind /usr/local/bin
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl; chmod +x kubectl; mv ./kubectl /usr/local/bin/kubectl
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
         ```
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
