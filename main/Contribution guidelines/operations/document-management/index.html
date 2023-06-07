@@ -1826,14 +1826,14 @@ scripts in <code>hack</code>).</p>
 <p>and in context that can look something like this:</p>
 <p>bash &lt;(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}</p>
 <p><b>note:</b><br /> 
-&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../../../all-macros.md">mkdocs information</a> <br />
+&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br />
 &nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
 <h3 id="including-external-markdown">Including external markdown</h3>
 <p>We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:</p>
 <p>In your original markdown document, add a block that refers to the external markdown you want to include:
-<img alt="Include Markdown" src="../../../include-markdown-example.png" /></p>
+<img alt="Include Markdown" src="../include-markdown-example.png" /></p>
 <p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
-<img alt="Included Markdown" src="../../../included-markdown-example.png" /></p>
+<img alt="Included Markdown" src="../included-markdown-example.png" /></p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
 <h3 id="serving-up-documents-locally">Serving up documents locally</h3>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
