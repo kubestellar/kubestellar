@@ -37,23 +37,23 @@ jobs:
       - name: get workflow_dispatch branch name
         shell: bash
         run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
-        id: extract_branch_workflow
+        id: extract_branch
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
       - name: echo pull_request branch name
-        run: echo "branch=${github.event.pull_request.base.ref}" >> $GITHUB_OUTPUT
-        id: extract_branch_pr
+        run: echo "branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+        id: extract_branch
         if: github.event_name == 'pull_request' 
 
       - name: echo push branch name
-        run: echo "branch=${github.event.push.base.ref}" >> $GITHUB_OUTPUT
-        id: extract_branch_push
+        run: echo "branch=${{ github.event.push.base.ref }}" >> $GITHUB_OUTPUT
+        id: extract_branch
         if: github.event_name == 'push' 
 
       - name: echo branch name
-        run: echo running on branch ${{ env.branch }}
+        run: echo running on branch ${{ steps.extract_branch.outputs.branch }}
         
-      - run: git fetch origin ${{ env.branch }}
+      - run: git fetch origin ${{ steps.extract_branch.outputs.branch }}
 
       # - uses: actions/setup-go@v4
       #   with:
