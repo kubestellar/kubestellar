@@ -34,17 +34,36 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: git fetch origin main
+      - name: get workflow_dispatch branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+        id: extract_branch_workflow
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
 
-      - uses: actions/setup-go@v4
-        with:
-          go-version: v1.19
-          cache: true
+      - name: echo pull_request branch name
+        run: echo "branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+        id: extract_branch_pr
+        if: github.event_name == 'pull_request' 
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        id: install
+      - name: echo push branch name
+        run: echo "branch=${{ github.event.push.base.ref }}" >> $GITHUB_OUTPUT
+        id: extract_branch_push
+        if: github.event_name == 'push' 
+
+      - name: echo branch name
+        run: echo running on branch ${{ env.branch }}
+        
+      - run: git fetch origin ${{ env.branch }}
+
+      # - uses: actions/setup-go@v4
+      #   with:
+      #     go-version: v1.19
+      #     cache: true
+
+      # - name: Install kubectl
+      #   uses: azure/setup-kubectl@v3
+      #   id: install
   
-      - run: |
-          make MANIFEST="'content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
-          docs-ecutable
+      # - run: |
+      #     make MANIFEST="'content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
+      #     docs-ecutable
