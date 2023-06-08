@@ -202,7 +202,7 @@ docs-ecutable:
 	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
 
 .PHONY: write-time-to-file
-docs-ecutable: 
+write-time-to-file: 
 	FILENAME=$(MANIFEST) docs/scripts/get-elapsed-time.sh
 
 # .PHONY: run-doc-shells
