@@ -9,7 +9,7 @@ on:
     types:
       - completed
 env:
-  github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
