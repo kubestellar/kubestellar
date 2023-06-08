@@ -36,14 +36,14 @@ jobs:
 
       - run: git fetch origin main
 
-      - uses: actions/setup-go@v4
-        with:
-          go-version: v1.19
-          cache: true
+#       - uses: actions/setup-go@v4
+#         with:
+#           go-version: v1.19
+#           cache: true
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        id: install
+#       - name: Install kubectl
+#         uses: azure/setup-kubectl@v3
+#         id: install
   
       - run: |
           make MANIFEST="'content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
