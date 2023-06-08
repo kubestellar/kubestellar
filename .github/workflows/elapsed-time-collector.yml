@@ -22,5 +22,9 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
       - run: make FILENAME="../overrides/placement.txt" write-time-to-file
           
