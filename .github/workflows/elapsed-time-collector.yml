@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
   workflow_run:
-    workflows: ["Run Doc Shells - example1","Run Doc Shells - placement","Run Doc Shells - scheduler","Run Doc Shells - mailbox","Run Doc Shells - qs"]
+    workflows: ["Run Doc Shells - example1","Run Doc Shells - Placement","Run Doc Shells - Scheduler","Run Doc Shells - Mailbox","Run Doc Shells - QS"]
     types:
       - completed
 
