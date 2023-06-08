@@ -62,6 +62,7 @@ nav:
       - QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
+      - KubeStellar - The Infomercial: Getting-Started/infomercial.md
   - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
   # # - Auto generated:
   #   - ... | auto-generated/*/*.md
@@ -137,6 +138,7 @@ plugins:
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
+  - mkdocs-video
   # Docs site search
   - search
   # Use Jinja macros in .md files

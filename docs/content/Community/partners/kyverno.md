@@ -1,6 +1,8 @@
 # Check out KubeStellar working with Kyverno:
 Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes cluster](https://medium.com/@yana1205dev/syncing-objects-between-kubernetes-kubernetes-bcedafdc80c2)<br/>
-Youtube - [Kyverno and KubeStellar Demo Day](https://youtu.be/tcpequs5pVM)<br/>
+
+### Kyverno and KubeStellar Demo Day
+![type:video](https://www.youtube.com/embed/tcpequs5pVM)
 
 # How do I get this working with my KubeStellar instance?
 Work with us to create this document

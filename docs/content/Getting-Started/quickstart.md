@@ -1,13 +1,15 @@
+
 [![QuickStart test]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml)&nbsp;&nbsp;&nbsp;
-<img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar">
+
+<!-- <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar"> -->
 {%
    include-markdown "quickstart-subs/quickstart-0-demo.md"
    start="<!--quickstart-0-demo-start-->"
    end="<!--quickstart-0-demo-end-->"
 %}
 
-!!! tip "Estimated Time:" 
-    ~3 minutes
+!!! tip "Estimated time to complete this example:" 
+    ~4 minutes
    
 {%
    include-markdown "../common-subs/required-packages.md"
@@ -18,14 +20,14 @@
 
 Table of contents:
 
-[1. Install and run **KubeStellar**](#1-install-and-run-kubestellar)</br>
-[2. Example deployment of Apache HTTP Server workload into two local kind clusters](#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[a. Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c. Onboarding the clusters](#c-onboarding-the-clusters)</br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[d. Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)</br>
-[3. Teardown the environment](#3-teardown-the-environment)</br>
-[4. Next Steps](#4-next-steps)</br>
+1. [Install and run **KubeStellar**](#1-install-and-run-kubestellar)
+2. [Example deployment of Apache HTTP Server workload into two local kind clusters](#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
+      1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
+      2. [Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
+      3. [Onboarding the clusters](#c-onboarding-the-clusters)
+      4. [Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+3. [Teardown the environment](#3-teardown-the-environment)
+4. [Next Steps](#4-next-steps)
 
 
 This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
