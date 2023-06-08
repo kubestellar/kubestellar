@@ -203,7 +203,7 @@ docs-ecutable:
 
 .PHONY: write-time-to-file
 write-time-to-file: 
-	FILENAME=$(MANIFEST) docs/scripts/get-elapsed-time.sh
+	FILENAME=$(FILENAME) docs/scripts/get-elapsed-time.sh
 
 # .PHONY: run-doc-shells
 # run-doc-shells: venv

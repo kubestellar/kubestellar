@@ -22,12 +22,19 @@ set -o pipefail
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
-# Check if arg1 is empty
-if [ -z "${1+x}" ]; then
+FILE_LIST=()
+SAVEIFS=$IFS
+
+IFS=',' read -r -a FILE_LIST <<< "${FILENAME}"
+if [ -z "${FILE_LIST[0]+x}" ]; then
+    echo empty filename, exiting
     exit
 else
-    option="$1"
+  option=${FILE_LIST[0]}
 fi
+
+IFS=$SAVEIFS
+
 
 workflow_id=""
 
@@ -77,4 +84,4 @@ date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-echo "~$minutes"
+echo "$minutes"
