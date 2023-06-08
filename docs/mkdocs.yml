@@ -181,10 +181,6 @@ markdown_extensions:
 # Our CSS
 extra_css:
   - stylesheets/kubestellar.css
-  - stylesheets/retainable.css
-
-extra_javascript:
-  - content/common-subs/retainable.js
 
 # Live reload if any of these change when running 'mkdocs serve'
 watch:
