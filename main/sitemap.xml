@@ -358,6 +358,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/infomercial/</loc>
+         <lastmod>2023-06-08</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/infomercial/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Getting-Started/quickstart/</loc>
          <lastmod>2023-06-08</lastmod>
          <changefreq>daily</changefreq>

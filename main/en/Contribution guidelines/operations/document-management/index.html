@@ -1461,6 +1461,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
@@ -1511,6 +1513,20 @@
     <li class="md-nav__item">
       <a href="../../../Getting-Started/user-guide/" class="md-nav__link">
         User Guide
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/infomercial/" class="md-nav__link">
+        KubeStellar - The Infomercial
       </a>
     </li>
   
@@ -1746,9 +1762,7 @@
 
   <h1>Document Management</h1>
 
-<!-- BEGIN INCLUDE ../../../README.md '&lt;!--readme-for-documentation-start--&gt;' '&lt;!--readme-for-documentation-end--&gt;' -->
-
-<h2 id="overview">Overview</h2>
+<div><h2 id="overview">Overview</h2>
 <p>Our documentation is powered by <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a> with some 
 additional plugins and tools:</p>
 <ul>
@@ -1813,7 +1827,7 @@ scripts in <code>hack</code>).</p>
 <div class="highlight"><pre><span></span><code>- site_name: KubeStellar
 - repo_url: https://github.com/kcp-dev/edge-mc
 - site_url: https://docs.kubestellar.io/main
-- repo_default_file_path: {{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;repo_default_path&#39;] }}
+- repo_default_file_path: {{ no such element: mkdocs.config.defaults.MkDocsConfig object['repo_default_path'] }}
 - repo_short_name: kcp-dev/edge-mc
 - docs_url: https://docs.kubestellar.io
 - repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
@@ -1822,37 +1836,37 @@ scripts in <code>hack</code>).</p>
 - ks_tag: latest
 </code></pre></div>
 <p>to use a variables/macro in your documentation reference like this:</p>
-<p>{{ config.&lt;var_name> }}</p>
+<p>{{ config.&lt;var_name&gt; }}</p>
 <p>and in context that can look something like this:</p>
 <p>bash &lt;(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}</p>
-<p><b>note:</b><br /> 
-&nbsp;&nbsp;&nbsp;&nbsp;- A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br />
-&nbsp;&nbsp;&nbsp;&nbsp;- We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br /></p>
+<p><b>note:</b><br> 
+    - A more extensive and detailed list is located at <a href="../all-macros/">mkdocs information</a> <br>
+    - We also check for broken links as part of our PR pipeline.  For more information check out our <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml">Broken Links Crawler</a><br></p>
 <h3 id="including-external-markdown">Including external markdown</h3>
 <p>We make extensive use of 'include-markdown' to help us keep our documentation modular and up-to-date.  To use 'include-markdown' you must add a block in your document that refers to a block in your external document content:</p>
 <p>In your original markdown document, add a block that refers to the external markdown you want to include:
-<img alt="Include Markdown" src="../include-markdown-example.png" /></p>
+<img alt="Include Markdown" src="../include-markdown-example.png"></p>
 <p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
-<img alt="Included Markdown" src="../included-markdown-example.png" /></p>
+<img alt="Included Markdown" src="../included-markdown-example.png"></p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
 <h3 id="serving-up-documents-locally">Serving up documents locally</h3>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">'repo_default_path'</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 <p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a>
 <p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
+<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">'repo_default_path'</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
 </code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a>
 <h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation</h3>
 <p>We currently support 3 aliases for our documentation:</p>
 <div class="highlight"><pre><span></span><code>- from the release major.minor branch:
@@ -1885,44 +1899,44 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <ul>
 <li>
 <p>For a codeblock that can be 'tested' (and seen by the reader) as part of our CI, use the <b><i><code>shell</code></i></b> block:
-<br/><b>codeblock:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>```shell
+<br><b>codeblock:</b>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>```shell
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>mkdocs serve
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 <li>
 <p>For a codeblock that should be 'tested', BUT <b>not</b> seen by the reader, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and the <b><i>'.hide-me'</i></b> style (great for hiding a sleep command that user does not need to run, but CI does):
-<br/><b>codeblock:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>``` {.bash .hide-me}
+<br><b>codeblock:</b>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>``` {.bash .hide-me}
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sleep 10
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 <li>
-<p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</b></i> style:
-<br/><b>codeblock:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>``` {.bash}
+<p>For a codeblock that should <u>not</u> be 'tested' as part of our CI, use the <b><i><code>.bash</code></i></b> with the plain codeblock, and <b>without</b> the <b><i>'.hide-me'</i></b> style:
+<br><b>codeblock:</b>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>``` {.bash}
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>mkdocs server
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>```
 </code></pre></div>
 <b>as seen by reader:</b>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mkdocs<span class="w"> </span>server
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 <li>
-<p>For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i><code>.bash</code></i></b> codeblock <b>without</b> the <b><i>'.no-copy'</b></i> style:
-<br/><b>codeblock:</b>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="sb">```</span><span class="w"> </span><span class="o">{</span>.bash<span class="w"> </span>.no-copy<span class="o">}</span>
+<p>For a codeblock that should not be 'tested', be seen by the reader, and not include a 'copy' icon (great for output-only instances), use the <b><i><code>.bash</code></i></b> codeblock <b>without</b> the <b><i>'.no-copy'</i></b> style:
+<br><b>codeblock:</b>
+</p><div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="sb">```</span><span class="w"> </span><span class="o">{</span>.bash<span class="w"> </span>.no-copy<span class="o">}</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.867837<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
@@ -1933,12 +1947,12 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.969533<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>I0412<span class="w"> </span><span class="m">15</span>:15:57.970003<span class="w">   </span><span class="m">94634</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>what-resolver
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 <li>
 <p>For language-specific highlighting (yaml, etc.), use the <b><i>yaml</i></b> codeblock
-<br/><b>codeblock:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>```yaml
+<br><b>codeblock:</b>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>```yaml
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>nav:
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>  - Home: index.md
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  - QuickStart: Getting-Started/quickstart.md
@@ -1953,12 +1967,12 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Contributing</span><span class="p">:</span><span class="w"> </span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Guidelines</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Contribution guidelines/CONTRIBUTING.md</span>
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 <li>
 <p>For a codeblock that has a title, and will not be tested, use the <b><i>'title'</i></b> parameter in conjunction with the plain codeblock (greater for showing or prescribing contents of files):
-<br/><b>codeblock:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>``` title=&quot;testing.sh&quot;
+<br><b>codeblock:</b>
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>``` title="testing.sh"
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>#!/bin/sh
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>echo hello KubeStellar
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>```
@@ -1967,7 +1981,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <div class="highlight"><span class="filename">testing.sh</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>#!/bin/sh
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>echo hello KubeStellar
 </code></pre></div>
-<br/></p>
+<br>
 </li>
 </ul>
 <p>(other variations are possible, PR an update to the <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
@@ -1998,13 +2012,13 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </li>
 </ul>
 <p>All of this is invoke in a target in our <a href="https://github.com/kcp-dev/edge-mc/blob/main/Makefile">Makefile</a>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
+</p><div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>run-doc-shells:<span class="w"> </span>venv
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/run-doc-shells.sh
-</code></pre></div></p>
+</code></pre></div>
 <p>You give the path from that follows the 'https://github.com/kcp-dev/edge-mc/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:</p>
-<div class="highlight"><span class="filename">How to 'make' our run-doc-shells target</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make MANIFEST=&quot;&#39;content/Getting-Started/quickstart.md&#39;&quot; run-doc-shells
+<div class="highlight"><span class="filename">How to 'make' our run-doc-shells target</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make MANIFEST="'content/Getting-Started/quickstart.md'" run-doc-shells
 </code></pre></div>
 <p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
 <h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch</h3>
@@ -2013,23 +2027,23 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <p><a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/home.html</a>
 <a href="https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html">https://github.com/kcp-dev/edge-mc/blob/gh-pages/index.html</a></p>
 <p>both files have content similar to:
-<div class="highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</p><div class="highlight"><span class="filename">index.html and home.html</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>KubeStellar<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;content-type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">&gt;</span>
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;refresh&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;0; URL=https://docs.kubestellar.io/stable&quot;</span> <span class="p">/&gt;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">"content-type"</span> <span class="na">content</span><span class="o">=</span><span class="s">"text/html; charset=utf-8"</span> <span class="p">&gt;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">"refresh"</span> <span class="na">content</span><span class="o">=</span><span class="s">"0; URL=https://docs.kubestellar.io/stable"</span> <span class="p">/&gt;</span>
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>Do not remove these files!</p>
 <h4 id="cname">CNAME</h4>
 <p>The CNAME file has to be in the gh-pages root to allow github to recognize the url tls cert served by our hosting provider.  Do not remove this file!</p>
 <p>the CNAME file must have the following content in it:
-<div class="highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>docs.kubestellar.io
-</code></pre></div></p>
+</p><div class="highlight"><span class="filename">CNAME</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>docs.kubestellar.io
+</code></pre></div>
 <h4 id="versionsjson">versions.json</h4>
 <p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">[{</span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"release-0.2"</span><span class="p">,</span><span class="w"> </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"release-0.2"</span><span class="p">,</span><span class="w"> </span><span class="nt">"aliases"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"stable"</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"main"</span><span class="p">,</span><span class="w"> </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"main"</span><span class="p">,</span><span class="w"> </span><span class="nt">"aliases"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"latest"</span><span class="p">,</span><span class="w"> </span><span class="s2">"unstable"</span><span class="p">]}]</span>
 </code></pre></div>
 <h3 id="in-case-of-emergency">In case of emergency</h3>
 <p>If you find yourself in a jam and the pages are not showing up at kubestellar.io or docs.kubestellar.io, check the following
@@ -2038,12 +2052,12 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <h3 id="how-to-recreate-the-gh-pages-branch">How to recreate the gh-pages branch</h3>
 <p>To recreate the gh-pages branch, do the following:
 - checkout the gh-pages branch to your local system
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>gh-pages<span class="w"> </span>https://github.com/kcp-dev/edge-mc<span class="w"> </span>KubeStellar
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>gh-pages<span class="w"> </span>https://github.com/kcp-dev/edge-mc<span class="w"> </span>KubeStellar
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nb">cd</span><span class="w"> </span>KubeStellar
 </code></pre></div>
 - delete all files in the branch and push it to GitHub
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>*
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>git<span class="w"> </span>add<span class="p">;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;removing all gh-pages files&quot;</span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>git<span class="w"> </span>add<span class="p">;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"removing all gh-pages files"</span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
 </code></pre></div>
 -- switch to the 'main' branch
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
@@ -2068,16 +2082,16 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>vi<span class="w"> </span>CNAME
 </code></pre></div>
 - push the new files into gh-pages
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>git<span class="w"> </span>add<span class="w"> </span>.<span class="p">;</span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;add index, home, and CNAME files&quot;</span><span class="p">;</span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>git<span class="w"> </span>add<span class="w"> </span>.<span class="p">;</span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"add index, home, and CNAME files"</span><span class="p">;</span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>gh-pages
 </code></pre></div>
-- go into the GitHub UI and go to the settings for the project and click on 'Pages' to add https://docs.kubestellar.io as the domain and check the box to enforce https.</p>
+- go into the GitHub UI and go to the settings for the project and click on 'Pages' to add https://docs.kubestellar.io as the domain and check the box to enforce https.
 <ul>
 <li>if the above did not work, then you might have an issue with the GoDaddy domain (expired, files missing, etc.)</li>
 </ul>
 <h2 id="publishing-workflow">Publishing Workflow</h2>
 <p>All documentation building and publishing is done using GitHub Actions in
 <a href="../../../../.github/workflows/docs-gen-and-push.yaml">docs-gen-and-push.yaml</a>. The overall sequence is:</p>
-<!-- END INCLUDE -->
+<!-- END INCLUDE --></div>
 
 
   
