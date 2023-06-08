@@ -8,6 +8,8 @@ on:
     workflows: ["Run Doc Shells - example1","Run Doc Shells - Placement","Run Doc Shells - Scheduler","Run Doc Shells - Mailbox","Run Doc Shells - QS"]
     types:
       - completed
+env:
+  github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
