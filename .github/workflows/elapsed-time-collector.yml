@@ -13,8 +13,8 @@ permissions:
   contents: write
 
 jobs:
-  broken-links-crawler:
-    name: broken-links-crawler
+  elapsed-time-collector:
+    name: elapsed-time-collector
     runs-on: ubuntu-latest
     steps:
       - name: Dump GitHub context
@@ -22,8 +22,5 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: get time diff in minutes
-        shell: bash
-        run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
-
+      - run: make FILENAME="../overrides/placement.txt" write-time-to-file
           
