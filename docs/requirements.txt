@@ -12,3 +12,4 @@ Pygments==2.14.0
 pymdown-extensions==9.9.2
 mkdocs-open-in-new-tab==1.0.2
 mkdocs-include-markdown-plugin==4.0.4
+mkdocs-video==1.5.0
