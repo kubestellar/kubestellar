@@ -17,12 +17,11 @@
         [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
     === "Ubuntu"
         ``` title="docker - https://docs.docker.com/engine/install/"
-        mkdir -p /etc/apt/keyrings
+        sudo mkdir -p /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu
-        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        apt update
-        apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
@@ -77,3 +76,4 @@
   - [kind](https://kind.sigs.k8s.io/)
   - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
   - [jq](https://stedolan.github.io/jq/download/) -->
+  
