@@ -5,15 +5,40 @@ As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are no
 Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.
 
 For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
-The procedures are similar.
+The steps are similar.
 Let's take WMW as an example:
 
-First, create `kube-system` namespace in the workspace.
+1. Create `kube-system` namespace in the workspace.
 
-Second, make sure necessary apibindings exist in the workspace.
+2. Make sure necessary apibindings exist in the workspace.
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.
 
-Third, make sure the current context uses WMW, then identify the admin.kubeconfig.
+3. Exclude `ClusterWorkspace` from discovery and sync.
+
+```shell
+kubectl -n argocd edit cm argocd-cm
+```
+
+Make sure `resource.exclusions` exists in the `data` field of the `argocd-cm` configmap as follows:
+```yaml
+data:
+  resource.exclusions: |
+    - apiGroups:
+      - "tenancy.kcp.io"
+      kinds:
+      - "ClusterWorkspace"
+      clusters:
+      - "*"
+```
+
+Restart the Argo CD server.
+```shell
+kubectl -n argocd rollout restart deployment argocd-server
+```
+
+Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
+
+4. Make sure the current context uses WMW, then identify the admin.kubeconfig.
 
 The command and output should be similar to
 ```console
