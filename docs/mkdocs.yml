@@ -138,7 +138,6 @@ plugins:
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
   # Greater control over how navigation links are shown
   - awesome-pages
-  - mkdocs-video
   # Docs site search
   - search
   # Use Jinja macros in .md files

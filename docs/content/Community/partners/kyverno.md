@@ -3,7 +3,7 @@ Medium - [Syncing Objects from one Kubernetes cluster to another Kubernetes clus
 
 ### Kyverno and KubeStellar Demo Day
 <p align=center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/tcpequs5pVM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tcpequs5pVM?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 <!-- ![type:video](https://www.youtube.com/embed/tcpequs5pVM) -->
 </p>
 
