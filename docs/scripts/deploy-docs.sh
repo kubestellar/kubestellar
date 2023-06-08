@@ -82,6 +82,10 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+  mike deploy "${MIKE_OPTIONS[@]}" $VERSION
+  exit
+fi
 
 mike deploy "${MIKE_OPTIONS[@]}" "${ALIAS_OPTIONS[@]}"
 
