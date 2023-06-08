@@ -88,10 +88,23 @@ Medium - [Sync 10,000 ArgoCD Applications in One Shot, by Yourself](https://medi
 Medium - [GitOpsCon - here we come](https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33)<br/>
 ### ArgoCD Scale Experiment - KubeStellar Community Demo Day
 <p align=center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="720" height="400" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </p>
 
 ### GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson & Jun Duan, IBM
 <p align=center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="720" height="400" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</p>
+
+### ArgoCD and KubeStellar in the news
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7031032280722632704" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+</p>
+</br>
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7046166635367268352" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+</p>
+</br>
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7060337925300838400" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
 </p>
