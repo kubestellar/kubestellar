@@ -9,43 +9,14 @@ on:
     types:
       - completed
 
-#   pull_request:
-#     branches:
-#       - main
-#       - "release-*"
-#     paths:
-# #       - "cmd/**"
-#       - "docs/**"
-# #       - "pkg/**"
-#       - ".github/workflows/broken-links-crawler.yaml"
-
-#   # Pushes to branches do the full build + deployment
-#   push:
-#     branches:
-#       - main
-#       - "release-*"
-#     paths:
-# #       - "cmd/**"
-#       - "docs/**"
-# #       - "pkg/**"
-#       - ".github/workflows/docs-gen-and-push.yaml"
-
 permissions:
   contents: write
-
-concurrency:
-  group: ${{ github.workflow }}
 
 jobs:
   broken-links-crawler:
     name: broken-links-crawler
     runs-on: ubuntu-latest
     steps:
-#       - name: Dump GitHub context
-#         env:
-#           GITHUB_CONTEXT: ${{ toJson(github) }}
-#         run: echo "$GITHUB_CONTEXT"
-
       - name: get workflow_dispatch branch name
         shell: bash
         run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
