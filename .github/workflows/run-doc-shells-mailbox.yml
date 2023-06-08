@@ -41,12 +41,12 @@ jobs:
         if: github.event_name != 'pull_request' && github.event_name != 'push'
 
       - name: echo pull_request branch name
-        run: echo "branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+        run: echo "branch=${github.event.pull_request.base.ref}" >> $GITHUB_OUTPUT
         id: extract_branch_pr
         if: github.event_name == 'pull_request' 
 
       - name: echo push branch name
-        run: echo "branch=${{ github.event.push.base.ref }}" >> $GITHUB_OUTPUT
+        run: echo "branch=${github.event.push.base.ref}" >> $GITHUB_OUTPUT
         id: extract_branch_push
         if: github.event_name == 'push' 
 
