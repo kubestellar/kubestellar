@@ -87,6 +87,11 @@ Medium - [Sync 10,000 ArgoCD Applications in One Shot](https://medium.com/itnext
 Medium - [Sync 10,000 ArgoCD Applications in One Shot, by Yourself](https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad)<br/>
 Medium - [GitOpsCon - here we come](https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33)<br/>
 ### ArgoCD Scale Experiment - KubeStellar Community Demo Day
-![type:video](https://www.youtube.com/embed/7XuEJF7--Sc)
+<p align=center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</p>
+
 ### GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson & Jun Duan, IBM
-![type:video](https://www.youtube.com/embed/PB3OTXDjFjg)
+<p align=center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</p>
