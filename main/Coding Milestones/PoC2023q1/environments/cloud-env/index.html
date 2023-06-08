@@ -1502,8 +1502,8 @@
 
   <h1>Cloud Environment</h1>
 
-<div><h2 id="monitoring-tools-for-kubestellar-prometheus-grafana-and-node-exporter">Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)</h2>
-<p><img alt="kubestellar-architecture-aws" src="../kcp-edge-architecture-aws.png"></p>
+<h2 id="monitoring-tools-for-kubestellar-prometheus-grafana-and-node-exporter">Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)</h2>
+<p><img alt="kubestellar-architecture-aws" src="../kcp-edge-architecture-aws.png" /></p>
 <h3 id="description">Description</h3>
 <p>This example shows how to deploy monitoring tools (prometheus, grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KubeStellar. A Prometheus agent is deployed in the edge regions running the edge pclusters</p>
 <ol>
@@ -1531,14 +1531,14 @@
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  metrics_path: /metrics
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  static_configs:
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>  - targets:
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    - '&lt;host-ipAddress&gt;:10203'
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    - &#39;&lt;host-ipAddress&gt;:10203&#39;
 <a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
 <a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>- job_name: node-exporter
 <a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  scrape_interval: 15s
 <a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>  metrics_path: /metrics
 <a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>  static_configs:
 <a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>  - targets:
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    - '&lt;host-ipAddress&gt;:9100'
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    - &#39;&lt;host-ipAddress&gt;:9100&#39;
 <a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
 <a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>- job_name: kcp
 <a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>  scrape_interval: 15s
@@ -1548,7 +1548,7 @@
 <a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    insecure_skip_verify: true
 <a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>  static_configs:
 <a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>  - targets:
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    - '&lt;host-ipAddress&gt;:6443'
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    - &#39;&lt;host-ipAddress&gt;:6443&#39;
 </code></pre></div>
 <p>b) Prometheus Agent: edit the file roles/prometheus/templates/prometheus-agent-config.yaml.j2</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># my global config
@@ -1556,12 +1556,12 @@
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  scrape_interval: 15s
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  evaluation_interval: 15s 
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>scrape_configs:
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  - job_name: "prometheus-agent"
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  - job_name: &quot;prometheus-agent&quot;
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    static_configs:
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      - targets: ["{ ansible_default_ipv4.address }:&lt;port_number&gt;"]
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      - targets: [&quot;{ ansible_default_ipv4.address }:&lt;port_number&gt;&quot;]
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>remote_write:
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  - url: "http://&lt;prometheus-server-ip-address&gt;:&lt;port_number&gt;/api/v1/write"
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  - url: &quot;http://&lt;prometheus-server-ip-address&gt;:&lt;port_number&gt;/api/v1/write&quot;
 </code></pre></div>
 <ol>
 <li>Install prometheus server, grafana and node exporter to the KCP server host using the following playbook:</li>
@@ -1588,14 +1588,14 @@
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  gather_facts: yes
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  connection: ssh
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>  vars:
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>   agent: 'yes'
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>   agent: &#39;yes&#39;
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  tasks:
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  roles:
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    - node-exporter
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    - prometheus
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ansible-playbook -i hosts monitoring-pcluster.yaml
-</code></pre></div></div>
+</code></pre></div>
 
 
   

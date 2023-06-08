@@ -1427,7 +1427,8 @@
 
   <h1>Example1 pre kcp</h1>
 
-<div><p><img alt="Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces." src="../../Edge-PoC-2023q1-Scenario-1-stage-1.svg" title="Stage 1 Summary"></p>
+<!--example1-pre-kcp-start-->
+<p><img alt="Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces." src="../../Edge-PoC-2023q1-Scenario-1-stage-1.svg" title="Stage 1 Summary" /></p>
 <p>Stage 1 creates the infrastructure and the edge service provider
 workspace (ESPW) and lets that react to the inventory.  Then the KubeStellar syncers
 are deployed, in the edge clusters and configured to work with the
@@ -1477,7 +1478,7 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>florin-config.yaml
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w"> </span>guilder-config.yaml
 </code></pre></div>
-<!--example1-pre-kcp-end--></div>
+<!--example1-pre-kcp-end-->
 
 
   

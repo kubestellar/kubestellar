@@ -1427,8 +1427,9 @@
 
   <h1>Example1 stage 4</h1>
 
-<div><h2 id="stage-4">Stage 4</h2>
-<p><img alt="Syncer effects" src="../../Edge-PoC-2023q1-Scenario-1-stage-4.svg" title="Stage 4 summary"></p>
+<!--example1-stage-4-start-->
+<h2 id="stage-4">Stage 4</h2>
+<p><img alt="Syncer effects" src="../../Edge-PoC-2023q1-Scenario-1-stage-4.svg" title="Stage 4 summary" /></p>
 <p>In Stage 4, the edge syncer does its thing.  Actually, it should have
 done it as soon as the relevant inputs became available in stage 3.
 Now we examine what happened.</p>
@@ -1442,7 +1443,7 @@ workspace.  This is driven by the <code>SyncerConfig</code> object named
 <code>the-one</code> in that mailbox workspace.</p>
 <p>Using the kubeconfig that <code>kind</code> modified, examine the florin cluster.
 Find just the <code>commonstuff</code> namespace and the <code>commond</code> Deployment.</p>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>NAME<span class="w">                              </span>STATUS<span class="w">   </span>AGE
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>commonstuff<span class="w">                       </span>Active<span class="w">   </span>6m51s
@@ -1452,29 +1453,29 @@ Find just the <code>commonstuff</code> namespace and the <code>commond</code> De
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>kube-public<span class="w">                       </span>Active<span class="w">   </span>57m
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>kube-system<span class="w">                       </span>Active<span class="w">   </span>57m
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>local-path-storage<span class="w">                </span>Active<span class="w">   </span>57m
-</code></pre></div>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">'NAME|stuff'</span>
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>NAMESPACE<span class="w">                         </span>NAME<span class="w">                              </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>commonstuff<span class="w">                       </span>commond<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>7m59s
-</code></pre></div>
+</code></pre></div></p>
 <p>Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.</p>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
-</code></pre></div>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>NAMESPACE<span class="w">                          </span>NAME<span class="w">                               </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>commonstuff<span class="w">                        </span>commond<span class="w">                            </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m37s
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>specialstuff<span class="w">                       </span>speciald<span class="w">                           </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>8m55s
-</code></pre></div>
+</code></pre></div></p>
 <p>Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.</p>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>...
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">      </span>containers:
@@ -1485,9 +1486,9 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">        </span>imagePullPolicy:<span class="w"> </span>IfNotPresent
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">        </span>name:<span class="w"> </span>httpd
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>...
-</code></pre></div>
+</code></pre></div></p>
 <p>Check that the common workload on the florin cluster is working.</p>
-<p></p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sleep<span class="w"> </span><span class="m">10</span>
+<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>http://localhost:8094
 </code></pre></div>
@@ -1498,9 +1499,9 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>florin.
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span>&lt;/body&gt;
 <a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>&lt;/html&gt;
-</code></pre></div>
+</code></pre></div></p>
 <p>Check that the special workload on the guilder cluster is working.
-</p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sleep<span class="w"> </span><span class="m">10</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>curl<span class="w"> </span>http://localhost:8097
 </code></pre></div>
@@ -1511,9 +1512,9 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
 <a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span>&lt;/body&gt;
 <a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>&lt;/html&gt;
-</code></pre></div>
+</code></pre></div></p>
 <p>Check that the common workload on the guilder cluster is working.</p>
-<p></p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>curl<span class="w"> </span>http://localhost:8096
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>curl<span class="w"> </span>http://localhost:8096
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>&lt;html&gt;
@@ -1522,8 +1523,8 @@ will show that the replacement-style customization happened.</p>
 <a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
 <a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span>&lt;/body&gt;
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>&lt;/html&gt;
-</code></pre></div>
-<!--example1-stage-4-stop--></div>
+</code></pre></div></p>
+<!--example1-stage-4-stop-->
 
 
   

@@ -1578,7 +1578,7 @@
   
 
 
-<div><p>This document explains how to add KubeStellar's 'workspaces' as Argo CD's 'clusters'.</p>
+<p>This document explains how to add KubeStellar's 'workspaces' as Argo CD's 'clusters'.</p>
 <h3 id="add-kubestellars-workspaces-to-argo-cd-as-clusters">Add KubeStellar's workspaces to Argo CD as clusters</h3>
 <p>As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are not identical with ordinary Kubernetes clusters.
 Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.</p>
@@ -1590,72 +1590,72 @@ Let's take WMW as an example:</p>
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
 <p>Third, make sure the current context uses WMW, then identify the admin.kubeconfig.</p>
 <p>The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `workspace.kcp.io/current` with full cluster level privileges. Do you want to continue [y/N]? y</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">INFO[0001] ServiceAccount "argocd-manager" already exists in namespace "kube-system"</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">INFO[0001] ClusterRole "argocd-manager-role" updated</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">INFO[0001] ClusterRoleBinding "argocd-manager-role-binding" updated</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">Cluster 'https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo' added</span>
-</code></pre></div>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">INFO[0001] ServiceAccount &quot;argocd-manager&quot; already exists in namespace &quot;kube-system&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">INFO[0001] ClusterRole &quot;argocd-manager-role&quot; updated</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">INFO[0001] ClusterRoleBinding &quot;argocd-manager-role-binding&quot; updated</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">Cluster &#39;https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo&#39; added</span>
+</code></pre></div></p>
 <h3 id="create-argo-cd-applications">Create Argo CD Applications</h3>
 <p>Once KubeStellar's workspaces are added, Argo CD Applications can be created as normal.
 There are a few examples listed <a href="https://github.com/edge-experiments/gitops-source/tree/main/edge-mc">here</a>,
 and the commands to use the examples are listed as follows.</p>
 <h4 id="create-argo-cd-applications-against-kubestellars-imw">Create Argo CD Applications against KubeStellar's IMW</h4>
 <p>Create two Locations. The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>--path<span class="w"> </span>edge-mc/locations/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>--sync-policy<span class="w"> </span>automated
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">application 'locations' created</span>
-</code></pre></div>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="go">application &#39;locations&#39; created</span>
+</code></pre></div></p>
 <p>Create two SyncTargets. The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>synctargets<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>synctargets<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>--path<span class="w"> </span>edge-mc/synctargets/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>--sync-policy<span class="w"> </span>automated
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">application 'synctargets' created</span>
-</code></pre></div>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">application &#39;synctargets&#39; created</span>
+</code></pre></div></p>
 <h4 id="create-argo-cd-application-against-kubestellars-wmw">Create Argo CD Application against KubeStellar's WMW</h4>
 <p>Create a Namespace. The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>--path<span class="w"> </span>edge-mc/namespaces/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>--sync-policy<span class="w"> </span>automated
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">application 'namespace' created</span>
-</code></pre></div>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">application &#39;namespace&#39; created</span>
+</code></pre></div></p>
 <p>Create a Deployment for 'cpumemload'. The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>cpumemload<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>cpumemload<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>--path<span class="w"> </span>edge-mc/workloads/cpumemload/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>--sync-policy<span class="w"> </span>automated
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="go">application 'cpumemload' created</span>
-</code></pre></div>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="go">application &#39;cpumemload&#39; created</span>
+</code></pre></div></p>
 <p>Create an EdgePlacement. The command and output should be similar to
-</p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>edgeplacement<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>edgeplacement<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--path<span class="w"> </span>edge-mc/placements/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>--sync-policy<span class="w"> </span>automated
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="go">application 'edgeplacement' created</span>
-</code></pre></div>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="go">application &#39;edgeplacement&#39; created</span>
+</code></pre></div></p>
 <h1 id="other-resources">Other Resources</h1>
-<p>Medium - <a href="https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b">Sync 10,000 ArgoCD Applications in One Shot</a><br>
-Medium - <a href="https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad">Sync 10,000 ArgoCD Applications in One Shot, by Yourself</a><br>
-Medium - <a href="https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33">GitOpsCon - here we come</a><br></p>
+<p>Medium - <a href="https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b">Sync 10,000 ArgoCD Applications in One Shot</a><br/>
+Medium - <a href="https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad">Sync 10,000 ArgoCD Applications in One Shot, by Yourself</a><br/>
+Medium - <a href="https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33">GitOpsCon - here we come</a><br/></p>
 <h3 id="argocd-scale-experiment-kubestellar-community-demo-day">ArgoCD Scale Experiment - KubeStellar Community Demo Day</h3>
-<p align="center">
+<p align=center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </p>
 
 <h3 id="gitopscon-2023-a-quantitative-study-on-argo-scalability-andrew-anderson-jun-duan-ibm">GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson &amp; Jun Duan, IBM</h3>
-<p align="center">
+<p align=center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</p></div>
+</p>
 
 
   
