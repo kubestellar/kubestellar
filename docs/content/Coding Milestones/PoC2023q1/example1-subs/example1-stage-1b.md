@@ -51,7 +51,8 @@ NAME                                                       TYPE        REGION   
 ```
 
 More usefully, using custom columns you can get a listing that shows
-the _name_ of the associated SyncTarget.
+the _name_ of the associated SyncTarget.  It is helpful to store the names of
+the florin and guilder SyncTargets for use later on in this example. 
 
 ```shell
 kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
