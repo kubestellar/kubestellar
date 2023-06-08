@@ -1561,81 +1561,86 @@
 <p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (<code>kubectl kubestellar syncer-gen</code>) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (;<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.</p>
 <p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
-<p>The equivalent manual steps are as follows:
-1. Generate UUID for Syncer identification
+<p>The equivalent manual steps are as follows:</p>
+<ol>
+<li>Generate UUID for Syncer identification
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uuidgen | tr &#39;[:upper:]&#39; &#39;[:lower:]&#39; | read syncer_id
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>syncer_id=&quot;syncer-$syncer_id&quot;
-</code></pre></div>
-2. Go to a workspace (It's exactly a mailbox workspace in the case of Edge MC)
+</code></pre></div></li>
+<li>Go to a workspace (It's exactly a mailbox workspace in the case of Edge MC)
     <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl ws create ws1 --enter
 </code></pre></div>
-3. Create a serviceaccount in the workspace
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cat &lt;&lt; EOL | kubectl apply -f -
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>apiVersion: v1
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>kind: ServiceAccount
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>metadata:
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  name: $syncer_id
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>EOL
-</code></pre></div>
-4. Create clusterrole and clusterrolebinding to bind the serviceaccount to the role
+    If you don't use a mailbox workspace created by KubeStellar but your own workspace, please create following custom resources in the workspace.
+      <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl create -f ./config/crds/edge.kcp.io_edgesyncconfigs.yaml,./config/crds/edge.kcp.io_syncerconfigs.yaml
+</code></pre></div></li>
+<li>Create a serviceaccount in the workspace
     <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cat &lt;&lt; EOL | kubectl apply -f -
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>apiVersion: rbac.authorization.k8s.io/v1
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>kind: ClusterRole
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>apiVersion: v1
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>kind: ServiceAccount
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>metadata:
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  name: $syncer_id
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>rules:
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>- apiGroups: [&quot;*&quot;]
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  resources: [&quot;*&quot;]
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  verbs: [&quot;*&quot;]
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>- nonResourceURLs: [&quot;/&quot;]
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  verbs: [&quot;access&quot;]
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>---
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>apiVersion: rbac.authorization.k8s.io/v1
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>kind: ClusterRoleBinding
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>metadata:
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>  name: $syncer_id
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>roleRef:
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>  apiGroup: rbac.authorization.k8s.io
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>  kind: ClusterRole
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>  name: $syncer_id
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>subjects:
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>- apiGroup: &quot;&quot;
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  kind: ServiceAccount
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>  name: $syncer_id
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>  namespace: default
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>EOL
-</code></pre></div>
-5. Get the serviceaccount token that will be set in the upstream kubeconfig manifest
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl get secret -o custom-columns=&quot;:.metadata.name&quot;| grep $syncer_id | read secret_name
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl get secret $secret_name -o jsonpath=&#39;{.data.token}&#39; | base64 -d | read token
-</code></pre></div>
-6. Get the certificates that will be set in the upstream kubeconfig manifest
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.certificate-authority-data&quot; | read cacrt
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>echo $cacrt
-</code></pre></div>
-7. Get the server host and port that will be set in the upstream kubeconfig manifest
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.server&quot; | sed -e &#39;s|https://\(.*\):\([^/]*\)/.*|\1 \2|g&#39; | read host port
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>echo $host, $port
-</code></pre></div>
-8. Set some other parameters</br>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>EOL
+</code></pre></div></li>
+<li>Create clusterrole and clusterrolebinding to bind the serviceaccount to the role
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cat &lt;&lt; EOL | kubectl apply -f -
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>apiVersion: rbac.authorization.k8s.io/v1
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>kind: ClusterRole
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>metadata:
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  name: $syncer_id
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>rules:
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>- apiGroups: [&quot;*&quot;]
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  resources: [&quot;*&quot;]
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  verbs: [&quot;*&quot;]
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>- nonResourceURLs: [&quot;/&quot;]
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>  verbs: [&quot;access&quot;]
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>---
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>apiVersion: rbac.authorization.k8s.io/v1
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>kind: ClusterRoleBinding
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>metadata:
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>  name: $syncer_id
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>roleRef:
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>  apiGroup: rbac.authorization.k8s.io
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>  kind: ClusterRole
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>  name: $syncer_id
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>subjects:
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>- apiGroup: &quot;&quot;
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>  kind: ServiceAccount
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>  name: $syncer_id
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>  namespace: default
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>EOL
+</code></pre></div></li>
+<li>Get the serviceaccount token that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl get secret -o custom-columns=&quot;:.metadata.name&quot;| grep $syncer_id | read secret_name
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl get secret $secret_name -o jsonpath=&#39;{.data.token}&#39; | base64 -d | read token
+</code></pre></div></li>
+<li>Get the certificates that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.certificate-authority-data&quot; | read cacrt
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>echo $cacrt
+</code></pre></div></li>
+<li>Get the server host and port that will be set in the upstream kubeconfig manifest
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl config view --minify --raw | yq &quot;.clusters[0].cluster.server&quot; | sed -e &#39;s|https://\(.*\):\([^/]*\)/.*|\1 \2|g&#39; | read host port
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>echo $host, $port
+</code></pre></div></li>
+<li>Set some other parameters</br>
     a. server_url of KCP from host and port
-        <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>server_url=&quot;https://$host:$port&quot;
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>server_url=&quot;https://$host:$port&quot;
 </code></pre></div>
     b. downstream_namespace where Syncer Pod runs
-        <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>downstream_namespace=&quot;kcp-edge-$syncer_id&quot;
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>downstream_namespace=&quot;kcp-edge-$syncer_id&quot;
 </code></pre></div>
     c. Syncer image
-        <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>image=&quot;quay.io/kubestellar/syncer:v0.2.2&quot;
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>image=&quot;quay.io/kubestellar/syncer:v0.2.2&quot;
 </code></pre></div>
-9. Generate manifests to bootstrap KubeStellar Syncer
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
+    d. Logical cluster name
+        <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=&quot;:.metadata.annotations.kcp\.io\/cluster&quot; --no-headers`
+</code></pre></div></li>
+<li>Generate manifests to bootstrap KubeStellar Syncer
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
 </code></pre></div>
     For debug purpose, you can extract kubeconfig.yaml of the upstream
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e &quot;select(.kind == \&quot;Secret\&quot; and .metadata.name == \&quot;$syncer_id\&quot;)&quot; | yq .stringData.kubeconfig 
-</code></pre></div>
-10. For now, EdgeSyncConfig API is required. Please create EdgeSyncConfig CRD in the workspace, if you run Syncer from the generated bootstrap manifest.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl create ./pkg/syncer/config/crds/edge.kcp.io_edgesyncconfigs.yaml
-</code></pre></div></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst &lt; ./pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml | yq e &quot;select(.kind == \&quot;Secret\&quot; and .metadata.name == \&quot;$syncer_id\&quot;)&quot; | yq .stringData.kubeconfig 
+</code></pre></div></li>
+</ol>
 <h4 id="deploy-workload-objects-from-edge-mc-to-edge-cluster">Deploy workload objects from edge-mc to Edge cluster</h4>
 <p>To deploy resources to Edge clusters, create the following in workload management workspace
 - workload objects
@@ -1752,52 +1757,52 @@
 <ol>
 <li><code>make build-edge-syncer-image-local</code>
 e.g.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>$ make build-edge-syncer-image-local
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>2023/04/24 11:50:40 Adding tag latest
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>2023/04/24 11:50:40 Added tag latest
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>Edge-Syncer image:
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>$ make build-edge-syncer-image-local
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>2023/04/24 11:50:40 Adding tag latest
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>2023/04/24 11:50:40 Added tag latest
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>Edge-Syncer image:
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 </code></pre></div>
 <code>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96</code> is the image stored in your local Docker registry.</li>
 </ol>
 <p>You can also set a shell variable to the output of this Make task.</p>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>image=`make build-edge-syncer-image-local`
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>image=`make build-edge-syncer-image-local`
 </code></pre></div></p>
 <h4 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry</h4>
 <ol>
 <li><code>make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
 </ol>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a>Edge-Syncer image
-<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>Edge-Syncer image
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 </code></pre></div>
 <code>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510</code> is the image pushed to the registry.</p>
 
