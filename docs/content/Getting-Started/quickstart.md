@@ -405,7 +405,7 @@ which should eventually yield:
 ```
 
 
-Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](/user-guide)
+Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our [User Guide](./user-guide.md)
 
 ### e. Next Steps
 
