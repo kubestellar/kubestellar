@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-example1.yml"
   push:
     branches:
@@ -19,6 +20,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-example1.yml"
 
 env:
