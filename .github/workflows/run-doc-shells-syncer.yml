@@ -9,16 +9,17 @@ on:
       - main
       - "release-*"
     paths:
-      - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-syncer.yml"
   push:
     branches:
       - main
+      
       - "release-*"
     paths:
-      - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-syncer.yml"
