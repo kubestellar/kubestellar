@@ -81,4 +81,4 @@ jobs:
 
       - run: git fetch origin main
 
-      - run: make FILENAME=${{ env.DF }} write-time-to-file
+      - run: make FILENAME="${{ env.DF }}" write-time-to-file
