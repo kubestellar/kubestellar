@@ -8,12 +8,11 @@ For KubeStellar's Inventory Management Workspace (IMW) and Workload Management W
 The steps are similar.
 Let's take WMW as an example:
 
-1. Create `kube-system` namespace in the workspace.
-
-2. Make sure necessary apibindings exist in the workspace.
-For WMW, we need one for Kubernetes and one for KubeStellar's edge API.
-
-3. Exclude `ClusterWorkspace` from discovery and sync.
+<ol>
+<li>Create `kube-system` namespace in the workspace.</li>
+<li>Make sure necessary apibindings exist in the workspace. 
+For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</li>
+<li>Exclude `ClusterWorkspace` from discovery and sync.
 
 ```shell
 kubectl -n argocd edit cm argocd-cm
@@ -37,9 +36,8 @@ kubectl -n argocd rollout restart deployment argocd-server
 ```
 
 Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
-
-4. { start=4 } Make sure the current context uses WMW, then identify the admin.kubeconfig.
-
+</li>
+<li>Make sure the current context uses WMW, then identify the admin.kubeconfig.
 The command and output should be similar to
 ```console
 $ argocd cluster add --name wmw --kubeconfig ./admin.kubeconfig workspace.kcp.io/current
@@ -106,6 +104,8 @@ $ argocd app create edgeplacement \
 --sync-policy automated
 application 'edgeplacement' created
 ```
+</li>
+</ol>
 
 # Other Resources
 Medium - [Sync 10,000 ArgoCD Applications in One Shot](https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b)<br/>

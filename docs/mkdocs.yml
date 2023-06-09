@@ -135,12 +135,7 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
-  # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
-  # Greater control over how navigation links are shown
-  - awesome-pages
-  # Docs site search
   - search
-  # Use Jinja macros in .md files
   - open-in-new-tab
   - include-markdown
   - macros:
@@ -159,10 +154,11 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
   - toc:               # Builds a table of contents 
       permalink: "#"
-  - attr_list
-  #- md_in_html
   # Code block highlighting
   - pymdownx.highlight:
       # Allows linking directly to specific lines in code blocks
@@ -172,7 +168,6 @@ markdown_extensions:
   # Lets you embed content from another file
   - pymdownx.snippets
   # Arbitrary nesting of code/content blocks inside each other
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true 
   # Enable note/warning/etc. callouts
