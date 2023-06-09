@@ -69,7 +69,7 @@ case $docs_ecutable_filename in
         ;;
 esac
 
-if [ -n "$option" ]; then
+if [ -n "$docs_ecutable_filename" ]; then
   createdAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].created_at')
   updatedAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].updated_at')
 fi
