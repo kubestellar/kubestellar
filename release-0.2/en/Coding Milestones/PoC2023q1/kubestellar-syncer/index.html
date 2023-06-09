@@ -11,13 +11,17 @@
         <link rel="canonical" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-syncer/">
       
       
+        <link rel="prev" href="../coding-milestone-invite-q1/">
+      
+      
+        <link rel="next" href="../example1/">
       
       <link rel="icon" href="../../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
     
     
       
-        <title>Kubestellar syncer - KubeStellar</title>
+        <title>KubeStellar-Syncer - KubeStellar</title>
       
     
     
@@ -35,8 +39,8 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=SapceMono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"SapceMono";--md-code-font:"Roboto Mono"}</style>
       
     
     
@@ -130,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Kubestellar syncer
+              KubeStellar-Syncer
             
           </span>
         </div>
@@ -242,6 +246,8 @@
         
   
   
+    
+  
 
 
   
@@ -253,7 +259,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../outline/" class="md-tabs__link">
+      <a href="../outline/" class="md-tabs__link md-tabs__link--active">
         Coding Milestones
       </a>
     </li>
@@ -430,6 +436,10 @@
         
           
         
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -491,13 +501,41 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/governance/" class="md-nav__link">
+        Governance
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Contribution%20guidelines/onboarding/" class="md-nav__link">
+        Onboarding
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
       
       
         
@@ -507,13 +545,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
           Security
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_4">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_6">
           <span class="md-nav__icon md-icon"></span>
           Security
         </label>
@@ -565,7 +603,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
       
       
         
@@ -577,13 +615,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
           Operations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3_5">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_7">
           <span class="md-nav__icon md-icon"></span>
           Operations
         </label>
@@ -650,14 +688,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
       
       
         
@@ -670,7 +710,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Coding Milestones
@@ -681,14 +721,16 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
       
       
         
@@ -715,7 +757,7 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_4_1">
           <span class="md-nav__icon md-icon"></span>
           PoC2023q1
@@ -754,11 +796,261 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../../../Coding Milestones/PoC2023q1/edge-syncer.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          KubeStellar-Syncer
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         KubeStellar-Syncer
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#steps-to-try-the-syncer" class="md-nav__link">
+    Steps to try the syncer
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps to try the syncer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-two-kind-clusters" class="md-nav__link">
+    Create two kind clusters.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-kcp" class="md-nav__link">
+    Start kcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-an-inventory-management-workspace" class="md-nav__link">
+    Create an inventory management workspace.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-edge-mc" class="md-nav__link">
+    Get edge-mc
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" class="md-nav__link">
+    Create SyncTarget and Location objects to represent the florin and guilder clusters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-edge-service-provider-workspace" class="md-nav__link">
+    Create the edge service provider workspace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#populate-the-edge-service-provider-workspace" class="md-nav__link">
+    Populate the edge service provider workspace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-mailbox-controller" class="md-nav__link">
+    The mailbox controller
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-kubestellar-syncer-on-the-target-clusters" class="md-nav__link">
+    Register KubeStellar Syncer on the target clusters
+  </a>
+  
+    <nav class="md-nav" aria-label="Register KubeStellar Syncer on the target clusters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-the-target-cluster-of-guilder" class="md-nav__link">
+    For the target cluster of guilder,
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-the-target-cluster-of-florin" class="md-nav__link">
+    For the target cluster of florin,
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teardown-the-environment" class="md-nav__link">
+    Teardown the environment
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deep-dive" class="md-nav__link">
+    Deep-dive
+  </a>
+  
+    <nav class="md-nav" aria-label="Deep-dive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" class="md-nav__link">
+    The details about the registration of KubeStellar Syncer on an Edge cluster and a workspace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-kubestellar-syncer-gen-plugin-does" class="md-nav__link">
+    What kubestellar syncer-gen plugin does
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" class="md-nav__link">
+    Deploy workload objects from edge-mc to Edge cluster
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edgesyncconfig-will-be-replaced-to-syncerconfig" class="md-nav__link">
+    EdgeSyncConfig (will be replaced to SyncerConfig)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syncerconfig" class="md-nav__link">
+    SyncerConfig
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downsyncing" class="md-nav__link">
+    Downsyncing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#renaturing-may-not-scope-in-poc2023q1-since-no-usage" class="md-nav__link">
+    Renaturing (May not scope in PoC2023q1 since no usage)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#return-of-reported-state" class="md-nav__link">
+    Return of reported state
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-upsyncing" class="md-nav__link">
+    Resource Upsyncing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feasibility-study" class="md-nav__link">
+    Feasibility study
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-kubestellar-syncer-image" class="md-nav__link">
+    Build KubeStellar Syncer image
+  </a>
+  
+    <nav class="md-nav" aria-label="Build KubeStellar Syncer image">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-in-your-local" class="md-nav__link">
+    How to build the image in your local
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" class="md-nav__link">
+    How to build the image with multiple architectures and push it to Docker registry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teardown-the-environment_1" class="md-nav__link">
+    Teardown the environment
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -802,14 +1094,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_1_5" id="__nav_4_1_5_label" tabindex="0">
-          Processes
+          KubeStellar Processes
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_1_5">
           <span class="md-nav__icon md-icon"></span>
-          Processes
+          KubeStellar Processes
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -820,7 +1112,7 @@
   
     <li class="md-nav__item">
       <a href="../kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Sheduler
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -869,7 +1161,7 @@
   
     <li class="md-nav__item">
       <a href="../roadmap-uses/" class="md-nav__link">
-        Roadap
+        Roadmap
       </a>
     </li>
   
@@ -1163,6 +1455,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
@@ -1213,6 +1507,20 @@
     <li class="md-nav__item">
       <a href="../../../Getting-Started/user-guide/" class="md-nav__link">
         User Guide
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/infomercial/" class="md-nav__link">
+        KubeStellar - The Infomercial
       </a>
     </li>
   
@@ -1515,7 +1823,7 @@
   
 
 
-  <h1>Kubestellar syncer</h1>
+  <h1>KubeStellar-Syncer</h1>
 
 <p><a href="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml"><img alt="docs-ecutable - kubestellar-syncer" src="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=release-0.2" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
@@ -2333,6 +2641,44 @@ e.g.
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../coding-milestone-invite-q1/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Inivitation to Contribute" rel="prev">
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Previous
+                </span>
+                Inivitation to Contribute
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../example1/" class="md-footer__link md-footer__link--next" aria-label="Next: Extended Example" rel="next">
+            <div class="md-footer__title">
+              <div class="md-ellipsis">
+                <span class="md-footer__direction">
+                  Next
+                </span>
+                Extended Example
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -2354,7 +2700,7 @@ e.g.
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.action.edit", "content.action.view", "navigation.indexes", "navigation.tabs", "navigation.path", "navigation.footer", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
       <script src="../../../../assets/javascripts/bundle.ce72ebac.min.js"></script>
