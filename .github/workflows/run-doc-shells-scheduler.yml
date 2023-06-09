@@ -21,11 +21,11 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - ".github/workflows/run-doc-shells-scheduler.yml"
 
+env:
+  docs-ecuted-filename: scheduler
+
 permissions:
   contents: write
-
-# concurrency:
-#   group: ${{ github.workflow }}
 
 jobs:
   run-doc-shells:
