@@ -1,4 +1,4 @@
-name: Run Doc Shells - example1
+name: docs-ecutable - example1
 
 on:
   # So we can trigger manually if needed
@@ -11,7 +11,9 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
-      - ".github/workflows/run-doc-shells-example1.yml"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-example1.yml"
+      - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
       - main
@@ -19,7 +21,9 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/example1.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
-      - ".github/workflows/run-doc-shells-example1.yml"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-example1.yml"
+      - "docs/scripts/docs-ecutable.sh"
 
 env:
   docs-ecuted-filename: example1
@@ -28,8 +32,8 @@ permissions:
   contents: write
 
 jobs:
-  run-doc-shells:
-    name: Run doc shells - for example1 e2e
+  docs-ecutable:
+    name: docs-ecutable - for example1 e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

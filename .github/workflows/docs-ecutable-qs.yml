@@ -1,4 +1,4 @@
-name: Run Doc Shells - QS
+name: docs-ecutable - QS
 
 on:
   # So we can trigger manually if needed
@@ -11,7 +11,9 @@ on:
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
-      - ".github/workflows/run-doc-shells-qs.yml"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-qs.yml"
+      - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
       - main
@@ -19,7 +21,9 @@ on:
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
-      - ".github/workflows/run-doc-shells-qs.yml"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-qs.yml"
+      - "docs/scripts/docs-ecutable.sh"
 
 env:
   docs-ecuted-filename: quickstart
@@ -28,8 +32,8 @@ permissions:
   contents: write
 
 jobs:
-  run-doc-shells:
-    name: Run doc shells - for QS e2e
+  docs-ecutable:
+    name: docs-ecutable - for QS e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
