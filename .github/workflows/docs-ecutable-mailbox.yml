@@ -80,4 +80,4 @@ jobs:
 
       - run: git fetch origin main
 
-      - run: make FILENAME="../overrides/{{ $docs-ecutable-filename }}.txt" write-time-to-file
+      - run: make FILENAME="../overrides/{{ $env.docs-ecutable-filename }}.txt" write-time-to-file
