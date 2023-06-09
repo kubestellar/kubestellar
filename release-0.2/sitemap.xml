@@ -22,13 +22,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/edge-syncer/</loc>
-         <lastmod>2023-06-09</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/edge-syncer/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/example1/</loc>
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
@@ -40,6 +33,13 @@
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/kubestellar-syncer/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-syncer/"/>
          
     </url>
     <url>
@@ -68,6 +68,34 @@
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/roadmap-uses/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/common-subs/pre-req/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/common-subs/pre-req/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/common-subs/remove-all/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/common-subs/remove-all/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/common-subs/required-packages/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/common-subs/required-packages/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/common-subs/save-some-time/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/common-subs/save-some-time/"/>
          
     </url>
     <url>
