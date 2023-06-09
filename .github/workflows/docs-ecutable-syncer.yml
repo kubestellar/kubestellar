@@ -1,0 +1,63 @@
+name: docs-ecutable - Syncer
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-syncer.yml"
+      - "docs/scripts/docs-ecutable.sh"
+  push:
+    branches:
+      - main
+      
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-syncer.yml"
+      - "docs/scripts/docs-ecutable.sh"
+
+env:
+  docs-ecuted-filename: syncer
+
+permissions:
+  contents: write
+
+jobs:
+  docs-ecutable:
+    name: docs-ecutable - for syncer e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: echo fetching workflow_dispatch branch
+        run: git fetch origin ${GITHUB_REF##*/}
+        # run: echo running on branch ${GITHUB_REF##*/}
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
+
+      - name: echo fetching push or pull_request branch
+        run: git fetch origin ${{ github.ref_name }}
+        # run: echo running on branch ${{ github.ref_name }}
+        if: github.event_name == 'push' || github.event_name != 'pull_request'
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+  
+      - run: |
+          make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'" \
+          docs-ecutable
