@@ -38,6 +38,8 @@ jobs:
       - id: step1
         run: echo "test=mailbox" >> "$GITHUB_OUTPUT"
 
+      - run: echo ${{ steps.step1.outputs.test }}
+
       # - uses: actions/checkout@v3
 
       # - name: echo fetching workflow_dispatch branch
