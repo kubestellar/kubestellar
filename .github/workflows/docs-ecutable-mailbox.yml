@@ -74,11 +74,11 @@ jobs:
     needs: docs-ecutable
     steps:
       - env:
-          docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
-        run: echo "$docs-ecutable-filename"
+          DF: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
+        run: echo "$DF"
 
       - uses: actions/checkout@v3
 
       - run: git fetch origin main
 
-      - run: make FILENAME="../overrides/$docs-ecutable-filename.txt" write-time-to-file
+      - run: make FILENAME="docs/overrides/$DF.txt" write-time-to-file
