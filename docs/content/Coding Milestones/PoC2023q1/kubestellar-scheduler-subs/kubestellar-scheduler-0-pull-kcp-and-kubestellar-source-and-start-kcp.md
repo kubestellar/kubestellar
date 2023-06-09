@@ -1,4 +1,4 @@
-<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-start-->
+<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->
 ```shell
 git clone {{ config.repo_url }} KubeStellar
 ```
@@ -17,6 +17,6 @@ export PATH=$(pwd)/bin:$PATH
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
 kcp start &> /dev/null &
-sleep 30  # wait for KCP to initialize
+sleep 30
 ```
-<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-end-->
+<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->

@@ -11,7 +11,7 @@ kubectl ws create imw-1 --enter
 ### Get edge-mc
 
 Download and build or install
-[edge-mc]({{ config.repo_url }}), according to your
+[edge-mc](https://github.com/kcp-dev/edge-mc), according to your
 preference.  That is, either (a) `git clone` the repo and then `make
 build` to populate its `bin` directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
@@ -23,6 +23,11 @@ explicit pathnames.  The kubectl plugin lines use fully specific
 executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
+```shell
+cd ../KubeStellar
+make build
+export PATH=$(pwd)/bin:$PATH
+```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands. They label both florin and guilder
