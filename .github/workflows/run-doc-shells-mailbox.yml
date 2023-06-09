@@ -24,17 +24,27 @@ on:
 permissions:
   contents: write
 
-# concurrency:
-#   group: ${{ github.workflow }}
-
 jobs:
   run-doc-shells:
     name: Run doc shells - for mailbox e2e
     runs-on: ubuntu-latest
     steps:
+      # - name: Dump GitHub context
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: echo "$GITHUB_CONTEXT"
+      
       - uses: actions/checkout@v3
 
-      - run: git fetch origin release-0.2
+      - name: echo fetching workflow_dispatch branch
+        run: git fetch origin ${GITHUB_REF##*/}
+        # run: echo running on branch ${GITHUB_REF##*/}
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
+
+      - name: echo fetching push or pull_request branch
+        run: git fetch origin ${{ github.ref_name }}
+        # run: echo running on branch ${{ github.ref_name }}
+        if: github.event_name == 'push' || github.event_name != 'pull_request'
 
       - uses: actions/setup-go@v4
         with:
@@ -47,4 +57,4 @@ jobs:
   
       - run: |
           make MANIFEST="'content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
-          run-doc-shells
+          docs-ecutable
