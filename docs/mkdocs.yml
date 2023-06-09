@@ -37,7 +37,7 @@ nav:
           - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/kubestellar-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
-          - Processes:
+          - KubeStellar Processes:
               - KubeStellar Scheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
               - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
