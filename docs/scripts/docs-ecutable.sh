@@ -104,7 +104,7 @@ function parse_file()
         fi
       fi
     fi
-  done < "$REPO_ROOT/docs/$file_name"
+  done < "$REPO_ROOT/$file_name"
 }
 
 for FILE_NAME in "${FILE_LIST[@]}"
