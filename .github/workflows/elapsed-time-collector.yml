@@ -19,11 +19,14 @@ jobs:
     name: elapsed-time-collector
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+      # - name: Dump GitHub context
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: echo "$GITHUB_CONTEXT"
 
+      - name: echo env
+        run: echo "$docs-ecuted-filename"
+        
       - uses: actions/checkout@v3
 
       - run: git fetch origin main
