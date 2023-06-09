@@ -35,28 +35,41 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for mailbox e2e
     runs-on: ubuntu-latest
+    outputs:
+      docs-ecuted-filename: ${{ steps.step1.outputs.docs-ecuted-filename }}
     steps:
-      - uses: actions/checkout@v3
+      - id: step1
+        run: echo "docs-ecuted-filename=${{ env.docs-ecuted-filename }}" >> "$GITHUB_OUTPUT"
 
-      - name: echo fetching workflow_dispatch branch
-        run: git fetch origin ${GITHUB_REF##*/}
-        # run: echo running on branch ${GITHUB_REF##*/}
-        if: github.event_name != 'pull_request' && github.event_name != 'push'
+      # - uses: actions/checkout@v3
 
-      - name: echo fetching push or pull_request branch
-        run: git fetch origin ${{ github.ref_name }}
-        # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name != 'pull_request'
+      # - name: echo fetching workflow_dispatch branch
+      #   run: git fetch origin ${GITHUB_REF##*/}
+      #   # run: echo running on branch ${GITHUB_REF##*/}
+      #   if: github.event_name != 'pull_request' && github.event_name != 'push'
 
-      - uses: actions/setup-go@v4
-        with:
-          go-version: v1.19
-          cache: true
+      # - name: echo fetching push or pull_request branch
+      #   run: git fetch origin ${{ github.ref_name }}
+      #   # run: echo running on branch ${{ github.ref_name }}
+      #   if: github.event_name == 'push' || github.event_name != 'pull_request'
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        id: install
+      # - uses: actions/setup-go@v4
+      #   with:
+      #     go-version: v1.19
+      #     cache: true
+
+      # - name: Install kubectl
+      #   uses: azure/setup-kubectl@v3
+      #   id: install
   
-      - run: |
-          make MANIFEST="'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
-          docs-ecutable
+      # - run: |
+      #     make MANIFEST="'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'" \
+      #     docs-ecutable
+
+  elapsed-time-collector:
+    runs-on: ubuntu-latest
+    needs: docs-ecutable
+    steps:
+      - env:
+          docs-ecuted-filename: ${{needs.job1.outputs.docs-ecuted-filename}}
+        run: echo "$docs-ecuted-filename"
