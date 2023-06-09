@@ -13,6 +13,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-placement.yml"
   push:
     branches:
@@ -23,6 +24,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-placement.yml"
 
 env:
