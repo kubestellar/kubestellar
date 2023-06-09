@@ -70,5 +70,5 @@ jobs:
     needs: docs-ecutable
     steps:
       - env:
-          OUTPUT1: ${{needs.job1.outputs.output1}}
+          OUTPUT1: ${{needs.docs-ecutable.outputs.output1}}
         run: echo "$OUTPUT1"
