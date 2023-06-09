@@ -1,10 +1,14 @@
-<img alt="KubeStellar" width="500px" align="left" src="./contrib/logo/kcp-edge-5-white.png" />
+<!--readme-for-root-start-->
+
+<img alt="" width="500px" align="left" src="KubeStellar with Logo.png" />
 
 <br/>
+<br/>
+<br/>
 
-# KubeStellar
 ## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
-<br/><br/><br/>
+<br/>
+
 [![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
@@ -86,6 +90,7 @@ Thanks go to these wonderful people:
     <td align="center"><a href="https://github.com/thinkahead"><img src="https://avatars.githubusercontent.com/u/7507482?v=4" width="100px;" alt=""/><br /><sub><b>Alexei Karve</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/issues?q=assignee%3Athinkahead+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/mra-ruiz"><img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100px;" alt=""/><br /><sub><b>Maria Camila Ruiz Cardenas</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/issues?q=assignee%3Amra-ruiz+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/aslom"><img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100px;" alt=""/><br /><sub><b>Aleksander Slominski</b></sub></a><br /><a href="https://github.com/kcp-dev/edge-mc/issues?q=assignee%3Aaslom+" title="Contributed PRs">👀</a></td>
+        
   </tr>
 
 </table>
@@ -94,3 +99,4 @@ Thanks go to these wonderful people:
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+<!--readme-for-root-end-->
