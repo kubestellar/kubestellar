@@ -441,4 +441,11 @@
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/common-subs/save-some-time/"/>
          
     </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/common-subs/teardown-the-environment/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/common-subs/teardown-the-environment/"/>
+         
+    </url>
 </urlset>

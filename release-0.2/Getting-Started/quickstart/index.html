@@ -2044,6 +2044,27 @@ which should eventually yield:</p>
 <!-- END INCLUDE -->
 
 <h2 id="3-teardown-the-environment">3. Teardown the environment</h2>
+<!-- BEGIN INCLUDE ../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
+
+<p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
+<a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+</code></pre></div>
+<p>Stop and uninstall KubeStellar use the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubestellar<span class="w"> </span>stop
+</code></pre></div>
+<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>remove-kubestellar
+</code></pre></div>
+<!-- END INCLUDE -->
+
 <h2 id="4-next-steps">4. Next Steps</h2>
 <p>What you just did is a shortened version of the 
 <a href="../../Coding%20Milestones/PoC2023q1/example1/">more detailed example</a> on the website,
