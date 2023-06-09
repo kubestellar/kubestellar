@@ -819,10 +819,10 @@
       
         <li class="md-nav__item">
   <a href="#steps-to-try-the-syncer" class="md-nav__link">
-    Steps to try the syncer
+    Steps to try the Syncer
   </a>
   
-    <nav class="md-nav" aria-label="Steps to try the syncer">
+    <nav class="md-nav" aria-label="Steps to try the Syncer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -930,14 +930,14 @@
         
           <li class="md-nav__item">
   <a href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" class="md-nav__link">
-    The details about the registration of KubeStellar Syncer on an Edge cluster and a workspace
+    The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#what-kubestellar-syncer-gen-plugin-does" class="md-nav__link">
-    What kubestellar syncer-gen plugin does
+    What KubeStellar syncer-gen plugin does
   </a>
   
 </li>
@@ -1649,10 +1649,10 @@
       
         <li class="md-nav__item">
   <a href="#steps-to-try-the-syncer" class="md-nav__link">
-    Steps to try the syncer
+    Steps to try the Syncer
   </a>
   
-    <nav class="md-nav" aria-label="Steps to try the syncer">
+    <nav class="md-nav" aria-label="Steps to try the Syncer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1760,14 +1760,14 @@
         
           <li class="md-nav__item">
   <a href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" class="md-nav__link">
-    The details about the registration of KubeStellar Syncer on an Edge cluster and a workspace
+    The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#what-kubestellar-syncer-gen-plugin-does" class="md-nav__link">
-    What kubestellar syncer-gen plugin does
+    What KubeStellar syncer-gen plugin does
   </a>
   
 </li>
@@ -1987,7 +1987,7 @@
 
 <p>KubeStellar Syncer runs in the target cluster and sync kubernetes resource objects from the target cluster to a mailbox workspace and vice versa.</p>
 <p><img alt="kubestellar-syncer drawio" src="../images/kubestellar-syncer-overview.png" /></p>
-<h2 id="steps-to-try-the-syncer">Steps to try the syncer<a class="headerlink" href="#steps-to-try-the-syncer" title="Permanent link">#</a></h2>
+<h2 id="steps-to-try-the-syncer">Steps to try the Syncer<a class="headerlink" href="#steps-to-try-the-syncer" title="Permanent link">#</a></h2>
 <p>The KubeStellar Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in <a href="../example1">example1</a> until <code>The mailbox controller</code> in stage 2. </p>
 <!-- BEGIN INCLUDE example1-subs/example1-pre-kcp.md '&lt;!--example1-pre-kcp-start--&gt;' '&lt;!--example1-pre-kcp-end--&gt;' -->
 
@@ -2046,7 +2046,7 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 <!-- BEGIN INCLUDE example1-subs/example1-start-kcp.md '&lt;!--example1-start-kcp-start--&gt;' '&lt;!--example1-start-kcp-end--&gt;' -->
 
 <h3 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h3>
-<p>Download and build or install <a href="https://github.com/kcp-dev/kcp">kcp</a>,
+<p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases">kcp</a>,
 according to your preference.</p>
 <p>In some shell that will be used only for this purpose, issue the <code>kcp
 start</code> command.  If you have junk from previous runs laying around,
@@ -2354,36 +2354,38 @@ SyncTarget name, you could do it as follows.</p>
 
 <hr />
 <h2 id="deep-dive">Deep-dive<a class="headerlink" href="#deep-dive" title="Permanent link">#</a></h2>
-<h3 id="the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace">The details about the registration of KubeStellar Syncer on an Edge cluster and a workspace<a class="headerlink" href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" title="Permanent link">#</a></h3>
+<h3 id="the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace">The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace<a class="headerlink" href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" title="Permanent link">#</a></h3>
 <p>Edge-syncer is deployed on Edge cluster easily by the following steps.</p>
 <ol>
 <li>Create SyncTarget and Location<ul>
-<li>Mailbox controller creates mailbox workspace automatically. </li>
+<li>Mailbox controller creates the mailbox workspace automatically </li>
 </ul>
 </li>
-<li>Get mailbox workspace name</li>
-<li>Use command to obtain yaml manifests to bootstrap KubeStellar Syncer
+<li>Get the mailbox workspace name</li>
+<li>Use the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer
     <div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="go">kubectl ws &lt;mb-ws name&gt;</span>
-<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="go">bin/kubectl-kubestellar-syncer_gen &lt;Edge Sync Target name&gt; --syncer-image &lt;KubeStellar Syncer image&gt; -o edge-syncer.yaml</span>
+<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="go">bin/kubectl-kubestellar-syncer_gen &lt;Edge Sync Target name&gt; --syncer-image &lt;KubeStellar-Syncer image&gt; -o edge-syncer.yaml</span>
 </code></pre></div>
-    Here <code>bin/kubectl-kubestellar-syncer_gen</code> refers to a special variant of KubeStellar's
+    Here, <code>bin/kubectl-kubestellar-syncer_gen</code> refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
     the <code>bin</code> of edge-mc.
-    For the KubeStellar Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:v0.2.2</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar Syncer Image</a>.</li>
+    For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:v0.2.2</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar-Syncer Image</a>.</li>
 <li>Deploy edge-syncer on an Edge cluster</li>
 <li>Syncer starts to run on the Edge cluster<ul>
-<li>KubeStellar Syncer starts watching and consuming SyncerConfig</li>
+<li>KubeStellar-Syncer starts watching and consuming SyncerConfig</li>
 </ul>
 </li>
 </ol>
 <p>The overall diagram is as follows:</p>
 <p><img alt="kubestellar-syncer boot" src="../images/kubestellar-syncer-boot.png" /></p>
-<h3 id="what-kubestellar-syncer-gen-plugin-does">What kubestellar syncer-gen plugin does<a class="headerlink" href="#what-kubestellar-syncer-gen-plugin-does" title="Permanent link">#</a></h3>
-<p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (<code>kubectl kubestellar syncer-gen</code>) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
-<p>Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (;<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.</p>
+<h3 id="what-kubestellar-syncer-gen-plugin-does">What KubeStellar syncer-gen plugin does<a class="headerlink" href="#what-kubestellar-syncer-gen-plugin-does" title="Permanent link">#</a></h3>
+<p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), access information for both is required. </p>
+<p>For the upstream access, Syncer's registration command (<code>kubectl kubestellar syncer-gen</code>) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. </p>
+<p>On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
+<p>Note: In addition to that, the command creates an EdgeSyncConfig CRD if it does not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of the EdgeSyncConfig CRD will also no longer be needed since we will switch to using SyncerConfig rather than EdgeSyncConfig in near future.</p>
 <p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
-<p>The equivalent manual steps are as follows:</p>
+<p>The equivalent manual steps are as follows: </p>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-start--&gt;' '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-end--&gt;' -->
 
 <p>Generate UUID for Syncer identification.
@@ -2510,11 +2512,11 @@ c. Logical cluster name
 <li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.</li>
-<li>One CR is initially created by the command for KubeStellar Syncer enablement in mb-ws (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>)</li>
+<li>One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>)</li>
 <li>The CR name is <code>&lt;name&gt;</code> and the contents are empty.</li>
-<li>This name is registered in the bootstrap manifests for KubeStellar Syncer install and KubeStellar Syncer is told to watch the CR of this name.</li>
-<li>Currently KubeStellar Syncer watches all CRs in the workspace</li>
-<li>KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
+<li>This name is registered in the bootstrap manifests for KubeStellar-Syncer install and KubeStellar-Syncer is told to watch the CR of this name.</li>
+<li>Currently KubeStellar-Syncer watches all CRs in the workspace</li>
+<li>KubeStellar-Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
 <li>This behavior may be changed to only watching the default CR once Placement Translator is to be the component that generates the CR from EdgePlacement: <a href="https://github.com/kcp-dev/edge-mc/pull/284#pullrequestreview-1375667129">related issue</a></li>
 </ul>
 <h3 id="syncerconfig">SyncerConfig<a class="headerlink" href="#syncerconfig" title="Permanent link">#</a></h3>
@@ -2549,8 +2551,8 @@ c. Logical cluster name
 <li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.</li>
-<li>Currently KubeStellar Syncer watches all CRs in the workspace</li>
-<li>KubeStellar Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
+<li>Currently KubeStellar-Syncer watches all CRs in the workspace</li>
+<li>KubeStellar-Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
 </ul>
 <h3 id="downsyncing">Downsyncing<a class="headerlink" href="#downsyncing" title="Permanent link">#</a></h3>
 <ul>

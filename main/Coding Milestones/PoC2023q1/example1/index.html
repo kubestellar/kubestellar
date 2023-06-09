@@ -2071,7 +2071,7 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 <!-- BEGIN INCLUDE example1-subs/example1-start-kcp.md '&lt;!--example1-start-kcp-start--&gt;' '&lt;!--example1-start-kcp-end--&gt;' -->
 
 <h3 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h3>
-<p>Download and build or install <a href="https://github.com/kcp-dev/kcp">kcp</a>,
+<p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases">kcp</a>,
 according to your preference.</p>
 <p>In some shell that will be used only for this purpose, issue the <code>kcp
 start</code> command.  If you have junk from previous runs laying around,
@@ -2700,7 +2700,7 @@ ESPW and use the edge-mc command that runs the placement translator.</p>
 <p>After it stops logging stuff, wait another minute and then you can ^C
 it or use another shell to continue exploring.</p>
 <p>The florin cluster gets only the common workload.  Examine florin's
-<code>SyncerConfig</code> as follows.</p>
+<code>SyncerConfig</code> as follows.  Utilize florin's name (which you stored in Stage 1) here.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$FLORIN_WS</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
@@ -2788,7 +2788,8 @@ it or use another shell to continue exploring.</p>
 <a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a>commonstuff<span class="w">   </span>commond<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m44s
 </code></pre></div></p>
 <p>The guilder cluster gets both the common and special workloads.
-Examine guilder's <code>SyncerConfig</code> object and workloads as follows.</p>
+Examine guilder's <code>SyncerConfig</code> object and workloads as follows, using
+the name that you stored in Stage 1.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
