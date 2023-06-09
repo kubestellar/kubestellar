@@ -1416,7 +1416,7 @@
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mailbox<span class="w"> </span>workspace<span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
 </code></pre></div></p>
-<p>Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar Syncer.
+<p>Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw:<span class="nv">$mbws</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>./bin/kubectl-kubestellar-syncer_gen<span class="w"> </span>florin<span class="w"> </span>--syncer-image<span class="w"> </span>quay.io/kubestellar/syncer:v0.2.2<span class="w"> </span>-o<span class="w"> </span>florin-syncer.yaml
 </code></pre></div>
