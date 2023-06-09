@@ -1,9 +1,9 @@
 ---
-short_name: edge-syncer
-manifest_name: 'content/Coding Milestones/PoC2023q1/edge-syncer.md'
+short_name: kubestellar-syncer
+manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-[![Run Doc Shells - edge-syncer]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml)&nbsp;&nbsp;&nbsp;
+[![Run Doc Shells - kubestellar-syncer]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"
@@ -17,7 +17,7 @@ pre_req_name: 'content/common-subs/pre-req.md'
 
 KubeStellar Syncer runs in the target cluster and sync kubernetes resource objects from the target cluster to a mailbox workspace and vice versa.
 
-![edge-syncer drawio](images/edge-syncer-overview.png)
+![kubestellar-syncer drawio](images/kubestellar-syncer-overview.png)
 
 
 ## Steps to try the syncer
@@ -52,16 +52,16 @@ The KubeStellar Syncer can be exercised after setting up KubeStellar mailbox wor
 Once KubeStellar setup is done, KubeStellar Syncer can be deployed on the target cluster easily by the following steps.
 #### For the target cluster of `guilder`,
 {%
-   include-markdown "edge-syncer-subs/edge-syncer-0-deploy-guilder.md"
-   start="<!--edge-syncer-0-deploy-guilder-start-->"
-   end="<!--edge-syncer-0-deploy-guilder-end-->"
+   include-markdown "kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder.md"
+   start="<!--kubestellar-syncer-0-deploy-guilder-start-->"
+   end="<!--kubestellar-syncer-0-deploy-guilder-end-->"
 %}
 
 #### For the target cluster of `florin`,
 {%
-   include-markdown "edge-syncer-subs/edge-syncer-0-deploy-florin.md"
-   start="<!--edge-syncer-0-deploy-florin-start-->"
-   end="<!--edge-syncer-0-deploy-florin-end-->"
+   include-markdown "kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin.md"
+   start="<!--kubestellar-syncer-0-deploy-florin-start-->"
+   end="<!--kubestellar-syncer-0-deploy-florin-end-->"
 %}
 
 ### Teardown the environment
@@ -98,7 +98,7 @@ Edge-syncer is deployed on Edge cluster easily by the following steps.
 
 The overall diagram is as follows:
 
-![edge-syncer boot](images/edge-syncer-boot.png)
+![kubestellar-syncer boot](images/kubestellar-syncer-boot.png)
 
 ### What kubestellar syncer-gen plugin does
 
@@ -111,9 +111,9 @@ The source code of the command is [{{ config.repo_url }}/blob/{{ config.ks_branc
 The equivalent manual steps are as follows:
 
 {%
-   include-markdown "edge-syncer-subs/edge-syncer-1-syncer-gen-plugin.md"
-   start="<!--edge-syncer-1-syncer-gen-plugin-start-->"
-   end="<!--edge-syncer-1-syncer-gen-plugin-end-->"
+   include-markdown "kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md"
+   start="<!--kubestellar-syncer-1-syncer-gen-plugin-start-->"
+   end="<!--kubestellar-syncer-1-syncer-gen-plugin-end-->"
 %}
 
 ### Deploy workload objects from edge-mc to Edge cluster
@@ -126,7 +126,7 @@ To deploy resources to Edge clusters, create the following in workload managemen
   - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script [here]({{ config.repo_url }}/blob/{{ config.ks_branch }}/hack/update-codegen-crds.sh#L57)). 
 - EdgePlacement
 
-![edge-syncer deploy](images/edge-syncer-deploy.png)
+![kubestellar-syncer deploy](images/kubestellar-syncer-deploy.png)
 
 After this, Edge-mc will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
@@ -171,7 +171,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
     - `namespaces` is an array of namespace for namespace objects.
     - `names` is an array of upsynced object name. Wildcard (`*`) is available.
 - The example CR is {{ config.repo_url }}/blob/{{ config.ks_branch }}/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml
-- The CR is used from edge syncer
+- The CR is used from KubeStellar-Syncer
 - The CR is placed in mb-ws to define
   - object selector
   - need of renaturing (May not scope in PoC2023q1)
@@ -207,7 +207,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - reported state returning on/off is configurable in SyncerConfig. (default is on)
 
 ### Resource Upsyncing
-- Edge syncer does upsyncing resources at Edge cluster to the corresponding mailbox workspace periodically. 
+- KubeStellar-Syncer does upsyncing resources at Edge cluster to the corresponding mailbox workspace periodically. 
 - SyncerConfig specifies which objects should be upsynced from Edge cluster.
   - object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation (, and more such as ownership reference?)
 - Upsyncing CRD is out of scope for now. This means when upsyncing a CR, corresponding APIBinding (not CRD) is available on the mailbox workspace. This limitation might be revisited later. 
@@ -281,3 +281,10 @@ ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac836
 ```
 `ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510` is the image pushed to the registry.
 
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

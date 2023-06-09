@@ -1,4 +1,4 @@
-<!--edge-syncer-0-deploy-florin-start-->
+<!--kubestellar-syncer-0-deploy-florin-start-->
 Go to inventry management workspace and find the mailbox workspace name.
 ```shell
 kubectl ws root:imw-1
@@ -62,4 +62,4 @@ kube-system                        coredns                            2/2     2 
 local-path-storage                 local-path-provisioner             1/1     1            1           41m
 ```
 
-<!--edge-syncer-0-deploy-florin-end-->
+<!--kubestellar-syncer-0-deploy-florin-end-->

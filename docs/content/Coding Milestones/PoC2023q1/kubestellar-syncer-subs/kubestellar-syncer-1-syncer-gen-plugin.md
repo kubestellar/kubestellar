@@ -1,4 +1,4 @@
-<!--edge-syncer-1-syncer-gen-plugin-start-->
+<!--kubestellar-syncer-1-syncer-gen-plugin-start-->
 Generate UUID for Syncer identification.
 ```shell
 syncer_id="syncer-"`uuidgen | tr '[:upper:]' '[:lower:]'`
@@ -116,4 +116,4 @@ kind: ServiceAccount
 metadata:
 ...
 ```
-<!--edge-syncer-1-syncer-gen-plugin-end-->
+<!--kubestellar-syncer-1-syncer-gen-plugin-end-->

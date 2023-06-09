@@ -40,7 +40,7 @@
         source /etc/profile
         go version
         ```
-    === "Centos8"
+    === "RHEL"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
