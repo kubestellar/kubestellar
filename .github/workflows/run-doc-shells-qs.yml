@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-qs.yml"
   push:
     branches:
@@ -19,6 +20,7 @@ on:
     paths:
       - "docs/content/Getting-Started/quickstart.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-qs.yml"
 
 env:
