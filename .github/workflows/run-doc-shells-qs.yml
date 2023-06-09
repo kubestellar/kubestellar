@@ -21,11 +21,11 @@ on:
       - "docs/content/Getting-Started/quickstart-subs/**"
       - ".github/workflows/run-doc-shells-qs.yml"
 
+env:
+  docs-ecuted-filename: quickstart
+
 permissions:
   contents: write
-
-# concurrency:
-#   group: ${{ github.workflow }}
 
 jobs:
   run-doc-shells:

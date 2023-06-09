@@ -21,6 +21,9 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - ".github/workflows/run-doc-shells-mailbox.yml"
 
+env:
+  docs-ecuted-filename: mailbox
+
 permissions:
   contents: write
 
@@ -29,11 +32,6 @@ jobs:
     name: Run doc shells - for mailbox e2e
     runs-on: ubuntu-latest
     steps:
-      # - name: Dump GitHub context
-      #   env:
-      #     GITHUB_CONTEXT: ${{ toJson(github) }}
-      #   run: echo "$GITHUB_CONTEXT"
-      
       - uses: actions/checkout@v3
 
       - name: echo fetching workflow_dispatch branch

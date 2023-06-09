@@ -21,11 +21,11 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - ".github/workflows/run-doc-shells-example1.yml"
 
+env:
+  docs-ecuted-filename: example1
+  
 permissions:
   contents: write
-
-# concurrency:
-#   group: ${{ github.workflow }}
 
 jobs:
   run-doc-shells:
