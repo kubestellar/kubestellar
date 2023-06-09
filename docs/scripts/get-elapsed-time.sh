@@ -37,6 +37,7 @@ IFS=$SAVEIFS
 
 
 workflow_id=""
+filename_ext=".dmd"
 
 case $docs-ecutable-filename in
     placement)
@@ -88,6 +89,6 @@ echo $date2
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-docs-ecutable-filename=$docs-ecutable-filename + ".dmd"
+docs-ecutable-filename=$docs-ecutable-filename$filename_ext
 echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->" > /docs/overrides/$docs-ecutable-filename
 
