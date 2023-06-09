@@ -3,7 +3,7 @@ short_name: mailbox-controller
 manifest_name: 'content/Coding Milestones/PoC2023q1/mailbox-controller.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-[![Run Doc Shells - mailbox-controller]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-mailbox.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - mailbox-controller]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"

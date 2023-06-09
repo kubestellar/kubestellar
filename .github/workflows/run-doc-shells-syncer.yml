@@ -1,4 +1,4 @@
-name: Run Doc Shells - Syncer
+name: docs-ecutable - Syncer
 
 on:
   # So we can trigger manually if needed
@@ -12,7 +12,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-syncer.yml"
+      - ".github/workflows/docs-ecutable-syncer.yml"
   push:
     branches:
       - main
@@ -22,7 +22,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-syncer.yml"
+      - ".github/workflows/docs-ecutable-syncer.yml"
 
 env:
   docs-ecuted-filename: syncer
@@ -31,8 +31,8 @@ permissions:
   contents: write
 
 jobs:
-  run-doc-shells:
-    name: Run doc shells - for syncer e2e
+  docs-ecutable:
+    name: docs-ecutable - for syncer e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

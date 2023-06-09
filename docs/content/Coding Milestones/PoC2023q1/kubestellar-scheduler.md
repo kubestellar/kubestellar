@@ -3,7 +3,7 @@ short_name: kubestellar-scheduler
 manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-[![Run Doc Shells - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-scheduler.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"

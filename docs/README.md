@@ -223,7 +223,7 @@ echo hello KubeStellar
 (other variations are possible, PR an update to the <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)
 
 ### Testing/Running Docs
-How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.
+How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'docs-ecutable' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.
 
 #### The way it works:
 - create your .md file as you normally would
@@ -234,26 +234,25 @@ How do we ensure that our documented examples work?  Simple, we 'execute' our do
 - you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.
 
 #### The GH Workflow:
-- One example of the GH Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/run-doc-shells-qs.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/run-doc-shells-qs.yml)
+- One example of the GH Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-qs.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-qs.yml)
 
 #### The secret sauce:
-- The code that makes all this possible is at <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/run-doc-shells.sh">{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/run-doc-shells.sh</a>
+- The code that makes all this possible is at <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh">{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh</a>
     - This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks
     - The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them
-    - It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.
+    - It then creates a file called 'generate_script.sh' which is then run at the end of the docs-ecutable execution.
 
 All of this is invoke in a target in our <a href="{{ config.repo_url }}/blob/{{config.ks_branch}}/Makefile">Makefile</a>
 ``` {.bash .no-copy}
-.PHONY: run-doc-shells
-run-doc-shells: venv
-	. $(VENV)/activate; \
-	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
+.PHONY: docs-ecutable
+docs-ecutable: 
+	MANIFEST=$(MANIFEST) docs/scripts/docs-ecutable.sh
 ```
 
 You give the path from that follows the '{{config.repo_url}}/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:
 
-``` title="How to 'make' our run-doc-shells target"
-make MANIFEST="'content/Getting-Started/quickstart.md'" run-doc-shells
+``` title="How to 'make' our docs-ecutable target"
+make MANIFEST="'content/Getting-Started/quickstart.md'" docs-ecutable
 ```
 
 <b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.

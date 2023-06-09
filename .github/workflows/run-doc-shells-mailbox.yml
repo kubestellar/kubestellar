@@ -1,4 +1,4 @@
-name: Run Doc Shells - Mailbox
+name: docs-ecutable - Mailbox
 
 on:
   # So we can trigger manually if needed
@@ -12,7 +12,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-mailbox.yml"
+      - ".github/workflows/docs-ecutable-mailbox.yml"
   push:
     branches:
       - main
@@ -21,7 +21,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-mailbox.yml"
+      - ".github/workflows/docs-ecutable-mailbox.yml"
 
 env:
   docs-ecuted-filename: mailbox
@@ -30,8 +30,8 @@ permissions:
   contents: write
 
 jobs:
-  run-doc-shells:
-    name: Run doc shells - for mailbox e2e
+  docs-ecutable:
+    name: docs-ecutable - for mailbox e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

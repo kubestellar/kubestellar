@@ -3,7 +3,7 @@ short_name: example1
 manifest_name: 'content/Coding Milestones/PoC2023q1/example1.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-[![Run Doc Shells - example1]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-example1.yml)
+[![docs-ecutable - example1]({{config.repo_url}}/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-example1.yml)
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"

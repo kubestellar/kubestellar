@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
   workflow_run:
-    workflows: ["Run Doc Shells - example1","Run Doc Shells - Placement","Run Doc Shells - Scheduler","Run Doc Shells - Mailbox","Run Doc Shells - QS"]
+    workflows: ["docs-ecutable - example1","docs-ecutable - Placement","docs-ecutable - Scheduler","docs-ecutable - Mailbox","docs-ecutable - QS","docs-ecutable - Syncer"]
     types:
       - completed
 env:
@@ -26,7 +26,7 @@ jobs:
 
       - name: echo env
         run: echo "$docs-ecuted-filename"
-        
+
       - uses: actions/checkout@v3
 
       - run: git fetch origin main

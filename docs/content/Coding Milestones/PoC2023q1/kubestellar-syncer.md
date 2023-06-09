@@ -3,7 +3,7 @@ short_name: kubestellar-syncer
 manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'
 pre_req_name: 'content/common-subs/pre-req.md'
 ---
-[![Run Doc Shells - kubestellar-syncer]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-syncer.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-syncer]({{config.repo_url}}/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"

@@ -1,5 +1,5 @@
 
-[![QuickStart test]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/run-doc-shells-qs.yml)&nbsp;&nbsp;&nbsp;
+[![QuickStart test]({{config.repo_url}}/actions/workflows/docs-ecutable-qs.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-qs.yml)&nbsp;&nbsp;&nbsp;
 
 <!-- <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar"> -->
 {%

@@ -1,4 +1,4 @@
-name: Run Doc Shells - Placement
+name: docs-ecutable - Placement
 
 on:
   # So we can trigger manually if needed
@@ -14,7 +14,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-placement.yml"
+      - ".github/workflows/docs-ecutable-placement.yml"
   push:
     branches:
       - main
@@ -25,7 +25,7 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/run-doc-shells-placement.yml"
+      - ".github/workflows/docs-ecutable-placement.yml"
 
 env:
   docs-ecuted-filename: placement
@@ -34,8 +34,8 @@ permissions:
   contents: write
 
 jobs:
-  run-doc-shells:
-    name: Run doc shells - for placement e2e
+  docs-ecutable:
+    name: docs-ecutable - for placement e2e
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
