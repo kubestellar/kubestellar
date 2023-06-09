@@ -204,6 +204,27 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Coding%20Milestones/PoC2023q1/mailbox-controller-subs/mailbox-controller-process-start-without-cd-kubestellar/</loc>
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
@@ -344,6 +365,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Getting-Started/infomercial/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Getting-Started/infomercial/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.2/Getting-Started/quickstart/</loc>
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
@@ -404,6 +432,13 @@
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/common-subs/check-command-syncerconfig-the-one/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/common-subs/check-command-syncerconfig-the-one/"/>
          
     </url>
     <url>
