@@ -22,6 +22,8 @@ nav:
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
       - License: Contribution guidelines/LICENSE.md
+      - Governance: Contribution guidelines/governance.md
+      - Onboarding: Contribution guidelines/onboarding.md
       - Security: 
           - Policy: Contribution guidelines/security/security.md
           - Contacts: Contribution guidelines/security/security_contacts.md
@@ -33,13 +35,13 @@ nav:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
           - Inivitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
-          - KubeStellar-Syncer: Coding Milestones/PoC2023q1/edge-syncer.md
+          - KubeStellar-Syncer: Coding Milestones/PoC2023q1/kubestellar-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
-          - Processes:
-              - KubeStellar Sheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
+          - KubeStellar Processes:
+              - KubeStellar Scheduler: Coding Milestones/PoC2023q1/kubestellar-scheduler.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
               - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
-          - Roadap: Coding Milestones/PoC2023q1/roadmap-uses.md
+          - Roadmap: Coding Milestones/PoC2023q1/roadmap-uses.md
           - Environments:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
@@ -61,11 +63,15 @@ nav:
       - QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
+      - KubeStellar - The Infomercial: Getting-Started/infomercial.md
   - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
   # # - Auto generated:
   #   - ... | auto-generated/*/*.md
 
 theme:
+  font:
+    text: 'SapceMono'
+    code: 'Roboto Mono'
   name: material
   language: en
   # Common files such as images, stylesheets, theme overrides
@@ -79,6 +85,7 @@ theme:
     # - navigation.tabs.sticky
     # - navigation.expand
     - navigation.path
+    - navigation.footer
     # - navigation.tracking
     # Enable a copy button in code blocks
     - content.code.copy
