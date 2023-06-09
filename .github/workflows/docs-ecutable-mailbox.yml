@@ -74,8 +74,6 @@ jobs:
     steps:
       - env:
           docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
-
-      - name: echo env
         run: echo "$docs-ecutable-filename"
 
       - uses: actions/checkout@v3
