@@ -288,10 +288,17 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/security/</loc>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/governance/</loc>
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/security/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/governance/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.2/Contribution%20guidelines/onboarding/</loc>
+         <lastmod>2023-06-09</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Contribution%20guidelines/onboarding/"/>
          
     </url>
     <url>
@@ -397,13 +404,6 @@
          <lastmod>2023-06-09</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.2/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/</loc>
-         <lastmod>2023-06-09</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.2/en/Getting-Started/quickstart-subs/quickstart-3-teardown-the-environment/"/>
          
     </url>
     <url>
