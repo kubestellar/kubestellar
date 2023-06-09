@@ -65,7 +65,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: echo push branch name
-        run: echo running on branch ${{ github.event.ref_name }}
+        run: echo running on branch ${{ github.ref_name }}
         if: github.event_name == 'push'
 
       # - run: git fetch origin ${{ steps.extract_branch.outputs.branch }}
