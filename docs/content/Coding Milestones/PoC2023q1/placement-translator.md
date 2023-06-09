@@ -161,6 +161,12 @@ Continue to follow the steps until the start of Stage 3 of the
 exercise.
 
 {%
+   include-markdown "example1-subs/example1-stage-1a.md"
+   start="<!--example1-stage-1a-start-->"
+   end="<!--example1-stage-1a-end-->"
+%}
+
+{%
    include-markdown "example1-subs/example1-stage-1b.md"
    start="<!--example1-stage-1b-start-->"
    end="<!--example1-stage-1b-end-->"

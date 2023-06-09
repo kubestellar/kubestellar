@@ -1,0 +1,50 @@
+name: Run Doc Shells - Syncer
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - ".github/workflows/run-doc-shells-syncer.yml"
+  push:
+    branches:
+      - main
+      - "release-*"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
+      - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - ".github/workflows/run-doc-shells-syncer.yml"
+
+permissions:
+  contents: write
+
+# concurrency:
+#   group: ${{ github.workflow }}
+
+jobs:
+  run-doc-shells:
+    name: Run doc shells - for syncer e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+  
+      - run: |
+          make MANIFEST="'content/Coding Milestones/PoC2023q1/edge-syncer.md'" \
+          docs-ecutable
