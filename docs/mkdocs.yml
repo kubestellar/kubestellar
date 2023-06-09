@@ -171,6 +171,8 @@ markdown_extensions:
   - pymdownx.snippets
   # Arbitrary nesting of code/content blocks inside each other
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
   # Enable note/warning/etc. callouts
   - admonition
 
