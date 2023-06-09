@@ -82,3 +82,5 @@ jobs:
       - run: git fetch origin main
 
       - run: make FILENAME="${{ env.docs-ecutable-filename }}" write-time-to-file
+
+      - run: git add . && git commit -m "Add changes" && git push -u origin main
