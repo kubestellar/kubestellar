@@ -1,0 +1,32 @@
+name: Elapsed Time Collector
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  workflow_run:
+    workflows: ["Run Doc Shells - example1","Run Doc Shells - Placement","Run Doc Shells - Scheduler","Run Doc Shells - Mailbox","Run Doc Shells - QS"]
+    types:
+      - completed
+env:
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+
+permissions:
+  contents: write
+
+jobs:
+  elapsed-time-collector:
+    name: elapsed-time-collector
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - uses: actions/checkout@v3
+
+      - run: git fetch origin main
+
+      - run: make FILENAME="../overrides/placement.txt" write-time-to-file
+          

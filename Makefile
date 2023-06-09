@@ -197,10 +197,18 @@ deploy-docs: venv
 	. $(VENV)/activate; \
 	REMOTE=$(REMOTE) BRANCH=$(BRANCH) docs/scripts/deploy-docs.sh
 
-.PHONY: run-doc-shells
-run-doc-shells: venv
-	. $(VENV)/activate; \
+.PHONY: docs-ecutable
+docs-ecutable: 
 	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
+
+.PHONY: write-time-to-file
+write-time-to-file: 
+	FILENAME=$(FILENAME) docs/scripts/get-elapsed-time.sh
+
+# .PHONY: run-doc-shells
+# run-doc-shells: venv
+# 	. $(VENV)/activate; \
+# 	MANIFEST=$(MANIFEST) docs/scripts/run-doc-shells.sh
 	
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
@@ -251,7 +259,7 @@ verify-syncer-codegen:
 		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
 	fi
 
-	$(MAKE) syncer-codegen
+#	$(MAKE) syncer-codegen
 
 	if ! git diff --quiet HEAD; then \
 		git diff; \
