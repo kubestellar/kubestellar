@@ -77,9 +77,9 @@ The command line flags, beyond the basics, are as follows.
 open a terminal window(1) and clone the latest KubeStellar source:
 
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md"
-   start="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-start-->"
-   end="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-end-->"
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
+   start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
+   end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
 %}
 
 #### Create the Edge Service Provider Workspace (ESPW)
