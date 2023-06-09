@@ -17,7 +17,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
@@ -30,7 +30,7 @@ echo ${FILE_LIST[0]}
 
 # regular expression pattern to match backtick fenced shell code blocks
 start_pattern="^\`\`\`shell"
-start_hidden_pattern="^\`\`\`\s*{\s*.bash\s*.hide-me\s*}"
+start_hidden_pattern="^\`\`\` \{\.bash \.hide-me\}"
 stop_pattern="^\`\`\`"
 include_pattern="\s*include-markdown\s*"
 
@@ -41,26 +41,10 @@ code_blocks+=("cd $REPO_ROOT/docs/scripts/")
 if [ -f "/etc/os-release" ]; then
   if [[ $(grep -i "ubuntu" /etc/os-release) ]]; then
     echo "The operating system is Ubuntu."
-    # code_blocks+=('sudo apt-get install -y curl wget gnupg')
-    # code_blocks+=('source /etc/os-release ; sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"2')
-    # code_blocks+=('source /etc/os-release ; wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_${VERSION_ID}/Release.key -O- | sudo apt-key add -')
-    # code_blocks+=('sudo apt update && sudo apt install -y podman && podman machine init && podman machine start')
-    # code_blocks+=('sudo snap install go --classic')
-    # code_blocks+=('go install sigs.k8s.io/kind@v0.17.0')
-    # code_blocks+=('curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 && chmod +x ./kind && sudo mv ./kind /usr/local/bin/')
-    # code_blocks+=('sudo apt update && sudo apt install -y jq')
-    # code_blocks+=('sudo apt update && sudo apt install -y kubectl')
-    # code_blocks+=('alias docker=podman')
   fi
 else
   echo "The operating system is not Ubuntu."
-  # code_blocks+=("brew install podman && podman machine init && podman machine start")
-  # code_blocks+=('alias docker=podman')
-  # code_blocks+=('KIND_EXPERIMENTAL_PROVIDER=podman')
-
 fi
-
-inside_block=0
 
 repo_url=$(yq -r ".repo_url" $REPO_ROOT/docs/mkdocs.yml)
 repo_raw_url=$(yq -r ".repo_raw_url" $REPO_ROOT/docs/mkdocs.yml)
@@ -70,10 +54,11 @@ ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
-code_blocks+=('set -o xtrace')
+# code_blocks+=('set -o xtrace')
 
 function parse_file() 
 {
+  local inside_block=0
   local file_name=$(echo $1 | sed 's/"//g')
   local path_name=$(echo "${file_name%/*}/")
 
@@ -101,15 +86,23 @@ function parse_file()
     if [[ $inside_block == 1 ]]; then
       # remove the backticks from the code block
       
-      code_block="${line//\`\`\`shell/}"
-      code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
-      code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
-      code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
-      code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
-      echo $code_block
-
-      # add the code block to the array
-      code_blocks+=("$code_block")
+      if [[ $line =~ $start_pattern ]]; then
+        echo ignore this line: $line
+      else
+        if [[ $line =~ $start_hidden_pattern ]]; then
+          echo ignote this line: $line
+        else
+          # code_block="${line//\`\`\`shell/}"
+          code_block=$line
+          code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
+          code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
+          code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
+          code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
+          echo $code_block
+          # add the code block to the array
+          code_blocks+=("$code_block")
+        fi
+      fi
     fi
   done < "$REPO_ROOT/docs/$file_name"
 }
@@ -118,8 +111,6 @@ for FILE_NAME in "${FILE_LIST[@]}"
 do
   parse_file "\"$FILE_NAME\""
 done
-
-
 
 IFS=$SAVEIFS
 
@@ -130,6 +121,8 @@ echo "" > "$generated_script_file"
 for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
+
+cat "$generated_script_file"
 
 # make the generated script executable
 chmod +x "$generated_script_file"

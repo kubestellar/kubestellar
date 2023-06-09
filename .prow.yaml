@@ -1,0 +1,56 @@
+presubmits:
+  - name: pull-edge-mc-verify
+    always_run: true
+    decorate: true
+    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    spec:
+      containers:
+        - image: ghcr.io/kcp-dev/infra/build:1.19.9-2
+          command:
+            - make
+            - verify-boilerplate
+            - verify-codegen
+            - verify-go-versions
+            - verify-imports
+            - verify-k8s-deps
+            - verify-modules
+            - verify-syncer-codegen
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1
+
+  - name: pull-edge-mc-lint
+    always_run: true
+    decorate: true
+    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    spec:
+      containers:
+        - image: ghcr.io/kcp-dev/infra/build:1.19.9-2
+          command:
+            - make
+            - lint
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
+
+  - name: pull-edge-mc-test-unit
+    always_run: true
+    decorate: true
+    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    labels:
+      preset-goproxy: "true"
+    spec:
+      containers:
+        - image: ghcr.io/kcp-dev/infra/build:1.19.9-2
+          command:
+            - make
+            - test
+          env:
+            - name: USE_GOTESTSUM
+              value: '1'
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
