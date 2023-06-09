@@ -78,12 +78,15 @@ updatedAt=${updatedAt//\"/}
 
 # Convert timestamps to date objects
 date1=$(date -d "$createdAt" "+%s")
+echo $date1
 # date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
 date2=$(date -d "$updatedAt" "+%s")
+echo $date2
 # date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
 
 # Compute the time difference in seconds
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-echo "$minutes"
+echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->"
+
