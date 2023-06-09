@@ -27,6 +27,7 @@ on:
 
 env:
   docs-ecutable-filename: mailbox
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
