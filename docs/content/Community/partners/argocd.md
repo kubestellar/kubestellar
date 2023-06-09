@@ -8,12 +8,12 @@ For KubeStellar's Inventory Management Workspace (IMW) and Workload Management W
 The steps are similar.
 Let's take WMW as an example:
 
-1\. Create `kube-system` namespace in the workspace.
+1. Create `kube-system` namespace in the workspace.
 
-2\. Make sure necessary apibindings exist in the workspace.
+2. Make sure necessary apibindings exist in the workspace.
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.
 
-3\. Exclude `ClusterWorkspace` from discovery and sync.
+3. Exclude `ClusterWorkspace` from discovery and sync.
 
 ```shell
 kubectl -n argocd edit cm argocd-cm
@@ -38,7 +38,7 @@ kubectl -n argocd rollout restart deployment argocd-server
 
 Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
 
-4\. Make sure the current context uses WMW, then identify the admin.kubeconfig.
+4. Make sure the current context uses WMW, then identify the admin.kubeconfig.
 
 The command and output should be similar to
 ```console
