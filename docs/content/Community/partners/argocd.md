@@ -5,15 +5,40 @@ As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are no
 Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.
 
 For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
-The procedures are similar.
+The steps are similar.
 Let's take WMW as an example:
 
-First, create `kube-system` namespace in the workspace.
+1. Create `kube-system` namespace in the workspace.
 
-Second, make sure necessary apibindings exist in the workspace.
+2. Make sure necessary apibindings exist in the workspace.
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.
 
-Third, make sure the current context uses WMW, then identify the admin.kubeconfig.
+3. Exclude `ClusterWorkspace` from discovery and sync.
+
+```shell
+kubectl -n argocd edit cm argocd-cm
+```
+
+Make sure `resource.exclusions` exists in the `data` field of the `argocd-cm` configmap as follows:
+```yaml
+data:
+  resource.exclusions: |
+    - apiGroups:
+      - "tenancy.kcp.io"
+      kinds:
+      - "ClusterWorkspace"
+      clusters:
+      - "*"
+```
+
+Restart the Argo CD server.
+```shell
+kubectl -n argocd rollout restart deployment argocd-server
+```
+
+Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
+
+4. Make sure the current context uses WMW, then identify the admin.kubeconfig.
 
 The command and output should be similar to
 ```console
@@ -86,6 +111,25 @@ application 'edgeplacement' created
 Medium - [Sync 10,000 ArgoCD Applications in One Shot](https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b)<br/>
 Medium - [Sync 10,000 ArgoCD Applications in One Shot, by Yourself](https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad)<br/>
 Medium - [GitOpsCon - here we come](https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33)<br/>
-Youtube - [ArgoCD Scale Experiment - KubeStellar Community Demo Day](https://www.youtube.com/watch?v=7XuEJF7--Sc&t=90s)<br/>
-YouTube - [GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson & Jun Duan, IBM](https://www.youtube.com/watch?v=PB3OTXDjFjg)<br/>
+### ArgoCD Scale Experiment - KubeStellar Community Demo Day
+<p align=center>
+<iframe width="720" height="400" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</p>
 
+### GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson & Jun Duan, IBM
+<p align=center>
+<iframe width="720" height="400" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</p>
+
+### ArgoCD and KubeStellar in the news
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7031032280722632704" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+</p>
+</br>
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7046166635367268352" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+</p>
+</br>
+<p align=center>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7060337925300838400" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+</p>

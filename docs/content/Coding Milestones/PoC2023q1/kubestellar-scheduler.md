@@ -1,111 +1,99 @@
 ---
-title: "KubeStellar Scheduler"
-date: 2023-03-27
-weight: 4
-description: >
+short_name: kubestellar-scheduler
+manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'
+pre_req_name: 'content/common-subs/pre-req.md'
 ---
-
-### Pre-requisite: 
-  You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-```console
-brew install go@1.19
-```
-
+[![docs-ecutable - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 ### Steps to try the scheduler
 
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest KubeStellar source:
-```console
-git clone {{ config.repo_url }} KubeStellar
-```
-
-clone the v0.11.0 branch kcp source:
-```console
-git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
-```
-build the kubectl-ws binary and include it in `$PATH`
-```console
-cd kcp
-make build
-export PATH=$(pwd)/bin:$PATH
-```
-
-
-run kcp (kcp will spit out tons of information and stay running in this terminal window)
-```console
-kcp start
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
+   start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
+   end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
+%}
 
 #### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
 open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
-```console
-export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/bin:$PATH
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
+   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
+   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+%}
 
-Use workspace `root:edge` as the Edge Service Provider Workspace (ESPW).
-```console
-kubectl ws root
-kubectl ws create edge --enter
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md"
+   start="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->"
+   end="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->"
+%}
 
 Install CRDs and APIExport.
-```console
-kubectl apply -f ../KubeStellar/config/exports/
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-exports.md"
+   start="<!--kubestellar-scheduler-exports-start-->"
+   end="<!--kubestellar-scheduler-exports-end-->"
+%}
 
 #### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
-Use the user home workspace (`~`) as the workload management workspace (WMW).
-```console
-kubectl ws ~
-```
-
-Bind APIs.
-```console
-kubectl apply -f ../KubeStellar/config/imports/
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-imports.md"
+   start="<!--kubestellar-scheduler-imports-start-->"
+   end="<!--kubestellar-scheduler-imports-end-->"
+%}
 
 #### Run the KubeStellar Scheduler against the ESPW
-Go to `root:edge` workspace and run the edge scheduler.
-```console
-kubectl ws root:edge
-cd ../KubeStellar
-go run cmd/kubestellar-scheduler/main.go -v 2
-```
-
+Go to the `root:espw` workspace and run the edge scheduler.
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md"
+   start="<!--kubestellar-scheduler-process-start-start-->"
+   end="<!--kubestellar-scheduler-process-start-end-->"
+%}
 The outputs from the edge scheduler should be similar to:
-```console
-I0327 17:14:42.222112   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/291lkbsqq181xfng/edge.kcp.io"
-I0327 17:14:42.225075   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/scheduling.kcp.io"
-I0327 17:14:42.226954   51241 kubestellar-scheduler.go:243] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.54:6443/services/apiexport/root/workload.kcp.io"
-I0327 17:14:42.528573   51241 controller.go:201] "starting controller" controller="kubestellar-scheduler"
+``` { .bash .no-copy }
+I0605 10:53:00.156100   29786 scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kcp.io"
+I0605 10:53:00.157874   29786 scheduler.go:212] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io"
+I0605 10:53:00.159242   29786 scheduler.go:212] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io"
+I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controller="kubestellar-scheduler"
 ```
 
 #### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
 open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
-```console
+```shell
 cd ../kcp
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 export PATH=$(pwd)/bin:$PATH
 ```
 
 Use workspace `root:compute` as the Inventory Management Workspace (IMW).
-```console
+```shell
 kubectl ws root:compute
 ```
 
 Create two Locations and two SyncTargets.
-```console
+```shell
 kubectl create -f ../KubeStellar/config/samples/location_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/location_dev.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_prod.yaml
 kubectl create -f ../KubeStellar/config/samples/synctarget_dev.yaml
+sleep 5
 ```
 
 Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
-```console
+```shell
 kubectl get locations,synctargets
-
+```
+``` { .bash .no-copy }
 NAME                                 RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
 location.scheduling.kcp.io/default   synctargets   0           2                    2m12s
 location.scheduling.kcp.io/dev       synctargets   0           1                    2m39s
@@ -117,82 +105,94 @@ synctarget.workload.kcp.io/prod   2m12s
 ```
 
 #### Create some EdgePlacements in the WMW
-Go to Workload Management Workspace (WMW) and create an EdgePlacement `test-1`.
-```console
-kubectl ws ~
-kubectl create -f ../KubeStellar/config/samples/edgeplacement_test-1.yaml
+Go to Workload Management Workspace (WMW) and create an EdgePlacement `all2all`.
+```shell
+kubectl ws \~
+kubectl create -f ../KubeStellar/config/samples/edgeplacement_all2all.yaml
+sleep 3
 ```
 
 The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
-```console
-kubectl get sps test-1 -oyaml
-
+```shell
+kubectl get sps all2all -oyaml
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 destinations:
-- cluster: f3il38atqno12hfd
+- cluster: 1yotsgod0d2p3xa5
   locationName: prod
   syncTargetName: prod
-  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
-- cluster: f3il38atqno12hfd
+  syncTargetUID: 13841ffd-33f2-4cf4-9114-6156f73aa5c8
+- cluster: 1yotsgod0d2p3xa5
   locationName: dev
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
-- cluster: f3il38atqno12hfd
-  locationName: default
-  syncTargetName: prod
-  syncTargetUID: 8c0a7003-ad18-4bf0-90a0-b1d74cda2437
-- cluster: f3il38atqno12hfd
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+- cluster: 1yotsgod0d2p3xa5
   locationName: default
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+- cluster: 1yotsgod0d2p3xa5
+  locationName: default
+  syncTargetName: prod
+  syncTargetUID: 13841ffd-33f2-4cf4-9114-6156f73aa5c8
 kind: SinglePlacementSlice
 metadata:
   annotations:
     kcp.io/cluster: kvdk2spgmbix
-  creationTimestamp: "2023-03-27T21:37:29Z"
+  creationTimestamp: "2023-06-05T14:55:20Z"
   generation: 1
-  name: test-1
+  name: all2all
   ownerReferences:
   - apiVersion: edge.kcp.io/v1alpha1
     kind: EdgePlacement
-    name: test-1
-    uid: 0c68724e-6d11-4cff-bd0a-8fa32c86caa9
-  resourceVersion: "877"
-  uid: 45ec86d7-bdf8-4c2d-bc02-087073a1ac17
+    name: all2all
+    uid: 31915018-6a25-4f01-943e-b8a0a0ed35ba
+  resourceVersion: "875"
+  uid: a2b8224d-5feb-40a1-adb2-67c07965f13b
 ```
-EdgePlacement `test-1` selects all the 3 Locations in `root:compute`.
+EdgePlacement `all2all` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
-```console
+```shell
 kubectl create -f ../KubeStellar/config/samples/edgeplacement_dev.yaml
+sleep 3
 ```
 
 The corresponding SinglePlacementSlice has a shorter list of `destinations`:
-```console
+```shell
 kubectl get sps dev -oyaml
-
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 destinations:
-- cluster: f3il38atqno12hfd
+- cluster: 1yotsgod0d2p3xa5
   locationName: dev
   syncTargetName: dev
-  syncTargetUID: dc490a42-e8f1-4930-a142-6c0ba8fd39d5
+  syncTargetUID: ea5492ec-44af-4173-a4ca-9c5cd59afcb1
 kind: SinglePlacementSlice
 metadata:
   annotations:
     kcp.io/cluster: kvdk2spgmbix
-  creationTimestamp: "2023-03-27T21:40:52Z"
+  creationTimestamp: "2023-06-05T14:57:00Z"
   generation: 1
   name: dev
   ownerReferences:
   - apiVersion: edge.kcp.io/v1alpha1
     kind: EdgePlacement
     name: dev
-    uid: 6e9d608d-12cd-47cc-8887-3695199259ba
-  resourceVersion: "880"
-  uid: 9b8de087-21bc-4585-99cb-e6c03ba0a8ae
+    uid: 1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b
+  resourceVersion: "877"
+  uid: c9c0c2fc-d721-4c73-9788-e10711bad23a
 ```
 
 Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.
 
 Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

@@ -1,9 +1,19 @@
 ---
-title: "Placement Translator"
-date: 2023-03-21
-weight: 4
-description: >
+short_name: placement-translator
+manifest_name: 'content/Coding Milestones/PoC2023q1/placement-translator.md'
+pre_req_name: 'content/common-subs/pre-req.md'
 ---
+[![docs-ecutable - placement-translator]({{config.repo_url}}/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 
 The placement translator runs in the center and translates EMC placement problems into edge sync problems.
 
@@ -85,13 +95,17 @@ takes the position that there might be other parties that create
 
 ## Usage
 
-The placement translator needs two kube client configurations.  One
+The placement translator needs three kube client configurations.  One
 points to the edge service provider workspace and provides authority
-to write into the mailbox workspaces.  The other points to the kcp
+to write into the mailbox workspaces.  Another points to the kcp
 server base (i.e., does not identify a particular logical cluster nor
 `*`) and is authorized to read all clusters.  In the kubeconfig
-created by `kcp start` the latter is satisfied by the context named
-`system:admin`.
+created by `kcp start` that is satisfied by the context named
+`system:admin`.  The third points to the "scheduling service provider
+workspace", the one that has the APIExport of `scheduling.kcp.io`.
+This is normally `root`, which has all the kcp APIExports, and the
+context named `root` in the kubeconfig created by `kcp start`
+satisfies this.
 
 The command line flags, beyond the basics, are as follows.  For a
 string parameter, if no default is explicitly stated then the default
@@ -99,16 +113,23 @@ is the empty string, which usually means "not specified here".  For
 both kube client configurations, the usual rules apply: first consider
 command line parameters, then `$KUBECONFIG`, then `~/.kube/config`.
 
-```console
+``` { .bash .no-copy }
       --allclusters-cluster string       The name of the kubeconfig cluster to use for access to all clusters
       --allclusters-context string       The name of the kubeconfig context to use for access to all clusters (default "system:admin")
       --allclusters-kubeconfig string    Path to the kubeconfig file to use for access to all clusters
       --allclusters-user string          The name of the kubeconfig user to use for access to all clusters
+
       --espw-cluster string              The name of the kubeconfig cluster to use for access to the edge service provider workspace
       --espw-context string              The name of the kubeconfig context to use for access to the edge service provider workspace
       --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace
       --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace
+
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10204)
+
+      --sspw-cluster string              The name of the kubeconfig cluster to use for access to the scheduling service provider workspace
+      --sspw-context string              The name of the kubeconfig context to use for access to the scheduling service provider workspace (default "root")
+      --sspw-kubeconfig string           Path to the kubeconfig file to use for access to the scheduling service provider workspace
+      --sspw-user string                 The name of the kubeconfig user to use for access to the scheduling service provider workspace
 ```
 
 ## Try It
@@ -118,39 +139,55 @@ scenario in [example1](../example1).  You will need to run the
 scheduler and mailbox controller long enough for them to create what
 this scenario calls for, but they can be terminated after that.
 
-When you get to the step of "Populate the edge service provider
-workspace", it suffices to do the following.
+{%
+   include-markdown "example1-subs/example1-pre-kcp.md"
+   start="<!--example1-pre-kcp-start-->"
+   end="<!--example1-pre-kcp-end-->"
+%}
 
-```console
-$ kubectl ws root:espw
-$ kubectl create -f config/exports
-```
+{%
+   include-markdown "example1-subs/example1-start-kcp.md"
+   start="<!--example1-start-kcp-start-->"
+   end="<!--example1-start-kcp-end-->"
+%}
+
+{%
+   include-markdown "example1-subs/example1-post-kcp.md"
+   start="<!--example1-post-kcp-start-->"
+   end="<!--example1-post-kcp-end-->"
+%}
 
 Continue to follow the steps until the start of Stage 3 of the
 exercise.
 
-Next make sure you run `kubectl ws root:espw` to enter the edge
-service provider workspace, then you will be ready to run the edge
-controllers.
+{%
+   include-markdown "example1-subs/example1-stage-1a.md"
+   start="<!--example1-stage-1a-start-->"
+   end="<!--example1-stage-1a-end-->"
+%}
 
-First run the mailbox controller, long for it to create the mailbox
-workspaces; it does not need to keep running, you can ^C it.  This
-should not take long, and do not expect an explicit acknowledgement on
-the console.  You can check for their existence by doing `kubectl get
-workspaces` while in the ESPW.
+{%
+   include-markdown "example1-subs/example1-stage-1b.md"
+   start="<!--example1-stage-1b-start-->"
+   end="<!--example1-stage-1b-end-->"
+%}
 
-Next run the scheduler, long enough for it to create the
-SinglePlacementSlice objects.  Again, this should not take long, and
-you can ^C the scheduler once it has created those objects.
+{%
+   include-markdown "example1-subs/example1-stage-2.md"
+   start="<!--example1-stage-2-start-->"
+   end="<!--example1-stage-2-end-->"
+%}
 
 Finally run the placement translator from the command line.  That
 should look like the following (possibly including some complaints,
-which do not necessarily indicate real problems because the subsequent
-success is not logged so profligately).
+which do not necessarily indicate real problems).
 
-```console
-$ go run ./cmd/placement-translator
-
+{%
+   include-markdown "placement-translator-subs/placement-translator-process-start-without-cd-kubestellar.md"
+   start="<!--placement-translator-process-start-without-cd-kubestellar-start-->"
+   end="<!--placement-translator-process-start-without-cd-kubestellar-end-->"
+%}
+``` { .bash .no-copy }
 I0412 15:15:57.867837   94634 shared_informer.go:282] Waiting for caches to sync for placement-translator
 I0412 15:15:57.969533   94634 shared_informer.go:289] Caches are synced for placement-translator
 I0412 15:15:57.970003   94634 shared_informer.go:282] Waiting for caches to sync for what-resolver
@@ -184,8 +221,10 @@ to mailbox workspace(s).
 You can get a listing of mailbox workspaces, while in the edge service
 provider workspace, as follows.
 
-```console
-$ kubectl get Workspace
+```shell 
+kubectl get workspace
+```
+``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19   universal            Ready   https://192.168.58.123:6443/clusters/12zzf3frkqz2yj39   36m
 1xpg93182scl85te-mb-e6efb8bd-6755-45ac-b44d-5d38f978f990   universal            Ready   https://192.168.58.123:6443/clusters/2v6wl3x41zxmpmhr   36m
@@ -195,11 +234,17 @@ Next switch to one of the mailbox workspaces (in my case I picked the
 one for the guilder cluster) and examine the `SyncerConfig` object.
 That should look like the following.
 
-```console
-$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```shell
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml                           
+```shell
+kubectl get SyncerConfig the-one -o yaml                           
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -286,16 +331,22 @@ At this point you might veer off from the example scenario and try
 tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
-```console
-$ kubectl ws root:work-c
-Current workspace is "root:work-c".
-$ kubectl delete EdgePlacement edge-placement-c
+```shell
+kubectl ws root:my-org:wmw-c
+```
+``` { .bash .no-copy }
+Current workspace is "root:work-c"
+```
+```shell
+kubectl delete EdgePlacement edge-placement-c
+```
+``` { .bash .no-copy }
 edgeplacement.edge.kcp.io "edge-placement-c" deleted
 ```
 
 That will cause the placement translator to log updates, as follows.
 
-```
+``` { .bash .no-copy }
 I0412 15:20:43.129842   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[] Upsync:[]}
 I0412 15:20:43.241674   94634 map-types.go:342] "Delete" map="where" key="1i1weo8uoea04wxr:edge-placement-c"
 ```
@@ -303,14 +354,24 @@ I0412 15:20:43.241674   94634 map-types.go:342] "Delete" map="where" key="1i1weo
 After that, the SyncerConfig in the florin mailbox should be empty, as
 in the following (you mailbox workspace names may be different).
 
-```console
-$ kubectl ws root:espw
+```shell
+kubectl ws root:espw
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw".
+```
 
-$ kubectl ws 2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f
+```shell
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml
+```shell
+kubectl get SyncerConfig the-one -o yaml
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -330,13 +391,18 @@ And the SyncerConfig in the guilder mailbox workspace should reflect
 only the special workload.  That would look something like the
 following.
 
-```console
-$ kubectl ws root:espw
-
-$ kubectl ws 1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19
+```shell
+kubectl ws root:espw
+kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+```
+``` { .bash .no-copy }
 Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+```
 
-$ kubectl get SyncerConfig the-one -o yaml                           
+```shell
+kubectl get SyncerConfig the-one -o yaml                           
+```
+``` { .bash .no-copy }
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncerConfig
 metadata:
@@ -411,3 +477,11 @@ spec:
     - flanges
 status: {}
 ```
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}

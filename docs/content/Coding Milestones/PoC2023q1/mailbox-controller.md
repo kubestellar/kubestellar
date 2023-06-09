@@ -1,11 +1,19 @@
 ---
-title: "Mailbox Controller"
-date: 2023-02-02
-weight: 4
-description: >
+short_name: mailbox-controller
+manifest_name: 'content/Coding Milestones/PoC2023q1/mailbox-controller.md'
+pre_req_name: 'content/common-subs/pre-req.md'
 ---
-
-
+[![docs-ecutable - mailbox-controller]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
+{%
+   include-markdown "../../common-subs/required-packages.md"
+   start="<!--required-packages-start-->"
+   end="<!--required-packages-end-->"
+%}
+{%
+   include-markdown "../../common-subs/save-some-time.md"
+   start="<!--save-some-time-start-->"
+   end="<!--save-some-time-end-->"
+%}
 ## Linking SyncTarget with Mailbox Workspace
 
 For a given SyncTarget T, the mailbox controller currently chooses the
@@ -40,7 +48,7 @@ consume the `Workspace` objects from there.
 
 The command line flags, beyond the basics, are as follows.
 
-```console
+``` { .bash .no-copy }
       --concurrency int                  number of syncs to run in parallel (default 4)
       --espw-path string                 the pathname of the edge service provider workspace (default "root:espw")
 
@@ -63,26 +71,40 @@ The command line flags, beyond the basics, are as follows.
 ```
 
 ## Try It
+### Steps to try the mailbox controller
 
-To exercise it, do the following steps.
+#### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+open a terminal window(1) and clone the latest KubeStellar source:
 
-Clone this repo, install kcp (the version for `github.com/kcp-dev/kcp` in `go.mod` is required) 
-and start a kcp server as described [here](kubestellar-scheduler.md#steps-to-try-the-scheduler).
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
+   start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
+   end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
+%}
 
-Do the remaining steps in a separate shell, with
-`$KUBECONFIG` set to the admin config for that kcp server.  
+#### Create the Edge Service Provider Workspace (ESPW)
+open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
 
-Next, create the edge service provider workspace:
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
+   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
+   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+%}
 
-```shell
-kubectl ws root
-kubectl ws create espw --enter
-```
+{%
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md"
+   start="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->"
+   end="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->"
+%}
 
 After that, a run of the controller should look like the following.
 
-```console
-$ go run ./cmd/mailbox-controller -v=2
+{%
+   include-markdown "mailbox-controller-subs/mailbox-controller-process-start.md"
+   start="<!--mailbox-controller-process-start-start-->"
+   end="<!--mailbox-controller-process-start-end-->"
+%}
+``` { .bash .no-copy }
 I0305 18:06:20.046741   85556 main.go:110] "Command line flag" add_dir_header="false"
 I0305 18:06:20.046954   85556 main.go:110] "Command line flag" alsologtostderr="false"
 I0305 18:06:20.046960   85556 main.go:110] "Command line flag" concurrency="4"
@@ -108,15 +130,14 @@ I0305 18:06:20.172169   85556 shared_informer.go:289] Caches are synced for mail
 I0305 18:06:20.172196   85556 main.go:210] "Informers synced"
 ```
 
-In a separate shell, make a inventory management workspace as follows.
+In a separate terminal window(3), create an inventory management workspace as follows.
 
 ```shell
 kubectl ws \~
 kubectl ws create imw --enter
 ```
 
-Then in that workspace, run the following command to create a `SyncTarget`
-object.
+Then in that workspace, run the following command to create a `SyncTarget` object.
 
 ```shell
 cat <<EOF | kubectl apply -f -
@@ -132,17 +153,23 @@ EOF
 
 That should provoke logging like the following from the mailbox controller.
 
-```console
+``` { .bash .no-copy }
 I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
 
 And you can verify that as follows:
 
-```console
-$ kubectl ws root:espw
+```shell
+kubectl ws root:espw
+```
+``` {.bash .no-copy }
 Current workspace is "root:espw".
+```
 
-$ kubectl get workspaces
+```shell
+kubectl get workspaces
+```
+``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
 niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s
 ```
@@ -169,6 +196,14 @@ kubectl delete SyncTarget stest1
 ```
 and watch the mailbox controller react as follows.
 
-```console
+``` { .bash .no-copy }
 I0305 18:08:44.380421   85556 main.go:352] "Deleted unwanted workspace" worker=0 mbwsName="niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368"
 ```
+
+## Teardown the environment
+
+{%
+   include-markdown "../../common-subs/teardown-the-environment.md"
+   start="<!--teardown-the-environment-start-->"
+   end="<!--teardown-the-environment-end-->"
+%}
