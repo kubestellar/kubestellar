@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-scheduler.yml"
   push:
     branches:
@@ -19,6 +20,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-scheduler.yml"
 
 env:
