@@ -25,9 +25,6 @@ on:
       - ".github/workflows/docs-ecutable-mailbox.yml"
       - "docs/scripts/docs-ecutable.sh"
 
-env:
-  docs-ecuted-filename: mailbox
-
 permissions:
   contents: write
 
@@ -39,7 +36,7 @@ jobs:
       docs-ecuted-filename: ${{ steps.step1.outputs.docs-ecuted-filename }}
     steps:
       - id: step1
-        run: echo "docs-ecuted-filename=${{ env.docs-ecuted-filename }}" >> "$GITHUB_OUTPUT"
+        run: echo "docs-ecuted-filename=mailbox" >> "$GITHUB_OUTPUT"
 
       # - uses: actions/checkout@v3
 
