@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-syncer.yml"
   push:
     branches:
@@ -19,13 +20,14 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/edge-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-syncer.yml"
+
+env:
+  docs-ecuted-filename: syncer
 
 permissions:
   contents: write
-
-# concurrency:
-#   group: ${{ github.workflow }}
 
 jobs:
   run-doc-shells:
@@ -34,7 +36,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: git fetch origin main
+      - name: echo fetching workflow_dispatch branch
+        run: git fetch origin ${GITHUB_REF##*/}
+        # run: echo running on branch ${GITHUB_REF##*/}
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
+
+      - name: echo fetching push or pull_request branch
+        run: git fetch origin ${{ github.ref_name }}
+        # run: echo running on branch ${{ github.ref_name }}
+        if: github.event_name == 'push' || github.event_name != 'pull_request'
 
       - uses: actions/setup-go@v4
         with:
@@ -46,5 +56,5 @@ jobs:
         id: install
   
       - run: |
-          make MANIFEST="'content/Coding Milestones/PoC2023q1/edge-syncer.md'" \
+          make MANIFEST="'content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'" \
           docs-ecutable
