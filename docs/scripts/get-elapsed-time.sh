@@ -30,7 +30,7 @@ if [ -z "${FILE_LIST[0]+x}" ]; then
     echo empty filename, exiting
     exit
 else
-  option=${FILE_LIST[0]}
+  docs-ecutable-filename=${FILE_LIST[0]}
 fi
 
 IFS=$SAVEIFS
@@ -38,7 +38,7 @@ IFS=$SAVEIFS
 
 workflow_id=""
 
-case $option in
+case $docs-ecutable-filename in
     placement)
         echo "Selected placement option"
         workflow_id="59166207"
@@ -88,5 +88,6 @@ echo $date2
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->"
+docs-ecutable-filename=$docs-ecutable-filename + ".dmd"
+echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->" > /docs/overrides/$docs-ecutable-filename
 
