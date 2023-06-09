@@ -77,8 +77,10 @@ createdAt=${createdAt//\"/}
 updatedAt=${updatedAt//\"/}
 
 # Convert timestamps to date objects
-date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
-date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
+date1=$(date -d "$createdAt" "+%s")
+# date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
+date2=$(date -d "$updatedAt" "+%s")
+# date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
 
 # Compute the time difference in seconds
 time_diff=$((date2 - date1))
