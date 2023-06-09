@@ -1718,7 +1718,7 @@
 <!-- <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar"> -->
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-0-demo.md '&lt;!--quickstart-0-demo-start--&gt;' '&lt;!--quickstart-0-demo-end--&gt;' -->
 
-<h2 id="demo-video">Demo Video</h2>
+<h2 id="demo-video">Demo Video<a class="headerlink" href="#demo-video" title="Permanent link">#</a></h2>
 <p>Watch this video to see a step-by-step demo of KubeStellar running and then follow the instructions below to get your own KubeStellar started quickly.</p>
 <p align=center>
 <iframe width="720" height="400" src="https://www.youtube.com/embed/NMGH-bwsh7s?controls=0" title="YouTube video player" frameborder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -1796,7 +1796,7 @@
 </div>
 </div>
 <!-- END INCLUDE -->
-<h2 id="setup-instructions">Setup Instructions</h2>
+<h2 id="setup-instructions">Setup Instructions<a class="headerlink" href="#setup-instructions" title="Permanent link">#</a></h2>
 <p>Table of contents:</p>
 <ol>
 <li><a href="#1-install-and-run-kubestellar">Install and run <strong>KubeStellar</strong></a></li>
@@ -1813,7 +1813,7 @@
 <p>This guide is intended to show how to (1) quickly bring up a <strong>KubeStellar</strong> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-1-install-and-run-kubestellar.md '&lt;!--quickstart-1-install-and-run-kubestellar-start--&gt;' '&lt;!--quickstart-1-install-and-run-kubestellar-end--&gt;' -->
 
-<h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong></h2>
+<h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong><a class="headerlink" href="#1-install-and-run-kubestellar" title="Permanent link">#</a></h2>
 <p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>latest
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
@@ -1840,7 +1840,7 @@
 </code></pre></div>
 <!-- END INCLUDE -->
 
-<h2 id="2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">2. Example deployment of Apache HTTP Server workload into two local kind clusters</h2>
+<h2 id="2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">2. Example deployment of Apache HTTP Server workload into two local kind clusters<a class="headerlink" href="#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters" title="Permanent link">#</a></h2>
 <p>In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
 clusters.  This example is similar to the one described more
@@ -1848,7 +1848,7 @@ expansively <a href="../../Coding%20Milestones/PoC2023q1/example1/">on the
 website</a>,
 but with the some steps reorganized and combined and the special
 workload and summarization aspirations removed.</p>
-<h3 id="a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder</h3>
+<h3 id="a-stand-up-two-kind-clusters-florin-and-guilder">a. Stand up two kind clusters: florin and guilder<a class="headerlink" href="#a-stand-up-two-kind-clusters-florin-and-guilder" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin.md '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-end--&gt;' -->
 
 <p>Create the first edge cluster:</p>
@@ -1882,7 +1882,7 @@ workload and summarization aspirations removed.</p>
 </code></pre></div>
 <p>Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.</p>
 <!-- END INCLUDE -->
-<h3 id="b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</h3>
+<h3 id="b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)<a class="headerlink" href="#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end--&gt;' -->
 
 <p>IMWs are used by KubeStellar to store inventory objects (<code>SyncTargets</code> and <code>Locations</code>). Create an IMW named <code>example-imw</code> with the following command:</p>
@@ -1898,7 +1898,7 @@ workload and summarization aspirations removed.</p>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
 <!-- END INCLUDE -->
 
-<h3 id="c-onboarding-the-clusters">c. Onboarding the clusters</h3>
+<h3 id="c-onboarding-the-clusters">c. Onboarding the clusters<a class="headerlink" href="#c-onboarding-the-clusters" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end--&gt;' -->
 
 <p>Let's begin by onboarding the <code>florin</code> cluster:</p>
@@ -1972,7 +1972,7 @@ workload and summarization aspirations removed.</p>
 </code></pre></div>
 <!-- END INCLUDE -->
 
-<h3 id="d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters">d. Create and deploy the Apache Server workload into florin and guilder clusters</h3>
+<h3 id="d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters">d. Create and deploy the Apache Server workload into florin and guilder clusters<a class="headerlink" href="#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md '&lt;!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end--&gt;' -->
 
 <p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters.</p>
@@ -2174,7 +2174,7 @@ which should eventually yield:</p>
 <p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="../user-guide">User Guide</a></p>
 <!-- END INCLUDE -->
 
-<h2 id="3-teardown-the-environment">3. Teardown the environment</h2>
+<h2 id="3-teardown-the-environment">3. Teardown the environment<a class="headerlink" href="#3-teardown-the-environment" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
@@ -2196,7 +2196,7 @@ which should eventually yield:</p>
 </code></pre></div>
 <!-- END INCLUDE -->
 
-<h2 id="4-next-steps">4. Next Steps</h2>
+<h2 id="4-next-steps">4. Next Steps<a class="headerlink" href="#4-next-steps" title="Permanent link">#</a></h2>
 <p>What you just did is a shortened version of the 
 <a href="../../Coding%20Milestones/PoC2023q1/example1/">more detailed example</a> on the website,
 but with the some steps reorganized and combined and the special

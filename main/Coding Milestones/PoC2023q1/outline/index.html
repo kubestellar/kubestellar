@@ -2066,10 +2066,10 @@
 
 <p>Want to get involved? Check out our <a href="https://github.com/kcp-dev/edge-mc/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">good-first-issue list</a>.</p>
 <p><img alt="poc2023q1 architecture" src="../Edge-PoC-2023q1.svg" /></p>
-<h2 id="status-of-this-memo">Status of this memo</h2>
+<h2 id="status-of-this-memo">Status of this memo<a class="headerlink" href="#status-of-this-memo" title="Permanent link">#</a></h2>
 <p>This summarizes the current state of design work that is still in
 progress.</p>
-<h2 id="introduction">Introduction</h2>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
 <p>This is a quick demo of a fragment of what we think is needed for edge
 multi-cluster.  It is intended to demonstrate the following points.</p>
 <ul>
@@ -2113,28 +2113,28 @@ multi-cluster.  It is intended to demonstrate the following points.</p>
 <li>Very strong isolation between tenants in the edge computing
   platform.</li>
 </ul>
-<h2 id="development-roadmap">Development Roadmap</h2>
+<h2 id="development-roadmap">Development Roadmap<a class="headerlink" href="#development-roadmap" title="Permanent link">#</a></h2>
 <p>Some features will get implemented later than others, so that we can
 start being able to run interesting end-to-end scenarios relatively
 soon.  Following is a list of features that will not be implemented at
 first.</p>
 <p>Of the following features, customization will be needed before the
 others.</p>
-<h3 id="customization">Customization</h3>
+<h3 id="customization">Customization<a class="headerlink" href="#customization" title="Permanent link">#</a></h3>
 <p>We can have a complete system that ignores customization, as long as
 it is only used for workloads that need no customization.</p>
-<h3 id="summarization">Summarization</h3>
+<h3 id="summarization">Summarization<a class="headerlink" href="#summarization" title="Permanent link">#</a></h3>
 <p>We can omit summarization at first.</p>
-<h3 id="return-andor-summarization-of-state-from-associated-objects">Return and/or summarization of state from associated objects</h3>
+<h3 id="return-andor-summarization-of-state-from-associated-objects">Return and/or summarization of state from associated objects<a class="headerlink" href="#return-andor-summarization-of-state-from-associated-objects" title="Permanent link">#</a></h3>
 <p>This will involve both defining a scalable interface for declaring
 what should be returned as well as implementing it.  This will
 certainly affect the syncer between mailbox workspace and edge
 cluster, and the summarization part will affect the status summarizer.</p>
-<h3 id="good-handling-of-workload-conflicts">Good handling of workload conflicts</h3>
+<h3 id="good-handling-of-workload-conflicts">Good handling of workload conflicts<a class="headerlink" href="#good-handling-of-workload-conflicts" title="Permanent link">#</a></h3>
 <p>We could start by handling workload conflicts in a very simple way:
 treating each as an error.  Later development can handle them better,
 as outlined <a href="#edgeplacement-objects">later</a>.</p>
-<h3 id="denaturingrenaturing">Denaturing/renaturing</h3>
+<h3 id="denaturingrenaturing">Denaturing/renaturing<a class="headerlink" href="#denaturingrenaturing" title="Permanent link">#</a></h3>
 <p>We could start by not doing this.  For some resources, the effect of
 leaving these resources natured in the center is only to add
 authorizations in the center that are not needed and are undesired in
@@ -2161,12 +2161,12 @@ anticipation.  <code>FlowSchema</code> and <code>PriorityLevelConfiguration</cod
 are not interpreted by kcp servers and so are effectively already
 denatured there.  Hopefully they will be given interpretations in the
 future, and then those resources will join the previous category.</p>
-<h2 id="roles-and-responsibilities">Roles and Responsibilities</h2>
-<h3 id="developersdeployersadminsusers-of-the-infrastructure-management-layer">Developers/deployers/admins/users of the infrastructure management layer</h3>
-<h3 id="developers-of-the-workload-management-layer">Developers of the workload management layer</h3>
-<h3 id="deployersadmins-of-the-workload-management-layer">Deployers/admins of the workload management layer</h3>
-<h3 id="users-of-the-workload-management-layer">Users of the workload management layer</h3>
-<h2 id="design-overview">Design overview</h2>
+<h2 id="roles-and-responsibilities">Roles and Responsibilities<a class="headerlink" href="#roles-and-responsibilities" title="Permanent link">#</a></h2>
+<h3 id="developersdeployersadminsusers-of-the-infrastructure-management-layer">Developers/deployers/admins/users of the infrastructure management layer<a class="headerlink" href="#developersdeployersadminsusers-of-the-infrastructure-management-layer" title="Permanent link">#</a></h3>
+<h3 id="developers-of-the-workload-management-layer">Developers of the workload management layer<a class="headerlink" href="#developers-of-the-workload-management-layer" title="Permanent link">#</a></h3>
+<h3 id="deployersadmins-of-the-workload-management-layer">Deployers/admins of the workload management layer<a class="headerlink" href="#deployersadmins-of-the-workload-management-layer" title="Permanent link">#</a></h3>
+<h3 id="users-of-the-workload-management-layer">Users of the workload management layer<a class="headerlink" href="#users-of-the-workload-management-layer" title="Permanent link">#</a></h3>
+<h2 id="design-overview">Design overview<a class="headerlink" href="#design-overview" title="Permanent link">#</a></h2>
 <p>In very brief: the design approach is to achieve the multicast
 semantics of edge placement by two layers of activity.  Between the
 two layers sit <em>mailbox workspaces</em>: these exist in the center, and
@@ -2184,7 +2184,7 @@ born on the edge clusters.  On the inward path, the reported or full
 state goes from edge to the mailbox workspace and then is summarized
 to the workload management workspace.  State propagation is maintained
 in an eventually consistent way, it is not just one-and-done.</p>
-<h2 id="inventory-management-workspaces">Inventory Management workspaces</h2>
+<h2 id="inventory-management-workspaces">Inventory Management workspaces<a class="headerlink" href="#inventory-management-workspaces" title="Permanent link">#</a></h2>
 <p>In this design the primary interface between infrastructure management
 and workload management is API objects in <em>inventory management</em>
 workspaces.  We abuse the <code>Location</code> and <code>SyncTarget</code> object types
@@ -2209,7 +2209,7 @@ is not among the things that this PoC takes a position on.</p>
 <li>A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.</li>
 </ol>
-<h2 id="edge-service-provider-workspace">Edge Service Provider workspace</h2>
+<h2 id="edge-service-provider-workspace">Edge Service Provider workspace<a class="headerlink" href="#edge-service-provider-workspace" title="Permanent link">#</a></h2>
 <p>The edge multi-cluster service is provided by one workspace that
 includes the following things.</p>
 <ul>
@@ -2217,12 +2217,12 @@ includes the following things.</p>
 <li>The edge controllers: scheduler, placement translator, mailbox
   controller, and status summarizer.</li>
 </ul>
-<h2 id="workload-management-workspaces">Workload Management workspaces</h2>
+<h2 id="workload-management-workspaces">Workload Management workspaces<a class="headerlink" href="#workload-management-workspaces" title="Permanent link">#</a></h2>
 <p>The users of edge multi-cluster primarily maintain these.  Each one of
 these has both control (API objects that direct the behavior of the
 edge computing platform) and data (API objects that hold workload
 desired and reported state).</p>
-<h3 id="data-objects">Data objects</h3>
+<h3 id="data-objects">Data objects<a class="headerlink" href="#data-objects" title="Permanent link">#</a></h3>
 <p>The workload desired state is represented by kube-style API objects,
 in the way that is usual in the Kubernetes milieu.  For edge computing
 we need to support both cluster-scoped (AKA non-namespaced) kinds as
@@ -2241,7 +2241,7 @@ cluster.  Furthermore, for some kinds of objects that modify apiserver
 behavior we want them "natured" at both center and edge.  There are
 thus a few categories of kinds of objects.  Following is a listing,
 with with the particular kinds that appear in kcp or plain kubernetes.</p>
-<h4 id="needs-to-be-denatured-in-center-natured-in-edge">Needs to be denatured in center, natured in edge</h4>
+<h4 id="needs-to-be-denatured-in-center-natured-in-edge">Needs to be denatured in center, natured in edge<a class="headerlink" href="#needs-to-be-denatured-in-center-natured-in-edge" title="Permanent link">#</a></h4>
 <p>For these kinds of objects: clients of the real workload management
 workspace can manipulate some such objects that will modify the
 behavior of the workspace, while clients of the edge computing view
@@ -2319,7 +2319,7 @@ the normal kcp behavior.</p>
 </tr>
 </tbody>
 </table>
-<h4 id="needs-to-be-natured-in-center-and-edge">Needs to be natured in center and edge</h4>
+<h4 id="needs-to-be-natured-in-center-and-edge">Needs to be natured in center and edge<a class="headerlink" href="#needs-to-be-natured-in-center-and-edge" title="Permanent link">#</a></h4>
 <p>These should have their usual effect in both center and edge; they
 need no distinct treatment.</p>
 <p>Note, however, that they <em>do</em> have some sequencing implications.  They
@@ -2346,7 +2346,7 @@ dependent objects.</p>
 </tr>
 </tbody>
 </table>
-<h4 id="needs-to-be-natured-in-center-not-destined-for-edge">Needs to be natured in center, not destined for edge</h4>
+<h4 id="needs-to-be-natured-in-center-not-destined-for-edge">Needs to be natured in center, not destined for edge<a class="headerlink" href="#needs-to-be-natured-in-center-not-destined-for-edge" title="Permanent link">#</a></h4>
 <table>
 <thead>
 <tr>
@@ -2375,7 +2375,7 @@ management workspace and be selected for downsync to mailbox
 workspaces while the edge clusters have the same resources defined by
 CRDs (as mentioned later in the discussion of built-in resources and
 namespaces).</p>
-<h4 id="for-features-not-supported">For features not supported</h4>
+<h4 id="for-features-not-supported">For features not supported<a class="headerlink" href="#for-features-not-supported" title="Permanent link">#</a></h4>
 <p>These are part of k8s or kcp APIs that are not supported by the edge
 computing platform.</p>
 <table>
@@ -2415,7 +2415,7 @@ are added by admins to add API groups served by custom external
 servers.  Sort (b) is not supported because this PoC does not support
 custom external servers in the edge clusters.  Sort (a) is not
 programmable in this PoC, but it might be inspectable.</p>
-<h4 id="not-destined-for-edge">Not destined for edge</h4>
+<h4 id="not-destined-for-edge">Not destined for edge<a class="headerlink" href="#not-destined-for-edge" title="Permanent link">#</a></h4>
 <p>These kinds of objects are concerned with either (a) TMC control or
 (b) workload data that should only exist in the edge clusters.  These
 will not be available in the view used by edge clients to maintain
@@ -2561,7 +2561,7 @@ their workload desired and reported state.</p>
 </tr>
 </tbody>
 </table>
-<h4 id="already-denatured-in-center-want-natured-in-edge">Already denatured in center, want natured in edge</h4>
+<h4 id="already-denatured-in-center-want-natured-in-edge">Already denatured in center, want natured in edge<a class="headerlink" href="#already-denatured-in-center-want-natured-in-edge" title="Permanent link">#</a></h4>
 <p>These are kinds of objects that kcp already gives no interpretation
 to, and that is what edge-mc needs from the center workspaces.</p>
 <p>This is the default category of kind of object --- any kind of data
@@ -2716,7 +2716,7 @@ this category.</p>
 </table>
 <p>Note that some <code>ConfigMap</code> and <code>Secret</code> objects are treated
 differently, as explained in the next section.</p>
-<h4 id="system-infrastructure-objects">System infrastructure objects</h4>
+<h4 id="system-infrastructure-objects">System infrastructure objects<a class="headerlink" href="#system-infrastructure-objects" title="Permanent link">#</a></h4>
 <p>Even in a kcp workspace, some certain objects --- called here "system
 infrastructure objects" --- are created as a consequence of certain
 other objects or things.  The system infrastructure objects are
@@ -2731,7 +2731,7 @@ an initial list of system infrastructure objects:</p>
 <li><code>ServiceAcount</code> objects named <code>default</code> (these are automatically
   created as a consequence of a namespace being created).</li>
 </ul>
-<h3 id="built-in-resources-and-namespaces">Built-in resources and namespaces</h3>
+<h3 id="built-in-resources-and-namespaces">Built-in resources and namespaces<a class="headerlink" href="#built-in-resources-and-namespaces" title="Permanent link">#</a></h3>
 <p>An edge cluster has some built-in resources (i.e, kinds of objects)
 and namespaces.  A resource may be built-in by any of several ways: it
 can be built-in to the apiserver, it can be defined by a CRD, its API
@@ -2781,11 +2781,11 @@ example, the following scenario is allowed.</p>
   in mailbox workspaces, and in any other workspaces where they
   appear) whose kind is defined through those APIBindings.</li>
 </ul>
-<h3 id="control-objects">Control objects</h3>
+<h3 id="control-objects">Control objects<a class="headerlink" href="#control-objects" title="Permanent link">#</a></h3>
 <p>These are the EdgePlacement objects, their associated
 SinglePlacementSlice objects, and the objects that direct
 customization and summarization.</p>
-<h4 id="edgeplacement-objects">EdgePlacement objects</h4>
+<h4 id="edgeplacement-objects">EdgePlacement objects<a class="headerlink" href="#edgeplacement-objects" title="Permanent link">#</a></h4>
 <p>One of these is a binding between a "what" predicate and a "where"
 predicate.</p>
 <p>Overlaps between EdgePlacement objects are explicitly allowed.  Two
@@ -2909,7 +2909,7 @@ used when writing to the mailbox workspace and edge cluster.  The
 version used for that is the version chosen above.  In the case of no
 conflicts, this means that the writes are done using the preferred
 version from the API group from the workload management workspace.</p>
-<h2 id="mailbox-workspaces">Mailbox workspaces</h2>
+<h2 id="mailbox-workspaces">Mailbox workspaces<a class="headerlink" href="#mailbox-workspaces" title="Permanent link">#</a></h2>
 <p>The mailbox controller maintains one mailbox workspace for each
 SyncTarget.  A mailbox workspace acts as a workload source for the
 corresponding syncer, prescribing the workload to go to the
@@ -2923,7 +2923,7 @@ the syncer.</p>
    objects.</li>
 <li>A <code>SyncerConfig</code> object.</li>
 </ol>
-<h2 id="edge-cluster">Edge cluster</h2>
+<h2 id="edge-cluster">Edge cluster<a class="headerlink" href="#edge-cluster" title="Permanent link">#</a></h2>
 <p>Also called edge pcluster.</p>
 <p>One of these contains the following items.  FYI, these are the things
 in the YAML output by <code>kubectl kcp workload edge-sync</code>.  The
@@ -2945,13 +2945,13 @@ among the things that this PoC takes a position on.</p>
   the edge cluster.</li>
 <li>A Deployment of the syncer.</li>
 </ul>
-<h2 id="mailbox-controller">Mailbox Controller</h2>
+<h2 id="mailbox-controller">Mailbox Controller<a class="headerlink" href="#mailbox-controller" title="Permanent link">#</a></h2>
 <p>This controller maintains one mailbox workspace per SyncTarget.  Each
 of these mailbox workspaces is used for a distinct syncing problem:
 downsynced objects go here from their workload management workspaces,
 and upsynced objects go here from the edge cluster.  These workspaces
 are all children of the edge service provider workspace.</p>
-<h2 id="kubestellar-scheduler">KubeStellar Scheduler</h2>
+<h2 id="kubestellar-scheduler">KubeStellar Scheduler<a class="headerlink" href="#kubestellar-scheduler" title="Permanent link">#</a></h2>
 <p>This controller monitors the EdgePlacement, Location, and SyncTarget
 objects and maintains the results of matching.  For each EdgePlacement
 object this controller maintains an associated collection of
@@ -2959,7 +2959,7 @@ SinglePlacementSlice objects holding the matches for that
 EdgePlacement.  These SinglePlacementSlice objects appear in the same
 workspace as the corresponding EdgePlacement; the remainder of how
 they are linked is TBD.</p>
-<h2 id="placement-translator">Placement Translator</h2>
+<h2 id="placement-translator">Placement Translator<a class="headerlink" href="#placement-translator" title="Permanent link">#</a></h2>
 <p>This controller continually monitors all the EdgePlacement objects,
 SinglePlacementSlice objects, and related workload objects, and
 maintains the proper projections of those into mailbox workspace
@@ -2981,7 +2981,7 @@ following five parts.</p>
 <li>Maintain the SyncerConfig object in each mailbox workspace to direct
   the corresponding syncer.</li>
 </ul>
-<h2 id="syncers">Syncers</h2>
+<h2 id="syncers">Syncers<a class="headerlink" href="#syncers" title="Permanent link">#</a></h2>
 <p>In this PoC there is a 1:1:1 relation between edge cluster, mailbox
 workspace, and syncer.  The syncer runs in the edge cluster and does
 downsync from and upsync to the mailbox workspace.  The syncer
@@ -2995,13 +2995,13 @@ differs in the following ways.</p>
 <li>Return reported state from associated objects.</li>
 <li>Does not access the SyncTarget object.</li>
 </ul>
-<h2 id="status-summarizer">Status Summarizer</h2>
+<h2 id="status-summarizer">Status Summarizer<a class="headerlink" href="#status-summarizer" title="Permanent link">#</a></h2>
 <p>For each EdgePlacement object and related objects this controller
 maintains the directed status summary objects.</p>
-<h2 id="usage-scenario">Usage Scenario</h2>
+<h2 id="usage-scenario">Usage Scenario<a class="headerlink" href="#usage-scenario" title="Permanent link">#</a></h2>
 <p>The usage scenario breaks, at the highest level, into two parts:
 inventory and workload.</p>
-<h3 id="inventory-usage">Inventory Usage</h3>
+<h3 id="inventory-usage">Inventory Usage<a class="headerlink" href="#inventory-usage" title="Permanent link">#</a></h3>
 <p>A user with infrastructure authority creates one or more inventory
 management workspaces.  Each such workspace needs to have the
 following items, which that user will create if they are not
@@ -3024,7 +3024,7 @@ pre-populated by the workspace type.</p>
 <li>a Location, in the same workspace, that matches only that
   SyncTarget.</li>
 </ul>
-<h3 id="workload-usage">Workload usage</h3>
+<h3 id="workload-usage">Workload usage<a class="headerlink" href="#workload-usage" title="Permanent link">#</a></h3>
 <p>A user with workload authority starts by creating one or more workload
 management workspaces.  Each needs to have the following, which that
 user creates if the workload type did not already provide.</p>

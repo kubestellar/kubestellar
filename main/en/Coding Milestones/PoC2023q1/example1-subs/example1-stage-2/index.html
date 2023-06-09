@@ -1455,11 +1455,11 @@
   <h1>Example1 stage 2</h1>
 
 <!--example1-stage-2-start-->
-<h2 id="stage-2">Stage 2</h2>
+<h2 id="stage-2">Stage 2<a class="headerlink" href="#stage-2" title="Permanent link">#</a></h2>
 <p><img alt="Placement and scheduling" src="../../Edge-PoC-2023q1-Scenario-1-stage-2.svg" title="Stage 2 summary" /></p>
 <p>Stage 2 creates two workloads, called "common" and "special", and lets
 the scheduler react.  It has the following steps.</p>
-<h3 id="create-and-populate-the-workload-management-workspace-for-the-common-workload">Create and populate the workload management workspace for the common workload</h3>
+<h3 id="create-and-populate-the-workload-management-workspace-for-the-common-workload">Create and populate the workload management workspace for the common workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-common-workload" title="Permanent link">#</a></h3>
 <p>One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".</p>
 <p>In this example, each workload description goes in its own workload
@@ -1602,7 +1602,7 @@ directing the common workload to both edge clusters.</p>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
-<h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload</h3>
+<h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" title="Permanent link">#</a></h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
 workload.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
@@ -1711,7 +1711,7 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
-<h3 id="edge-scheduling">Edge scheduling</h3>
+<h3 id="edge-scheduling">Edge scheduling<a class="headerlink" href="#edge-scheduling" title="Permanent link">#</a></h3>
 <p>In response to each EdgePlacement, the scheduler will create a
 corresponding SinglePlacementSlice object.  These will indicate the
 following resolutions of the "where" predicates.</p>

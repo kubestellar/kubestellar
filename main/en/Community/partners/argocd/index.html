@@ -1593,7 +1593,7 @@
 
 
 <p>This document explains how to add KubeStellar's 'workspaces' as Argo CD's 'clusters'.</p>
-<h3 id="add-kubestellars-workspaces-to-argo-cd-as-clusters">Add KubeStellar's workspaces to Argo CD as clusters</h3>
+<h3 id="add-kubestellars-workspaces-to-argo-cd-as-clusters">Add KubeStellar's workspaces to Argo CD as clusters<a class="headerlink" href="#add-kubestellars-workspaces-to-argo-cd-as-clusters" title="Permanent link">#</a></h3>
 <p>As of today, the 'workspaces', aka 'logical clusters' used by KubeStellar are not identical with ordinary Kubernetes clusters.
 Thus, in order to add them as Argo CD's 'clusters', there are a few more steps to take.</p>
 <p>For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
@@ -1628,7 +1628,7 @@ For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
 </code></pre></div></p>
 <p>Argo CD's documentation mentions this feature as <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion">Resource Exclusion/Inclusion</a>.</p>
 <ol>
-<li>{ start=4 } Make sure the current context uses WMW, then identify the admin.kubeconfig.</li>
+<li>Make sure the current context uses WMW, then identify the admin.kubeconfig. {: start=4 }</li>
 </ol>
 <p>The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
@@ -1638,11 +1638,11 @@ For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="go">INFO[0001] ClusterRoleBinding &quot;argocd-manager-role-binding&quot; updated</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="go">Cluster &#39;https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo&#39; added</span>
 </code></pre></div></p>
-<h3 id="create-argo-cd-applications">Create Argo CD Applications</h3>
+<h3 id="create-argo-cd-applications">Create Argo CD Applications<a class="headerlink" href="#create-argo-cd-applications" title="Permanent link">#</a></h3>
 <p>Once KubeStellar's workspaces are added, Argo CD Applications can be created as normal.
 There are a few examples listed <a href="https://github.com/edge-experiments/gitops-source/tree/main/edge-mc">here</a>,
 and the commands to use the examples are listed as follows.</p>
-<h4 id="create-argo-cd-applications-against-kubestellars-imw">Create Argo CD Applications against KubeStellar's IMW</h4>
+<h4 id="create-argo-cd-applications-against-kubestellars-imw">Create Argo CD Applications against KubeStellar's IMW<a class="headerlink" href="#create-argo-cd-applications-against-kubestellars-imw" title="Permanent link">#</a></h4>
 <p>Create two Locations. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
@@ -1659,7 +1659,7 @@ and the commands to use the examples are listed as follows.</p>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="go">application &#39;synctargets&#39; created</span>
 </code></pre></div></p>
-<h4 id="create-argo-cd-application-against-kubestellars-wmw">Create Argo CD Application against KubeStellar's WMW</h4>
+<h4 id="create-argo-cd-application-against-kubestellars-wmw">Create Argo CD Application against KubeStellar's WMW<a class="headerlink" href="#create-argo-cd-application-against-kubestellars-wmw" title="Permanent link">#</a></h4>
 <p>Create a Namespace. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
@@ -1684,21 +1684,21 @@ and the commands to use the examples are listed as follows.</p>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="go">application &#39;edgeplacement&#39; created</span>
 </code></pre></div></p>
-<h1 id="other-resources">Other Resources</h1>
+<h1 id="other-resources">Other Resources<a class="headerlink" href="#other-resources" title="Permanent link">#</a></h1>
 <p>Medium - <a href="https://medium.com/itnext/sync-10-000-argo-cd-applications-in-one-shot-bfcda04abe5b">Sync 10,000 ArgoCD Applications in One Shot</a><br/>
 Medium - <a href="https://medium.com/@filepp/how-to-sync-10-000-argo-cd-applications-in-one-shot-by-yourself-9e389ab9e8ad">Sync 10,000 ArgoCD Applications in One Shot, by Yourself</a><br/>
 Medium - <a href="https://medium.com/@clubanderson/gitopscon-here-we-come-9a8b8ffe2a33">GitOpsCon - here we come</a><br/></p>
-<h3 id="argocd-scale-experiment-kubestellar-community-demo-day">ArgoCD Scale Experiment - KubeStellar Community Demo Day</h3>
+<h3 id="argocd-scale-experiment-kubestellar-community-demo-day">ArgoCD Scale Experiment - KubeStellar Community Demo Day<a class="headerlink" href="#argocd-scale-experiment-kubestellar-community-demo-day" title="Permanent link">#</a></h3>
 <p align=center>
 <iframe width="720" height="400" src="https://www.youtube.com/embed/7XuEJF7--Sc?start=90" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </p>
 
-<h3 id="gitopscon-2023-a-quantitative-study-on-argo-scalability-andrew-anderson-jun-duan-ibm">GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson &amp; Jun Duan, IBM</h3>
+<h3 id="gitopscon-2023-a-quantitative-study-on-argo-scalability-andrew-anderson-jun-duan-ibm">GitOpsCon 2023 - A Quantitative Study on Argo Scalability - Andrew Anderson &amp; Jun Duan, IBM<a class="headerlink" href="#gitopscon-2023-a-quantitative-study-on-argo-scalability-andrew-anderson-jun-duan-ibm" title="Permanent link">#</a></h3>
 <p align=center>
 <iframe width="720" height="400" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </p>
 
-<h3 id="argocd-and-kubestellar-in-the-news">ArgoCD and KubeStellar in the news</h3>
+<h3 id="argocd-and-kubestellar-in-the-news">ArgoCD and KubeStellar in the news<a class="headerlink" href="#argocd-and-kubestellar-in-the-news" title="Permanent link">#</a></h3>
 <p align=center>
 <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7031032280722632704" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
 </p>
