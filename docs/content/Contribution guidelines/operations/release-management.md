@@ -2,10 +2,12 @@
 
 #### Prerequisite - make sure you have a GPG signing key
 
-https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key
-https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account
-https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key
-Create the tags
+[https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
+[https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
+[https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
+
+### Create the tags
+
 #### Note:
 You currently need write access to the [{{ config.repo_url }}]({{ config.repo_url }}) repository to perform these tasks.
 
