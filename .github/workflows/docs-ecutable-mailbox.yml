@@ -72,14 +72,14 @@ jobs:
   elapsed-time-collector:
     runs-on: ubuntu-latest
     env:
-      DF: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
+      docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
     needs: docs-ecutable
     steps:
       
-      - run: echo "${{ env.DF }}"
+      - run: echo "${{ env.docs-ecutable-filename }}"
 
       - uses: actions/checkout@v3
 
       - run: git fetch origin main
 
-      - run: make FILENAME="${{ env.DF }}" write-time-to-file
+      - run: make FILENAME="${{ env.docs-ecutable-filename }}" write-time-to-file
