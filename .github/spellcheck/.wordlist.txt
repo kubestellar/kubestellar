@@ -24,6 +24,7 @@ Braulio
 CEL
 CICD
 CLI
+CNAME
 CNCF
 CR
 CRD
@@ -42,6 +43,8 @@ ClusterRoleBinding
 ClusterScope
 ClusterWorkspace
 CoC
+Codeblock
+Codeblocks
 ComponentStatus
 ConfigMap
 ControllerRevision
@@ -80,9 +83,12 @@ FlowSchema
 FluxCD
 GenerateName
 GitOpsCon
+GoDaddy
+GPG
 Grafana
 GroupResource
 HorizontalPodAutoscaler
+HOSTTYPE
 IMW
 IMWs
 IncludeNamespaceObject
@@ -122,6 +128,7 @@ OLM
 ObjectMeta
 Onboarding
 OpenShift
+OSTYPE
 OwnerReferences
 Paolo
 PartitionSet
@@ -136,8 +143,10 @@ PolicyReport
 Postgresql
 PriorityClass
 PriorityLevelConfiguration
+PWD
 QuickStart
 RBAC
+README
 RemainingItemCount
 ReplicaSet
 ReplicationController
@@ -178,6 +187,7 @@ Teardown
 TokenReview
 Turbonomic
 TypeMeta
+UI
 UID
 UUID
 Upsync
@@ -188,7 +198,9 @@ VolumeAttachment
 WorkspaceType
 WMW
 WMWs
+WSL
 Youtube
+afterall
 andy
 apache
 api
@@ -215,6 +227,8 @@ clusterrole
 clusterrolebinding
 cmd
 codebase
+codeblock
+codeblocks
 commond
 commonstuff
 config
@@ -227,6 +241,7 @@ cosmo
 cpumemload
 crds
 creationTimestamp
+css
 csv
 customizer
 darwin
@@ -243,6 +258,7 @@ downSyncedResources
 downsynced
 downsyncing
 dropdown
+ecutable
 edgesync
 edgesyncer
 egrep
@@ -279,6 +295,7 @@ instanceSelector
 io
 ipaddr
 jaggy
+joinus
 jq
 json
 kcp
@@ -294,6 +311,7 @@ lgtm
 licensable
 limitranges
 linenums
+linkedin
 linkTitle
 linux
 loc
@@ -316,10 +334,12 @@ namespaced
 namespaces
 namespacessyncer
 natured
+nav
 nonNamespacedObjects
 nonResourceURLs
 ns
 onboarding
+openshift
 opensource
 otherstuff
 ownerReferences
@@ -329,6 +349,7 @@ pathnames
 policyreport
 policyreports
 pre
+programmatically
 prometheus
 provisioner
 proxying
@@ -377,6 +398,8 @@ syncerconfigs
 syncers
 synctarget
 synctargets
+tv
+teardown
 ter
 testdata
 timeframe
@@ -388,6 +411,7 @@ upsynced
 upsyncing
 uid
 url
+urls
 usr
 volumeMounts
 watchall
@@ -403,4 +427,5 @@ ws
 www
 yaml
 yml
+youtube
 yyyy
