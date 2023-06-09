@@ -24,12 +24,12 @@ jobs:
       #     GITHUB_CONTEXT: ${{ toJson(github) }}
       #   run: echo "$GITHUB_CONTEXT"
 
-      - name: echo env
-        run: echo "$docs-ecuted-filename"
+#       - name: echo env
+#         run: echo "$docs-ecuted-filename"
 
-      - uses: actions/checkout@v3
+#       - uses: actions/checkout@v3
 
-      - run: git fetch origin main
+#       - run: git fetch origin main
 
-      - run: make FILENAME="../overrides/placement.txt" write-time-to-file
+#       - run: make FILENAME="../overrides/placement.txt" write-time-to-file
           
