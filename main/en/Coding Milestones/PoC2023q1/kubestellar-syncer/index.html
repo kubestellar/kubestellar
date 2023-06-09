@@ -1973,8 +1973,8 @@
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>git clone -n -b main https://github.com/kcp-dev/edge-mc --depth 1 KubeStellar-kubestellar-syncer
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>cd KubeStellar-kubestellar-syncer
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>git checkout Makefile Makefile.venv go.mod docs/content docs/scripts/docs-ecutable.sh
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>git checkout Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
 <a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>make MANIFEST=&quot;&#39;content/common-subs/pre-req.md&#39;,&#39;content/Coding Milestones/PoC2023q1/kubestellar-syncer.md&#39;&quot; docs-ecutable
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a># done? remove everything

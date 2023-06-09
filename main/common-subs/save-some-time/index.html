@@ -1412,8 +1412,8 @@
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone -n -b main https://github.com/kcp-dev/edge-mc --depth 1 KubeStellar-{{ no such element: dict object[&#39;short_name&#39;] }}
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cd KubeStellar-{{ no such element: dict object[&#39;short_name&#39;] }}
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git checkout Makefile Makefile.venv go.mod docs/content docs/scripts/docs-ecutable.sh
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git checkout Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>make MANIFEST=&quot;&#39;{{ no such element: dict object[&#39;pre_req_name&#39;] }}&#39;,&#39;{{ no such element: dict object[&#39;manifest_name&#39;] }}&#39;&quot; docs-ecutable
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># done? remove everything
