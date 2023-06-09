@@ -20,7 +20,7 @@ set -o pipefail
 # set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-cd "$REPO_ROOT/docs"
+cd "$REPO_ROOT"
 
 FILE_LIST=()
 SAVEIFS=$IFS
@@ -104,7 +104,7 @@ function parse_file()
         fi
       fi
     fi
-  done < "$REPO_ROOT/docs/$file_name"
+  done < "$REPO_ROOT/$file_name"
 }
 
 for FILE_NAME in "${FILE_LIST[@]}"

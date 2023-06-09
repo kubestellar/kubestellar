@@ -252,7 +252,7 @@ docs-ecutable:
 You give the path from that follows the '{{config.repo_url}}/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:
 
 ``` title="How to 'make' our docs-ecutable target"
-make MANIFEST="'content/Getting-Started/quickstart.md'" docs-ecutable
+make MANIFEST="'docs/content/Getting-Started/quickstart.md'" docs-ecutable
 ```
 
 <b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.

@@ -1,7 +1,7 @@
 ---
 short_name: example1
-manifest_name: 'content/Coding Milestones/PoC2023q1/example1.md'
-pre_req_name: 'content/common-subs/pre-req.md'
+manifest_name: 'docs/content/Coding Milestones/PoC2023q1/example1.md'
+pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
 [![docs-ecutable - example1]({{config.repo_url}}/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-example1.yml)
 {%

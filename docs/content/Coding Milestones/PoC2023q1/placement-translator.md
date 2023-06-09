@@ -1,7 +1,7 @@
 ---
 short_name: placement-translator
-manifest_name: 'content/Coding Milestones/PoC2023q1/placement-translator.md'
-pre_req_name: 'content/common-subs/pre-req.md'
+manifest_name: 'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'
+pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
 [![docs-ecutable - placement-translator]({{config.repo_url}}/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
 {%

@@ -1,7 +1,7 @@
 ---
 short_name: kubestellar-scheduler
-manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'
-pre_req_name: 'content/common-subs/pre-req.md'
+manifest_name: 'docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'
+pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
 [![docs-ecutable - kubestellar-scheduler]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
 {%

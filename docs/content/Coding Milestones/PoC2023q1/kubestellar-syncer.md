@@ -1,7 +1,7 @@
 ---
 short_name: kubestellar-syncer
-manifest_name: 'content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'
-pre_req_name: 'content/common-subs/pre-req.md'
+manifest_name: 'docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'
+pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
 [![docs-ecutable - kubestellar-syncer]({{config.repo_url}}/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 {%
