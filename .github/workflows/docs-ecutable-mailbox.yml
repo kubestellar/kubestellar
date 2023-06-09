@@ -71,11 +71,12 @@ jobs:
 
   elapsed-time-collector:
     runs-on: ubuntu-latest
+    env:
+      DF: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
     needs: docs-ecutable
     steps:
-      - env:
-          DF: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
-        run: echo "$DF"
+      
+      - run: echo "${{ env.DF }}"
 
       - uses: actions/checkout@v3
 
