@@ -9,18 +9,14 @@ on:
       - main
       - "release-*"
     paths:
-#       - "cmd/**"
       - "docs/**"
-#       - "pkg/**"
       - ".github/workflows/docs-gen-and-push.yaml"
   push:
     branches:
       - main
       - "release-*"
     paths:
-#       - "cmd/**"
       - "docs/**"
-#       - "pkg/**"
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
