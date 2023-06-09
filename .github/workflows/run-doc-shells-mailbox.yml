@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-mailbox.yml"
   push:
     branches:
@@ -19,6 +20,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/run-doc-shells-mailbox.yml"
 
 env:
