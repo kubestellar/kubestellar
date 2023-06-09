@@ -1,5 +1,11 @@
 <!--example1-post-espw-start-->
 {%
+   include-markdown "./example1-stage-1a.md"
+   start="<!--example1-stage-1a-start-->"
+   end="<!--example1-stage-1a-end-->"
+%}
+
+{%
    include-markdown "./example1-stage-1b.md"
    start="<!--example1-stage-1b-start-->"
    end="<!--example1-stage-1b-end-->"
