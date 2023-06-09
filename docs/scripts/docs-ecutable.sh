@@ -20,7 +20,7 @@ set -o pipefail
 # set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-cd "$REPO_ROOT/docs"
+cd "$REPO_ROOT"
 
 FILE_LIST=()
 SAVEIFS=$IFS

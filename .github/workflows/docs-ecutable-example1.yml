@@ -58,5 +58,5 @@ jobs:
         id: install
   
       - run: |
-          make MANIFEST="'content/Coding Milestones/PoC2023q1/example1.md'" \
+          make MANIFEST="'docs/content/Coding Milestones/PoC2023q1/example1.md'" \
           docs-ecutable

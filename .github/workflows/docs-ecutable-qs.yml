@@ -58,6 +58,6 @@ jobs:
         id: install
 
       - run: |
-          make MANIFEST="'content/Getting-Started/quickstart.md'" \
+          make MANIFEST="'docs/content/Getting-Started/quickstart.md'" \
           docs-ecutable
       

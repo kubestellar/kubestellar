@@ -10,7 +10,7 @@
 
     ```
     # done? remove everything
-    make MANIFEST="content/common-subs/remove-all.md" docs-ecutable
+    make MANIFEST="docs/content/common-subs/remove-all.md" docs-ecutable
     cd ../
     rm -rf {{config.site_name}}-{{page.meta.short_name}}
     ```

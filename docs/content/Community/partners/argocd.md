@@ -38,7 +38,7 @@ kubectl -n argocd rollout restart deployment argocd-server
 
 Argo CD's documentation mentions this feature as [Resource Exclusion/Inclusion](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion).
 
-4. { start=4 } Make sure the current context uses WMW, then identify the admin.kubeconfig.
+4. Make sure the current context uses WMW, then identify the admin.kubeconfig. {: start=4 }
 
 The command and output should be similar to
 ```console
