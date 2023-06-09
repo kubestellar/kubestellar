@@ -1988,7 +1988,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </ul>
 <p>(other variations are possible, PR an update to the <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
 <h3 id="testingrunning-docs">Testing/Running Docs</h3>
-<p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'run-doc-shells' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
+<p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'docs-ecutable' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
 <h4 id="the-way-it-works">The way it works:</h4>
 <ul>
 <li>create your .md file as you normally would</li>
@@ -2002,25 +2002,24 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </ul>
 <h4 id="the-gh-workflow">The GH Workflow:</h4>
 <ul>
-<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/run-doc-shells-qs.yml</a></li>
+<li>One example of the GH Workflow is located in our kcp-dev/edge-mc at <a href="../../../https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/docs-ecutable-qs.yml">https://github.com/kcp-dev/edge-mc/blob/main/.github/workflows/docs-ecutable-qs.yml</a></li>
 </ul>
 <h4 id="the-secret-sauce">The secret sauce:</h4>
 <ul>
-<li>The code that makes all this possible is at <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/run-doc-shells.sh</a><ul>
+<li>The code that makes all this possible is at <a href="https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/docs-ecutable.sh">https://github.com/kcp-dev/edge-mc/blob/main/docs/scripts/docs-ecutable.sh</a><ul>
 <li>This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks</li>
 <li>The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them</li>
-<li>It then creates a file called 'generate_script.sh' which is then run at the end of the run-doc-shells execution.</li>
+<li>It then creates a file called 'generate_script.sh' which is then run at the end of the docs-ecutable execution.</li>
 </ul>
 </li>
 </ul>
 <p>All of this is invoke in a target in our <a href="https://github.com/kcp-dev/edge-mc/blob/main/Makefile">Makefile</a>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>run-doc-shells
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>run-doc-shells:<span class="w"> </span>venv
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>.<span class="w"> </span><span class="k">$(</span>VENV<span class="k">)</span>/activate<span class="p">;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/run-doc-shells.sh
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>docs-ecutable
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docs-ecutable:<span class="w"> </span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/docs-ecutable.sh
 </code></pre></div></p>
 <p>You give the path from that follows the 'https://github.com/kcp-dev/edge-mc/docs' path, and name of the .md file you want to 'execute'/'test' as the value for the <b><i>MANIFEST</i></b> variable:</p>
-<div class="highlight"><span class="filename">How to 'make' our run-doc-shells target</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make MANIFEST=&quot;&#39;content/Getting-Started/quickstart.md&#39;&quot; run-doc-shells
+<div class="highlight"><span class="filename">How to 'make' our docs-ecutable target</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make MANIFEST=&quot;&#39;content/Getting-Started/quickstart.md&#39;&quot; docs-ecutable
 </code></pre></div>
 <p><b>note:</b> there are single and double-quotes used here to avoid issues with 'spaces' used in files names or directories.  Use the single and double-quotes as specified in the quickstart example here.</p>
 <h3 id="important-files-in-our-gh-pages-branch">Important files in our gh-pages branch</h3>
