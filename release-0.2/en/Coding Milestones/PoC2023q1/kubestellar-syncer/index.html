@@ -1315,6 +1315,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#populate-the-edge-service-provider-workspace" class="md-nav__link">
+    Populate the edge service provider workspace
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-mailbox-controller" class="md-nav__link">
+    The mailbox controller
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#register-kubestellar-syncer-on-the-target-clusters" class="md-nav__link">
     Register KubeStellar Syncer on the target clusters
   </a>
@@ -1678,6 +1692,63 @@ used in this PoC, if it shows up.</p>
 </code></pre></div>
 <!-- END INCLUDE -->
 
+<!-- BEGIN INCLUDE example1-subs/example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
+
+<h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace</h3>
+<p>This puts the definition and export of the edge-mc API in the edge
+service provider workspace.</p>
+<p>Use the following command.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
+</code></pre></div>
+<h3 id="the-mailbox-controller">The mailbox controller</h3>
+<p>Running the mailbox controller will be conveniently automated.
+Eventually.  In the meantime, you can use the edge-mc command shown
+here.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>sleep<span class="w"> </span><span class="m">45</span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>...
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>I0423<span class="w"> </span><span class="m">01</span>:09:37.991080<span class="w">   </span><span class="m">10624</span><span class="w"> </span>main.go:196<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>...
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>I0423<span class="w"> </span><span class="m">01</span>:09:38.449395<span class="w">   </span><span class="m">10624</span><span class="w"> </span>controller.go:299<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created APIBinding&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba&quot;</span><span class="w"> </span><span class="nv">mbwsCluster</span><span class="o">=</span><span class="s2">&quot;yk9a66vjms1pi8hu&quot;</span><span class="w"> </span><span class="nv">bindingName</span><span class="o">=</span><span class="s2">&quot;bind-edge&quot;</span><span class="w"> </span><span class="nv">resourceVersion</span><span class="o">=</span><span class="s2">&quot;914&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>...
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>I0423<span class="w"> </span><span class="m">01</span>:09:38.842881<span class="w">   </span><span class="m">10624</span><span class="w"> </span>controller.go:299<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created APIBinding&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54&quot;</span><span class="w"> </span><span class="nv">mbwsCluster</span><span class="o">=</span><span class="s2">&quot;12299slctppnhjnn&quot;</span><span class="w"> </span><span class="nv">bindingName</span><span class="o">=</span><span class="s2">&quot;bind-edge&quot;</span><span class="w"> </span><span class="nv">resourceVersion</span><span class="o">=</span><span class="s2">&quot;968&quot;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>^C
+</code></pre></div></p>
+<p>You need a <code>-v</code> setting of 2 or numerically higher to get log messages
+about individual mailbox workspaces.</p>
+<p>This controller creates a mailbox workspace for each SyncTarget and
+puts an APIBinding to the edge API in each of those mailbox
+workspaces.  For this simple scenario, you do not need to keep this
+controller running after it does those things (hence the <code>^C</code> above);
+normally it would run continuously.</p>
+<p>You can get a listing of those mailbox workspaces as follows.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>Workspaces
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>NAME<span class="w">                                                       </span>TYPE<span class="w">        </span>REGION<span class="w">   </span>PHASE<span class="w">   </span>URL<span class="w">                                                     </span>AGE
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/1najcltzt2nqax47<span class="w">   </span>50s
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/1y7wll1dz806h3sb<span class="w">   </span>50s
+</code></pre></div></p>
+<p>More usefully, using custom columns you can get a listing that shows
+the <em>name</em> of the associated SyncTarget.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations[&#39;edge\.kcp\.io/sync-target-name&#39;],CLUSTER:.spec.cluster&quot;</span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>NAME<span class="w">                                                       </span>SYNCTARGET<span class="w">   </span>CLUSTER
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1<span class="w">   </span>florin<span class="w">       </span>1najcltzt2nqax47
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c<span class="w">   </span>guilder<span class="w">      </span>1y7wll1dz806h3sb
+</code></pre></div></p>
+<p>Also: if you ever need to look up just one mailbox workspace by
+SyncTarget name, you could do it as follows.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">GUILDER_WS</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kcp.io/sync-target-name&quot;] == &quot;guilder&quot;) | .name&#39;</span><span class="k">)</span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">FLORIN_WS</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kcp.io/sync-target-name&quot;] == &quot;florin&quot;) | .name&#39;</span><span class="k">)</span>
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+</code></pre></div></p>
+<!-- END INCLUDE -->
+
 <h3 id="register-kubestellar-syncer-on-the-target-clusters">Register KubeStellar Syncer on the target clusters</h3>
 <p>Once KubeStellar setup is done, KubeStellar Syncer can be deployed on the target cluster easily by the following steps.</p>
 <h4 id="for-the-target-cluster-of-guilder">For the target cluster of <code>guilder</code>,</h4>
@@ -1694,8 +1765,8 @@ used in this PoC, if it shows up.</p>
 </li>
 <li>Get mailbox workspace name</li>
 <li>Use command to obtain yaml manifests to bootstrap KubeStellar Syncer
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="go">kubectl ws &lt;mb-ws name&gt;</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="go">bin/kubectl-kubestellar-syncer_gen &lt;Edge Sync Target name&gt; --syncer-image &lt;KubeStellar Syncer image&gt; -o edge-syncer.yaml</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="go">kubectl ws &lt;mb-ws name&gt;</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="go">bin/kubectl-kubestellar-syncer_gen &lt;Edge Sync Target name&gt; --syncer-image &lt;KubeStellar Syncer image&gt; -o edge-syncer.yaml</span>
 </code></pre></div>
     Here <code>bin/kubectl-kubestellar-syncer_gen</code> refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
@@ -1831,52 +1902,52 @@ used in this PoC, if it shows up.</p>
 <ol>
 <li><code>make build-edge-syncer-image-local</code>
 e.g.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>$ make build-edge-syncer-image-local
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>2023/04/24 11:50:40 Adding tag latest
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>2023/04/24 11:50:40 Added tag latest
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>Edge-Syncer image:
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>$ make build-edge-syncer-image-local
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>2023/04/24 11:50:40 Adding tag latest
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>2023/04/24 11:50:40 Added tag latest
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>Edge-Syncer image:
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 </code></pre></div>
 <code>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96</code> is the image stored in your local Docker registry.</li>
 </ol>
 <p>You can also set a shell variable to the output of this Make task.</p>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>image=`make build-edge-syncer-image-local`
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>image=`make build-edge-syncer-image-local`
 </code></pre></div></p>
 <h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry</h3>
 <ol>
 <li><code>make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
 </ol>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
-<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
-<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
-<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
-<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
-<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
-<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
-<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>Edge-Syncer image
-<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
+<a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
+<a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
+<a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/edge-mc/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
+<a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
+<a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
+<a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-26-24" name="__codelineno-26-24" href="#__codelineno-26-24"></a>Edge-Syncer image
+<a id="__codelineno-26-25" name="__codelineno-26-25" href="#__codelineno-26-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 </code></pre></div>
 <code>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510</code> is the image pushed to the registry.</p>
 <h2 id="teardown-the-environment_1">Teardown the environment</h2>
