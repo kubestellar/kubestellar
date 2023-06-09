@@ -100,7 +100,7 @@ Download manifest tamplate.
 curl -LO https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
 ```
 
-Generate manifests to bootstrap KubeStellar Syncer.
+Generate manifests to bootstrap KubeStellar-Syncer.
 ```shell
 syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < edge-syncer-bootstrap.template.yaml
 ```

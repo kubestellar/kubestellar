@@ -15,13 +15,13 @@ pre_req_name: 'docs/content/common-subs/pre-req.md'
    end="<!--save-some-time-end-->"
 %}
 
-KubeStellar Syncer runs in the target cluster and sync kubernetes resource objects from the target cluster to a mailbox workspace and vice versa.
+KubeStellar-Syncer runs in the target cluster and sync kubernetes resource objects from the target cluster to a mailbox workspace and vice versa.
 
 ![kubestellar-syncer drawio](images/kubestellar-syncer-overview.png)
 
 
 ## Steps to try the Syncer
-The KubeStellar Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in [example1](../example1) until `The mailbox controller` in stage 2. 
+The KubeStellar-Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in [example1](../example1) until `The mailbox controller` in stage 2. 
 
 {%
    include-markdown "example1-subs/example1-pre-kcp.md"
@@ -47,9 +47,9 @@ The KubeStellar Syncer can be exercised after setting up KubeStellar mailbox wor
    end="<!--example1-stage-1a-end-->"
 %}
 
-### Register KubeStellar Syncer on the target clusters
+### Register KubeStellar-Syncer on the target clusters
 
-Once KubeStellar setup is done, KubeStellar Syncer can be deployed on the target cluster easily by the following steps.
+Once KubeStellar setup is done, KubeStellar-Syncer can be deployed on the target cluster easily by the following steps.
 #### For the target cluster of `guilder`,
 {%
    include-markdown "kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder.md"
@@ -77,7 +77,7 @@ Once KubeStellar setup is done, KubeStellar Syncer can be deployed on the target
 
 ### The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace
 
-Edge-syncer is deployed on Edge cluster easily by the following steps.
+KubeStellar-Syncer is deployed on an Edge cluster easily by the following steps.
 
 1. Create SyncTarget and Location
     - Mailbox controller creates the mailbox workspace automatically 
@@ -92,7 +92,7 @@ Edge-syncer is deployed on Edge cluster easily by the following steps.
     here.  This variant, under the special name shown here, is a normal part of
     the `bin` of edge-mc.
     For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:v0.2.2`. You can also create a syncer image from the source following [Build KubeStellar-Syncer Image](#build-kubestellar-syncer-image).
-4. Deploy edge-syncer on an Edge cluster
+4. Deploy KubeStellar-Syncer on an Edge cluster
 5. Syncer starts to run on the Edge cluster
     - KubeStellar-Syncer starts watching and consuming SyncerConfig
 
@@ -152,7 +152,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - The CR is managed by edge-mc (placement transformer).
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
-- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.
+- This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (`kubectl kubestellar syncer-gen <name>`)
   - The CR name is `<name>` and the contents are empty.
   - This name is registered in the bootstrap manifests for KubeStellar-Syncer install and KubeStellar-Syncer is told to watch the CR of this name.
@@ -184,13 +184,13 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - The CR is managed by edge-mc (placement translator).
   - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
-- This CR is a placeholder for defining how edge-syncer behaves, and will be extended/split/merged according to further design discussion.
+- This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - Currently KubeStellar-Syncer watches all CRs in the workspace
   - KubeStellar-Syncer merges them and decides which resources are down/up synced based on the merged information. 
 
 ### Downsyncing
 
-- Edge syncer does downsyncing, which copy workload objects on mailbox workspace to Edge cluster
+- KubeStellar-Syncer does downsyncing, which copy workload objects on mailbox workspace to Edge cluster
 - If workload objects are deleted on mailbox workspace, the corresponding objects on the Edge cluster will be also deleted according to SyncerConfig. 
 - SyncerConfig specifies which objects should be downsynced.
   - object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation
@@ -200,13 +200,13 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - Current implementation is using polling to detect changes on mailbox workspace, but will be changed to use Informers. 
 
 ### Renaturing (May not scope in PoC2023q1 since no usage)
-- Edge syncer does renaturing, which converts workload objects to different forms of objects on a Edge cluster. 
+- KubeStellar-Syncer does renaturing, which converts workload objects to different forms of objects on a Edge cluster. 
 - The conversion rules (downstream/upstream mapping) is specified in SyncerConfig.
 - Some objects need to be denatured. 
   - CRD needs to be denatured when conflicting with APIBinding.
 
 ### Return of reported state
-- Edge syncer return the reported state of downsynced objects at Edge cluster to the status of objects on the mailbox workspace periodically. 
+- KubeStellar-Syncer return the reported state of downsynced objects at Edge cluster to the status of objects on the mailbox workspace periodically. 
   - TODO: Failing to returning reported state of some resources (e.g. deployment and service). Need more investigation. 
 - reported state returning on/off is configurable in SyncerConfig. (default is on)
 
@@ -219,12 +219,12 @@ After this, Edge-mc will put the following in the mailbox workspace.
 
 ### Feasibility study
 We will verify if the design described here could cover the following 4 scenarios. 
-- I can register an edge-syncer on a Edge cluster to connect a mailbox workspace specified by name. (edge-syncer registration)
-- I can deploy Kyverno and its policy from mailbox workspace to Edge cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM. (workload deployment by edge-syncer's downsyncing)
-- I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by edge-syncer) 
-- I can deploy the denatured objects on mailbox workspace to Edge cluster by renaturing them automatically in edge-syncer. (workload deployment by renaturing)
+- I can register a KubeStellar-Syncer on a Edge cluster to connect a mailbox workspace specified by name. (KubeStellar-Syncer registration)
+- I can deploy Kyverno and its policy from mailbox workspace to Edge cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM. (workload deployment by KubeStellar-Syncer's downsyncing)
+- I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by KubeStellar-Syncer) 
+- I can deploy the denatured objects on mailbox workspace to Edge cluster by renaturing them automatically in KubeStellar-Syncer. (workload deployment by renaturing)
 
-## Build KubeStellar Syncer image
+## Build KubeStellar-Syncer image
 
 Prerequisite
 - Install ko (https://ko.build/install/)
