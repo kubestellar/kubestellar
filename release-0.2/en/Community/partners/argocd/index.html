@@ -1497,10 +1497,18 @@ Thus, in order to add them as Argo CD's 'clusters', there are a few more steps t
 <p>For KubeStellar's Inventory Management Workspace (IMW) and Workload Management Workspace (WMW).
 The steps are similar.
 Let's take WMW as an example:</p>
-<p>1. Create <code>kube-system</code> namespace in the workspace.</p>
-<p>2. Make sure necessary apibindings exist in the workspace.
+<ol>
+<li>
+<p>Create <code>kube-system</code> namespace in the workspace.</p>
+</li>
+<li>
+<p>Make sure necessary apibindings exist in the workspace.
 For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
-<p>3. Exclude <code>ClusterWorkspace</code> from discovery and sync.</p>
+</li>
+<li>
+<p>Exclude <code>ClusterWorkspace</code> from discovery and sync.</p>
+</li>
+</ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>edit<span class="w"> </span>cm<span class="w"> </span>argocd-cm
 </code></pre></div>
 <p>Make sure <code>resource.exclusions</code> exists in the <code>data</code> field of the <code>argocd-cm</code> configmap as follows:
@@ -1517,7 +1525,9 @@ For WMW, we need one for Kubernetes and one for KubeStellar's edge API.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>argocd-server
 </code></pre></div></p>
 <p>Argo CD's documentation mentions this feature as <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#resource-exclusioninclusion">Resource Exclusion/Inclusion</a>.</p>
-<p>4. Make sure the current context uses WMW, then identify the admin.kubeconfig.</p>
+<ol>
+<li>{ start=4 } Make sure the current context uses WMW, then identify the admin.kubeconfig.</li>
+</ol>
 <p>The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>cluster<span class="w"> </span>add<span class="w"> </span>--name<span class="w"> </span>wmw<span class="w"> </span>--kubeconfig<span class="w"> </span>./admin.kubeconfig<span class="w"> </span>workspace.kcp.io/current
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="go">WARNING: This will create a service account `argocd-manager` on the cluster referenced by context `workspace.kcp.io/current` with full cluster level privileges. Do you want to continue [y/N]? y</span>
