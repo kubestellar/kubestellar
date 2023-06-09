@@ -10,6 +10,7 @@ on:
       - "release-*"
     paths:
       - "docs/**"
+      - "*.md"
       - ".github/workflows/docs-gen-and-push.yaml"
   push:
     branches:
@@ -17,6 +18,7 @@ on:
       - "release-*"
     paths:
       - "docs/**"
+      - "*.md"
       - ".github/workflows/docs-gen-and-push.yaml"
 
 permissions:
