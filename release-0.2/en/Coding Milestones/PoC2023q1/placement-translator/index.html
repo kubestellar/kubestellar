@@ -1617,7 +1617,7 @@ this scenario calls for, but they can be terminated after that.</p>
 
 <p><img alt="Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces." src="../Edge-PoC-2023q1-Scenario-1-stage-1.svg" title="Stage 1 Summary" /></p>
 <p>Stage 1 creates the infrastructure and the edge service provider
-workspace and lets that react to the inventory.  Then the edge syncers
+workspace (ESPW) and lets that react to the inventory.  Then the KubeStellar syncers
 are deployed, in the edge clusters and configured to work with the
 corresponding mailbox workspaces.  This stage has the following steps.</p>
 <h3 id="create-two-kind-clusters">Create two kind clusters.</h3>
@@ -1689,27 +1689,25 @@ noted that the florin or guilder cluster is being accessed.</p>
 build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>kcp
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>make<span class="w"> </span>build
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c1"># wait for KCP to initialize</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w"> </span>
 </code></pre></div></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
-</code></pre></div>
 <!-- END INCLUDE -->
 
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
 <h3 id="create-an-inventory-management-workspace">Create an inventory management workspace.</h3>
 <p>Use the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
 </code></pre></div>
 <h3 id="get-edge-mc">Get edge-mc</h3>
 <p>Download and build or install
-<a href="example1-subs/https://github.com/kcp-dev/edge-mc">edge-mc</a>, according to your
+<a href="https://github.com/kcp-dev/edge-mc">edge-mc</a>, according to your
 preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
 build</code> to populate its <code>bin</code> directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
@@ -1720,6 +1718,10 @@ being on the <code>$PATH</code>.  Alternatively you could invoke them with
 explicit pathnames.  The kubectl plugin lines use fully specific
 executables (e.g., <code>kubectl kubestellar prep-for-syncer</code> corresponds to
 <code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>make<span class="w"> </span>build
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+</code></pre></div>
 <h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters</h3>
 <p>Use the following two commands. They label both florin and guilder
 with <code>env=prod</code>, and also label guilder with <code>extended=si</code>.</p>

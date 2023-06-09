@@ -1469,14 +1469,28 @@
 <p>open a terminal window(1) and clone the latest KubeStellar source:</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kcp-dev/edge-mc<span class="w"> </span>KubeStellar
+</code></pre></div>
+<p>clone the v0.11.0 branch kcp source:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
+</code></pre></div>
+build the kubectl-ws binary and include it in <code>$PATH</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>kcp
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>make<span class="w"> </span>build
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+</code></pre></div></p>
+<p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sleep<span class="w"> </span><span class="m">30</span>
+</code></pre></div></p>
 <!-- END INCLUDE -->
 
 <h4 id="create-the-edge-service-provider-workspace-espw-and-populate-it-with-crds-and-apis">Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs</h4>
 <p>open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -1484,16 +1498,16 @@
 
 <p>Next, create the edge service provider workspace:</p>
 <p>Use workspace <code>root:espw</code> as the Edge Service Provider Workspace (ESPW).
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
 <p>Install CRDs and APIExport.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-exports.md '&lt;!--kubestellar-scheduler-exports-start--&gt;' '&lt;!--kubestellar-scheduler-exports-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -1501,10 +1515,10 @@
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-imports.md '&lt;!--kubestellar-scheduler-imports-start--&gt;' '&lt;!--kubestellar-scheduler-imports-end--&gt;' -->
 
 <p>Use the user home workspace (\~) as the workload management workspace (WMW).
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 </code></pre></div></p>
 <p>Bind APIs.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -1512,116 +1526,116 @@
 <p>Go to the <code>root:espw</code> workspace and run the edge scheduler.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md '&lt;!--kubestellar-scheduler-process-start-start--&gt;' '&lt;!--kubestellar-scheduler-process-start-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>sleep<span class="w"> </span><span class="m">45</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 <p>The outputs from the edge scheduler should be similar to:
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.156100<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kcp.io&quot;</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.157874<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;scheduling.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io&quot;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.159242<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io&quot;</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.261128<span class="w">   </span><span class="m">29786</span><span class="w"> </span>controller.go:201<span class="o">]</span><span class="w"> </span><span class="s2">&quot;starting controller&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-scheduler&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.156100<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kcp.io&quot;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.157874<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;scheduling.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.159242<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io&quot;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.261128<span class="w">   </span><span class="m">29786</span><span class="w"> </span>controller.go:201<span class="o">]</span><span class="w"> </span><span class="s2">&quot;starting controller&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-scheduler&quot;</span>
 </code></pre></div></p>
 <h4 id="create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets">Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets</h4>
 <p>open another terminal window(3) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">cd</span><span class="w"> </span>../kcp
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span><span class="w"> </span>../kcp
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>Use workspace <code>root:compute</code> as the Inventory Management Workspace (IMW).
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:compute
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:compute
 </code></pre></div></p>
 <p>Create two Locations and two SyncTargets.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_prod.yaml
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_dev.yaml
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_prod.yaml
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_dev.yaml
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>sleep<span class="w"> </span><span class="m">5</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_prod.yaml
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_dev.yaml
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_prod.yaml
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_dev.yaml
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>sleep<span class="w"> </span><span class="m">5</span>
 </code></pre></div></p>
 <p>Note that kcp automatically creates a Location <code>default</code>. So there are 3 Locations and 2 SyncTargets in <code>root:compute</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>locations,synctargets
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>locations,synctargets
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>NAME<span class="w">                                 </span>RESOURCE<span class="w">      </span>AVAILABLE<span class="w">   </span>INSTANCES<span class="w">   </span>LABELS<span class="w">   </span>AGE
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>location.scheduling.kcp.io/default<span class="w">   </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">2</span><span class="w">                    </span>2m12s
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>location.scheduling.kcp.io/dev<span class="w">       </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>2m39s
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>location.scheduling.kcp.io/prod<span class="w">      </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>3m13s
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>NAME<span class="w">                              </span>AGE
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>synctarget.workload.kcp.io/dev<span class="w">    </span>110s
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>synctarget.workload.kcp.io/prod<span class="w">   </span>2m12s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>NAME<span class="w">                                 </span>RESOURCE<span class="w">      </span>AVAILABLE<span class="w">   </span>INSTANCES<span class="w">   </span>LABELS<span class="w">   </span>AGE
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>location.scheduling.kcp.io/default<span class="w">   </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">2</span><span class="w">                    </span>2m12s
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>location.scheduling.kcp.io/dev<span class="w">       </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>2m39s
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>location.scheduling.kcp.io/prod<span class="w">      </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>3m13s
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>NAME<span class="w">                              </span>AGE
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>synctarget.workload.kcp.io/dev<span class="w">    </span>110s
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>synctarget.workload.kcp.io/prod<span class="w">   </span>2m12s
 </code></pre></div></p>
 <h4 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW</h4>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>all2all</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_all2all.yaml
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>sleep<span class="w"> </span><span class="m">3</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_all2all.yaml
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>all2all<span class="w"> </span>-oyaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>all2all<span class="w"> </span>-oyaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>destinations:
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span>locationName:<span class="w"> </span>prod
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>prod
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>13841ffd-33f2-4cf4-9114-6156f73aa5c8
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">  </span>locationName:<span class="w"> </span>dev
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">  </span>locationName:<span class="w"> </span>default
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">  </span>locationName:<span class="w"> </span>default
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>prod
-<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>13841ffd-33f2-4cf4-9114-6156f73aa5c8
-<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>kind:<span class="w"> </span>SinglePlacementSlice
-<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>metadata:
-<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">  </span>annotations:
-<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>kvdk2spgmbix
-<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-06-05T14:55:20Z&quot;</span>
-<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
-<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="w">  </span>name:<span class="w"> </span>all2all
-<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">  </span>ownerReferences:
-<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
-<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="w">    </span>name:<span class="w"> </span>all2all
-<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="w">    </span>uid:<span class="w"> </span><span class="m">31915018</span>-6a25-4f01-943e-b8a0a0ed35ba
-<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;875&quot;</span>
-<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="w">  </span>uid:<span class="w"> </span>a2b8224d-5feb-40a1-adb2-67c07965f13b
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>destinations:
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span>locationName:<span class="w"> </span>prod
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>prod
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>13841ffd-33f2-4cf4-9114-6156f73aa5c8
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span>locationName:<span class="w"> </span>dev
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">  </span>locationName:<span class="w"> </span>default
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">  </span>locationName:<span class="w"> </span>default
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>prod
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>13841ffd-33f2-4cf4-9114-6156f73aa5c8
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>kind:<span class="w"> </span>SinglePlacementSlice
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>metadata:
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">  </span>annotations:
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>kvdk2spgmbix
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-06-05T14:55:20Z&quot;</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">  </span>name:<span class="w"> </span>all2all
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">  </span>ownerReferences:
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">    </span>name:<span class="w"> </span>all2all
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a><span class="w">    </span>uid:<span class="w"> </span><span class="m">31915018</span>-6a25-4f01-943e-b8a0a0ed35ba
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;875&quot;</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a><span class="w">  </span>uid:<span class="w"> </span>a2b8224d-5feb-40a1-adb2-67c07965f13b
 </code></pre></div>
 EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:compute</code>.</p>
 <p>Create a more specific EdgePlacement which selects Locations labeled by <code>env: dev</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_dev.yaml
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>sleep<span class="w"> </span><span class="m">3</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_dev.yaml
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The corresponding SinglePlacementSlice has a shorter list of <code>destinations</code>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>dev<span class="w"> </span>-oyaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>dev<span class="w"> </span>-oyaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>destinations:
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>locationName:<span class="w"> </span>dev
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>kind:<span class="w"> </span>SinglePlacementSlice
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>metadata:
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span>annotations:
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>kvdk2spgmbix
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-06-05T14:57:00Z&quot;</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
-<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">  </span>name:<span class="w"> </span>dev
-<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">  </span>ownerReferences:
-<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
-<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
-<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="w">    </span>name:<span class="w"> </span>dev
-<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="w">    </span>uid:<span class="w"> </span>1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b
-<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;877&quot;</span>
-<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="w">  </span>uid:<span class="w"> </span>c9c0c2fc-d721-4c73-9788-e10711bad23a
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>destinations:
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span>locationName:<span class="w"> </span>dev
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span>syncTargetName:<span class="w"> </span>dev
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span>syncTargetUID:<span class="w"> </span>ea5492ec-44af-4173-a4ca-9c5cd59afcb1
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>kind:<span class="w"> </span>SinglePlacementSlice
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>metadata:
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span>annotations:
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>kvdk2spgmbix
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-06-05T14:57:00Z&quot;</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">  </span>name:<span class="w"> </span>dev
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="w">  </span>ownerReferences:
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="w">    </span>name:<span class="w"> </span>dev
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="w">    </span>uid:<span class="w"> </span>1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;877&quot;</span>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="w">  </span>uid:<span class="w"> </span>c9c0c2fc-d721-4c73-9788-e10711bad23a
 </code></pre></div></p>
 <p>Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.</p>
 <p>Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)</p>
