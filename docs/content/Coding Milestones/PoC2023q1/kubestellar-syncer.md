@@ -20,7 +20,7 @@ KubeStellar Syncer runs in the target cluster and sync kubernetes resource objec
 ![kubestellar-syncer drawio](images/kubestellar-syncer-overview.png)
 
 
-## Steps to try the syncer
+## Steps to try the Syncer
 The KubeStellar Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in [example1](../example1) until `The mailbox controller` in stage 2. 
 
 {%
