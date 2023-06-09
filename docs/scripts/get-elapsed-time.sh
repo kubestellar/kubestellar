@@ -89,6 +89,5 @@ echo $date2
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-docs_ecutable_filename=$docs_ecutable_filename$filename_ext
-echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->" > /docs/overrides/$docs_ecutable_filename
+echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->" > docs/overrides/$docs_ecutable_filename$filename_ext
 
