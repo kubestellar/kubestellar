@@ -19,9 +19,9 @@ pre_req_name: 'content/common-subs/pre-req.md'
 #### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
 open a terminal window(1) and clone the latest KubeStellar source:
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp.md"
-   start="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-start-->"
-   end="<!--kubestellar-scheduler-0-pull-kcp-and-kuberstellar-source-and-start-kcp-end-->"
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
+   start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
+   end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
 %}
 
 #### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
