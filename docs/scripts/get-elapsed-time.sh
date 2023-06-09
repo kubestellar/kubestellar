@@ -20,7 +20,7 @@ set -o pipefail
 # set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-cd "$REPO_ROOT/docs"
+# cd "$REPO_ROOT/docs"
 
 FILE_LIST=()
 SAVEIFS=$IFS
@@ -30,7 +30,7 @@ if [ -z "${FILE_LIST[0]+x}" ]; then
     echo empty filename, exiting
     exit
 else
-  docs-ecutable-filename=${FILE_LIST[0]}
+  option=${FILE_LIST[0]}
 fi
 
 IFS=$SAVEIFS
@@ -39,7 +39,7 @@ IFS=$SAVEIFS
 workflow_id=""
 filename_ext=".dmd"
 
-case $docs-ecutable-filename in
+case $option in
     placement)
         echo "Selected placement option"
         workflow_id="59166207"
@@ -89,6 +89,6 @@ echo $date2
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-docs-ecutable-filename=$docs-ecutable-filename$filename_ext
+docs-ecutable-filename=$option$filename_ext
 echo -e "<!--elapsed-time-start-->\n$minutes\n<!--elapsed-time-end-->" > /docs/overrides/$docs-ecutable-filename
 
