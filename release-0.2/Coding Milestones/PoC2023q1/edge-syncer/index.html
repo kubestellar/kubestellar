@@ -1531,7 +1531,7 @@
 
   <h1>KubeStellar-Syncer</h1>
 
-<p><img alt="edge-syncer drawio" src="../images/edge-syncer-overview.png" /></p>
+<p><img alt="edge-syncer drawio" src="images/edge-syncer-overview.png" /></p>
 <h4 id="registering-kubestellar-syncer-on-an-edge-cluster">Registering KubeStellar Syncer on an Edge cluster</h4>
 <p>Edge-syncer can be deployed on Edge cluster easily by the following steps.</p>
 <ol>
@@ -1556,7 +1556,7 @@
 </li>
 </ol>
 <p>The overall diagram is as follows:</p>
-<p><img alt="edge-syncer boot" src="../images/edge-syncer-boot.png" /></p>
+<p><img alt="edge-syncer boot" src="images/edge-syncer-boot.png" /></p>
 <h4 id="what-kubestellar-syncer-gen-plugin-does">What kubestellar syncer-gen plugin does</h4>
 <p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), both access information are required. For the upstream access, the registration command of Syncer (<code>kubectl kubestellar syncer-gen</code>) creates a service account, clusterrole, and clusterrolebinding in the workspace, and then generates kubeconfig manifest from the service account token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mount to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a service account, role/clusterrole, rolebinding/clusterrolebinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to downstream cluster. The serviceaccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addition to that, the command creates EdgeSyncConfig CRD if not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (;<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of EdgeSyncConfig CRD will also no longer be needed since we will switch to use SyncerConfig rather than EdgeSyncConfig in near future.</p>
@@ -1649,7 +1649,7 @@
 - APIExport/API Schema corresponding to CRD such as Kubernetes <a href="https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml">ClusterPolicyReport</a>.
   - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/hack/update-codegen-crds.sh#L57">here</a>). 
 - EdgePlacement</p>
-<p><img alt="edge-syncer deploy" src="../images/edge-syncer-deploy.png" /></p>
+<p><img alt="edge-syncer deploy" src="images/edge-syncer-deploy.png" /></p>
 <p>After this, Edge-mc will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
 - SyncerConfig CR</p>

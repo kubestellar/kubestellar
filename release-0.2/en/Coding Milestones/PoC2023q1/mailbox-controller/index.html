@@ -21,7 +21,7 @@
     
     
       
-        <title>Mailbox Controller - KubeStellar</title>
+        <title>KubeStellar Mailbox Controller - KubeStellar</title>
       
     
     
@@ -134,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Mailbox Controller
+              KubeStellar Mailbox Controller
             
           </span>
         </div>
@@ -893,6 +893,46 @@
     Try It
   </a>
   
+    <nav class="md-nav" aria-label="Try It">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-try-the-mailbox-controller" class="md-nav__link">
+    Steps to try the mailbox controller
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps to try the mailbox controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" class="md-nav__link">
+    Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-edge-service-provider-workspace-espw" class="md-nav__link">
+    Create the Edge Service Provider Workspace (ESPW)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teardown-the-environment" class="md-nav__link">
+    Teardown the environment
+  </a>
+  
 </li>
       
     </ul>
@@ -1346,6 +1386,46 @@
     Try It
   </a>
   
+    <nav class="md-nav" aria-label="Try It">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#steps-to-try-the-mailbox-controller" class="md-nav__link">
+    Steps to try the mailbox controller
+  </a>
+  
+    <nav class="md-nav" aria-label="Steps to try the mailbox controller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" class="md-nav__link">
+    Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-edge-service-provider-workspace-espw" class="md-nav__link">
+    Create the Edge Service Provider Workspace (ESPW)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teardown-the-environment" class="md-nav__link">
+    Teardown the environment
+  </a>
+  
 </li>
       
     </ul>
@@ -1381,6 +1461,7 @@
 
   <h1>KubeStellar Mailbox Controller</h1>
 
+<p><a href="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml"><img alt="docs-ecutable - mailbox-controller" src="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=release-0.2" /></a>&nbsp;&nbsp;&nbsp;</p>
 <h2 id="linking-synctarget-with-mailbox-workspace">Linking SyncTarget with Mailbox Workspace</h2>
 <p>For a given SyncTarget T, the mailbox controller currently chooses the
 name of the corresponding workspace to be the concatenation of the
@@ -1410,89 +1491,113 @@ start</code>.  Finally, the controller also needs a kube client config that
 is pointed at the edge service provider workspace and is authorized to
 consume the <code>Workspace</code> objects from there.</p>
 <p>The command line flags, beyond the basics, are as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">      --concurrency int                  number of syncs to run in parallel (default 4)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="go">      --espw-path string                 the pathname of the edge service provider workspace (default &quot;root:espw&quot;)</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">      </span>--concurrency<span class="w"> </span>int<span class="w">                  </span>number<span class="w"> </span>of<span class="w"> </span>syncs<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span><span class="k">in</span><span class="w"> </span>parallel<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="m">4</span><span class="o">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">      </span>--espw-path<span class="w"> </span>string<span class="w">                 </span>the<span class="w"> </span>pathname<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span><span class="o">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">      --inventory-cluster string         The name of the kubeconfig cluster to use for access to APIExport view of SyncTarget objects</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">      --inventory-context string         The name of the kubeconfig context to use for access to APIExport view of SyncTarget objects (default &quot;root&quot;)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">      --inventory-kubeconfig string      Path to the kubeconfig file to use for access to APIExport view of SyncTarget objects</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">      --inventory-user string            The name of the kubeconfig user to use for access to APIExport view of SyncTarget objects</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">      </span>--inventory-cluster<span class="w"> </span>string<span class="w">         </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span>--inventory-context<span class="w"> </span>string<span class="w">         </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span>--inventory-kubeconfig<span class="w"> </span>string<span class="w">      </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span>--inventory-user<span class="w"> </span>string<span class="w">            </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="go">      --mbws-cluster string              The name of the kubeconfig cluster to use for access to mailbox workspaces (really all clusters)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="go">      --mbws-context string              The name of the kubeconfig context to use for access to mailbox workspaces (really all clusters) (default &quot;base&quot;)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">      --mbws-kubeconfig string           Path to the kubeconfig file to use for access to mailbox workspaces (really all clusters)</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="go">      --mbws-user string                 The name of the kubeconfig user to use for access to mailbox workspaces (really all clusters)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span>--mbws-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span>--mbws-context<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span><span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;base&quot;</span><span class="o">)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span>--mbws-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span>--mbws-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="go">      --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span>--server-bind-address<span class="w"> </span>ipport<span class="w">       </span>The<span class="w"> </span>IP<span class="w"> </span>address<span class="w"> </span>with<span class="w"> </span>port<span class="w"> </span>at<span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> </span>/metrics<span class="w"> </span>and<span class="w"> </span>/debug/pprof/<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>:10203<span class="o">)</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="go">      --workload-cluster string          The name of the kubeconfig cluster to use for access to edge service provider workspace</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="go">      --workload-context string          The name of the kubeconfig context to use for access to edge service provider workspace</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="go">      --workload-kubeconfig string       Path to the kubeconfig file to use for access to edge service provider workspace</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="go">      --workload-user string             The name of the kubeconfig user to use for access to edge service provider workspace</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span>--workload-cluster<span class="w"> </span>string<span class="w">          </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span>--workload-context<span class="w"> </span>string<span class="w">          </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span>--workload-kubeconfig<span class="w"> </span>string<span class="w">       </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">      </span>--workload-user<span class="w"> </span>string<span class="w">             </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 </code></pre></div>
 <h2 id="try-it">Try It</h2>
-<p>To exercise it, do the following steps.</p>
-<p>Clone this repo, install kcp (the version for <code>github.com/kcp-dev/kcp</code> in <code>go.mod</code> is required) 
-and start a kcp server as described <a href="../kubestellar-scheduler/#steps-to-try-the-scheduler">here</a>.</p>
-<p>Do the remaining steps in a separate shell, with
-<code>$KUBECONFIG</code> set to the admin config for that kcp server.  </p>
+<h3 id="steps-to-try-the-mailbox-controller">Steps to try the mailbox controller</h3>
+<h4 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp</h4>
+<p>open a terminal window(1) and clone the latest KubeStellar source:</p>
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
+
+<!-- END INCLUDE -->
+
+<h4 id="create-the-edge-service-provider-workspace-espw">Create the Edge Service Provider Workspace (ESPW)</h4>
+<p>open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end--&gt;' -->
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+</code></pre></div>
+<!-- END INCLUDE -->
+
+<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start--&gt;' '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end--&gt;' -->
+
 <p>Next, create the edge service provider workspace:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw<span class="w"> </span>--enter
-</code></pre></div>
+<p>Use workspace <code>root:espw</code> as the Edge Service Provider Workspace (ESPW).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw
+</code></pre></div></p>
+<!-- END INCLUDE -->
+
 <p>After that, a run of the controller should look like the following.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gp">$ </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="go">I0305 18:06:20.046741   85556 main.go:110] &quot;Command line flag&quot; add_dir_header=&quot;false&quot;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">I0305 18:06:20.046954   85556 main.go:110] &quot;Command line flag&quot; alsologtostderr=&quot;false&quot;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">I0305 18:06:20.046960   85556 main.go:110] &quot;Command line flag&quot; concurrency=&quot;4&quot;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">I0305 18:06:20.046965   85556 main.go:110] &quot;Command line flag&quot; inventory-context=&quot;root&quot;</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">I0305 18:06:20.046971   85556 main.go:110] &quot;Command line flag&quot; inventory-kubeconfig=&quot;&quot;</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="go">I0305 18:06:20.046976   85556 main.go:110] &quot;Command line flag&quot; log_backtrace_at=&quot;:0&quot;</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="go">I0305 18:06:20.046980   85556 main.go:110] &quot;Command line flag&quot; log_dir=&quot;&quot;</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="go">I0305 18:06:20.046985   85556 main.go:110] &quot;Command line flag&quot; log_file=&quot;&quot;</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="go">I0305 18:06:20.046989   85556 main.go:110] &quot;Command line flag&quot; log_file_max_size=&quot;1800&quot;</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="go">I0305 18:06:20.046993   85556 main.go:110] &quot;Command line flag&quot; logtostderr=&quot;true&quot;</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="go">I0305 18:06:20.046997   85556 main.go:110] &quot;Command line flag&quot; one_output=&quot;false&quot;</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="go">I0305 18:06:20.047002   85556 main.go:110] &quot;Command line flag&quot; server-bind-address=&quot;:10203&quot;</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="go">I0305 18:06:20.047006   85556 main.go:110] &quot;Command line flag&quot; skip_headers=&quot;false&quot;</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="go">I0305 18:06:20.047011   85556 main.go:110] &quot;Command line flag&quot; skip_log_headers=&quot;false&quot;</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="go">I0305 18:06:20.047015   85556 main.go:110] &quot;Command line flag&quot; stderrthreshold=&quot;2&quot;</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="go">I0305 18:06:20.047019   85556 main.go:110] &quot;Command line flag&quot; v=&quot;2&quot;</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="go">I0305 18:06:20.047023   85556 main.go:110] &quot;Command line flag&quot; vmodule=&quot;&quot;</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="go">I0305 18:06:20.047027   85556 main.go:110] &quot;Command line flag&quot; workload-context=&quot;&quot;</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="go">I0305 18:06:20.047031   85556 main.go:110] &quot;Command line flag&quot; workload-kubeconfig=&quot;&quot;</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="go">I0305 18:06:20.070071   85556 main.go:247] &quot;Found APIExport view&quot; exportName=&quot;workload.kcp.io&quot; serverURL=&quot;https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io&quot;</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="go">I0305 18:06:20.072088   85556 shared_informer.go:282] Waiting for caches to sync for mailbox-controller</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="go">I0305 18:06:20.172169   85556 shared_informer.go:289] Caches are synced for mailbox-controller</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="go">I0305 18:06:20.172196   85556 main.go:210] &quot;Informers synced&quot;</span>
+<!-- BEGIN INCLUDE mailbox-controller-subs/mailbox-controller-process-start.md '&lt;!--mailbox-controller-process-start-start--&gt;' '&lt;!--mailbox-controller-process-start-end--&gt;' -->
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
-<p>In a separate shell, make a inventory management workspace as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
+<!-- END INCLUDE -->
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046741<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">add_dir_header</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046954<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">alsologtostderr</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046960<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">concurrency</span><span class="o">=</span><span class="s2">&quot;4&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046965<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-context<span class="o">=</span><span class="s2">&quot;root&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046971<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046976<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_backtrace_at</span><span class="o">=</span><span class="s2">&quot;:0&quot;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046980<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046985<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046989<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file_max_size</span><span class="o">=</span><span class="s2">&quot;1800&quot;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046993<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">logtostderr</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046997<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">one_output</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047002<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>server-bind-address<span class="o">=</span><span class="s2">&quot;:10203&quot;</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047006<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047011<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_log_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047015<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">stderrthreshold</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047019<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">v</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047023<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">vmodule</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047027<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-context<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047031<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.070071<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:247<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io&quot;</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.072088<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172169<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172196<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:210<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Informers synced&quot;</span>
 </code></pre></div>
-<p>Then in that workspace, run the following command to create a <code>SyncTarget</code>
-object.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="s">kind: SyncTarget</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="s">  name: stest1</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="s">spec:</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="s">  cells:</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="s">EOF</span>
+<p>In a separate terminal window(3), create an inventory management workspace as follows.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
+</code></pre></div>
+<p>Then in that workspace, run the following command to create a <code>SyncTarget</code> object.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="s">kind: SyncTarget</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="s">  name: stest1</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="s">spec:</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="s">  cells:</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>That should provoke logging like the following from the mailbox controller.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="go">I0305 18:07:20.490417   85556 main.go:369] &quot;Created missing workspace&quot; worker=0 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>I0305<span class="w"> </span><span class="m">18</span>:07:20.490417<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:369<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created missing workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
 <p>And you can verify that as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="go">Current workspace is &quot;root:espw&quot;.</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="gp">$ </span>kubectl<span class="w"> </span>get<span class="w"> </span>workspaces
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="go">NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="go">niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            Ready   https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht   22s</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+</code></pre></div></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>workspaces
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>NAME<span class="w">                                                       </span>TYPE<span class="w">        </span>REGION<span class="w">   </span>PHASE<span class="w">   </span>URL<span class="w">                                                     </span>AGE
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht<span class="w">   </span>22s
+</code></pre></div></p>
 <p>FYI, if you look inside that workspace you will see an <code>APIBinding</code>
 named <code>bind-edge</code> that binds to the <code>APIExport</code> named <code>edge.kcp.io</code>
 from the edge service provider workspace (and this is why the
@@ -1500,16 +1605,17 @@ controller needs to know the pathname of that workspace), so that the
 edge API is available in the mailbox workspace.</p>
 <p>Next, <code>kubectl delete</code> that workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="go">I0305 18:08:15.428884   85556 main.go:369] &quot;Created missing workspace&quot; worker=2 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="go">I0305 18:08:15.428884   85556 main.go:369] &quot;Created missing workspace&quot; worker=2 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
 <p>Finally, go back to your inventory workspace to delete the <code>SyncTarget</code>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>imw
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>SyncTarget<span class="w"> </span>stest1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>imw
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>SyncTarget<span class="w"> </span>stest1
 </code></pre></div>
 and watch the mailbox controller react as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="go">I0305 18:08:44.380421   85556 main.go:352] &quot;Deleted unwanted workspace&quot; worker=0 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
+<h2 id="teardown-the-environment">Teardown the environment</h2>
 
 
   

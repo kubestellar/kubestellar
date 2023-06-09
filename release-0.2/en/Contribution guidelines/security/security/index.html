@@ -85,6 +85,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#security-announcements" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -537,9 +542,79 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Policy
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Policy
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#security-announcements" class="md-nav__link">
+    Security Announcements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#report-a-vulnerability" class="md-nav__link">
+    Report a Vulnerability
+  </a>
+  
+    <nav class="md-nav" aria-label="Report a Vulnerability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-report-a-vulnerability" class="md-nav__link">
+    When Should I Report a Vulnerability?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-not-report-a-vulnerability" class="md-nav__link">
+    When Should I NOT Report a Vulnerability?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-vulnerability-response" class="md-nav__link">
+    Security Vulnerability Response
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-disclosure-timing" class="md-nav__link">
+    Public Disclosure Timing
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1271,6 +1346,62 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#security-announcements" class="md-nav__link">
+    Security Announcements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#report-a-vulnerability" class="md-nav__link">
+    Report a Vulnerability
+  </a>
+  
+    <nav class="md-nav" aria-label="Report a Vulnerability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-report-a-vulnerability" class="md-nav__link">
+    When Should I Report a Vulnerability?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-should-i-not-report-a-vulnerability" class="md-nav__link">
+    When Should I NOT Report a Vulnerability?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-vulnerability-response" class="md-nav__link">
+    Security Vulnerability Response
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-disclosure-timing" class="md-nav__link">
+    Public Disclosure Timing
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1302,7 +1433,33 @@
 
   <h1>Policy</h1>
 
+<!-- BEGIN INCLUDE ../../../../SECURITY.md '&lt;!--security-start--&gt;' '&lt;!--security-end--&gt;' -->
 
+<h2 id="security-announcements">Security Announcements</h2>
+<p>Join the <a href="https://groups.google.com/u/1/g/kubestellar-security-announce">kubestellar-security-announce</a> group for emails about security and major API announcements.</p>
+<h2 id="report-a-vulnerability">Report a Vulnerability</h2>
+<p>We're extremely grateful for security researchers and users that report vulnerabilities to the KubeStellar Open Source Community. All reports are thoroughly investigated by a set of community volunteers.</p>
+<p>You can also email the private <a href="mailto:kubestellar-security-announce@googlegroups.com">kubestellar-security-announce@googlegroups.com</a> list with the security details and the details expected for <a href="https://github.com/kcp-dev/edge-mc/blob/main/.github/ISSUE_TEMPLATE/bug_report.yaml">all KubeStellar bug reports</a>.</p>
+<h3 id="when-should-i-report-a-vulnerability">When Should I Report a Vulnerability?</h3>
+<ul>
+<li>You think you discovered a potential security vulnerability in KubeStellar</li>
+<li>You are unsure how a vulnerability affects KubeStellar</li>
+<li>You think you discovered a vulnerability in another project that KubeStellar depends on</li>
+<li>For projects with their own vulnerability reporting and disclosure process, please report it directly there</li>
+</ul>
+<h3 id="when-should-i-not-report-a-vulnerability">When Should I NOT Report a Vulnerability?</h3>
+<ul>
+<li>You need help tuning KubeStellar components for security</li>
+<li>You need help applying security related updates</li>
+<li>Your issue is not security related</li>
+</ul>
+<h2 id="security-vulnerability-response">Security Vulnerability Response</h2>
+<p>Each report is acknowledged and analyzed by the maintainers of KubeStellar within 3 working days.</p>
+<p>Any vulnerability information shared with Security Response Committee stays within KubeStellar project and will not be disseminated to other projects unless it is necessary to get the issue fixed.</p>
+<p>As the security issue moves from triage, to identified fix, to release planning we will keep the reporter updated.</p>
+<h2 id="public-disclosure-timing">Public Disclosure Timing</h2>
+<p>A public disclosure date is negotiated by the KubeStellar Security Response Committee and the bug submitter. We prefer to fully disclose the bug as soon as possible once a user mitigation is available. It is reasonable to delay disclosure when the bug or the fix is not yet fully understood, the solution is not well-tested, or for vendor coordination. The timeframe for disclosure is from immediate (especially if it's already publicly known) to a few weeks. For a vulnerability with a straightforward mitigation, we expect report date to disclosure date to be on the order of 7 days. The KubeStellar maintainers hold the final say when setting a disclosure date.</p>
+<!-- END INCLUDE -->
 
 
   
