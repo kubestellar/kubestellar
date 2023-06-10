@@ -128,21 +128,21 @@ build-all:
 # 	test -n "$(SYNCER_IMAGE)" || (echo Failed to create syncer image; exit 1)
 # 	test -n "$(TEST_IMAGE)" || (echo Failed to create test image; exit 1)
 
-# build and push edge-syncer image by ko
+# build and push kubestellar-syncer image by ko
 # e.g. usage:
-#      make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
 # This example builds ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
-.PHONY: build-edge-syncer-image
-build-edge-syncer-image: DOCKER_REPO ?= 
-build-edge-syncer-image: IMAGE_TAG ?= latest
-build-edge-syncer-image: ARCHS ?= linux/$(ARCH)
-build-edge-syncer-image: require-ko
+.PHONY: build-kubestellar-syncer-image
+build-kubestellar-syncer-image: DOCKER_REPO ?= 
+build-kubestellar-syncer-image: IMAGE_TAG ?= latest
+build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
+build-kubestellar-syncer-image: require-ko
 	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer
 	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
-.PHONY: build-edge-syncer-image-local
-build-edge-syncer-image-local: require-ko
+.PHONY: build-kubestellar-syncer-image-local
+build-kubestellar-syncer-image-local: require-ko
 	$(eval SYNCER_IMAGE=$(shell ko build --local --platform=linux/$(ARCH) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
@@ -405,22 +405,22 @@ endif
 # 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: e2e-test-edge-syncer
-e2e-test-edge-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-e2e-test-edge-syncer: TEST_ARGS ?= 
-e2e-test-edge-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
-e2e-test-edge-syncer: e2e-test-edge-syncer-cleanup
+.PHONY: e2e-test-kubestellar-syncer
+e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+e2e-test-kubestellar-syncer: TEST_ARGS ?= 
+e2e-test-kubestellar-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
+e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
 	echo 'Starting test(s)' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
 		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/edgesyncer/... $(TEST_ARGS) \
-		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites edge-syncer \
+		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites kubestellar-syncer \
 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
-.PHONY: e2e-test-edge-syncer-cleanup
-e2e-test-edge-syncer-cleanup:
+.PHONY: e2e-test-kubestellar-syncer-cleanup
+e2e-test-kubestellar-syncer-cleanup:
 	rm -rf $(WORK_DIR)/.kcp/etcd-server
 	rm -rf $(WORK_DIR)/.kcp/.admin-token-store $(WORK_DIR)/.kcp/admin.kubeconfig
 	rm -rf $(WORK_DIR)/.kcp/apiserver.* $(WORK_DIR)/.kcp/sa.key
