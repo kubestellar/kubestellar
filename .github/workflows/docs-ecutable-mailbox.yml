@@ -85,7 +85,7 @@ jobs:
 
       - run: |
           echo "md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)" >> $GITHUB_OUTPUT
-          id: run_make
+        id: run_make
 
       - uses: actions/checkout@v3
         with:
