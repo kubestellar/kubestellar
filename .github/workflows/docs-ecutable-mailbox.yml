@@ -84,8 +84,10 @@ jobs:
       - run: git rev-parse --abbrev-ref HEAD 
 
       - run: |
-          md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)
-          echo "md_content=$md_content" >> ${GITHUB_ENV}
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "MD_CONTENT<<$EOF" >> "$GITHUB_ENV"
+          make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
         id: run_make
 
       - uses: actions/checkout@v3
