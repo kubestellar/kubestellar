@@ -1,5 +1,5 @@
 <!--kubestellar-syncer-0-deploy-florin-start-->
-Go to inventry management workspace and find the mailbox workspace name.
+Go to inventory management workspace and find the mailbox workspace name.
 ```shell
 kubectl ws root:imw-1
 mbws=`kubectl get SyncTarget florin -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`

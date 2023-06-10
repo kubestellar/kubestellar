@@ -82,6 +82,7 @@ Finalizers
 FlowSchema
 FluxCD
 GenerateName
+GH
 GitOpsCon
 GoDaddy
 GPG
@@ -152,6 +153,7 @@ ReplicaSet
 ReplicationController
 ResourceQuota
 ResourceVersion
+RHEL
 Roadmap
 RoleBinding
 Rollout
@@ -201,6 +203,7 @@ WMWs
 WSL
 Youtube
 afterall
+amd
 andy
 apache
 api
@@ -217,6 +220,7 @@ apiserver
 apiwatch
 approvers
 autoscaling
+awk
 boto
 buildDate
 clientset
@@ -267,9 +271,12 @@ env
 envar
 espw
 etcd
+exe
 executables
 faq
+fi
 george
+gh
 gitCommit
 gitTreeState
 gitVersion
@@ -278,6 +285,8 @@ googlegroups
 goVersion
 goroutine
 grafana
+gpg
+gz
 hostPort
 hostvars
 htdocs
@@ -321,6 +330,7 @@ locationSelectors
 loopback
 mailboxwatch
 matchLabels
+md
 mishi
 mkdocs
 mountPath
@@ -341,6 +351,7 @@ ns
 onboarding
 openshift
 opensource
+os
 otherstuff
 ownerReferences
 oyaml
@@ -360,6 +371,7 @@ renature
 renatured
 renaturing
 repo
+req
 resourceNames
 resourceVersion
 resourcequotas
@@ -425,6 +437,7 @@ workspace
 workspaces
 ws
 www
+xargs
 yaml
 yml
 youtube
