@@ -195,11 +195,6 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 			t.Logf("error seen waiting for service crd to become active: %v", err)
 			return false
 		}
-		_, err = upstreamKubeClient.CoreV1().Endpoints("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			t.Logf("error seen waiting for endpoint crd to become active: %v", err)
-			return false
-		}
 		_, err = upstreamKubeClient.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			t.Logf("error seen waiting for pods crd to become active: %v", err)
