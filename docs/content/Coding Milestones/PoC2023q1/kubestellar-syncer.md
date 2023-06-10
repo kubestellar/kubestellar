@@ -90,7 +90,7 @@ KubeStellar-Syncer is deployed on an Edge cluster easily by the following steps.
     Here, `bin/kubectl-kubestellar-syncer_gen` refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
-    the `bin` of edge-mc.
+    the `bin` of KubeStellar.
     For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:v0.2.2`. You can also create a syncer image from the source following [Build KubeStellar-Syncer Image](#build-kubestellar-syncer-image).
 4. Deploy KubeStellar-Syncer on an Edge cluster
 5. Syncer starts to run on the Edge cluster
@@ -120,7 +120,7 @@ The equivalent manual steps are as follows:
    end="<!--kubestellar-syncer-1-syncer-gen-plugin-end-->"
 %}
 
-### Deploy workload objects from edge-mc to Edge cluster
+### Deploy workload objects from KubeStellar to Edge cluster
 
 To deploy resources to Edge clusters, create the following in workload management workspace
 - workload objects
@@ -136,7 +136,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
 - SyncerConfig CR
 
-**TODO**: This is something we should clarify..e.g. which existing controller(s) in edge-mc will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
+**TODO**: This is something we should clarify..e.g. which existing controller(s) in KubeStellar will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
   - The placement translator will put the workload objects and syncer config into the mailbox workspaces.
   - The placement translator will create syncer config based on the EdgePlacement objects and what they match.
   - The mailbox controller will put API Binding into the mailbox workspace.
@@ -149,8 +149,8 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - need of renaturing
   - need of returning reported states of downsynced objects
   - need of delete propagation for downsyncing
-- The CR is managed by edge-mc (placement transformer).
-  - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
+- The CR is managed by KubeStellar (placement transformer).
+  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (`kubectl kubestellar syncer-gen <name>`)
@@ -181,8 +181,8 @@ After this, Edge-mc will put the following in the mailbox workspace.
   - need of renaturing (May not scope in PoC2023q1)
   - need of returning reported states of downsynced objects (May not scope in PoC2023q1)
   - need of delete propagation for downsyncing (May not scope in PoC2023q1)
-- The CR is managed by edge-mc (placement translator).
-  - At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
+- The CR is managed by KubeStellar (placement translator).
+  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - Currently KubeStellar-Syncer watches all CRs in the workspace
@@ -215,7 +215,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
 - SyncerConfig specifies which objects should be upsynced from Edge cluster.
   - object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation (, and more such as ownership reference?)
 - Upsyncing CRD is out of scope for now. This means when upsyncing a CR, corresponding APIBinding (not CRD) is available on the mailbox workspace. This limitation might be revisited later. 
-- ~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in edge-mc.~ => Upsynced objects are accessed through Mailbox informer.
+- ~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in KubeStellar.~ => Upsynced objects are accessed through Mailbox informer.
 
 ### Feasibility study
 We will verify if the design described here could cover the following 4 scenarios. 

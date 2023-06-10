@@ -10,7 +10,7 @@ into the mailbox workspaces and create `SyncerConfig` objects there.
 
 Eventually there will be convenient automation running the placement
 translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the edge-mc command that runs the placement translator.
+ESPW and use the KubeStellar command that runs the placement translator.
 
 ```shell
 kubectl ws root:espw
