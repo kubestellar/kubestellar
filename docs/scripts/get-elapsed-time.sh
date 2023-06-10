@@ -41,27 +41,21 @@ filename_ext=".dmd"
 
 case $docs_ecutable_filename in
     placement)
-        echo "Selected placement option"
         workflow_id="59166207"
         ;;
     scheduler)
-        echo "Selected scheduler option"
         workflow_id="59159715"
         ;;
     mailbox)
-        echo "Selected mailbox option"
         workflow_id="59164731"
         ;;
     example1)
-        echo "Selected example1 option"
         workflow_id="59184957"
         ;;
     quickstart)
-        echo "Selected quickstart option"
         workflow_id="59223574"
         ;;
     syncer)
-        echo "Selected syncer option"
         workflow_id="?"
         ;;
     *)
