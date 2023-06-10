@@ -43,7 +43,7 @@ func NewSyncerConfigController(
 		syncerConfigClient:  syncerConfigClient,
 		syncerConfigManager: syncerConfigManager,
 	}
-	controllerName := "kcp-edge-syncerconfig-controller"
+	controllerName := "kubestellar-syncer-config-controller"
 	controllerBase := &controllerBase{
 		name:              controllerName,
 		target:            "SyncerConfig",
