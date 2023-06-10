@@ -85,7 +85,7 @@ jobs:
 
       - run: |
           temp=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)
-          echo "var<<EOF" >> $GITHUB
+          echo "var<<EOF" >> $GITHUB_OUTPUT
           echo "md_content=$temp" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         id: run_make
