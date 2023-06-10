@@ -11,6 +11,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-syncer.yml"
       - "docs/scripts/docs-ecutable.sh"
@@ -22,6 +23,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
       - "docs/content/Coding Milestones/PoC2023q1/example1-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-syncer.yml"
       - "docs/scripts/docs-ecutable.sh"
