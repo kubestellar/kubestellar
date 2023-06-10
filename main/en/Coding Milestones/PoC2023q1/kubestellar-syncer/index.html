@@ -847,8 +847,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-edge-mc" class="md-nav__link">
-    Get edge-mc
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
 </li>
@@ -943,8 +943,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" class="md-nav__link">
-    Deploy workload objects from edge-mc to Edge cluster
+  <a href="#deploy-workload-objects-from-kubestellar-to-edge-cluster" class="md-nav__link">
+    Deploy workload objects from KubeStellar to Edge cluster
   </a>
   
 </li>
@@ -1677,8 +1677,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-edge-mc" class="md-nav__link">
-    Get edge-mc
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
 </li>
@@ -1773,8 +1773,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" class="md-nav__link">
-    Deploy workload objects from edge-mc to Edge cluster
+  <a href="#deploy-workload-objects-from-kubestellar-to-edge-cluster" class="md-nav__link">
+    Deploy workload objects from KubeStellar to Edge cluster
   </a>
   
 </li>
@@ -2081,15 +2081,15 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
 </code></pre></div>
-<h3 id="get-edge-mc">Get edge-mc<a class="headerlink" href="#get-edge-mc" title="Permanent link">#</a></h3>
+<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
 <p>Download and build or install
 <a href="https://github.com/kcp-dev/edge-mc">edge-mc</a>, according to your
 preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
 build</code> to populate its <code>bin</code> directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
 (creating a <code>bin</code> directory).  In the following exhibited command
-lines, the commands described as "edge-mc commands" and the commands
-that start with <code>kubectl kubestellar</code> rely on the edge-mc <code>bin</code> directory
+lines, the commands described as "KubeStellar commands" and the commands
+that start with <code>kubectl kubestellar</code> rely on the KubeStellar <code>bin</code> directory
 being on the <code>$PATH</code>.  Alternatively you could invoke them with
 explicit pathnames.  The kubectl plugin lines use fully specific
 executables (e.g., <code>kubectl kubestellar prep-for-syncer</code> corresponds to
@@ -2162,14 +2162,14 @@ used in this PoC, if it shows up.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
 
 <h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace<a class="headerlink" href="#populate-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
-<p>This puts the definition and export of the edge-mc API in the edge
+<p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
 <h3 id="the-mailbox-controller">The mailbox controller<a class="headerlink" href="#the-mailbox-controller" title="Permanent link">#</a></h3>
 <p>Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the edge-mc command shown
+Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>sleep<span class="w"> </span><span class="m">45</span>
@@ -2369,7 +2369,7 @@ SyncTarget name, you could do it as follows.</p>
     Here, <code>bin/kubectl-kubestellar-syncer_gen</code> refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
-    the <code>bin</code> of edge-mc.
+    the <code>bin</code> of KubeStellar.
     For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:v0.2.2</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar-Syncer Image</a>.</li>
 <li>Deploy KubeStellar-Syncer on an Edge cluster</li>
 <li>Syncer starts to run on the Edge cluster<ul>
@@ -2483,7 +2483,7 @@ c. Logical cluster name
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="deploy-workload-objects-from-edge-mc-to-edge-cluster">Deploy workload objects from edge-mc to Edge cluster<a class="headerlink" href="#deploy-workload-objects-from-edge-mc-to-edge-cluster" title="Permanent link">#</a></h3>
+<h3 id="deploy-workload-objects-from-kubestellar-to-edge-cluster">Deploy workload objects from KubeStellar to Edge cluster<a class="headerlink" href="#deploy-workload-objects-from-kubestellar-to-edge-cluster" title="Permanent link">#</a></h3>
 <p>To deploy resources to Edge clusters, create the following in workload management workspace
 - workload objects
   - Some objects are denatured if needed.
@@ -2495,7 +2495,7 @@ c. Logical cluster name
 <p>After this, Edge-mc will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
 - SyncerConfig CR</p>
-<p><strong>TODO</strong>: This is something we should clarify..e.g. which existing controller(s) in edge-mc will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
+<p><strong>TODO</strong>: This is something we should clarify..e.g. which existing controller(s) in KubeStellar will cover, or just create a new controller to handle uncovered one. @MikeSpreitzer gave the following suggestions.
   - The placement translator will put the workload objects and syncer config into the mailbox workspaces.
   - The placement translator will create syncer config based on the EdgePlacement objects and what they match.
   - The mailbox controller will put API Binding into the mailbox workspace.</p>
@@ -2508,8 +2508,8 @@ c. Logical cluster name
 <li>need of renaturing</li>
 <li>need of returning reported states of downsynced objects</li>
 <li>need of delete propagation for downsyncing</li>
-<li>The CR is managed by edge-mc (placement transformer).</li>
-<li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>The CR is managed by KubeStellar (placement transformer).</li>
+<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.</li>
 <li>One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>)</li>
@@ -2547,8 +2547,8 @@ c. Logical cluster name
 <li>need of renaturing (May not scope in PoC2023q1)</li>
 <li>need of returning reported states of downsynced objects (May not scope in PoC2023q1)</li>
 <li>need of delete propagation for downsyncing (May not scope in PoC2023q1)</li>
-<li>The CR is managed by edge-mc (placement translator).</li>
-<li>At the initial implementation before edge-mc side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>The CR is managed by KubeStellar (placement translator).</li>
+<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.</li>
 <li>Currently KubeStellar-Syncer watches all CRs in the workspace</li>
@@ -2584,7 +2584,7 @@ c. Logical cluster name
 <li>SyncerConfig specifies which objects should be upsynced from Edge cluster.</li>
 <li>object selector: group, version, kind, name, namespace (for namespaced objects), label, annotation (, and more such as ownership reference?)</li>
 <li>Upsyncing CRD is out of scope for now. This means when upsyncing a CR, corresponding APIBinding (not CRD) is available on the mailbox workspace. This limitation might be revisited later. </li>
-<li>~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in edge-mc.~ =&gt; Upsynced objects are accessed through Mailbox informer.</li>
+<li>~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in KubeStellar.~ =&gt; Upsynced objects are accessed through Mailbox informer.</li>
 </ul>
 <h3 id="feasibility-study">Feasibility study<a class="headerlink" href="#feasibility-study" title="Permanent link">#</a></h3>
 <p>We will verify if the design described here could cover the following 4 scenarios. 

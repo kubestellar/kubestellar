@@ -2153,7 +2153,7 @@ some are created by some other thing as part of the nature of that
 other thing (object or external system).  Another way of looking at
 these particular objects is that they are system infrastructure.</p>
 <p>For some kinds of object, lack of denaturing/renaturing means that
-edge-mc will simply not be able to support workloads that contain such
+KubeStellar will simply not be able to support workloads that contain such
 objects.  These are: <code>MutatingWebhookConfiguration</code>,
 <code>ValidatingWebhookConfiguration</code>, <code>LimitRange</code>, <code>ResourceQuota</code>.</p>
 <p>For some resources, the need to denature is only a matter of
@@ -2563,7 +2563,7 @@ their workload desired and reported state.</p>
 </table>
 <h4 id="already-denatured-in-center-want-natured-in-edge">Already denatured in center, want natured in edge<a class="headerlink" href="#already-denatured-in-center-want-natured-in-edge" title="Permanent link">#</a></h4>
 <p>These are kinds of objects that kcp already gives no interpretation
-to, and that is what edge-mc needs from the center workspaces.</p>
+to, and that is what KubeStellar needs from the center workspaces.</p>
 <p>This is the default category of kind of object --- any kind of data
 object not specifically listed in another category is implicitly in
 this category.  Following are the kinds from k8s and kcp that fall in
@@ -2991,7 +2991,7 @@ to downsync and upsync.</p>
 differs in the following ways.</p>
 <ul>
 <li>Create self-sufficient edge clusters.</li>
-<li>Re-nature objects that edge-mc forcibly denatures at the center.</li>
+<li>Re-nature objects that KubeStellar forcibly denatures at the center.</li>
 <li>Return reported state from associated objects.</li>
 <li>Does not access the SyncTarget object.</li>
 </ul>
@@ -3043,7 +3043,7 @@ workspace to describe the workload desired state.</p>
 workload goes where.  These may be accompanied by API objects that
 specify rule-based customization, specify how status is to be
 summarized.</p>
-<p>The edge-mc implementation propagates the desired state from center to
+<p>The KubeStellar implementation propagates the desired state from center to
 edge and collects the specified information from edge to center.</p>
 <p>The edge user monitors status summary objects in their workload
 management workspaces.</p>
