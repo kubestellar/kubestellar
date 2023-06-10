@@ -53,7 +53,7 @@ import (
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgesyncer "github.com/kcp-dev/edge-mc/pkg/syncer"
+	"github.com/kcp-dev/edge-mc/pkg/syncer"
 )
 
 //go:embed testdata/*
@@ -95,15 +95,15 @@ var syncerConfigGVR = schema.GroupVersionResource{
 	Resource: "syncerconfigs",
 }
 
-type SyncerOption func(t *testing.T, fs *edgeSyncerFixture)
+type SyncerOption func(t *testing.T, fs *kubeStellarSyncerFixture)
 
-func NewEdgeSyncerFixture(t *testing.T, server framework.RunningServer, path logicalcluster.Path) *edgeSyncerFixture {
+func NewKubeStellarSyncerFixture(t *testing.T, server framework.RunningServer, path logicalcluster.Path) *kubeStellarSyncerFixture {
 	t.Helper()
 
-	if !sets.NewString(framework.TestConfig.Suites()...).HasAny("edge-syncer") {
-		t.Fatalf("invalid to use an edge syncer fixture when only the following suites were requested: %v", framework.TestConfig.Suites())
+	if !sets.NewString(framework.TestConfig.Suites()...).HasAny("kubestellar-syncer") {
+		t.Fatalf("invalid to use an kubestellar syncer fixture when only the following suites were requested: %v", framework.TestConfig.Suites())
 	}
-	sf := &edgeSyncerFixture{
+	sf := &kubeStellarSyncerFixture{
 		upstreamServer:     server,
 		edgeSyncTargetPath: path,
 		edgeSyncTargetName: "psyncer-01",
@@ -111,16 +111,16 @@ func NewEdgeSyncerFixture(t *testing.T, server framework.RunningServer, path log
 	return sf
 }
 
-// edgeSyncerFixture configures a syncer fixture. Its `Start` method does the work of starting a syncer.
-type edgeSyncerFixture struct {
+// kubeStellarSyncerFixture configures a syncer fixture. Its `Start` method does the work of starting a syncer.
+type kubeStellarSyncerFixture struct {
 	upstreamServer     framework.RunningServer
 	edgeSyncTargetPath logicalcluster.Path
 	edgeSyncTargetName string
 }
 
 // CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kubestellar syncer-gen` CLI command,
-// applies the edge-syncer-related resources in the physical cluster.
-func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedEdgeSyncerFixture {
+// applies the kubestellar-syncer-related resources in the physical cluster.
+func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedKubeStellarSyncerFixture {
 	t.Helper()
 
 	useDeployedSyncer := len(framework.TestConfig.PClusterKubeconfig()) > 0
@@ -195,11 +195,6 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 			t.Logf("error seen waiting for service crd to become active: %v", err)
 			return false
 		}
-		_, err = upstreamKubeClient.CoreV1().Endpoints("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			t.Logf("error seen waiting for endpoint crd to become active: %v", err)
-			return false
-		}
 		_, err = upstreamKubeClient.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			t.Logf("error seen waiting for pods crd to become active: %v", err)
@@ -224,7 +219,7 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
 	require.NoError(t, err)
 
-	// Run the plugin command to enable the edge syncer and collect the resulting yaml
+	// Run the plugin command to enable the kubestellar syncer and collect the resulting yaml
 	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
 	pluginArgs := []string{
 		sf.edgeSyncTargetName,
@@ -256,8 +251,8 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 
 	syncerConfig := syncerConfigFromCluster(t, downstreamConfig, syncerID, syncerID)
 
-	return &appliedEdgeSyncerFixture{
-		edgeSyncerFixture: *sf,
+	return &appliedKubeStellarSyncerFixture{
+		kubeStellarSyncerFixture: *sf,
 
 		SyncerConfig:                syncerConfig,
 		SyncerID:                    syncerID,
@@ -276,7 +271,7 @@ func (sf *edgeSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing
 // RunSyncer runs a new Syncer against the upstream kcp workspaces
 // Whether the syncer runs in-process or deployed on a pcluster will depend
 // whether --pcluster-kubeconfig and --syncer-image are supplied to the test invocation.
-func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFixture {
+func (sf *appliedKubeStellarSyncerFixture) RunSyncer(t *testing.T) *StartedKubeStellarSyncerFixture {
 	t.Helper()
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -285,23 +280,23 @@ func (sf *appliedEdgeSyncerFixture) RunSyncer(t *testing.T) *StartedEdgeSyncerFi
 		sf.SyncerConfig.DownstreamConfig.QPS = 128
 		sf.SyncerConfig.UpstreamConfig.Burst = 128
 		sf.SyncerConfig.UpstreamConfig.QPS = 128
-		err := edgesyncer.RunSyncer(ctx, sf.SyncerConfig, 1)
+		err := syncer.RunSyncer(ctx, sf.SyncerConfig, 1)
 		require.NoError(t, err, "syncer failed to start")
 	}()
 
 	t.Cleanup(cancelFunc)
 
-	return &StartedEdgeSyncerFixture{
+	return &StartedKubeStellarSyncerFixture{
 		sf,
 	}
 }
 
-// appliedEdgeSyncerFixture contains the configuration required to start an edge syncer and interact with its
+// appliedKubeStellarSyncerFixture contains the configuration required to start an kubestellar syncer and interact with its
 // downstream cluster.
-type appliedEdgeSyncerFixture struct {
-	edgeSyncerFixture
+type appliedKubeStellarSyncerFixture struct {
+	kubeStellarSyncerFixture
 
-	SyncerConfig  *edgesyncer.SyncerConfig
+	SyncerConfig  *syncer.SyncerConfig
 	SyncerID      string
 	WorkspacePath logicalcluster.Path
 	// Provide cluster-admin config and client for test purposes. The downstream config in
@@ -317,20 +312,20 @@ type appliedEdgeSyncerFixture struct {
 	UpstreamKubeconfigPath    string
 }
 
-// StartedEdgeSyncerFixture contains the configuration used to start a syncer and interact with its
+// StartedKubeStellarSyncerFixture contains the configuration used to start a syncer and interact with its
 // downstream cluster.
-type StartedEdgeSyncerFixture struct {
-	*appliedEdgeSyncerFixture
+type StartedKubeStellarSyncerFixture struct {
+	*appliedKubeStellarSyncerFixture
 }
 
-func (sf *StartedEdgeSyncerFixture) DeleteRootComputeAPIBinding(t *testing.T) {
+func (sf *StartedKubeStellarSyncerFixture) DeleteRootComputeAPIBinding(t *testing.T) {
 	err := sf.UpstreamDynamicKubeClient.Cluster(sf.WorkspacePath).Resource(apibindingGVR).Delete(context.Background(), "kubernetes", v1.DeleteOptions{})
 	require.NoError(t, err)
 }
 
 // syncerConfigFromCluster reads the configuration needed to start an in-process
 // syncer from the resources applied to a cluster for a deployed syncer.
-func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namespace, syncerID string) *edgesyncer.SyncerConfig {
+func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namespace, syncerID string) *syncer.SyncerConfig {
 	t.Helper()
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -369,7 +364,7 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 
 	// Compose a new downstream config that uses the token
 	downstreamConfigWithToken := framework.ConfigWithToken(string(token), rest.CopyConfig(downstreamConfig))
-	return &edgesyncer.SyncerConfig{
+	return &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfigWithToken,
 		SyncTargetPath:   logicalcluster.NewPath(""),

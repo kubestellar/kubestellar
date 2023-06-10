@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgesyncer
+package syncer
 
 import (
 	"context"
@@ -34,7 +34,7 @@ import (
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-func TestEdgeSyncerForTurboForDeletionScenario(t *testing.T) {
+func TestKubeStellarSyncerForTurboForDeletionScenario(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
@@ -43,7 +43,7 @@ func TestEdgeSyncerForTurboForDeletionScenario(t *testing.T) {
 	err = edgeframework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config2.yaml", embedded, &syncerConfig2Unst)
 	require.NoError(t, err)
 
-	framework.Suite(t, "edge-syncer")
+	framework.Suite(t, "kubestellar-syncer")
 
 	syncerFixture := setup(t)
 	wsPath := syncerFixture.WorkspacePath

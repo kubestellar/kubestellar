@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgesyncer
+package syncer
 
 import (
 	"context"
@@ -33,7 +33,7 @@ import (
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-func TestEdgeSyncerForKyvernoWithSyncerConfig(t *testing.T) {
+func TestKubeStellarSyncerForKyvernoWithSyncerConfig(t *testing.T) {
 
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/kyverno/syncer-config.yaml", embedded, &syncerConfigUnst)
@@ -47,7 +47,7 @@ func TestEdgeSyncerForKyvernoWithSyncerConfig(t *testing.T) {
 	err = edgeframework.LoadFile("testdata/kyverno/cluster-policy-report.yaml", embedded, &clusterPolicyReportUnst)
 	require.NoError(t, err)
 
-	framework.Suite(t, "edge-syncer")
+	framework.Suite(t, "kubestellar-syncer")
 
 	syncerFixture := setup(t)
 	wsPath := syncerFixture.WorkspacePath

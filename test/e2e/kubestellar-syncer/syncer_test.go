@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgesyncer
+package syncer
 
 import (
 	"context"
@@ -34,7 +34,7 @@ import (
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
+func TestKubeStellarSyncerWithEdgeSyncConfig(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/edgesyncconfig/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
@@ -52,7 +52,7 @@ func TestEdgeSyncerWithEdgeSyncConfig(t *testing.T) {
 	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
 	require.NoError(t, err)
 
-	framework.Suite(t, "edge-syncer")
+	framework.Suite(t, "kubestellar-syncer")
 
 	syncerFixture := setup(t)
 	wsPath := syncerFixture.WorkspacePath

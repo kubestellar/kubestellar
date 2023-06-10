@@ -8,21 +8,21 @@
     ```
     make build
     ```
-1. The new plugin to generate bootstrap manifests for edge-syncer is available by adding the `./bin` directory
+1. The new plugin to generate bootstrap manifests for kubestellar-syncer is available by adding the `./bin` directory
     ```
     Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a physical cluster.
 
     Usage:
-      syncer-gen <name> --syncer-image <edge-syncer-image> -o <output-file> [flags]
+      syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o <output-file> [flags]
 
     Examples:
 
             # Setup workspace for syncer to interact and then install syncer on a physical cluster
-            kubectl kcp-edge syncer-gen <name> --syncer-image <edge-syncer-image> -o edge-syncer.yaml
-            KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f edge-syncer.yaml
+            kubectl kcp-edge syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o kubestellar-syncer.yaml
+            KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
 
             # Directly apply the manifest
-            kubectl kcp-edge syncer-gen <name> --syncer-image <edge-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
+            kubectl kcp-edge syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
 
 
     Flags:
@@ -31,7 +31,7 @@
  
 ## Edge Syncer feasibility verification
 
-### Register an edge-syncer on a p-cluster to connect a mailbox workspace specified by name
+### Register an kubestellar-syncer on a p-cluster to connect a mailbox workspace specified by name
 1. Created a mailbox workspace following to https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller/
     ```
     $ kubectl get Workspace
@@ -43,45 +43,45 @@
     $ kubectl kcp ws 1lkhy98o1f84q2a3-mb-861789a8-5867-402d-9fc4-06f0cc81fe1b
     Current workspace is "root:edge:1lkhy98o1f84q2a3-mb-861789a8-5867-402d-9fc4-06f0cc81fe1b" (type root:universal).
     ```
-1. Run edge-syncer registration command
+1. Run kubestellar-syncer registration command
     ```
-    $ kubectl kcp-edge sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/edge-syncer.yaml
-    Creating service account "kcp-edge-syncer-pcluster1-1na3tqcd"
-    Creating cluster role "kcp-edge-syncer-pcluster1-1na3tqcd" to give service account "kcp-edge-syncer-pcluster1-1na3tqcd"
+    $ kubectl kcp-edge sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/kubestellar-syncer.yaml
+    Creating service account "kubestellar-syncer-pcluster1-1na3tqcd"
+    Creating cluster role "kubestellar-syncer-pcluster1-1na3tqcd" to give service account "kubestellar-syncer-pcluster1-1na3tqcd"
 
-    1. write and sync access to the synctarget "kcp-edge-syncer-pcluster1-1na3tqcd"
+    1. write and sync access to the synctarget "kubestellar-syncer-pcluster1-1na3tqcd"
     2. write access to apiresourceimports.
 
-    Creating or updating cluster role binding "kcp-edge-syncer-pcluster1-1na3tqcd" to bind service account "kcp-edge-syncer-pcluster1-1na3tqcd" to cluster role "kcp-edge-syncer-pcluster1-1na3tqcd".
+    Creating or updating cluster role binding "kubestellar-syncer-pcluster1-1na3tqcd" to bind service account "kubestellar-syncer-pcluster1-1na3tqcd" to cluster role "kubestellar-syncer-pcluster1-1na3tqcd".
 
-    Wrote physical cluster manifest to /tmp/edge-syncer.yaml for namespace "kcp-edge-syncer-pcluster1-1na3tqcd". Use
+    Wrote physical cluster manifest to /tmp/kubestellar-syncer.yaml for namespace "kubestellar-syncer-pcluster1-1na3tqcd". Use
 
-      KUBECONFIG=<pcluster-config> kubectl apply -f "/tmp/edge-syncer.yaml"
+      KUBECONFIG=<pcluster-config> kubectl apply -f "/tmp/kubestellar-syncer.yaml"
 
     to apply it. Use
 
-      KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-pcluster1-1na3tqcd" kcp-edge-syncer-pcluster1-1na3tqcd
+      KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-pcluster1-1na3tqcd" kubestellar-syncer-pcluster1-1na3tqcd
 
     to verify the syncer pod is running.
     ```
-1. Deploy the generated bootstrap manifest (`/tmp/edge-syncer.yaml`) in a p-cluster
+1. Deploy the generated bootstrap manifest (`/tmp/kubestellar-syncer.yaml`) in a p-cluster
     ```
-    $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl apply -f /tmp/edge-syncer.yaml
-    namespace/kcp-edge-syncer-pcluster1-1na3tqcd created
-    serviceaccount/kcp-edge-syncer-pcluster1-1na3tqcd created
-    secret/kcp-edge-syncer-pcluster1-1na3tqcd-token created
-    clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-pcluster1-1na3tqcd created
-    clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-pcluster1-1na3tqcd created
+    $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl apply -f /tmp/kubestellar-syncer.yaml
+    namespace/kubestellar-syncer-pcluster1-1na3tqcd created
+    serviceaccount/kubestellar-syncer-pcluster1-1na3tqcd created
+    secret/kubestellar-syncer-pcluster1-1na3tqcd-token created
+    clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
+    clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
     role.rbac.authorization.k8s.io/kcp-edge-dns-pcluster1-1na3tqcd created
     rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-pcluster1-1na3tqcd created
-    secret/kcp-edge-syncer-pcluster1-1na3tqcd created
-    deployment.apps/kcp-edge-syncer-pcluster1-1na3tqcd created
+    secret/kubestellar-syncer-pcluster1-1na3tqcd created
+    deployment.apps/kubestellar-syncer-pcluster1-1na3tqcd created
     ```
 1. Edge Syncer successfully runs and interact with the mailbox workspace
     ```
     $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get pod -A
-    NAMESPACE                            NAME                                                  READY   STATUS    RESTARTS   AGE
-    kcp-edge-syncer-pcluster1-1na3tqcd   kcp-edge-syncer-pcluster1-1na3tqcd-7467d4bf7f-7rqnt   1/1     Running   0          31s
+    NAMESPACE                               NAME                                                     READY   STATUS    RESTARTS   AGE
+    kubestellar-syncer-pcluster1-1na3tqcd   kubestellar-syncer-pcluster1-1na3tqcd-7467d4bf7f-7rqnt   1/1     Running   0          31s
     ...
     ```
 1. Try downsync a namespace
@@ -106,14 +106,14 @@
     1. The namespace `from-ws-to-pcluster` is successfully downsynced
         ```
         $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get ns
-        NAME                                 STATUS   AGE
-        default                              Active   13m
-        from-ws-to-pcluster                  Active   1s
-        kcp-edge-syncer-pcluster1-1na3tqcd   Active   11m
-        kube-node-lease                      Active   13m
-        kube-public                          Active   13m
-        kube-system                          Active   13m
-        local-path-storage                   Active   13m
+        NAME                                    STATUS   AGE
+        default                                 Active   13m
+        from-ws-to-pcluster                     Active   1s
+        kubestellar-syncer-pcluster1-1na3tqcd   Active   11m
+        kube-node-lease                         Active   13m
+        kube-public                             Active   13m
+        kube-system                             Active   13m
+        local-path-storage                      Active   13m
         ```
 
 ### Deploy Kyverno and its policy from mailbox workspace to p-cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM.
@@ -222,5 +222,5 @@
     1bz73lo0r5e6baep   pol-sample-policy   0      1      0      0       0      2023-03-22T12:15:27Z
     ```
 
-### Deploy the denatured objects on mailbox workspace to p-cluster by renaturing them automatically in edge-syncer.
+### Deploy the denatured objects on mailbox workspace to p-cluster by renaturing them automatically in kubestellar-syncer.
 The previous case covers this item since the denatured PolicyReport CRD was downsynced and deployed as PolicyReport CRD renatured by Edge Syncer.

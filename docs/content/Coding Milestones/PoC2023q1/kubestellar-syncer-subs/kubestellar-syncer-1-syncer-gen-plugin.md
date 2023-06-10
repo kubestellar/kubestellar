@@ -97,19 +97,19 @@ cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=
 
 Download manifest tamplate.
 ```shell
-curl -LO https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/edge-syncer-bootstrap.template.yaml
+curl -LO https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 ```
 
 Generate manifests to bootstrap KubeStellar-Syncer.
 ```shell
-syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < edge-syncer-bootstrap.template.yaml
+syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < kubestellar-syncer-bootstrap.template.yaml
 ```
 ```
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kcp-edge-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
+  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
 ---
 apiVersion: v1
 kind: ServiceAccount
