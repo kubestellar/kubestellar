@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgesyncer
+package syncer
 
 import (
 	"context"
@@ -97,8 +97,8 @@ var syncerConfigGvr = schema.GroupVersionResource{
 	Resource: "syncerconfigs",
 }
 
-func setup(t *testing.T) *edgeframework.StartedEdgeSyncerFixture {
-	framework.Suite(t, "edge-syncer")
+func setup(t *testing.T) *edgeframework.StartedKubeStellarSyncerFixture {
+	framework.Suite(t, "kubestellar-syncer")
 
 	upstreamServer := framework.SharedKcpServer(t)
 
@@ -108,7 +108,7 @@ func setup(t *testing.T) *edgeframework.StartedEdgeSyncerFixture {
 	t.Log("Creating a workspace")
 	_, ws := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.WithName("upstream-sink"), framework.TODO_WithoutMultiShardSupport())
 	wsPath := logicalcluster.NewPath(logicalcluster.Name(ws.Spec.Cluster).String())
-	syncerFixture := edgeframework.NewEdgeSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
+	syncerFixture := edgeframework.NewKubeStellarSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)

@@ -415,7 +415,7 @@ e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
 	echo 'Starting test(s)' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
-		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/edgesyncer/... $(TEST_ARGS) \
+		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \
 		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites kubestellar-syncer \
 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 

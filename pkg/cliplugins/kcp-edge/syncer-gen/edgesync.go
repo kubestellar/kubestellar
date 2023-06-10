@@ -107,11 +107,11 @@ func NewEdgeSyncOptions(streams genericclioptions.IOStreams) *EdgeSyncOptions {
 func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	o.Options.BindFlags(cmd)
 
-	cmd.Flags().StringVar(&o.SyncerImage, "syncer-image", o.SyncerImage, "The edge-syncer image to use in the syncer's deployment YAML. Images are published at https://quay.io/repository/kcpedge/syncer")
+	cmd.Flags().StringVar(&o.SyncerImage, "syncer-image", o.SyncerImage, "The kubestellar-syncer image to use in the syncer's deployment YAML. Images are published at https://quay.io/repository/kcpedge/syncer")
 	cmd.Flags().IntVar(&o.Replicas, "replicas", o.Replicas, "Number of replicas of the syncer deployment.")
 	cmd.Flags().StringVar(&o.KCPNamespace, "kcp-namespace", o.KCPNamespace, "The name of the kcp namespace to create a service account in.")
 	cmd.Flags().StringVarP(&o.OutputFile, "output-file", "o", o.OutputFile, "The manifest file to be created and applied to the physical cluster. Use - for stdout.")
-	cmd.Flags().StringVarP(&o.DownstreamNamespace, "namespace", "n", o.DownstreamNamespace, "The namespace to create the syncer in the physical cluster. By default this is \"kcp-edge-syncer-<synctarget-name>-<uid>\".")
+	cmd.Flags().StringVarP(&o.DownstreamNamespace, "namespace", "n", o.DownstreamNamespace, "The namespace to create the syncer in the physical cluster. By default this is \"kubestellar-syncer-<synctarget-name>-<uid>\".")
 	cmd.Flags().Float32Var(&o.QPS, "qps", o.QPS, "QPS to use when talking to API servers.")
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
@@ -245,7 +245,7 @@ func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 		Burst:    o.Burst,
 	}
 
-	resources, err := renderEdgeSyncerResources(input, syncerID)
+	resources, err := renderKubeStellarSyncerResources(input, syncerID)
 	if err != nil {
 		return err
 	}
@@ -258,12 +258,12 @@ func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 	return err
 }
 
-// getEdgeSyncerID returns a unique ID for a syncer derived from the name and its UID. It's
+// getKubeStellarSyncerID returns a unique ID for a syncer derived from the name and its UID. It's
 // a valid DNS segment and can be used as namespace or object names.
-func getEdgeSyncerID(edgeSyncTarget *typeEdgeSyncTarget) string {
+func getKubeStellarSyncerID(edgeSyncTarget *typeEdgeSyncTarget) string {
 	syncerHash := sha256.Sum224([]byte(edgeSyncTarget.UID))
 	base36hash := strings.ToLower(base36.EncodeBytes(syncerHash[:]))
-	return fmt.Sprintf("kcp-edge-syncer-%s-%s", edgeSyncTarget.Name, base36hash[:8])
+	return fmt.Sprintf("kubestellar-syncer-%s-%s", edgeSyncTarget.Name, base36hash[:8])
 }
 
 type typeEdgeSyncTarget struct {
@@ -319,7 +319,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 	}); err != nil {
 		return "", "", nil, fmt.Errorf("failed to get or create EdgeSyncConfig resource: %w", err)
 	}
-	syncerID = getEdgeSyncerID(edgeSyncTarget)
+	syncerID = getKubeStellarSyncerID(edgeSyncTarget)
 	syncTargetOwnerReferences := []metav1.OwnerReference{{
 		APIVersion: syncConfig.GetAPIVersion(),
 		Kind:       syncConfig.GetKind(),
@@ -593,8 +593,8 @@ type templateArgsForEdge struct {
 	DeploymentApp string
 }
 
-// renderEdgeSyncerResources renders the resources required to deploy a syncer to a pcluster.
-func renderEdgeSyncerResources(input templateInputForEdge, syncerID string) ([]byte, error) {
+// renderKubeStellarSyncerResources renders the resources required to deploy a syncer to a pcluster.
+func renderKubeStellarSyncerResources(input templateInputForEdge, syncerID string) ([]byte, error) {
 
 	tmplArgs := templateArgsForEdge{
 		templateInputForEdge: input,
@@ -608,7 +608,7 @@ func renderEdgeSyncerResources(input templateInputForEdge, syncerID string) ([]b
 		DeploymentApp:        syncerID,
 	}
 
-	syncerTemplate, err := embeddedResources.ReadFile("edge-syncer.yaml")
+	syncerTemplate, err := embeddedResources.ReadFile("kubestellar-syncer.yaml")
 	if err != nil {
 		return nil, err
 	}

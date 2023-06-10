@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package edgesyncer
+package syncer
 
 import (
 	"context"
@@ -34,21 +34,21 @@ import (
 	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
 )
 
-func TestEdgeSyncerWithSyncerConfig(t *testing.T) {
+func TestKubeStellarSyncerWithSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
-	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
+	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
-func TestEdgeSyncerWithWildcardSyncerConfig(t *testing.T) {
+func TestKubeStellarSyncerWithWildcardSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
-	testEdgeSyncerWithSyncerConfig(t, syncerConfigUnst)
+	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
-func testEdgeSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
+func testKubeStellarSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var sampleDownsyncCRDUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/syncerconfig/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
@@ -66,7 +66,7 @@ func testEdgeSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured
 	err = edgeframework.LoadFile("testdata/syncerconfig/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
 	require.NoError(t, err)
 
-	framework.Suite(t, "edge-syncer")
+	framework.Suite(t, "kubestellar-syncer")
 
 	syncerFixture := setup(t)
 	wsPath := syncerFixture.WorkspacePath

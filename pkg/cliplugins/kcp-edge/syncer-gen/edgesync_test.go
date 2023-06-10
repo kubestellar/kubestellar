@@ -23,24 +23,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewEdgeSyncerYAML(t *testing.T) {
+func TestNewKubeStellarSyncerYAML(t *testing.T) {
 	expectedYAML := `---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kcp-edge-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kcp-syncer-sync-target-name-34b23c4k
-  namespace: kcp-edge-syncer-sync-target-name-34b23c4k
+  namespace: kubestellar-syncer-sync-target-name-34b23c4k
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: kcp-syncer-sync-target-name-34b23c4k-token
-  namespace: kcp-edge-syncer-sync-target-name-34b23c4k
+  namespace: kubestellar-syncer-sync-target-name-34b23c4k
   annotations:
     kubernetes.io/service-account.name: kcp-syncer-sync-target-name-34b23c4k
 type: kubernetes.io/service-account-token
@@ -75,13 +75,13 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kcp-syncer-sync-target-name-34b23c4k
-  namespace: kcp-edge-syncer-sync-target-name-34b23c4k
+  namespace: kubestellar-syncer-sync-target-name-34b23c4k
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: kcp-syncer-sync-target-name-34b23c4k
-  namespace: kcp-edge-syncer-sync-target-name-34b23c4k
+  namespace: kubestellar-syncer-sync-target-name-34b23c4k
 stringData:
   kubeconfig: |
     apiVersion: v1
@@ -107,7 +107,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kcp-syncer-sync-target-name-34b23c4k
-  namespace: kcp-edge-syncer-sync-target-name-34b23c4k
+  namespace: kubestellar-syncer-sync-target-name-34b23c4k
 spec:
   replicas: 1
   strategy:
@@ -152,12 +152,12 @@ spec:
             optional: false
 `
 
-	actualYAML, err := renderEdgeSyncerResources(templateInputForEdge{
+	actualYAML, err := renderKubeStellarSyncerResources(templateInputForEdge{
 		ServerURL:      "server-url",
 		Token:          "token",
 		CAData:         "ca-data",
 		KCPNamespace:   "kcp-namespace",
-		Namespace:      "kcp-edge-syncer-sync-target-name-34b23c4k",
+		Namespace:      "kubestellar-syncer-sync-target-name-34b23c4k",
 		SyncTargetPath: "root:default:foo",
 		SyncTarget:     "sync-target-name",
 		SyncTargetUID:  "sync-target-uid",
