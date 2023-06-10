@@ -17,21 +17,21 @@ location.scheduling.kcp.io/florin labeled
 Current workspace is "root:example-imw".
 Current workspace is "root:espw".
 Current workspace is "root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a" (type root:universal).
-Creating service account "kcp-edge-syncer-florin-1yi5q9c4"
-Creating cluster role "kcp-edge-syncer-florin-1yi5q9c4" to give service account "kcp-edge-syncer-florin-1yi5q9c4"
+Creating service account "kubestellar-syncer-florin-1yi5q9c4"
+Creating cluster role "kubestellar-syncer-florin-1yi5q9c4" to give service account "kubestellar-syncer-florin-1yi5q9c4"
 
- 1. write and sync access to the synctarget "kcp-edge-syncer-florin-1yi5q9c4"
+ 1. write and sync access to the synctarget "kubestellar-syncer-florin-1yi5q9c4"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-florin-1yi5q9c4" to bind service account "kcp-edge-syncer-florin-1yi5q9c4" to cluster role "kcp-edge-syncer-florin-1yi5q9c4".
+Creating or updating cluster role binding "kubestellar-syncer-florin-1yi5q9c4" to bind service account "kubestellar-syncer-florin-1yi5q9c4" to cluster role "kubestellar-syncer-florin-1yi5q9c4".
 
-Wrote physical cluster manifest to florin-syncer.yaml for namespace "kcp-edge-syncer-florin-1yi5q9c4". Use
+Wrote physical cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-1yi5q9c4". Use
 
   KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-florin-1yi5q9c4" kcp-edge-syncer-florin-1yi5q9c4
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-florin-1yi5q9c4" kubestellar-syncer-florin-1yi5q9c4
 
 to verify the syncer pod is running.
 Current workspace is "root:example-imw".
@@ -50,13 +50,13 @@ kubectl --context kind-florin apply -f florin-syncer.yaml
 which should yield something like:
 
 ``` { .sh .no-copy }
-namespace/kcp-edge-syncer-florin-1yi5q9c4 created
-serviceaccount/kcp-edge-syncer-florin-1yi5q9c4 created
-secret/kcp-edge-syncer-florin-1yi5q9c4-token created
-clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
-clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-1yi5q9c4 created
-secret/kcp-edge-syncer-florin-1yi5q9c4 created
-deployment.apps/kcp-edge-syncer-florin-1yi5q9c4 created
+namespace/kubestellar-syncer-florin-1yi5q9c4 created
+serviceaccount/kubestellar-syncer-florin-1yi5q9c4 created
+secret/kubestellar-syncer-florin-1yi5q9c4-token created
+clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4 created
+clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4 created
+secret/kubestellar-syncer-florin-1yi5q9c4 created
+deployment.apps/kubestellar-syncer-florin-1yi5q9c4 created
 ```
 
 Optionally, check that the edge syncer pod is running:
@@ -68,17 +68,17 @@ kubectl --context kind-florin get pods -A
 which should yield something like:
 
 ``` { .sh .no-copy }
-NAMESPACE                         NAME                                               READY   STATUS    RESTARTS   AGE
-kcp-edge-syncer-florin-1yi5q9c4   kcp-edge-syncer-florin-1yi5q9c4-77cb588c89-xc5qr   1/1     Running   0          12m
-kube-system                       coredns-565d847f94-92f4k                           1/1     Running   0          58m
-kube-system                       coredns-565d847f94-kgddm                           1/1     Running   0          58m
-kube-system                       etcd-florin-control-plane                          1/1     Running   0          58m
-kube-system                       kindnet-p8vkv                                      1/1     Running   0          58m
-kube-system                       kube-apiserver-florin-control-plane                1/1     Running   0          58m
-kube-system                       kube-controller-manager-florin-control-plane       1/1     Running   0          58m
-kube-system                       kube-proxy-jmxsg                                   1/1     Running   0          58m
-kube-system                       kube-scheduler-florin-control-plane                1/1     Running   0          58m
-local-path-storage                local-path-provisioner-684f458cdd-kw2xz            1/1     Running   0          58m
+NAMESPACE                            NAME                                                  READY   STATUS    RESTARTS   AGE
+kubestellar-syncer-florin-1yi5q9c4   kubestellar-syncer-florin-1yi5q9c4-77cb588c89-xc5qr   1/1     Running   0          12m
+kube-system                          coredns-565d847f94-92f4k                              1/1     Running   0          58m
+kube-system                          coredns-565d847f94-kgddm                              1/1     Running   0          58m
+kube-system                          etcd-florin-control-plane                             1/1     Running   0          58m
+kube-system                          kindnet-p8vkv                                         1/1     Running   0          58m
+kube-system                          kube-apiserver-florin-control-plane                   1/1     Running   0          58m
+kube-system                          kube-controller-manager-florin-control-plane          1/1     Running   0          58m
+kube-system                          kube-proxy-jmxsg                                      1/1     Running   0          58m
+kube-system                          kube-scheduler-florin-control-plane                   1/1     Running   0          58m
+local-path-storage                   local-path-provisioner-684f458cdd-kw2xz               1/1     Running   0          58m
 
 ``` 
 
