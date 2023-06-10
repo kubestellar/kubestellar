@@ -84,7 +84,7 @@ jobs:
       - run: git rev-parse --abbrev-ref HEAD 
 
       - run: |
-          echo "md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)" >> $GITHUB_OUTPUT
+          echo "md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file) | tr '\n' ' '" >> $GITHUB_OUTPUT
         id: run_make
 
       - uses: actions/checkout@v3
