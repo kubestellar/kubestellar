@@ -84,9 +84,8 @@ jobs:
       - run: git rev-parse --abbrev-ref HEAD 
 
       - run: |
-          echo 'var<<EOF' >> $GITHUB_OUTPUT
-          echo "md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)" >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          md_content=$(make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file)"
+          md_content=$md_content >> $GITHUB_OUTPUT
         id: run_make
 
       - uses: actions/checkout@v3
@@ -94,7 +93,7 @@ jobs:
           ref: gh-pages
 
       - run: |
-          echo ${{ steps.run_make.outputs.md_content[1] }}
+          echo ${{ steps.run_make.outputs.md_content }}
 
       # - run: |
       #     echo ${{ steps.run_make.outputs.md_content }} > ${{ env.docs-ecutable-filename }}.dmd
