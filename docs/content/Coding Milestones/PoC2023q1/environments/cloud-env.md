@@ -8,7 +8,7 @@ description: >-
 
 ## Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)
 
-![kubestellar-architecture-aws](kcp-edge-architecture-aws.png)
+![kubestellar-architecture-aws](kubestellar-architecture-aws.png)
 
 
 ### Description

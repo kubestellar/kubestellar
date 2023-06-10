@@ -23,7 +23,7 @@
 # [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--ensure-folder name] sets the installation folder, default: $PWD/kcp-edge
+# [--ensure-folder name] sets the installation folder, default: $PWD/kubestellar
 # [--bind-address address] bind kcp to a specific ip address
 # [--ensure-imw name] create a Inventory Management Workspace (IMW)
 # [--ensure-wmw name] create a Workload Management Workspace (WMW)

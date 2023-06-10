@@ -1,6 +1,6 @@
-# Monitoring Tools for KCP-Edge (Prometheus, Grafana and Node Exporter)
+# Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)
 
-<img src="images/kcp-edge-architecture-aws.png" width="200%" height="200%" title="kcp-edge-architecture-aws">
+<img src="images/kubestellar-architecture-aws.png" width="200%" height="200%" title="kubestellar-architecture-aws">
 
 
 ### Description

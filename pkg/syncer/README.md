@@ -3,7 +3,7 @@
 ## Build image
 1. `ko build --local --platform=linux/$ARCH ./cmd/syncer`
 
-## Install CLI Plugin (kcp-edge syncer-gen)
+## Install CLI Plugin (KubeStellar syncer-gen)
 1. Run `make build` to build binaries
     ```
     make build
