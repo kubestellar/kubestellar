@@ -95,7 +95,7 @@ jobs:
           ref: gh-pages
 
       - run: |
-          echo ${{ steps.run_make.outputs.md_content }}
+          echo ${{ steps.run_make.outputs.* }}
 
       # - run: |
       #     echo ${{ steps.run_make.outputs.md_content }} > ${{ env.docs-ecutable-filename }}.dmd
