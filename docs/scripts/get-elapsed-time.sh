@@ -73,10 +73,10 @@ updatedAt=${updatedAt//\"/}
 
 # Convert timestamps to date objects
 date1=$(date -d "$createdAt" "+%s")
-echo $date1
+# echo $date1
 # date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
 date2=$(date -d "$updatedAt" "+%s")
-echo $date2
+# echo $date2
 # date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
 
 # Compute the time difference in seconds
