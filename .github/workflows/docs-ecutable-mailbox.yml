@@ -94,8 +94,8 @@ jobs:
         with:
           ref: gh-pages
 
-      - run: |
-          echo ${{ env.MD_CONTENT }}
+      # - run: |
+      #     echo ${{ env.MD_CONTENT }}
 
       - run: |
           cat <<EOF > ${{ env.docs-ecutable-filename }}.dmd
