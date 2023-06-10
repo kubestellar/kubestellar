@@ -85,7 +85,7 @@ KubeStellar-Syncer is deployed on an Edge cluster easily by the following steps.
 3. Use the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer
     ```console
     kubectl ws <mb-ws name>
-    bin/kubectl-kubestellar-syncer_gen <Edge Sync Target name> --syncer-image <KubeStellar-Syncer image> -o edge-syncer.yaml
+    bin/kubectl-kubestellar-syncer_gen <Edge Sync Target name> --syncer-image <KubeStellar-Syncer image> -o kubestellar-syncer.yaml
     ```
     Here, `bin/kubectl-kubestellar-syncer_gen` refers to a special variant of KubeStellar's
     kubectl plugin that includes the implementation of the functionality needed
@@ -174,7 +174,7 @@ After this, Edge-mc will put the following in the mailbox workspace.
     - `resources` is an array of upsynced resource.
     - `namespaces` is an array of namespace for namespace objects.
     - `names` is an array of upsynced object name. Wildcard (`*`) is available.
-- The example CR is {{ config.repo_url }}/blob/{{ config.ks_branch }}/test/e2e/edgesyncer/testdata/kyverno/syncer-config.yaml
+- The example CR is {{ config.repo_url }}/blob/{{ config.ks_branch }}/test/e2e/kubestellar-syncer/testdata/kyverno/syncer-config.yaml
 - The CR is used from KubeStellar-Syncer
 - The CR is placed in mb-ws to define
   - object selector
@@ -230,17 +230,17 @@ Prerequisite
 - Install ko (https://ko.build/install/)
 
 ### How to build the image in your local
-1. `make build-edge-syncer-image-local`
+1. `make build-kubestellar-syncer-image-local`
 e.g.
 ```
-$ make build-edge-syncer-image-local
+$ make build-kubestellar-syncer-image-local
 2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
 2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
 2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 2023/04/24 11:50:40 Adding tag latest
 2023/04/24 11:50:40 Added tag latest
-Edge-Syncer image:
+kubestellar-syncer image:
 ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 ```
 `ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96` is the image stored in your local Docker registry.
@@ -249,15 +249,15 @@ You can also set a shell variable to the output of this Make task.
 
 For example
 ```
-image=`make build-edge-syncer-image-local`
+image=`make build-kubestellar-syncer-image-local`
 ```
 
 ### How to build the image with multiple architectures and push it to Docker registry
-1. `make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64`
+1. `make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64`
 
 For example
 ```
-$ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
 2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
 2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
 2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
@@ -280,7 +280,7 @@ $ make build-edge-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE
 2023/04/24 11:50:27 Published ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 echo KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
 KO_DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-Edge-Syncer image
+kubestellar-syncer image
 ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 ```
 `ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510` is the image pushed to the registry.

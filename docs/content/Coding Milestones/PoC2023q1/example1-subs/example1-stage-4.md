@@ -25,14 +25,14 @@ Find just the `commonstuff` namespace and the `commond` Deployment.
 KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
 ```
 ``` { .bash .no-copy }
-NAME                              STATUS   AGE
-commonstuff                       Active   6m51s
-default                           Active   57m
-kcp-edge-syncer-florin-1t9zgidy   Active   17m
-kube-node-lease                   Active   57m
-kube-public                       Active   57m
-kube-system                       Active   57m
-local-path-storage                Active   57m
+NAME                                 STATUS   AGE
+commonstuff                          Active   6m51s
+default                              Active   57m
+kubestellar-syncer-florin-1t9zgidy   Active   17m
+kube-node-lease                      Active   57m
+kube-public                          Active   57m
+kube-system                          Active   57m
+local-path-storage                   Active   57m
 ```
 
 ```shell

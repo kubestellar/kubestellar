@@ -281,21 +281,21 @@ kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
 Current workspace is "root:imw-1".
 Current workspace is "root:espw"
 Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
-Creating service account "kcp-edge-syncer-demo1-28at01r3"
-Creating cluster role "kcp-edge-syncer-demo1-28at01r3" to give service account "kcp-edge-syncer-demo1-28at01r3"
+Creating service account "kubestellar-syncer-demo1-28at01r3"
+Creating cluster role "kubestellar-syncer-demo1-28at01r3" to give service account "kubestellar-syncer-demo1-28at01r3"
 
- 1. write and sync access to the synctarget "kcp-edge-syncer-demo1-28at01r3"
+ 1. write and sync access to the synctarget "kubestellar-syncer-demo1-28at01r3"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-demo1-28at01r3" to bind service account "kcp-edge-syncer-demo1-28at01r3" to cluster role "kcp-edge-syncer-demo1-28at01r3".
+Creating or updating cluster role binding "kubestellar-syncer-demo1-28at01r3" to bind service account "kubestellar-syncer-demo1-28at01r3" to cluster role "kubestellar-syncer-demo1-28at01r3".
 
-Wrote physical cluster manifest to demo1-syncer.yaml for namespace "kcp-edge-syncer-demo1-28at01r3". Use
+Wrote physical cluster manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
 
   KUBECONFIG=<pcluster-config> kubectl apply -f "demo1-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-demo1-28at01r3" kcp-edge-syncer-demo1-28at01r3
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-demo1-28at01r3" kubestellar-syncer-demo1-28at01r3
 
 to verify the syncer pod is running.
 Current workspace is "root:espw".
@@ -335,21 +335,21 @@ location.scheduling.kcp.io/demo2 labeled
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7" (type root:universal).
-Creating service account "kcp-edge-syncer-demo2-15nq4e94"
-Creating cluster role "kcp-edge-syncer-demo2-15nq4e94" to give service account "kcp-edge-syncer-demo2-15nq4e94"
+Creating service account "kubestellar-syncer-demo2-15nq4e94"
+Creating cluster role "kubestellar-syncer-demo2-15nq4e94" to give service account "kubestellar-syncer-demo2-15nq4e94"
 
- 1. write and sync access to the synctarget "kcp-edge-syncer-demo2-15nq4e94"
+ 1. write and sync access to the synctarget "kubestellar-syncer-demo2-15nq4e94"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kcp-edge-syncer-demo2-15nq4e94" to bind service account "kcp-edge-syncer-demo2-15nq4e94" to cluster role "kcp-edge-syncer-demo2-15nq4e94".
+Creating or updating cluster role binding "kubestellar-syncer-demo2-15nq4e94" to bind service account "kubestellar-syncer-demo2-15nq4e94" to cluster role "kubestellar-syncer-demo2-15nq4e94".
 
-Wrote physical cluster manifest to demo2-syncer.yaml for namespace "kcp-edge-syncer-demo2-15nq4e94". Use
+Wrote physical cluster manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
 
   KUBECONFIG=<pcluster-config> kubectl apply -f "demo2-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kcp-edge-syncer-demo2-15nq4e94" kcp-edge-syncer-demo2-15nq4e94
+  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-demo2-15nq4e94" kubestellar-syncer-demo2-15nq4e94
 
 to verify the syncer pod is running.
 ```
