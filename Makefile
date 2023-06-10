@@ -405,14 +405,18 @@ endif
 # 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARGS) \
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
+kcp/bin/kcp:
+	bash ./bootstrap/install-kcp-with-plugins.sh
+
 .PHONY: e2e-test-kubestellar-syncer
 e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 e2e-test-kubestellar-syncer: TEST_ARGS ?= 
 e2e-test-kubestellar-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
-e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup
+e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
+	export PATH=$(PWD)/kcp/bin:$$PATH && \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
-	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
+	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; echo "kcp is not ready. wait for 1s...";done && \
 	echo 'Starting test(s)' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
 		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \
