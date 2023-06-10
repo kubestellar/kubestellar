@@ -1408,7 +1408,7 @@
   <h1>Kubestellar syncer 0 deploy florin</h1>
 
 <!--kubestellar-syncer-0-deploy-florin-start-->
-<p>Go to inventry management workspace and find the mailbox workspace name.
+<p>Go to inventory management workspace and find the mailbox workspace name.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">mbws</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncTarget<span class="w"> </span>florin<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.metadata.annotations[&#39;kcp\.io/cluster&#39;]}-mb-{.metadata.uid}&quot;</span><span class="sb">`</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;mailbox workspace name = </span><span class="nv">$mbws</span><span class="s2">&quot;</span>

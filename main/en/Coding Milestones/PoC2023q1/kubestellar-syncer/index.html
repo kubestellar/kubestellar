@@ -2221,7 +2221,7 @@ SyncTarget name, you could do it as follows.</p>
 <h4 id="for-the-target-cluster-of-guilder">For the target cluster of <code>guilder</code>,<a class="headerlink" href="#for-the-target-cluster-of-guilder" title="Permanent link">#</a></h4>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder.md '&lt;!--kubestellar-syncer-0-deploy-guilder-start--&gt;' '&lt;!--kubestellar-syncer-0-deploy-guilder-end--&gt;' -->
 
-<p>Go to inventry management workspace and find the mailbox workspace name.
+<p>Go to inventory management workspace and find the mailbox workspace name.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
 <a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="nv">mbws</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncTarget<span class="w"> </span>guilder<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.metadata.annotations[&#39;kcp\.io/cluster&#39;]}-mb-{.metadata.uid}&quot;</span><span class="sb">`</span>
 <a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;mailbox workspace name = </span><span class="nv">$mbws</span><span class="s2">&quot;</span>
@@ -2277,7 +2277,7 @@ SyncTarget name, you could do it as follows.</p>
 <h4 id="for-the-target-cluster-of-florin">For the target cluster of <code>florin</code>,<a class="headerlink" href="#for-the-target-cluster-of-florin" title="Permanent link">#</a></h4>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin.md '&lt;!--kubestellar-syncer-0-deploy-florin-start--&gt;' '&lt;!--kubestellar-syncer-0-deploy-florin-end--&gt;' -->
 
-<p>Go to inventry management workspace and find the mailbox workspace name.
+<p>Go to inventory management workspace and find the mailbox workspace name.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
 <a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="nv">mbws</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncTarget<span class="w"> </span>florin<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{.metadata.annotations[&#39;kcp\.io/cluster&#39;]}-mb-{.metadata.uid}&quot;</span><span class="sb">`</span>
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;mailbox workspace name = </span><span class="nv">$mbws</span><span class="s2">&quot;</span>
@@ -2395,7 +2395,7 @@ SyncTarget name, you could do it as follows.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>ws1<span class="w"> </span>--enter
 </code></pre></div></p>
-<p>Create following apibingin in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
+<p>Create the following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
 <a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
 <a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="s">kind: APIBinding</span>
@@ -2464,7 +2464,7 @@ b. Syncer image
 c. Logical cluster name
 <div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="nv">cluster_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>logicalclusters.core.kcp.io<span class="w"> </span>cluster<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.annotations.kcp\.io\/cluster&quot;</span><span class="w"> </span>--no-headers<span class="sb">`</span>
 </code></pre></div></p>
-<p>Download manifest tamplate.
+<p>Download manifest template.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
