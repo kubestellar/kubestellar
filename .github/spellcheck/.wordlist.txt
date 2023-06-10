@@ -144,6 +144,7 @@ PolicyReport
 Postgresql
 PriorityClass
 PriorityLevelConfiguration
+PVP
 PWD
 QuickStart
 RBAC
@@ -219,6 +220,8 @@ apis
 apiserver
 apiwatch
 approvers
+argo
+argocd
 autoscaling
 awk
 boto
