@@ -2384,7 +2384,7 @@ SyncTarget name, you could do it as follows.</p>
 <p>For the upstream access, Syncer's registration command (<code>kubectl kubestellar syncer-gen</code>) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. </p>
 <p>On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addition to that, the command creates an EdgeSyncConfig CRD if it does not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of the EdgeSyncConfig CRD will also no longer be needed since we will switch to using SyncerConfig rather than EdgeSyncConfig in near future.</p>
-<p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kcp-edge/syncer-gen/edgesync.go</a>.</p>
+<p>The source code of the command is <a href="https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go">https://github.com/kcp-dev/edge-mc/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go</a>.</p>
 <p>The equivalent manual steps are as follows: </p>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-start--&gt;' '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-end--&gt;' -->
 
@@ -2456,7 +2456,7 @@ SyncTarget name, you could do it as follows.</p>
 </code></pre></div></p>
 <p>Set some other parameters.</br>
 a. downstream_namespace where Syncer Pod runs
-<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kcp-edge-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kubestellar-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
 </code></pre></div>
 b. Syncer image
 <div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
