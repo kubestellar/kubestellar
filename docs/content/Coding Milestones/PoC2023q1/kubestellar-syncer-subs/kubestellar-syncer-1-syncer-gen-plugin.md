@@ -84,7 +84,7 @@ server_url=`kubectl config view --minify --raw | yq ".clusters[0].cluster.server
 Set some other parameters.</br>
 a. downstream_namespace where Syncer Pod runs
 ```shell
-downstream_namespace="kcp-edge-$syncer_id"
+downstream_namespace="kubestellar-$syncer_id"
 ```
 b. Syncer image
 ```shell
