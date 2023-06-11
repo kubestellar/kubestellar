@@ -21,22 +21,19 @@ package mcclient
 import (
 	"context"
 	"errors"
-	"reflect"
+	"fmt"
 	"sync"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	log "k8s.io/klog/v2"
 
 	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	ksinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
-	"github.com/kcp-dev/edge-mc/pkg/mcclient/listwatch"
 )
 
 type KubestellarClusterInterface interface {
@@ -44,23 +41,26 @@ type KubestellarClusterInterface interface {
 	Cluster(name string) (client mcclientset.Interface)
 	// ConfigForCluster returns rest config for given cluster.
 	ConfigForCluster(name string) (*rest.Config, error)
-	// CrossClusterListWatch returns cross-cluster ListWatch
-	CrossClusterListWatch(gv schema.GroupVersion, resource string, namespace string, fieldSelector fields.Selector) *listwatch.CrossClusterListerWatcher
 }
 
 type multiClusterClient struct {
-	configs    map[string]*rest.Config
-	clientsets map[string]*mcclientset.Clientset
-	lock       sync.Mutex
+	ctx              context.Context
+	configs          map[string]*rest.Config
+	clientsets       map[string]*mcclientset.Clientset
+	managerClientset *ksclientset.Clientset
+	lock             sync.Mutex
 }
 
 func (mcc *multiClusterClient) Cluster(name string) mcclientset.Interface {
+	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	clientset, ok := mcc.clientsets[name]
 	if !ok {
-		//TODO change to ClusterOrDie and panic? return an error?
-		panic("invalid cluster name")
+		// Try to get LogicalCluster from API server.
+		if clientset, err = mcc.getFromServer(name); err != nil {
+			panic(fmt.Sprintf("invalid cluster name: %s. error: %v", name, err))
+		}
 	}
 	return clientset
 }
@@ -69,22 +69,9 @@ func (mcc *multiClusterClient) ConfigForCluster(name string) (*rest.Config, erro
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	if _, ok := mcc.configs[name]; !ok {
-		//TODO get from server
-		return nil, errors.New("failed to get config for cluster")
+		return nil, fmt.Errorf("failed to get config for cluster: %s", name)
 	}
 	return mcc.configs[name], nil
-}
-
-// CrossClusterListWatch NOT implemented. WIP
-func (mcc *multiClusterClient) CrossClusterListWatch(gv schema.GroupVersion, resource string, namespace string, fieldSelector fields.Selector) *listwatch.CrossClusterListerWatcher {
-	optionsModifier := func(options *metav1.ListOptions) {
-		options.FieldSelector = fieldSelector.String()
-	}
-	clusterLW := make(map[string]*cache.ListWatch)
-	for cluster, config := range mcc.configs {
-		clusterLW[cluster] = listwatch.ClusterListWatch(config, gv, resource, namespace, optionsModifier)
-	}
-	return listwatch.NewCrossClusterListerWatcher(clusterLW)
 }
 
 var client *multiClusterClient
@@ -99,14 +86,17 @@ func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (Kubestell
 		return client, nil
 	}
 
-	client = &multiClusterClient{
-		configs:    make(map[string]*rest.Config),
-		clientsets: make(map[string]*mcclientset.Clientset),
-		lock:       sync.Mutex{},
-	}
 	managerClientset, err := ksclientset.NewForConfig(managerConfig)
 	if err != nil {
 		return client, err
+	}
+
+	client = &multiClusterClient{
+		ctx:              ctx,
+		configs:          make(map[string]*rest.Config),
+		clientsets:       make(map[string]*mcclientset.Clientset),
+		managerClientset: managerClientset,
+		lock:             sync.Mutex{},
 	}
 
 	client.startClusterCollection(ctx, managerClientset)
@@ -114,66 +104,41 @@ func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (Kubestell
 }
 
 func (mcc *multiClusterClient) startClusterCollection(ctx context.Context, managerClientset *ksclientset.Clientset) {
-	clusterInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, 0, metav1.NamespaceAll)
+	numThreads := 2
+	resyncPeriod := time.Duration(0)
+
+	clusterInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, resyncPeriod, metav1.NamespaceAll)
 	clusterInformer := clusterInformerFactory.Edge().V1alpha1().LogicalClusters().Informer()
 
-	clusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			clusterInfo, ok := obj.(*v1alpha1.LogicalCluster)
-			if !ok {
-				log.Error("unexpected object type. expected LogicalCluster")
-				return
-			}
-			go mcc.handleAdd(clusterInfo)
-		},
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			oldInfo := oldObj.(*v1alpha1.LogicalCluster)
-			newInfo := newObj.(*v1alpha1.LogicalCluster)
-			if reflect.DeepEqual(oldInfo.Status, newInfo.Status) {
-				return
-			}
-			go mcc.handleAdd(newInfo)
-		},
-		DeleteFunc: func(obj interface{}) {
-			clusterInfo := obj.(*v1alpha1.LogicalCluster)
-			go mcc.handleDelete(clusterInfo)
-		},
-	})
-
 	clusterInformerFactory.Start(ctx.Done())
-	cache.WaitForNamedCacheSync("management", ctx.Done(), clusterInformer.HasSynced)
+	cache.WaitForNamedCacheSync("logicalclusters-management", ctx.Done(), clusterInformer.HasSynced)
+
+	logicalClusterController := newController(ctx, clusterInformer, mcc)
+	go logicalClusterController.Run(numThreads)
 }
 
-func (mcc *multiClusterClient) handleAdd(clusterInfo *v1alpha1.LogicalCluster) {
-	if clusterInfo.Status.Phase != v1alpha1.LogicalClusterPhaseReady {
-		mcc.handleDelete(clusterInfo)
-		return
-	}
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(clusterInfo.Status.ClusterConfig))
+// getFromServer will query API server for specific LogicalCluster and cache it if it exists and ready.
+// getFromServer caller function should acquire the mcc lock.
+func (mcc *multiClusterClient) getFromServer(name string) (*mcclientset.Clientset, error) {
+	cluster, err := mcc.managerClientset.EdgeV1alpha1().LogicalClusters().Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
-		log.Errorf("failed to get cluster config: %v", err)
-		return
+		return nil, err
 	}
-	mcc.lock.Lock()
-	defer mcc.lock.Unlock()
-	mcc.configs[clusterInfo.Name] = config
 
+	if cluster.Status.Phase != v1alpha1.LogicalClusterPhaseReady {
+		return nil, errors.New("cluster is not ready")
+	}
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(cluster.Status.ClusterConfig))
+	if err != nil {
+		return nil, err
+	}
 	cs, err := mcclientset.NewForConfig(config)
 	if err != nil {
-		//ES: do we want to try again ? how ?
-		// should we delete  the config as well ?
-		log.Errorf("failed to create clientset for cluster config: %v", err)
-		return
+		return nil, err
 	}
-	mcc.clientsets[clusterInfo.Name] = cs
-}
+	// Calling function should acquire the mcc lock
+	mcc.configs[cluster.Name] = config
+	mcc.clientsets[cluster.Name] = cs
 
-func (mcc *multiClusterClient) handleDelete(clusterInfo *v1alpha1.LogicalCluster) {
-	mcc.lock.Lock()
-	defer mcc.lock.Unlock()
-	if _, ok := mcc.configs[clusterInfo.Name]; !ok {
-		return
-	}
-	delete(mcc.configs, clusterInfo.Name)
-	delete(mcc.clientsets, clusterInfo.Name)
+	return cs, nil
 }
