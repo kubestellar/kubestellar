@@ -50,7 +50,7 @@ func NewEdgeSyncConfigController(
 		upSyncer:          upSyncer,
 		downSyncer:        downSyncer,
 	}
-	controllerName := "kcp-edge-syncconfig-controller"
+	controllerName := "kubestellar-syncconfig-controller"
 	controllerBase := &controllerBase{
 		name:              controllerName,
 		target:            "SyncConfig",

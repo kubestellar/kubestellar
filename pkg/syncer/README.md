@@ -18,11 +18,11 @@
     Examples:
 
             # Setup workspace for syncer to interact and then install syncer on a physical cluster
-            kubectl kcp-edge syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o kubestellar-syncer.yaml
+            kubectl kubestellar syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o kubestellar-syncer.yaml
             KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
 
             # Directly apply the manifest
-            kubectl kcp-edge syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
+            kubectl kubestellar syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
 
 
     Flags:
@@ -45,7 +45,7 @@
     ```
 1. Run kubestellar-syncer registration command
     ```
-    $ kubectl kcp-edge sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/kubestellar-syncer.yaml
+    $ kubectl kubestellar sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/kubestellar-syncer.yaml
     Creating service account "kubestellar-syncer-pcluster1-1na3tqcd"
     Creating cluster role "kubestellar-syncer-pcluster1-1na3tqcd" to give service account "kubestellar-syncer-pcluster1-1na3tqcd"
 
@@ -72,8 +72,8 @@
     secret/kubestellar-syncer-pcluster1-1na3tqcd-token created
     clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
     clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
-    role.rbac.authorization.k8s.io/kcp-edge-dns-pcluster1-1na3tqcd created
-    rolebinding.rbac.authorization.k8s.io/kcp-edge-dns-pcluster1-1na3tqcd created
+    role.rbac.authorization.k8s.io/kubestellar-syncer-dns-pcluster1-1na3tqcd created
+    rolebinding.rbac.authorization.k8s.io/kubestellar-syncer-dns-pcluster1-1na3tqcd created
     secret/kubestellar-syncer-pcluster1-1na3tqcd created
     deployment.apps/kubestellar-syncer-pcluster1-1na3tqcd created
     ```
