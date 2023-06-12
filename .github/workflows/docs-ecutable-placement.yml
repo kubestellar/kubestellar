@@ -31,7 +31,7 @@ on:
 
 env:
   docs-ecutable-filename: placement
-  docs-ecutable-md-filename: 'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'
+  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'"
   GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:

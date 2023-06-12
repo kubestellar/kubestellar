@@ -27,7 +27,7 @@ on:
 
 env:
   docs-ecutable-filename: mailbox
-  docs-ecutable-md-filename: 'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'
+  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'"
   GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
