@@ -58,15 +58,30 @@ workload_id=""
 echo doc_name: $docs_ecutable_filename
 if [ -n "$docs_ecutable_filename" ]; then
     x=0;
+    workflow_name=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].name") 
     while [[ ${workflow_name,,} != *"${docs_ecutable_filename,,}"* ]]
     do
-        workflow_name=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].name") 
         x=$((x+1))
+        workflow_name=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].name") 
+
         if [ "$workflow_name" == "null" ];then echo 'no match'; exit; fi
     done
-    echo $workflow_name  
+    echo workflow_name: $workflow_name 
     workflow_id=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].id")
     echo workflow_id: $workflow_id
+    run_number=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq ".workflow_runs[0].run_number")
+    echo run_number: $run_number
+    # workflow_status="" 
+    # y=0;
+    # workflow_status=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$x/runs | jq ".workflows[$y].status") 
+    # echo $workflow_status
+    # while [ "workflow_status" != "completed" ]
+    # do
+    #     y=$((x+1))
+    #     workflow_status=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$y].status") 
+    # done
+    # workflow_id=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].id")
+    # echo workflow_id: $workflow_id
     createdAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].created_at')
     updatedAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].updated_at')
 fi
