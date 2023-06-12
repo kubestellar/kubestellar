@@ -30,7 +30,9 @@ on:
       - "docs/scripts/docs-ecutable.sh"
 
 env:
-  docs-ecuted-filename: placement
+  docs-ecutable-filename: placement
+  docs-ecutable-md-filename: 'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
@@ -39,7 +41,14 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for placement e2e
     runs-on: ubuntu-latest
+    outputs:
+      docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
+      - id: step1
+        run: echo "docs-ecutable-filename=${{ env.docs-ecutable-filename }}" >> "$GITHUB_OUTPUT"
+
+      - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
+
       - uses: actions/checkout@v3
 
       - name: echo fetching workflow_dispatch branch
@@ -62,5 +71,42 @@ jobs:
         id: install
   
       - run: |
-          make MANIFEST="'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'" \
+          make MANIFEST="${{ docs-ecutable-md-filename }}" \
           docs-ecutable
+
+  elapsed-time-collector:
+    runs-on: ubuntu-latest
+    env:
+      docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
+    needs: docs-ecutable
+    steps:
+      - run: echo "${{ env.docs-ecutable-filename }}"
+
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - run: git rev-parse --abbrev-ref HEAD 
+
+      - run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "MD_CONTENT<<$EOF" >> "$GITHUB_ENV"
+          make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
+        id: run_make
+
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      # - run: |
+      #     echo ${{ env.MD_CONTENT }}
+
+      - run: |
+          cat <<EOF > ${{ env.docs-ecutable-filename }}.dmd
+          ${{ env.MD_CONTENT }}
+          EOF
+          echo "cat ${{ env.docs-ecutable-filename }}.dmd"
+          cat ${{ env.docs-ecutable-filename }}.dmd
+          
+      - run: git config --global user.email "kubestellar@kubestellar-dev@google.groups.com" && git config --global user.name "KubeStellar" && git add . && git commit -m "Add changes" && git push origin gh-pages
