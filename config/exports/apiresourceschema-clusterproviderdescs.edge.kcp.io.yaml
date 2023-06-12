@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230607-cb885f75.clusterproviderdescs.edge.kcp.io
+  name: v230612-02e13145.clusterproviderdescs.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -33,6 +33,10 @@ spec:
         spec:
           description: '`spec` describes a provider.'
           properties:
+            ClusterPrefixForDiscovery:
+              description: ClusterPrefixForDiscovery contains the prefix used during
+                cluster discovery.
+              type: string
             Config:
               description: 'TODO: this should be stored as a secret! Config is the
                 provider config'

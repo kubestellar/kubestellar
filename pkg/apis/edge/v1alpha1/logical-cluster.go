@@ -46,12 +46,12 @@ type LogicalCluster struct {
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
 	// ProviderName is the name of the provider of the cluster.
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="cluster is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
 	ProviderName string `json:"ProviderName"`
 
 	// ClusterName is the name of the logical cluster this workspace is stored under.
 	// +optional
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="cluster is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
 	ClusterName string `json:"ClusterName,omitempty"`
 
 	// URL is the address under which the Kubernetes-cluster-like endpoint
@@ -59,6 +59,11 @@ type LogicalClusterSpec struct {
 	// client libraries and command line tools.
 	// +kubebuilder:format:uri
 	URL string `json:"URL,omitempty"`
+
+	// Managed identifies whether a cluster is managed (true) or unmanaged (false)
+	// +kubebuilder:default=true
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Managed is immutable"
+	Managed bool `json:"Managed"`
 }
 
 // LogicalClusterPhaseType is the type of the current phase of the cluster.
