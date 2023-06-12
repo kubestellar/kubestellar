@@ -106,8 +106,12 @@ fi
 
 # Compute the time difference in seconds
 time_diff=$((date2 - date1))
-minutes=$((time_diff / 60))
+minutes=$(( (time_diff + 60 )/ 60))
 
-echo -e '<!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
+if [ $minutes -gt 1 ]; then
+    echo -e '<!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
     ~' $minutes ' minutes<!--elapsed-time-end-->'
-
+else
+    echo -e '<!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
+    no estimate available at this time<!--elapsed-time-end-->'
+fi
