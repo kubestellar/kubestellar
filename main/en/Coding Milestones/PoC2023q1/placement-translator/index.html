@@ -961,8 +961,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-edge-mc" class="md-nav__link">
-    Get edge-mc
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
 </li>
@@ -1625,8 +1625,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-edge-mc" class="md-nav__link">
-    Get edge-mc
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
 </li>
@@ -2036,15 +2036,15 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
 </code></pre></div>
-<h3 id="get-edge-mc">Get edge-mc<a class="headerlink" href="#get-edge-mc" title="Permanent link">#</a></h3>
+<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
 <p>Download and build or install
 <a href="https://github.com/kcp-dev/edge-mc">edge-mc</a>, according to your
 preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
 build</code> to populate its <code>bin</code> directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
 (creating a <code>bin</code> directory).  In the following exhibited command
-lines, the commands described as "edge-mc commands" and the commands
-that start with <code>kubectl kubestellar</code> rely on the edge-mc <code>bin</code> directory
+lines, the commands described as "KubeStellar commands" and the commands
+that start with <code>kubectl kubestellar</code> rely on the KubeStellar <code>bin</code> directory
 being on the <code>$PATH</code>.  Alternatively you could invoke them with
 explicit pathnames.  The kubectl plugin lines use fully specific
 executables (e.g., <code>kubectl kubestellar prep-for-syncer</code> corresponds to
@@ -2119,14 +2119,14 @@ exercise.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
 
 <h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace<a class="headerlink" href="#populate-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
-<p>This puts the definition and export of the edge-mc API in the edge
+<p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
 <h3 id="the-mailbox-controller">The mailbox controller<a class="headerlink" href="#the-mailbox-controller" title="Permanent link">#</a></h3>
 <p>Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the edge-mc command shown
+Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>sleep<span class="w"> </span><span class="m">45</span>
@@ -2185,21 +2185,21 @@ cluster.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
 <a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 <a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span>
-<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>
 <a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>
-<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span>
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>
 <a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
 <a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>
-<a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span>.
+<a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>.
 <a id="__codelineno-44-11" name="__codelineno-44-11" href="#__codelineno-44-11"></a>
-<a id="__codelineno-44-12" name="__codelineno-44-12" href="#__codelineno-44-12"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-44-12" name="__codelineno-44-12" href="#__codelineno-44-12"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>.<span class="w"> </span>Use
 <a id="__codelineno-44-13" name="__codelineno-44-13" href="#__codelineno-44-13"></a>
 <a id="__codelineno-44-14" name="__codelineno-44-14" href="#__codelineno-44-14"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;guilder-syncer.yaml&quot;</span>
 <a id="__codelineno-44-15" name="__codelineno-44-15" href="#__codelineno-44-15"></a>
 <a id="__codelineno-44-16" name="__codelineno-44-16" href="#__codelineno-44-16"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
 <a id="__codelineno-44-17" name="__codelineno-44-17" href="#__codelineno-44-17"></a>
-<a id="__codelineno-44-18" name="__codelineno-44-18" href="#__codelineno-44-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>kcp-edge-syncer-guilder-wfeig2lv
+<a id="__codelineno-44-18" name="__codelineno-44-18" href="#__codelineno-44-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span><span class="w"> </span>kubestellar-syncer-guilder-wfeig2lv
 <a id="__codelineno-44-19" name="__codelineno-44-19" href="#__codelineno-44-19"></a>
 <a id="__codelineno-44-20" name="__codelineno-44-20" href="#__codelineno-44-20"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 <a id="__codelineno-44-21" name="__codelineno-44-21" href="#__codelineno-44-21"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
@@ -2210,19 +2210,19 @@ cluster.  That will look something like the following; adjust as
 necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>namespace/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
-<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>serviceaccount/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
-<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>secret/kcp-edge-syncer-guilder-wfeig2lv-token<span class="w"> </span>created
-<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
-<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
-<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a>secret/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
-<a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a>deployment.apps/kcp-edge-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>namespace/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>serviceaccount/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>secret/kubestellar-syncer-guilder-wfeig2lv-token<span class="w"> </span>created
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a>secret/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
+<a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a>deployment.apps/kubestellar-syncer-guilder-wfeig2lv<span class="w"> </span>created
 </code></pre></div></p>
 <p>You might check that the syncer is running, as follows.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>NAMESPACE<span class="w">                          </span>NAME<span class="w">                               </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>kcp-edge-syncer-guilder-saaywsu5<span class="w">   </span>kcp-edge-syncer-guilder-saaywsu5<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>52s
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>kubestellar-syncer-guilder-saaywsu5<span class="w">   </span>kubestellar-syncer-guilder-saaywsu5<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>52s
 <a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a>kube-system<span class="w">                        </span>coredns<span class="w">                            </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>35m
 <a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>local-path-storage<span class="w">                 </span>local-path-provisioner<span class="w">             </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>35m
 </code></pre></div></p>
@@ -2233,21 +2233,21 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
 <a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span>
-<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>
 <a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
-<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>
 <a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
 <a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a>
-<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span>.
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>.
 <a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a>
-<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>florin-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>florin-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>.<span class="w"> </span>Use
 <a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>
 <a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;florin-syncer.yaml&quot;</span>
 <a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a>
 <a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
 <a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a>
-<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kcp-edge-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>kcp-edge-syncer-florin-32uaph9l
+<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span><span class="w"> </span>kubestellar-syncer-florin-32uaph9l
 <a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a>
 <a id="__codelineno-50-20" name="__codelineno-50-20" href="#__codelineno-50-20"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 <a id="__codelineno-50-21" name="__codelineno-50-21" href="#__codelineno-50-21"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
@@ -2255,13 +2255,13 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <p>And deploy the syncer in the florin cluster.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>namespace/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
-<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>serviceaccount/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
-<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>secret/kcp-edge-syncer-florin-32uaph9l-token<span class="w"> </span>created
-<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>clusterrole.rbac.authorization.k8s.io/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
-<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
-<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>secret/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
-<a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a>deployment.apps/kcp-edge-syncer-florin-32uaph9l<span class="w"> </span>created
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>namespace/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>serviceaccount/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>secret/kubestellar-syncer-florin-32uaph9l-token<span class="w"> </span>created
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
+<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
+<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>secret/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
+<a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a>deployment.apps/kubestellar-syncer-florin-32uaph9l<span class="w"> </span>created
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -2547,7 +2547,7 @@ following resolutions of the "where" predicates.</p>
 </table>
 <p>Eventually there will be automation that conveniently runs the
 scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the edge-mc command that runs the scheduler.</p>
+ESPW and invoke the KubeStellar command that runs the scheduler.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
