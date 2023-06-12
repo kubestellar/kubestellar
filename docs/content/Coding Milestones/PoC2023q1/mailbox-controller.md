@@ -3,6 +3,12 @@ short_name: mailbox-controller
 manifest_name: 'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'
 pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
+{%
+   include-markdown "https://docs.kubestellar.io/mailbox.md"
+   start="<!--elapsed-time-start-->"
+   end="<!--elapsed-time-end-->"
+%}
+
 [![docs-ecutable - mailbox-controller]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
