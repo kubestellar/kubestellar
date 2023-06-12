@@ -83,5 +83,6 @@ date2=$(date -d "$updatedAt" "+%s")
 time_diff=$((date2 - date1))
 minutes=$((time_diff / 60))
 
-echo -e "<!--elapsed-time-start-->$minutes<!--elapsed-time-end-->"
+echo -e '<!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
+    ~' $minutes ' minutes<!--elapsed-time-end-->'
 
