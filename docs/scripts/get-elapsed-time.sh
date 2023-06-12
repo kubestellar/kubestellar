@@ -61,9 +61,10 @@ if [ -n "$docs_ecutable_filename" ]; then
     while [[ ${workflow_name,,} != *"${docs_ecutable_filename,,}"* ]]
     do
         workflow_name=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].name") 
-        echo $workflow_name  
         x=$((x+1))
+        if [ "$workflow_name" == "null" ];then echo 'no match'; exit; fi
     done
+    echo $workflow_name  
     workflow_id=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].id")
     echo workflow_id: $workflow_id
     createdAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].created_at')
