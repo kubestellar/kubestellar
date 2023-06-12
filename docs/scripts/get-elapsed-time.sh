@@ -19,6 +19,20 @@ set -o nounset
 set -o pipefail
 # set -o xtrace
 
+os_type=""
+
+get_os_type() {
+  case "$OSTYPE" in
+      linux*)   echo "linux" ;;
+      darwin*)  echo "darwin" ;;
+      *)        echo "Unsupported operating system type: $OSTYPE" >&2 ; exit 1 ;;
+  esac
+}
+
+if [ "$os_type" == "" ]; then
+    os_type=$(get_os_type)
+fi
+
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 # cd "$REPO_ROOT/docs"
 
@@ -36,48 +50,43 @@ fi
 IFS=$SAVEIFS
 
 
-workflow_id=""
 filename_ext=".dmd"
 
-case $docs_ecutable_filename in
-    placement)
-        workflow_id="59166207"
-        ;;
-    scheduler)
-        workflow_id="59159715"
-        ;;
-    mailbox)
-        workflow_id="59164731"
-        ;;
-    example1)
-        workflow_id="59184957"
-        ;;
-    quickstart)
-        workflow_id="59223574"
-        ;;
-    syncer)
-        workflow_id="?"
-        ;;
-    *)
-        echo "Invalid option"
-        ;;
-esac
+workflow_name=""
+workload_id=""
 
+echo doc_name: $docs_ecutable_filename
 if [ -n "$docs_ecutable_filename" ]; then
-  createdAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].created_at')
-  updatedAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].updated_at')
+    x=0;
+    while [[ ${workflow_name,,} != *"${docs_ecutable_filename,,}"* ]]
+    do
+        workflow_name=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].name") 
+        echo $workflow_name  
+        x=$((x+1))
+    done
+    workflow_id=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows | jq ".workflows[$x].id")
+    echo workflow_id: $workflow_id
+    createdAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].created_at')
+    updatedAt=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/kcp-dev/edge-mc/actions/workflows/$workflow_id/runs | jq '.workflow_runs[0].updated_at')
 fi
 
 createdAt=${createdAt//\"/}
+echo createdAt: $createdAt
 updatedAt=${updatedAt//\"/}
+echo updatedAt: $updatedAt
 
 # Convert timestamps to date objects
-date1=$(date -d "$createdAt" "+%s")
-# echo $date1
-# date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
-date2=$(date -d "$updatedAt" "+%s")
-# echo $date2
-# date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
+if [ "$os_type" == "darwin" ]; then
+    date1=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$createdAt" "+%s")
+else
+    date1=$(date -d "$createdAt" "+%s")
+fi
+
+if [ "$os_type" == "darwin" ]; then
+    date2=$(date -ju -f "%Y-%m-%dT%H:%M:%SZ" "$updatedAt" "+%s")
+else
+    date2=$(date -d "$updatedAt" "+%s")
+fi
 
 # Compute the time difference in seconds
 time_diff=$((date2 - date1))
