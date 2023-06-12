@@ -45,22 +45,19 @@ type LogicalCluster struct {
 
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
-	// ProviderName is the name of the provider of the cluster.
+	// ClusterProviderDesc is a reference to a ClusterProviderDesc resource
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
-	ProviderName string `json:"ProviderName"`
+	ClusterProviderDesc string `json:"ClusterProviderDesc"`
 
 	// ClusterName is the name of the logical cluster this workspace is stored under.
 	// +optional
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
 	ClusterName string `json:"ClusterName,omitempty"`
 
-	// URL is the address under which the Kubernetes-cluster-like endpoint
-	// can be found. This URL can be used to access the workspace with standard Kubernetes
-	// client libraries and command line tools.
-	// +kubebuilder:format:uri
-	URL string `json:"URL,omitempty"`
-
-	// Managed identifies whether a cluster is managed (true) or unmanaged (false)
+	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
+	// Currently this is immutable.
+	// A logical cluster can be created through the ClusterManager (managed) or
+	// discovered/imported (unmanaged).
 	// +kubebuilder:default=true
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Managed is immutable"
 	Managed bool `json:"Managed"`
