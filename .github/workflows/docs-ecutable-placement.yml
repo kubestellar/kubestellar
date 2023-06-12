@@ -71,7 +71,7 @@ jobs:
         id: install
   
       - run: |
-          make MANIFEST="${{ docs-ecutable-md-filename }}" \
+          make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
           docs-ecutable
 
   elapsed-time-collector:
