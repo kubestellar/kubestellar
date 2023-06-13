@@ -1508,32 +1508,30 @@
 <p>Medium - <a href="https://medium.com/@yana1205dev/syncing-objects-between-kubernetes-kubernetes-bcedafdc80c2">Syncing Objects from one Kubernetes cluster to another Kubernetes cluster</a><br/></p>
 <h3 id="kyverno-and-kubestellar-demo-day">Kyverno and KubeStellar Demo Day<a class="headerlink" href="#kyverno-and-kubestellar-demo-day" title="Permanent link">#</a></h3>
 <p align=center>
-<div class="spinner1"></div>
-<iframe id="myFrame1" width="720" height="400" src="https://www.youtube.com/embed/tcpequs5pVM?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div id="spinner1">
+  <img width="180" height="180" src="../../../images/spinner.gif" class="centerImage">
+</div>
+<iframe id="myFrame1" width="720" height="400" src="https://www.youtube.com/embed/tcpequs5pVM?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload= "document.getElementById('spinner1').style.display='none';"></iframe>
 <!-- ![type:video](https://www.youtube.com/embed/tcpequs5pVM) -->
 </p>
 
 <h3 id="kyverno-and-kubestellar-in-the-news">Kyverno and KubeStellar in the news<a class="headerlink" href="#kyverno-and-kubestellar-in-the-news" title="Permanent link">#</a></h3>
 <p align=center>
-<div class="spinner2"></div>
-<iframe id='myFrame2' src="https://www.linkedin.com/embed/feed/update/urn:li:share:7072623853629263875" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Kyverno and KubeStellar"></iframe>
+<div id="spinner2">
+  <img width="180" height="180" src="../../../images/spinner.gif" class="centerImage">
+</div>
+<iframe id='myFrame2' src="https://www.linkedin.com/embed/feed/update/urn:li:share:7072623853629263875" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Kyverno and KubeStellar" onload= "document.getElementById('spinner2').style.display='none';"></iframe>
 </p>
 
 <h3 id="how-do-i-get-this-working-with-my-kubestellar-instance">How do I get this working with my KubeStellar instance?<a class="headerlink" href="#how-do-i-get-this-working-with-my-kubestellar-instance" title="Permanent link">#</a></h3>
 <p><a href="https://kubernetes.slack.com/archives/C058SUSL5AA">Work with us</a> to create this document</p>
-<script>
-const spinner1 = document.querySelector('.spinner1');
-const spinner2 = document.querySelector('.spinner2');
-const iframe1 = document.querySelector('#myFrame1');
-const iframe2 = document.querySelector('#myFrame2');
-
-iframe.addEventListener('load', function() {
-    spinner1.style.display = 'none';
-    spinner2.style.display = 'none';
-    iframe1.style.display = 'block';
-    iframe2.style.display = 'block';
-});
-</script>
+<style type="text/css">
+.centerImage
+{
+    display: block;
+    margin: auto;
+}
+</style>
 
 
   
