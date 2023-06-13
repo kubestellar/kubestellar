@@ -6,4 +6,4 @@ spec:
   reference:
     export:
       name: edge.kcp.io
-      path: root:edge
+      path: root:espw
