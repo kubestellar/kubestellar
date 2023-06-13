@@ -10,7 +10,7 @@ kubectl ws root
 kubectl ws create ws1 --enter
 ```
 
-Create following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
+Create the following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
 ```shell
 cat << EOL | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1
@@ -95,12 +95,12 @@ c. Logical cluster name
 cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=":.metadata.annotations.kcp\.io\/cluster" --no-headers`
 ```
 
-Download manifest tamplate.
+Download manifest template.
 ```shell
 curl -LO https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 ```
 
-Generate manifests to bootstrap KubeStellar Syncer.
+Generate manifests to bootstrap KubeStellar-Syncer.
 ```shell
 syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < kubestellar-syncer-bootstrap.template.yaml
 ```

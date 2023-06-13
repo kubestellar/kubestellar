@@ -1,5 +1,5 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
-Go to inventry management workspace and find the mailbox workspace name.
+Go to inventory management workspace and find the mailbox workspace name.
 ```shell
 kubectl ws root:imw-1
 mbws=`kubectl get SyncTarget guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
@@ -10,7 +10,7 @@ Current workspace is "root:imw-1".
 mailbox workspace name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
 ```
 
-Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar Syncer.
+Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
 kubectl ws root:espw:$mbws
 ./bin/kubectl-kubestellar-syncer_gen guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml

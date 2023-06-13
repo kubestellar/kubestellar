@@ -144,8 +144,8 @@ The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be your chosen
 IMW.
 
-This command does not depend on the action of any of the edge-mc
-(KubeStellar) controllers.
+This command does not depend on the action of any of the 
+KubeStellar controllers.
 
 An example usage follows.
 
@@ -204,8 +204,7 @@ usage of `kubectl kubestellar ensure location`.  It has all the same
 command line syntax and semantics except that the
 `labelname=labelvalue` pairs do not appear.
 
-This command does not depend on the action of any of the edge-mc
-(KubeStellar) controllers.
+This command does not depend on the action of any of the KubeStellar controllers.
 
 The following session demonstrates usage, including idempotency.
 
