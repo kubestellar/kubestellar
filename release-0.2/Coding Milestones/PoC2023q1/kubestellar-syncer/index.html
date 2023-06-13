@@ -1885,7 +1885,7 @@
 
 <p>KubeStellar-Syncer runs in the target cluster and sync kubernetes resource objects from the target cluster to a mailbox workspace and vice versa.</p>
 <p><img alt="kubestellar-syncer drawio" src="../images/kubestellar-syncer-overview.png" /></p>
-<h2 id="steps-to-try-the-syncer">Steps to try the Syncer</h2>
+<h2 id="steps-to-try-the-syncer">Steps to try the Syncer<a class="headerlink" href="#steps-to-try-the-syncer" title="Permanent link">#</a></h2>
 <p>The KubeStellar-Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in <a href="../example1">example1</a> until <code>The mailbox controller</code> in stage 2. </p>
 <!-- BEGIN INCLUDE example1-subs/example1-pre-kcp.md '&lt;!--example1-pre-kcp-start--&gt;' '&lt;!--example1-pre-kcp-end--&gt;' -->
 
@@ -1894,7 +1894,7 @@
 workspace (ESPW) and lets that react to the inventory.  Then the KubeStellar syncers
 are deployed, in the edge clusters and configured to work with the
 corresponding mailbox workspaces.  This stage has the following steps.</p>
-<h3 id="create-two-kind-clusters">Create two kind clusters.</h3>
+<h3 id="create-two-kind-clusters">Create two kind clusters.<a class="headerlink" href="#create-two-kind-clusters" title="Permanent link">#</a></h3>
 <p>This example uses two <a href="https://kind.sigs.k8s.io/">kind</a> clusters as
 edge clusters.  We will call them "florin" and "guilder".</p>
 <p>This example uses extremely simple workloads, which
@@ -1943,7 +1943,7 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 
 <!-- BEGIN INCLUDE example1-subs/example1-start-kcp.md '&lt;!--example1-start-kcp-start--&gt;' '&lt;!--example1-start-kcp-end--&gt;' -->
 
-<h3 id="start-kcp">Start kcp</h3>
+<h3 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h3>
 <p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
 according to your preference.</p>
 <p>In some shell that will be used only for this purpose, issue the <code>kcp
@@ -1974,12 +1974,12 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
-<h3 id="create-an-inventory-management-workspace">Create an inventory management workspace.</h3>
+<h3 id="create-an-inventory-management-workspace">Create an inventory management workspace.<a class="headerlink" href="#create-an-inventory-management-workspace" title="Permanent link">#</a></h3>
 <p>Use the following commands.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
 </code></pre></div>
-<h3 id="get-kubestellar">Get KubeStellar</h3>
+<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
 <p>Download and build or install
 <a href="https://github.com/kcp-dev/edge-mc">edge-mc</a>, according to your
 preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
@@ -1996,7 +1996,7 @@ executables (e.g., <code>kubectl kubestellar prep-for-syncer</code> corresponds 
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
-<h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters</h3>
+<h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters<a class="headerlink" href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" title="Permanent link">#</a></h3>
 <p>Use the following two commands. They label both florin and guilder
 with <code>env=prod</code>, and also label guilder with <code>extended=si</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>florin<span class="w">  </span>loc-name<span class="o">=</span>florin<span class="w">  </span><span class="nv">env</span><span class="o">=</span>prod
@@ -2050,7 +2050,7 @@ four objects.</p>
 </code></pre></div>
 <p>That script also deletes the Location named <code>default</code>, which is not
 used in this PoC, if it shows up.</p>
-<h3 id="create-the-edge-service-provider-workspace">Create the edge service provider workspace</h3>
+<h3 id="create-the-edge-service-provider-workspace">Create the edge service provider workspace<a class="headerlink" href="#create-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
 <p>Use the following commands.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw<span class="w"> </span>--enter
@@ -2059,13 +2059,13 @@ used in this PoC, if it shows up.</p>
 
 <!-- BEGIN INCLUDE example1-subs/example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
 
-<h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace</h3>
+<h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace<a class="headerlink" href="#populate-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
 <p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
-<h3 id="the-mailbox-controller">The mailbox controller</h3>
+<h3 id="the-mailbox-controller">The mailbox controller<a class="headerlink" href="#the-mailbox-controller" title="Permanent link">#</a></h3>
 <p>Running the mailbox controller will be conveniently automated.
 Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
@@ -2114,9 +2114,9 @@ SyncTarget name, you could do it as follows.</p>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="register-kubestellar-syncer-on-the-target-clusters">Register KubeStellar-Syncer on the target clusters</h3>
+<h3 id="register-kubestellar-syncer-on-the-target-clusters">Register KubeStellar-Syncer on the target clusters<a class="headerlink" href="#register-kubestellar-syncer-on-the-target-clusters" title="Permanent link">#</a></h3>
 <p>Once KubeStellar setup is done, KubeStellar-Syncer can be deployed on the target cluster easily by the following steps.</p>
-<h4 id="for-the-target-cluster-of-guilder">For the target cluster of <code>guilder</code>,</h4>
+<h4 id="for-the-target-cluster-of-guilder">For the target cluster of <code>guilder</code>,<a class="headerlink" href="#for-the-target-cluster-of-guilder" title="Permanent link">#</a></h4>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-0-deploy-guilder.md '&lt;!--kubestellar-syncer-0-deploy-guilder-start--&gt;' '&lt;!--kubestellar-syncer-0-deploy-guilder-end--&gt;' -->
 
 <p>Go to inventory management workspace and find the mailbox workspace name.
@@ -2172,7 +2172,7 @@ SyncTarget name, you could do it as follows.</p>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h4 id="for-the-target-cluster-of-florin">For the target cluster of <code>florin</code>,</h4>
+<h4 id="for-the-target-cluster-of-florin">For the target cluster of <code>florin</code>,<a class="headerlink" href="#for-the-target-cluster-of-florin" title="Permanent link">#</a></h4>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin.md '&lt;!--kubestellar-syncer-0-deploy-florin-start--&gt;' '&lt;!--kubestellar-syncer-0-deploy-florin-end--&gt;' -->
 
 <p>Go to inventory management workspace and find the mailbox workspace name.
@@ -2228,7 +2228,7 @@ SyncTarget name, you could do it as follows.</p>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="teardown-the-environment">Teardown the environment</h3>
+<h3 id="teardown-the-environment">Teardown the environment<a class="headerlink" href="#teardown-the-environment" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
@@ -2251,8 +2251,8 @@ SyncTarget name, you could do it as follows.</p>
 <!-- END INCLUDE -->
 
 <hr />
-<h2 id="deep-dive">Deep-dive</h2>
-<h3 id="the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace">The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace</h3>
+<h2 id="deep-dive">Deep-dive<a class="headerlink" href="#deep-dive" title="Permanent link">#</a></h2>
+<h3 id="the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace">The details about the registration of KubeStellar-Syncer on an Edge cluster and a workspace<a class="headerlink" href="#the-details-about-the-registration-of-kubestellar-syncer-on-an-edge-cluster-and-a-workspace" title="Permanent link">#</a></h3>
 <p>KubeStellar-Syncer is deployed on an Edge cluster easily by the following steps.</p>
 <ol>
 <li>Create SyncTarget and Location<ul>
@@ -2277,7 +2277,7 @@ SyncTarget name, you could do it as follows.</p>
 </ol>
 <p>The overall diagram is as follows:</p>
 <p><img alt="kubestellar-syncer boot" src="../images/kubestellar-syncer-boot.png" /></p>
-<h3 id="what-kubestellar-syncer-gen-plugin-does">What KubeStellar syncer-gen plugin does</h3>
+<h3 id="what-kubestellar-syncer-gen-plugin-does">What KubeStellar syncer-gen plugin does<a class="headerlink" href="#what-kubestellar-syncer-gen-plugin-does" title="Permanent link">#</a></h3>
 <p>In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), access information for both is required. </p>
 <p>For the upstream access, Syncer's registration command (<code>kubectl kubestellar syncer-gen</code>) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. </p>
 <p>On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
@@ -2381,7 +2381,7 @@ c. Logical cluster name
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="deploy-workload-objects-from-kubestellar-to-edge-cluster">Deploy workload objects from KubeStellar to Edge cluster</h3>
+<h3 id="deploy-workload-objects-from-kubestellar-to-edge-cluster">Deploy workload objects from KubeStellar to Edge cluster<a class="headerlink" href="#deploy-workload-objects-from-kubestellar-to-edge-cluster" title="Permanent link">#</a></h3>
 <p>To deploy resources to Edge clusters, create the following in workload management workspace
 - workload objects
   - Some objects are denatured if needed.
@@ -2397,7 +2397,7 @@ c. Logical cluster name
   - The placement translator will put the workload objects and syncer config into the mailbox workspaces.
   - The placement translator will create syncer config based on the EdgePlacement objects and what they match.
   - The mailbox controller will put API Binding into the mailbox workspace.</p>
-<h3 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)</h3>
+<h3 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)<a class="headerlink" href="#edgesyncconfig-will-be-replaced-to-syncerconfig" title="Permanent link">#</a></h3>
 <ul>
 <li>The example of EdgeSyncConfig CR is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
 <li>The CR here is used from edge syncer. </li>
@@ -2417,7 +2417,7 @@ c. Logical cluster name
 <li>KubeStellar-Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
 <li>This behavior may be changed to only watching the default CR once Placement Translator is to be the component that generates the CR from EdgePlacement: <a href="https://github.com/kcp-dev/edge-mc/pull/284#pullrequestreview-1375667129">related issue</a></li>
 </ul>
-<h3 id="syncerconfig">SyncerConfig</h3>
+<h3 id="syncerconfig">SyncerConfig<a class="headerlink" href="#syncerconfig" title="Permanent link">#</a></h3>
 <ul>
 <li>The spec is defined in https://github.com/kcp-dev/edge-mc/blob/release-0.2/pkg/apis/edge/v1alpha1/syncer-config.go</li>
 <li><code>namespaceScope</code> field is for namespace scoped objects.<ul>
@@ -2452,7 +2452,7 @@ c. Logical cluster name
 <li>Currently KubeStellar-Syncer watches all CRs in the workspace</li>
 <li>KubeStellar-Syncer merges them and decides which resources are down/up synced based on the merged information. </li>
 </ul>
-<h3 id="downsyncing">Downsyncing</h3>
+<h3 id="downsyncing">Downsyncing<a class="headerlink" href="#downsyncing" title="Permanent link">#</a></h3>
 <ul>
 <li>KubeStellar-Syncer does downsyncing, which copy workload objects on mailbox workspace to Edge cluster</li>
 <li>If workload objects are deleted on mailbox workspace, the corresponding objects on the Edge cluster will be also deleted according to SyncerConfig. </li>
@@ -2463,20 +2463,20 @@ c. Logical cluster name
 <li>Renaturing is applied if required (specified in SyncerConfig). (May not scope in PoC2023q1 since no usage)</li>
 <li>Current implementation is using polling to detect changes on mailbox workspace, but will be changed to use Informers. </li>
 </ul>
-<h3 id="renaturing-may-not-scope-in-poc2023q1-since-no-usage">Renaturing (May not scope in PoC2023q1 since no usage)</h3>
+<h3 id="renaturing-may-not-scope-in-poc2023q1-since-no-usage">Renaturing (May not scope in PoC2023q1 since no usage)<a class="headerlink" href="#renaturing-may-not-scope-in-poc2023q1-since-no-usage" title="Permanent link">#</a></h3>
 <ul>
 <li>KubeStellar-Syncer does renaturing, which converts workload objects to different forms of objects on a Edge cluster. </li>
 <li>The conversion rules (downstream/upstream mapping) is specified in SyncerConfig.</li>
 <li>Some objects need to be denatured. </li>
 <li>CRD needs to be denatured when conflicting with APIBinding.</li>
 </ul>
-<h3 id="return-of-reported-state">Return of reported state</h3>
+<h3 id="return-of-reported-state">Return of reported state<a class="headerlink" href="#return-of-reported-state" title="Permanent link">#</a></h3>
 <ul>
 <li>KubeStellar-Syncer return the reported state of downsynced objects at Edge cluster to the status of objects on the mailbox workspace periodically. </li>
 <li>TODO: Failing to returning reported state of some resources (e.g. deployment and service). Need more investigation. </li>
 <li>reported state returning on/off is configurable in SyncerConfig. (default is on)</li>
 </ul>
-<h3 id="resource-upsyncing">Resource Upsyncing</h3>
+<h3 id="resource-upsyncing">Resource Upsyncing<a class="headerlink" href="#resource-upsyncing" title="Permanent link">#</a></h3>
 <ul>
 <li>KubeStellar-Syncer does upsyncing resources at Edge cluster to the corresponding mailbox workspace periodically. </li>
 <li>SyncerConfig specifies which objects should be upsynced from Edge cluster.</li>
@@ -2484,16 +2484,16 @@ c. Logical cluster name
 <li>Upsyncing CRD is out of scope for now. This means when upsyncing a CR, corresponding APIBinding (not CRD) is available on the mailbox workspace. This limitation might be revisited later. </li>
 <li>~Upsynced objects can be accessed from APIExport set on the workload management workspace bound to the mailbox workspace (with APIBinding). This access pattern might be changed when other APIs such as summarization are provided in KubeStellar.~ =&gt; Upsynced objects are accessed through Mailbox informer.</li>
 </ul>
-<h3 id="feasibility-study">Feasibility study</h3>
+<h3 id="feasibility-study">Feasibility study<a class="headerlink" href="#feasibility-study" title="Permanent link">#</a></h3>
 <p>We will verify if the design described here could cover the following 4 scenarios. 
 - I can register a KubeStellar-Syncer on a Edge cluster to connect a mailbox workspace specified by name. (KubeStellar-Syncer registration)
 - I can deploy Kyverno and its policy from mailbox workspace to Edge cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM. (workload deployment by KubeStellar-Syncer's downsyncing)
 - I can see the policy report generated at Edge cluster via API Export on workload management workspace. (resource upsyncing by KubeStellar-Syncer) 
 - I can deploy the denatured objects on mailbox workspace to Edge cluster by renaturing them automatically in KubeStellar-Syncer. (workload deployment by renaturing)</p>
-<h2 id="build-kubestellar-syncer-image">Build KubeStellar-Syncer image</h2>
+<h2 id="build-kubestellar-syncer-image">Build KubeStellar-Syncer image<a class="headerlink" href="#build-kubestellar-syncer-image" title="Permanent link">#</a></h2>
 <p>Prerequisite
 - Install ko (https://ko.build/install/)</p>
-<h3 id="how-to-build-the-image-in-your-local">How to build the image in your local</h3>
+<h3 id="how-to-build-the-image-in-your-local">How to build the image in your local<a class="headerlink" href="#how-to-build-the-image-in-your-local" title="Permanent link">#</a></h3>
 <ol>
 <li><code>make build-kubestellar-syncer-image-local</code>
 e.g.
@@ -2513,7 +2513,7 @@ e.g.
 <p>For example
 <div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>image=`make build-kubestellar-syncer-image-local`
 </code></pre></div></p>
-<h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry</h3>
+<h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry<a class="headerlink" href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" title="Permanent link">#</a></h3>
 <ol>
 <li><code>make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
 </ol>
@@ -2545,7 +2545,7 @@ e.g.
 <a id="__codelineno-78-25" name="__codelineno-78-25" href="#__codelineno-78-25"></a>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 </code></pre></div>
 <code>ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510</code> is the image pushed to the registry.</p>
-<h2 id="teardown-the-environment_1">Teardown the environment</h2>
+<h2 id="teardown-the-environment_1">Teardown the environment<a class="headerlink" href="#teardown-the-environment_1" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>

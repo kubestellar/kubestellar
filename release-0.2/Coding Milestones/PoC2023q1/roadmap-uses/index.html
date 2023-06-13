@@ -1590,21 +1590,21 @@
 
   <h1>Roadmap</h1>
 
-<h2 id="background">Background</h2>
+<h2 id="background">Background<a class="headerlink" href="#background" title="Permanent link">#</a></h2>
 <p>The outline <a href="../outline/#development-roadmap">mentions features that need not be implement at
 first</a>.  In the following sections we
 consider some particular use cases.</p>
-<h2 id="mvi">MVI</h2>
+<h2 id="mvi">MVI<a class="headerlink" href="#mvi" title="Permanent link">#</a></h2>
 <p>MVI needs customization.  We can demo an MVI scenario without:
 self-sufficient edge clusters, summarization, upsync (Return and/or
 summarization of reported state from associated objects),
 sophisticated handling of workload conflicts.</p>
 <p>What about denaturing?</p>
-<h2 id="compliance-to-policy">Compliance-to-Policy</h2>
+<h2 id="compliance-to-policy">Compliance-to-Policy<a class="headerlink" href="#compliance-to-policy" title="Permanent link">#</a></h2>
 <p>I am not sure what is workable here.  Following are some
 possibilities.  They vary in two dimensions.</p>
-<h3 id="how-c2p-controller-consumes-reports">How C2P controller consumes reports</h3>
-<h4 id="through-view-of-workload-apiexport-and-workload-apibindings">Through view of workload APIExport and workload APIBindings</h4>
+<h3 id="how-c2p-controller-consumes-reports">How C2P controller consumes reports<a class="headerlink" href="#how-c2p-controller-consumes-reports" title="Permanent link">#</a></h3>
+<h4 id="through-view-of-workload-apiexport-and-workload-apibindings">Through view of workload APIExport and workload APIBindings<a class="headerlink" href="#through-view-of-workload-apiexport-and-workload-apibindings" title="Permanent link">#</a></h4>
 <p>As outlined in <a href="https://github.com/kcp-dev/edge-mc/pull/241">PR 241</a>:
 - the C2P team maintains CRDs, APIResourceSchemas, and an APIExport for
   the policy and report resources;
@@ -1623,9 +1623,9 @@ maintain two copies of the Kyverno resource definitions.</p>
 <p>This is a bad choice because it is not consistent with the preferred
 way to demonstrate installation of Kyverno, which is to have Helm
 install Kyverno into the workload management workspace.</p>
-<h4 id="through-a-new-kind-of-view">Through a new kind of view</h4>
+<h4 id="through-a-new-kind-of-view">Through a new kind of view<a class="headerlink" href="#through-a-new-kind-of-view" title="Permanent link">#</a></h4>
 <p>We could define a new kind of view that does what we want.</p>
-<h4 id="through-view-of-emc-apiexport-and-mailbox-apibindings">Through view of EMC APIExport and mailbox APIBindings</h4>
+<h4 id="through-view-of-emc-apiexport-and-mailbox-apibindings">Through view of EMC APIExport and mailbox APIBindings<a class="headerlink" href="#through-view-of-emc-apiexport-and-mailbox-apibindings" title="Permanent link">#</a></h4>
 <p>This approach also uses APIExport and APIBinding objects but in a
 different way than above.  In this approach the placement translator
 maintains one APIExport in the edge service provider workspace and a
@@ -1645,20 +1645,20 @@ has an entry for every resource downsynced or upsynced to that
 workspace.</p>
 <p>As a consequence, the APIExport's view holds all the objects whose
 kind/resource is defined by those APIBindings.</p>
-<h4 id="through-an-api-for-consuming-from-mailboxes">Through an API for consuming from mailboxes</h4>
+<h4 id="through-an-api-for-consuming-from-mailboxes">Through an API for consuming from mailboxes<a class="headerlink" href="#through-an-api-for-consuming-from-mailboxes" title="Permanent link">#</a></h4>
 <p>The C2P Controller uses the API proposed in <a href="https://github.com/kcp-dev/edge-mc/pull/240">PR
 240</a> to read the report
 objects from the mailbox workspaces.  This has the downside of
 exposing the mailbox workspaces as part of the KubeStellar interface ---
 which they were NOT originally intended to be.</p>
-<h4 id="c2p-controller-consumes-report-summaries-prepared-by-kubestellar">C2P Controller consumes report summaries prepared by KubeStellar</h4>
+<h4 id="c2p-controller-consumes-report-summaries-prepared-by-kubestellar">C2P Controller consumes report summaries prepared by KubeStellar<a class="headerlink" href="#c2p-controller-consumes-report-summaries-prepared-by-kubestellar" title="Permanent link">#</a></h4>
 <p>In this scenario:
 - we have defined and implemented summarization in KubeStellar;
 - that summarization is adequate for the needs of the C2P Controller;
 - that controller consumes summaries rather than the reports themselves.</p>
-<h3 id="mailbox-vs-edge">Mailbox vs. Edge</h3>
+<h3 id="mailbox-vs-edge">Mailbox vs. Edge<a class="headerlink" href="#mailbox-vs-edge" title="Permanent link">#</a></h3>
 <p>The latest plan is to <a href="#use-full-emc">use full EMC</a>.</p>
-<h4 id="using-the-current-tmc-syncer">Using the current TMC syncer</h4>
+<h4 id="using-the-current-tmc-syncer">Using the current TMC syncer<a class="headerlink" href="#using-the-current-tmc-syncer" title="Permanent link">#</a></h4>
 <p>In this scenario the edge clusters are not self-sufficient; the
 workload containers in an edge cluster use kube api services from the
 corresponding mailbox workspace.  The key insight here is that from an
@@ -1676,17 +1676,17 @@ workload containers is in the edge cluster.  This scenario will work
 if the C2P workload does not include admission control webhooks.  Note
 that Kubernetes release 1.26 introduces CEL-based validating admission
 control <em>policies</em>, so using them would not involve webhooks.</p>
-<h4 id="expand-tmc-to-support-webhooks">Expand TMC to support webhooks</h4>
+<h4 id="expand-tmc-to-support-webhooks">Expand TMC to support webhooks<a class="headerlink" href="#expand-tmc-to-support-webhooks" title="Permanent link">#</a></h4>
 <p>The problem with webhooks would go away if TMC were expanded to
 support them, perhaps through some sort of tunneling so that a client
 in the center can open connections to a Service at the edge.</p>
-<h4 id="pre-deploy-controllers-and-resources-on-edge-clusters">Pre-deploy controllers and resources on edge clusters</h4>
+<h4 id="pre-deploy-controllers-and-resources-on-edge-clusters">Pre-deploy controllers and resources on edge clusters<a class="headerlink" href="#pre-deploy-controllers-and-resources-on-edge-clusters" title="Permanent link">#</a></h4>
 <p>In this scenario, the PVP/PEP is pre-deployed on the edge clusters, and
 the policy and report resources (which are cluster-scoped) are
 predefined there too.  This scenario would continue to use the TMC
 syncer, but only need it to downsync the policies and upsync the
 reports.</p>
-<h4 id="use-full-emc">Use full EMC</h4>
+<h4 id="use-full-emc">Use full EMC<a class="headerlink" href="#use-full-emc" title="Permanent link">#</a></h4>
 <p>No shortcuts here, no limitations.</p>
 
 

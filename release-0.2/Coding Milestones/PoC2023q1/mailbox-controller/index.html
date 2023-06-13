@@ -1540,7 +1540,7 @@
 </code></pre></div>
 </div>
 <!-- END INCLUDE -->
-<h2 id="linking-synctarget-with-mailbox-workspace">Linking SyncTarget with Mailbox Workspace</h2>
+<h2 id="linking-synctarget-with-mailbox-workspace">Linking SyncTarget with Mailbox Workspace<a class="headerlink" href="#linking-synctarget-with-mailbox-workspace" title="Permanent link">#</a></h2>
 <p>For a given SyncTarget T, the mailbox controller currently chooses the
 name of the corresponding workspace to be the concatenation of the
 following:</p>
@@ -1553,7 +1553,7 @@ following:</p>
 <code>edge.kcp.io/sync-target-name</code> and whose value is the name of the
 workspace object (as seen in its parent workspace, the edge service
 provider workspace).</p>
-<h2 id="usage">Usage</h2>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
 <p>The mailbox controller needs three Kubernetes client configurations.
 One --- concerned with reading inventory --- is to access the
 APIExport view of the <code>workload.kcp.io</code> API group, to read the
@@ -1589,8 +1589,8 @@ consume the <code>Workspace</code> objects from there.</p>
 <a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">      </span>--workload-kubeconfig<span class="w"> </span>string<span class="w">       </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 <a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="w">      </span>--workload-user<span class="w"> </span>string<span class="w">             </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 </code></pre></div>
-<h2 id="try-out-the-mailbox-controller">Try out the mailbox controller</h2>
-<h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp</h3>
+<h2 id="try-out-the-mailbox-controller">Try out the mailbox controller<a class="headerlink" href="#try-out-the-mailbox-controller" title="Permanent link">#</a></h2>
+<h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp<a class="headerlink" href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" title="Permanent link">#</a></h3>
 <p>Open a terminal window(1) and clone the latest KubeStellar source:</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
@@ -1610,7 +1610,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="create-the-edge-service-provider-workspace-espw">Create the Edge Service Provider Workspace (ESPW)</h3>
+<h3 id="create-the-edge-service-provider-workspace-espw">Create the Edge Service Provider Workspace (ESPW)<a class="headerlink" href="#create-the-edge-service-provider-workspace-espw" title="Permanent link">#</a></h3>
 <p>Open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end--&gt;' -->
 
@@ -1706,7 +1706,7 @@ controller wait for it to be gone and then re-create it.</p>
 and watch the mailbox controller react as follows.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
-<h2 id="teardown-the-environment">Teardown the environment</h2>
+<h2 id="teardown-the-environment">Teardown the environment<a class="headerlink" href="#teardown-the-environment" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>

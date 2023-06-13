@@ -1592,25 +1592,25 @@
 
   <h1>Release Management</h1>
 
-<h3 id="publishing-a-new-kubestellar-release">Publishing a new KubeStellar release</h3>
-<h4 id="prerequisite-make-sure-you-have-a-gpg-signing-key">Prerequisite - make sure you have a GPG signing key</h4>
+<h3 id="publishing-a-new-kubestellar-release">Publishing a new KubeStellar release<a class="headerlink" href="#publishing-a-new-kubestellar-release" title="Permanent link">#</a></h3>
+<h4 id="prerequisite-make-sure-you-have-a-gpg-signing-key">Prerequisite - make sure you have a GPG signing key<a class="headerlink" href="#prerequisite-make-sure-you-have-a-gpg-signing-key" title="Permanent link">#</a></h4>
 <ol>
 <li><a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key</a></li>
 <li><a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account">https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account</a></li>
 <li><a href="https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key">https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key</a></li>
 </ol>
-<h3 id="create-the-tags">Create the tags</h3>
-<h4 id="note">Note:</h4>
+<h3 id="create-the-tags">Create the tags<a class="headerlink" href="#create-the-tags" title="Permanent link">#</a></h3>
+<h4 id="note">Note:<a class="headerlink" href="#note" title="Permanent link">#</a></h4>
 <p>You currently need write access to the <a href="https://github.com/kcp-dev/edge-mc">https://github.com/kcp-dev/edge-mc</a> repository to perform these tasks.</p>
 <p>You also need an available team member with approval permissions from <a href="https://github.com/openshift/release/blob/master/ci-operator/config/kcp-dev/edge-mc/OWNERS">https://github.com/openshift/release/blob/master/ci-operator/config/kcp-dev/edge-mc/OWNERS</a>.</p>
-<h3 id="create-a-release-majorminor-branch">Create a release-major.minor branch</h3>
+<h3 id="create-a-release-majorminor-branch">Create a release-major.minor branch<a class="headerlink" href="#create-a-release-majorminor-branch" title="Permanent link">#</a></h3>
 <p>To create a release branch, identify the current 'release' branches' name (e.g. release-0.2).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kcp-dev/edge-mc.git
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
 </code></pre></div>
-<h3 id="update-the-mkdocsyml-file">Update the mkdocs.yml file</h3>
+<h3 id="update-the-mkdocsyml-file">Update the mkdocs.yml file<a class="headerlink" href="#update-the-mkdocsyml-file" title="Permanent link">#</a></h3>
 <p>The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>vi<span class="w"> </span>docs/mkdocs.yml
 </code></pre></div>
@@ -1626,26 +1626,26 @@
 </span><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.3.0&#39;</span>
 </span><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
 </code></pre></div></p>
-<h3 id="remove-the-current-stable-alias-using-mike-danger">Remove the current 'stable' alias using 'mike' (DANGER!)</h3>
+<h3 id="remove-the-current-stable-alias-using-mike-danger">Remove the current 'stable' alias using 'mike' (DANGER!)<a class="headerlink" href="#remove-the-current-stable-alias-using-mike-danger" title="Permanent link">#</a></h3>
 <p>Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the current &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>stable<span class="w"> </span><span class="c1"># this generates the &#39;main&#39; branches&#39; docs set and points &#39;stable&#39; at it temporarily</span>
 </code></pre></div></p>
-<h3 id="push-the-new-release-branch">Push the new release branch</h3>
+<h3 id="push-the-new-release-branch">Push the new release branch<a class="headerlink" href="#push-the-new-release-branch" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;new release version &lt;major&gt;.&lt;minor&gt;&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span>replace<span class="w"> </span>&lt;major&gt;.&lt;minor&gt;<span class="w"> </span>with<span class="w"> </span>your<span class="w"> </span>incremented<span class="w"> </span>&lt;major&gt;.&lt;minor&gt;<span class="w"> </span>pair
 </code></pre></div>
-<h3 id="update-the-stable-alias-using-mike">Update the 'stable' alias using 'mike'</h3>
+<h3 id="update-the-stable-alias-using-mike">Update the 'stable' alias using 'mike'<a class="headerlink" href="#update-the-stable-alias-using-mike" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>releae-0.3<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
 </code></pre></div>
-<h3 id="test-your-doc-site">Test your doc site</h3>
+<h3 id="test-your-doc-site">Test your doc site<a class="headerlink" href="#test-your-doc-site" title="Permanent link">#</a></h3>
 <p>Open a Chrome Incognito browser to <a href="https://kubestellar.io">https://kubestellar.io</a> and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'</p>
-<h3 id="create-a-build">Create a build</h3>
+<h3 id="create-a-build">Create a build<a class="headerlink" href="#create-a-build" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.3.0
 </code></pre></div>
-<h3 id="create-a-tagged-release">Create a tagged release</h3>
+<h3 id="create-a-tagged-release">Create a tagged release<a class="headerlink" href="#create-a-tagged-release" title="Permanent link">#</a></h3>
 <p>View the existing tags you have for the repo</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>git<span class="w"> </span>tag
@@ -1656,7 +1656,7 @@
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>git<span class="w"> </span>push<span class="w"> </span>???<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w">  </span><span class="c1">#TODO - not sure if this is right</span>
 </code></pre></div>
-<h3 id="create-a-release-in-gh-ui">Create a release in GH UI</h3>
+<h3 id="create-a-release-in-gh-ui">Create a release in GH UI<a class="headerlink" href="#create-a-release-in-gh-ui" title="Permanent link">#</a></h3>
 <ul>
 <li>Navigate to the KubeStellar GitHub Source Repository Releases section at https://github.com/kcp-dev/edge-mc/releases</li>
 <li>
@@ -1674,7 +1674,7 @@
 <p><img alt="Release Example" src="../gh-draft-new-release.png" /></p>
 </li>
 </ul>
-<h3 id="check-that-gh-workflows-for-docs-are-working">Check that GH Workflows for docs are working</h3>
+<h3 id="check-that-gh-workflows-for-docs-are-working">Check that GH Workflows for docs are working<a class="headerlink" href="#check-that-gh-workflows-for-docs-are-working" title="Permanent link">#</a></h3>
 <p>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
 <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml">https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml</a>
 <a href="https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml">https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml</a></p>
@@ -1733,7 +1733,7 @@ Click "Generate release notes"
 Publish the release
 Notify -->
 
-<h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="https://kubestellar.io/joinus">kubestellar-dev@googlegroups.com</a> and <a href="https://groups.google.com/g/kubestellar-users">kubestellar-users@googlegroups.com</a></h3>
+<h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="https://kubestellar.io/joinus">kubestellar-dev@googlegroups.com</a> and <a href="https://groups.google.com/g/kubestellar-users">kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Subject: [release] &lt;major&gt;&lt;minor&gt;
 </code></pre></div>
     - In the body, include noteworthy changes

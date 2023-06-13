@@ -1524,12 +1524,12 @@
   
 
 
-<h1 id="contributing-to-kubestellar">Contributing to KubeStellar</h1>
+<h1 id="contributing-to-kubestellar">Contributing to KubeStellar<a class="headerlink" href="#contributing-to-kubestellar" title="Permanent link">#</a></h1>
 <p>Greetings! We are grateful for your interest in joining the KubeStellar community and making a positive impact. Whether you're raising issues, enhancing documentation, fixing bugs, or developing new features, your contributions are essential to our success.</p>
 <p>To get started, kindly read through this document and familiarize yourself with our code of conduct. If you have any inquiries, please feel free to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/">Slack channel</a>.</p>
 <p>We can't wait to collaborate with you!</p>
-<h2 id="contributing-code">Contributing Code</h2>
-<h3 id="prerequisites">Prerequisites</h3>
+<h2 id="contributing-code">Contributing Code<a class="headerlink" href="#contributing-code" title="Permanent link">#</a></h2>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h3>
 <p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.
   Please note that the go language version numbers in these files must exactly agree:</p>
 <div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
@@ -1540,18 +1540,18 @@
 - In the .github/workflows yaml files it is indicated by &quot;go-version&quot;
 </code></pre></div>
 <p>Check out our <a href="../../Getting-Started/quickstart/">QuickStart Guide</a></p>
-<h3 id="issues">Issues</h3>
+<h3 id="issues">Issues<a class="headerlink" href="#issues" title="Permanent link">#</a></h3>
 <p>Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.</p>
 <p>If you believe that there is a need for a fix and no existing issue covers it, feel free to create a new one.</p>
 <p>As a new contributor, we encourage you to start with issues labeled as good first issues.</p>
 <p>Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.</p>
 <p>To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.</p>
-<h3 id="committing">Committing</h3>
+<h3 id="committing">Committing<a class="headerlink" href="#committing" title="Permanent link">#</a></h3>
 <p>We encourage all contributors to adopt <a href="https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
 <p>A recommended format for final commit messages is as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 </code></pre></div>
-<h3 id="pull-requests">Pull Requests</h3>
+<h3 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">#</a></h3>
 <p>When submitting a pull request, clear communication is appreciated. This can be achieved by providing the following information:</p>
 <ul>
 <li>Detailed description of the problem you are trying to solve, along with links to related GitHub issues</li>
@@ -1564,7 +1564,7 @@
 <p>Approvers will review your PR within a business day. A PR requires both an /lgtm and then an /approve in order to get merged. You may /approve your own PR but you may not /lgtm it. Automation will add the PR it to the OpenShift PR merge queue. The OpenShift Tide bot will automatically merge your work when it is available.</p>
 <p>Congratulations! Your pull request has been successfully merged! 👏</p>
 <p>If you have any questions about contributing, don't hesitate to reach out to us on the KubeStellar-dev <a href="https://kubernetes.slack.com/archives/C058SUSL5AA/">Slack channel</a>.</p>
-<h2 id="testing-locally">Testing Locally</h2>
+<h2 id="testing-locally">Testing Locally<a class="headerlink" href="#testing-locally" title="Permanent link">#</a></h2>
 <p>Our <a href="../../Getting-Started/quickstart/">QuickStart</a>
  guide shows a user how to install a
 local KCP server and install the KubeStellar components and run an
@@ -1572,7 +1572,7 @@ example.  As a contributor you will want a different setup flow,
 including <code>git clone</code> of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
 there is a larger example at <a href="../../Coding%20Milestones/PoC2023q1/example1/">this link</a>.</p>
-<h3 id="testing-changes-to-the-bootstrap-script">Testing changes to the bootstrap script</h3>
+<h3 id="testing-changes-to-the-bootstrap-script">Testing changes to the bootstrap script<a class="headerlink" href="#testing-changes-to-the-bootstrap-script" title="Permanent link">#</a></h3>
 <p>The quickstart says to fetch the <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/bootstrap-kubestellar.sh">bootstrap script</a> from the release-0.2 branch of
 the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
@@ -1586,17 +1586,17 @@ version of the executables, changes to this script can not rely on any
 behavior of those executables that is not in the currently latest
 release.  Also, a change that restricts the range of usable releases
 needs to add checking for use of incompatible releases.</p>
-<h3 id="testing-the-bootstrap-script-against-an-upcoming-release">Testing the bootstrap script against an upcoming release</h3>
+<h3 id="testing-the-bootstrap-script-against-an-upcoming-release">Testing the bootstrap script against an upcoming release<a class="headerlink" href="#testing-the-bootstrap-script-against-an-upcoming-release" title="Permanent link">#</a></h3>
 <p>Prior to making a new release, there needs to be testing that the
 current bootstrap script works with the executable behavior that will
 appear in the new release.  To support this we will add an option to
 the bootstrap script that enables it to use a local release archive
 instead of fetching an archive of an actual release from github.</p>
-<h2 id="licensing">Licensing</h2>
+<h2 id="licensing">Licensing<a class="headerlink" href="#licensing" title="Permanent link">#</a></h2>
 <p>KubeStellar is <a href="../LICENSE/">Apache 2.0 licensed</a> and we accept contributions via
 GitHub pull requests.</p>
 <p>Please read the following guide if you're interested in contributing to KubeStellar.</p>
-<h2 id="certificate-of-origin">Certificate of Origin</h2>
+<h2 id="certificate-of-origin">Certificate of Origin<a class="headerlink" href="#certificate-of-origin" title="Permanent link">#</a></h2>
 <p>By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the

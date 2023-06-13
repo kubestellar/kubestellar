@@ -1397,13 +1397,13 @@
 <!--example1-post-espw-start-->
 <!-- BEGIN INCLUDE ./example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
 
-<h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace</h3>
+<h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace<a class="headerlink" href="#populate-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
 <p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
-<h3 id="the-mailbox-controller">The mailbox controller</h3>
+<h3 id="the-mailbox-controller">The mailbox controller<a class="headerlink" href="#the-mailbox-controller" title="Permanent link">#</a></h3>
 <p>Running the mailbox controller will be conveniently automated.
 Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
@@ -1454,7 +1454,7 @@ SyncTarget name, you could do it as follows.</p>
 
 <!-- BEGIN INCLUDE ./example1-stage-1b.md '&lt;!--example1-stage-1b-start--&gt;' '&lt;!--example1-stage-1b-end--&gt;' -->
 
-<h3 id="connect-guilder-edge-cluster-with-its-mailbox-workspace">Connect guilder edge cluster with its mailbox workspace</h3>
+<h3 id="connect-guilder-edge-cluster-with-its-mailbox-workspace">Connect guilder edge cluster with its mailbox workspace<a class="headerlink" href="#connect-guilder-edge-cluster-with-its-mailbox-workspace" title="Permanent link">#</a></h3>
 <p>The following command will (a) create, in the mailbox workspace for
 guilder, an identity and authorizations for the edge syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
@@ -1505,7 +1505,7 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>kube-system<span class="w">                        </span>coredns<span class="w">                            </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>35m
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>local-path-storage<span class="w">                 </span>local-path-provisioner<span class="w">             </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>35m
 </code></pre></div></p>
-<h3 id="connect-florin-edge-cluster-with-its-mailbox-workspace">Connect florin edge cluster with its mailbox workspace</h3>
+<h3 id="connect-florin-edge-cluster-with-its-mailbox-workspace">Connect florin edge cluster with its mailbox workspace<a class="headerlink" href="#connect-florin-edge-cluster-with-its-mailbox-workspace" title="Permanent link">#</a></h3>
 <p>Do the analogous stuff for the florin cluster.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>florin
 </code></pre></div>
@@ -1546,11 +1546,11 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 
 <!-- BEGIN INCLUDE ./example1-stage-2.md '&lt;!--example1-stage-2-start--&gt;' '&lt;!--example1-stage-2-end--&gt;' -->
 
-<h2 id="stage-2">Stage 2</h2>
+<h2 id="stage-2">Stage 2<a class="headerlink" href="#stage-2" title="Permanent link">#</a></h2>
 <p><img alt="Placement and scheduling" src="../../Edge-PoC-2023q1-Scenario-1-stage-2.svg" title="Stage 2 summary" /></p>
 <p>Stage 2 creates two workloads, called "common" and "special", and lets
 the scheduler react.  It has the following steps.</p>
-<h3 id="create-and-populate-the-workload-management-workspace-for-the-common-workload">Create and populate the workload management workspace for the common workload</h3>
+<h3 id="create-and-populate-the-workload-management-workspace-for-the-common-workload">Create and populate the workload management workspace for the common workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-common-workload" title="Permanent link">#</a></h3>
 <p>One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".</p>
 <p>In this example, each workload description goes in its own workload
@@ -1693,7 +1693,7 @@ directing the common workload to both edge clusters.</p>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
-<h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload</h3>
+<h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" title="Permanent link">#</a></h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
 workload.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
@@ -1802,7 +1802,7 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
-<h3 id="edge-scheduling">Edge scheduling</h3>
+<h3 id="edge-scheduling">Edge scheduling<a class="headerlink" href="#edge-scheduling" title="Permanent link">#</a></h3>
 <p>In response to each EdgePlacement, the scheduler will create a
 corresponding SinglePlacementSlice object.  These will indicate the
 following resolutions of the "where" predicates.</p>
@@ -1888,7 +1888,7 @@ should include only the entry for guilder.</p>
 
 <!-- BEGIN INCLUDE ./example1-stage-3.md '&lt;!--example1-stage-3-start--&gt;' '&lt;!--example1-stage-3-end--&gt;' -->
 
-<h2 id="stage-3">Stage 3</h2>
+<h2 id="stage-3">Stage 3<a class="headerlink" href="#stage-3" title="Permanent link">#</a></h2>
 <p><img alt="Placement translation" src="../../Edge-PoC-2023q1-Scenario-1-stage-3.svg" title="Stage 3 summary" /></p>
 <p>In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
@@ -2094,7 +2094,7 @@ the name that you stored in Stage 1.</p>
 
 <!-- BEGIN INCLUDE ./example1-stage-4.md '&lt;!--example1-stage-4-start--&gt;' '&lt;!--example1-stage-4-end--&gt;' -->
 
-<h2 id="stage-4">Stage 4</h2>
+<h2 id="stage-4">Stage 4<a class="headerlink" href="#stage-4" title="Permanent link">#</a></h2>
 <p><img alt="Syncer effects" src="../../Edge-PoC-2023q1-Scenario-1-stage-4.svg" title="Stage 4 summary" /></p>
 <p>In Stage 4, the edge syncer does its thing.  Actually, it should have
 done it as soon as the relevant inputs became available in stage 3.

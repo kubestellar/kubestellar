@@ -1548,7 +1548,7 @@
 executables delivered in the <code>bin</code> directory.  The other sort of
 command for users is a <code>bash</code> script that is designed to be fetched
 from github and fed directly into <code>bash</code>.</p>
-<h1 id="executables">Executables</h1>
+<h1 id="executables">Executables<a class="headerlink" href="#executables" title="Permanent link">#</a></h1>
 <p>The command lines exhibited below presume that you have added the
 <code>bin</code> directory to your <code>$PATH</code>.  Alternatively: these executables can
 be invoked directly using any pathname (not in your <code>$PATH</code>).</p>
@@ -1557,7 +1557,7 @@ potentially change the setting of which kcp workspace is "current" in
 your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.</p>
-<h2 id="platform-control">Platform control</h2>
+<h2 id="platform-control">Platform control<a class="headerlink" href="#platform-control" title="Permanent link">#</a></h2>
 <p>The <code>kubestellar</code> command has three subcommands, one to finish setup
 and two for process control.</p>
 <p>The usage synopsis is as follows.</p>
@@ -1575,7 +1575,7 @@ only used in the <code>start</code> subcommand.</p>
   <code>${PWD}/kubestellar-logs</code>.</li>
 <li><code>-h</code> or <code>--help</code>: print a brief usage message and terminate.</li>
 </ul>
-<h3 id="kubestellar-init">Kubestellar init</h3>
+<h3 id="kubestellar-init">Kubestellar init<a class="headerlink" href="#kubestellar-init" title="Permanent link">#</a></h3>
 <p>This subcommand is used after installation to finish setup and does
 two things.  One is to ensure that the edge service provider workspace
 (ESPW) exists and has the required contents.  The other is to ensure
@@ -1583,15 +1583,15 @@ that the <code>root:compute</code> workspace has been extended with the RBAC
 objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.</p>
-<h3 id="kubestellar-start">KubeStellar start</h3>
+<h3 id="kubestellar-start">KubeStellar start<a class="headerlink" href="#kubestellar-start" title="Permanent link">#</a></h3>
 <p>This subcommand is used after installation or process stops.</p>
 <p>This subcommand stops any running kubestellar controllers and then
 starts them all.  It also does the same thing as <code>kubestellar init</code>.</p>
-<h3 id="kubestellar-stop">KubeStellar stop</h3>
+<h3 id="kubestellar-stop">KubeStellar stop<a class="headerlink" href="#kubestellar-stop" title="Permanent link">#</a></h3>
 <p>This subcommand undoes the primary function of <code>kubestellar start</code>,
 stopping any running KubeStellar controllers.  It does <em>not</em> tear down
 the ESPW.</p>
-<h2 id="kubestellar-release">KubeStellar-release</h2>
+<h2 id="kubestellar-release">KubeStellar-release<a class="headerlink" href="#kubestellar-release" title="Permanent link">#</a></h2>
 <p>This command just echoes the <a href="https://semver.org/">semantic version</a>
 of the release used.  This command is only available in archives built
 for a release.  Following is an example usage.</p>
@@ -1599,7 +1599,7 @@ for a release.  Following is an example usage.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>v0.2.3-preview
 </code></pre></div></p>
-<h2 id="kubestellar-version">Kubestellar-version</h2>
+<h2 id="kubestellar-version">Kubestellar-version<a class="headerlink" href="#kubestellar-version" title="Permanent link">#</a></h2>
 <p>This executable prints information about itself captured at build
 time.  If built by <code>make</code> then this is information conveyed by the
 Makefile; otherwise it is <a href="https://github.com/kubernetes/client-go/blob/master/pkg/version/base.go">the Kubernetes
@@ -1623,7 +1623,7 @@ containing many.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="o">{</span><span class="s2">&quot;major&quot;</span>:<span class="s2">&quot;1&quot;</span>,<span class="s2">&quot;minor&quot;</span>:<span class="s2">&quot;24&quot;</span>,<span class="s2">&quot;gitVersion&quot;</span>:<span class="s2">&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;</span>,<span class="s2">&quot;gitCommit&quot;</span>:<span class="s2">&quot;1747254b&quot;</span>,<span class="s2">&quot;gitTreeState&quot;</span>:<span class="s2">&quot;dirty&quot;</span>,<span class="s2">&quot;buildDate&quot;</span>:<span class="s2">&quot;2023-05-19T02:54:01Z&quot;</span>,<span class="s2">&quot;goVersion&quot;</span>:<span class="s2">&quot;go1.19.9&quot;</span>,<span class="s2">&quot;compiler&quot;</span>:<span class="s2">&quot;gc&quot;</span>,<span class="s2">&quot;platform&quot;</span>:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
 </code></pre></div></p>
-<h2 id="creating-synctargetlocation-pairs">Creating SyncTarget/Location pairs</h2>
+<h2 id="creating-synctargetlocation-pairs">Creating SyncTarget/Location pairs<a class="headerlink" href="#creating-synctargetlocation-pairs" title="Permanent link">#</a></h2>
 <p>In this PoC, the interface between infrastructure and workload
 management is inventory API objects.  Specifically, for each edge
 cluster there is a unique pair of SyncTarget and Location objects in a
@@ -1690,7 +1690,7 @@ This was equivalent to the following commands.</p>
 any) are needed to move from the current state to the desired state.
 Current limitation: it does not cast a skeptical eye on the spec of a
 pre-existing Location.</p>
-<h2 id="removing-synctargetlocation-pairs">Removing SyncTarget/Location pairs</h2>
+<h2 id="removing-synctargetlocation-pairs">Removing SyncTarget/Location pairs<a class="headerlink" href="#removing-synctargetlocation-pairs" title="Permanent link">#</a></h2>
 <p>The following script undoes whatever remains from a corresponding
 usage of <code>kubectl kubestellar ensure location</code>.  It has all the same
 command line syntax and semantics except that the
@@ -1708,7 +1708,7 @@ command line syntax and semantics except that the
 </code></pre></div></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
-<h2 id="syncer-preparation-and-installation">Syncer preparation and installation</h2>
+<h2 id="syncer-preparation-and-installation">Syncer preparation and installation<a class="headerlink" href="#syncer-preparation-and-installation" title="Permanent link">#</a></h2>
 <p>The syncer runs in each edge cluster and also talks to the
 corresponding mailbox workspace.  In order for it to be able to do
 that, there is some work to do in the mailbox workspace to create a
@@ -1777,7 +1777,7 @@ needed to configure <code>kubectl</code> to modify the edge cluster and read you
 chosen output file.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
 </code></pre></div>
-<h2 id="edge-cluster-on-boarding">Edge cluster on-boarding</h2>
+<h2 id="edge-cluster-on-boarding">Edge cluster on-boarding<a class="headerlink" href="#edge-cluster-on-boarding" title="Permanent link">#</a></h2>
 <p>The following command is a combination of <code>kubectl kubestellar
 ensure-location</code> and <code>kubectl kubestellar prep-for-syncer</code>, and takes
 the union of their command line flags and arguments.  Upon completion,
@@ -1811,7 +1811,7 @@ the kcp current workspace will be what it was at the start.</p>
 <a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>
 <a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 </code></pre></div></p>
-<h2 id="creating-a-workload-management-workspace">Creating a Workload Management Workspace</h2>
+<h2 id="creating-a-workload-management-workspace">Creating a Workload Management Workspace<a class="headerlink" href="#creating-a-workload-management-workspace" title="Permanent link">#</a></h2>
 <p>Such a workspace needs not only to be created but also populated with
 an <code>APIBinding</code> to the edge API and, if desired, an <code>APIBinding</code> to
 the Kubernetes API for management of containerized workloads.</p>
@@ -1878,7 +1878,7 @@ is included.</p>
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 <a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kube&quot;</span><span class="w"> </span>deleted<span class="w"> </span>
 </code></pre></div></p>
-<h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace</h2>
+<h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace<a class="headerlink" href="#removing-a-workload-management-workspace" title="Permanent link">#</a></h2>
 <p>Deleting a WMW can be done by simply deleting its <code>Workspace</code> object from
 the parent.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
@@ -1914,8 +1914,8 @@ the parent of the workload management workspace to delete.</p>
 </code></pre></div></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<h1 id="web-to-bash">Web-to-bash</h1>
-<h2 id="quick-setup">Quick Setup</h2>
+<h1 id="web-to-bash">Web-to-bash<a class="headerlink" href="#web-to-bash" title="Permanent link">#</a></h1>
+<h2 id="quick-setup">Quick Setup<a class="headerlink" href="#quick-setup" title="Permanent link">#</a></h2>
 <p>This is a combination of some installation and setup steps, for use in
 <a href="../../../Getting-Started/quickstart/">the
 QuickStart</a>.</p>
@@ -1968,7 +1968,7 @@ the shell running the script.  Of course, if you run the script in a
 sub-shell then those environment effects terminate with that
 sub-shell; this script also prints out messages showing how to update
 the environment in another shell.</p>
-<h2 id="install-kcp-and-its-kubectl-plugins">Install kcp and its kubectl plugins</h2>
+<h2 id="install-kcp-and-its-kubectl-plugins">Install kcp and its kubectl plugins<a class="headerlink" href="#install-kcp-and-its-kubectl-plugins" title="Permanent link">#</a></h2>
 <p>This script is directly available at <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kcp-with-plugins.sh">https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh</a> and does the following things.</p>
 <ul>
 <li>Fetch and install the <code>kcp</code> server executable.</li>
@@ -1996,7 +1996,7 @@ optional.</p>
 <code>$install_parent_dir/bin</code>.  If <code>$install_parent_dir/bin</code> is not
 already on your <code>$PATH</code> then this script will print out a message
 telling you to add it.</p>
-<h2 id="install-kubestellar">Install KubeStellar</h2>
+<h2 id="install-kubestellar">Install KubeStellar<a class="headerlink" href="#install-kubestellar" title="Permanent link">#</a></h2>
 <p>This script is directly available at
 <a href="https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh">https://github.com/kcp-dev/edge-mc/blob/release-0.2/bootstrap/install-kubestellar.sh</a>
 and will download and install KubeStellar.</p>

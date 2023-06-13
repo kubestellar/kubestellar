@@ -1568,8 +1568,8 @@
 </code></pre></div>
 </div>
 <!-- END INCLUDE -->
-<h2 id="steps-to-try-the-scheduler">Steps to try the scheduler</h2>
-<h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp</h3>
+<h2 id="steps-to-try-the-scheduler">Steps to try the scheduler<a class="headerlink" href="#steps-to-try-the-scheduler" title="Permanent link">#</a></h2>
+<h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp<a class="headerlink" href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" title="Permanent link">#</a></h3>
 <p>Open a terminal window(1) and clone the latest KubeStellar source:</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
@@ -1589,7 +1589,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="create-the-edge-service-provider-workspace-espw-and-populate-it-with-crds-and-apis">Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs</h3>
+<h3 id="create-the-edge-service-provider-workspace-espw-and-populate-it-with-crds-and-apis">Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs<a class="headerlink" href="#create-the-edge-service-provider-workspace-espw-and-populate-it-with-crds-and-apis" title="Permanent link">#</a></h3>
 <p>Open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end--&gt;' -->
 
@@ -1615,7 +1615,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div>
 <!-- END INCLUDE -->
 
-<h3 id="create-the-workload-management-workspace-wmw-and-bind-it-to-the-espw-apis">Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs</h3>
+<h3 id="create-the-workload-management-workspace-wmw-and-bind-it-to-the-espw-apis">Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs<a class="headerlink" href="#create-the-workload-management-workspace-wmw-and-bind-it-to-the-espw-apis" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-imports.md '&lt;!--kubestellar-scheduler-imports-start--&gt;' '&lt;!--kubestellar-scheduler-imports-end--&gt;' -->
 
 <p>Use the user home workspace (\~) as the workload management workspace (WMW).
@@ -1626,7 +1626,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
-<h3 id="run-the-kubestellar-scheduler-against-the-espw">Run the KubeStellar Scheduler against the ESPW</h3>
+<h3 id="run-the-kubestellar-scheduler-against-the-espw">Run the KubeStellar Scheduler against the ESPW<a class="headerlink" href="#run-the-kubestellar-scheduler-against-the-espw" title="Permanent link">#</a></h3>
 <p>Go to the <code>root:espw</code> workspace and run the edge scheduler.</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md '&lt;!--kubestellar-scheduler-process-start-start--&gt;' '&lt;!--kubestellar-scheduler-process-start-end--&gt;' -->
 
@@ -1642,7 +1642,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.159242<span class="w">   </span><span class="m">29786</span><span class="w"> </span>scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io&quot;</span>
 <a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>I0605<span class="w"> </span><span class="m">10</span>:53:00.261128<span class="w">   </span><span class="m">29786</span><span class="w"> </span>controller.go:201<span class="o">]</span><span class="w"> </span><span class="s2">&quot;starting controller&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-scheduler&quot;</span>
 </code></pre></div></p>
-<h3 id="create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets">Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets</h3>
+<h3 id="create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets">Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets<a class="headerlink" href="#create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets" title="Permanent link">#</a></h3>
 <p>open another terminal window(3) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">cd</span><span class="w"> </span>../kcp
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
@@ -1670,7 +1670,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>synctarget.workload.kcp.io/dev<span class="w">    </span>110s
 <a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>synctarget.workload.kcp.io/prod<span class="w">   </span>2m12s
 </code></pre></div></p>
-<h3 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW</h3>
+<h3 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW<a class="headerlink" href="#create-some-edgeplacements-in-the-wmw" title="Permanent link">#</a></h3>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>all2all</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_all2all.yaml
@@ -1743,7 +1743,7 @@ EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:com
 </code></pre></div></p>
 <p>Feel free to change the Locations, SyncTargets, and EdgePlacements and see how the scheduler reacts.</p>
 <p>Your next step is to deliver a workload to a mailbox (that represents an edge location).  Go here to take the next step... (TBD)</p>
-<h2 id="teardown-the-environment">Teardown the environment</h2>
+<h2 id="teardown-the-environment">Teardown the environment<a class="headerlink" href="#teardown-the-environment" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
