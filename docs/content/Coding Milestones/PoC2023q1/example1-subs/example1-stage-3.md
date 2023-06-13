@@ -10,7 +10,7 @@ into the mailbox workspaces and create `SyncerConfig` objects there.
 
 Eventually there will be convenient automation running the placement
 translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the edge-mc command that runs the placement translator.
+ESPW and use the KubeStellar command that runs the placement translator.
 
 ```shell
 kubectl ws root:espw
@@ -31,7 +31,7 @@ After it stops logging stuff, wait another minute and then you can ^C
 it or use another shell to continue exploring.
 
 The florin cluster gets only the common workload.  Examine florin's
-`SyncerConfig` as follows.
+`SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
 
 ```shell
 kubectl ws $FLORIN_WS
@@ -135,7 +135,8 @@ commonstuff   commond   0/0     0            0           6m44s
 ```
 
 The guilder cluster gets both the common and special workloads.
-Examine guilder's `SyncerConfig` object and workloads as follows.
+Examine guilder's `SyncerConfig` object and workloads as follows, using
+the name that you stored in Stage 1.
 
 ```shell
 kubectl ws root:espw

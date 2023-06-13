@@ -1,7 +1,7 @@
 <!--example1-stage-1a-start-->
 ### Populate the edge service provider workspace
 
-This puts the definition and export of the edge-mc API in the edge
+This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.
 
 Use the following command.
@@ -13,7 +13,7 @@ kubectl create -f config/exports
 ### The mailbox controller
 
 Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the edge-mc command shown
+Eventually.  In the meantime, you can use the KubeStellar command shown
 here.
 
 ```shell

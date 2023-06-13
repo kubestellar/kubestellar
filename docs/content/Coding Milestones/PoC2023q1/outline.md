@@ -110,7 +110,7 @@ other thing (object or external system).  Another way of looking at
 these particular objects is that they are system infrastructure.
 
 For some kinds of object, lack of denaturing/renaturing means that
-edge-mc will simply not be able to support workloads that contain such
+KubeStellar will simply not be able to support workloads that contain such
 objects.  These are: `MutatingWebhookConfiguration`,
 `ValidatingWebhookConfiguration`, `LimitRange`, `ResourceQuota`.
 
@@ -336,7 +336,7 @@ their workload desired and reported state.
 #### Already denatured in center, want natured in edge
 
 These are kinds of objects that kcp already gives no interpretation
-to, and that is what edge-mc needs from the center workspaces.
+to, and that is what KubeStellar needs from the center workspaces.
 
 This is the default category of kind of object --- any kind of data
 object not specifically listed in another category is implicitly in
@@ -685,7 +685,7 @@ For those familiar with kcp's TMC syncer, note that the edge syncer
 differs in the following ways.
 
 - Create self-sufficient edge clusters.
-- Re-nature objects that edge-mc forcibly denatures at the center.
+- Re-nature objects that KubeStellar forcibly denatures at the center.
 - Return reported state from associated objects.
 - Does not access the SyncTarget object.
 
@@ -746,7 +746,7 @@ workload goes where.  These may be accompanied by API objects that
 specify rule-based customization, specify how status is to be
 summarized.
 
-The edge-mc implementation propagates the desired state from center to
+The KubeStellar implementation propagates the desired state from center to
 edge and collects the specified information from edge to center.
 
 The edge user monitors status summary objects in their workload

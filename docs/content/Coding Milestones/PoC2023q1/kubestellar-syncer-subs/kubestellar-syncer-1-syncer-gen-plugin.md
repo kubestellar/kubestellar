@@ -10,7 +10,7 @@ kubectl ws root
 kubectl ws create ws1 --enter
 ```
 
-Create following apibingin in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
+Create following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
 ```shell
 cat << EOL | kubectl apply -f -
 apiVersion: apis.kcp.io/v1alpha1

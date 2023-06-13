@@ -3,6 +3,7 @@ short_name: mailbox-controller
 manifest_name: 'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'
 pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
+
 [![docs-ecutable - mailbox-controller]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
@@ -18,7 +19,7 @@ pre_req_name: 'docs/content/common-subs/pre-req.md'
 
 For a given SyncTarget T, the mailbox controller currently chooses the
 name of the corresponding workspace to be the concatenation of the
-following.
+following:
 
 - the ID of the logical cluster containing T
 - the string "-mb-"
@@ -70,11 +71,10 @@ The command line flags, beyond the basics, are as follows.
       --workload-user string             The name of the kubeconfig user to use for access to edge service provider workspace
 ```
 
-## Try It
-### Steps to try the mailbox controller
+## Try out the mailbox controller
 
-#### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
-open a terminal window(1) and clone the latest KubeStellar source:
+### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+Open a terminal window(1) and clone the latest KubeStellar source:
 
 {%
    include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
@@ -82,8 +82,8 @@ open a terminal window(1) and clone the latest KubeStellar source:
    end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
 %}
 
-#### Create the Edge Service Provider Workspace (ESPW)
-open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
+### Create the Edge Service Provider Workspace (ESPW)
+Open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
 
 {%
    include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"

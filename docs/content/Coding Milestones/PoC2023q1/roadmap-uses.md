@@ -78,13 +78,13 @@ kind/resource is defined by those APIBindings.
 The C2P Controller uses the API proposed in [PR
 240]({{ config.repo_url }}/pull/240) to read the report
 objects from the mailbox workspaces.  This has the downside of
-exposing the mailbox workspaces as part of the edge-mc interface ---
+exposing the mailbox workspaces as part of the KubeStellar interface ---
 which they were NOT originally intended to be.
 
-#### C2P Controller consumes report summaries prepared by edge-mc
+#### C2P Controller consumes report summaries prepared by KubeStellar
 
 In this scenario:
-- we have defined and implemented summarization in edge-mc;
+- we have defined and implemented summarization in KubeStellar;
 - that summarization is adequate for the needs of the C2P Controller;
 - that controller consumes summaries rather than the reports themselves.
 

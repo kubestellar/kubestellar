@@ -304,7 +304,7 @@ following resolutions of the "where" predicates.
 
 Eventually there will be automation that conveniently runs the
 scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the edge-mc command that runs the scheduler.
+ESPW and invoke the KubeStellar command that runs the scheduler.
 
 ```shell
 kubectl ws root:espw

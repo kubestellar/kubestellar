@@ -111,7 +111,7 @@ We have a few shortcut urls that come in handy when referring others to our proj
 
 - [https://kubestellar.io/agenda](https://kubestellar.io/agenda) - our community meeting agenda google doc
 - [https://kubestellar.io/blog](https://kubestellar.io/blog) - our medium reading list
-- [https://kubestellar.io/code](https://kubestellar.io/code) - our current GH repo (wherever that is)
+- [https://kubestellar.io/code](https://kubestellar.io/code) - our current GitHub repo (wherever that is)
 - [https://kubestellar.io/community](https://kubestellar.io/community) - our stable docs community page
 - [https://kubestellar.io/drive](https://kubestellar.io/drive) - our google drive
 - [https://kubestellar.io/joinus](https://kubestellar.io/joinus) - our dev mailing list where you join and get our invites
@@ -233,8 +233,8 @@ How do we ensure that our documented examples work?  Simple, we 'execute' our do
     - use plain codeblock (```) if you want to show sample output that is not to be tested
 - you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.
 
-#### The GH Workflow:
-- One example of the GH Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-qs.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-qs.yml)
+#### The GitHub Workflow:
+- One example of the GitHub Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml)
 
 #### The secret sauce:
 - The code that makes all this possible is at <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh">{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh</a>
