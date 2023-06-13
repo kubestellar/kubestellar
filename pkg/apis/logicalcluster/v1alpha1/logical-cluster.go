@@ -24,7 +24,7 @@ import (
 //
 // +crd
 // +genclient
-// +kubebuilder:resource:scope=Cluster,shortName=ecl
+// +kubebuilder:resource:scope=Namespaced,shortName=ecl
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type LogicalCluster struct {
 	metav1.TypeMeta `json:",inline"`
