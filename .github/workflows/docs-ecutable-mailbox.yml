@@ -99,7 +99,7 @@ jobs:
       #     echo ${{ env.MD_CONTENT }}
 
       - run: |
-          cat <<EOF > ${{ env.docs-ecutable-filename }}.dmd
+          cat <<EOF > elapsed-time/${{ env.docs-ecutable-filename }}.dmd
           ${{ env.MD_CONTENT }}
           EOF
           echo "cat ${{ env.docs-ecutable-filename }}.dmd"
