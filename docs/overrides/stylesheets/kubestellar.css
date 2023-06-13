@@ -164,37 +164,3 @@ dl.crd-meta {
     }
 
 }
-
-/* .iframe_container {
-    position: relative;
-}
-.iframe_container .spinner {
-    position: absolute;
-    top: 25%;
-    left: 35%;
-}
-.iframe_container iframe {
-    background: transparent;
-    z-index: 1;
-} */
-
-.spinner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-
-  .spinner::before {
-    content: "";
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 3px solid #ccc;
-    border-top-color: #333;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
