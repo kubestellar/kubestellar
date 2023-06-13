@@ -7,7 +7,7 @@ import (
 
 	clusterprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
 	kindprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/kind"
-	v1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
 var ProviderList map[string]ProviderClient

@@ -27,7 +27,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	scheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
 )
 
@@ -57,7 +57,7 @@ type clusterProviderDescs struct {
 }
 
 // newClusterProviderDescs returns a ClusterProviderDescs
-func newClusterProviderDescs(c *EdgeV1alpha1Client) *clusterProviderDescs {
+func newClusterProviderDescs(c *LogicalclusterV1alpha1Client) *clusterProviderDescs {
 	return &clusterProviderDescs{
 		client: c.RESTClient(),
 	}

@@ -21,11 +21,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge"
+	lcapi "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster"
 )
 
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: edgeapi.GroupName, Version: "v1alpha1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: lcapi.GroupName, Version: "v1alpha1"}
 
 // Kind takes an unqualified kind and returns back a Group qualified GroupKind
 func Kind(kind string) schema.GroupKind {
@@ -45,16 +45,8 @@ var (
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&EdgePlacement{},
-		&EdgePlacementList{},
-		&SinglePlacementSlice{},
-		&SinglePlacementSliceList{},
-		&Customizer{},
-		&CustomizerList{},
-		&SyncerConfig{},
-		&SyncerConfigList{},
-		&EdgeSyncConfig{},
-		&EdgeSyncConfigList{},
+		&ClusterProviderDesc{},
+		&LogicalCluster{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

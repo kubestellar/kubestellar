@@ -23,48 +23,33 @@ import (
 
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	"github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
 )
 
-type EdgeV1alpha1Interface interface {
+type LogicalclusterV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	CustomizersGetter
-	EdgePlacementsGetter
-	EdgeSyncConfigsGetter
-	SinglePlacementSlicesGetter
-	SyncerConfigsGetter
+	ClusterProviderDescsGetter
+	LogicalClustersGetter
 }
 
-// EdgeV1alpha1Client is used to interact with features provided by the edge.kcp.io group.
-type EdgeV1alpha1Client struct {
+// LogicalclusterV1alpha1Client is used to interact with features provided by the logicalcluster.kubestellar.io group.
+type LogicalclusterV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *EdgeV1alpha1Client) Customizers(namespace string) CustomizerInterface {
-	return newCustomizers(c, namespace)
+func (c *LogicalclusterV1alpha1Client) ClusterProviderDescs() ClusterProviderDescInterface {
+	return newClusterProviderDescs(c)
 }
 
-func (c *EdgeV1alpha1Client) EdgePlacements() EdgePlacementInterface {
-	return newEdgePlacements(c)
+func (c *LogicalclusterV1alpha1Client) LogicalClusters() LogicalClusterInterface {
+	return newLogicalClusters(c)
 }
 
-func (c *EdgeV1alpha1Client) EdgeSyncConfigs() EdgeSyncConfigInterface {
-	return newEdgeSyncConfigs(c)
-}
-
-func (c *EdgeV1alpha1Client) SinglePlacementSlices() SinglePlacementSliceInterface {
-	return newSinglePlacementSlices(c)
-}
-
-func (c *EdgeV1alpha1Client) SyncerConfigs() SyncerConfigInterface {
-	return newSyncerConfigs(c)
-}
-
-// NewForConfig creates a new EdgeV1alpha1Client for the given config.
+// NewForConfig creates a new LogicalclusterV1alpha1Client for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*EdgeV1alpha1Client, error) {
+func NewForConfig(c *rest.Config) (*LogicalclusterV1alpha1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -76,9 +61,9 @@ func NewForConfig(c *rest.Config) (*EdgeV1alpha1Client, error) {
 	return NewForConfigAndClient(&config, httpClient)
 }
 
-// NewForConfigAndClient creates a new EdgeV1alpha1Client for the given config and http client.
+// NewForConfigAndClient creates a new LogicalclusterV1alpha1Client for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*EdgeV1alpha1Client, error) {
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*LogicalclusterV1alpha1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -87,12 +72,12 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*EdgeV1alpha1Client,
 	if err != nil {
 		return nil, err
 	}
-	return &EdgeV1alpha1Client{client}, nil
+	return &LogicalclusterV1alpha1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new EdgeV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new LogicalclusterV1alpha1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *EdgeV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *LogicalclusterV1alpha1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -100,9 +85,9 @@ func NewForConfigOrDie(c *rest.Config) *EdgeV1alpha1Client {
 	return client
 }
 
-// New creates a new EdgeV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *EdgeV1alpha1Client {
-	return &EdgeV1alpha1Client{c}
+// New creates a new LogicalclusterV1alpha1Client for the given RESTClient.
+func New(c rest.Interface) *LogicalclusterV1alpha1Client {
+	return &LogicalclusterV1alpha1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -120,7 +105,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *EdgeV1alpha1Client) RESTClient() rest.Interface {
+func (c *LogicalclusterV1alpha1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

@@ -51,7 +51,7 @@ func main() {
 	}
 
 	clusterInformerFactory := edgeinformers.NewSharedScopedInformerFactory(clusterClientset, resyncPeriod, metav1.NamespaceAll)
-	clusterInformer := clusterInformerFactory.Edge().V1alpha1().LogicalClusters()
+	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters()
 
 	doneCh := ctx.Done()
 	clusterController := clustermanager.NewController(

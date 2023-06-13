@@ -34,11 +34,11 @@ import (
 	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	logicalclusterv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/logicalcluster/v1alpha1"
 )
 
 // LogicalClusterClusterInformer provides access to a shared informer and lister for
@@ -46,7 +46,7 @@ import (
 type LogicalClusterClusterInformer interface {
 	Cluster(logicalcluster.Name) LogicalClusterInformer
 	Informer() kcpcache.ScopeableSharedIndexInformer
-	Lister() edgev1alpha1listers.LogicalClusterClusterLister
+	Lister() logicalclusterv1alpha1listers.LogicalClusterClusterLister
 }
 
 type logicalClusterClusterInformer struct {
@@ -71,16 +71,16 @@ func NewFilteredLogicalClusterClusterInformer(client clientset.ClusterInterface,
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().LogicalClusters().List(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().LogicalClusters().Watch(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters().Watch(context.TODO(), options)
 			},
 		},
-		&edgev1alpha1.LogicalCluster{},
+		&logicalclusterv1alpha1.LogicalCluster{},
 		resyncPeriod,
 		indexers,
 	)
@@ -95,18 +95,18 @@ func (f *logicalClusterClusterInformer) defaultInformer(client clientset.Cluster
 }
 
 func (f *logicalClusterClusterInformer) Informer() kcpcache.ScopeableSharedIndexInformer {
-	return f.factory.InformerFor(&edgev1alpha1.LogicalCluster{}, f.defaultInformer)
+	return f.factory.InformerFor(&logicalclusterv1alpha1.LogicalCluster{}, f.defaultInformer)
 }
 
-func (f *logicalClusterClusterInformer) Lister() edgev1alpha1listers.LogicalClusterClusterLister {
-	return edgev1alpha1listers.NewLogicalClusterClusterLister(f.Informer().GetIndexer())
+func (f *logicalClusterClusterInformer) Lister() logicalclusterv1alpha1listers.LogicalClusterClusterLister {
+	return logicalclusterv1alpha1listers.NewLogicalClusterClusterLister(f.Informer().GetIndexer())
 }
 
 // LogicalClusterInformer provides access to a shared informer and lister for
 // LogicalClusters.
 type LogicalClusterInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() edgev1alpha1listers.LogicalClusterLister
+	Lister() logicalclusterv1alpha1listers.LogicalClusterLister
 }
 
 func (f *logicalClusterClusterInformer) Cluster(clusterName logicalcluster.Name) LogicalClusterInformer {
@@ -118,14 +118,14 @@ func (f *logicalClusterClusterInformer) Cluster(clusterName logicalcluster.Name)
 
 type logicalClusterInformer struct {
 	informer cache.SharedIndexInformer
-	lister   edgev1alpha1listers.LogicalClusterLister
+	lister   logicalclusterv1alpha1listers.LogicalClusterLister
 }
 
 func (f *logicalClusterInformer) Informer() cache.SharedIndexInformer {
 	return f.informer
 }
 
-func (f *logicalClusterInformer) Lister() edgev1alpha1listers.LogicalClusterLister {
+func (f *logicalClusterInformer) Lister() logicalclusterv1alpha1listers.LogicalClusterLister {
 	return f.lister
 }
 
@@ -135,11 +135,11 @@ type logicalClusterScopedInformer struct {
 }
 
 func (f *logicalClusterScopedInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&edgev1alpha1.LogicalCluster{}, f.defaultInformer)
+	return f.factory.InformerFor(&logicalclusterv1alpha1.LogicalCluster{}, f.defaultInformer)
 }
 
-func (f *logicalClusterScopedInformer) Lister() edgev1alpha1listers.LogicalClusterLister {
-	return edgev1alpha1listers.NewLogicalClusterLister(f.Informer().GetIndexer())
+func (f *logicalClusterScopedInformer) Lister() logicalclusterv1alpha1listers.LogicalClusterLister {
+	return logicalclusterv1alpha1listers.NewLogicalClusterLister(f.Informer().GetIndexer())
 }
 
 // NewLogicalClusterInformer constructs a new informer for LogicalCluster type.
@@ -159,16 +159,16 @@ func NewFilteredLogicalClusterInformer(client scopedclientset.Interface, resyncP
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().LogicalClusters().List(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.EdgeV1alpha1().LogicalClusters().Watch(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters().Watch(context.TODO(), options)
 			},
 		},
-		&edgev1alpha1.LogicalCluster{},
+		&logicalclusterv1alpha1.LogicalCluster{},
 		resyncPeriod,
 		indexers,
 	)

@@ -5,11 +5,9 @@ metadata:
   name: edge.kcp.io
 spec:
   latestResourceSchemas:
-  - v230227-655d6c9.customizers.edge.kcp.io
-  - v230303-6f7f2fe.singleplacementslices.edge.kcp.io
-  - v230317-d43d2d5.edgeplacements.edge.kcp.io
-  - v230407-c87b2365.syncerconfigs.edge.kcp.io
-  - v230413-5a4d4ba.edgesyncconfigs.edge.kcp.io
-  - v230607-02e13145.clusterproviderdescs.edge.kcp.io
-  - v230613-76054123.logicalclusters.edge.kcp.io
+  - v230613-af8b13d0.customizers.edge.kcp.io
+  - v230613-af8b13d0.edgeplacements.edge.kcp.io
+  - v230613-af8b13d0.edgesyncconfigs.edge.kcp.io
+  - v230613-af8b13d0.singleplacementslices.edge.kcp.io
+  - v230613-af8b13d0.syncerconfigs.edge.kcp.io
 status: {}

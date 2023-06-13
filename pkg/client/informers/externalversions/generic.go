@@ -31,6 +31,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
 )
 
@@ -88,20 +89,21 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericClusterInformer, error) {
 	switch resource {
 	// Group=edge.kcp.io, Version=V1alpha1
-	case edgev1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().ClusterProviderDescs().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("customizers"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Customizers().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("edgeplacements"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().EdgePlacements().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("edgesyncconfigs"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().EdgeSyncConfigs().Informer()}, nil
-	case edgev1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().LogicalClusters().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("singleplacementslices"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SinglePlacementSlices().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("syncerconfigs"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncerConfigs().Informer()}, nil
+	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
+	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()}, nil
+	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Logicalcluster().V1alpha1().LogicalClusters().Informer()}, nil
 	// Group=meta.kcp.io, Version=V1alpha1
 	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Meta().V1alpha1().APIResources().Informer()}, nil
@@ -115,9 +117,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=edge.kcp.io, Version=V1alpha1
-	case edgev1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
-		informer := f.Edge().V1alpha1().ClusterProviderDescs().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("customizers"):
 		informer := f.Edge().V1alpha1().Customizers().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
@@ -127,14 +126,18 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 	case edgev1alpha1.SchemeGroupVersion.WithResource("edgesyncconfigs"):
 		informer := f.Edge().V1alpha1().EdgeSyncConfigs().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	case edgev1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
-		informer := f.Edge().V1alpha1().LogicalClusters().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("singleplacementslices"):
 		informer := f.Edge().V1alpha1().SinglePlacementSlices().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("syncerconfigs"):
 		informer := f.Edge().V1alpha1().SyncerConfigs().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
+	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
+		informer := f.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
+		informer := f.Logicalcluster().V1alpha1().LogicalClusters().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	// Group=meta.kcp.io, Version=V1alpha1
 	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):

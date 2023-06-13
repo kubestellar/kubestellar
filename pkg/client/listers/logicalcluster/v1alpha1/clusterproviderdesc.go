@@ -29,7 +29,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // ClusterProviderDescClusterLister can list ClusterProviderDescs across all workspaces, or scope down to a ClusterProviderDescLister for one workspace.
@@ -37,7 +37,7 @@ import (
 type ClusterProviderDescClusterLister interface {
 	// List lists all ClusterProviderDescs in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*edgev1alpha1.ClusterProviderDesc, err error)
+	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.ClusterProviderDesc, err error)
 	// Cluster returns a lister that can list and get ClusterProviderDescs in one workspace.
 	Cluster(clusterName logicalcluster.Name) ClusterProviderDescLister
 	ClusterProviderDescClusterListerExpansion
@@ -57,9 +57,9 @@ func NewClusterProviderDescClusterLister(indexer cache.Indexer) *clusterProvider
 }
 
 // List lists all ClusterProviderDescs in the indexer across all workspaces.
-func (s *clusterProviderDescClusterLister) List(selector labels.Selector) (ret []*edgev1alpha1.ClusterProviderDesc, err error) {
+func (s *clusterProviderDescClusterLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.ClusterProviderDesc, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*edgev1alpha1.ClusterProviderDesc))
+		ret = append(ret, m.(*logicalclusterv1alpha1.ClusterProviderDesc))
 	})
 	return ret, err
 }
@@ -74,10 +74,10 @@ func (s *clusterProviderDescClusterLister) Cluster(clusterName logicalcluster.Na
 type ClusterProviderDescLister interface {
 	// List lists all ClusterProviderDescs in the workspace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*edgev1alpha1.ClusterProviderDesc, err error)
+	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.ClusterProviderDesc, err error)
 	// Get retrieves the ClusterProviderDesc from the indexer for a given workspace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*edgev1alpha1.ClusterProviderDesc, error)
+	Get(name string) (*logicalclusterv1alpha1.ClusterProviderDesc, error)
 	ClusterProviderDescListerExpansion
 }
 
@@ -88,24 +88,24 @@ type clusterProviderDescLister struct {
 }
 
 // List lists all ClusterProviderDescs in the indexer for a workspace.
-func (s *clusterProviderDescLister) List(selector labels.Selector) (ret []*edgev1alpha1.ClusterProviderDesc, err error) {
+func (s *clusterProviderDescLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.ClusterProviderDesc, err error) {
 	err = kcpcache.ListAllByCluster(s.indexer, s.clusterName, selector, func(i interface{}) {
-		ret = append(ret, i.(*edgev1alpha1.ClusterProviderDesc))
+		ret = append(ret, i.(*logicalclusterv1alpha1.ClusterProviderDesc))
 	})
 	return ret, err
 }
 
 // Get retrieves the ClusterProviderDesc from the indexer for a given workspace and name.
-func (s *clusterProviderDescLister) Get(name string) (*edgev1alpha1.ClusterProviderDesc, error) {
+func (s *clusterProviderDescLister) Get(name string) (*logicalclusterv1alpha1.ClusterProviderDesc, error) {
 	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), "", name)
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("ClusterProviderDesc"), name)
+		return nil, errors.NewNotFound(logicalclusterv1alpha1.Resource("ClusterProviderDesc"), name)
 	}
-	return obj.(*edgev1alpha1.ClusterProviderDesc), nil
+	return obj.(*logicalclusterv1alpha1.ClusterProviderDesc), nil
 }
 
 // NewClusterProviderDescLister returns a new ClusterProviderDescLister.
@@ -122,22 +122,22 @@ type clusterProviderDescScopedLister struct {
 }
 
 // List lists all ClusterProviderDescs in the indexer for a workspace.
-func (s *clusterProviderDescScopedLister) List(selector labels.Selector) (ret []*edgev1alpha1.ClusterProviderDesc, err error) {
+func (s *clusterProviderDescScopedLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.ClusterProviderDesc, err error) {
 	err = cache.ListAll(s.indexer, selector, func(i interface{}) {
-		ret = append(ret, i.(*edgev1alpha1.ClusterProviderDesc))
+		ret = append(ret, i.(*logicalclusterv1alpha1.ClusterProviderDesc))
 	})
 	return ret, err
 }
 
 // Get retrieves the ClusterProviderDesc from the indexer for a given workspace and name.
-func (s *clusterProviderDescScopedLister) Get(name string) (*edgev1alpha1.ClusterProviderDesc, error) {
+func (s *clusterProviderDescScopedLister) Get(name string) (*logicalclusterv1alpha1.ClusterProviderDesc, error) {
 	key := name
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("ClusterProviderDesc"), name)
+		return nil, errors.NewNotFound(logicalclusterv1alpha1.Resource("ClusterProviderDesc"), name)
 	}
-	return obj.(*edgev1alpha1.ClusterProviderDesc), nil
+	return obj.(*logicalclusterv1alpha1.ClusterProviderDesc), nil
 }

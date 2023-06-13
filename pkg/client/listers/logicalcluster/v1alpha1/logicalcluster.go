@@ -29,7 +29,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // LogicalClusterClusterLister can list LogicalClusters across all workspaces, or scope down to a LogicalClusterLister for one workspace.
@@ -37,7 +37,7 @@ import (
 type LogicalClusterClusterLister interface {
 	// List lists all LogicalClusters in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*edgev1alpha1.LogicalCluster, err error)
+	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error)
 	// Cluster returns a lister that can list and get LogicalClusters in one workspace.
 	Cluster(clusterName logicalcluster.Name) LogicalClusterLister
 	LogicalClusterClusterListerExpansion
@@ -57,9 +57,9 @@ func NewLogicalClusterClusterLister(indexer cache.Indexer) *logicalClusterCluste
 }
 
 // List lists all LogicalClusters in the indexer across all workspaces.
-func (s *logicalClusterClusterLister) List(selector labels.Selector) (ret []*edgev1alpha1.LogicalCluster, err error) {
+func (s *logicalClusterClusterLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*edgev1alpha1.LogicalCluster))
+		ret = append(ret, m.(*logicalclusterv1alpha1.LogicalCluster))
 	})
 	return ret, err
 }
@@ -74,10 +74,10 @@ func (s *logicalClusterClusterLister) Cluster(clusterName logicalcluster.Name) L
 type LogicalClusterLister interface {
 	// List lists all LogicalClusters in the workspace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*edgev1alpha1.LogicalCluster, err error)
+	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error)
 	// Get retrieves the LogicalCluster from the indexer for a given workspace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*edgev1alpha1.LogicalCluster, error)
+	Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error)
 	LogicalClusterListerExpansion
 }
 
@@ -88,24 +88,24 @@ type logicalClusterLister struct {
 }
 
 // List lists all LogicalClusters in the indexer for a workspace.
-func (s *logicalClusterLister) List(selector labels.Selector) (ret []*edgev1alpha1.LogicalCluster, err error) {
+func (s *logicalClusterLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error) {
 	err = kcpcache.ListAllByCluster(s.indexer, s.clusterName, selector, func(i interface{}) {
-		ret = append(ret, i.(*edgev1alpha1.LogicalCluster))
+		ret = append(ret, i.(*logicalclusterv1alpha1.LogicalCluster))
 	})
 	return ret, err
 }
 
 // Get retrieves the LogicalCluster from the indexer for a given workspace and name.
-func (s *logicalClusterLister) Get(name string) (*edgev1alpha1.LogicalCluster, error) {
+func (s *logicalClusterLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
 	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), "", name)
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("LogicalCluster"), name)
+		return nil, errors.NewNotFound(logicalclusterv1alpha1.Resource("LogicalCluster"), name)
 	}
-	return obj.(*edgev1alpha1.LogicalCluster), nil
+	return obj.(*logicalclusterv1alpha1.LogicalCluster), nil
 }
 
 // NewLogicalClusterLister returns a new LogicalClusterLister.
@@ -122,22 +122,22 @@ type logicalClusterScopedLister struct {
 }
 
 // List lists all LogicalClusters in the indexer for a workspace.
-func (s *logicalClusterScopedLister) List(selector labels.Selector) (ret []*edgev1alpha1.LogicalCluster, err error) {
+func (s *logicalClusterScopedLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error) {
 	err = cache.ListAll(s.indexer, selector, func(i interface{}) {
-		ret = append(ret, i.(*edgev1alpha1.LogicalCluster))
+		ret = append(ret, i.(*logicalclusterv1alpha1.LogicalCluster))
 	})
 	return ret, err
 }
 
 // Get retrieves the LogicalCluster from the indexer for a given workspace and name.
-func (s *logicalClusterScopedLister) Get(name string) (*edgev1alpha1.LogicalCluster, error) {
+func (s *logicalClusterScopedLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
 	key := name
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("LogicalCluster"), name)
+		return nil, errors.NewNotFound(logicalclusterv1alpha1.Resource("LogicalCluster"), name)
 	}
-	return obj.(*edgev1alpha1.LogicalCluster), nil
+	return obj.(*logicalclusterv1alpha1.LogicalCluster), nil
 }

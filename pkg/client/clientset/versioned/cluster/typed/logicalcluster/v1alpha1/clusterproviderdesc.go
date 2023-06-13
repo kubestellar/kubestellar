@@ -30,8 +30,8 @@ import (
 	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
 // ClusterProviderDescsClusterGetter has a method to return a ClusterProviderDescClusterInterface.
@@ -41,19 +41,19 @@ type ClusterProviderDescsClusterGetter interface {
 }
 
 // ClusterProviderDescClusterInterface can operate on ClusterProviderDescs across all clusters,
-// or scope down to one cluster and return a edgev1alpha1client.ClusterProviderDescInterface.
+// or scope down to one cluster and return a logicalclusterv1alpha1client.ClusterProviderDescInterface.
 type ClusterProviderDescClusterInterface interface {
-	Cluster(logicalcluster.Path) edgev1alpha1client.ClusterProviderDescInterface
-	List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.ClusterProviderDescList, error)
+	Cluster(logicalcluster.Path) logicalclusterv1alpha1client.ClusterProviderDescInterface
+	List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.ClusterProviderDescList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 }
 
 type clusterProviderDescsClusterInterface struct {
-	clientCache kcpclient.Cache[*edgev1alpha1client.EdgeV1alpha1Client]
+	clientCache kcpclient.Cache[*logicalclusterv1alpha1client.LogicalclusterV1alpha1Client]
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *clusterProviderDescsClusterInterface) Cluster(clusterPath logicalcluster.Path) edgev1alpha1client.ClusterProviderDescInterface {
+func (c *clusterProviderDescsClusterInterface) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1client.ClusterProviderDescInterface {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
@@ -62,7 +62,7 @@ func (c *clusterProviderDescsClusterInterface) Cluster(clusterPath logicalcluste
 }
 
 // List returns the entire collection of all ClusterProviderDescs across all clusters.
-func (c *clusterProviderDescsClusterInterface) List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.ClusterProviderDescList, error) {
+func (c *clusterProviderDescsClusterInterface) List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.ClusterProviderDescList, error) {
 	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).ClusterProviderDescs().List(ctx, opts)
 }
 

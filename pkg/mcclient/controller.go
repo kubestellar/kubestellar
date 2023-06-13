@@ -31,7 +31,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
 )
 
@@ -65,8 +65,8 @@ func newController(
 	logicalClusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueue,
 		UpdateFunc: func(oldObj, newObj interface{}) {
-			oldInfo := oldObj.(*v1alpha1.LogicalCluster)
-			newInfo := newObj.(*v1alpha1.LogicalCluster)
+			oldInfo := oldObj.(*lcv1alpha1.LogicalCluster)
+			newInfo := newObj.(*lcv1alpha1.LogicalCluster)
 			if !reflect.DeepEqual(oldInfo.Status, newInfo.Status) {
 				c.enqueue(newObj)
 			}
@@ -141,14 +141,14 @@ func (c *controller) process(key string) error {
 }
 
 func (c *controller) handleAdd(cluster interface{}) {
-	clusterInfo, ok := cluster.(*v1alpha1.LogicalCluster)
+	clusterInfo, ok := cluster.(*lcv1alpha1.LogicalCluster)
 	if !ok {
 		runtime.HandleError(errors.New("unexpected object type. expected LogicalCluster"))
 		return
 	}
 	// Only clusters in ready state are cached.
 	// We will get another event when the cluster is Ready and then we cache it.
-	if clusterInfo.Status.Phase != v1alpha1.LogicalClusterPhaseReady {
+	if clusterInfo.Status.Phase != lcv1alpha1.LogicalClusterPhaseReady {
 		c.handleDelete(clusterInfo.Name)
 		return
 	}

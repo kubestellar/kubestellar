@@ -26,16 +26,12 @@ import (
 )
 
 type ClusterInterface interface {
-	// ClusterProviderDescs returns a ClusterProviderDescClusterInformer
-	ClusterProviderDescs() ClusterProviderDescClusterInformer
 	// Customizers returns a CustomizerClusterInformer
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
 	EdgePlacements() EdgePlacementClusterInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
 	EdgeSyncConfigs() EdgeSyncConfigClusterInformer
-	// LogicalClusters returns a LogicalClusterClusterInformer
-	LogicalClusters() LogicalClusterClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 	SinglePlacementSlices() SinglePlacementSliceClusterInformer
 	// SyncerConfigs returns a SyncerConfigClusterInformer
@@ -50,11 +46,6 @@ type version struct {
 // New returns a new ClusterInterface.
 func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalinterfaces.TweakListOptionsFunc) ClusterInterface {
 	return &version{factory: f, tweakListOptions: tweakListOptions}
-}
-
-// ClusterProviderDescs returns a ClusterProviderDescClusterInformer
-func (v *version) ClusterProviderDescs() ClusterProviderDescClusterInformer {
-	return &clusterProviderDescClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // Customizers returns a CustomizerClusterInformer
@@ -72,11 +63,6 @@ func (v *version) EdgeSyncConfigs() EdgeSyncConfigClusterInformer {
 	return &edgeSyncConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// LogicalClusters returns a LogicalClusterClusterInformer
-func (v *version) LogicalClusters() LogicalClusterClusterInformer {
-	return &logicalClusterClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
 func (v *version) SinglePlacementSlices() SinglePlacementSliceClusterInformer {
 	return &singlePlacementSliceClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
@@ -88,16 +74,12 @@ func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
 }
 
 type Interface interface {
-	// ClusterProviderDescs returns a ClusterProviderDescInformer
-	ClusterProviderDescs() ClusterProviderDescInformer
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
 	EdgePlacements() EdgePlacementInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigInformer
 	EdgeSyncConfigs() EdgeSyncConfigInformer
-	// LogicalClusters returns a LogicalClusterInformer
-	LogicalClusters() LogicalClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceInformer
 	SinglePlacementSlices() SinglePlacementSliceInformer
 	// SyncerConfigs returns a SyncerConfigInformer
@@ -115,11 +97,6 @@ func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace strin
 	return &scopedVersion{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ClusterProviderDescs returns a ClusterProviderDescInformer
-func (v *scopedVersion) ClusterProviderDescs() ClusterProviderDescInformer {
-	return &clusterProviderDescScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
 // Customizers returns a CustomizerInformer
 func (v *scopedVersion) Customizers() CustomizerInformer {
 	return &customizerScopedInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -133,11 +110,6 @@ func (v *scopedVersion) EdgePlacements() EdgePlacementInformer {
 // EdgeSyncConfigs returns a EdgeSyncConfigInformer
 func (v *scopedVersion) EdgeSyncConfigs() EdgeSyncConfigInformer {
 	return &edgeSyncConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
-// LogicalClusters returns a LogicalClusterInformer
-func (v *scopedVersion) LogicalClusters() LogicalClusterInformer {
-	return &logicalClusterScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // SinglePlacementSlices returns a SinglePlacementSliceInformer

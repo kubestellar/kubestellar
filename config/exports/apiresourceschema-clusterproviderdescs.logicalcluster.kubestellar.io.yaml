@@ -2,9 +2,9 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230607-02e13145.clusterproviderdescs.edge.kcp.io
+  name: v230613-af8b13d0.clusterproviderdescs.logicalcluster.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: logicalcluster.kubestellar.io
   names:
     kind: ClusterProviderDesc
     listKind: ClusterProviderDescList

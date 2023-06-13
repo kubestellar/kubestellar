@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230317-d43d2d5.edgeplacements.edge.kcp.io
+  name: v230613-af8b13d0.edgeplacements.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:

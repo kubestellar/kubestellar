@@ -30,8 +30,8 @@ import (
 	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgev1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
 // LogicalClustersClusterGetter has a method to return a LogicalClusterClusterInterface.
@@ -41,19 +41,19 @@ type LogicalClustersClusterGetter interface {
 }
 
 // LogicalClusterClusterInterface can operate on LogicalClusters across all clusters,
-// or scope down to one cluster and return a edgev1alpha1client.LogicalClusterInterface.
+// or scope down to one cluster and return a logicalclusterv1alpha1client.LogicalClusterInterface.
 type LogicalClusterClusterInterface interface {
-	Cluster(logicalcluster.Path) edgev1alpha1client.LogicalClusterInterface
-	List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.LogicalClusterList, error)
+	Cluster(logicalcluster.Path) logicalclusterv1alpha1client.LogicalClusterInterface
+	List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 }
 
 type logicalClustersClusterInterface struct {
-	clientCache kcpclient.Cache[*edgev1alpha1client.EdgeV1alpha1Client]
+	clientCache kcpclient.Cache[*logicalclusterv1alpha1client.LogicalclusterV1alpha1Client]
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *logicalClustersClusterInterface) Cluster(clusterPath logicalcluster.Path) edgev1alpha1client.LogicalClusterInterface {
+func (c *logicalClustersClusterInterface) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1client.LogicalClusterInterface {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
@@ -62,7 +62,7 @@ func (c *logicalClustersClusterInterface) Cluster(clusterPath logicalcluster.Pat
 }
 
 // List returns the entire collection of all LogicalClusters across all clusters.
-func (c *logicalClustersClusterInterface) List(ctx context.Context, opts metav1.ListOptions) (*edgev1alpha1.LogicalClusterList, error) {
+func (c *logicalClustersClusterInterface) List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error) {
 	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).LogicalClusters().List(ctx, opts)
 }
 

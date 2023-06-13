@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	ksinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
@@ -108,7 +108,7 @@ func (mcc *multiClusterClient) startClusterCollection(ctx context.Context, manag
 	resyncPeriod := time.Duration(0)
 
 	clusterInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, resyncPeriod, metav1.NamespaceAll)
-	clusterInformer := clusterInformerFactory.Edge().V1alpha1().LogicalClusters().Informer()
+	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters().Informer()
 
 	clusterInformerFactory.Start(ctx.Done())
 	cache.WaitForNamedCacheSync("logicalclusters-management", ctx.Done(), clusterInformer.HasSynced)
@@ -120,12 +120,12 @@ func (mcc *multiClusterClient) startClusterCollection(ctx context.Context, manag
 // getFromServer will query API server for specific LogicalCluster and cache it if it exists and ready.
 // getFromServer caller function should acquire the mcc lock.
 func (mcc *multiClusterClient) getFromServer(name string) (*mcclientset.Clientset, error) {
-	cluster, err := mcc.managerClientset.EdgeV1alpha1().LogicalClusters().Get(mcc.ctx, name, metav1.GetOptions{})
+	cluster, err := mcc.managerClientset.LogicalclusterV1alpha1().LogicalClusters().Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	if cluster.Status.Phase != v1alpha1.LogicalClusterPhaseReady {
+	if cluster.Status.Phase != lcv1alpha1.LogicalClusterPhaseReady {
 		return nil, errors.New("cluster is not ready")
 	}
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(cluster.Status.ClusterConfig))

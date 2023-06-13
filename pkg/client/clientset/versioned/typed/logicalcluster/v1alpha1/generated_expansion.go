@@ -18,12 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-type CustomizerExpansion interface{}
+type ClusterProviderDescExpansion interface{}
 
-type EdgePlacementExpansion interface{}
-
-type EdgeSyncConfigExpansion interface{}
-
-type SinglePlacementSliceExpansion interface{}
-
-type SyncerConfigExpansion interface{}
+type LogicalClusterExpansion interface{}

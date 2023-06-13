@@ -28,17 +28,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // FakeLogicalClusters implements LogicalClusterInterface
 type FakeLogicalClusters struct {
-	Fake *FakeEdgeV1alpha1
+	Fake *FakeLogicalclusterV1alpha1
 }
 
-var logicalclustersResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "logicalclusters"}
+var logicalclustersResource = schema.GroupVersionResource{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Resource: "logicalclusters"}
 
-var logicalclustersKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "LogicalCluster"}
+var logicalclustersKind = schema.GroupVersionKind{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Kind: "LogicalCluster"}
 
 // Get takes name of the logicalCluster, and returns the corresponding logicalCluster object, and an error if there is any.
 func (c *FakeLogicalClusters) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LogicalCluster, err error) {

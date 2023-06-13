@@ -28,17 +28,17 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // FakeClusterProviderDescs implements ClusterProviderDescInterface
 type FakeClusterProviderDescs struct {
-	Fake *FakeEdgeV1alpha1
+	Fake *FakeLogicalclusterV1alpha1
 }
 
-var clusterproviderdescsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "clusterproviderdescs"}
+var clusterproviderdescsResource = schema.GroupVersionResource{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Resource: "clusterproviderdescs"}
 
-var clusterproviderdescsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "ClusterProviderDesc"}
+var clusterproviderdescsKind = schema.GroupVersionKind{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Kind: "ClusterProviderDesc"}
 
 // Get takes name of the clusterProviderDesc, and returns the corresponding clusterProviderDesc object, and an error if there is any.
 func (c *FakeClusterProviderDescs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ClusterProviderDesc, err error) {

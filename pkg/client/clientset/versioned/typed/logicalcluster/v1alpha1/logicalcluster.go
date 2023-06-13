@@ -27,7 +27,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	scheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
 )
 
@@ -57,7 +57,7 @@ type logicalClusters struct {
 }
 
 // newLogicalClusters returns a LogicalClusters
-func newLogicalClusters(c *EdgeV1alpha1Client) *logicalClusters {
+func newLogicalClusters(c *LogicalclusterV1alpha1Client) *logicalClusters {
 	return &logicalClusters{
 		client: c.RESTClient(),
 	}

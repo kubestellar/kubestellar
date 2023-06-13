@@ -25,7 +25,7 @@ import (
 	log "k8s.io/klog/v2"
 	kind "sigs.k8s.io/kind/pkg/cluster"
 
-	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	lcv1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	"github.com/kcp-dev/edge-mc/pkg/mcclient"
 )
@@ -79,7 +79,7 @@ func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 		return
 	}
 
-	cm := v1alpha1.LogicalCluster{
+	cm := lcv1.LogicalCluster{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "LogicalCluster",
 			APIVersion: "v1alpha1",
@@ -87,13 +87,13 @@ func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 		ObjectMeta: metav1.ObjectMeta{
 			Name: cluster,
 		},
-		Status: v1alpha1.LogicalClusterStatus{
-			Phase:         v1alpha1.LogicalClusterPhaseReady,
+		Status: lcv1.LogicalClusterStatus{
+			Phase:         lcv1.LogicalClusterPhaseReady,
 			ClusterConfig: kubeconfig,
 		},
 	}
 
-	_, err = clientset.EdgeV1alpha1().LogicalClusters().Create(ctx, &cm, metav1.CreateOptions{})
+	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters().Create(ctx, &cm, metav1.CreateOptions{})
 	if err != nil {
 		log.Errorf("failed to create LogicalCluster: %v", err)
 	}
@@ -101,7 +101,7 @@ func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 }
 
 func deleteClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
-	err := clientset.EdgeV1alpha1().LogicalClusters().Delete(ctx, cluster, metav1.DeleteOptions{})
+	err := clientset.LogicalclusterV1alpha1().LogicalClusters().Delete(ctx, cluster, metav1.DeleteOptions{})
 	if err != nil {
 		log.Errorf("failed to delete LogicalCluster: %v", err)
 	}
@@ -109,13 +109,13 @@ func deleteClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 }
 
 func updateClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
-	clusterConfig, err := clientset.EdgeV1alpha1().LogicalClusters().Get(ctx, cluster, metav1.GetOptions{})
+	clusterConfig, err := clientset.LogicalclusterV1alpha1().LogicalClusters().Get(ctx, cluster, metav1.GetOptions{})
 	if err != nil {
 		log.Errorf("failed to get LogicalCluster: %v", err)
 	}
 
-	clusterConfig.Status.Phase = v1alpha1.LogicalClusterPhaseNotReady
-	_, err = clientset.EdgeV1alpha1().LogicalClusters().Update(ctx, clusterConfig, metav1.UpdateOptions{})
+	clusterConfig.Status.Phase = lcv1.LogicalClusterPhaseNotReady
+	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters().Update(ctx, clusterConfig, metav1.UpdateOptions{})
 	if err != nil {
 		log.Errorf("failed to update LogicalCluster: %v", err)
 	}

@@ -22,36 +22,24 @@ import (
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
-type FakeEdgeV1alpha1 struct {
+type FakeLogicalclusterV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeEdgeV1alpha1) Customizers(namespace string) v1alpha1.CustomizerInterface {
-	return &FakeCustomizers{c, namespace}
+func (c *FakeLogicalclusterV1alpha1) ClusterProviderDescs() v1alpha1.ClusterProviderDescInterface {
+	return &FakeClusterProviderDescs{c}
 }
 
-func (c *FakeEdgeV1alpha1) EdgePlacements() v1alpha1.EdgePlacementInterface {
-	return &FakeEdgePlacements{c}
-}
-
-func (c *FakeEdgeV1alpha1) EdgeSyncConfigs() v1alpha1.EdgeSyncConfigInterface {
-	return &FakeEdgeSyncConfigs{c}
-}
-
-func (c *FakeEdgeV1alpha1) SinglePlacementSlices() v1alpha1.SinglePlacementSliceInterface {
-	return &FakeSinglePlacementSlices{c}
-}
-
-func (c *FakeEdgeV1alpha1) SyncerConfigs() v1alpha1.SyncerConfigInterface {
-	return &FakeSyncerConfigs{c}
+func (c *FakeLogicalclusterV1alpha1) LogicalClusters() v1alpha1.LogicalClusterInterface {
+	return &FakeLogicalClusters{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeEdgeV1alpha1) RESTClient() rest.Interface {
+func (c *FakeLogicalclusterV1alpha1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

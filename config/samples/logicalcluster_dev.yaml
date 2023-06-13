@@ -1,4 +1,4 @@
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: logicalcluster.kubestellar.io/v1alpha1
 kind: LogicalCluster
 metadata:
   name: dev2
