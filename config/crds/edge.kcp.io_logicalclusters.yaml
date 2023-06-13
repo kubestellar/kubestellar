@@ -42,21 +42,28 @@ spec:
                   is stored under.
                 type: string
                 x-kubernetes-validations:
-                - message: cluster is immutable
+                - message: clusterName is immutable
                   rule: self == oldSelf
-              ProviderName:
-                description: ProviderName is the name of the provider of the cluster.
+              ClusterProviderDesc:
+                description: ClusterProviderDesc is a reference to a ClusterProviderDesc
+                  resource
                 type: string
                 x-kubernetes-validations:
-                - message: cluster is immutable
+                - message: ProviderName is immutable
                   rule: self == oldSelf
-              URL:
-                description: URL is the address under which the Kubernetes-cluster-like
-                  endpoint can be found. This URL can be used to access the workspace
-                  with standard Kubernetes client libraries and command line tools.
-                type: string
+              Managed:
+                default: true
+                description: Managed identifies whether a cluster is managed (true)
+                  or unmanaged (false). Currently this is immutable. A logical cluster
+                  can be created through the ClusterManager (managed) or discovered/imported
+                  (unmanaged).
+                type: boolean
+                x-kubernetes-validations:
+                - message: Managed is immutable
+                  rule: self == oldSelf
             required:
-            - ProviderName
+            - ClusterProviderDesc
+            - Managed
             type: object
           status:
             description: '`status` describes the status of the cluster object.'
