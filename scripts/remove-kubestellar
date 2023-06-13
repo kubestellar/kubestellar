@@ -15,10 +15,10 @@
 
 # Usage: $0 (--clusters <list of kind cluster names> e.g, "florin guilder" | --folder < directory> )
 
-# Purpose: clean up environment by removing kcp & kcp-edge and
+# Purpose: clean up environment by removing kcp & KubeStellar and
 # deleting all the generated files (e.g., edge syncer manifests and logs files)
 
-# Assumption: kcp and kcp-edge are running 
+# Assumption: kcp and KubeStellar are running 
 
 # This script requires the kcp folders, logs and syncer manifest files
 # are created at your current directory - where this script is executed
