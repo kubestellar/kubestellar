@@ -56,12 +56,12 @@ func main() {
 		log.Fatalf("get client failed: %v", err)
 	}
 
-	log.Info("----------  List EdgePlacements in cluster1")
+	log.Info("List EdgePlacements in cluster1")
 	list, _ := mcclient.Cluster("cluster1").KS().EdgeV1alpha1().EdgePlacements().List(ctx, metav1.ListOptions{})
 	for _, ep := range list.Items {
 		log.Infof("Cluster: cluster1 ; ObjName: %s", ep.Name)
 	}
-	log.Info("----------  List configmaps in cluster1")
+	log.Info("List configmaps in cluster1")
 	listm, _ := mcclient.Cluster("cluster1").Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).List(ctx, metav1.ListOptions{})
 	for _, ep := range listm.Items {
 		log.Infof("Cluster: cluster1 ; ObjName: %s", ep.Name)
@@ -97,7 +97,7 @@ func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 	if err != nil {
 		log.Errorf("failed to create LogicalCluster: %v", err)
 	}
-	log.Infof("------ created: %s", cluster)
+	log.Infof("LogicalCluster created: %s", cluster)
 }
 
 func deleteClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
@@ -105,7 +105,7 @@ func deleteClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 	if err != nil {
 		log.Errorf("failed to delete LogicalCluster: %v", err)
 	}
-	log.Infof("------ deleted: %s", cluster)
+	log.Infof("LogicalCluster deleted: %s", cluster)
 }
 
 func updateClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
@@ -119,5 +119,5 @@ func updateClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 	if err != nil {
 		log.Errorf("failed to update LogicalCluster: %v", err)
 	}
-	log.Infof("------ updated: %s", cluster)
+	log.Infof("LogicalCluster updated: %s", cluster)
 }
