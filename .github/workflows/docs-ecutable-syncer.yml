@@ -76,6 +76,7 @@ jobs:
   elapsed-time-collector:
     runs-on: ubuntu-latest
     env:
+      GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
       docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
     needs: docs-ecutable
     steps:
