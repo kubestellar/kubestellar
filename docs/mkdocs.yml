@@ -159,8 +159,11 @@ plugins:
   #           'some_file.md': 'http://external.url.com/foobar'
 
 markdown_extensions:
+  - pymdownx.superfences
   - attr_list
-  #- md_in_html
+  - md_in_html
+  - toc:               # Builds a table of contents 
+      permalink: "#"
   # Code block highlighting
   - pymdownx.highlight:
       # Allows linking directly to specific lines in code blocks
@@ -170,7 +173,6 @@ markdown_extensions:
   # Lets you embed content from another file
   - pymdownx.snippets
   # Arbitrary nesting of code/content blocks inside each other
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true 
   # Enable note/warning/etc. callouts
