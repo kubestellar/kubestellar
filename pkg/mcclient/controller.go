@@ -22,6 +22,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/go-logr/logr"
+
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
@@ -29,7 +31,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/go-logr/logr"
 	"github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
 	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
 )
