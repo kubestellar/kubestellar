@@ -1398,14 +1398,14 @@
 <!-- BEGIN INCLUDE ./example1-stage-1a.md '&lt;!--example1-stage-1a-start--&gt;' '&lt;!--example1-stage-1a-end--&gt;' -->
 
 <h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace</h3>
-<p>This puts the definition and export of the edge-mc API in the edge
+<p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
 <h3 id="the-mailbox-controller">The mailbox controller</h3>
 <p>Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the edge-mc command shown
+Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sleep<span class="w"> </span><span class="m">45</span>
@@ -1826,7 +1826,7 @@ following resolutions of the "where" predicates.</p>
 </table>
 <p>Eventually there will be automation that conveniently runs the
 scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the edge-mc command that runs the scheduler.</p>
+ESPW and invoke the KubeStellar command that runs the scheduler.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
@@ -1895,7 +1895,7 @@ objects, the placement translator will copy the workload prescriptions
 into the mailbox workspaces and create <code>SyncerConfig</code> objects there.</p>
 <p>Eventually there will be convenient automation running the placement
 translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the edge-mc command that runs the placement translator.</p>
+ESPW and use the KubeStellar command that runs the placement translator.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
@@ -1909,7 +1909,7 @@ ESPW and use the edge-mc command that runs the placement translator.</p>
 <p>After it stops logging stuff, wait another minute and then you can ^C
 it or use another shell to continue exploring.</p>
 <p>The florin cluster gets only the common workload.  Examine florin's
-<code>SyncerConfig</code> as follows.</p>
+<code>SyncerConfig</code> as follows.  Utilize florin's name (which you stored in Stage 1) here.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="nv">$FLORIN_WS</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
@@ -1997,7 +1997,8 @@ it or use another shell to continue exploring.</p>
 <a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>commonstuff<span class="w">   </span>commond<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">0</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>6m44s
 </code></pre></div></p>
 <p>The guilder cluster gets both the common and special workloads.
-Examine guilder's <code>SyncerConfig</code> object and workloads as follows.</p>
+Examine guilder's <code>SyncerConfig</code> object and workloads as follows, using
+the name that you stored in Stage 1.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
@@ -2110,14 +2111,14 @@ workspace.  This is driven by the <code>SyncerConfig</code> object named
 Find just the <code>commonstuff</code> namespace and the <code>commond</code> Deployment.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>NAME<span class="w">                              </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>commonstuff<span class="w">                       </span>Active<span class="w">   </span>6m51s
-<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>default<span class="w">                           </span>Active<span class="w">   </span>57m
-<a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a>kcp-edge-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
-<a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a>kube-node-lease<span class="w">                   </span>Active<span class="w">   </span>57m
-<a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a>kube-public<span class="w">                       </span>Active<span class="w">   </span>57m
-<a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a>kube-system<span class="w">                       </span>Active<span class="w">   </span>57m
-<a id="__codelineno-63-8" name="__codelineno-63-8" href="#__codelineno-63-8"></a>local-path-storage<span class="w">                </span>Active<span class="w">   </span>57m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>NAME<span class="w">                                 </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>commonstuff<span class="w">                          </span>Active<span class="w">   </span>6m51s
+<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>default<span class="w">                              </span>Active<span class="w">   </span>57m
+<a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a>kubestellar-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
+<a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a>kube-node-lease<span class="w">                      </span>Active<span class="w">   </span>57m
+<a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a>kube-public<span class="w">                          </span>Active<span class="w">   </span>57m
+<a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a>kube-system<span class="w">                          </span>Active<span class="w">   </span>57m
+<a id="__codelineno-63-8" name="__codelineno-63-8" href="#__codelineno-63-8"></a>local-path-storage<span class="w">                   </span>Active<span class="w">   </span>57m
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
 </code></pre></div>

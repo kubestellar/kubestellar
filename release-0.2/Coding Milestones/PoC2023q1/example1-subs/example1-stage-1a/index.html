@@ -1334,14 +1334,14 @@
 
 <!--example1-stage-1a-start-->
 <h3 id="populate-the-edge-service-provider-workspace">Populate the edge service provider workspace</h3>
-<p>This puts the definition and export of the edge-mc API in the edge
+<p>This puts the definition and export of the KubeStellar API in the edge
 service provider workspace.</p>
 <p>Use the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/exports
 </code></pre></div>
 <h3 id="the-mailbox-controller">The mailbox controller</h3>
 <p>Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the edge-mc command shown
+Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sleep<span class="w"> </span><span class="m">45</span>
