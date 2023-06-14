@@ -3,8 +3,10 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 
 ### Turbonomic and KubeStellar Demo Day
 <p align=center>
-<div class="spinner1"></div>
-<iframe width="720" height="400" src="https://www.youtube.com/embed/B3jZTnu1LDo?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div id="spinner1">
+  <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
+</div>
+<iframe width="720" height="400" src="https://www.youtube.com/embed/B3jZTnu1LDo?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload= "document.getElementById('spinner1').style.display='none';" class="centerImage"></iframe>
 </p>
 
 ### How do I get this working with my KubeStellar instance?
@@ -12,20 +14,16 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 
 ### Turbonomic and KubeStellar in the news
 <p align=center>
-<div class="spinner2"></div>
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7066466334334668800" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+<div id="spinner2">
+    <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
+</div>
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7066466334334668800" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" onload= "document.getElementById('spinner2').style.display='none';" class="centerImage"></iframe>
 </p>
 
-<script>
-const spinner1 = document.querySelector('.spinner1');
-const spinner2 = document.querySelector('.spinner2');
-const iframe1 = document.querySelector('#myFrame1');
-const iframe2 = document.querySelector('#myFrame2');
-
-iframe.addEventListener('load', function() {
-    spinner1.style.display = 'none';
-    spinner2.style.display = 'none';
-    iframe1.style.display = 'block';
-    iframe2.style.display = 'block';
-});
-</script>
+<style type="text/css">
+.centerImage
+{
+ display: block;
+ margin: auto;
+}
+</style>
