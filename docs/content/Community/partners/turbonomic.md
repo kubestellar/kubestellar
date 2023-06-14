@@ -4,9 +4,9 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 ### Turbonomic and KubeStellar Demo Day
 <p align=center>
 <div id="spinner1">
-  <img width="180" height="180" src="../../../images/spinner.gif" class="centerImage">
+  <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe width="720" height="400" src="https://www.youtube.com/embed/B3jZTnu1LDo?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen onload= "document.getElementById('spinner1').style.display='none';"></iframe>
+<iframe class="centerImage" id="embed1" width="720" height="400" src="https://www.youtube.com/embed/B3jZTnu1LDo?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="visibility:hidden;" onload= "document.getElementById('spinner1').style.display='none';document.getElementById('embed1').style.visibility='visible';document.getElementById('embed1').width='720';document.getElementById('embed1').height='400';"></iframe>
 </p>
 
 ### How do I get this working with my KubeStellar instance?
@@ -15,9 +15,9 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 ### Turbonomic and KubeStellar in the news
 <p align=center>
 <div id="spinner2">
-    <img width="180" height="180" src="../../../images/spinner.gif" class="centerImage">
+    <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7066466334334668800" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" onload= "document.getElementById('spinner2').style.display='none';"></iframe>
+<iframe class="centerImage" id="embed2" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7066466334334668800" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner2').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='740';document.getElementById('embed2').height='400';"></iframe>
 </p>
 
 <style type="text/css">
