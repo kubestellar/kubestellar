@@ -2,8 +2,8 @@ FILENAME=placement docs/scripts/get-elapsed-time.sh
 doc_name: placement
 workflow_name: "docs-ecutable - Placement"
 workflow_id: 59733280
-run_number: 27
-createdAt: 2023-06-13T21:39:27Z
-updatedAt: 2023-06-13T21:57:32Z
+run_number: 29
+createdAt: 2023-06-14T19:27:32Z
+updatedAt: 2023-06-14T19:37:16Z
 <!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
-    ~ 19  minutes<!--elapsed-time-end-->
+    ~ 10  minutes<!--elapsed-time-end-->
