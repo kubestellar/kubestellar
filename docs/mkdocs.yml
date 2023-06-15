@@ -50,14 +50,25 @@ nav:
               - Commands: Coding Milestones/PoC2023q1/commands.md
       # - PoC2023q3:
       #     - Details: Coding Milestones/PoC2023q3/outline.md
-  - Community: Community/_index.md
-  - Partners:
-      - ArgoCD: Community/partners/argocd.md
-      - Turbonomic: Community/partners/turbonomic.md
-      # - MVI: Community/partners/mvi.md
-      # - FluxCD: Community/partners/fluxcd.md
-      # - OpenZiti: Community/partners/openziti.md
-      - Kyverno: Community/partners/kyverno.md
+  - Community: 
+    - Get Involved: Community/_index.md
+    - Contributor Guidelines: https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/
+    - Contact Us:
+        - Mailing List: https://kubestellar.io/join_us
+        - Community Meeting Agenda (join mailing list first): https://docs.google.com/document/d/1XppfxSOD7AOX1lVVVIPWjpFkrxakfBfVzcybRg17-PM/edit?usp=share_link
+        - Slack: https://kubestellar.io/slack
+        - Medium Blog: https://kubestellar.io/blog 
+        - YouTube Channel: https://kubestellar.io/tv
+        - LinkedIn: https://kubestellar.io/linkedin
+        - Reddit: https://www.reddit.com/r/kubestellar/
+        - Google Drive: https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS
+    - Partners:
+        - ArgoCD: Community/partners/argocd.md
+        - Turbonomic: Community/partners/turbonomic.md
+        #- MVI: Community/partners/mvi.md
+        #- FluxCD: Community/partners/fluxcd.md
+        #- OpenZiti: Community/partners/openziti.md
+        - Kyverno: Community/partners/kyverno.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
