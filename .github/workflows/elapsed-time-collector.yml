@@ -2,7 +2,7 @@ name: elapsed time collector
 
 on:
     schedule:
-      - cron: "*/5 * * * *"
+      - cron: "0 0 * * *"
 # on:
 #   # So we can trigger manually if needed
 #   workflow_dispatch:
