@@ -1,5 +1,5 @@
 ---
-title: KubeStellar Community Meeting {{ date | date('add', 28, 'days') | date('MMMM Do') }}
+title: KubeStellar Community Meeting {{ date | date('add', 28, 'days') | date('MMMM Do, YYYY') }}
 assignees: clubanderson
 labels: community-meeting
 ---
