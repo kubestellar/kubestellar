@@ -1,7 +1,7 @@
 name: Add pull request to project and assign author
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
 env:
   github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
