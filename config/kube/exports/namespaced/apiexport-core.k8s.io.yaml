@@ -1,0 +1,12 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: core.k8s.io
+spec:
+  latestResourceSchemas:
+  - v230615-d48020c8.endpoints.core
+  - v230615-d48020c8.persistentvolumeclaims.core
+  - v230615-d48020c8.podtemplates.core
+  - v230615-d48020c8.replicationcontrollers.core
+status: {}

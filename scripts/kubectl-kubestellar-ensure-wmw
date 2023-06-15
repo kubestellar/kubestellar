@@ -100,18 +100,32 @@ spec:
 EOF
 fi
 
-if [ "$want_kube" == true ] && ! kubectl "${kubectl_flags[@]}" get APIBinding bind-kube &> /dev/null; then
+function bind_iff_wanted() { # usage: export_name
+    export_name=$1
+    binding_name=bind-$export_name
+    if [ "$want_kube" == true ] && ! kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
 kubectl "${kubectl_flags[@]}" apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
-  name: bind-kube
+  name: ${binding_name}
 spec:
   reference:
     export:
       path: root:compute
-      name: kubernetes
+      name: ${export_name}
 EOF
-elif [ "$want_kube" == false ] && kubectl "${kubectl_flags[@]}" get APIBinding bind-kube &> /dev/null; then
-     kubectl "${kubectl_flags[@]}" delete APIBinding bind-kube
+elif [ "$want_kube" == false ] && kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
+     kubectl "${kubectl_flags[@]}" delete APIBinding ${binding_name}
 fi
+}
+
+bind_iff_wanted kubernetes
+bind_iff_wanted apps
+bind_iff_wanted autoscaling
+bind_iff_wanted batch
+bind_iff_wanted core.k8s.io
+bind_iff_wanted discovery.k8s.io
+bind_iff_wanted networking.k8s.io
+bind_iff_wanted policy
+bind_iff_wanted storage.k8s.io

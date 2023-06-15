@@ -36,11 +36,12 @@ local-path-storage                   Active   57m
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-florin get deploy -A | egrep 'NAME|stuff'
+KUBECONFIG=~/.kube/config kubectl --context kind-florin get deploy,rs -A | egrep 'NAME|stuff'
 ```
 ``` { .bash .no-copy }
-NAMESPACE                         NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff                       commond                           1/1     1            1           7m59s
+NAMESPACE                            NAME                                                 READY   UP-TO-DATE   AVAILABLE   AGE
+NAMESPACE                            NAME                                                            DESIRED   CURRENT   READY   AGE
+commonstuff                          replicaset.apps/commond                                         1         1         1       13m
 ```
 
 Examine the guilder cluster.  Find both workload namespaces and both
@@ -56,19 +57,21 @@ specialstuff                       Active   8m33s
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -A | egrep NAME\|stuff
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy,rs -A | egrep NAME\|stuff
 ```
 ``` { .bash .no-copy }
-NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff                        commond                            1/1     1            1           8m37s
-specialstuff                       speciald                           1/1     1            1           8m55s
+NAMESPACE                             NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+specialstuff                          deployment.apps/speciald                              1/1     1            1           23m
+NAMESPACE                             NAME                                                            DESIRED   CURRENT   READY   AGE
+commonstuff                           replicaset.apps/commond                                         1         1         1       23m
+specialstuff                          replicaset.apps/speciald-76cdbb69b5                             1         1         1       14s
 ```
 
 Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-guilder get deploy -n commonstuff commond -o yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get rs -n commonstuff commond -o yaml
 ```
 ``` { .bash .no-copy }
 ...

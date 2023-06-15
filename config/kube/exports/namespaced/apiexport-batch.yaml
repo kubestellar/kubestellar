@@ -1,0 +1,10 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: batch
+spec:
+  latestResourceSchemas:
+  - v230615-6e3cae39.jobs.batch
+  - v230615-d48020c8.cronjobs.batch
+status: {}

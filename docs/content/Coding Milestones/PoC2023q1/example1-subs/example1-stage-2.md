@@ -98,7 +98,7 @@ replacements:
   value: '"env is %(env)"'
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: ReplicaSet
 metadata:
   namespace: commonstuff
   name: commond
@@ -155,7 +155,7 @@ spec:
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io
     resources: [ "apibindings" ]
-    resourceNames: [ "bind-kube" ]
+    resourceNames: [ "bind-kubernetes", "bind-apps" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
@@ -276,7 +276,7 @@ spec:
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io
     resources: [ "apibindings" ]
-    resourceNames: [ "bind-kube" ]
+    resourceNames: [ "bind-kubernetes" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]

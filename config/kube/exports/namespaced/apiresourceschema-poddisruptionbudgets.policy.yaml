@@ -1,0 +1,213 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIResourceSchema
+metadata:
+  creationTimestamp: null
+  name: v230615-d48020c8.poddisruptionbudgets.policy
+spec:
+  group: policy
+  names:
+    kind: PodDisruptionBudget
+    listKind: PodDisruptionBudgetList
+    plural: poddisruptionbudgets
+    shortNames:
+    - pdb
+    singular: poddisruptionbudget
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      description: PodDisruptionBudget is an object to define the max disruption that
+        can be caused to a collection of pods
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: Specification of the desired behavior of the PodDisruptionBudget.
+          properties:
+            maxUnavailable:
+              anyOf:
+              - type: integer
+              - type: string
+              description: An eviction is allowed if at most "maxUnavailable" pods
+                selected by "selector" are unavailable after the eviction, i.e. even
+                in absence of the evicted pod. For example, one can prevent all voluntary
+                evictions by specifying 0. This is a mutually exclusive setting with
+                "minAvailable".
+              x-kubernetes-int-or-string: true
+            minAvailable:
+              anyOf:
+              - type: integer
+              - type: string
+              description: An eviction is allowed if at least "minAvailable" pods
+                selected by "selector" will still be available after the eviction,
+                i.e. even in the absence of the evicted pod.  So for example you can
+                prevent all voluntary evictions by specifying "100%".
+              x-kubernetes-int-or-string: true
+            selector:
+              description: Label query over pods whose evictions are managed by the
+                disruption budget. A null selector will match no pods, while an empty
+                ({}) selector will select all pods within the namespace.
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+          type: object
+        status:
+          description: Most recently observed status of the PodDisruptionBudget.
+          properties:
+            conditions:
+              description: |-
+                Conditions contain conditions for PDB. The disruption controller sets the DisruptionAllowed condition. The following are known values for the reason field (additional reasons could be added in the future): - SyncFailed: The controller encountered an error and wasn't able to compute
+                              the number of allowed disruptions. Therefore no disruptions are
+                              allowed and the status of the condition will be False.
+                - InsufficientPods: The number of pods are either at or below the number
+                                    required by the PodDisruptionBudget. No disruptions are
+                                    allowed and the status of the condition will be False.
+                - SufficientPods: There are more pods than required by the PodDisruptionBudget.
+                                  The condition will be True, and the number of allowed
+                                  disruptions are provided by the disruptionsAllowed property.
+              items:
+                description: Condition contains details for one aspect of the current
+                  state of this API Resource.
+                properties:
+                  lastTransitionTime:
+                    description: lastTransitionTime is the last time the condition
+                      transitioned from one status to another. This should be when
+                      the underlying condition changed.  If that is not known, then
+                      using the time when the API field changed is acceptable.
+                    format: date-time
+                    type: string
+                  message:
+                    description: message is a human readable message indicating details
+                      about the transition. This may be an empty string.
+                    type: string
+                  observedGeneration:
+                    description: observedGeneration represents the .metadata.generation
+                      that the condition was set based upon. For instance, if .metadata.generation
+                      is currently 12, but the .status.conditions[x].observedGeneration
+                      is 9, the condition is out of date with respect to the current
+                      state of the instance.
+                    format: int64
+                    type: integer
+                  reason:
+                    description: reason contains a programmatic identifier indicating
+                      the reason for the condition's last transition. Producers of
+                      specific condition types may define expected values and meanings
+                      for this field, and whether the values are considered a guaranteed
+                      API. The value should be a CamelCase string. This field may
+                      not be empty.
+                    type: string
+                  status:
+                    description: status of the condition, one of True, False, Unknown.
+                    type: string
+                  type:
+                    description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                    type: string
+                required:
+                - lastTransitionTime
+                - message
+                - reason
+                - status
+                - type
+                type: object
+              type: array
+              x-kubernetes-list-map-keys:
+              - type
+              x-kubernetes-list-type: map
+            currentHealthy:
+              description: current number of healthy pods
+              format: int32
+              type: integer
+            desiredHealthy:
+              description: minimum desired number of healthy pods
+              format: int32
+              type: integer
+            disruptedPods:
+              additionalProperties:
+                format: date-time
+                type: string
+              description: DisruptedPods contains information about pods whose eviction
+                was processed by the API server eviction subresource handler but has
+                not yet been observed by the PodDisruptionBudget controller. A pod
+                will be in this map from the time when the API server processed the
+                eviction request to the time when the pod is seen by PDB controller
+                as having been marked for deletion (or after a timeout). The key in
+                the map is the name of the pod and the value is the time when the
+                API server processed the eviction request. If the deletion didn't
+                occur and a pod is still there it will be removed from the list automatically
+                by PodDisruptionBudget controller after some time. If everything goes
+                smooth this map should be empty for the most of the time. Large number
+                of entries in the map may indicate problems with pod deletions.
+              type: object
+            disruptionsAllowed:
+              description: Number of pod disruptions that are currently allowed.
+              format: int32
+              type: integer
+            expectedPods:
+              description: total number of pods counted by this disruption budget
+              format: int32
+              type: integer
+            observedGeneration:
+              description: Most recent generation observed when updating this PDB
+                status. DisruptionsAllowed and other status information is valid only
+                if observedGeneration equals to PDB's object generation.
+              format: int64
+              type: integer
+          required:
+          - disruptionsAllowed
+          - currentHealthy
+          - desiredHealthy
+          - expectedPods
+          type: object
+      type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

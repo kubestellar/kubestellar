@@ -1,0 +1,12 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: storage.k8s.io
+spec:
+  latestResourceSchemas:
+  - v230615-d48020c8.csidrivers.storage.k8s.io
+  - v230615-d48020c8.csinodes.storage.k8s.io
+  - v230615-d48020c8.storageclasses.storage.k8s.io
+  - v230615-d48020c8.volumeattachments.storage.k8s.io
+status: {}

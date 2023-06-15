@@ -1,0 +1,10 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: flowcontrol.apiserver.k8s.io
+spec:
+  latestResourceSchemas:
+  - v230615-d48020c8.flowschemas.flowcontrol.apiserver.k8s.io
+  - v230615-d48020c8.prioritylevelconfigurations.flowcontrol.apiserver.k8s.io
+status: {}
