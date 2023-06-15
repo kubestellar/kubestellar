@@ -1,4 +1,4 @@
-name: docs-ecutable - Mailbox
+name: elapsed time collector
 
 on:
   # So we can trigger manually if needed
