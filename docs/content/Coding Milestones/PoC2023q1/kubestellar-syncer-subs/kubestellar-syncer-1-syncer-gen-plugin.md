@@ -97,7 +97,7 @@ cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=
 
 Download manifest template.
 ```shell
-curl -LO ${{ config.repo_raw_url }}/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+curl -LO {{ config.repo_raw_url }}/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 ```
 
 Generate manifests to bootstrap KubeStellar-Syncer.
