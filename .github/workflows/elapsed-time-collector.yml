@@ -70,10 +70,10 @@ jobs:
     #       echo ${{ env.MD_CONTENT }}
 
       - run: |
-          cat <<EOF > elapsed-time/${{ env.docs-ecutable-filename }}.dmd
+          cat <<EOF > elapsed-time/${{ matrix.manifest }}.dmd
           ${{ env.MD_CONTENT }}
           EOF
-          echo "cat elapsed-time/${{ env.docs-ecutable-filename }}.dmd"
-          cat elapsed-time/${{ env.docs-ecutable-filename }}.dmd
+          echo "cat elapsed-time/${{ matrix.manifest }}.dmd"
+          cat elapsed-time/${{ matrix.manifest }}.dmd
         
         # - run: git config --global user.email "kubestellar@kubestellar-dev@google.groups.com" && git config --global user.name "KubeStellar" && git add . && git commit -m "Add changes" && git push origin gh-pages || true
