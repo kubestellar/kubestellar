@@ -1,19 +1,22 @@
 name: elapsed time collector
 
 on:
-  # So we can trigger manually if needed
-  workflow_dispatch:
-  # To confirm any changes to docs build successfully, without deploying them
-  push:
-    branches:
-      - main
-      - "release-*"
-    paths:
-        - "docs/content/Coding Milestones/PoC2023q1/*-subs/**"
-        - "docs/content/Coding Milestones/PoC2023q1/*.md"
-        - "docs/content/common-subs/**"
-        - "docs/scripts/get-elapsed-time.sh"
-        - ".github/workflows/elapsed-time-collector.yml"
+    schedule:
+      - cron: "*/5 * * * *"
+# on:
+#   # So we can trigger manually if needed
+#   workflow_dispatch:
+#   # To confirm any changes to docs build successfully, without deploying them
+#   push:
+#     branches:
+#       - main
+#       - "release-*"
+#     paths:
+#         - "docs/content/Coding Milestones/PoC2023q1/*-subs/**"
+#         - "docs/content/Coding Milestones/PoC2023q1/*.md"
+#         - "docs/content/common-subs/**"
+#         - "docs/scripts/get-elapsed-time.sh"
+#         - ".github/workflows/elapsed-time-collector.yml"
  
 env:
   docs-ecutable-filename: mailbox
