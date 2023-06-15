@@ -2292,7 +2292,7 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div>
 <h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
 <p>Download and build or install
-<a href="example1-subs/$https://github.com/kcp-dev/edge-mc">KubeStellar</a>, according to your
+<a href="example1-subs/https://github.com/kcp-dev/edge-mc">KubeStellar</a>, according to your
 preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
 build</code> to populate its <code>bin</code> directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it
@@ -2674,7 +2674,7 @@ c. Logical cluster name
 <div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="nv">cluster_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>logicalclusters.core.kcp.io<span class="w"> </span>cluster<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.annotations.kcp\.io\/cluster&quot;</span><span class="w"> </span>--no-headers<span class="sb">`</span>
 </code></pre></div></p>
 <p>Download manifest template.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span><span class="nv">$https</span>://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kcp-dev/edge-mc/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span><span class="nv">cluster_name</span><span class="o">=</span><span class="nv">$cluster_name</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
@@ -2809,8 +2809,8 @@ c. Logical cluster name
 <li><code>make build-kubestellar-syncer-image-local</code>
 e.g.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>$ make build-kubestellar-syncer-image-local
-<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/$kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a>2023/04/24 11:50:38 Building github.com/$kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a>2023/04/24 11:50:38 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
 <a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 <a id="__codelineno-76-5" name="__codelineno-76-5" href="#__codelineno-76-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 <a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a>2023/04/24 11:50:40 Adding tag latest
@@ -2830,9 +2830,9 @@ e.g.
 </ol>
 <p>For example
 <div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/$kcp-dev/edge-mc/cmd/syncer
-<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>2023/04/24 11:50:17 Building github.com/$kcp-dev/edge-mc/cmd/syncer for linux/arm64
-<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>2023/04/24 11:50:17 Building github.com/$kcp-dev/edge-mc/cmd/syncer for linux/amd64
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kcp-dev/edge-mc/cmd/syncer
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/arm64
+<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>2023/04/24 11:50:17 Building github.com/kcp-dev/edge-mc/cmd/syncer for linux/amd64
 <a id="__codelineno-78-5" name="__codelineno-78-5" href="#__codelineno-78-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
 <a id="__codelineno-78-6" name="__codelineno-78-6" href="#__codelineno-78-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
 <a id="__codelineno-78-7" name="__codelineno-78-7" href="#__codelineno-78-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
