@@ -23,42 +23,42 @@ permissions:
   contents: write
 
 jobs:
-    elapsed-time-collector:
-        name: elapsed time collector
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                manifest:
-                    - mailbox
-                    - scheduler
-                    - syncer
-                    - qs
-                    - placement
-                    - example1
+  elapsed-time-collector:
+    name: elapsed time collector
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        manifest:
+          - mailbox
+          - scheduler
+          - syncer
+          - qs
+          - placement
+          - example1
         steps:
-            - run: echo "${{ matrix.manifest }}"
+          - run: echo "${{ matrix.manifest }}"
             
-            - name: echo fetching push or pull_request branch
-              uses: actions/checkout@v3
-              with:
-                ref: ${{ github.ref_name }}
+          - name: echo fetching push or pull_request branch
+            uses: actions/checkout@v3
+            with:
+              ref: ${{ github.ref_name }}
               # run: echo running on branch ${{ github.ref_name }}
-              if: github.event_name == 'push' || github.event_name != 'pull_request'
+            if: github.event_name == 'push' || github.event_name != 'pull_request'
 
-            - name: echo fetching workflow_dispatch branch
-              uses: actions/checkout@v3
-              with:
-                ref: ${GITHUB_REF##*/}
+          - name: echo fetching workflow_dispatch branch
+            uses: actions/checkout@v3
+            with:
+              ref: ${GITHUB_REF##*/}
               # run: echo running on branch ${GITHUB_REF##*/}
-              if: github.event_name != 'pull_request' && github.event_name != 'push'
+            if: github.event_name != 'pull_request' && github.event_name != 'push'
 
-            - run: git rev-parse --abbrev-ref HEAD 
+          - run: git rev-parse --abbrev-ref HEAD 
 
-            - run: |
-                EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-                echo "MD_CONTENT<<$EOF" >> "$GITHUB_ENV"
-                make FILENAME='${{ matrix.manifest }}' write-time-to-file >> "$GITHUB_ENV"
-                echo "$EOF" >> "$GITHUB_ENV"
+          - run: |
+              EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+              echo "MD_CONTENT<<$EOF" >> "$GITHUB_ENV"
+              make FILENAME='${{ matrix.manifest }}' write-time-to-file >> "$GITHUB_ENV"
+              echo "$EOF" >> "$GITHUB_ENV"
             id: run_make
 
             # - uses: actions/checkout@v3
