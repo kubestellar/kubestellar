@@ -8,6 +8,9 @@ env:
   MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
   GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
   
+permissions:
+  contents: write
+  
 jobs:
   assignAuthor:
     name: Assign author to PR
