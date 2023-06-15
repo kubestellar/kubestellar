@@ -27,6 +27,8 @@ jobs:
     name: elapsed time collector
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: true
+      max-parallel: 1
       matrix:
         manifest:
           - mailbox
