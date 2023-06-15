@@ -1,8 +1,8 @@
 name: Create our bi-Weekly Meeting issue
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 14 * * 1'
+  schedule:
+    - cron: '0 14 * * 1'
 jobs:
   issue:
     runs-on: ubuntu-latest
