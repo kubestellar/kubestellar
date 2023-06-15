@@ -45,11 +45,11 @@ type LogicalCluster struct {
 
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
-	// ClusterProviderDesc is a reference to a ClusterProviderDesc resource
+	// ClusterProviderDescName is a reference to a ClusterProviderDesc resource
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
-	ClusterProviderDesc string `json:"ClusterProviderDesc"`
+	ClusterProviderDescName string `json:"ClusterProviderDescName"`
 
-	// ClusterName is the name of the logical cluster this workspace is stored under.
+	// ClusterName is the name of the logical cluster created by the provider.
 	// +optional
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
 	ClusterName string `json:"ClusterName,omitempty"`
