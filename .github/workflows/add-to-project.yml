@@ -7,6 +7,9 @@ on:
       - reopened
 env:
   MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+
+permissions:
+  contents: write
   
 jobs:
   create-update-project:
