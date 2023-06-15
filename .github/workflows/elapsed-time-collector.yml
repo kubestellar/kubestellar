@@ -46,13 +46,13 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+    #     if: github.event_name == 'push' || github.event_name == 'pull_request'
 
-      - name: echo fetching workflow_dispatch branch
-        uses: actions/checkout@v3
-        with:
-            ref: ${GITHUB_REF##*/}
-        if: github.event_name == 'workflow_dispatch'
+    #   - name: echo fetching workflow_dispatch branch
+    #     uses: actions/checkout@v3
+    #     with:
+    #         ref: ${GITHUB_REF##*/} 
+    #     if: github.event_name == 'workflow_dispatch'
 
       - run: git rev-parse --abbrev-ref HEAD 
 
