@@ -132,7 +132,7 @@ To deploy resources to Edge clusters, create the following in workload managemen
 
 ![kubestellar-syncer deploy](images/kubestellar-syncer-deploy.png)
 
-After this, Edge-mc will put the following in the mailbox workspace.
+After this, KubeStellar will put the following in the mailbox workspace.
 - Workload objects (both denatured one and not-denatured one)
 - SyncerConfig CR
 

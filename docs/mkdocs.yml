@@ -107,7 +107,7 @@ theme:
 extra:
   # social:
   #   - icon: fontawesome/brands/github
-  #     link: 'https://github.com/kcp-dev/edge-mc'
+  #     link: 'https://github.com/kubestellar/kubestellar'
   #     name: KubeStellar on GitHub
   #   - icon: fontawesome/brands/linkedin
   #     link: 'https://www.linkedin.com/feed/hashtag/?keywords=kubestellar'
