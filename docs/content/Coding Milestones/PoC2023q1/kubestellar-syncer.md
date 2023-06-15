@@ -234,8 +234,8 @@ Prerequisite
 e.g.
 ```
 $ make build-kubestellar-syncer-image-local
-2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/${{ config.repo_short_name }}/cmd/syncer
-2023/04/24 11:50:38 Building github.com/${{ config.repo_short_name }}/cmd/syncer for linux/arm64
+2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/{{ config.repo_short_name }}/cmd/syncer
+2023/04/24 11:50:38 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/arm64
 2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 2023/04/24 11:50:40 Adding tag latest
@@ -258,9 +258,9 @@ image=`make build-kubestellar-syncer-image-local`
 For example
 ```
 $ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/${{ config.repo_short_name }}/cmd/syncer
-2023/04/24 11:50:17 Building github.com/${{ config.repo_short_name }}/cmd/syncer for linux/arm64
-2023/04/24 11:50:17 Building github.com/${{ config.repo_short_name }}/cmd/syncer for linux/amd64
+2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/{{ config.repo_short_name }}/cmd/syncer
+2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/arm64
+2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/amd64
 2023/04/24 11:50:18 Publishing ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
 2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
 2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
