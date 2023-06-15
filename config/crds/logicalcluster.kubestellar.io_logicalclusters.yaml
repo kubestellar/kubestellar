@@ -38,14 +38,14 @@ spec:
             description: '`spec` describes a cluster.'
             properties:
               ClusterName:
-                description: ClusterName is the name of the logical cluster this workspace
-                  is stored under.
+                description: ClusterName is the name of the logical cluster created
+                  by the provider.
                 type: string
                 x-kubernetes-validations:
                 - message: clusterName is immutable
                   rule: self == oldSelf
-              ClusterProviderDesc:
-                description: ClusterProviderDesc is a reference to a ClusterProviderDesc
+              ClusterProviderDescName:
+                description: ClusterProviderDescName is a reference to a ClusterProviderDesc
                   resource
                 type: string
                 x-kubernetes-validations:
@@ -62,7 +62,7 @@ spec:
                 - message: Managed is immutable
                   rule: self == oldSelf
             required:
-            - ClusterProviderDesc
+            - ClusterProviderDescName
             - Managed
             type: object
           status:
