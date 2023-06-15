@@ -7,7 +7,7 @@ service provider workspace.
 Use the following command.
 
 ```shell
-kubectl create -f config/exports
+kubectl apply -f config/exports
 ```
 
 ### The mailbox controller
