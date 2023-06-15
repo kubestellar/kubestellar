@@ -11,4 +11,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
         with:
-          filename: .github/ISSUE_TEMPLATE/community_meeting.yaml
+          filename: .github/ISSUE_TEMPLATE/community_meeting.md
