@@ -124,7 +124,7 @@ Medium - [GitOpsCon - here we come](https://medium.com/@clubanderson/gitopscon-h
 <div id="spinner2">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe class="centerImage" id="embed2" width="720" height="400" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="visibility:hidden;" onload= "document.getElementById('spinner2').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='720';document.getElementById('embed2').height='400';"></iframe>
+<iframe class="centerImage" id="embed2" width="0" height="0" src="https://www.youtube.com/embed/PB3OTXDjFjg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="visibility:hidden;" onload= "document.getElementById('spinner2').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='720';document.getElementById('embed2').height='400';"></iframe>
 </p>
 
 ### ArgoCD and KubeStellar in the news
@@ -132,21 +132,21 @@ Medium - [GitOpsCon - here we come](https://medium.com/@clubanderson/gitopscon-h
 <div id="spinner3">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe class="centerImage" id="embed3" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7031032280722632704" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner3').style.display='none';document.getElementById('embed3').style.visibility='visible';document.getElementById('embed3').width='740';document.getElementById('embed3').height='400';"></iframe>
+<iframe class="centerImage" id="embed3" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7031032280722632704" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner3').style.display='none';document.getElementById('embed3').style.visibility='visible';document.getElementById('embed3').width='740';document.getElementById('embed3').height='400';"></iframe>
 </p>
 </br>
 <p align=center>
 <div id="spinner4">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe class="centerImage" id="embed4" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7046166635367268352" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload="document.getElementById('spinner4').style.display='none';document.getElementById('embed4').style.visibility='visible';document.getElementById('embed4').width='740';document.getElementById('embed4').height='400';"></iframe>
+<iframe class="centerImage" id="embed4" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7046166635367268352" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload="document.getElementById('spinner4').style.display='none';document.getElementById('embed4').style.visibility='visible';document.getElementById('embed4').width='740';document.getElementById('embed4').height='400';"></iframe>
 </p>
 </br>
 <p align=center>
 <div id="spinner5">
   <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe class="centerImage" id="embed5" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7060337925300838400" scrolling=no height="400" width="740" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload="document.getElementById('spinner5').style.display='none';document.getElementById('embed5').style.visibility='visible';document.getElementById('embed5').width='740';document.getElementById('embed5').height='400';"></iframe>
+<iframe class="centerImage" id="embed5" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7060337925300838400" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload="document.getElementById('spinner5').style.display='none';document.getElementById('embed5').style.visibility='visible';document.getElementById('embed5').width='740';document.getElementById('embed5').height='400';"></iframe>
 </p>
 
 <style type="text/css">
