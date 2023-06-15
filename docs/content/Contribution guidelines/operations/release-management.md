@@ -106,8 +106,8 @@ git push ??? "$TAG"  #TODO - not sure if this is right
 
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
-[${{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml](${{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
-[${{ config.repo_url }}/actions/workflows/broken-links-crawler.yml](${{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
+[${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml](${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
+[${{ config.repo_short_name }}/actions/workflows/broken-links-crawler.yml](${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
 
 
 
@@ -117,7 +117,7 @@ Check to make sure the GitHub workflows for doc generation, doc push, and broken
 
     - Make sure you have openshift/release cloned
     - Create a new branch
-    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestelar/kubestellar/kcp-dev-kcp-release-<version>.yaml
+    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
     - Edit the new file
     - Change main to the name of the release branch, such as release-0.8
 
