@@ -11,7 +11,7 @@ kubectl ws create imw-1 --enter
 ### Get KubeStellar
 
 Download and build or install
-[KubeStellar](${{ config.repo_url }}), according to your
+[KubeStellar]({{ config.repo_url }}), according to your
 preference.  That is, either (a) `git clone` the repo and then `make
 build` to populate its `bin` directory, or (b) fetch the binary
 archive appropriate for your machine from a release and unpack it

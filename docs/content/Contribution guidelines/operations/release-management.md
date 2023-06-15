@@ -106,8 +106,8 @@ git push ??? "$TAG"  #TODO - not sure if this is right
 
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
-[${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml](${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
-[${{ config.repo_short_name }}/actions/workflows/broken-links-crawler.yml](${{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
+[{{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml]({{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
+[{{ config.repo_short_name }}/actions/workflows/broken-links-crawler.yml]({{ config.repo_short_name }}/actions/workflows/docs-gen-and-push.yml)
 
 
 
