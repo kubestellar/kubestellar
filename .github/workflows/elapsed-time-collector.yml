@@ -24,6 +24,7 @@ permissions:
 
 jobs:
     elapsed-time-collector:
+        name: elapsed time collector
         runs-on: ubuntu-latest
         strategy:
             matrix:
