@@ -1,4 +1,4 @@
-name: Create our Weekly Meeting notes issue
+name: Create our bi-Weekly Meeting issue
 on:
   schedule:
     - cron: '0 14 * * 1'
