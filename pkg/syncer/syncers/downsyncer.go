@@ -122,23 +122,27 @@ func (ds *DownSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conv
 			if !isDeleted {
 				// update
 				ds.logger.V(3).Info(fmt.Sprintf("  update %q in downstream since it's found", resourceToString(resourceForDown)))
-				upstreamResource.SetResourceVersion(downstreamResource.GetResourceVersion())
-				upstreamResource.SetUID(downstreamResource.GetUID())
 				if hasDownsyncAnnotation(downstreamResource) {
+					upstreamResource.SetResourceVersion(downstreamResource.GetResourceVersion())
+					upstreamResource.SetUID(downstreamResource.GetUID())
 					setDownsyncAnnotation(upstreamResource)
-				}
-				applyConversion(upstreamResource, resourceForDown)
-				if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
-					ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
-					return err
+					applyConversion(upstreamResource, resourceForDown)
+					if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
+						ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
+						return err
+					}
+				} else {
+					ds.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in downstream since downsync annotation is not set", resourceToString(resourceForDown)))
 				}
 			} else {
+				ds.logger.V(3).Info(fmt.Sprintf("  delete %q from downstream since it's found", resourceToString(resourceForDown)))
 				if hasDownsyncAnnotation(downstreamResource) {
-					ds.logger.V(3).Info(fmt.Sprintf("  delete %q from downstream since it's found", resourceToString(resourceForDown)))
 					if err := downstreamClient.Delete(resourceForDown, resourceForDown.Name); err != nil {
 						ds.logger.Error(err, fmt.Sprintf("failed to delete resource from downstream %q", resourceToString(resourceForDown)))
 						return err
 					}
+				} else {
+					ds.logger.V(2).Info(fmt.Sprintf("  ignore deleting %q from downstream since downsync annotation is not setn", resourceToString(resourceForDown)))
 				}
 			}
 		} else {

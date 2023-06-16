@@ -178,13 +178,15 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 	for _, srcResource := range srcResourceList.Items {
 		destResource, ok := findWithObject(srcResource, destResourceList)
 		if ok {
-			srcResource.SetResourceVersion("")
-			srcResource.SetUID("")
+			srcResource.SetResourceVersion(destResource.GetResourceVersion())
+			srcResource.SetUID(destResource.GetUID())
 			srcResource.SetManagedFields(nil)
 			if hasAnnotation(destResource) {
 				setAnnotation(&srcResource)
+				updatedResources = append(updatedResources, srcResource)
+			} else {
+				logger.V(2).Info(fmt.Sprintf("  ignore adding %s to updatedResources since annotation is not set.", destResource.GetName()))
 			}
-			updatedResources = append(updatedResources, srcResource)
 		} else {
 			srcResource.SetResourceVersion("")
 			srcResource.SetUID("")
@@ -199,7 +201,7 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 				logger.V(3).Info(fmt.Sprintf("  %s is added to deletedResources since annotation is set.", destResource.GetName()))
 				deletedResources = append(deletedResources, destResource)
 			} else {
-				logger.V(3).Info(fmt.Sprintf("  %s is not added to deletedResources since annotation is not set.", destResource.GetName()))
+				logger.V(2).Info(fmt.Sprintf("  ignore adding %s to deletedResources since annotation is not set.", destResource.GetName()))
 			}
 		}
 	}

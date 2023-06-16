@@ -156,4 +156,24 @@ func testKubeStellarSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstr
 		t.Logf("fetched upsynced SampleCR: %v", fetched)
 		return true, ""
 	}, wait.ForeverTestTimeout, time.Second*5, "All upsynced resources haven't been propagated to upstream yet.")
+
+	t.Logf("Get latest sample CR %q in downstream cluster %q for updating.", sampleUpsyncCRUnst.GetName(), wsPath.String())
+	latestSampleUpsyncCRUnst, err := syncerFixture.DownstreamDynamicKubeClient.Resource(sampleUpsyncCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
+	require.NoError(t, err)
+
+	t.Logf("Update sample CR %q in downstream cluster %q for cheking upsyncing against existing objects to work properly.", latestSampleUpsyncCRUnst.GetName(), wsPath.String())
+	err = unstructured.SetNestedField(latestSampleUpsyncCRUnst.Object, "bar update", "spec", "foo")
+	require.NoError(t, err)
+	_, err = syncerFixture.DownstreamDynamicKubeClient.Resource(sampleUpsyncCRGVR).Update(ctx, latestSampleUpsyncCRUnst, v1.UpdateOptions{})
+	require.NoError(t, err)
+
+	framework.Eventually(t, func() (bool, string) {
+		fetched, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(sampleUpsyncCRGVR).Get(ctx, sampleUpsyncCRUnst.GetName(), v1.GetOptions{})
+		if err != nil {
+			return false, fmt.Sprintf("Failed to get sample CR %q in workspace %q: %v", sampleUpsyncCRUnst.GetName(), wsPath, err)
+		}
+		t.Logf("fetched upsynced SampleCR: %v", fetched)
+		val, ok, _ := unstructured.NestedString(fetched.Object, "spec", "foo")
+		return ok && val == "bar update", ""
+	}, wait.ForeverTestTimeout, time.Second*5, "Upsynced resources haven't been updated in upstream yet.")
 }
