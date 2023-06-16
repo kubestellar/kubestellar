@@ -53,12 +53,12 @@ jobs:
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}
         # run: echo running on branch ${GITHUB_REF##*/}
-        if: github.event_name != 'pull_request' && github.event_name != 'push'
+        if: github.event_name == 'workflow_dispatch'
 
       - name: echo fetching push or pull_request branch
         run: git fetch origin ${{ github.ref_name }}
         # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
 
       - uses: actions/setup-go@v4
         with:
