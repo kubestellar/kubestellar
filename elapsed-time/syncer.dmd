@@ -2,8 +2,8 @@ FILENAME=syncer docs/scripts/get-elapsed-time.sh
 doc_name: syncer
 workflow_name: "docs-ecutable - Syncer"
 workflow_id: 59733283
-run_number: 50
-createdAt: 2023-06-15T17:56:03Z
-updatedAt: 2023-06-15T18:01:46Z
+run_number: 56
+createdAt: 2023-06-16T00:06:28Z
+updatedAt: 2023-06-16T00:11:31Z
 <!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
     ~ 6  minutes<!--elapsed-time-end-->
