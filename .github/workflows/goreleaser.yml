@@ -1,0 +1,74 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+ 
+env:
+  REGISTRY: ghcr.io
+  ARCHS: linux/amd64,linux/arm64
+#   OPERATOR_IMAGE: kubestellar/kubeflex/manager
+#   IMAGE_NAME: ${{ github.repository }}/chart
+#   CHART_PATH: ./chart
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-go@v4
+      with:
+        go-version: v1.19
+
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+    - name: Delete non-semver tags
+      run: 'git tag -d $(git tag -l | grep -v "^v")'
+
+    - name: Set LDFLAGS
+      run: echo LDFLAGS="$(make ldflags)" >> $GITHUB_ENV
+
+    - name: Run GoReleaser on tag
+      uses: goreleaser/goreleaser-action@v4
+      with:
+        distribution: goreleaser
+        version: latest
+        args: release --timeout 60m --clean
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+        KO_TOKEN: ${{ secrets.TOKEN }}
+        USER: ${{ github.actor }}
+        EMAIL: ${{ github.actor}}@users.noreply.github.com
+
+    # - name: Set up Helm
+    #   uses: azure/setup-helm@v3
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Login to registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+
+    - name: Package and push chart
+      run: |
+          make build-kubestellar-syncer-image \ 
+          DOCKER_REPO=${{ env.REGISTRY }}/${{ github.actor }}/kubestellar/syncer \
+          IMAGE_TAG=${{ env.RELEASE_VERSION }} \
+          ARCHS=${{ env.ARCHS }}
+    
+    # make chart IMG=${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE }}:${{github.ref_name}}
+    # helm package ${{ env.CHART_PATH }} --destination . --version ${{github.ref_name}}
+    # helm push ./*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}    
