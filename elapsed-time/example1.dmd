@@ -2,8 +2,8 @@ FILENAME=example1 docs/scripts/get-elapsed-time.sh
 doc_name: example1
 workflow_name: "docs-ecutable - example1"
 workflow_id: 59733278
-run_number: 56
-createdAt: 2023-06-16T00:06:28Z
-updatedAt: 2023-06-16T00:15:34Z
+run_number: 59
+createdAt: 2023-06-16T16:49:10Z
+updatedAt: 2023-06-16T16:49:27Z
 <!--elapsed-time-start-->!!! tip "Estimated time to complete this example:" 
-    ~ 10  minutes<!--elapsed-time-end-->
+    no estimate available at this time<!--elapsed-time-end-->
