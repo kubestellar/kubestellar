@@ -35,6 +35,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	kcplogicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/logicalcluster/v1alpha1"
 	logicalclusterv1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
@@ -46,17 +47,17 @@ type logicalClustersClusterClient struct {
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *logicalClustersClusterClient) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1client.LogicalClusterInterface {
+func (c *logicalClustersClusterClient) Cluster(clusterPath logicalcluster.Path) kcplogicalclusterv1alpha1.LogicalClustersNamespacer {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 
-	return &logicalClustersClient{Fake: c.Fake, ClusterPath: clusterPath}
+	return &logicalClustersNamespacer{Fake: c.Fake, ClusterPath: clusterPath}
 }
 
 // List takes label and field selectors, and returns the list of LogicalClusters that match those selectors across all clusters.
 func (c *logicalClustersClusterClient) List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(logicalClustersResource, logicalClustersKind, logicalcluster.Wildcard, opts), &logicalclusterv1alpha1.LogicalClusterList{})
+	obj, err := c.Fake.Invokes(kcptesting.NewListAction(logicalClustersResource, logicalClustersKind, logicalcluster.Wildcard, metav1.NamespaceAll, opts), &logicalclusterv1alpha1.LogicalClusterList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -76,16 +77,26 @@ func (c *logicalClustersClusterClient) List(ctx context.Context, opts metav1.Lis
 
 // Watch returns a watch.Interface that watches the requested LogicalClusters across all clusters.
 func (c *logicalClustersClusterClient) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(logicalClustersResource, logicalcluster.Wildcard, opts))
+	return c.Fake.InvokesWatch(kcptesting.NewWatchAction(logicalClustersResource, logicalcluster.Wildcard, metav1.NamespaceAll, opts))
+}
+
+type logicalClustersNamespacer struct {
+	*kcptesting.Fake
+	ClusterPath logicalcluster.Path
+}
+
+func (n *logicalClustersNamespacer) Namespace(namespace string) logicalclusterv1alpha1client.LogicalClusterInterface {
+	return &logicalClustersClient{Fake: n.Fake, ClusterPath: n.ClusterPath, Namespace: namespace}
 }
 
 type logicalClustersClient struct {
 	*kcptesting.Fake
 	ClusterPath logicalcluster.Path
+	Namespace   string
 }
 
 func (c *logicalClustersClient) Create(ctx context.Context, logicalCluster *logicalclusterv1alpha1.LogicalCluster, opts metav1.CreateOptions) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootCreateAction(logicalClustersResource, c.ClusterPath, logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
+	obj, err := c.Fake.Invokes(kcptesting.NewCreateAction(logicalClustersResource, c.ClusterPath, c.Namespace, logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
 	if obj == nil {
 		return nil, err
 	}
@@ -93,7 +104,7 @@ func (c *logicalClustersClient) Create(ctx context.Context, logicalCluster *logi
 }
 
 func (c *logicalClustersClient) Update(ctx context.Context, logicalCluster *logicalclusterv1alpha1.LogicalCluster, opts metav1.UpdateOptions) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateAction(logicalClustersResource, c.ClusterPath, logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
+	obj, err := c.Fake.Invokes(kcptesting.NewUpdateAction(logicalClustersResource, c.ClusterPath, c.Namespace, logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
 	if obj == nil {
 		return nil, err
 	}
@@ -101,7 +112,7 @@ func (c *logicalClustersClient) Update(ctx context.Context, logicalCluster *logi
 }
 
 func (c *logicalClustersClient) UpdateStatus(ctx context.Context, logicalCluster *logicalclusterv1alpha1.LogicalCluster, opts metav1.UpdateOptions) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootUpdateSubresourceAction(logicalClustersResource, c.ClusterPath, "status", logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
+	obj, err := c.Fake.Invokes(kcptesting.NewUpdateSubresourceAction(logicalClustersResource, c.ClusterPath, "status", c.Namespace, logicalCluster), &logicalclusterv1alpha1.LogicalCluster{})
 	if obj == nil {
 		return nil, err
 	}
@@ -109,19 +120,19 @@ func (c *logicalClustersClient) UpdateStatus(ctx context.Context, logicalCluster
 }
 
 func (c *logicalClustersClient) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
-	_, err := c.Fake.Invokes(kcptesting.NewRootDeleteActionWithOptions(logicalClustersResource, c.ClusterPath, name, opts), &logicalclusterv1alpha1.LogicalCluster{})
+	_, err := c.Fake.Invokes(kcptesting.NewDeleteActionWithOptions(logicalClustersResource, c.ClusterPath, c.Namespace, name, opts), &logicalclusterv1alpha1.LogicalCluster{})
 	return err
 }
 
 func (c *logicalClustersClient) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
-	action := kcptesting.NewRootDeleteCollectionAction(logicalClustersResource, c.ClusterPath, listOpts)
+	action := kcptesting.NewDeleteCollectionAction(logicalClustersResource, c.ClusterPath, c.Namespace, listOpts)
 
 	_, err := c.Fake.Invokes(action, &logicalclusterv1alpha1.LogicalClusterList{})
 	return err
 }
 
 func (c *logicalClustersClient) Get(ctx context.Context, name string, options metav1.GetOptions) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootGetAction(logicalClustersResource, c.ClusterPath, name), &logicalclusterv1alpha1.LogicalCluster{})
+	obj, err := c.Fake.Invokes(kcptesting.NewGetAction(logicalClustersResource, c.ClusterPath, c.Namespace, name), &logicalclusterv1alpha1.LogicalCluster{})
 	if obj == nil {
 		return nil, err
 	}
@@ -130,7 +141,7 @@ func (c *logicalClustersClient) Get(ctx context.Context, name string, options me
 
 // List takes label and field selectors, and returns the list of LogicalClusters that match those selectors.
 func (c *logicalClustersClient) List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootListAction(logicalClustersResource, logicalClustersKind, c.ClusterPath, opts), &logicalclusterv1alpha1.LogicalClusterList{})
+	obj, err := c.Fake.Invokes(kcptesting.NewListAction(logicalClustersResource, logicalClustersKind, c.ClusterPath, c.Namespace, opts), &logicalclusterv1alpha1.LogicalClusterList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -149,11 +160,11 @@ func (c *logicalClustersClient) List(ctx context.Context, opts metav1.ListOption
 }
 
 func (c *logicalClustersClient) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.Fake.InvokesWatch(kcptesting.NewRootWatchAction(logicalClustersResource, c.ClusterPath, opts))
+	return c.Fake.InvokesWatch(kcptesting.NewWatchAction(logicalClustersResource, c.ClusterPath, c.Namespace, opts))
 }
 
 func (c *logicalClustersClient) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	obj, err := c.Fake.Invokes(kcptesting.NewRootPatchSubresourceAction(logicalClustersResource, c.ClusterPath, name, pt, data, subresources...), &logicalclusterv1alpha1.LogicalCluster{})
+	obj, err := c.Fake.Invokes(kcptesting.NewPatchSubresourceAction(logicalClustersResource, c.ClusterPath, c.Namespace, name, pt, data, subresources...), &logicalclusterv1alpha1.LogicalCluster{})
 	if obj == nil {
 		return nil, err
 	}

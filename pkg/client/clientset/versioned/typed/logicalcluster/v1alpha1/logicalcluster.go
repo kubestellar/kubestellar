@@ -34,7 +34,7 @@ import (
 // LogicalClustersGetter has a method to return a LogicalClusterInterface.
 // A group's client should implement this interface.
 type LogicalClustersGetter interface {
-	LogicalClusters() LogicalClusterInterface
+	LogicalClusters(namespace string) LogicalClusterInterface
 }
 
 // LogicalClusterInterface has methods to work with LogicalCluster resources.
@@ -54,12 +54,14 @@ type LogicalClusterInterface interface {
 // logicalClusters implements LogicalClusterInterface
 type logicalClusters struct {
 	client rest.Interface
+	ns     string
 }
 
 // newLogicalClusters returns a LogicalClusters
-func newLogicalClusters(c *LogicalclusterV1alpha1Client) *logicalClusters {
+func newLogicalClusters(c *LogicalclusterV1alpha1Client, namespace string) *logicalClusters {
 	return &logicalClusters{
 		client: c.RESTClient(),
+		ns:     namespace,
 	}
 }
 
@@ -67,6 +69,7 @@ func newLogicalClusters(c *LogicalclusterV1alpha1Client) *logicalClusters {
 func (c *logicalClusters) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.LogicalCluster, err error) {
 	result = &v1alpha1.LogicalCluster{}
 	err = c.client.Get().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
@@ -83,6 +86,7 @@ func (c *logicalClusters) List(ctx context.Context, opts v1.ListOptions) (result
 	}
 	result = &v1alpha1.LogicalClusterList{}
 	err = c.client.Get().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -99,6 +103,7 @@ func (c *logicalClusters) Watch(ctx context.Context, opts v1.ListOptions) (watch
 	}
 	opts.Watch = true
 	return c.client.Get().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -109,6 +114,7 @@ func (c *logicalClusters) Watch(ctx context.Context, opts v1.ListOptions) (watch
 func (c *logicalClusters) Create(ctx context.Context, logicalCluster *v1alpha1.LogicalCluster, opts v1.CreateOptions) (result *v1alpha1.LogicalCluster, err error) {
 	result = &v1alpha1.LogicalCluster{}
 	err = c.client.Post().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(logicalCluster).
@@ -121,6 +127,7 @@ func (c *logicalClusters) Create(ctx context.Context, logicalCluster *v1alpha1.L
 func (c *logicalClusters) Update(ctx context.Context, logicalCluster *v1alpha1.LogicalCluster, opts v1.UpdateOptions) (result *v1alpha1.LogicalCluster, err error) {
 	result = &v1alpha1.LogicalCluster{}
 	err = c.client.Put().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		Name(logicalCluster.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
@@ -135,6 +142,7 @@ func (c *logicalClusters) Update(ctx context.Context, logicalCluster *v1alpha1.L
 func (c *logicalClusters) UpdateStatus(ctx context.Context, logicalCluster *v1alpha1.LogicalCluster, opts v1.UpdateOptions) (result *v1alpha1.LogicalCluster, err error) {
 	result = &v1alpha1.LogicalCluster{}
 	err = c.client.Put().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		Name(logicalCluster.Name).
 		SubResource("status").
@@ -148,6 +156,7 @@ func (c *logicalClusters) UpdateStatus(ctx context.Context, logicalCluster *v1al
 // Delete takes name of the logicalCluster and deletes it. Returns an error if one occurs.
 func (c *logicalClusters) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		Name(name).
 		Body(&opts).
@@ -162,6 +171,7 @@ func (c *logicalClusters) DeleteCollection(ctx context.Context, opts v1.DeleteOp
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
@@ -174,6 +184,7 @@ func (c *logicalClusters) DeleteCollection(ctx context.Context, opts v1.DeleteOp
 func (c *logicalClusters) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.LogicalCluster, err error) {
 	result = &v1alpha1.LogicalCluster{}
 	err = c.client.Patch(pt).
+		Namespace(c.ns).
 		Resource("logicalclusters").
 		Name(name).
 		SubResource(subresources...).

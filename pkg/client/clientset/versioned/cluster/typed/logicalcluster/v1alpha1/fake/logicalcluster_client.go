@@ -68,6 +68,6 @@ func (c *LogicalclusterV1alpha1Client) ClusterProviderDescs() logicalclusterv1al
 	return &clusterProviderDescsClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
 
-func (c *LogicalclusterV1alpha1Client) LogicalClusters() logicalclusterv1alpha1.LogicalClusterInterface {
-	return &logicalClustersClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
+func (c *LogicalclusterV1alpha1Client) LogicalClusters(namespace string) logicalclusterv1alpha1.LogicalClusterInterface {
+	return &logicalClustersClient{Fake: c.Fake, ClusterPath: c.ClusterPath, Namespace: namespace}
 }

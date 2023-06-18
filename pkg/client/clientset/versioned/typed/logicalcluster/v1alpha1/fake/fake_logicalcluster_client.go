@@ -33,8 +33,8 @@ func (c *FakeLogicalclusterV1alpha1) ClusterProviderDescs() v1alpha1.ClusterProv
 	return &FakeClusterProviderDescs{c}
 }
 
-func (c *FakeLogicalclusterV1alpha1) LogicalClusters() v1alpha1.LogicalClusterInterface {
-	return &FakeLogicalClusters{c}
+func (c *FakeLogicalclusterV1alpha1) LogicalClusters(namespace string) v1alpha1.LogicalClusterInterface {
+	return &FakeLogicalClusters{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
