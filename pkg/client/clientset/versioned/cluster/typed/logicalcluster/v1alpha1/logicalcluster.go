@@ -41,9 +41,9 @@ type LogicalClustersClusterGetter interface {
 }
 
 // LogicalClusterClusterInterface can operate on LogicalClusters across all clusters,
-// or scope down to one cluster and return a logicalclusterv1alpha1client.LogicalClusterInterface.
+// or scope down to one cluster and return a LogicalClustersNamespacer.
 type LogicalClusterClusterInterface interface {
-	Cluster(logicalcluster.Path) logicalclusterv1alpha1client.LogicalClusterInterface
+	Cluster(logicalcluster.Path) LogicalClustersNamespacer
 	List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 }
@@ -53,20 +53,34 @@ type logicalClustersClusterInterface struct {
 }
 
 // Cluster scopes the client down to a particular cluster.
-func (c *logicalClustersClusterInterface) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1client.LogicalClusterInterface {
+func (c *logicalClustersClusterInterface) Cluster(clusterPath logicalcluster.Path) LogicalClustersNamespacer {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 
-	return c.clientCache.ClusterOrDie(clusterPath).LogicalClusters()
+	return &logicalClustersNamespacer{clientCache: c.clientCache, clusterPath: clusterPath}
 }
 
 // List returns the entire collection of all LogicalClusters across all clusters.
 func (c *logicalClustersClusterInterface) List(ctx context.Context, opts metav1.ListOptions) (*logicalclusterv1alpha1.LogicalClusterList, error) {
-	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).LogicalClusters().List(ctx, opts)
+	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).LogicalClusters(metav1.NamespaceAll).List(ctx, opts)
 }
 
 // Watch begins to watch all LogicalClusters across all clusters.
 func (c *logicalClustersClusterInterface) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
-	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).LogicalClusters().Watch(ctx, opts)
+	return c.clientCache.ClusterOrDie(logicalcluster.Wildcard).LogicalClusters(metav1.NamespaceAll).Watch(ctx, opts)
+}
+
+// LogicalClustersNamespacer can scope to objects within a namespace, returning a logicalclusterv1alpha1client.LogicalClusterInterface.
+type LogicalClustersNamespacer interface {
+	Namespace(string) logicalclusterv1alpha1client.LogicalClusterInterface
+}
+
+type logicalClustersNamespacer struct {
+	clientCache kcpclient.Cache[*logicalclusterv1alpha1client.LogicalclusterV1alpha1Client]
+	clusterPath logicalcluster.Path
+}
+
+func (n *logicalClustersNamespacer) Namespace(namespace string) logicalclusterv1alpha1client.LogicalClusterInterface {
+	return n.clientCache.ClusterOrDie(n.clusterPath).LogicalClusters(namespace)
 }

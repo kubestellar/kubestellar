@@ -26,3 +26,6 @@ type LogicalClusterClusterListerExpansion interface{}
 
 // LogicalClusterListerExpansion allows custom methods to be added to LogicalClusterLister.
 type LogicalClusterListerExpansion interface{}
+
+// LogicalClusterNamespaceListerExpansion allows custom methods to be added to LogicalClusterNamespaceLister.
+type LogicalClusterNamespaceListerExpansion interface{}

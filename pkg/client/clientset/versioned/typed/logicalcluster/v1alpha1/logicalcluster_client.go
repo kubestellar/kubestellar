@@ -42,8 +42,8 @@ func (c *LogicalclusterV1alpha1Client) ClusterProviderDescs() ClusterProviderDes
 	return newClusterProviderDescs(c)
 }
 
-func (c *LogicalclusterV1alpha1Client) LogicalClusters() LogicalClusterInterface {
-	return newLogicalClusters(c)
+func (c *LogicalclusterV1alpha1Client) LogicalClusters(namespace string) LogicalClusterInterface {
+	return newLogicalClusters(c, namespace)
 }
 
 // NewForConfig creates a new LogicalclusterV1alpha1Client for the given config.
