@@ -88,8 +88,8 @@ func NewFilteredLogicalClusterClusterInformer(client clientset.ClusterInterface,
 
 func (f *logicalClusterClusterInformer) defaultInformer(client clientset.ClusterInterface, resyncPeriod time.Duration) kcpcache.ScopeableSharedIndexInformer {
 	return NewFilteredLogicalClusterClusterInformer(client, resyncPeriod, cache.Indexers{
-		kcpcache.ClusterIndexName: kcpcache.ClusterIndexFunc,
-	},
+		kcpcache.ClusterIndexName:             kcpcache.ClusterIndexFunc,
+		kcpcache.ClusterAndNamespaceIndexName: kcpcache.ClusterAndNamespaceIndexFunc},
 		f.tweakListOptions,
 	)
 }
@@ -132,6 +132,7 @@ func (f *logicalClusterInformer) Lister() logicalclusterv1alpha1listers.LogicalC
 type logicalClusterScopedInformer struct {
 	factory          internalinterfaces.SharedScopedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	namespace        string
 }
 
 func (f *logicalClusterScopedInformer) Informer() cache.SharedIndexInformer {
@@ -145,27 +146,27 @@ func (f *logicalClusterScopedInformer) Lister() logicalclusterv1alpha1listers.Lo
 // NewLogicalClusterInformer constructs a new informer for LogicalCluster type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewLogicalClusterInformer(client scopedclientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredLogicalClusterInformer(client, resyncPeriod, indexers, nil)
+func NewLogicalClusterInformer(client scopedclientset.Interface, resyncPeriod time.Duration, namespace string, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredLogicalClusterInformer(client, resyncPeriod, namespace, indexers, nil)
 }
 
 // NewFilteredLogicalClusterInformer constructs a new informer for LogicalCluster type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredLogicalClusterInformer(client scopedclientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredLogicalClusterInformer(client scopedclientset.Interface, resyncPeriod time.Duration, namespace string, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().LogicalClusters().List(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().LogicalClusters().Watch(context.TODO(), options)
+				return client.LogicalclusterV1alpha1().LogicalClusters(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&logicalclusterv1alpha1.LogicalCluster{},
@@ -175,5 +176,7 @@ func NewFilteredLogicalClusterInformer(client scopedclientset.Interface, resyncP
 }
 
 func (f *logicalClusterScopedInformer) defaultInformer(client scopedclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredLogicalClusterInformer(client, resyncPeriod, cache.Indexers{}, f.tweakListOptions)
+	return NewFilteredLogicalClusterInformer(client, resyncPeriod, f.namespace, cache.Indexers{
+		cache.NamespaceIndex: cache.MetaNamespaceIndexFunc,
+	}, f.tweakListOptions)
 }

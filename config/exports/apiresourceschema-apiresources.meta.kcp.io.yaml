@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230220-d814bdd.apiresources.meta.kcp.io
+  name: v230618-23cd8129.apiresources.meta.kcp.io
 spec:
   group: meta.kcp.io
   names:
