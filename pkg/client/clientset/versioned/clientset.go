@@ -27,14 +27,14 @@ import (
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
+	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface
-	LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface
+	LcV1alpha1() lcv1alpha1.LcV1alpha1Interface
 	MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface
 }
 
@@ -42,9 +42,9 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	edgeV1alpha1           *edgev1alpha1.EdgeV1alpha1Client
-	logicalclusterV1alpha1 *logicalclusterv1alpha1.LogicalclusterV1alpha1Client
-	metaV1alpha1           *metav1alpha1.MetaV1alpha1Client
+	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1Client
+	lcV1alpha1   *lcv1alpha1.LcV1alpha1Client
+	metaV1alpha1 *metav1alpha1.MetaV1alpha1Client
 }
 
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client
@@ -52,9 +52,9 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return c.edgeV1alpha1
 }
 
-// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1Client
-func (c *Clientset) LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
-	return c.logicalclusterV1alpha1
+// LcV1alpha1 retrieves the LcV1alpha1Client
+func (c *Clientset) LcV1alpha1() lcv1alpha1.LcV1alpha1Interface {
+	return c.lcV1alpha1
 }
 
 // MetaV1alpha1 retrieves the MetaV1alpha1Client
@@ -110,7 +110,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.logicalclusterV1alpha1, err = logicalclusterv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.lcV1alpha1, err = lcv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.edgeV1alpha1 = edgev1alpha1.New(c)
-	cs.logicalclusterV1alpha1 = logicalclusterv1alpha1.New(c)
+	cs.lcV1alpha1 = lcv1alpha1.New(c)
 	cs.metaV1alpha1 = metav1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

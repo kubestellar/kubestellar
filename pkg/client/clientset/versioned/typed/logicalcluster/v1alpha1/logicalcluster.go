@@ -58,7 +58,7 @@ type logicalClusters struct {
 }
 
 // newLogicalClusters returns a LogicalClusters
-func newLogicalClusters(c *LogicalclusterV1alpha1Client, namespace string) *logicalClusters {
+func newLogicalClusters(c *LcV1alpha1Client, namespace string) *logicalClusters {
 	return &logicalClusters{
 		client: c.RESTClient(),
 		ns:     namespace,
