@@ -52,6 +52,7 @@ type logicalClusterClusterLister struct {
 // - is fed by a cross-workspace LIST+WATCH
 // - uses kcpcache.MetaClusterNamespaceKeyFunc as the key function
 // - has the kcpcache.ClusterIndex as an index
+// - has the kcpcache.ClusterAndNamespaceIndex as an index
 func NewLogicalClusterClusterLister(indexer cache.Indexer) *logicalClusterClusterLister {
 	return &logicalClusterClusterLister{indexer: indexer}
 }
@@ -69,19 +70,18 @@ func (s *logicalClusterClusterLister) Cluster(clusterName logicalcluster.Name) L
 	return &logicalClusterLister{indexer: s.indexer, clusterName: clusterName}
 }
 
-// LogicalClusterLister can list all LogicalClusters, or get one in particular.
+// LogicalClusterLister can list LogicalClusters across all namespaces, or scope down to a LogicalClusterNamespaceLister for one namespace.
 // All objects returned here must be treated as read-only.
 type LogicalClusterLister interface {
 	// List lists all LogicalClusters in the workspace.
 	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error)
-	// Get retrieves the LogicalCluster from the indexer for a given workspace and name.
-	// Objects returned here must be treated as read-only.
-	Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error)
+	// LogicalClusters returns a lister that can list and get LogicalClusters in one workspace and namespace.
+	LogicalClusters(namespace string) LogicalClusterNamespaceLister
 	LogicalClusterListerExpansion
 }
 
-// logicalClusterLister can list all LogicalClusters inside a workspace.
+// logicalClusterLister can list all LogicalClusters inside a workspace or scope down to a LogicalClusterLister for one namespace.
 type logicalClusterLister struct {
 	indexer     cache.Indexer
 	clusterName logicalcluster.Name
@@ -95,9 +95,42 @@ func (s *logicalClusterLister) List(selector labels.Selector) (ret []*logicalclu
 	return ret, err
 }
 
-// Get retrieves the LogicalCluster from the indexer for a given workspace and name.
-func (s *logicalClusterLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), "", name)
+// LogicalClusters returns an object that can list and get LogicalClusters in one namespace.
+func (s *logicalClusterLister) LogicalClusters(namespace string) LogicalClusterNamespaceLister {
+	return &logicalClusterNamespaceLister{indexer: s.indexer, clusterName: s.clusterName, namespace: namespace}
+}
+
+// logicalClusterNamespaceLister helps list and get LogicalClusters.
+// All objects returned here must be treated as read-only.
+type LogicalClusterNamespaceLister interface {
+	// List lists all LogicalClusters in the workspace and namespace.
+	// Objects returned here must be treated as read-only.
+	List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error)
+	// Get retrieves the LogicalCluster from the indexer for a given workspace, namespace and name.
+	// Objects returned here must be treated as read-only.
+	Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error)
+	LogicalClusterNamespaceListerExpansion
+}
+
+// logicalClusterNamespaceLister helps list and get LogicalClusters.
+// All objects returned here must be treated as read-only.
+type logicalClusterNamespaceLister struct {
+	indexer     cache.Indexer
+	clusterName logicalcluster.Name
+	namespace   string
+}
+
+// List lists all LogicalClusters in the indexer for a given workspace and namespace.
+func (s *logicalClusterNamespaceLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error) {
+	err = kcpcache.ListAllByClusterAndNamespace(s.indexer, s.clusterName, s.namespace, selector, func(i interface{}) {
+		ret = append(ret, i.(*logicalclusterv1alpha1.LogicalCluster))
+	})
+	return ret, err
+}
+
+// Get retrieves the LogicalCluster from the indexer for a given workspace, namespace and name.
+func (s *logicalClusterNamespaceLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
+	key := kcpcache.ToClusterAwareKey(s.clusterName.String(), s.namespace, name)
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err
@@ -112,11 +145,12 @@ func (s *logicalClusterLister) Get(name string) (*logicalclusterv1alpha1.Logical
 // We assume that the indexer:
 // - is fed by a workspace-scoped LIST+WATCH
 // - uses cache.MetaNamespaceKeyFunc as the key function
+// - has the cache.NamespaceIndex as an index
 func NewLogicalClusterLister(indexer cache.Indexer) *logicalClusterScopedLister {
 	return &logicalClusterScopedLister{indexer: indexer}
 }
 
-// logicalClusterScopedLister can list all LogicalClusters inside a workspace.
+// logicalClusterScopedLister can list all LogicalClusters inside a workspace or scope down to a LogicalClusterLister for one namespace.
 type logicalClusterScopedLister struct {
 	indexer cache.Indexer
 }
@@ -129,9 +163,28 @@ func (s *logicalClusterScopedLister) List(selector labels.Selector) (ret []*logi
 	return ret, err
 }
 
-// Get retrieves the LogicalCluster from the indexer for a given workspace and name.
-func (s *logicalClusterScopedLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
-	key := name
+// LogicalClusters returns an object that can list and get LogicalClusters in one namespace.
+func (s *logicalClusterScopedLister) LogicalClusters(namespace string) LogicalClusterNamespaceLister {
+	return &logicalClusterScopedNamespaceLister{indexer: s.indexer, namespace: namespace}
+}
+
+// logicalClusterScopedNamespaceLister helps list and get LogicalClusters.
+type logicalClusterScopedNamespaceLister struct {
+	indexer   cache.Indexer
+	namespace string
+}
+
+// List lists all LogicalClusters in the indexer for a given workspace and namespace.
+func (s *logicalClusterScopedNamespaceLister) List(selector labels.Selector) (ret []*logicalclusterv1alpha1.LogicalCluster, err error) {
+	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(i interface{}) {
+		ret = append(ret, i.(*logicalclusterv1alpha1.LogicalCluster))
+	})
+	return ret, err
+}
+
+// Get retrieves the LogicalCluster from the indexer for a given workspace, namespace and name.
+func (s *logicalClusterScopedNamespaceLister) Get(name string) (*logicalclusterv1alpha1.LogicalCluster, error) {
+	key := s.namespace + "/" + name
 	obj, exists, err := s.indexer.GetByKey(key)
 	if err != nil {
 		return nil, err

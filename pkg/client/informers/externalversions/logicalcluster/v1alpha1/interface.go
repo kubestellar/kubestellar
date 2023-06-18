@@ -77,5 +77,5 @@ func (v *scopedVersion) ClusterProviderDescs() ClusterProviderDescInformer {
 
 // LogicalClusters returns a LogicalClusterInformer
 func (v *scopedVersion) LogicalClusters() LogicalClusterInformer {
-	return &logicalClusterScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+	return &logicalClusterScopedInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
