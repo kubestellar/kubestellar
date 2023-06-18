@@ -57,7 +57,7 @@ type clusterProviderDescs struct {
 }
 
 // newClusterProviderDescs returns a ClusterProviderDescs
-func newClusterProviderDescs(c *LogicalclusterV1alpha1Client) *clusterProviderDescs {
+func newClusterProviderDescs(c *LcV1alpha1Client) *clusterProviderDescs {
 	return &clusterProviderDescs{
 		client: c.RESTClient(),
 	}
