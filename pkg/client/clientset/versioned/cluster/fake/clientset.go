@@ -33,13 +33,13 @@ import (
 	kcpclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	kcpedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
-	kcplogicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/logicalcluster/v1alpha1"
-	fakelogicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/logicalcluster/v1alpha1/fake"
+	kcplcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/lc/v1alpha1"
+	fakelcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/lc/v1alpha1/fake"
 	kcpmetav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
 	fakemetav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1/fake"
 	clientscheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
+	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/lc/v1alpha1"
 	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
@@ -82,9 +82,9 @@ func (c *ClusterClientset) EdgeV1alpha1() kcpedgev1alpha1.EdgeV1alpha1ClusterInt
 	return &fakeedgev1alpha1.EdgeV1alpha1ClusterClient{Fake: c.Fake}
 }
 
-// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1ClusterClient.
-func (c *ClusterClientset) LogicalclusterV1alpha1() kcplogicalclusterv1alpha1.LogicalclusterV1alpha1ClusterInterface {
-	return &fakelogicalclusterv1alpha1.LogicalclusterV1alpha1ClusterClient{Fake: c.Fake}
+// LcV1alpha1 retrieves the LcV1alpha1ClusterClient.
+func (c *ClusterClientset) LcV1alpha1() kcplcv1alpha1.LcV1alpha1ClusterInterface {
+	return &fakelcv1alpha1.LcV1alpha1ClusterClient{Fake: c.Fake}
 }
 
 // MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
@@ -129,9 +129,9 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
 }
 
-// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1Client.
-func (c *Clientset) LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
-	return &fakelogicalclusterv1alpha1.LogicalclusterV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
+// LcV1alpha1 retrieves the LcV1alpha1Client.
+func (c *Clientset) LcV1alpha1() lcv1alpha1.LcV1alpha1Interface {
+	return &fakelcv1alpha1.LcV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
 }
 
 // MetaV1alpha1 retrieves the MetaV1alpha1Client.

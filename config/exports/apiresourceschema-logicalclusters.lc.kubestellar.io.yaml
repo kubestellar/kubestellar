@@ -2,9 +2,9 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230622-db17e114.logicalclusters.logicalcluster.kubestellar.io
+  name: v230622-8f51a0e9.logicalclusters.lc.kubestellar.io
 spec:
-  group: logicalcluster.kubestellar.io
+  group: lc.kubestellar.io
   names:
     kind: LogicalCluster
     listKind: LogicalClusterList

@@ -25,21 +25,21 @@ import (
 	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
-type FakeLogicalclusterV1alpha1 struct {
+type FakeLcV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeLogicalclusterV1alpha1) ClusterProviderDescs() v1alpha1.ClusterProviderDescInterface {
+func (c *FakeLcV1alpha1) ClusterProviderDescs() v1alpha1.ClusterProviderDescInterface {
 	return &FakeClusterProviderDescs{c}
 }
 
-func (c *FakeLogicalclusterV1alpha1) LogicalClusters(namespace string) v1alpha1.LogicalClusterInterface {
+func (c *FakeLcV1alpha1) LogicalClusters(namespace string) v1alpha1.LogicalClusterInterface {
 	return &FakeLogicalClusters{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeLogicalclusterV1alpha1) RESTClient() rest.Interface {
+func (c *FakeLcV1alpha1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

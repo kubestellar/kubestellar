@@ -34,11 +34,11 @@ import (
 	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/lc/v1alpha1"
 	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	logicalclusterv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/logicalcluster/v1alpha1"
+	lcv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/lc/v1alpha1"
 )
 
 // ClusterProviderDescClusterInformer provides access to a shared informer and lister for
@@ -46,7 +46,7 @@ import (
 type ClusterProviderDescClusterInformer interface {
 	Cluster(logicalcluster.Name) ClusterProviderDescInformer
 	Informer() kcpcache.ScopeableSharedIndexInformer
-	Lister() logicalclusterv1alpha1listers.ClusterProviderDescClusterLister
+	Lister() lcv1alpha1listers.ClusterProviderDescClusterLister
 }
 
 type clusterProviderDescClusterInformer struct {
@@ -71,16 +71,16 @@ func NewFilteredClusterProviderDescClusterInformer(client clientset.ClusterInter
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().ClusterProviderDescs().List(context.TODO(), options)
+				return client.LcV1alpha1().ClusterProviderDescs().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().ClusterProviderDescs().Watch(context.TODO(), options)
+				return client.LcV1alpha1().ClusterProviderDescs().Watch(context.TODO(), options)
 			},
 		},
-		&logicalclusterv1alpha1.ClusterProviderDesc{},
+		&lcv1alpha1.ClusterProviderDesc{},
 		resyncPeriod,
 		indexers,
 	)
@@ -95,18 +95,18 @@ func (f *clusterProviderDescClusterInformer) defaultInformer(client clientset.Cl
 }
 
 func (f *clusterProviderDescClusterInformer) Informer() kcpcache.ScopeableSharedIndexInformer {
-	return f.factory.InformerFor(&logicalclusterv1alpha1.ClusterProviderDesc{}, f.defaultInformer)
+	return f.factory.InformerFor(&lcv1alpha1.ClusterProviderDesc{}, f.defaultInformer)
 }
 
-func (f *clusterProviderDescClusterInformer) Lister() logicalclusterv1alpha1listers.ClusterProviderDescClusterLister {
-	return logicalclusterv1alpha1listers.NewClusterProviderDescClusterLister(f.Informer().GetIndexer())
+func (f *clusterProviderDescClusterInformer) Lister() lcv1alpha1listers.ClusterProviderDescClusterLister {
+	return lcv1alpha1listers.NewClusterProviderDescClusterLister(f.Informer().GetIndexer())
 }
 
 // ClusterProviderDescInformer provides access to a shared informer and lister for
 // ClusterProviderDescs.
 type ClusterProviderDescInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() logicalclusterv1alpha1listers.ClusterProviderDescLister
+	Lister() lcv1alpha1listers.ClusterProviderDescLister
 }
 
 func (f *clusterProviderDescClusterInformer) Cluster(clusterName logicalcluster.Name) ClusterProviderDescInformer {
@@ -118,14 +118,14 @@ func (f *clusterProviderDescClusterInformer) Cluster(clusterName logicalcluster.
 
 type clusterProviderDescInformer struct {
 	informer cache.SharedIndexInformer
-	lister   logicalclusterv1alpha1listers.ClusterProviderDescLister
+	lister   lcv1alpha1listers.ClusterProviderDescLister
 }
 
 func (f *clusterProviderDescInformer) Informer() cache.SharedIndexInformer {
 	return f.informer
 }
 
-func (f *clusterProviderDescInformer) Lister() logicalclusterv1alpha1listers.ClusterProviderDescLister {
+func (f *clusterProviderDescInformer) Lister() lcv1alpha1listers.ClusterProviderDescLister {
 	return f.lister
 }
 
@@ -135,11 +135,11 @@ type clusterProviderDescScopedInformer struct {
 }
 
 func (f *clusterProviderDescScopedInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&logicalclusterv1alpha1.ClusterProviderDesc{}, f.defaultInformer)
+	return f.factory.InformerFor(&lcv1alpha1.ClusterProviderDesc{}, f.defaultInformer)
 }
 
-func (f *clusterProviderDescScopedInformer) Lister() logicalclusterv1alpha1listers.ClusterProviderDescLister {
-	return logicalclusterv1alpha1listers.NewClusterProviderDescLister(f.Informer().GetIndexer())
+func (f *clusterProviderDescScopedInformer) Lister() lcv1alpha1listers.ClusterProviderDescLister {
+	return lcv1alpha1listers.NewClusterProviderDescLister(f.Informer().GetIndexer())
 }
 
 // NewClusterProviderDescInformer constructs a new informer for ClusterProviderDesc type.
@@ -159,16 +159,16 @@ func NewFilteredClusterProviderDescInformer(client scopedclientset.Interface, re
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().ClusterProviderDescs().List(context.TODO(), options)
+				return client.LcV1alpha1().ClusterProviderDescs().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.LogicalclusterV1alpha1().ClusterProviderDescs().Watch(context.TODO(), options)
+				return client.LcV1alpha1().ClusterProviderDescs().Watch(context.TODO(), options)
 			},
 		},
-		&logicalclusterv1alpha1.ClusterProviderDesc{},
+		&lcv1alpha1.ClusterProviderDesc{},
 		resyncPeriod,
 		indexers,
 	)
