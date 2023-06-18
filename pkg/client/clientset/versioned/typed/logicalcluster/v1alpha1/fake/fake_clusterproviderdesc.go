@@ -33,12 +33,12 @@ import (
 
 // FakeClusterProviderDescs implements ClusterProviderDescInterface
 type FakeClusterProviderDescs struct {
-	Fake *FakeLogicalclusterV1alpha1
+	Fake *FakeLcV1alpha1
 }
 
-var clusterproviderdescsResource = schema.GroupVersionResource{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Resource: "clusterproviderdescs"}
+var clusterproviderdescsResource = schema.GroupVersionResource{Group: "lc.kubestellar.io", Version: "v1alpha1", Resource: "clusterproviderdescs"}
 
-var clusterproviderdescsKind = schema.GroupVersionKind{Group: "logicalcluster.kubestellar.io", Version: "v1alpha1", Kind: "ClusterProviderDesc"}
+var clusterproviderdescsKind = schema.GroupVersionKind{Group: "lc.kubestellar.io", Version: "v1alpha1", Kind: "ClusterProviderDesc"}
 
 // Get takes name of the clusterProviderDesc, and returns the corresponding clusterProviderDesc object, and an error if there is any.
 func (c *FakeClusterProviderDescs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.ClusterProviderDesc, err error) {
