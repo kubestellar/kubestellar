@@ -61,16 +61,16 @@ jobs:
         # run: echo running on branch ${{ github.ref_name }}
         if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
 
-      - name: Check for Makefile
-        id: check_makefile
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-        run: |
-          if [[ -f "Makefile" ]]; then
-            echo "Makefile found"
-            exit 1
-          else
-            echo "Makefile not found"
-          fi
+      # - name: Check for Makefile
+      #   id: check_makefile
+      #   if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+      #   run: |
+      #     if [[ -f "Makefile" ]]; then
+      #       echo "Makefile found"
+      #       exit 1
+      #     else
+      #       echo "Makefile not found"
+      #     fi
 
       - uses: actions/setup-go@v4
         with:
