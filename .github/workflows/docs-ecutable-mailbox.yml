@@ -59,11 +59,11 @@ jobs:
       - name: echo fetching push or pull_request branch
         run: git fetch origin ${{ github.ref_name }}
         # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
 
       - name: Check for Makefile
         id: check_makefile
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         run: |
           if [[ -f "Makefile" ]]; then
             echo "Makefile found"
