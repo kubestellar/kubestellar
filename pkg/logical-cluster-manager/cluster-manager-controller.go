@@ -28,7 +28,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/logical-cluster"
 
 	clusterproviderclient "github.com/kcp-dev/edge-mc/cluster-provider-client"
 	cluster "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
@@ -191,7 +190,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	var opts cluster.Options
 	//ES: what exactly is this kubeconfig
 	opts.KubeconfigPath = *c.kubeconfig
-	newCluster, err := provider.Create(ctx, logical.Name(clusterName), opts)
+	newCluster, err := provider.Create(ctx, clusterName, opts)
 	if err != nil {
 		logger.Error(err, "failed to create cluster")
 		return err
@@ -238,7 +237,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 	}
 
 	provider := clusterproviderclient.GetProviderClient(providerInfo.Spec.ProviderType, delClusterConfig.Spec.ClusterProviderDesc)
-	err = provider.Delete(ctx, logical.Name(clusterName), opts)
+	err = provider.Delete(ctx, clusterName, opts)
 	if err != nil {
 		logger.Error(err, "failed to delete cluster")
 		return err
