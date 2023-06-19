@@ -21,7 +21,7 @@ which should yield something like:
 
 ``` { .sh .no-copy }
 user     1892  0.0  0.3 747644 29628 pts/1    Sl   10:51   0:00 mailbox-controller -v=2
-user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 scheduler -v 2 
+user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 kubestellar-scheduler -v 2
 user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator -v=2
 ``` 
 
