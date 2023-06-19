@@ -2,7 +2,7 @@
 # KubeStellar Project Governance
 
 The KubeStellar project is dedicated to solving challenges stemming from
-multicluster configuration management for edge, multi-cloud, and hybrid cloud. 
+multi-cluster configuration management for edge, multi-cloud, and hybrid cloud. 
 This governance explains how the project is run.
 
 - [Manifesto](#manifesto)
