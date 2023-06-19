@@ -18,7 +18,6 @@ package cluster
 
 import (
 	"k8s.io/apimachinery/pkg/watch"
-	"sigs.k8s.io/logical-cluster"
 )
 
 func New(cfg string, opts Options) *LogicalClusterInfo {
@@ -82,5 +81,5 @@ type WatchEvent struct {
 	Type watch.EventType
 
 	// Name is the name of the logical cluster related to the event.
-	Name logical.Name
+	Name string
 }

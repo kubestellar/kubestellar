@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	kind "sigs.k8s.io/kind/pkg/cluster"
-	"sigs.k8s.io/logical-cluster"
 
 	clusterprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
 )
@@ -42,7 +41,7 @@ func New(providerName string) KindClusterProvider {
 }
 
 func (k KindClusterProvider) Create(ctx context.Context,
-	name logical.Name,
+	name string,
 	opts clusterprovider.Options) (clusterprovider.LogicalClusterInfo, error) {
 	var resCluster clusterprovider.LogicalClusterInfo
 
@@ -64,21 +63,20 @@ func (k KindClusterProvider) Create(ctx context.Context,
 }
 
 func (k KindClusterProvider) Delete(ctx context.Context,
-	name logical.Name,
+	name string,
 	opts clusterprovider.Options) error {
 
 	return k.kindProvider.Delete(string(name), opts.KubeconfigPath)
 }
 
-func (k KindClusterProvider) List() ([]logical.Name, error) {
+func (k KindClusterProvider) List() ([]string, error) {
 	list, err := k.kindProvider.List()
 	if err != nil {
 		return nil, err
 	}
-	// TODO: what's the right way to cast []string into []logical.Name ??
-	logicalNameList := make([]logical.Name, 0, len(list))
+	logicalNameList := make([]string, 0, len(list))
 	for _, cluster := range list {
-		logicalNameList = append(logicalNameList, logical.Name(cluster))
+		logicalNameList = append(logicalNameList, cluster)
 	}
 	return logicalNameList, err
 }
