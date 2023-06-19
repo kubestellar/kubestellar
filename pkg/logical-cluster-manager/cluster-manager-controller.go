@@ -180,7 +180,10 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 
 	// Update status to NotReady
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
-	_, err = c.clusterclientset.LogicalclusterV1alpha1().LogicalClusters().Update(ctx, newClusterConfig, v1.UpdateOptions{})
+	_, err = c.clusterclientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(newClusterConfig.Spec.ClusterProviderDesc).
+		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
 		return err
@@ -200,7 +203,10 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	// Update the new cluster's status - specifically the config string and the phase
 	newClusterConfig.Status.ClusterConfig = newCluster.Config
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
-	_, err = c.clusterclientset.LogicalclusterV1alpha1().LogicalClusters().Update(ctx, newClusterConfig, v1.UpdateOptions{})
+	_, err = c.clusterclientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(newClusterConfig.Spec.ClusterProviderDesc).
+		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
 		return err
@@ -213,7 +219,10 @@ func (c *Controller) processUpdate(ctx context.Context, key any) error {
 	logger := klog.FromContext(ctx)
 	var err error
 	clusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
-	_, err = c.clusterclientset.LogicalclusterV1alpha1().LogicalClusters().Update(ctx, clusterConfig, v1.UpdateOptions{})
+	_, err = c.clusterclientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(clusterConfig.Spec.ClusterProviderDesc).
+		Update(ctx, clusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
 		return err
