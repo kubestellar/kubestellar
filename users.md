@@ -6,3 +6,4 @@ PR with your organization name if you are using KubeStellar.
 Currently, the following organizations are **officially** using Argo CD:
 
 1. [your org name here](https://your-org-url-here.com/)
+2. 
