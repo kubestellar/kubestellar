@@ -178,7 +178,7 @@ is not among the things that this PoC takes a position on.
 3. A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.
 
-## Edge Service Provider workspace (ESP)
+## Edge Service Provider workspace (ESPW)
 
 The edge multi-cluster service is provided by one workspace that
 includes the following things.
