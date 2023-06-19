@@ -1,4 +1,4 @@
-<!-- <img alt="" width="500px" align="left" src="KubeStellar with Logo.png" />
+<!-- <img alt="" width="500px" align="left" src="../KubeStellar-with-Logo.png" />
 
 <br/>
 <br/>
@@ -26,6 +26,6 @@
 
 <br/>
 <p align="center">
-<img alt="" width="500px" align="center" src="KubeStellar with Logo.png" />
+<img alt="" width="500px" align="center" src="./KubeStellar-with-Logo.png" />
 </p>
 <br/>
