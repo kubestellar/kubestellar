@@ -102,4 +102,3 @@ workload and summarization aspiration removed.  You can continue
 from here, learning more details about what you did in the QuickStart,
 and adding on some more steps for the special workload.
 
-
