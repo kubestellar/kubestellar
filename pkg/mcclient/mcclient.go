@@ -36,11 +36,13 @@ import (
 	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
 )
 
+const defaultProviderNs = "lcprovider-default"
+
 type KubestellarClusterInterface interface {
 	// Cluster returns clientset for given cluster.
-	Cluster(name string) (client mcclientset.Interface)
+	Cluster(name string, namespace ...string) (client mcclientset.Interface)
 	// ConfigForCluster returns rest config for given cluster.
-	ConfigForCluster(name string) (*rest.Config, error)
+	ConfigForCluster(name string, namespace ...string) (*rest.Config, error)
 }
 
 type multiClusterClient struct {
@@ -51,27 +53,29 @@ type multiClusterClient struct {
 	lock             sync.Mutex
 }
 
-func (mcc *multiClusterClient) Cluster(name string) mcclientset.Interface {
+func (mcc *multiClusterClient) Cluster(name string, namespace ...string) mcclientset.Interface {
+	key, ns := namespaceKey(name, namespace)
 	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
-	clientset, ok := mcc.clientsets[name]
+	clientset, ok := mcc.clientsets[key]
 	if !ok {
 		// Try to get LogicalCluster from API server.
-		if clientset, err = mcc.getFromServer(name); err != nil {
+		if clientset, err = mcc.getFromServer(name, ns); err != nil {
 			panic(fmt.Sprintf("invalid cluster name: %s. error: %v", name, err))
 		}
 	}
 	return clientset
 }
 
-func (mcc *multiClusterClient) ConfigForCluster(name string) (*rest.Config, error) {
+func (mcc *multiClusterClient) ConfigForCluster(name string, namespace ...string) (*rest.Config, error) {
+	key, _ := namespaceKey(name, namespace)
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
-	if _, ok := mcc.configs[name]; !ok {
+	if _, ok := mcc.configs[key]; !ok {
 		return nil, fmt.Errorf("failed to get config for cluster: %s", name)
 	}
-	return mcc.configs[name], nil
+	return mcc.configs[key], nil
 }
 
 var client *multiClusterClient
@@ -119,8 +123,8 @@ func (mcc *multiClusterClient) startClusterCollection(ctx context.Context, manag
 
 // getFromServer will query API server for specific LogicalCluster and cache it if it exists and ready.
 // getFromServer caller function should acquire the mcc lock.
-func (mcc *multiClusterClient) getFromServer(name string) (*mcclientset.Clientset, error) {
-	cluster, err := mcc.managerClientset.LogicalclusterV1alpha1().LogicalClusters().Get(mcc.ctx, name, metav1.GetOptions{})
+func (mcc *multiClusterClient) getFromServer(name string, namespace string) (*mcclientset.Clientset, error) {
+	cluster, err := mcc.managerClientset.LogicalclusterV1alpha1().LogicalClusters(namespace).Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -141,4 +145,12 @@ func (mcc *multiClusterClient) getFromServer(name string) (*mcclientset.Clientse
 	mcc.clientsets[cluster.Name] = cs
 
 	return cs, nil
+}
+
+func namespaceKey(name string, namespaces []string) (key string, namespace string) {
+	ns := defaultProviderNs
+	if len(namespace) > 0 {
+		ns = namespaces[0]
+	}
+	return ns + "/" + name, ns
 }
