@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: clusterproviderdescs.lc.kubestellar.io
+  name: clusterproviderdescs.logicalcluster.kubestellar.io
 spec:
-  group: lc.kubestellar.io
+  group: logicalcluster.kubestellar.io
   names:
     kind: ClusterProviderDesc
     listKind: ClusterProviderDescList

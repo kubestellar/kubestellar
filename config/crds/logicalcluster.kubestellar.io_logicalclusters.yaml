@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: logicalclusters.lc.kubestellar.io
+  name: logicalclusters.logicalcluster.kubestellar.io
 spec:
-  group: lc.kubestellar.io
+  group: logicalcluster.kubestellar.io
   names:
     kind: LogicalCluster
     listKind: LogicalClusterList
@@ -15,7 +15,7 @@ spec:
     shortNames:
     - ecl
     singular: logicalcluster
-  scope: Namespaced
+  scope: Cluster
   versions:
   - name: v1alpha1
     schema:

@@ -29,42 +29,42 @@ import (
 	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/lc/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
-type LcV1alpha1ClusterInterface interface {
-	LcV1alpha1ClusterScoper
+type LogicalclusterV1alpha1ClusterInterface interface {
+	LogicalclusterV1alpha1ClusterScoper
 	ClusterProviderDescsClusterGetter
 	LogicalClustersClusterGetter
 }
 
-type LcV1alpha1ClusterScoper interface {
-	Cluster(logicalcluster.Path) lcv1alpha1.LcV1alpha1Interface
+type LogicalclusterV1alpha1ClusterScoper interface {
+	Cluster(logicalcluster.Path) logicalclusterv1alpha1.LogicalclusterV1alpha1Interface
 }
 
-type LcV1alpha1ClusterClient struct {
-	clientCache kcpclient.Cache[*lcv1alpha1.LcV1alpha1Client]
+type LogicalclusterV1alpha1ClusterClient struct {
+	clientCache kcpclient.Cache[*logicalclusterv1alpha1.LogicalclusterV1alpha1Client]
 }
 
-func (c *LcV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) lcv1alpha1.LcV1alpha1Interface {
+func (c *LogicalclusterV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
 	return c.clientCache.ClusterOrDie(clusterPath)
 }
 
-func (c *LcV1alpha1ClusterClient) ClusterProviderDescs() ClusterProviderDescClusterInterface {
+func (c *LogicalclusterV1alpha1ClusterClient) ClusterProviderDescs() ClusterProviderDescClusterInterface {
 	return &clusterProviderDescsClusterInterface{clientCache: c.clientCache}
 }
 
-func (c *LcV1alpha1ClusterClient) LogicalClusters() LogicalClusterClusterInterface {
+func (c *LogicalclusterV1alpha1ClusterClient) LogicalClusters() LogicalClusterClusterInterface {
 	return &logicalClustersClusterInterface{clientCache: c.clientCache}
 }
 
-// NewForConfig creates a new LcV1alpha1ClusterClient for the given config.
+// NewForConfig creates a new LogicalclusterV1alpha1ClusterClient for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*LcV1alpha1ClusterClient, error) {
+func NewForConfig(c *rest.Config) (*LogicalclusterV1alpha1ClusterClient, error) {
 	client, err := rest.HTTPClientFor(c)
 	if err != nil {
 		return nil, err
@@ -72,21 +72,21 @@ func NewForConfig(c *rest.Config) (*LcV1alpha1ClusterClient, error) {
 	return NewForConfigAndClient(c, client)
 }
 
-// NewForConfigAndClient creates a new LcV1alpha1ClusterClient for the given config and http client.
+// NewForConfigAndClient creates a new LogicalclusterV1alpha1ClusterClient for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*LcV1alpha1ClusterClient, error) {
-	cache := kcpclient.NewCache(c, h, &kcpclient.Constructor[*lcv1alpha1.LcV1alpha1Client]{
-		NewForConfigAndClient: lcv1alpha1.NewForConfigAndClient,
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*LogicalclusterV1alpha1ClusterClient, error) {
+	cache := kcpclient.NewCache(c, h, &kcpclient.Constructor[*logicalclusterv1alpha1.LogicalclusterV1alpha1Client]{
+		NewForConfigAndClient: logicalclusterv1alpha1.NewForConfigAndClient,
 	})
 	if _, err := cache.Cluster(logicalcluster.Name("root").Path()); err != nil {
 		return nil, err
 	}
-	return &LcV1alpha1ClusterClient{clientCache: cache}, nil
+	return &LogicalclusterV1alpha1ClusterClient{clientCache: cache}, nil
 }
 
-// NewForConfigOrDie creates a new LcV1alpha1ClusterClient for the given config and
+// NewForConfigOrDie creates a new LogicalclusterV1alpha1ClusterClient for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *LcV1alpha1ClusterClient {
+func NewForConfigOrDie(c *rest.Config) *LogicalclusterV1alpha1ClusterClient {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)

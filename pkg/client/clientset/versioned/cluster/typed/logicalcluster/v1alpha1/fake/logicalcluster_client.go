@@ -27,47 +27,47 @@ import (
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	kcplcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/lc/v1alpha1"
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/lc/v1alpha1"
+	kcplogicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
-var _ kcplcv1alpha1.LcV1alpha1ClusterInterface = (*LcV1alpha1ClusterClient)(nil)
+var _ kcplogicalclusterv1alpha1.LogicalclusterV1alpha1ClusterInterface = (*LogicalclusterV1alpha1ClusterClient)(nil)
 
-type LcV1alpha1ClusterClient struct {
+type LogicalclusterV1alpha1ClusterClient struct {
 	*kcptesting.Fake
 }
 
-func (c *LcV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) lcv1alpha1.LcV1alpha1Interface {
+func (c *LogicalclusterV1alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
 	if clusterPath == logicalcluster.Wildcard {
 		panic("A specific cluster must be provided when scoping, not the wildcard.")
 	}
-	return &LcV1alpha1Client{Fake: c.Fake, ClusterPath: clusterPath}
+	return &LogicalclusterV1alpha1Client{Fake: c.Fake, ClusterPath: clusterPath}
 }
 
-func (c *LcV1alpha1ClusterClient) ClusterProviderDescs() kcplcv1alpha1.ClusterProviderDescClusterInterface {
+func (c *LogicalclusterV1alpha1ClusterClient) ClusterProviderDescs() kcplogicalclusterv1alpha1.ClusterProviderDescClusterInterface {
 	return &clusterProviderDescsClusterClient{Fake: c.Fake}
 }
 
-func (c *LcV1alpha1ClusterClient) LogicalClusters() kcplcv1alpha1.LogicalClusterClusterInterface {
+func (c *LogicalclusterV1alpha1ClusterClient) LogicalClusters() kcplogicalclusterv1alpha1.LogicalClusterClusterInterface {
 	return &logicalClustersClusterClient{Fake: c.Fake}
 }
 
-var _ lcv1alpha1.LcV1alpha1Interface = (*LcV1alpha1Client)(nil)
+var _ logicalclusterv1alpha1.LogicalclusterV1alpha1Interface = (*LogicalclusterV1alpha1Client)(nil)
 
-type LcV1alpha1Client struct {
+type LogicalclusterV1alpha1Client struct {
 	*kcptesting.Fake
 	ClusterPath logicalcluster.Path
 }
 
-func (c *LcV1alpha1Client) RESTClient() rest.Interface {
+func (c *LogicalclusterV1alpha1Client) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }
 
-func (c *LcV1alpha1Client) ClusterProviderDescs() lcv1alpha1.ClusterProviderDescInterface {
+func (c *LogicalclusterV1alpha1Client) ClusterProviderDescs() logicalclusterv1alpha1.ClusterProviderDescInterface {
 	return &clusterProviderDescsClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
 
-func (c *LcV1alpha1Client) LogicalClusters(namespace string) lcv1alpha1.LogicalClusterInterface {
+func (c *LogicalclusterV1alpha1Client) LogicalClusters(namespace string) logicalclusterv1alpha1.LogicalClusterInterface {
 	return &logicalClustersClient{Fake: c.Fake, ClusterPath: c.ClusterPath, Namespace: namespace}
 }
