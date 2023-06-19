@@ -28,8 +28,8 @@ import (
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
-	fakelcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1/fake"
+	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
+	fakelogicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1/fake"
 	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 	fakemetav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
 )
@@ -89,9 +89,9 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.FakeEdgeV1alpha1{Fake: &c.Fake}
 }
 
-// LcV1alpha1 retrieves the LcV1alpha1Client
-func (c *Clientset) LcV1alpha1() lcv1alpha1.LcV1alpha1Interface {
-	return &fakelcv1alpha1.FakeLcV1alpha1{Fake: &c.Fake}
+// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1Client
+func (c *Clientset) LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
+	return &fakelogicalclusterv1alpha1.FakeLogicalclusterV1alpha1{Fake: &c.Fake}
 }
 
 // MetaV1alpha1 retrieves the MetaV1alpha1Client
