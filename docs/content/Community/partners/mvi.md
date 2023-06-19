@@ -14,10 +14,17 @@ Medium - [Deployment and configuration of MVI-Edge using KubeStellar](https://me
 
 ### MVI and KubeStellar in the news
 <p align=center>
+<div id="spinner1">
+    <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
+</div>
+<iframe class="centerImage" id="embed2" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7076627464424189953" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner1').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='740';document.getElementById('embed2').height='400';"></iframe>
+</p>
+
+<p align=center>
 <div id="spinner2">
     <img width="140" height="140" src="../../../images/spinner.gif" class="centerImage">
 </div>
-<iframe class="centerImage" id="embed2" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7076627464424189953" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner2').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='740';document.getElementById('embed2').height='400';"></iframe>
+<iframe class="centerImage" id="embed2" src="https://www.linkedin.com/embed/feed/update/urn:li:share:7076651072211013632" scrolling=no height="0" width="0" frameborder="0" allowfullscreen="" title="Embedded post" style="visibility:hidden;" onload= "document.getElementById('spinner2').style.display='none';document.getElementById('embed2').style.visibility='visible';document.getElementById('embed2').width='740';document.getElementById('embed2').height='400';"></iframe>
 </p>
 
 <style type="text/css">
