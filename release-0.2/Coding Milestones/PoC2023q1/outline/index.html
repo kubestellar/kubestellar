@@ -886,25 +886,25 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inventory-management-workspaces" class="md-nav__link">
-    Inventory Management workspaces
+  <a href="#inventory-management-workspaces-imw" class="md-nav__link">
+    Inventory Management workspaces (IMW)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#edge-service-provider-workspace" class="md-nav__link">
-    Edge Service Provider workspace
+  <a href="#edge-service-provider-workspace-esp" class="md-nav__link">
+    Edge Service Provider workspace (ESP)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#workload-management-workspaces" class="md-nav__link">
-    Workload Management workspaces
+  <a href="#workload-management-workspaces-wmw" class="md-nav__link">
+    Workload Management workspaces (WMW)
   </a>
   
-    <nav class="md-nav" aria-label="Workload Management workspaces">
+    <nav class="md-nav" aria-label="Workload Management workspaces (WMW)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1947,25 +1947,25 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inventory-management-workspaces" class="md-nav__link">
-    Inventory Management workspaces
+  <a href="#inventory-management-workspaces-imw" class="md-nav__link">
+    Inventory Management workspaces (IMW)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#edge-service-provider-workspace" class="md-nav__link">
-    Edge Service Provider workspace
+  <a href="#edge-service-provider-workspace-esp" class="md-nav__link">
+    Edge Service Provider workspace (ESP)
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#workload-management-workspaces" class="md-nav__link">
-    Workload Management workspaces
+  <a href="#workload-management-workspaces-wmw" class="md-nav__link">
+    Workload Management workspaces (WMW)
   </a>
   
-    <nav class="md-nav" aria-label="Workload Management workspaces">
+    <nav class="md-nav" aria-label="Workload Management workspaces (WMW)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2291,7 +2291,7 @@ born on the edge clusters.  On the inward path, the reported or full
 state goes from edge to the mailbox workspace and then is summarized
 to the workload management workspace.  State propagation is maintained
 in an eventually consistent way, it is not just one-and-done.</p>
-<h2 id="inventory-management-workspaces">Inventory Management workspaces<a class="headerlink" href="#inventory-management-workspaces" title="Permanent link">#</a></h2>
+<h2 id="inventory-management-workspaces-imw">Inventory Management workspaces (IMW)<a class="headerlink" href="#inventory-management-workspaces-imw" title="Permanent link">#</a></h2>
 <p>In this design the primary interface between infrastructure management
 and workload management is API objects in <em>inventory management</em>
 workspaces.  We abuse the <code>Location</code> and <code>SyncTarget</code> object types
@@ -2316,7 +2316,7 @@ is not among the things that this PoC takes a position on.</p>
 <li>A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.</li>
 </ol>
-<h2 id="edge-service-provider-workspace">Edge Service Provider workspace<a class="headerlink" href="#edge-service-provider-workspace" title="Permanent link">#</a></h2>
+<h2 id="edge-service-provider-workspace-esp">Edge Service Provider workspace (ESP)<a class="headerlink" href="#edge-service-provider-workspace-esp" title="Permanent link">#</a></h2>
 <p>The edge multi-cluster service is provided by one workspace that
 includes the following things.</p>
 <ul>
@@ -2324,7 +2324,7 @@ includes the following things.</p>
 <li>The edge controllers: scheduler, placement translator, mailbox
   controller, and status summarizer.</li>
 </ul>
-<h2 id="workload-management-workspaces">Workload Management workspaces<a class="headerlink" href="#workload-management-workspaces" title="Permanent link">#</a></h2>
+<h2 id="workload-management-workspaces-wmw">Workload Management workspaces (WMW)<a class="headerlink" href="#workload-management-workspaces-wmw" title="Permanent link">#</a></h2>
 <p>The users of edge multi-cluster primarily maintain these.  Each one of
 these has both control (API objects that direct the behavior of the
 edge computing platform) and data (API objects that hold workload
