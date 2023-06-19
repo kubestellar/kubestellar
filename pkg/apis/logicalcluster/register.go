@@ -17,5 +17,5 @@ limitations under the License.
 package workload
 
 const (
-	GroupName = "lc.kubestellar.io"
+	GroupName = "logicalcluster.kubestellar.io"
 )

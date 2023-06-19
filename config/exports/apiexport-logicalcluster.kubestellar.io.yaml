@@ -1,0 +1,10 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: logicalcluster.kubestellar.io
+spec:
+  latestResourceSchemas:
+  - v230622-6fbf5a92.clusterproviderdescs.logicalcluster.kubestellar.io
+  - v230622-6fbf5a92.logicalclusters.logicalcluster.kubestellar.io
+status: {}
