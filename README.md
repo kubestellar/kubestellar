@@ -1,7 +1,7 @@
 <!--readme-for-root-start-->
-
-<img alt="" width="500px" align="left" src="KubeStellar with Logo.png" />
-
+<p align="center">
+<img alt="" width="500px" align="left" src="/KubeStellar with Logo.png" />
+</p>
 <br/>
 <br/>
 <br/>

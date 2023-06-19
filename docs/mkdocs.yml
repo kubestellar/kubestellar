@@ -16,7 +16,9 @@ docs_dir: 'content'
 site_dir: 'generated'
 
 nav:
-  - Home: index.md
+  - Home:
+      - Overview: index.md 
+      - Readme: readme.md
   - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
