@@ -25,6 +25,7 @@
 - scalability - scale to a large number of objects, overcoming default Kubernetes limitations
 
 [Learn more about KubeStellar](./readme.md)
+
 [Try our QuickStart](https://kubestellar.io/quickstart)
 
 <br/>
