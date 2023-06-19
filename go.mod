@@ -25,7 +25,6 @@ require (
 	k8s.io/klog/v2 v2.70.1
 	k8s.io/kubernetes v1.24.3
 	sigs.k8s.io/kind v0.19.0
-	sigs.k8s.io/logical-cluster v0.0.1-alpha.0
 )
 
 require (
