@@ -4,7 +4,8 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request:
+  pull_request_target:
+    types: [labeled]
     branches:
       - main
       - "release-*"
@@ -28,7 +29,6 @@ on:
 env:
   docs-ecutable-filename: mailbox
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'"
-  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
@@ -37,6 +37,7 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for mailbox e2e
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'safe-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
@@ -46,6 +47,9 @@ jobs:
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
 
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}
