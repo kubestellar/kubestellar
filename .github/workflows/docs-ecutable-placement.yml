@@ -4,7 +4,7 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request:
+  pull_request_target:
     branches:
       - main
       - "release-*"
@@ -32,7 +32,6 @@ on:
 env:
   docs-ecutable-filename: placement
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/placement-translator.md'"
-  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
@@ -41,6 +40,7 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for placement e2e
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'safe-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
@@ -49,7 +49,10 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
 
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}
@@ -59,8 +62,19 @@ jobs:
       - name: echo fetching push or pull_request branch
         run: git fetch origin ${{ github.ref_name }}
         # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
 
+      # - name: Check for Makefile
+      #   id: check_makefile
+      #   if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+      #   run: |
+      #     if [[ -f "Makefile" ]]; then
+      #       echo "Makefile found"
+      #       exit 1
+      #     else
+      #       echo "Makefile not found"
+      #     fi
+      
       - uses: actions/setup-go@v4
         with:
           go-version: v1.19

@@ -30,7 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # The checkout step
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3.5.3
+      with:
+        token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+        persist-credentials: 'false'
     - uses: rojopolis/spellcheck-github-actions@v0
       name: Spellcheck
       with:
