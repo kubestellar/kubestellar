@@ -22,7 +22,7 @@ set -o xtrace
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT/docs"
 
-if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ] || [ "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" || "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
   # For PRs, we don't want to use GITHUB_REF_NAME, which will be something like merge/1234; instead, we want to use
   # the branch the PR is targeting, such as main or release-0.11
   VERSION=$GITHUB_BASE_REF
@@ -82,7 +82,7 @@ if [[ -n "${CI:-}" ]]; then
   git config user.email no-reply@kcp.io
 fi
 
-if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ] || [ "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" || "${GITHUB_EVENT_NAME:-}" == "pull_request_target" ]]; then
   mike deploy "${MIKE_OPTIONS[@]}" $VERSION
   exit
 fi
