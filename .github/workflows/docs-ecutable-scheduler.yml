@@ -28,7 +28,6 @@ on:
 env:
   docs-ecutable-filename: scheduler
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'"
-  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
@@ -37,6 +36,7 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for scheduler e2e
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'safe-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
@@ -45,7 +45,10 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
 
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}

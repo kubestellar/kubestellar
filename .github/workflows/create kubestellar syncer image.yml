@@ -23,7 +23,10 @@ jobs:
     name: create KubeStellar-Syncer image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
 
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}

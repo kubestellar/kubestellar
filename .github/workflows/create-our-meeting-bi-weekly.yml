@@ -21,7 +21,11 @@ jobs:
             echo "::set-output name=run_workflow::false"
           fi
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
+          
       - uses: JasonEtco/create-an-issue@v2
         if: steps.check_condition.outputs.run_workflow == 'true'
         env:

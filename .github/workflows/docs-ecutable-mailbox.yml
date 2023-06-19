@@ -46,7 +46,7 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'false'
