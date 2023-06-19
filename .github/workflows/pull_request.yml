@@ -3,8 +3,9 @@ name: Add pull request to project and assign author
 on:
   pull_request_target:
     types: [opened]
-# env:
-#   github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+env:
+  github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+  
 #   MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 #   GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
@@ -25,19 +26,19 @@ jobs:
 
       - uses: actions/checkout@v3.5.3
         with:
-          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          token: ${{ env.github-token }}
           persist-credentials: 'false'
 
       - uses: actions/add-to-project@v0.5.0 # This adds the issue to the project
         with:
           project-url: https://github.com/orgs/kcp-dev/projects/12
-          github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          github-token: ${{ env.github-token }}
         id: add-project
 
       - uses: titoportas/update-project-fields@v0.1.0
         with:
           project-url: https://github.com/orgs/kcp-dev/projects/12
-          github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          github-token: ${{ env.github-token }}
           item-id: ${{ steps.add-project.outputs.itemId }} # Use the item-id output of the previous step
           field-keys: Status,Date Posted
           field-values: In Progress,${{ steps.date.outputs.date }}
