@@ -38,7 +38,7 @@ import (
 	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge"
 	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	lcinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/lc"
+	logicalclusterinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/logicalcluster"
 	metainformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/meta"
 )
 
@@ -185,7 +185,7 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.ClusterInterface
-	Lc() lcinformers.ClusterInterface
+	Logicalcluster() logicalclusterinformers.ClusterInterface
 	Meta() metainformers.ClusterInterface
 }
 
@@ -193,8 +193,8 @@ func (f *sharedInformerFactory) Edge() edgeinformers.ClusterInterface {
 	return edgeinformers.New(f, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Lc() lcinformers.ClusterInterface {
-	return lcinformers.New(f, f.tweakListOptions)
+func (f *sharedInformerFactory) Logicalcluster() logicalclusterinformers.ClusterInterface {
+	return logicalclusterinformers.New(f, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Meta() metainformers.ClusterInterface {
@@ -345,7 +345,7 @@ type SharedScopedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.Interface
-	Lc() lcinformers.Interface
+	Logicalcluster() logicalclusterinformers.Interface
 	Meta() metainformers.Interface
 }
 
@@ -353,8 +353,8 @@ func (f *sharedScopedInformerFactory) Edge() edgeinformers.Interface {
 	return edgeinformers.NewScoped(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedScopedInformerFactory) Lc() lcinformers.Interface {
-	return lcinformers.NewScoped(f, f.namespace, f.tweakListOptions)
+func (f *sharedScopedInformerFactory) Logicalcluster() logicalclusterinformers.Interface {
+	return logicalclusterinformers.NewScoped(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedScopedInformerFactory) Meta() metainformers.Interface {
