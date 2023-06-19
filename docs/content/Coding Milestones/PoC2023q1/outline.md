@@ -151,7 +151,7 @@ state goes from edge to the mailbox workspace and then is summarized
 to the workload management workspace.  State propagation is maintained
 in an eventually consistent way, it is not just one-and-done.
 
-## Inventory Management workspaces
+## Inventory Management workspaces (IMW)
 
 In this design the primary interface between infrastructure management
 and workload management is API objects in _inventory management_
@@ -178,7 +178,7 @@ is not among the things that this PoC takes a position on.
 3. A ClusterRoleBinding that links that ServiceAccount with that
    ClusterRole.
 
-## Edge Service Provider workspace
+## Edge Service Provider workspace (ESP)
 
 The edge multi-cluster service is provided by one workspace that
 includes the following things.
@@ -187,7 +187,7 @@ includes the following things.
 - The edge controllers: scheduler, placement translator, mailbox
   controller, and status summarizer.
 
-## Workload Management workspaces
+## Workload Management workspaces (WMW)
 
 The users of edge multi-cluster primarily maintain these.  Each one of
 these has both control (API objects that direct the behavior of the
