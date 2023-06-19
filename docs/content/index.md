@@ -20,9 +20,12 @@
 <b>Additional features</b>
 </p>
 - non-wrapped / kubernetes-object-native denaturing (enables hierarchy) (no requirement to wrap objects)
-- rule-based customization (grouping)
-- status summarization
-- scalability
+- rule-based customization (grouping) - automate the customization of your deployments
+- status summarization - summarize the status returned from all your deployments
+- scalability - scale to a large number of objects, overcoming default Kubernetes limitations
+
+[Learn more about KubeStellar](./readme.md)
+[Try our QuickStart](https://kubestellar.io/quickstart)
 
 <br/>
 <p align="center">

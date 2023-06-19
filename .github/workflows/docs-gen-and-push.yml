@@ -37,6 +37,16 @@ jobs:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'true'
 
+      - name: Check for Makefile
+        id: check_makefile
+        run: |
+          if [[ -f "Makefile" ]]; then
+            echo "Makefile found"
+            exit 1
+          else
+            echo "Makefile not found"
+          fi
+  
       - run: git fetch origin gh-pages
 
       - uses: actions/setup-go@v4
