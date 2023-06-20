@@ -36,7 +36,7 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for example1 e2e
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'safe-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: contains(github.event.pull_request.labels.*.name, 'ok-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
