@@ -123,15 +123,17 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 			if !isDeleted {
 				// update
 				us.logger.V(3).Info(fmt.Sprintf("  update %q in upstream since it's found", resourceToString(resourceForUp)))
-				downstreamResource.SetResourceVersion(upstreamResource.GetResourceVersion())
-				downstreamResource.SetUID(upstreamResource.GetUID())
 				if hasUpsyncAnnotation(upstreamResource) {
+					downstreamResource.SetResourceVersion(upstreamResource.GetResourceVersion())
+					downstreamResource.SetUID(upstreamResource.GetUID())
 					setUpsyncAnnotation(downstreamResource)
-				}
-				applyConversion(downstreamResource, resourceForUp)
-				if _, err := upstreamClient.Update(resourceForUp, downstreamResource); err != nil {
-					us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
-					return err
+					applyConversion(downstreamResource, resourceForUp)
+					if _, err := upstreamClient.Update(resourceForUp, downstreamResource); err != nil {
+						us.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
+						return err
+					}
+				} else {
+					us.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in upstream since upstream annotation is not set", resourceToString(resourceForUp)))
 				}
 			} else {
 				// Upsyncer should not delete upstream resource objects that are not created by Upsyncer
@@ -141,6 +143,8 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 						us.logger.Error(err, fmt.Sprintf("failed to delete resource from upstream %q", resourceToString(resourceForUp)))
 						return err
 					}
+				} else {
+					us.logger.V(2).Info(fmt.Sprintf("  ignore deleting %q from upstream since downsync annotation is not set", resourceToString(resourceForUp)))
 				}
 			}
 		} else {
