@@ -79,7 +79,6 @@ func NewController(
 			"cluster-controller"),
 	}
 
-	logger.Info("Setting up event handlers")
 	clusterInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			logger.Info("Add cluster")
@@ -115,7 +114,6 @@ func NewController(
 		},
 	})
 
-	logger.Info("New %s controller", controllerName)
 	return controller
 }
 
@@ -198,7 +196,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 		logger.Error(err, "failed to create cluster")
 		return err
 	}
-	logger.Info("Done creating cluster", clusterName)
+	logger.Info("Done creating cluster", "clusterName", clusterName)
 
 	// Update the new cluster's status - specifically the config string and the phase
 	newClusterConfig.Status.ClusterConfig = newCluster.Config
@@ -265,17 +263,17 @@ func (c *Controller) process(ctx context.Context, item queueItem) error {
 	case opAdd:
 		err = c.processAdd(ctx, key)
 		if err != nil {
-			logger.Info("Error:", err)
+			logger.Error(err, "failed to process work item")
 		}
 	case opUpdate:
 		err = c.processUpdate(ctx, key)
 		if err != nil {
-			logger.Info("Error:", err)
+			logger.Error(err, "failed to process work item")
 		}
 	case opDelete:
 		err = c.processDelete(ctx, key)
 		if err != nil {
-			logger.Info("Error:", err)
+			logger.Error(err, "failed to process work item")
 		}
 	}
 	return err
