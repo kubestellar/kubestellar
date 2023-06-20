@@ -37,13 +37,6 @@ spec:
           spec:
             description: '`spec` describes a cluster.'
             properties:
-              ClusterName:
-                description: ClusterName is the name of the logical cluster created
-                  by the provider.
-                type: string
-                x-kubernetes-validations:
-                - message: clusterName is immutable
-                  rule: self == oldSelf
               ClusterProviderDescName:
                 description: ClusterProviderDescName is a reference to a ClusterProviderDesc
                   resource

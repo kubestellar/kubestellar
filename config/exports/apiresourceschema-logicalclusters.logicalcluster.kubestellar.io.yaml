@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230622-6fbf5a92.logicalclusters.logicalcluster.kubestellar.io
+  name: v230622-286e246c.logicalclusters.logicalcluster.kubestellar.io
 spec:
   group: logicalcluster.kubestellar.io
   names:
@@ -33,13 +33,6 @@ spec:
         spec:
           description: '`spec` describes a cluster.'
           properties:
-            ClusterName:
-              description: ClusterName is the name of the logical cluster created
-                by the provider.
-              type: string
-              x-kubernetes-validations:
-              - message: clusterName is immutable
-                rule: self == oldSelf
             ClusterProviderDescName:
               description: ClusterProviderDescName is a reference to a ClusterProviderDesc
                 resource

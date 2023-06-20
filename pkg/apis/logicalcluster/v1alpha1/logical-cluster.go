@@ -48,11 +48,6 @@ type LogicalClusterSpec struct {
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
 	ClusterProviderDescName string `json:"ClusterProviderDescName"`
 
-	// ClusterName is the name of the logical cluster created by the provider.
-	// +optional
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
-	ClusterName string `json:"ClusterName,omitempty"`
-
 	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
 	// Currently this is immutable.
 	// A logical cluster can be created through the ClusterManager (managed) or

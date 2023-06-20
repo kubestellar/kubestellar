@@ -5,5 +5,5 @@ metadata:
   name: meta.kcp.io
 spec:
   latestResourceSchemas:
-  - v230622-6fbf5a92.apiresources.meta.kcp.io
+  - v230622-286e246c.apiresources.meta.kcp.io
 status: {}

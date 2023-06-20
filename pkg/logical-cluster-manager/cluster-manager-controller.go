@@ -164,7 +164,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	var err error
 
 	newClusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
-	clusterName := newClusterConfig.Spec.ClusterName
+	clusterName := newClusterConfig.Name
 
 	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, newClusterConfig.Spec.ClusterProviderDesc, v1.GetOptions{})
 	if err != nil {
@@ -172,9 +172,11 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 		return err
 	}
 
-	// TODO: we have yet to finalize the fields in the provider,
-	// so likely this one liner will expend in the future.
-	provider := clusterproviderclient.GetProviderClient(providerInfo.Spec.ProviderType, newClusterConfig.Spec.ClusterProviderDesc)
+	provider, err := clusterproviderclient.GetProviderClient(ctx, c.clusterclientset, providerInfo.Spec.ProviderType, providerInfo.Name)
+	if err != nil {
+		logger.Error(err, "failed to get provider client")
+		return err
+	}
 
 	// Update status to NotReady
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
@@ -235,7 +237,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 	var opts cluster.Options
 	opts.KubeconfigPath = *c.kubeconfig
 	delClusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
-	clusterName := delClusterConfig.Spec.ClusterName
+	clusterName := delClusterConfig.Name
 
 	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, delClusterConfig.Spec.ClusterProviderDesc, v1.GetOptions{})
 	if err != nil {
@@ -243,7 +245,12 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 		return err
 	}
 
-	provider := clusterproviderclient.GetProviderClient(providerInfo.Spec.ProviderType, delClusterConfig.Spec.ClusterProviderDesc)
+	provider, err := clusterproviderclient.GetProviderClient(ctx, c.clusterclientset, providerInfo.Spec.ProviderType, providerInfo.Name)
+	if err != nil {
+		logger.Error(err, "failed to get provider client")
+		return err
+	}
+
 	err = provider.Delete(ctx, clusterName, opts)
 	if err != nil {
 		logger.Error(err, "failed to delete cluster")
