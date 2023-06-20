@@ -1,0 +1,34 @@
+name: Create KubeStellar bi-Weekly Meeting issue
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 4"
+    
+jobs:
+  issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Bi-Weekly Condition
+        id: check_condition
+        run: |
+          # Calculate the week number
+          week_number=$(($(date +\%U) % 2))
+
+          # Set the output variable based on the week number
+          if [[ $week_number -eq 0 ]]; then
+            echo "::set-output name=run_workflow::true"
+          else
+            echo "::set-output name=run_workflow::false"
+          fi
+
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
+          
+      - uses: JasonEtco/create-an-issue@v2
+        if: steps.check_condition.outputs.run_workflow == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/community_meeting.md

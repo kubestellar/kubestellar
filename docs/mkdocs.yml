@@ -16,7 +16,9 @@ docs_dir: 'content'
 site_dir: 'generated'
 
 nav:
-  - Home: index.md
+  - Home:
+      - Overview: index.md 
+      - Readme: readme.md
   - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
@@ -50,14 +52,25 @@ nav:
               - Commands: Coding Milestones/PoC2023q1/commands.md
       - PoC2023q3:
           - Details: Coding Milestones/PoC2023q3/outline.md
-  - Community: Community/_index.md
-  - Partners:
-      - ArgoCD: Community/partners/argocd.md
-      - Turbonomic: Community/partners/turbonomic.md
-      - MVI: Community/partners/mvi.md
-      - FluxCD: Community/partners/fluxcd.md
-      - OpenZiti: Community/partners/openziti.md
-      - Kyverno: Community/partners/kyverno.md
+  - Community: 
+    - Get Involved: Community/_index.md
+    - Contributor Guidelines: https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/
+    - Contact Us:
+        - Mailing List: https://kubestellar.io/join_us
+        - Community Meeting Agenda (join mailing list first): https://kubestellar.io/agenda
+        - Slack: https://kubestellar.io/slack
+        - Medium Blog: https://kubestellar.io/blog 
+        - YouTube Channel: https://kubestellar.io/tv
+        - LinkedIn: https://kubestellar.io/linkedin
+        - Reddit: https://www.reddit.com/r/kubestellar/
+        - Google Drive: https://drive.google.com/drive/u/1/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS
+    - Partners:
+        - ArgoCD: Community/partners/argocd.md
+        - Turbonomic: Community/partners/turbonomic.md
+        - MVI: Community/partners/mvi.md
+        - FluxCD: Community/partners/fluxcd.md
+        - OpenZiti: Community/partners/openziti.md
+        - Kyverno: Community/partners/kyverno.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
@@ -96,7 +109,7 @@ theme:
 extra:
   # social:
   #   - icon: fontawesome/brands/github
-  #     link: 'https://github.com/kcp-dev/edge-mc'
+  #     link: 'https://github.com/kubestellar/kubestellar'
   #     name: KubeStellar on GitHub
   #   - icon: fontawesome/brands/linkedin
   #     link: 'https://www.linkedin.com/feed/hashtag/?keywords=kubestellar'
@@ -135,7 +148,12 @@ extra:
             using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
+  # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
+  # Greater control over how navigation links are shown
+  - awesome-pages
+  # Docs site search
   - search
+  # Use Jinja macros in .md files
   - open-in-new-tab
   - include-markdown
   - macros:

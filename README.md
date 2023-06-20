@@ -1,7 +1,8 @@
 <!--readme-for-root-start-->
 
-<img alt="" width="500px" align="left" src="KubeStellar with Logo.png" />
+<img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
+<br/>
 <br/>
 <br/>
 <br/>
@@ -9,17 +10,17 @@
 ## Multicluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
-[![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
+[![Generate and push docs](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![PR Verifier](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/pr-verifier.yaml)&nbsp;&nbsp;&nbsp;
 [![Open Source Helpers](https://www.codetriage.com/kcp-dev/edge-mc/badges/users.svg)](https://www.codetriage.com/kcp-dev/edge-mc)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
-[![Broken Links Crawler](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)&nbsp;&nbsp;&nbsp;
+[![Broken Links Crawler](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml)
 [![QuickStart test](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-qs.yml/badge.svg)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-qs.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - example1](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-example1.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - placement-translator](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - mailbox-controller](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - kubestellar-scheduler](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - kubestellar-syncer](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - example1](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-example1.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - placement-translator](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - mailbox-controller](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-scheduler](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-syncer](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=release-0.2)](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>

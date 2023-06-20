@@ -4,7 +4,8 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request:
+  pull_request_target:
+    types: [labeled]
     branches:
       - main
       - "release-*"
@@ -28,7 +29,6 @@ on:
 env:
   docs-ecutable-filename: mailbox
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md'"
-  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
 
 permissions:
   contents: write
@@ -37,6 +37,7 @@ jobs:
   docs-ecutable:
     name: docs-ecutable - for mailbox e2e
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'safe-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
@@ -45,17 +46,31 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
 
       - name: echo fetching workflow_dispatch branch
         run: git fetch origin ${GITHUB_REF##*/}
         # run: echo running on branch ${GITHUB_REF##*/}
-        if: github.event_name != 'pull_request' && github.event_name != 'push'
+        if: github.event_name == 'workflow_dispatch'
 
       - name: echo fetching push or pull_request branch
         run: git fetch origin ${{ github.ref_name }}
         # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+
+      # - name: Check for Makefile
+      #   id: check_makefile
+      #   if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+      #   run: |
+      #     if [[ -f "Makefile" ]]; then
+      #       echo "Makefile found"
+      #       exit 1
+      #     else
+      #       echo "Makefile not found"
+      #     fi
 
       - uses: actions/setup-go@v4
         with:
@@ -69,40 +84,3 @@ jobs:
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
           docs-ecutable
-
-  elapsed-time-collector:
-    runs-on: ubuntu-latest
-    env:
-      docs-ecutable-filename: ${{needs.docs-ecutable.outputs.docs-ecutable-filename}}
-    needs: docs-ecutable
-    steps:
-      - run: echo "${{ env.docs-ecutable-filename }}"
-
-      - uses: actions/checkout@v3
-        with:
-          ref: main
-
-      - run: git rev-parse --abbrev-ref HEAD 
-
-      - run: |
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "MD_CONTENT<<$EOF" >> "$GITHUB_ENV"
-          make FILENAME='${{ env.docs-ecutable-filename }}' write-time-to-file >> "$GITHUB_ENV"
-          echo "$EOF" >> "$GITHUB_ENV"
-        id: run_make
-
-      - uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-
-      # - run: |
-      #     echo ${{ env.MD_CONTENT }}
-
-      - run: |
-          cat <<EOF > elapsed-time/${{ env.docs-ecutable-filename }}.dmd
-          ${{ env.MD_CONTENT }}
-          EOF
-          echo "cat elapsed-time/${{ env.docs-ecutable-filename }}.dmd"
-          cat elapsed-time/${{ env.docs-ecutable-filename }}.dmd
-          
-      - run: git config --global user.email "kubestellar@kubestellar-dev@google.groups.com" && git config --global user.name "KubeStellar" && git add . && git commit -m "Add changes" && git push origin gh-pages

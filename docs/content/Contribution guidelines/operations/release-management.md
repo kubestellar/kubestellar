@@ -11,7 +11,7 @@
 #### Note:
 You currently need write access to the [{{ config.repo_url }}]({{ config.repo_url }}) repository to perform these tasks.
 
-You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS).
+<!-- You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS). -->
 
 ### Create a release-major.minor branch
 To create a release branch, identify the current 'release' branches' name (e.g. release-0.2).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.
@@ -106,8 +106,8 @@ git push ??? "$TAG"  #TODO - not sure if this is right
 
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
-[https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)
-[https://github.com/kcp-dev/edge-mc/actions/workflows/broken-links-crawler.yml](https://github.com/kcp-dev/edge-mc/actions/workflows/docs-gen-and-push.yml)
+[{{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
+[{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)
 
 
 
@@ -117,7 +117,7 @@ Check to make sure the GitHub workflows for doc generation, doc push, and broken
 
     - Make sure you have openshift/release cloned
     - Create a new branch
-    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kcp-dev/edge-mc/kcp-dev-kcp-release-<version>.yaml
+    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
     - Edit the new file
     - Change main to the name of the release branch, such as release-0.8
 

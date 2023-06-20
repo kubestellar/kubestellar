@@ -1,12 +1,11 @@
 name: Add pull request to project and assign author
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
-env:
-  github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-  MY_GITHUB_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+
+permissions:
+  contents: write
   
 jobs:
   assignAuthor:
@@ -14,17 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign author to PR
-        uses: technote-space/assign-author@v1
+        uses: technote-space/assign-author@v1.3.1
         
       - name: Get current date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v3
-      - uses: actions/add-to-project@v0.3.0 # This adds the issue to the project
+
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
+
+      - uses: actions/add-to-project@v0.5.0 # This adds the issue to the project
         with:
           project-url: https://github.com/orgs/kcp-dev/projects/12
           github-token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
         id: add-project
+
       - uses: titoportas/update-project-fields@v0.1.0
         with:
           project-url: https://github.com/orgs/kcp-dev/projects/12

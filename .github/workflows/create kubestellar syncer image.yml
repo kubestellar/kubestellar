@@ -1,0 +1,45 @@
+name: create KubeStellar-Syncer image
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  # push:
+  #   branches:
+  #     - main
+  #     - "release-*"
+  #   paths:
+  #     - "docs/content/Coding Milestones/PoC2023q1/example1.md"
+  #     - "docs/scripts/docs-ecutable.sh"
+
+env:
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+
+# permissions:
+#   contents: write
+
+jobs:
+  docs-ecutable:
+    name: create KubeStellar-Syncer image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.3
+        with:
+          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+          persist-credentials: 'false'
+
+      - name: echo fetching workflow_dispatch branch
+        run: git fetch origin ${GITHUB_REF##*/}
+        # run: echo running on branch ${GITHUB_REF##*/}
+        if: github.event_name == 'workflow_dispatch'
+
+      - name: echo fetching push or pull_request branch
+        run: git fetch origin ${{ github.ref_name }}
+        # run: echo running on branch ${{ github.ref_name }}
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+  
+      - run: |
+          make build-kubestellar-syncer-image \ 
+          DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer \
+          IMAGE_TAG=dev-2023-04-24-x \
+          ARCHS=linux/amd64,linux/arm64

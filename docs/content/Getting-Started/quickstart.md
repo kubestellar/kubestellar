@@ -1,7 +1,7 @@
 
 [![QuickStart test]({{config.repo_url}}/actions/workflows/docs-ecutable-qs.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-qs.yml)&nbsp;&nbsp;&nbsp;
 
-<!-- <img width="500px" src="../../KubeStellar with Logo.png" title="KubeStellar"> -->
+<!-- <img width="500px" src="../../KubeStellar-with-Logo.png" title="KubeStellar"> -->
 {%
    include-markdown "quickstart-subs/quickstart-0-demo.md"
    start="<!--quickstart-0-demo-start-->"
@@ -101,5 +101,4 @@ but with the some steps reorganized and combined and the special
 workload and summarization aspiration removed.  You can continue
 from here, learning more details about what you did in the QuickStart,
 and adding on some more steps for the special workload.
-
 
