@@ -22,7 +22,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	log "k8s.io/klog/v2"
+	klog "k8s.io/klog/v2"
 	kind "sigs.k8s.io/kind/pkg/cluster"
 
 	lcv1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
@@ -30,41 +30,49 @@ import (
 	"github.com/kcp-dev/edge-mc/pkg/mcclient"
 )
 
+const defaultProviderNs = "lcprovider-default"
+
 // This is an example for cluster-aware client
 // To run this example you need to create 2 regular kind clusters:
 // kind create cluster -n cluster1
 // kind create cluster -n management-cluster
-// kubectl create -f config/crds/edge.kcp.io_logicalclusters.yaml
+// kubectl create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml
+// kubectl create ns lcprovider-default
 // go run main.go
 func main() {
 	ctx := context.Background()
+	logger := klog.Background()
+	ctx = klog.NewContext(ctx, logger)
 
 	kubeConfigPath := os.Getenv("HOME") + "/.kube/config"
 	managementClusterConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		log.Fatalf("failed to build management cluster config: %v", err)
+		logger.Error(err, "failed to build management cluster config")
+		panic(err)
 	}
 	managementksClientset, err := ksclientset.NewForConfig(managementClusterConfig)
 	if err != nil {
-		log.Fatalf("failed to build management cluster clientset: %v", err)
+		logger.Error(err, "failed to build management cluster clientset")
+		panic(err)
 	}
 
 	createClusterObjectKS(ctx, managementksClientset, "cluster1")
 
 	mcclient, err := mcclient.NewMultiCluster(ctx, managementClusterConfig)
 	if err != nil {
-		log.Fatalf("get client failed: %v", err)
+		logger.Error(err, "get client failed")
+		panic(err)
 	}
 
-	log.Info("List EdgePlacements in cluster1")
+	logger.Info("List EdgePlacements in cluster1")
 	list, _ := mcclient.Cluster("cluster1").KS().EdgeV1alpha1().EdgePlacements().List(ctx, metav1.ListOptions{})
 	for _, ep := range list.Items {
-		log.Infof("Cluster: cluster1 ; ObjName: %s", ep.Name)
+		logger.Info("Cluster: cluster1", "edgePlacement", ep.Name)
 	}
-	log.Info("List configmaps in cluster1")
+	logger.Info("List configmaps in cluster1")
 	listm, _ := mcclient.Cluster("cluster1").Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).List(ctx, metav1.ListOptions{})
-	for _, ep := range listm.Items {
-		log.Infof("Cluster: cluster1 ; ObjName: %s", ep.Name)
+	for _, cm := range listm.Items {
+		logger.Info("Cluster: cluster1", "configMap", cm.Name)
 	}
 
 	updateClusterObjectKS(ctx, managementksClientset, "cluster1")
@@ -72,10 +80,11 @@ func main() {
 }
 
 func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
+	logger := klog.FromContext(ctx)
 	provider := kind.NewProvider()
 	kubeconfig, err := provider.KubeConfig(cluster, false)
 	if err != nil {
-		log.Error("failed to get config from kind provider")
+		logger.Error(err, "failed to get config from kind provider")
 		return
 	}
 
@@ -93,31 +102,37 @@ func createClusterObjectKS(ctx context.Context, clientset ksclientset.Interface,
 		},
 	}
 
-	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters().Create(ctx, &cm, metav1.CreateOptions{})
+	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(defaultProviderNs).Create(ctx, &cm, metav1.CreateOptions{})
 	if err != nil {
-		log.Errorf("failed to create LogicalCluster: %v", err)
+		logger.Error(err, "failed to create LogicalCluster")
+		return
 	}
-	log.Infof("LogicalCluster created: %s", cluster)
+	logger.Info("LogicalCluster created", "cluster", cluster)
 }
 
 func deleteClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
-	err := clientset.LogicalclusterV1alpha1().LogicalClusters().Delete(ctx, cluster, metav1.DeleteOptions{})
+	logger := klog.FromContext(ctx)
+	err := clientset.LogicalclusterV1alpha1().LogicalClusters(defaultProviderNs).Delete(ctx, cluster, metav1.DeleteOptions{})
 	if err != nil {
-		log.Errorf("failed to delete LogicalCluster: %v", err)
+		logger.Error(err, "failed to delete LogicalCluster")
+		return
 	}
-	log.Infof("LogicalCluster deleted: %s", cluster)
+	logger.Info("LogicalCluster deleted", "cluster", cluster)
 }
 
 func updateClusterObjectKS(ctx context.Context, clientset ksclientset.Interface, cluster string) {
-	clusterConfig, err := clientset.LogicalclusterV1alpha1().LogicalClusters().Get(ctx, cluster, metav1.GetOptions{})
+	logger := klog.FromContext(ctx)
+	clusterConfig, err := clientset.LogicalclusterV1alpha1().LogicalClusters(defaultProviderNs).Get(ctx, cluster, metav1.GetOptions{})
 	if err != nil {
-		log.Errorf("failed to get LogicalCluster: %v", err)
+		logger.Error(err, "failed to get LogicalCluster")
+		return
 	}
 
 	clusterConfig.Status.Phase = lcv1.LogicalClusterPhaseNotReady
-	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters().Update(ctx, clusterConfig, metav1.UpdateOptions{})
+	_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(defaultProviderNs).Update(ctx, clusterConfig, metav1.UpdateOptions{})
 	if err != nil {
-		log.Errorf("failed to update LogicalCluster: %v", err)
+		logger.Error(err, "failed to update LogicalCluster")
+		return
 	}
-	log.Infof("LogicalCluster updated: %s", cluster)
+	logger.Info("LogicalCluster updated", "cluster", cluster)
 }

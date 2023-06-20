@@ -135,12 +135,12 @@ func (c *controller) process(key string) error {
 	if !exists {
 		c.handleDelete(key)
 	} else {
-		c.handleAdd(cluster)
+		c.handleAdd(cluster, key)
 	}
 	return nil
 }
 
-func (c *controller) handleAdd(cluster interface{}) {
+func (c *controller) handleAdd(cluster interface{}, clusterKey string) {
 	clusterInfo, ok := cluster.(*lcv1alpha1.LogicalCluster)
 	if !ok {
 		runtime.HandleError(errors.New("unexpected object type. expected LogicalCluster"))
@@ -149,7 +149,7 @@ func (c *controller) handleAdd(cluster interface{}) {
 	// Only clusters in ready state are cached.
 	// We will get another event when the cluster is Ready and then we cache it.
 	if clusterInfo.Status.Phase != lcv1alpha1.LogicalClusterPhaseReady {
-		c.handleDelete(clusterInfo.Name)
+		c.handleDelete(clusterKey)
 		return
 	}
 
@@ -166,17 +166,17 @@ func (c *controller) handleAdd(cluster interface{}) {
 
 	c.multiClusterClient.lock.Lock()
 	defer c.multiClusterClient.lock.Unlock()
-	c.multiClusterClient.configs[clusterInfo.Name] = config
-	c.multiClusterClient.clientsets[clusterInfo.Name] = cs
+	c.multiClusterClient.configs[clusterKey] = config
+	c.multiClusterClient.clientsets[clusterKey] = cs
 }
 
 // handleDelete deletes cluster from the cache maps
-func (c *controller) handleDelete(clusterName string) {
+func (c *controller) handleDelete(clusterKey string) {
 	c.multiClusterClient.lock.Lock()
 	defer c.multiClusterClient.lock.Unlock()
-	if _, ok := c.multiClusterClient.configs[clusterName]; !ok {
+	if _, ok := c.multiClusterClient.configs[clusterKey]; !ok {
 		return
 	}
-	delete(c.multiClusterClient.configs, clusterName)
-	delete(c.multiClusterClient.clientsets, clusterName)
+	delete(c.multiClusterClient.configs, clusterKey)
+	delete(c.multiClusterClient.clientsets, clusterKey)
 }
