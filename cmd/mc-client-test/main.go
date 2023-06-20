@@ -67,12 +67,12 @@ func main() {
 	logger.Info("List EdgePlacements in cluster1")
 	list, _ := mcclient.Cluster("cluster1").KS().EdgeV1alpha1().EdgePlacements().List(ctx, metav1.ListOptions{})
 	for _, ep := range list.Items {
-		logger.Info("Cluster: cluster1", "EdgePlacement", ep.Name)
+		logger.Info("Cluster: cluster1", "edgePlacement", ep.Name)
 	}
 	logger.Info("List configmaps in cluster1")
 	listm, _ := mcclient.Cluster("cluster1").Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).List(ctx, metav1.ListOptions{})
 	for _, cm := range listm.Items {
-		logger.Info("Cluster: cluster1", "ConfigMap", cm.Name)
+		logger.Info("Cluster: cluster1", "configMap", cm.Name)
 	}
 
 	updateClusterObjectKS(ctx, managementksClientset, "cluster1")
