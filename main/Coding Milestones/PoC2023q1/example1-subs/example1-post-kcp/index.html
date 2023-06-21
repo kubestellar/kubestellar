@@ -1672,8 +1672,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-the-edge-service-provider-workspace" class="md-nav__link">
-    Create the edge service provider workspace
+  <a href="#initialize-the-kubestellar-platform" class="md-nav__link">
+    Initialize the KubeStellar platform
   </a>
   
 </li>
@@ -1788,10 +1788,17 @@ four objects.</p>
 </code></pre></div>
 <p>That script also deletes the Location named <code>default</code>, which is not
 used in this PoC, if it shows up.</p>
-<h3 id="create-the-edge-service-provider-workspace">Create the edge service provider workspace<a class="headerlink" href="#create-the-edge-service-provider-workspace" title="Permanent link">#</a></h3>
-<p>Use the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>espw<span class="w"> </span>--enter
+<h3 id="initialize-the-kubestellar-platform">Initialize the KubeStellar platform<a class="headerlink" href="#initialize-the-kubestellar-platform" title="Permanent link">#</a></h3>
+<p>In this step KubeStellar creates and populates the Edge Service
+Provider Workspace (ESPW), which exports the KubeStellar API, and also
+augments the <code>root:compute</code> workspace from kcp TMC as needed here.
+Those augmentation consists of adding authorization to update the
+relevant <code>/status</code> and <code>/scale</code> subresources (missing in kcp TMC) and
+extending the supported subset of the Kubernetes API for managing
+containerized workloads from the four resources built into kcp TMC
+(<code>Deployment</code>, <code>Pod</code>, <code>Service</code>, and <code>Ingress</code>) to the other ones that
+are namespaced and are meaningful in KubeStellar.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubestellar<span class="w"> </span>init
 </code></pre></div>
 <!--example1-post-kcp-end-->
 
