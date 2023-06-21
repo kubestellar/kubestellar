@@ -62,41 +62,83 @@ spec:
     - commonstuff
     resources:
     - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
       group: ""
       resource: secrets
     - apiVersion: v1
       group: rbac.authorization.k8s.io
-      resource: rolebindings
+      resource: roles
     - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: ""
-      resource: pods
+      group: batch
+      resource: jobs
     - apiVersion: v1
       group: ""
       resource: serviceaccounts
     - apiVersion: v1
       group: ""
-      resource: services
+      resource: limitranges
+    - apiVersion: v1
+      group: apps
+      resource: daemonsets
+    - apiVersion: v1
+      group: storage.k8s.io
+      resource: csistoragecapacities
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+    - apiVersion: v1
+      group: ""
+      resource: pods
     - apiVersion: v1
       group: ""
       resource: resourcequotas
     - apiVersion: v1
+      group: discovery.k8s.io
+      resource: endpointslices
+    - apiVersion: v1
+      group: ""
+      resource: replicationcontrollers
+    - apiVersion: v1
+      group: networking.k8s.io
+      resource: ingresses
+    - apiVersion: v1
+      group: ""
+      resource: services
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: ""
+      resource: persistentvolumeclaims
+    - apiVersion: v1
       group: coordination.k8s.io
       resource: leases
+    - apiVersion: v1
+      group: policy
+      resource: poddisruptionbudgets
+    - apiVersion: v1
+      group: apps
+      resource: statefulsets
+    - apiVersion: v1
+      group: networking.k8s.io
+      resource: networkpolicies
+    - apiVersion: v1
+      group: batch
+      resource: cronjobs
+    - apiVersion: v1
+      group: ""
+      resource: endpoints
+    - apiVersion: v2
+      group: autoscaling
+      resource: horizontalpodautoscalers
+    - apiVersion: v1
+      group: apps
+      resource: replicasets
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: podtemplates
   upsync:
   - apiGroup: group1.test
     names:
@@ -127,11 +169,11 @@ default       Active   32m
 ```
 
 ```shell
-kubectl get deployments -A
+kubectl get replicasets -A
 ```
 ``` { .bash .no-copy }
-NAMESPACE     NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff   commond   0/0     0            0           6m44s
+NAMESPACE     NAME      DESIRED   CURRENT   READY   AGE
+commonstuff   commond   0         1         1       10m
 ```
 
 The guilder cluster gets both the common and special workloads.
@@ -173,41 +215,83 @@ spec:
     - specialstuff
     resources:
     - apiVersion: v1
+      group: apps
+      resource: replicasets
+    - apiVersion: v1
+      group: storage.k8s.io
+      resource: csistoragecapacities
+    - apiVersion: v1
+      group: networking.k8s.io
+      resource: networkpolicies
+    - apiVersion: v1
+      group: apps
+      resource: daemonsets
+    - apiVersion: v1
       group: ""
       resource: services
     - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
       group: ""
-      resource: pods
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
+      resource: replicationcontrollers
     - apiVersion: v1
       group: networking.k8s.io
       resource: ingresses
+    - apiVersion: v2
+      group: autoscaling
+      resource: horizontalpodautoscalers
     - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: secrets
+      group: policy
+      resource: poddisruptionbudgets
     - apiVersion: v1
       group: rbac.authorization.k8s.io
       resource: roles
     - apiVersion: v1
       group: ""
+      resource: serviceaccounts
+    - apiVersion: v1
+      group: batch
+      resource: jobs
+    - apiVersion: v1
+      group: batch
+      resource: cronjobs
+    - apiVersion: v1
+      group: ""
+      resource: persistentvolumeclaims
+    - apiVersion: v1
+      group: apps
+      resource: deployments
+    - apiVersion: v1
+      group: rbac.authorization.k8s.io
+      resource: rolebindings
+    - apiVersion: v1
+      group: apps
+      resource: statefulsets
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: podtemplates
+    - apiVersion: v1
+      group: ""
       resource: resourcequotas
+    - apiVersion: v1
+      group: coordination.k8s.io
+      resource: leases
+    - apiVersion: v1
+      group: ""
+      resource: endpoints
+    - apiVersion: v1
+      group: discovery.k8s.io
+      resource: endpointslices
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+    - apiVersion: v1
+      group: ""
+      resource: limitranges
+    - apiVersion: v1
+      group: ""
+      resource: pods
   upsync:
   - apiGroup: group3.test
     names:
@@ -232,11 +316,13 @@ status: {}
 ```
 
 ```shell
-kubectl get deployments -A
+kubectl get deployments,replicasets -A
 ```
 ``` { .bash .no-copy }
-NAMESPACE      NAME       READY   UP-TO-DATE   AVAILABLE   AGE
-commonstuff    commond    0/0     0            0           6m1s
-specialstuff   speciald   0/0     0            0           5m58s
+NAMESPACE      NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+specialstuff   deployment.apps/speciald   0/0     1            0           12m
+
+NAMESPACE     NAME                      DESIRED   CURRENT   READY   AGE
+commonstuff   replicaset.apps/commond   0         1         1       7m4s
 ```
 <!--example1-stage-3-stop-->

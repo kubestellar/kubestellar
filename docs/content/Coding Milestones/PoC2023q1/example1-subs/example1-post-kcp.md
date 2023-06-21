@@ -90,12 +90,20 @@ spec:
 That script also deletes the Location named `default`, which is not
 used in this PoC, if it shows up.
 
-### Create the edge service provider workspace
+### Initialize the KubeStellar platform
 
-Use the following commands.
+In this step KubeStellar creates and populates the Edge Service
+Provider Workspace (ESPW), which exports the KubeStellar API, and also
+augments the `root:compute` workspace from kcp TMC as needed here.
+Those augmentation consists of adding authorization to update the
+relevant `/status` and `/scale` subresources (missing in kcp TMC) and
+extending the supported subset of the Kubernetes API for managing
+containerized workloads from the four resources built into kcp TMC
+(`Deployment`, `Pod`, `Service`, and `Ingress`) to the other ones that
+are namespaced and are meaningful in KubeStellar.
 
 ```shell
-kubectl ws root
-kubectl ws create espw --enter
+kubestellar init
 ```
+
 <!--example1-post-kcp-end-->

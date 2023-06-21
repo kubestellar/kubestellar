@@ -88,10 +88,50 @@ then
     exit 1
 fi
 
+function create_or_replace() { # usage: filename
+    filename="$1"
+    kind=$(grep kind: "$filename" | head -1 | awk '{ print $2 }')
+    name=$(grep name: "$filename" | head -1 | awk '{ print $2 }')
+    if kubectl get "$kind" "$name" &> /dev/null
+    then eval kubectl replace -f "$filename" $verbdir
+    else eval kubectl create -f "$filename" $verbdir
+    fi
+}
+    
 # current ws at start does not matter, is root:compute on return
-function ensure_compute_status_updateable() {
+function ensure_root_compute_configd() {
     kubectl ws root:compute &> /dev/null
-    kubectl apply -f - &> /dev/null <<EOF
+    ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
+      # Some are too big to `kubectl apply`
+      for rsfn in apiresourceschema-*.yaml; do
+	  create_or_replace $rsfn
+      done
+      for refn in apiexport-*.yaml; do
+	  eval kubectl apply -f "$refn" $verbdir
+      done
+    )
+    eval kubectl apply -f - $verbdir <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: compute:apiexport:kubernetes-extended:bind
+rules:
+- apiGroups:
+  - apis.kcp.io
+  resourceNames:
+  - apps
+  - autoscaling
+  - batch
+  - core.k8s.io
+  - discovery.k8s.io
+  - networking.k8s.io
+  - policy
+  - storage.k8s.io
+  resources:
+  - apiexports
+  verbs:
+  - bind
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -101,17 +141,89 @@ rules:
   - ""
   - apps
   - networking.k8s.io
+
+  - autoscaling
+  - batch
+  - discovery.k8s.io
+  - policy
+  - storage.k8s.io
+  resources:
+  - services
+  - pods
+  - ingresses
+  - deployments
+
+  - cronjobs
+  - csistoragecapacities
+  - daemonsets
+  - endpoints
+  - endpointslices
+  - horizontalpodautoscalers
+  - jobs
+  - networkpolicies
+  - persistentvolumeclaims
+  - poddisruptionbudgets
+  - podtemplates
+  - replicasets
+  - replicationcontrollers
+  - statefulsets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  - apps
+  - networking.k8s.io
+
+  - autoscaling
+  - batch
+  - discovery.k8s.io
+  - policy
+  - storage.k8s.io
   resources:
   - services/status
   - pods/status
   - ingresses/status
   - deployments/status
   - deployments/scale
+
+  - cronjobs/status
+  - csistoragecapacities/status
+  - daemonsets/status
+  - endpoints/status
+  - endpointslices/status
+  - horizontalpodautoscalers/status
+  - jobs/status
+  - networkpolicies/status
+  - persistentvolumeclaims/status
+  - poddisruptionbudgets/status
+  - podtemplates/status
+  - replicasets/scale
+  - replicasets/status
+  - replicationcontrollers/scale
+  - replicationcontrollers/status
+  - statefulsets/scale
+  - statefulsets/status
   verbs:
+  - get
+  - list
+  - watch
   - update
   - patch
 EOF
     kubectl apply -f - &> /dev/null <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: compute:apiexport:kubernetes-extended:bind
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: compute:apiexport:kubernetes-extended:bind
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: apis.kcp.io:binding:system:authenticated
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -125,6 +237,7 @@ subjects:
   kind: Group
   name: apis.kcp.io:binding:system:authenticated
 EOF
+    echo "Finished augmenting root:compute for KubeStellar"
 }
 
 # current ws at start does not matter, is ESPW on return
@@ -141,7 +254,7 @@ function ensure_espw() {
 }
 
 if [ "$subcommand" == init ]; then
-    ensure_compute_status_updateable
+    ensure_root_compute_configd
     ensure_espw
     exit
 fi
@@ -172,7 +285,7 @@ if [ $subcommand == stop ]; then
    exit 0
 fi
 
-ensure_compute_status_updateable
+ensure_root_compute_configd
 ensure_espw
 
 wait_for_process(){

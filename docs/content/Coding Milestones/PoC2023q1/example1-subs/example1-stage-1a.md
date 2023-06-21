@@ -1,15 +1,4 @@
 <!--example1-stage-1a-start-->
-### Populate the edge service provider workspace
-
-This puts the definition and export of the KubeStellar API in the edge
-service provider workspace.
-
-Use the following command.
-
-```shell
-kubectl apply -f config/exports
-```
-
 ### The mailbox controller
 
 Running the mailbox controller will be conveniently automated.

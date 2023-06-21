@@ -1,0 +1,74 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.kubernetes.io: https://github.com/kcp-dev/kubernetes/pull/4
+  creationTimestamp: null
+  name: priorityclasses.scheduling.k8s.io
+spec:
+  conversion:
+    strategy: None
+  group: scheduling.k8s.io
+  names:
+    kind: PriorityClass
+    listKind: PriorityClassList
+    plural: priorityclasses
+    shortNames:
+    - pc
+    singular: priorityclass
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: PriorityClass defines mapping from a priority class name to the
+          priority integer value. The value can be any valid integer.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          description:
+            description: description is an arbitrary string that usually provides
+              guidelines on when this priority class should be used.
+            type: string
+          globalDefault:
+            description: globalDefault specifies whether this PriorityClass should
+              be considered as the default priority for pods that do not have any
+              priority class. Only one PriorityClass can be marked as `globalDefault`.
+              However, if more than one PriorityClasses exists with their `globalDefault`
+              field set to true, the smallest value of such global default PriorityClasses
+              will be used as the default priority.
+            type: boolean
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          preemptionPolicy:
+            description: PreemptionPolicy is the Policy for preempting pods with lower
+              priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority
+              if unset.
+            type: string
+          value:
+            description: The value of this priority class. This is the actual priority
+              that pods receive when they have the name of this class in their pod
+              spec.
+            format: int32
+            type: integer
+        required:
+        - value
+        type: object
+    served: true
+    storage: true
+    subresources: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions:
+  - v1

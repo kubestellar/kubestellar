@@ -1,0 +1,11 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: apps
+spec:
+  latestResourceSchemas:
+  - v230615-d48020c8.daemonsets.apps
+  - v230615-d48020c8.replicasets.apps
+  - v230615-d48020c8.statefulsets.apps
+status: {}
