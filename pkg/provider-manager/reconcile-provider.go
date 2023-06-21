@@ -21,12 +21,12 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/runtime"
 
-	clusterproviderclient "github.com/kcp-dev/edge-mc/cluster-provider-client"
 	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 )
 
-func (c *controller) handleAdd(provider interface{}) {
-	providerInfo, ok := provider.(*lcv1alpha1.ClusterProviderDesc)
+func (c *controller) handleAdd(objProvider interface{}) {
+	// TODO: _ should be providerDesc. Changing to _ to avoid the compile check until we start using this variable.
+	_, ok := objProvider.(*lcv1alpha1.ClusterProviderDesc)
 	if !ok {
 		// TODO: Is HandleError() better than changing the return type?
 		err := errors.New("unexpected object type")
@@ -35,19 +35,16 @@ func (c *controller) handleAdd(provider interface{}) {
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	// Provider descriptions are cluster wide and unique. The uniqueness is
-	// determined by the provider description object name and enforced by
-	// kubernetes.
-	provider, err := clusterproviderclient.GetProviderClient(c.ctx, c.clientset, providerInfo.Spec.ProviderType, providerInfo.Name)
-	if err != nil {
-		runtime.HandleError(err)
-	}
+
+	// TODO: Initiate discovery
 }
 
-// handleDelete deletes cluster from the cache maps
+// handleDelete deletes a provider and its associated clusters (when managed)
+// TODO: delete associated clusters when managed
 func (c *controller) handleDelete(nameProvider string) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
+
 	if _, ok := c.listProviders[nameProvider]; !ok {
 		return
 	}

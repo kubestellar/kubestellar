@@ -35,7 +35,7 @@ import (
 
 var (
 	resyncPeriod = 4 * time.Second
-	numThreads   = 1
+	numThreads   = 2
 )
 
 const nameLogicalClusterManagerCluster string = "kind-fleet-test1"
@@ -70,7 +70,7 @@ func main() {
 	doneCh := ctx.Done()
 
 	clusterInformerFactory := edgeinformers.NewSharedScopedInformerFactory(clusterClientset, resyncPeriod, metav1.NamespaceAll)
-	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters()
+	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters().Informer()
 	clusterInformerFactory.Start(doneCh)
 
 	providerInformerFactory := edgeinformers.NewSharedScopedInformerFactory(clusterClientset, resyncPeriod, metav1.NamespaceAll)
@@ -89,6 +89,7 @@ func main() {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
+	logger.Info("about to create provider controller")
 	providerController := providermanager.NewController(
 		ctx,
 		clusterClientset,
@@ -98,8 +99,9 @@ func main() {
 		logger.Error(err, "failed to create provider controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
+	logger.Info("done creating provider controller")
 
-	go clusterController.Run(numThreads)
-	providerController.Run(numThreads)
+	clusterController.Run(numThreads)
+	go providerController.Run(numThreads)
 	logger.Info("Time to stop")
 }
