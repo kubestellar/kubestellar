@@ -33,10 +33,12 @@ import (
 	cluster "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
 	lcv1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	lcclient "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/logicalcluster/v1alpha1"
+	providerlib "github.com/kcp-dev/edge-mc/pkg/provider-library"
 )
 
-const controllerName = "cluster-manager"
+const (
+	controllerName = "cluster-manager"
+)
 
 type op string
 
@@ -55,7 +57,7 @@ type Controller struct {
 	kubeconfig       *string
 	ctx              context.Context
 	clusterclientset edgeclient.Interface
-	clusterInformer  lcclient.LogicalClusterInformer
+	clusterInformer  cache.SharedIndexInformer
 	queue            workqueue.RateLimitingInterface
 }
 
@@ -63,12 +65,8 @@ func NewController(
 	kubeconfig *string,
 	ctx context.Context,
 	clusterclientset edgeclient.Interface,
-	clusterInformer lcclient.LogicalClusterInformer) *Controller {
+	clusterInformer cache.SharedIndexInformer) *Controller {
 	logger := klog.FromContext(ctx)
-
-	// TODO: We are keeping a hash table of logical cluster provider clients
-	// this might change once we create the cluster provider client resource.
-	clusterproviderclient.ProviderList = make(map[string]clusterproviderclient.ProviderClient)
 
 	controller := &Controller{
 		kubeconfig:       kubeconfig,
@@ -76,10 +74,10 @@ func NewController(
 		clusterclientset: clusterclientset,
 		clusterInformer:  clusterInformer,
 		queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(),
-			"cluster-controller"),
+			controllerName),
 	}
 
-	clusterInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	clusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			logger.Info("Add cluster")
 			controller.queue.Add(
@@ -172,7 +170,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 		return err
 	}
 
-	provider, err := clusterproviderclient.GetProviderClient(ctx, c.clusterclientset, providerInfo.Spec.ProviderType, providerInfo.Name)
+	provider, err := providerlib.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err
@@ -182,7 +180,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(newClusterConfig.Spec.ClusterProviderDesc).
+		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDesc)).
 		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -205,7 +203,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(newClusterConfig.Spec.ClusterProviderDesc).
+		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDesc)).
 		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -221,7 +219,7 @@ func (c *Controller) processUpdate(ctx context.Context, key any) error {
 	clusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterConfig.Spec.ClusterProviderDesc).
+		LogicalClusters(clusterproviderclient.GetNamespace(clusterConfig.Spec.ClusterProviderDesc)).
 		Update(ctx, clusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -245,7 +243,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 		return err
 	}
 
-	provider, err := clusterproviderclient.GetProviderClient(ctx, c.clusterclientset, providerInfo.Spec.ProviderType, providerInfo.Name)
+	provider, err := providerlib.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err

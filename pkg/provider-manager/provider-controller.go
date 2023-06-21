@@ -105,6 +105,7 @@ func (c *controller) Run(numThreads int) {
 }
 
 func (c *controller) runWorker(ctx context.Context) {
+	c.logger.Info("runWorker")
 	for c.processNextItem() {
 	}
 }

@@ -18,6 +18,7 @@ package clusterproviderclient
 
 import (
 	"context"
+	"errors"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -29,99 +30,84 @@ import (
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 )
 
-var ProviderList map[string]ProviderClient
+// Each provider gets its own namespace named prefixNamespace+providerName
+const prefixNamespace = "lcprovider-"
 
-// TODO: now that we support namespaces, this function will likely change.
-func compareLogicalClusters(cluster1 v1alpha1apis.LogicalCluster, cluster2 v1alpha1apis.LogicalCluster) bool {
-	return cluster1.Name == cluster2.Name &&
-		cluster1.Spec.ClusterProviderDesc == cluster2.Spec.ClusterProviderDesc
+func GetNamespace(providerName string) string {
+	return prefixNamespace + providerName
+}
+
+func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, clientset edgeclient.Interface, providerName string) {
+	logger := klog.FromContext(ctx)
+	for {
+		event, ok := <-w.ResultChan()
+		if !ok {
+			w.Stop()
+			logger.Info("stopping")
+			// TODO: return an error
+			return
+		}
+		listLogicalClusters, err := clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).List(ctx, v1.ListOptions{})
+		if err != nil {
+			logger.Error(err, "")
+			// TODO: how do we handle failure?
+			return
+		}
+		switch event.Type {
+		case watch.Added:
+			// TODO: I am currently ignoring the possibility of the logical cluster object already existing
+			var found bool = false
+			for _, logicalCluster := range listLogicalClusters.Items {
+				if logicalCluster.Name == event.Name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				logger.Info("Creating new LogicalCluster object", event.Name)
+				var eventLogicalCluster v1alpha1apis.LogicalCluster
+				eventLogicalCluster.Name = event.Name
+				eventLogicalCluster.Spec.ClusterProviderDesc = providerName
+				eventLogicalCluster.Spec.Managed = false
+				eventLogicalCluster.Status.Phase = "Initializing"
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})
+				if err != nil {
+					logger.Error(err, "")
+					// TODO: how do we handle failure?
+					return
+				}
+			}
+		case watch.Deleted:
+			logger.Info("Deleting LogicalCluster object", event.Name)
+			err := clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).Delete(ctx, event.Name, v1.DeleteOptions{})
+			if err != nil {
+				// TODO: If the logical cluster object does not exist, ignore the error.
+				logger.Error(err, "")
+				// TODO: how do we handle failure?
+				return
+			}
+
+		default:
+			// Unknown!
+			logger.Info("unknown event")
+			// TODO return an error or panic?
+		}
+	}
 }
 
 // ES: return and error and don't panic, move push to outside the case
-func GetProviderClient(ctx context.Context,
+func NewProvider(ctx context.Context,
 	clientset edgeclient.Interface,
-	providerType v1alpha1apis.ClusterProviderType,
-	providerName string) (ProviderClient, error) {
-	logger := klog.FromContext(ctx)
-	key := providerName
-	newProvider, exists := ProviderList[key]
-	if !exists {
-		switch providerType {
-		case v1alpha1apis.KindProviderType:
-			newProvider = kindprovider.New(providerName)
-			// TODO: support deleting a provider from the list
-			ProviderList[key] = newProvider
-			w, _ := newProvider.Watch()
-			go func() {
-				for {
-					event, ok := <-w.ResultChan()
-					if !ok {
-						w.Stop()
-						logger.Info("stopping")
-						// TODO: return an error
-						return
-					}
-					var eventLogicalCluster v1alpha1apis.LogicalCluster
-					eventLogicalCluster.Name = event.Name
-					eventLogicalCluster.Spec.ClusterProviderDesc = providerName
-					eventLogicalCluster.Spec.Managed = false
-					eventLogicalCluster.Status.Phase = "Initializing"
-					listLogicalClusters, err := clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).List(ctx, v1.ListOptions{})
-					if err != nil {
-						logger.Error(err, "")
-						// TODO: how do we handle failure?
-						return
-					}
-					switch event.Type {
-					case watch.Added:
-						// TODO: I am currently ignoring the possibility of the logical cluster object already existing
-						var found bool = false
-						for _, logicalCluster := range listLogicalClusters.Items {
-							if compareLogicalClusters(logicalCluster, eventLogicalCluster) {
-								found = true
-								break
-							}
-						}
-						if !found {
-							logger.Info("Creating new LogicalCluster object", eventLogicalCluster.Name)
-							_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})
-							if err != nil {
-								logger.Error(err, "")
-								// TODO: how do we handle failure?
-								return
-							}
-						}
-					case watch.Deleted:
-						// TODO: I am currently ignoring the possibility of the logical cluster object not existing
-						var nameLogicalClusterObject string = ""
-						for _, logicalCluster := range listLogicalClusters.Items {
-							if compareLogicalClusters(logicalCluster, eventLogicalCluster) {
-								nameLogicalClusterObject = logicalCluster.Name
-								break
-							}
-						}
-						if nameLogicalClusterObject != "" {
-							logger.Info("Deleting LogicalCluster object", nameLogicalClusterObject)
-							err := clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).Delete(ctx, nameLogicalClusterObject, v1.DeleteOptions{})
-							if err != nil {
-								logger.Error(err, "")
-								// TODO: how do we handle failure?
-								return
-							}
-						}
-
-					default:
-						// Unknown!
-						logger.Info("unknown event")
-						// TODO return an error or panic?
-					}
-				}
-			}()
-		default:
-			panic("unknown provider type")
-		}
+	providerName string,
+	providerType v1alpha1apis.ClusterProviderType) (ProviderClient, error) {
+	var newProvider ProviderClient = nil
+	switch providerType {
+	case v1alpha1apis.KindProviderType:
+		newProvider = kindprovider.New(providerName)
+	default:
+		err := errors.New("unknown provider type")
+		return nil, err
 	}
-
 	return newProvider, nil
 }
 
