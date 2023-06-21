@@ -30,7 +30,6 @@ import (
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
 	clustermanager "github.com/kcp-dev/edge-mc/pkg/logical-cluster-manager"
-	providermanager "github.com/kcp-dev/edge-mc/pkg/provider-manager"
 )
 
 var (
@@ -73,10 +72,6 @@ func main() {
 	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters().Informer()
 	clusterInformerFactory.Start(doneCh)
 
-	providerInformerFactory := edgeinformers.NewSharedScopedInformerFactory(clusterClientset, resyncPeriod, metav1.NamespaceAll)
-	providerInformer := providerInformerFactory.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()
-	providerInformerFactory.Start(doneCh)
-
 	// TODO: clusterInformer is not the same as providerInformer
 	clusterController := clustermanager.NewController(
 		kubeconfig,
@@ -89,19 +84,6 @@ func main() {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	logger.Info("about to create provider controller")
-	providerController := providermanager.NewController(
-		ctx,
-		clusterClientset,
-		providerInformer,
-	)
-	if err != nil {
-		logger.Error(err, "failed to create provider controller")
-		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
-	}
-	logger.Info("done creating provider controller")
-
 	clusterController.Run(numThreads)
-	go providerController.Run(numThreads)
 	logger.Info("Time to stop")
 }
