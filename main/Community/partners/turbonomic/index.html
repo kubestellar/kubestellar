@@ -1780,7 +1780,13 @@
 </p>
 
 <h3 id="how-do-i-get-this-working-with-my-kubestellar-instance">How do I get this working with my KubeStellar instance?<a class="headerlink" href="#how-do-i-get-this-working-with-my-kubestellar-instance" title="Permanent link">#</a></h3>
-<p><a href="https://kubernetes.slack.com/archives/C058SUSL5AA">Work with us</a> to create this document</p>
+<p>As we can see from the blog and the demo, Turbonomic talks to KubeStellar via GitOps. The scheduling decisions are passed from Turbonomic to KubeStellar in two steps:
+1. Turbo -&gt; GitHub repository.
+2. GitHub repository -&gt; KubeStellar.</p>
+<p>For the 1st step (Turbonomic -&gt; GitHub repository), a controller named "<a href="https://github.com/irfanurrehman/change-reconciler">change reconciler</a>" creates PRs against the GitHub repository, where the PRs contains changes to scheduling decisions.</p>
+<p>There's also <a href="https://github.com/edge-experiments/turbonomic-integrations">a piece of code</a> which intercepts Turbonomic actions and creates CRs for the above change reconciler.</p>
+<p>For the 2nd step (GitHub repository-&gt; KubeStellar), we can use Argo CD. The detailed procedure to integrate Argo CD with KubeStellar is documented <a href="../argocd/">here</a>.</p>
+<p>As we can see from the blog and the demo, Turbonomic collects data from edge clusters. This is made possible by installing <a href="https://github.com/turbonomic/kubeturbo">kubeturbo</a> into each of the edge clusters.</p>
 <h3 id="turbonomic-and-kubestellar-in-the-news">Turbonomic and KubeStellar in the news<a class="headerlink" href="#turbonomic-and-kubestellar-in-the-news" title="Permanent link">#</a></h3>
 <p align=center>
 <div id="spinner2">
