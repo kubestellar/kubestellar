@@ -10,7 +10,18 @@ Medium - [Make Multi-Cluster Scheduling a No-Brainer](https://medium.com/@waltfo
 </p>
 
 ### How do I get this working with my KubeStellar instance?
-[Work with us](https://kubernetes.slack.com/archives/C058SUSL5AA) to create this document
+As we can see from the blog and the demo, Turbonomic talks to KubeStellar via GitOps. The scheduling decisions are passed from Turbonomic to KubeStellar in two steps:
+1. Turbo -> GitHub repository.
+2. GitHub repository -> KubeStellar.
+
+For the 1st step (Turbonomic -> GitHub repository), a controller named "[change reconciler](https://github.com/irfanurrehman/change-reconciler)" creates PRs against the GitHub repository, where the PRs contains changes to scheduling decisions.
+
+There's also [a piece of code](https://github.com/edge-experiments/turbonomic-integrations) which intercepts Turbonomic actions and creates CRs for the above change reconciler.
+
+For the 2nd step (GitHub repository-> KubeStellar), we can use Argo CD. The detailed procedure to integrate Argo CD with KubeStellar is documented [here](./argocd.md).
+
+As we can see from the blog and the demo, Turbonomic collects data from edge clusters. This is made possible by installing [kubeturbo](https://github.com/turbonomic/kubeturbo) into each of the edge clusters.
+
 
 ### Turbonomic and KubeStellar in the news
 <p align=center>
