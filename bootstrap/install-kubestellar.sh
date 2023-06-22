@@ -53,7 +53,7 @@ get_arch_type() {
 }
 
 get_latest_version() {
-    curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_full_path() {
@@ -127,9 +127,9 @@ fi
 
 if [ $verbose == "true" ]; then
     echo "Downloading Kubestellar $kubestellar_version $kubestellar_os/$kubestellar_arch..."
-    curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
+    curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 else
-    curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
+    curl -sSL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${kubestellar_os}_$kubestellar_arch.tar.gz"
 fi
 
 if [ $verbose == "true" ]; then
