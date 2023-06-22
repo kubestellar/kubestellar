@@ -51,7 +51,7 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	clientopts "github.com/kcp-dev/edge-mc/pkg/client-options"
+	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 )
 
 func main() {

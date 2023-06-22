@@ -34,9 +34,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/fake"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgefakeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
 
 var scheme *runtime.Scheme

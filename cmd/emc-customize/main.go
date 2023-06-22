@@ -33,8 +33,8 @@ import (
 
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/customize"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
 func main() {

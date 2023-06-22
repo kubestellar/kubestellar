@@ -32,8 +32,8 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	urmetav1a1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
-	apiwatch "github.com/kcp-dev/edge-mc/pkg/apiwatch"
+	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	apiwatch "github.com/kubestellar/kubestellar/pkg/apiwatch"
 )
 
 // NewAPIWatchMapProvider constructs an APIMapProvider that gets its information

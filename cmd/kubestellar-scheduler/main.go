@@ -22,7 +22,7 @@ import (
 	"k8s.io/component-base/cli"
 	_ "k8s.io/component-base/logs/json/register"
 
-	"github.com/kcp-dev/edge-mc/cmd/kubestellar-scheduler/cmd"
+	"github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/cmd"
 )
 
 func main() {

@@ -30,8 +30,8 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	synceroptions "github.com/kcp-dev/edge-mc/cmd/syncer/options"
-	"github.com/kcp-dev/edge-mc/pkg/syncer"
+	synceroptions "github.com/kubestellar/kubestellar/cmd/syncer/options"
+	"github.com/kubestellar/kubestellar/pkg/syncer"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/kcp-dev/edge-mc
+module github.com/kubestellar/kubestellar
 
 go 1.19
 
