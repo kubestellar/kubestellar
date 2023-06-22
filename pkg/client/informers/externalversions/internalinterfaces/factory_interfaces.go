@@ -30,8 +30,8 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
-	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
+	scopedclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 )
 
 // NewInformerFunc takes clientset.ClusterInterface and time.Duration to return a ScopeableSharedIndexInformer.

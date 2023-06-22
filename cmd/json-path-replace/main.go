@@ -22,7 +22,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/kcp-dev/edge-mc/pkg/jsonpath"
+	"github.com/kubestellar/kubestellar/pkg/jsonpath"
 )
 
 func main() {

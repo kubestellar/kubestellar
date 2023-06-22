@@ -27,7 +27,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/edge-mc/pkg/syncer/shared"
+	"github.com/kubestellar/kubestellar/pkg/syncer/shared"
 )
 
 type controllerBase struct {

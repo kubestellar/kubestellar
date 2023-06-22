@@ -31,7 +31,7 @@ import (
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeframework "github.com/kcp-dev/edge-mc/test/e2e/framework"
+	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 //go:embed testdata/*

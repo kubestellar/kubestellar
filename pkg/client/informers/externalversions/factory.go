@@ -34,12 +34,12 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge"
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	logicalclusterinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/logicalcluster"
-	metainformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/meta"
+	scopedclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
+	logicalclusterinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/logicalcluster"
+	metainformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/meta"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
