@@ -1,8 +1,10 @@
 /cmd/cluster-watchall/main.go:100:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/kcp-watchall/main.go:103:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/mailbox-controller/main.go:88:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
-/cmd/placement-translator/main.go:117:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
-/pkg/placement/workload-projector.go:592:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-/pkg/placement/workload-projector.go:614:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-/pkg/placement/workload-projector.go:710:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
-/pkg/placement/workload-projector.go:790:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/cmd/placement-translator/main.go:121:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/pkg/clustermanager/provider-cluster/provider_cluster.go:122:5: Additional arguments to Info should always be Key Value pairs. Please check if there is any key or value missing.
+/pkg/clustermanager/provider-cluster/provider_cluster.go:136:4: Additional arguments to Info should always be Key Value pairs. Please check if there is any key or value missing.
+/pkg/placement/workload-projector.go:687:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:709:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:882:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
+/pkg/placement/workload-projector.go:964:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
