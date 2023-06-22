@@ -33,7 +33,7 @@ import (
 	cluster "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
 	lcv1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	providerlib "github.com/kcp-dev/edge-mc/pkg/provider-library"
+	providercluster "github.com/kcp-dev/edge-mc/pkg/clustermanager/provider-cluster"
 )
 
 const (
@@ -170,7 +170,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 		return err
 	}
 
-	provider, err := providerlib.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
+	provider, err := providercluster.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err
@@ -243,7 +243,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 		return err
 	}
 
-	provider, err := providerlib.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
+	provider, err := providercluster.GetProvider(ctx, c.clusterclientset, providerInfo.Name, providerInfo.Spec.ProviderType)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err

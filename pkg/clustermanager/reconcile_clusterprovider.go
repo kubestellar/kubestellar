@@ -20,6 +20,7 @@ import (
 	"errors"
 
 	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	providercluster "github.com/kcp-dev/edge-mc/pkg/clustermanager/provider-cluster"
 )
 
 func (c *controller) reconcileClusterProviderDesc(key string) error {
@@ -39,6 +40,28 @@ func (c *controller) reconcileClusterProviderDesc(key string) error {
 	} else {
 		//TODO handle ClusterProviderDesc added/updated
 		c.logger.V(2).Info("reconcile ClusterProviderDesc", "resource", provider.Name)
+		c.processAdd(provider.Name, provider.Spec.ProviderType)
 	}
+	return nil
+}
+
+// TODO: perform discovery
+// TODO: requeue the add if the provider is already hashed in the provider list?
+func (c *controller) processAdd(providerName string, providerType lcv1alpha1.ClusterProviderType) error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	newProvider, err := providercluster.CreateProvider(c.context, providerName, providerType)
+	if err != nil {
+		// TODO: Check if the err is because the provider already exists
+		c.logger.V(2).Info("processAdd", "resource", providerName)
+		return err
+	}
+	err = providercluster.StartDiscovery(c.context, newProvider, c.clientset, providerName)
+	if err != nil {
+		c.logger.V(2).Info("processAdd", "resource", providerName)
+		return err
+	}
+
 	return nil
 }

@@ -42,7 +42,7 @@ spec:
                   resource
                 type: string
                 x-kubernetes-validations:
-                - message: ProviderName is immutable
+                - message: ClusterProviderDescName is immutable
                   rule: self == oldSelf
               Managed:
                 default: true

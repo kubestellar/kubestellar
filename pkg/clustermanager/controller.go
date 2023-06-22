@@ -19,6 +19,7 @@ package clustermanager
 import (
 	"context"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -30,6 +31,7 @@ import (
 	"k8s.io/klog/v2"
 
 	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
 )
 
 const ()
@@ -49,15 +51,18 @@ type queueItem struct {
 
 type controller struct {
 	context                 context.Context
+	clientset               edgeclient.Interface
 	logger                  logr.Logger
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
 	clusterProviderInformer cache.SharedIndexInformer
+	lock                    sync.Mutex
 }
 
 // NewController returns logicalcluster-manager controller
 func NewController(
 	context context.Context,
+	clientset edgeclient.Interface,
 	logicalClusterInformer cache.SharedIndexInformer,
 	providerInformer cache.SharedIndexInformer,
 ) *controller {
@@ -65,6 +70,7 @@ func NewController(
 
 	c := &controller{
 		context:                 context,
+		clientset:               clientset,
 		logger:                  klog.FromContext(context),
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,

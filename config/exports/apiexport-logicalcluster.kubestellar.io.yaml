@@ -6,5 +6,5 @@ metadata:
 spec:
   latestResourceSchemas:
   - v230622-286e246c.clusterproviderdescs.logicalcluster.kubestellar.io
-  - v230622-286e246c.logicalclusters.logicalcluster.kubestellar.io
+  - v230622-b4b7445f.logicalclusters.logicalcluster.kubestellar.io
 status: {}
