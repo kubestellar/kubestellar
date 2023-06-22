@@ -45,7 +45,7 @@ type LogicalCluster struct {
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
 	// ClusterProviderDescName is a reference to a ClusterProviderDesc resource
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ClusterProviderDescName is immutable"
 	ClusterProviderDescName string `json:"ClusterProviderDescName"`
 
 	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
