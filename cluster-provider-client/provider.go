@@ -67,7 +67,7 @@ func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				logger.Info("Creating new LogicalCluster object", event.Name)
 				var eventLogicalCluster v1alpha1apis.LogicalCluster
 				eventLogicalCluster.Name = event.Name
-				eventLogicalCluster.Spec.ClusterProviderDesc = providerName
+				eventLogicalCluster.Spec.ClusterProviderDescName = providerName
 				eventLogicalCluster.Spec.Managed = false
 				eventLogicalCluster.Status.Phase = "Initializing"
 				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(providerName).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})

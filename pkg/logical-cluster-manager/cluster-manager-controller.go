@@ -164,7 +164,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
 	clusterName := newClusterConfig.Name
 
-	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, newClusterConfig.Spec.ClusterProviderDesc, v1.GetOptions{})
+	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, newClusterConfig.Spec.ClusterProviderDescName, v1.GetOptions{})
 	if err != nil {
 		logger.Error(err, "failed to get the provider resource")
 		return err
@@ -180,7 +180,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDesc)).
+		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDescName)).
 		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -203,7 +203,7 @@ func (c *Controller) processAdd(ctx context.Context, key any) error {
 	newClusterConfig.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDesc)).
+		LogicalClusters(clusterproviderclient.GetNamespace(newClusterConfig.Spec.ClusterProviderDescName)).
 		Update(ctx, newClusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -219,7 +219,7 @@ func (c *Controller) processUpdate(ctx context.Context, key any) error {
 	clusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
 	_, err = c.clusterclientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(clusterConfig.Spec.ClusterProviderDesc)).
+		LogicalClusters(clusterproviderclient.GetNamespace(clusterConfig.Spec.ClusterProviderDescName)).
 		Update(ctx, clusterConfig, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -237,7 +237,7 @@ func (c *Controller) processDelete(ctx context.Context, key any) error {
 	delClusterConfig := key.(*lcv1alpha1apis.LogicalCluster)
 	clusterName := delClusterConfig.Name
 
-	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, delClusterConfig.Spec.ClusterProviderDesc, v1.GetOptions{})
+	providerInfo, err := c.clusterclientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(ctx, delClusterConfig.Spec.ClusterProviderDescName, v1.GetOptions{})
 	if err != nil {
 		logger.Error(err, "failed to get provider resource.")
 		return err
