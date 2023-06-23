@@ -7,7 +7,7 @@ Join the [kubestellar-security-announce](https://groups.google.com/u/1/g/kubeste
 
 We're extremely grateful for security researchers and users that report vulnerabilities to the KubeStellar Open Source Community. All reports are thoroughly investigated by a set of community volunteers.
 
-You can also email the private [kubestellar-security-announce@googlegroups.com](mailto:kubestellar-security-announce@googlegroups.com) list with the security details and the details expected for [all KubeStellar bug reports](https://github.com/kcp-dev/edge-mc/blob/main/.github/ISSUE_TEMPLATE/bug_report.yaml).
+You can also email the private [kubestellar-security-announce@googlegroups.com](mailto:kubestellar-security-announce@googlegroups.com) list with the security details and the details expected for [all KubeStellar bug reports](https://github.com/kubestellar/kubestellar/blob/main/.github/ISSUE_TEMPLATE/bug_report.yaml).
 
 ### When Should I Report a Vulnerability?
 
