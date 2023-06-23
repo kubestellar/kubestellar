@@ -1,11 +1,11 @@
 site_name: KubeStellar
-repo_url: https://github.com/kcp-dev/edge-mc
+repo_url: https://github.com/kubestellar/kubestellar
 site_url: https://docs.kubestellar.io/
 
-repo_short_name: kcp-dev/edge-mc
-repo_default_file_path: edge-mc
+repo_short_name: kubestellar/kubestellar
+repo_default_file_path: kubestellar
 docs_url: https://docs.kubestellar.io
-repo_raw_url: https://raw.githubusercontent.com/kcp-dev/edge-mc
+repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/release-0.2/docs/content
 ks_branch: 'release-0.2'
 ks_tag: 'v0.2.2'
@@ -143,7 +143,7 @@ extra:
           data: 0
           note: >- 
             Thanks for your feedback! Help us improve this page by
-            using our <a href="https://github.com/kcp-dev/edge-mc/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
+            using our <a href="https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+" target="_blank" rel="noopener">feedback form</a>.
 
 plugins:
   # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
