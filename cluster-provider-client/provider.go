@@ -20,9 +20,9 @@ import (
 	"context"
 	"errors"
 
-	clusterprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
-	kindprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/kind"
-	v1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	clusterprovider "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
+	kindprovider "github.com/kubestellar/kubestellar/cluster-provider-client/kind"
+	v1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName

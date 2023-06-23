@@ -30,12 +30,12 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/controller"
-	"github.com/kcp-dev/edge-mc/pkg/syncer/syncers"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
+	"github.com/kubestellar/kubestellar/pkg/syncer/controller"
+	"github.com/kubestellar/kubestellar/pkg/syncer/syncers"
 )
 
 type SyncerConfig struct {

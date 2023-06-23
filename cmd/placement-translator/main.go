@@ -59,10 +59,10 @@ import (
 	schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
-	emcclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	emcinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/placement"
+	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
 type ClientOpts struct {

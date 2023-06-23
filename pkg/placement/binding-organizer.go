@@ -24,7 +24,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 )
 
 // SimpleBindingOrganizer constructs a BindingOrganizer.

@@ -30,10 +30,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	ksinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
+	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	mcclientset "github.com/kubestellar/kubestellar/pkg/mcclient/clientset"
 )
 
 const defaultProviderNs = "lcprovider-default"

@@ -25,10 +25,10 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
 
-	clusterproviderclient "github.com/kcp-dev/edge-mc/cluster-provider-client"
-	clusterprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
-	lcv1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
+	clusterprovider "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
+	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 )
 
 var (

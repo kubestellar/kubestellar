@@ -22,8 +22,8 @@ limitations under the License.
 package edge
 
 import (
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 type ClusterInterface interface {
