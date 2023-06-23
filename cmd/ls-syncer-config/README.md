@@ -1,7 +1,7 @@
 This command demonstrates the difficulty with all-cluster access to
 resources not built into kcp.
 
-To see the demo, start in the `edge-mc` directory and any convenient
+To see the demo, start in the `kubestellar` directory and any convenient
 kcp workspace and do the following commands.
 
 ```shell
@@ -43,10 +43,10 @@ $ go run ./cmd/ls-syncer-config --cluster-name '*'
 panic: A specific cluster must be provided when scoping, not the wildcard.
 
 goroutine 1 [running]:
-github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1.(*syncerConfigsClusterInterface).Cluster(0xc00048b1a0, {{0x7ff7bfeff8dd?, 0x1ee5320?}})
-	/Users/mspreitz/go/src/github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/syncerconfig.go:58 +0xe5
+github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1.(*syncerConfigsClusterInterface).Cluster(0xc00048b1a0, {{0x7ff7bfeff8dd?, 0x1ee5320?}})
+	/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/syncerconfig.go:58 +0xe5
 main.main()
-	/Users/mspreitz/go/src/github.com/kcp-dev/edge-mc/cmd/ls-syncer-config/main.go:76 +0x3d8
+	/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/cmd/ls-syncer-config/main.go:76 +0x3d8
 exit status 2
 ```
 

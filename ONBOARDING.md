@@ -11,7 +11,7 @@ The purpose of this policy is to ensure a smooth on-boarding and off-boarding pr
 
 2. On-boarding Process:
 2.1. Access Request:
-- New members shall submit an access request, via a blank GitHub issue from the KubeStellar repository, mentioning all members of the [OWNERS](https://github.com/kcp-dev/edge-mc/OWNERS) file.
+- New members shall submit an access request, via a blank GitHub issue from the KubeStellar repository, mentioning all members of the [OWNERS](https://github.com/kcp-dev/kubestellar/OWNERS) file.
 - The access request should include the member's GitHub username and a brief description of their role and contributions to the KubeStellar project.
 
 2.2. Review and Approval:
@@ -24,7 +24,7 @@ The purpose of this policy is to ensure a smooth on-boarding and off-boarding pr
 - Be sure to join the [KubeStellar-dev Google Group](https://groups.google.com/g/kubestellar-dev) to get access to important artifacts like proposals, diagrams, and meeting invitations.
 
 2.4. Orientation:
-- Newly on-boarded members will be provided with [contribution guidelines](https://github.com/kcp-dev/edge-mc/CONTRIBUTING.MD).
+- Newly on-boarded members will be provided with [contribution guidelines](https://github.com/kcp-dev/kubestellar/CONTRIBUTING.MD).
 - The guide will include instructions on how to access relevant repositories, participate in discussions, and contribute to ongoing projects.
 
 3. Off-boarding Process:
@@ -41,7 +41,7 @@ The purpose of this policy is to ensure a smooth on-boarding and off-boarding pr
 - Documentation or guidelines related to ongoing projects should be updated and made available to the team for seamless continuity.
 
 4. Code of Conduct:
-- All members of the KubeStellar GitHub organization are expected to adhere to the organization's [code of conduct](https://github.com/kcp-dev/edge-mc/CODE_OF_CONDUCT.md), promoting a respectful and inclusive environment.
+- All members of the KubeStellar GitHub organization are expected to adhere to the organization's [code of conduct](https://github.com/kcp-dev/kubestellar/CODE_OF_CONDUCT.md), promoting a respectful and inclusive environment.
 - Violations of the code of conduct will be addressed following the organization's established procedures for handling such incidents.
 
 5. Policy Compliance:

@@ -46,7 +46,7 @@ The KubeStellar and its leadership embrace the following values:
 
 ## Maintainers
 
-KubeStellar Maintainers have write access to the [project GitHub repository](https://github.com/kcp-dev/edge-mc).
+KubeStellar Maintainers have write access to the [project GitHub repository](https://github.com/kcp-dev/kubestellar).
 They can merge their own patches or patches from others. The current maintainers
 can be found as top-level approvers in [OWNERS](./OWNERS).  Maintainers collectively 
 manage the project's resources and contributors.
