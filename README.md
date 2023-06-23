@@ -1,6 +1,6 @@
 <!--readme-for-root-start-->
 
-<img alt="" width="500px" align="left" src="/KubeStellar-with-Logo.png" />
+<img alt="" width="500px" align="left" src="KubeStellar-with-Logo.png" />
 
 <br/>
 <br/>
@@ -96,7 +96,7 @@ Thanks go to these wonderful people:
     <td align="center"><a href="https://github.com/thinkahead"><img src="https://avatars.githubusercontent.com/u/7507482?v=4" width="100px;" alt=""/><br /><sub><b>Alexei Karve</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Athinkahead+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/mra-ruiz"><img src="https://avatars.githubusercontent.com/u/16118462?v=4" width="100px;" alt=""/><br /><sub><b>Maria Camila Ruiz Cardenas</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Amra-ruiz+" title="Contributed PRs">👀</a></td>
     <td align="center"><a href="https://github.com/aslom"><img src="https://avatars.githubusercontent.com/u/1648338?v=4" width="100px;" alt=""/><br /><sub><b>Aleksander Slominski</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aaslom+" title="Contributed PRs">👀</a></td>
-    <td align="center"><a href="https://github.com/amanroa"><img src="https://avatars.githubusercontent.com/u/26678552?v=4" width="100px;" alt=""/><br /><sub><b>Aashni Manroa</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Aamanroa+" title="Contributed PRs">👀</a></td>    
+        
   </tr>
 
 </table>
