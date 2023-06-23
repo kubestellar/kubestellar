@@ -73,10 +73,10 @@ if [ "$imw" != "." ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 
-if kubectl "${kubectl_flags[@]}" get synctargets.workload.kcp.io "$objname" &> /dev/null
-then kubectl "${kubectl_flags[@]}" delete synctargets.workload.kcp.io "$objname"
+if kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$objname" &> /dev/null
+then kubectl "${kubectl_flags[@]}" delete synctargets.edge.kcp.io "$objname"
 fi
 
-if kubectl "${kubectl_flags[@]}" get locations.scheduling.kcp.io "$objname" &> /dev/null
-then kubectl "${kubectl_flags[@]}" delete locations.scheduling.kcp.io "$objname"
+if kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io "$objname" &> /dev/null
+then kubectl "${kubectl_flags[@]}" delete locations.edge.kcp.io "$objname"
 fi
