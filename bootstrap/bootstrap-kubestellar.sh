@@ -77,7 +77,7 @@ kubestellar_running() {
 }
 
 kubestellar_get_latest_version() {
-    curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_os_type() {
@@ -199,7 +199,7 @@ if [ "$(kcp_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing kcp..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --ensure-folder  $folder/kcp $verbose $flagx
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/install-kcp-with-plugins.sh) --version $kcp_version --os $os_type --arch $arch_type --ensure-folder  $folder/kcp $verbose $flagx
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kcp/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kcp/bin)
     fi
@@ -233,7 +233,7 @@ if [ "$(kubestellar_installed)" == "false" ]; then
     if [ "$verbose" != "" ]; then
         echo "Installing Kubestellar..."
     fi
-    bash <(curl -s https://raw.githubusercontent.com/kcp-dev/edge-mc/main/bootstrap/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --ensure-folder  $folder/kubestellar $verbose $flagx
+    bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/install-kubestellar.sh) --version $kubestellar_version --os $os_type --arch $arch_type --ensure-folder  $folder/kubestellar $verbose $flagx
     if [[ ! ":$PATH:" == *":$(get_full_path $folder/kubestellar/bin):"* ]]; then
         export PATH=$PATH:$(get_full_path $folder/kubestellar/bin)
     fi
