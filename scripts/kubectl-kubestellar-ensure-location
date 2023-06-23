@@ -114,7 +114,7 @@ fi
 
 if ! kubectl "${kubectl_flags[@]}" get SyncTarget "$objname" &> /dev/null; then
 (cat <<EOF
-apiVersion: workload.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
   name: "$objname"
@@ -129,10 +129,10 @@ fi
 
 if ! kubectl "${kubectl_flags[@]}" get Location "$objname" &> /dev/null; then
 (cat <<EOF
-apiVersion: scheduling.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 spec:
-  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"id":"$objname"}
 metadata:
