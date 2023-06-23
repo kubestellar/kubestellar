@@ -22,7 +22,7 @@ import (
 	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
 
-	clientoptions "github.com/kcp-dev/edge-mc/pkg/client-options"
+	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
 )
 
 type Options struct {

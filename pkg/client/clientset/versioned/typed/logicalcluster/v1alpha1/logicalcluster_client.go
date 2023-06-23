@@ -23,8 +23,8 @@ import (
 
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
 )
 
 type LogicalclusterV1alpha1Interface interface {

@@ -1,4 +1,4 @@
-module github.com/kcp-dev/edge-mc/cmd/watchall
+module github.com/kubestellar/kubestellar/cmd/watchall
 
 go 1.19
 

@@ -34,9 +34,9 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	clientopts "github.com/kcp-dev/edge-mc/pkg/client-options"
-	clusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
+	clusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 )
 
 func main() {

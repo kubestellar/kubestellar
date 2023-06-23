@@ -1,8 +1,8 @@
 presubmits:
-  - name: pull-edge-mc-verify
+  - name: pull-kubestellar-verify
     always_run: true
     decorate: true
-    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    clone_uri: "https://github.com/kubestellar/kubestellar"
     spec:
       containers:
         - image: ghcr.io/kcp-dev/infra/build:1.19.9-2
@@ -20,10 +20,10 @@ presubmits:
               memory: 1Gi
               cpu: 1
 
-  - name: pull-edge-mc-lint
+  - name: pull-kubestellar-lint
     always_run: true
     decorate: true
-    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    clone_uri: "https://github.com/kubestellar/kubestellar"
     spec:
       containers:
         - image: ghcr.io/kcp-dev/infra/build:1.19.9-2
@@ -35,10 +35,10 @@ presubmits:
               memory: 4Gi
               cpu: 2
 
-  - name: pull-edge-mc-test-unit
+  - name: pull-kubestellar-test-unit
     always_run: true
     decorate: true
-    clone_uri: "https://github.com/kcp-dev/edge-mc"
+    clone_uri: "https://github.com/kubestellar/kubestellar"
     labels:
       preset-goproxy: "true"
     spec:
