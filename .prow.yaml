@@ -1,5 +1,5 @@
 presubmits:
-  - name: pull-kubestellar-kubestellar-verify
+  - name: pull-kubestellar-verify
     always_run: true
     decorate: true
     clone_uri: "https://github.com/kubestellar/kubestellar"
@@ -20,7 +20,7 @@ presubmits:
               memory: 1Gi
               cpu: 1
 
-  - name: pull-kubestellar-kubestellar-lint
+  - name: pull-kubestellar-lint
     always_run: true
     decorate: true
     clone_uri: "https://github.com/kubestellar/kubestellar"
@@ -35,7 +35,7 @@ presubmits:
               memory: 4Gi
               cpu: 2
 
-  - name: pull-kubestellar-kubestellar-test-unit
+  - name: pull-kubestellar-test-unit
     always_run: true
     decorate: true
     clone_uri: "https://github.com/kubestellar/kubestellar"
