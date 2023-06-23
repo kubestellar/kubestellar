@@ -36,10 +36,10 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
-	scheduleroptions "github.com/kcp-dev/edge-mc/cmd/kubestellar-scheduler/options"
-	edgeclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	"github.com/kcp-dev/edge-mc/pkg/scheduler"
+	scheduleroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/options"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/scheduler"
 )
 
 func NewSchedulerCommand() *cobra.Command {

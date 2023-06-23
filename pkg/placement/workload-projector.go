@@ -51,10 +51,10 @@ import (
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgeclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgev1a1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/customize"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
 const SyncerConfigName = "the-one"

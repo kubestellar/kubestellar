@@ -37,7 +37,7 @@ import (
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	"github.com/kcp-dev/edge-mc/pkg/placement"
+	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
 func newCrossClusterListerWatcher[Scoped ScopedListerWatcher[ListType], ListType runtime.Object](

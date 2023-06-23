@@ -27,7 +27,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 )
 
 func exerciseFactorer[Whole, PartA, PartB comparable](factor Factorer[Whole, PartA, PartB], exampleWhole Whole, examplePartA PartA, examplePartB PartB) func(*testing.T) {

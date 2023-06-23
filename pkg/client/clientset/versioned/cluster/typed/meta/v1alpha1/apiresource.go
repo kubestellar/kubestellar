@@ -30,8 +30,8 @@ import (
 	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
-	metav1alpha1client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	metav1alpha1client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
 // APIResourcesClusterGetter has a method to return a APIResourceClusterInterface.

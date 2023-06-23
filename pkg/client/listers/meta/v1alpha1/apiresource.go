@@ -29,7 +29,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 )
 
 // APIResourceClusterLister can list APIResources across all workspaces, or scope down to a APIResourceLister for one workspace.

@@ -22,8 +22,8 @@ limitations under the License.
 package meta
 
 import (
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/meta/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/meta/v1alpha1"
 )
 
 type ClusterInterface interface {

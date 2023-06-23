@@ -53,8 +53,8 @@ import (
 	extkcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	urmetav1a1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/apiwatch"
+	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 )
 
 /* This program is a kcp client that monitors all LogicalClusters and,

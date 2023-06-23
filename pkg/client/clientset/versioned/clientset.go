@@ -26,9 +26,9 @@ import (
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
-	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
 type Interface interface {
