@@ -16,9 +16,9 @@ jobs:
 
           # Set the output variable based on the week number
           if [[ $week_number -eq 0 ]]; then
-            run: echo "run_workflow=true" >> $GITHUB_OUTPUT
+            echo "run_workflow=true" >> $GITHUB_OUTPUT
           else
-            run: echo "run_workflow=false" >> $GITHUB_OUTPUT
+            echo "run_workflow=false" >> $GITHUB_OUTPUT
           fi
           
       - uses: actions/checkout@v3.5.3
