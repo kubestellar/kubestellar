@@ -1,7 +1,7 @@
 This command demonstrates the difficulty with all-cluster access to
 resources not built into kcp.
 
-To see the demo, start in the `edge-mc` directory and any convenient
+To see the demo, start in the `kubestellar` directory and any convenient
 kcp workspace and do the following commands.
 
 ```shell
