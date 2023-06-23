@@ -35,7 +35,7 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
-	urmetav1a1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
+	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 )
 
 // Invalidatable is a cache that has to be explicitly invalidated

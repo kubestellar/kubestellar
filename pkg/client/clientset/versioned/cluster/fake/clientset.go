@@ -29,15 +29,15 @@ import (
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	client "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	kcpclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	kcpedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	fakeedgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
-	kcpmetav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
-	fakemetav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1/fake"
-	clientscheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	metav1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+	client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	kcpclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	kcpedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
+	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
+	kcpmetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
+	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1/fake"
+	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.

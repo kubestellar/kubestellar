@@ -53,7 +53,7 @@ import (
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	"github.com/kcp-dev/edge-mc/pkg/syncer"
+	"github.com/kubestellar/kubestellar/pkg/syncer"
 )
 
 //go:embed testdata/*

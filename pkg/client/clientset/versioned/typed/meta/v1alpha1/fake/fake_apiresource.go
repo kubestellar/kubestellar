@@ -28,7 +28,7 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 )
 
 // FakeAPIResources implements APIResourceInterface

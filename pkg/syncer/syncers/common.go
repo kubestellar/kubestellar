@@ -26,8 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	. "github.com/kcp-dev/edge-mc/pkg/syncer/clientfactory"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	. "github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
 )
 
 func resourceToString(resource edgev1alpha1.EdgeSyncConfigResource) string {
