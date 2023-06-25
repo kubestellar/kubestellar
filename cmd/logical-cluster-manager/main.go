@@ -32,7 +32,6 @@ import (
 	clustermanager "github.com/kubestellar/kubestellar/pkg/logical-cluster-manager"
 )
 
-
 var (
 	resyncPeriod = 4 * time.Second
 	numThreads   = 2
