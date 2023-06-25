@@ -18,9 +18,6 @@ on:
 #         - "docs/scripts/get-elapsed-time.sh"
 #         - ".github/workflows/elapsed-time-collector.yml"
  
-env:
-  docs-ecutable-filename: mailbox
-
 permissions:
   contents: write
 
