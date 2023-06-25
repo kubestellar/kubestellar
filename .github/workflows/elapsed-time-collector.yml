@@ -16,7 +16,10 @@ on:
 #         - "docs/content/common-subs/**"
 #         - "docs/scripts/get-elapsed-time.sh"
 #         - ".github/workflows/elapsed-time-collector.yml"
- 
+
+env:
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+  
 permissions:
   contents: write
 
