@@ -3,9 +3,8 @@ name: elapsed time collector
 on:
     schedule:
       - cron: "0 0 * * *"
-# on:
-#   # So we can trigger manually if needed
-#   workflow_dispatch:
+    # So we can trigger manually if needed
+    workflow_dispatch:
 #   # To confirm any changes to docs build successfully, without deploying them
 #   push:
 #     branches:
