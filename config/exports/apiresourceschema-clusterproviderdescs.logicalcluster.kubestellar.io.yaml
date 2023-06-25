@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230618-23cd8129.clusterproviderdescs.logicalcluster.kubestellar.io
+  name: v230625-f10a03977.clusterproviderdescs.logicalcluster.kubestellar.io
 spec:
   group: logicalcluster.kubestellar.io
   names:
