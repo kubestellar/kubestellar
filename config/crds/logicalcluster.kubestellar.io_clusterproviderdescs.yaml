@@ -55,7 +55,17 @@ spec:
             - ProviderType
             type: object
           status:
-            description: '`status` describes the status of the cluster object.'
+            description: '`status` describes the status of the provider object.'
+            properties:
+              Phase:
+                default: Initializing
+                description: Phase of the provider (Initializing,Ready).
+                enum:
+                - Initializing
+                - Ready
+                type: string
+            required:
+            - Phase
             type: object
         type: object
     served: true
