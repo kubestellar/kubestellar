@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	lcapi "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster"
+	lcapi "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster"
 )
 
 // SchemeGroupVersion is group version used to register these objects

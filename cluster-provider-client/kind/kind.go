@@ -27,7 +27,7 @@ import (
 	"k8s.io/klog/v2"
 	kind "sigs.k8s.io/kind/pkg/cluster"
 
-	clusterprovider "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
+	clusterprovider "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 )
 
 // KindClusterProvider is a cluster provider that works with a local Kind instance.

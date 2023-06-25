@@ -19,8 +19,8 @@ package clustermanager
 import (
 	"errors"
 
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	providercluster "github.com/kcp-dev/edge-mc/pkg/clustermanager/provider-cluster"
+	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	providercluster "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-cluster"
 )
 
 func (c *controller) reconcileClusterProviderDesc(key string) error {

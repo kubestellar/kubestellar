@@ -31,8 +31,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	mcclientset "github.com/kcp-dev/edge-mc/pkg/mcclient/clientset"
+	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	mcclientset "github.com/kubestellar/kubestellar/pkg/mcclient/clientset"
 )
 
 const (

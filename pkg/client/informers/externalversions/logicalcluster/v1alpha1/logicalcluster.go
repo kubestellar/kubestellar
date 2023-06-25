@@ -34,11 +34,11 @@ import (
 	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	scopedclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	clientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	"github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/internalinterfaces"
-	logicalclusterv1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	scopedclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
+	logicalclusterv1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/logicalcluster/v1alpha1"
 )
 
 // LogicalClusterClusterInformer provides access to a shared informer and lister for

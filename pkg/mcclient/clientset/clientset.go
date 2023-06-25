@@ -21,7 +21,7 @@ import (
 	kubeclient "k8s.io/client-go/kubernetes"
 	rest "k8s.io/client-go/rest"
 
-	ksclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
+	ksclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 )
 
 type Interface interface {

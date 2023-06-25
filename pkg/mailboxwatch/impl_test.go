@@ -39,11 +39,11 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	edgefakeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/fake"
-	edgeclusterclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	edgescopedclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/placement"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgefakeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
+	edgeclusterclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
+	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
 var _ edgeapi.SyncerConfig

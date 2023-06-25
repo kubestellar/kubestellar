@@ -27,9 +27,9 @@ import (
 	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
 
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	edgeinformers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions"
-	clustermanager "github.com/kcp-dev/edge-mc/pkg/logical-cluster-manager"
+	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	clustermanager "github.com/kubestellar/kubestellar/pkg/logical-cluster-manager"
 )
 
 var (

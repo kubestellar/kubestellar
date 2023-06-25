@@ -27,8 +27,8 @@ import (
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 
-	v1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	scheme "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/scheme"
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	scheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
 )
 
 // EdgeSyncConfigsGetter has a method to return a EdgeSyncConfigInterface.

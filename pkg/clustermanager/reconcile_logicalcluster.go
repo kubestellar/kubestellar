@@ -19,7 +19,7 @@ package clustermanager
 import (
 	"errors"
 
-	lcv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 )
 
 func (c *controller) reconcileLogicalCluster(key string) error {

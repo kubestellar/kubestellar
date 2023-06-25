@@ -25,9 +25,9 @@ import (
 	klog "k8s.io/klog/v2"
 	kind "sigs.k8s.io/kind/pkg/cluster"
 
-	lcv1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	ksclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	"github.com/kcp-dev/edge-mc/pkg/mcclient"
+	lcv1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	"github.com/kubestellar/kubestellar/pkg/mcclient"
 )
 
 const defaultProviderNs = "lcprovider-default"

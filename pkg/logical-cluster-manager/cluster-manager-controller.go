@@ -29,11 +29,11 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	clusterproviderclient "github.com/kcp-dev/edge-mc/cluster-provider-client"
-	cluster "github.com/kcp-dev/edge-mc/cluster-provider-client/cluster"
-	lcv1alpha1apis "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
-	edgeclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned"
-	providercluster "github.com/kcp-dev/edge-mc/pkg/clustermanager/provider-cluster"
+	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
+	cluster "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
+	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	providercluster "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-cluster"
 )
 
 const (

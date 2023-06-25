@@ -41,11 +41,11 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	urmetav1a1 "github.com/kcp-dev/edge-mc/pkg/apis/meta/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/apiwatch"
-	edgev1alpha1informers "github.com/kcp-dev/edge-mc/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/apiwatch"
+	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
 )
 
 type whatResolver struct {
