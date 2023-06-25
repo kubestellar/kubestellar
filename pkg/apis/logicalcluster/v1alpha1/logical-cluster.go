@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The KubeStellar Authors.
+Copyright 2023 The KubeStellar Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 //
 // +crd
 // +genclient
-// +kubebuilder:resource:scope=Namespaced,shortName=ecl
+// +kubebuilder:resource:scope=Cluster,shortName=ecl
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type LogicalCluster struct {
 	metav1.TypeMeta `json:",inline"`
@@ -45,13 +45,8 @@ type LogicalCluster struct {
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
 	// ClusterProviderDescName is a reference to a ClusterProviderDesc resource
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ClusterProviderDescName is immutable"
 	ClusterProviderDescName string `json:"ClusterProviderDescName"`
-
-	// ClusterName is the name of the logical cluster created by the provider.
-	// +optional
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
-	ClusterName string `json:"ClusterName,omitempty"`
 
 	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
 	// Currently this is immutable.

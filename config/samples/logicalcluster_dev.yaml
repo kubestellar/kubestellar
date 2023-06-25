@@ -1,0 +1,7 @@
+apiVersion: logicalcluster.kubestellar.io/v1alpha1
+kind: LogicalCluster
+metadata:
+  name: dev2
+spec:
+  ClusterProviderDesc: "dev2"
+  ClusterName: "kind-fleet-test2"
