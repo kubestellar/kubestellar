@@ -19,6 +19,11 @@ package clustermanager
 import (
 	"errors"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog/v2"
+
+	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
+	cluster "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 )
 
@@ -35,10 +40,119 @@ func (c *controller) reconcileLogicalCluster(key string) error {
 
 	if !exists {
 		c.logger.V(2).Info("LogicalCluster deleted", "resource", cluster.Name)
-		//TODO handle LogicalCluster deleted
+		err := c.processDeleteLC(cluster)
+		if err != nil {
+			return err
+		}
 	} else {
-		//TODO handle LogicalCluster added/updated
 		c.logger.V(2).Info("reconcile LogicalCluster", "resource", cluster.Name)
+		err := c.processAddLC(cluster)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// TODO: the processAddLC needs to check whether the LogicalCluster has already
+// been added and processed, or whether this is actually an Update.
+func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
+	logger := klog.FromContext(c.context)
+	var err error
+
+	clusterName := newCluster.Name
+
+	providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
+		c.context, newCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
+	if err != nil {
+		logger.Error(err, "failed to get the provider resource")
+		return err
+	}
+
+	provider, err := c.GetProvider(providerInfo.Name, providerInfo.Spec.ProviderType)
+	if err != nil {
+		logger.Error(err, "failed to get provider client")
+		return err
+	}
+
+	// Update status to NotReady
+	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
+	_, err = c.clientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		Update(c.context, newCluster, v1.UpdateOptions{})
+	if err != nil {
+		logger.Error(err, "failed to update cluster status.")
+		return err
+	}
+
+	// Create cluster
+	var opts cluster.Options
+	//ES: what exactly is this kubeconfig
+	createdCluster, err := provider.Create(c.context, clusterName, opts)
+	if err != nil {
+		logger.Error(err, "failed to create cluster")
+		return err
+	}
+	logger.Info("Done creating cluster", "clusterName", clusterName)
+
+	// Update the new cluster's status - specifically the config string and the phase
+	newCluster.Status.ClusterConfig = createdCluster.Config
+	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseReady
+	_, err = c.clientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		Update(c.context, newCluster, v1.UpdateOptions{})
+	if err != nil {
+		logger.Error(err, "failed to update cluster status.")
+		return err
+	}
+
+	return err
+}
+
+/***
+func (c *controller) processUpdateLC(ctx context.Context, key any) error {
+	logger := klog.FromContext(ctx)
+	var err error
+	clusterConfig := key.(*lcv1alpha1.LogicalCluster)
+	_, err = c.clientset.
+		LogicalclusterV1alpha1().
+		LogicalClusters(clusterproviderclient.GetNamespace(clusterConfig.Spec.ClusterProviderDescName)).
+		Update(ctx, clusterConfig, v1.UpdateOptions{})
+	if err != nil {
+		logger.Error(err, "failed to update cluster status.")
+		return err
+	}
+	return err
+}
+***/
+
+func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) error {
+	logger := klog.FromContext(c.context)
+	var err error
+
+	var opts cluster.Options
+	clusterName := delCluster.Name
+
+	providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
+		c.context, delCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
+	if err != nil {
+		logger.Error(err, "failed to get provider resource.")
+		return err
+	}
+
+	provider, err := c.GetProvider(providerInfo.Name, providerInfo.Spec.ProviderType)
+	if err != nil {
+		logger.Error(err, "failed to get provider client")
+		return err
+	}
+
+	err = provider.Delete(c.context, clusterName, opts)
+	if err != nil {
+		logger.Error(err, "failed to delete cluster")
+		return err
+	}
+
+	return err
 }

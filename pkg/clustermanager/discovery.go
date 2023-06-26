@@ -14,12 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package providercluster
+package clustermanager
 
 import (
 	"context"
 	"errors"
-	"sync"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -31,25 +30,12 @@ import (
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 )
 
-var (
-	providerList map[string]clusterproviderclient.ProviderClient
-	lock         sync.Mutex
-)
+func (c *controller) GetProvider(
+	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
-func New() {
-	lock.Lock()
-	defer lock.Unlock()
-	providerList = make(map[string]clusterproviderclient.ProviderClient)
-}
-
-func GetProvider(ctx context.Context,
-	clusterclientset edgeclient.Interface,
-	providerName string,
-	providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
-	lock.Lock()
-	defer lock.Unlock()
-
-	provider, exists := providerList[providerName]
+	provider, exists := c.providers.providerList[providerName]
 	if !exists {
 		// If the provider does not exists in the list, then likely the provider object was
 		// recentely added, and the provider is in the process of being added.  Return an
@@ -61,34 +47,32 @@ func GetProvider(ctx context.Context,
 	return provider, nil
 }
 
-func CreateProvider(ctx context.Context,
-	providerName string,
-	providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
-	lock.Lock()
-	defer lock.Unlock()
+func (c *controller) CreateProvider(
+	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
-	_, exists := providerList[providerName]
+	_, exists := c.providers.providerList[providerName]
 	if exists {
 		err := errors.New("provider already in the list")
 		return nil, err
 	}
-	newProvider, err := clusterproviderclient.NewProvider(ctx, providerName, providerType)
+	newProvider, err := clusterproviderclient.NewProvider(c.context, providerName, providerType)
 	if err != nil {
 		return nil, err
 	}
-	providerList[providerName] = newProvider
+	c.providers.providerList[providerName] = newProvider
 	return newProvider, nil
 }
 
-func StartDiscovery(ctx context.Context,
+func (c *controller) StartDiscovery(
 	provider clusterproviderclient.ProviderClient,
-	clusterclientset edgeclient.Interface,
 	providerName string) error {
-	w, err := provider.Watch()
+	w, err := provider.StartWatch()
 	if err != nil {
 		return err
 	}
-	go ProcessProviderWatchEvents(ctx, w, clusterclientset, providerName)
+	go ProcessProviderWatchEvents(c.context, w, c.clientset, providerName)
 	return nil
 }
 

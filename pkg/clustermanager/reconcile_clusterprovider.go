@@ -19,9 +19,17 @@ package clustermanager
 import (
 	"errors"
 
+	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
-	providercluster "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-cluster"
 )
+
+type providers struct {
+	providerList map[string]clusterproviderclient.ProviderClient
+}
+
+func (c *controller) InitProviders() {
+	c.providers.providerList = make(map[string]clusterproviderclient.ProviderClient)
+}
 
 func (c *controller) reconcileClusterProviderDesc(key string) error {
 	providerObj, exists, err := c.clusterProviderInformer.GetIndexer().GetByKey(key)
@@ -48,16 +56,13 @@ func (c *controller) reconcileClusterProviderDesc(key string) error {
 // TODO: perform discovery
 // TODO: requeue the add if the provider is already hashed in the provider list?
 func (c *controller) processAdd(providerName string, providerType lcv1alpha1.ClusterProviderType) error {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	newProvider, err := providercluster.CreateProvider(c.context, providerName, providerType)
+	newProvider, err := c.CreateProvider(providerName, providerType)
 	if err != nil {
 		// TODO: Check if the err is because the provider already exists
 		c.logger.V(2).Info("processAdd", "resource", providerName)
 		return err
 	}
-	err = providercluster.StartDiscovery(c.context, newProvider, c.clientset, providerName)
+	err = c.StartDiscovery(newProvider, providerName)
 	if err != nil {
 		c.logger.V(2).Info("processAdd", "resource", providerName)
 		return err

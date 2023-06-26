@@ -34,6 +34,7 @@ import (
 type KindClusterProvider struct {
 	kindProvider *kind.Provider
 	providerName string
+	watch        clusterprovider.Watcher
 }
 
 // New creates a new KindClusterProvider
@@ -50,7 +51,7 @@ func (k KindClusterProvider) Create(ctx context.Context,
 	opts clusterprovider.Options) (clusterprovider.LogicalClusterInfo, error) {
 	var resCluster clusterprovider.LogicalClusterInfo
 
-	err := k.kindProvider.Create(string(name), kind.CreateWithKubeconfigPath(opts.KubeconfigPath))
+	err := k.kindProvider.Create(name)
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "node(s) already exist for a cluster with the name") {
 			// TODO: check whether it's the same cluster and return success if true
@@ -59,7 +60,7 @@ func (k KindClusterProvider) Create(ctx context.Context,
 		}
 	}
 
-	cfg, err := k.kindProvider.KubeConfig(string(name), false)
+	cfg, err := k.kindProvider.KubeConfig(name, false)
 	if err != nil {
 		return resCluster, err
 	}
@@ -71,7 +72,7 @@ func (k KindClusterProvider) Delete(ctx context.Context,
 	name string,
 	opts clusterprovider.Options) error {
 
-	return k.kindProvider.Delete(string(name), opts.KubeconfigPath)
+	return k.kindProvider.Delete(name, opts.KubeconfigPath)
 }
 
 func (k KindClusterProvider) List() ([]string, error) {
@@ -84,10 +85,17 @@ func (k KindClusterProvider) List() ([]string, error) {
 	return logicalNameList, err
 }
 
-func (k KindClusterProvider) Watch() (clusterprovider.Watcher, error) {
-	return &KindWatcher{
+func (k KindClusterProvider) StartWatch() (clusterprovider.Watcher, error) {
+	w := &KindWatcher{
 		ch:       make(chan clusterprovider.WatchEvent),
-		provider: &k}, nil
+		provider: &k}
+	k.watch = w
+	return w, nil
+}
+
+func (k KindClusterProvider) StopWatch() error {
+	k.watch.Stop()
+	return nil
 }
 
 type KindWatcher struct {

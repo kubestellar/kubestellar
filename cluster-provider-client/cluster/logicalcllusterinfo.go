@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
+// TODO: I think it would make more sense to return a LogicalCluster structure.
 func New(cfg string, opts Options) *LogicalClusterInfo {
 	return &LogicalClusterInfo{
 		Name:   opts.Name,
