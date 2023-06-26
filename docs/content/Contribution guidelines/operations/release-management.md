@@ -41,8 +41,8 @@ ks_tag: 'v0.2.2'
 <b>after:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
-ks_branch: 'release-0.2'
-ks_tag: 'v0.3.0'
+ks_branch: 'release-0.3'
+ks_tag: 'v0.4.0'
 ...
 ```
 
@@ -67,7 +67,9 @@ git push -u origin release-<major>.<minor> # replace <major>.<minor> with your i
 ```shell
 cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
+git pull
 mike deploy --push --rebase --update-aliases releae-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+cd ..
 ```
 
 ### Test your doc site
