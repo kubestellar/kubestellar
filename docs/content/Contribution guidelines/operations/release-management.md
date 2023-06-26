@@ -49,8 +49,10 @@ ks_tag: 'v0.3.0'
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
+cd docs
 mike delete stable # remove the 'stable' alias from the current 'release-<major>.<minor>' branches' doc set
 mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
+cd ..
 ```
 
 
@@ -58,11 +60,12 @@ mike deploy --push --rebase --update-aliases main stable # this generates the 'm
 ```shell
 git add .
 git commit -m "new release version <major>.<minor>"
-git push -u origin release-<major>.<minor> replace <major>.<minor> with your incremented <major>.<minor> pair
+git push -u origin release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'stable' alias using 'mike'
 ```shell
+cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
 mike deploy --push --rebase --update-aliases releae-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
 ```
