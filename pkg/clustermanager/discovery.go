@@ -30,12 +30,12 @@ import (
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 )
 
-func (c *controller) GetProvider(
-	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
+// GetProvider returns provider client interface for provider
+func (c *controller) GetProvider(providerName string) (clusterproviderclient.ProviderClient, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	provider, exists := c.providers.providerList[providerName]
+	provider, exists := c.providers[providerName]
 	if !exists {
 		// If the provider does not exists in the list, then likely the provider object was
 		// recentely added, and the provider is in the process of being added.  Return an
@@ -44,15 +44,16 @@ func (c *controller) GetProvider(
 		err := errors.New("provider does not exist in the provider list")
 		return nil, err
 	}
-	return provider, nil
+	return provider.providerClient, nil
 }
 
+// CreateProvider returns new provider client
 func (c *controller) CreateProvider(
 	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	_, exists := c.providers.providerList[providerName]
+	_, exists := c.providers[providerName]
 	if exists {
 		err := errors.New("provider already in the list")
 		return nil, err
@@ -61,28 +62,55 @@ func (c *controller) CreateProvider(
 	if err != nil {
 		return nil, err
 	}
-	c.providers.providerList[providerName] = newProvider
+	c.providers[providerName] = providerInfo{providerClient: newProvider}
 	return newProvider, nil
 }
 
-func (c *controller) StartDiscovery(
-	provider clusterproviderclient.ProviderClient,
-	providerName string) error {
-	w, err := provider.StartWatch()
+// StartDiscovery will start watching provider clusters for changes
+func (c *controller) StartDiscovery(providerName string) error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	providerInfo, ok := c.providers[providerName]
+	if !ok {
+		return errors.New("failed to start provider discovery. provider info not exists")
+	}
+
+	watcher, err := providerInfo.providerClient.Watch()
 	if err != nil {
 		return err
 	}
-	go ProcessProviderWatchEvents(c.context, w, c.clientset, providerName)
+	go processProviderWatchEvents(c.context, watcher, c.clientset, providerName)
+
+	providerInfo.providerWatcher = watcher
+	c.providers[providerName] = providerInfo
 	return nil
 }
 
-func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, clientset edgeclient.Interface, providerName string) {
+// StopDiscovery will stop watching provider clusters for changes
+func (c *controller) StopDiscovery(providerName string) error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	providerInfo, ok := c.providers[providerName]
+	if !ok {
+		return errors.New("failed to stop provider discovery. provider info does not exist")
+	}
+
+	if providerInfo.providerWatcher == nil {
+		return errors.New("failed to stop provider discovery. provider watcher does not exist")
+	}
+	providerInfo.providerWatcher.Stop()
+	return nil
+}
+
+func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, clientset edgeclient.Interface, providerName string) {
 	logger := klog.FromContext(ctx)
 	for {
 		event, ok := <-w.ResultChan()
 		if !ok {
 			w.Stop()
-			logger.Info("stopping")
+			logger.Info("stopping cluster provider watch", "provider", providerName)
 			// TODO: return an error
 			return
 		}
@@ -103,7 +131,7 @@ func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				}
 			}
 			if !found {
-				logger.Info("Creating new LogicalCluster object", event.Name)
+				logger.Info("Creating new LogicalCluster object", "cluster", event.Name)
 				var eventLogicalCluster lcv1alpha1apis.LogicalCluster
 				eventLogicalCluster.Name = event.Name
 				eventLogicalCluster.Spec.ClusterProviderDescName = providerName
@@ -117,7 +145,7 @@ func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				}
 			}
 		case watch.Deleted:
-			logger.Info("Deleting LogicalCluster object", event.Name)
+			logger.Info("Deleting LogicalCluster object", "cluster", event.Name)
 			err := clientset.LogicalclusterV1alpha1().LogicalClusters(clusterproviderclient.GetNamespace(providerName)).Delete(ctx, event.Name, v1.DeleteOptions{})
 			if err != nil {
 				// TODO: If the logical cluster object does not exist, ignore the error.
@@ -127,9 +155,7 @@ func ProcessProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 			}
 
 		default:
-			// Unknown!
-			logger.Info("unknown event")
-			// TODO return an error or panic?
+			logger.Info("unknown event type", "type", event.Type)
 		}
 	}
 }

@@ -69,7 +69,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 		return err
 	}
 
-	provider, err := c.GetProvider(providerInfo.Name, providerInfo.Spec.ProviderType)
+	provider, err := c.GetProvider(providerInfo.Name)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err
@@ -142,7 +142,7 @@ func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) erro
 		return err
 	}
 
-	provider, err := c.GetProvider(providerInfo.Name, providerInfo.Spec.ProviderType)
+	provider, err := c.GetProvider(providerInfo.Name)
 	if err != nil {
 		logger.Error(err, "failed to get provider client")
 		return err
