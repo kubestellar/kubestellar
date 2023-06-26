@@ -94,7 +94,7 @@ create a tag that follows <major>.<minor>.<patch>.  For this example we will inc
 TAG=v0.3.0
 REF=release-0.3
 git tag --sign --message "$TAG" "$TAG" "$REF"
-git push ??? "$TAG"  #TODO - not sure if this is right
+git push origin --tags
 ```
 
 ### Create a release in GH UI
