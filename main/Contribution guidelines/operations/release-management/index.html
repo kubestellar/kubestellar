@@ -1961,8 +1961,8 @@
 </code></pre></div></p>
 <p><b>after:</b>
 <div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>...
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.2&#39;</span>
-</span><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.3.0&#39;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.3&#39;</span>
+</span><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.4.0&#39;</span>
 </span><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
 </code></pre></div></p>
 <h3 id="remove-the-current-stable-alias-using-mike-danger">Remove the current 'stable' alias using 'mike' (DANGER!)<a class="headerlink" href="#remove-the-current-stable-alias-using-mike-danger" title="Permanent link">#</a></h3>
@@ -1980,7 +1980,9 @@
 <h3 id="update-the-stable-alias-using-mike">Update the 'stable' alias using 'mike'<a class="headerlink" href="#update-the-stable-alias-using-mike" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>docs
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>releae-0.3<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>git<span class="w"> </span>pull
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>releae-0.3<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div>
 <h3 id="test-your-doc-site">Test your doc site<a class="headerlink" href="#test-your-doc-site" title="Permanent link">#</a></h3>
 <p>Open a Chrome Incognito browser to <a href="https://kubestellar.io">https://kubestellar.io</a> and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'</p>
