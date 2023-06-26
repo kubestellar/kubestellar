@@ -2061,7 +2061,7 @@ scripts in <code>hack</code>).</p>
 </tbody>
 </table>
 <h3 id="global-variables">Global Variables<a class="headerlink" href="#global-variables" title="Permanent link">#</a></h3>
-<p>There are many global variables defined in the <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.3/docs/mkdocs.yml">docs/mkdocs.yml</a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking</p>
+<p>There are many global variables defined in the <a href="https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/mkdocs.yml">docs/mkdocs.yml</a>.  The following are some very common variables you are encouraged to use in our documentation.  Use of these variables/macros allows our documentation to have github branch context and take advantage of our evolution without breaking</p>
 <div class="highlight"><pre><span></span><code>- site_name: KubeStellar
 - repo_url: https://github.com/kubestellar/kubestellar
 - site_url: https://docs.kubestellar.io/main
@@ -2070,8 +2070,8 @@ scripts in <code>hack</code>).</p>
 - docs_url: https://docs.kubestellar.io
 - repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 - edit_uri: edit/main/docs/content/
-- ks_branch: release-0.3
-- ks_tag: v0.3.0
+- ks_branch: main
+- ks_tag: latest
 </code></pre></div>
 <p>to use a variables/macro in your documentation reference like this:</p>
 <p>{{ config.&lt;var_name> }}</p>
@@ -2091,7 +2091,7 @@ scripts in <code>hack</code>).</p>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>release-0.3
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 <p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
@@ -2101,7 +2101,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>release-0.3
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
 </code></pre></div>
 Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
@@ -2222,7 +2222,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 <br/></p>
 </li>
 </ul>
-<p>(other variations are possible, PR an update to the <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
+<p>(other variations are possible, PR an update to the <a href="https://github.com/kubestellar/kubestellar/blob/main/docs/overrides/stylesheets/kubestellar.css">kubestellar.css</a> file and, once approved, use the style on the plain codeblock in your documentation.)</p>
 <h3 id="testingrunning-docs">Testing/Running Docs<a class="headerlink" href="#testingrunning-docs" title="Permanent link">#</a></h3>
 <p>How do we ensure that our documented examples work?  Simple, we 'execute' our documentation in our CI.  We built automation called 'docs-ecutable' which can be invoked to test any markdown (.md) file in our repository. You could use it in your project as well - afterall it is opensource.</p>
 <h4 id="the-way-it-works">The way it works:<a class="headerlink" href="#the-way-it-works" title="Permanent link">#</a></h4>
@@ -2238,18 +2238,18 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </ul>
 <h4 id="the-github-workflow">The GitHub Workflow:<a class="headerlink" href="#the-github-workflow" title="Permanent link">#</a></h4>
 <ul>
-<li>One example of the GitHub Workflow is located in our kubestellar/kubestellar at <a href="../../../https://github.com/kubestellar/kubestellar/blob/release-0.3/.github/workflows/docs-ecutable-scheduler.yml">https://github.com/kubestellar/kubestellar/blob/release-0.3/.github/workflows/docs-ecutable-scheduler.yml</a></li>
+<li>One example of the GitHub Workflow is located in our kubestellar/kubestellar at <a href="../../../https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/docs-ecutable-scheduler.yml">https://github.com/kubestellar/kubestellar/blob/main/.github/workflows/docs-ecutable-scheduler.yml</a></li>
 </ul>
 <h4 id="the-secret-sauce">The secret sauce:<a class="headerlink" href="#the-secret-sauce" title="Permanent link">#</a></h4>
 <ul>
-<li>The code that makes all this possible is at <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/docs/scripts/docs-ecutable.sh">https://github.com/kubestellar/kubestellar/blob/release-0.3/docs/scripts/docs-ecutable.sh</a><ul>
+<li>The code that makes all this possible is at <a href="https://github.com/kubestellar/kubestellar/blob/main/docs/scripts/docs-ecutable.sh">https://github.com/kubestellar/kubestellar/blob/main/docs/scripts/docs-ecutable.sh</a><ul>
 <li>This code parses the .md file you give it to pull out all the 'shell' and '.bash .hide-me' blocks</li>
 <li>The code is smart enough to traverse the include-markdown blocks and include the 'shell' and '.bash .hide-me' blocks in them</li>
 <li>It then creates a file called 'generate_script.sh' which is then run at the end of the docs-ecutable execution.</li>
 </ul>
 </li>
 </ul>
-<p>All of this is invoke in a target in our <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/Makefile">Makefile</a>
+<p>All of this is invoke in a target in our <a href="https://github.com/kubestellar/kubestellar/blob/main/Makefile">Makefile</a>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>.PHONY:<span class="w"> </span>docs-ecutable
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docs-ecutable:<span class="w"> </span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nv">MANIFEST</span><span class="o">=</span><span class="k">$(</span>MANIFEST<span class="k">)</span><span class="w"> </span>docs/scripts/docs-ecutable.sh
@@ -2280,7 +2280,7 @@ Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8
 </code></pre></div></p>
 <h4 id="versionsjson">versions.json<a class="headerlink" href="#versionsjson" title="Permanent link">#</a></h4>
 <p>The versions.json file contains the version and alias information required by 'mike' to properly serve our doc site.  This file is maintained by the 'mike' environment and should not be edited by hand.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">[{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;release-0.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;stable&quot;</span><span class="p">]},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;unstable&quot;</span><span class="p">]}]</span>
 </code></pre></div>
 <h3 id="in-case-of-emergency">In case of emergency<a class="headerlink" href="#in-case-of-emergency" title="Permanent link">#</a></h3>
 <p>If you find yourself in a jam and the pages are not showing up at kubestellar.io or docs.kubestellar.io, check the following
