@@ -85,17 +85,12 @@ func (k KindClusterProvider) List() ([]string, error) {
 	return logicalNameList, err
 }
 
-func (k KindClusterProvider) StartWatch() (clusterprovider.Watcher, error) {
+func (k KindClusterProvider) Watch() (clusterprovider.Watcher, error) {
 	w := &KindWatcher{
 		ch:       make(chan clusterprovider.WatchEvent),
 		provider: &k}
 	k.watch = w
 	return w, nil
-}
-
-func (k KindClusterProvider) StopWatch() error {
-	k.watch.Stop()
-	return nil
 }
 
 type KindWatcher struct {

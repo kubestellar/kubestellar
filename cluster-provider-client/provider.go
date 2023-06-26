@@ -50,9 +50,6 @@ func NewProvider(ctx context.Context,
 // Provider defines methods to retrieve, list, and watch fleet of clusters.
 // The provider is responsible for discovering and managing the lifecycle of each
 // cluster.
-//
-// Example:
-// ES: add example, remove list() add Get()
 type ProviderClient interface {
 	Create(ctx context.Context, name string, opts clusterprovider.Options) (clusterprovider.LogicalClusterInfo, error)
 	Delete(ctx context.Context, name string, opts clusterprovider.Options) error
@@ -62,11 +59,7 @@ type ProviderClient interface {
 	// and to refresh the list of logical clusters periodically.
 	List() ([]string, error)
 
-	// StartWatch returns a Watcher that watches for changes to a list of logical clusters
+	// Watch returns a Watcher that watches for changes to a list of logical clusters
 	// and react to potential changes.
-	StartWatch() (clusterprovider.Watcher, error)
-
-	// StopWatch stops a Watcher that watches for changes to a list of logical clusters
-	// and react to potential changes.
-	StopWatch() error
+	Watch() (clusterprovider.Watcher, error)
 }

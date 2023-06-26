@@ -30,6 +30,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
+	providerclient "github.com/kubestellar/kubestellar/cluster-provider-client"
+	clusterprovider "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 )
@@ -49,6 +51,11 @@ type queueItem struct {
 	key            string
 }
 
+type providerInfo struct {
+	providerClient  providerclient.ProviderClient
+	providerWatcher clusterprovider.Watcher
+}
+
 type controller struct {
 	context                 context.Context
 	clientset               edgeclient.Interface
@@ -56,7 +63,7 @@ type controller struct {
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
 	clusterProviderInformer cache.SharedIndexInformer
-	providers               providers
+	providers               map[string]providerInfo
 	lock                    sync.Mutex
 }
 
@@ -76,9 +83,8 @@ func NewController(
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,
 		clusterProviderInformer: providerInformer,
+		providers:               make(map[string]providerInfo),
 	}
-
-	c.InitProviders() // Initializes the providers structure
 
 	logicalClusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueLogicalCluster,
