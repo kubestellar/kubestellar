@@ -94,11 +94,11 @@ func (c *controller) StopDiscovery(providerName string) error {
 
 	providerInfo, ok := c.providers[providerName]
 	if !ok {
-		return errors.New("failed to stop provider discovery. provider info not exists")
+		return errors.New("failed to stop provider discovery. provider info does not exist")
 	}
 
 	if providerInfo.providerWatcher == nil {
-		return errors.New("failed to stop provider discovery. provider watcher not exists")
+		return errors.New("failed to stop provider discovery. provider watcher does not exist")
 	}
 	providerInfo.providerWatcher.Stop()
 	return nil
