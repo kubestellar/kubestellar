@@ -68,7 +68,7 @@ git push -u origin release-<major>.<minor> # replace <major>.<minor> with your i
 cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
 git pull
-mike deploy --push --rebase --update-aliases releae-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+mike deploy --push --rebase --update-aliases release-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
 cd ..
 ```
 
