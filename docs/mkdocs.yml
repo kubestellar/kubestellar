@@ -19,7 +19,6 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
-  - QuickStart: Getting-Started/quickstart.md
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
