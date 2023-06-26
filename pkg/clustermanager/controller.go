@@ -56,6 +56,7 @@ type controller struct {
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
 	clusterProviderInformer cache.SharedIndexInformer
+	providers               providers
 	lock                    sync.Mutex
 }
 
@@ -76,6 +77,8 @@ func NewController(
 		logicalClusterInformer:  logicalClusterInformer,
 		clusterProviderInformer: providerInformer,
 	}
+
+	c.InitProviders() // Initializes the providers structure
 
 	logicalClusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueLogicalCluster,

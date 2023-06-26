@@ -62,8 +62,11 @@ type ProviderClient interface {
 	// and to refresh the list of logical clusters periodically.
 	List() ([]string, error)
 
-	// Watch returns a Watcher that watches for changes to a list of logical clusters
+	// StartWatch returns a Watcher that watches for changes to a list of logical clusters
 	// and react to potential changes.
-	// TODO: I have yet to implement it for the kind provider type, so commenting it out for now
-	Watch() (clusterprovider.Watcher, error)
+	StartWatch() (clusterprovider.Watcher, error)
+
+	// StopWatch stops a Watcher that watches for changes to a list of logical clusters
+	// and react to potential changes.
+	StopWatch() error
 }
