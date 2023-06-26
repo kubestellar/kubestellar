@@ -19,6 +19,11 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
+  - Getting Started:
+      - QuickStart: Getting-Started/quickstart.md
+      - Extended Example: Coding Milestones/PoC2023q1/example1.md
+      - User Guide: Getting-Started/user-guide.md
+      - KubeStellar - The Infomercial: Getting-Started/infomercial.md
   - Contributing: 
       - Guidelines: Contribution guidelines/CONTRIBUTING.md
       - Code of Conduct: Contribution guidelines/coc.md
@@ -70,11 +75,6 @@ nav:
         - FluxCD: Community/partners/fluxcd.md
         - OpenZiti: Community/partners/openziti.md
         - Kyverno: Community/partners/kyverno.md
-  - Getting Started:
-      - QuickStart: Getting-Started/quickstart.md
-      - Extended Example: Coding Milestones/PoC2023q1/example1.md
-      - User Guide: Getting-Started/user-guide.md
-      - KubeStellar - The Infomercial: Getting-Started/infomercial.md
   - 'Blog': https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST" target="_blank
   # # - Auto generated:
   #   - ... | auto-generated/*/*.md
