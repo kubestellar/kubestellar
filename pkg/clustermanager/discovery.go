@@ -110,7 +110,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 		event, ok := <-w.ResultChan()
 		if !ok {
 			w.Stop()
-			logger.Info("stopping")
+			logger.Info("stopping cluster provider watch", "provider", providerName)
 			// TODO: return an error
 			return
 		}
@@ -131,7 +131,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				}
 			}
 			if !found {
-				logger.Info("Creating new LogicalCluster object", event.Name)
+				logger.Info("Creating new LogicalCluster object", "cluster", event.Name)
 				var eventLogicalCluster lcv1alpha1apis.LogicalCluster
 				eventLogicalCluster.Name = event.Name
 				eventLogicalCluster.Spec.ClusterProviderDescName = providerName
@@ -145,7 +145,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				}
 			}
 		case watch.Deleted:
-			logger.Info("Deleting LogicalCluster object", event.Name)
+			logger.Info("Deleting LogicalCluster object", "cluster", event.Name)
 			err := clientset.LogicalclusterV1alpha1().LogicalClusters(clusterproviderclient.GetNamespace(providerName)).Delete(ctx, event.Name, v1.DeleteOptions{})
 			if err != nil {
 				// TODO: If the logical cluster object does not exist, ignore the error.
@@ -155,9 +155,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 			}
 
 		default:
-			// Unknown!
-			logger.Info("unknown event")
-			// TODO return an error or panic?
+			logger.Info("unknown event type", "type", event.Type)
 		}
 	}
 }
