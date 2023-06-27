@@ -17,7 +17,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$REPO_ROOT"
@@ -54,7 +54,7 @@ ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
 code_blocks+=('set -o pipefail')
-# code_blocks+=('set -o xtrace')
+code_blocks+=('set -o xtrace')
 
 function parse_file() 
 {
