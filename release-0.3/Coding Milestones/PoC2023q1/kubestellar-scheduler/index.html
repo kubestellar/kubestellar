@@ -1911,7 +1911,7 @@
 <p>Open a terminal window(1) and clone the latest KubeStellar source:</p>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar<span class="w"> </span>KubeStellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
 </code></pre></div>
 <p>Clone the v0.11.0 branch kcp source:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
@@ -1949,7 +1949,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-exports.md '&lt;!--kubestellar-scheduler-exports-start--&gt;' '&lt;!--kubestellar-scheduler-exports-end--&gt;' -->
 
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/exports/
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/exports/
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -1960,7 +1960,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 </code></pre></div></p>
 <p>Bind APIs.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/imports/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/imports/
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -1969,7 +1969,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-process-start.md '&lt;!--kubestellar-scheduler-process-start-start--&gt;' '&lt;!--kubestellar-scheduler-process-start-end--&gt;' -->
 
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nb">cd</span><span class="w"> </span>../KubeStellar
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nb">cd</span><span class="w"> </span>../kubestellar
 <a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/kubestellar-scheduler/main.go<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
@@ -1990,10 +1990,10 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:compute
 </code></pre></div></p>
 <p>Create two Locations and two SyncTargets.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_prod.yaml
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/location_dev.yaml
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_prod.yaml
-<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/synctarget_dev.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/location_prod.yaml
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/location_dev.yaml
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/synctarget_prod.yaml
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/synctarget_dev.yaml
 <a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>sleep<span class="w"> </span><span class="m">5</span>
 </code></pre></div></p>
 <p>Note that kcp automatically creates a Location <code>default</code>. So there are 3 Locations and 2 SyncTargets in <code>root:compute</code>.
@@ -2011,7 +2011,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 <h3 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW<a class="headerlink" href="#create-some-edgeplacements-in-the-wmw" title="Permanent link">#</a></h3>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>all2all</code>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_all2all.yaml
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/edgeplacement_all2all.yaml
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The scheduler maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
@@ -2052,7 +2052,7 @@ Build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div>
 EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:compute</code>.</p>
 <p>Create a more specific EdgePlacement which selects Locations labeled by <code>env: dev</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../KubeStellar/config/samples/edgeplacement_dev.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>../kubestellar/config/samples/edgeplacement_dev.yaml
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>sleep<span class="w"> </span><span class="m">3</span>
 </code></pre></div></p>
 <p>The corresponding SinglePlacementSlice has a shorter list of <code>destinations</code>:
