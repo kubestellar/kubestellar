@@ -32,7 +32,7 @@ import (
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
+	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 const ()

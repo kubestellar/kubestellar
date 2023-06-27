@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package providerclientinterface
+package clustermanager
 
 import (
 	"context"
 	"errors"
 
-	kindprovider "github.com/kubestellar/kubestellar/cluster-provider-client/kind"
+	kindprovider "github.com/kubestellar/kubestellar/clusterprovider/kind"
 	v1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
-	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
+	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName

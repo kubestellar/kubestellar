@@ -23,8 +23,8 @@ import (
 	"k8s.io/klog/v2"
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
-	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
-	cluster "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
+	cluster "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
+	// clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
 )
 
 func (c *controller) reconcileLogicalCluster(key string) error {
@@ -79,7 +79,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
 		Update(c.context, newCluster, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -101,7 +101,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
 		Update(c.context, newCluster, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")

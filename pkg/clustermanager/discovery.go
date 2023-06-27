@@ -28,8 +28,8 @@ import (
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 
 	//	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
-	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
-	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
+	//	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
+	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 // GetProvider returns provider client interface for provider
@@ -60,7 +60,7 @@ func (c *controller) CreateProvider(
 		err := errors.New("provider already in the list")
 		return nil, err
 	}
-	newProvider, err := clusterproviderclient.NewProvider(c.context, providerName, providerType)
+	newProvider, err := NewProvider(c.context, providerName, providerType)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 			// TODO: return an error
 			return
 		}
-		listLogicalClusters, err := clientset.LogicalclusterV1alpha1().LogicalClusters(clusterproviderclient.GetNamespace(providerName)).List(ctx, v1.ListOptions{})
+		listLogicalClusters, err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).List(ctx, v1.ListOptions{})
 		if err != nil {
 			logger.Error(err, "")
 			// TODO: how do we handle failure?
@@ -139,7 +139,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				eventLogicalCluster.Spec.ClusterProviderDescName = providerName
 				eventLogicalCluster.Spec.Managed = false
 				eventLogicalCluster.Status.Phase = "Initializing"
-				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(clusterproviderclient.GetNamespace(providerName)).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})
 				if err != nil {
 					logger.Error(err, "")
 					// TODO: how do we handle failure?
@@ -148,7 +148,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 			}
 		case watch.Deleted:
 			logger.Info("Deleting LogicalCluster object", "cluster", event.Name)
-			err := clientset.LogicalclusterV1alpha1().LogicalClusters(clusterproviderclient.GetNamespace(providerName)).Delete(ctx, event.Name, v1.DeleteOptions{})
+			err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Delete(ctx, event.Name, v1.DeleteOptions{})
 			if err != nil {
 				// TODO: If the logical cluster object does not exist, ignore the error.
 				logger.Error(err, "")
