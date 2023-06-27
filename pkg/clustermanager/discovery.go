@@ -26,9 +26,6 @@ import (
 
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-
-	//	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
-	//	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 

@@ -23,8 +23,7 @@ import (
 	"k8s.io/klog/v2"
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
-	cluster "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
-	// clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
+	pclient "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 func (c *controller) reconcileLogicalCluster(key string) error {
@@ -87,7 +86,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	}
 
 	// Create cluster
-	var opts cluster.Options
+	var opts pclient.Options
 	//ES: what exactly is this kubeconfig
 	createdCluster, err := provider.Create(c.context, clusterName, opts)
 	if err != nil {
@@ -132,7 +131,7 @@ func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) erro
 	logger := klog.FromContext(c.context)
 	var err error
 
-	var opts cluster.Options
+	var opts pclient.Options
 	clusterName := delCluster.Name
 
 	providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
