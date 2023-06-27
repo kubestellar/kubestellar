@@ -109,48 +109,55 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 		event, ok := <-w.ResultChan()
 		if !ok {
 			w.Stop()
-			logger.Info("stopping cluster provider watch", "provider", providerName)
+			logger.Info("Stopping cluster provider watch", "provider", providerName)
 			// TODO: return an error
 			return
 		}
-		listLogicalClusters, err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).List(ctx, v1.ListOptions{})
-		if err != nil {
-			logger.Error(err, "")
-			// TODO: how do we handle failure?
-			return
-		}
+		lcName := event.Name
+		reflcluster, err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Get(ctx, lcName, v1.GetOptions{})
+		found := reflcluster != nil && err != nil
+
 		switch event.Type {
 		case watch.Added:
-			// TODO: I am currently ignoring the possibility of the logical cluster object already existing
-			var found bool = false
-			for _, logicalCluster := range listLogicalClusters.Items {
-				if logicalCluster.Name == event.Name {
-					found = true
-					break
-				}
-			}
+			logger.Info("New cluster was detected", "cluster", event.Name)
+			// A new cluster was detected either create it or change the status to READY
 			if !found {
+				// No corresponding Logicalcluster, let's create it
 				logger.Info("Creating new LogicalCluster object", "cluster", event.Name)
-				var eventLogicalCluster lcv1alpha1apis.LogicalCluster
-				eventLogicalCluster.Name = event.Name
-				eventLogicalCluster.Spec.ClusterProviderDescName = providerName
-				eventLogicalCluster.Spec.Managed = false
-				eventLogicalCluster.Status.Phase = "Initializing"
-				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Create(ctx, &eventLogicalCluster, v1.CreateOptions{})
+				lcluster := lcv1alpha1apis.LogicalCluster{}
+				lcluster.Name = lcName
+				lcluster.Spec.ClusterProviderDescName = providerName
+				lcluster.Spec.Managed = false
+				lcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Create(ctx, &lcluster, v1.CreateOptions{})
 				if err != nil {
-					logger.Error(err, "")
 					// TODO: how do we handle failure?
+					logger.Error(err, "New cluster detected,  couldn't create the corresponding LogicalCluster")
+					return
+				}
+			} else {
+				// TODO: when finalizers added - cheeck the logicalcluster delete timestamp
+				// Logical cluster exists , just update its status
+				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+				if err != nil {
+					// TODO: how do we handle failure?
+					logger.Error(err, "New cluster detected, Couldn't update the LogicalCluster status")
 					return
 				}
 			}
+
 		case watch.Deleted:
-			logger.Info("Deleting LogicalCluster object", "cluster", event.Name)
-			err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Delete(ctx, event.Name, v1.DeleteOptions{})
-			if err != nil {
-				// TODO: If the logical cluster object does not exist, ignore the error.
-				logger.Error(err, "")
-				// TODO: how do we handle failure?
-				return
+			logger.Info("A cluster was removed", "cluster", event.Name)
+			if found {
+				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+				if err != nil {
+					// TODO: how do we handle failure?
+					logger.Error(err, "Cluster was removed, Couldn't update the LogicalCluster status")
+					return
+				}
+				//TODO: When using finalizers we need to remove the finalizer in this point.
 			}
 
 		default:
