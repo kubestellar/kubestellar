@@ -26,12 +26,14 @@ import (
 
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+
+	//	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
 	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
 )
 
 // GetProvider returns provider client interface for provider
-func (c *controller) GetProvider(providerName string) (clusterproviderclient.ProviderClient, error) {
+func (c *controller) GetProvider(providerName string) (clusterprovider.ProviderClient, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -49,7 +51,7 @@ func (c *controller) GetProvider(providerName string) (clusterproviderclient.Pro
 
 // CreateProvider returns new provider client
 func (c *controller) CreateProvider(
-	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterproviderclient.ProviderClient, error) {
+	providerName string, providerType lcv1alpha1apis.ClusterProviderType) (clusterprovider.ProviderClient, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 

@@ -32,7 +32,6 @@ import (
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	providerclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
 )
 
@@ -52,7 +51,7 @@ type queueItem struct {
 }
 
 type providerInfo struct {
-	providerClient  providerclient.ProviderClient
+	providerClient  clusterprovider.ProviderClient
 	providerWatcher clusterprovider.Watcher
 }
 

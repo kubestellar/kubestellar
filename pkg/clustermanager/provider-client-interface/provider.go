@@ -35,8 +35,8 @@ func GetNamespace(providerName string) string {
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
 func NewProvider(ctx context.Context,
 	providerName string,
-	providerType v1alpha1apis.ClusterProviderType) (ProviderClient, error) {
-	var newProvider ProviderClient = nil
+	providerType v1alpha1apis.ClusterProviderType) (clusterprovider.ProviderClient, error) {
+	var newProvider clusterprovider.ProviderClient = nil
 	switch providerType {
 	case v1alpha1apis.KindProviderType:
 		newProvider = kindprovider.New(providerName)
@@ -45,21 +45,4 @@ func NewProvider(ctx context.Context,
 		return nil, err
 	}
 	return newProvider, nil
-}
-
-// Provider defines methods to retrieve, list, and watch fleet of clusters.
-// The provider is responsible for discovering and managing the lifecycle of each
-// cluster.
-type ProviderClient interface {
-	Create(ctx context.Context, name string, opts clusterprovider.Options) (clusterprovider.LogicalClusterInfo, error)
-	Delete(ctx context.Context, name string, opts clusterprovider.Options) error
-
-	// List returns a list of logical clusters.
-	// This method is used to discover the initial set of logical clusters
-	// and to refresh the list of logical clusters periodically.
-	List() ([]string, error)
-
-	// Watch returns a Watcher that watches for changes to a list of logical clusters
-	// and react to potential changes.
-	Watch() (clusterprovider.Watcher, error)
 }
