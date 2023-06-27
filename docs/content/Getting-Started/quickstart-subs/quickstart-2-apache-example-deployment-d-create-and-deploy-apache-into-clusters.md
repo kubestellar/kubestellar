@@ -19,7 +19,7 @@ spec:
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io
     resources: [ "apibindings" ]
-    resourceNames: [ "bind-kube" ]
+    resourceNames: [ "bind-kubernetes" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
