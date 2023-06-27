@@ -22,9 +22,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
-	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
-	cluster "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	pclient "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 func (c *controller) reconcileLogicalCluster(key string) error {
@@ -79,7 +78,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
 		Update(c.context, newCluster, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -87,7 +86,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	}
 
 	// Create cluster
-	var opts cluster.Options
+	var opts pclient.Options
 	//ES: what exactly is this kubeconfig
 	createdCluster, err := provider.Create(c.context, clusterName, opts)
 	if err != nil {
@@ -101,7 +100,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
-		LogicalClusters(clusterproviderclient.GetNamespace(newCluster.Spec.ClusterProviderDescName)).
+		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
 		Update(c.context, newCluster, v1.UpdateOptions{})
 	if err != nil {
 		logger.Error(err, "failed to update cluster status.")
@@ -132,7 +131,7 @@ func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) erro
 	logger := klog.FromContext(c.context)
 	var err error
 
-	var opts cluster.Options
+	var opts pclient.Options
 	clusterName := delCluster.Name
 
 	providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
