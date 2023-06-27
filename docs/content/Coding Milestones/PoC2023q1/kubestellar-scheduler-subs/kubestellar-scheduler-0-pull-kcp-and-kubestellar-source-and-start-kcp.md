@@ -1,6 +1,6 @@
 <!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->
 ```shell
-git clone {{ config.repo_url }} kubestellar
+git clone {{ config.repo_url }}
 ```
 
 Clone the v0.11.0 branch kcp source:
