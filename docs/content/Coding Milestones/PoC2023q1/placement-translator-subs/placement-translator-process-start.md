@@ -1,8 +1,8 @@
 <!--placement-translator-process-start-start-->
 ```shell
 kubectl ws root:espw
-cd ../KubeStellar
-go run ./cmd/placement-translator &
+cd ../kubestellar
+placement-translator &> /tmp/ks-pt.log &
 sleep 120
 ```
 <!--placement-translator-process-start-end-->

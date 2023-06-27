@@ -302,9 +302,10 @@ following resolutions of the "where" predicates.
 | edge-placement-c | florin, guilder |
 | edge-placement-s | guilder |
 
-Eventually there will be automation that conveniently runs the
-scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the KubeStellar command that runs the scheduler.
+The `kubestellar start` command launches the scheduler along with the
+other controllers.  If you want to exercise the scheduler by itself
+then you could do that as follows.  The scheduler needs to be pointed
+at the ESPW either by command line flags or the current kcp workspace.
 
 ```shell
 kubectl ws root:espw
@@ -313,16 +314,18 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-go run ./cmd/kubestellar-scheduler &
+kubestellar-scheduler &> /tmp/ks-scheduler.log &
 sleep 45
 ```
+
+That will put stuff in the log like the following.
+
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 kubestellar-scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
 I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
 I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
-^C
 ```
 
 In this simple scenario you do not need to keep the scheduler running

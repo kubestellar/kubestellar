@@ -1,14 +1,17 @@
 <!--example1-stage-1a-start-->
 ### The mailbox controller
 
-Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the KubeStellar command shown
-here.
+Running the mailbox controller is included in `kubestellar start`.
+Alternatively you could run just that controller now, for example as
+shown below.
 
 ```shell
-go run ./cmd/mailbox-controller -v=2 &
+mailbox-controller -v=2 &> /tmp/ks-mbctlr.log &
 sleep 45
 ```
+
+The log file should get contents like the following.
+
 ``` { .bash .no-copy }
 ...
 I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
@@ -16,7 +19,6 @@ I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="wo
 I0423 01:09:38.449395   10624 controller.go:299] "Created APIBinding" worker=1 mbwsName="apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" mbwsCluster="yk9a66vjms1pi8hu" bindingName="bind-edge" resourceVersion="914"
 ...
 I0423 01:09:38.842881   10624 controller.go:299] "Created APIBinding" worker=3 mbwsName="apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" mbwsCluster="12299slctppnhjnn" bindingName="bind-edge" resourceVersion="968"
-^C
 ```
 
 You need a `-v` setting of 2 or numerically higher to get log messages
@@ -25,8 +27,7 @@ about individual mailbox workspaces.
 This controller creates a mailbox workspace for each SyncTarget and
 puts an APIBinding to the edge API in each of those mailbox
 workspaces.  For this simple scenario, you do not need to keep this
-controller running after it does those things (hence the `^C` above);
-normally it would run continuously.
+controller running after it does those things.
 
 You can get a listing of those mailbox workspaces as follows.
 

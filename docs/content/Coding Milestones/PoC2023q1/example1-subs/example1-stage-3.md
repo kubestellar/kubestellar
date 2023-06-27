@@ -8,9 +8,11 @@ In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
 into the mailbox workspaces and create `SyncerConfig` objects there.
 
-Eventually there will be convenient automation running the placement
-translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the KubeStellar command that runs the placement translator.
+The `kubestellar start` command launches the placement translator
+along with the other controllers.  If you want to exercise just the
+placement translator then you could launch it as shown below.  The
+placement translator needs to be pointed at the ESPW either by command
+line flags or the current kcp workspace.
 
 ```shell
 kubectl ws root:espw
@@ -19,9 +21,12 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-go run ./cmd/placement-translator &
+placement-translator &> /tmp/ks-pt.log &
 sleep 120
 ```
+
+That will put a lot of stuff in the log, including the following line.
+
 ``` { .bash .no-copy }
 I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
 ...
