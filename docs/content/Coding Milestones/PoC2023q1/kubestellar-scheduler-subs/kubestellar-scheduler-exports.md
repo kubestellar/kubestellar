@@ -1,6 +1,6 @@
 <!--kubestellar-scheduler-exports-start-->
 ```shell
 kubectl ws root:espw
-kubectl apply -f ../KubeStellar/config/exports/
+kubectl apply -f ../kubestellar/config/exports/
 ```
 <!--kubestellar-scheduler-exports-end-->
