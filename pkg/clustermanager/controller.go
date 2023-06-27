@@ -30,10 +30,10 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	providerclient "github.com/kubestellar/kubestellar/cluster-provider-client"
-	clusterprovider "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	providerclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
+	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
 )
 
 const ()

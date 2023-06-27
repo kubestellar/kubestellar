@@ -22,9 +22,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
-	clusterproviderclient "github.com/kubestellar/kubestellar/cluster-provider-client"
-	cluster "github.com/kubestellar/kubestellar/cluster-provider-client/cluster"
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	clusterproviderclient "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface"
+	cluster "github.com/kubestellar/kubestellar/pkg/clustermanager/provider-client-interface/cluster"
 )
 
 func (c *controller) reconcileLogicalCluster(key string) error {
