@@ -1,7 +1,7 @@
 <!--mailbox-controller-process-start-start-->
 ```shell
 kubectl ws root:espw
-cd ../KubeStellar
+cd ../kubestellar
 go run ./cmd/mailbox-controller -v=2 &
 sleep 45
 ```

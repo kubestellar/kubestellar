@@ -24,7 +24,7 @@ executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
 ```shell
-cd ../KubeStellar
+cd ../kubestellar
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
