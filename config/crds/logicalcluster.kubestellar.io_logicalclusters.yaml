@@ -65,7 +65,6 @@ spec:
                 description: Cluster config from the kube config file in string format.
                 type: string
               Phase:
-                default: Initializing
                 description: Phase of the workspace (Initializing,NotReady,Ready).
                 enum:
                 - Initializing
