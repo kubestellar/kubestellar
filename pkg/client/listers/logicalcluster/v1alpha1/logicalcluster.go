@@ -29,7 +29,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 )
 
 // LogicalClusterClusterLister can list LogicalClusters across all workspaces, or scope down to a LogicalClusterLister for one workspace.

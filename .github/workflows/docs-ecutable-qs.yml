@@ -1,4 +1,5 @@
 name: docs-ecutable - QS
+run-name: docs-ecutable - QS - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed

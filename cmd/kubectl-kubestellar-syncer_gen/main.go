@@ -27,7 +27,7 @@ import (
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	plugin "github.com/kcp-dev/edge-mc/pkg/cliplugins/kubestellar/syncer-gen"
+	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
 )
 
 var (

@@ -99,9 +99,9 @@ kubestellar_installed() {
 
 kubestellar_download() {
     if [ $verbose == "true" ]; then
-        curl -SL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
+        curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
     else
-        curl -sSL -o kubestellar.tar.gz "https://github.com/kcp-dev/edge-mc/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
+        curl -sSL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_$arch_type.tar.gz"
     fi
 }
 
@@ -118,7 +118,7 @@ kubestellar_running() {
 }
 
 kubestellar_get_latest_version() {
-    curl -sL https://github.com/kcp-dev/edge-mc/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_os_type() {

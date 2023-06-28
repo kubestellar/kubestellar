@@ -1,4 +1,6 @@
 name: Spellcheck Action
+run-name: Spellcheck Action - ${{ github.ref_name }}
+
 on:
   # So we can trigger manually if needed
   workflow_dispatch:

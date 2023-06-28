@@ -1,7 +1,7 @@
 <!--kubestellar-scheduler-process-start-start-->
 ```shell
 kubectl ws root:espw
-cd ../KubeStellar
+cd ../kubestellar
 go run cmd/kubestellar-scheduler/main.go -v 2 &
 sleep 45
 ```

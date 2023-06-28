@@ -204,7 +204,7 @@ docs-ecutable:
 .PHONY: write-time-to-file
 write-time-to-file: 
 	FILENAME=$(FILENAME) docs/scripts/get-elapsed-time.sh
-	
+
 tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
 .PHONY: tools
 
@@ -235,8 +235,8 @@ codegen: crds $(CODE_GENERATOR)
 .PHONY: verify-codegen
 verify-codegen:
 	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
-		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
+		mkdir -p $$(go env GOPATH)/src/github.com/kubestellar; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kubestellar/kubestellar; \
 	fi
 
 	$(MAKE) codegen
@@ -250,8 +250,8 @@ verify-codegen:
 .PHONY: verify-syncer-codegen
 verify-syncer-codegen:
 	if [[ -n "${GITHUB_WORKSPACE}" ]]; then \
-		mkdir -p $$(go env GOPATH)/src/github.com/kcp-dev; \
-		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kcp-dev/edge-mc; \
+		mkdir -p $$(go env GOPATH)/src/github.com/kubestellar; \
+		ln -s ${GITHUB_WORKSPACE} $$(go env GOPATH)/src/github.com/kubestellar/kubestellar; \
 	fi
 
 #	$(MAKE) syncer-codegen
@@ -267,7 +267,7 @@ $(OPENSHIFT_GOIMPORTS):
 
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) verify-go-versions
-	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kcp-dev/edge-mc
+	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
 
 $(TOOLS_DIR)/verify_boilerplate.py:
 	mkdir -p $(TOOLS_DIR)

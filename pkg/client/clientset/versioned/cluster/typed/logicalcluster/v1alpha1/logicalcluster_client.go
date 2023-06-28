@@ -29,7 +29,7 @@ import (
 	kcpclient "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	logicalclusterv1alpha1 "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
+	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 )
 
 type LogicalclusterV1alpha1ClusterInterface interface {

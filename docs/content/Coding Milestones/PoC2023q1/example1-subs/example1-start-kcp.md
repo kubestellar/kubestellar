@@ -17,7 +17,7 @@ It is also assumed that you have the usual kcp kubectl plugins on your
 `$PATH`.
 
 ```shell
-git clone {{ config.repo_url }} KubeStellar
+git clone -b {{ config.ks_branch }} {{ config.repo_url }}
 ```
 
 clone the v0.11.0 branch kcp source:

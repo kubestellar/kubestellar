@@ -36,11 +36,11 @@ import (
 	kcpscopedclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 
-	edgeapi "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	clientopts "github.com/kcp-dev/edge-mc/pkg/client-options"
-	emcclusterclientset "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/cluster"
-	edgescopedclient "github.com/kcp-dev/edge-mc/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	"github.com/kcp-dev/edge-mc/pkg/mailboxwatch"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
+	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/mailboxwatch"
 )
 
 func main() {
