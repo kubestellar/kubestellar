@@ -33,6 +33,9 @@ jobs:
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
+      - id: step1
+        run: echo "${{ github.event.inputs }}"
+
       - uses: actions/checkout@v3.5.3
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
