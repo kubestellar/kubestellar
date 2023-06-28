@@ -10,10 +10,9 @@
 !!! tip "Estimated time to complete this example:" 
     ~4 minutes
    
-{%
-   include-markdown "./required-packages.md"
-   start="<!--required-packages-start-->"
-   <!--required-packages-start-->
+
+
+
 !!! tip "Required Packages:"
     === "Mac"
         ``` title="jq - https://stedolan.github.io/jq/download/"
@@ -97,8 +96,6 @@
   - [kubectl](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
   - [jq](https://stedolan.github.io/jq/download/) -->
   
-   end="<!--required-packages-end-->"
-%}
 ## Setup Instructions
 
 Table of contents:
