@@ -164,17 +164,16 @@ func (c *controller) processNextItem() bool {
 		return false
 	}
 	item := i.(queueItem)
-	key := item.key
 
 	// Done with this key, unblock other workers.
-	defer c.queue.Done(key)
+	defer c.queue.Done(i)
 
 	if err := c.process(item); err != nil {
 		runtime.HandleError(err)
-		c.queue.AddRateLimited(key)
+		c.queue.AddRateLimited(i)
 		return true
 	}
-	c.queue.Forget(key)
+	c.queue.Forget(i)
 	return true
 }
 
