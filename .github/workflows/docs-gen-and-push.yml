@@ -1,5 +1,5 @@
 name: Generate and push docs
-run-name: Deploy to ${{ inputs.BRANCH }} by @${{ github.actor }}
+run-name: Deploy to ${{ inputs.branch }} by @${{ github.actor }}
 
 on:
   # So we can trigger manually if needed
