@@ -63,7 +63,7 @@ if [[ -n "${CI:-}" ]]; then
     elif [ $VERSION == "release-0.3" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
     else
-      ALIAS_OPTIONS+=()
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION")
     fi
   fi
 
@@ -77,7 +77,7 @@ if [[ -n "${CI:-}" ]]; then
     elif [ $VERSION == "release-0.3" ]; then
       ALIAS_OPTIONS+=(--update-aliases "$VERSION" "stable")
     else
-      ALIAS_OPTIONS+=()
+      ALIAS_OPTIONS+=(--update-aliases "$VERSION")
     fi
   fi
 
