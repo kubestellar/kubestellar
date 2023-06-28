@@ -160,9 +160,12 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					// Check for new clusters.
 					for _, name := range newSetClusters.Difference(setClusters).UnsortedList() {
 						logger.Info("Detected a new cluster")
-						lcInfo, _ := k.provider.Get(ctx, name)
-						// TODO: handle error
-
+						lcInfo, err := k.provider.Get(ctx, name)
+						if err != nil {
+							// Can't get the cluster info, so let's discover it again
+							newSetClusters.Delete(name)
+							continue
+						}
 						k.ch <- clusterprovider.WatchEvent{
 							Type:   watch.Added,
 							Name:   name,
