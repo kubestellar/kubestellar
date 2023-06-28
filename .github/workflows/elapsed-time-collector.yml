@@ -1,4 +1,5 @@
 name: elapsed time collector
+run-name: elapsed time collector - ${{ github.ref_name }}
 
 on:
     schedule:
