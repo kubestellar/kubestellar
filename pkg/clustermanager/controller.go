@@ -33,6 +33,7 @@ import (
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
+	kubeclient "k8s.io/client-go/kubernetes"
 )
 
 const ()
@@ -58,6 +59,7 @@ type providerInfo struct {
 type controller struct {
 	context                 context.Context
 	clientset               edgeclient.Interface
+	k8sClientset            *kubeclient.Clientset
 	logger                  logr.Logger
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
@@ -70,6 +72,7 @@ type controller struct {
 func NewController(
 	context context.Context,
 	clientset edgeclient.Interface,
+	k8sClientset *kubeclient.Clientset,
 	logicalClusterInformer cache.SharedIndexInformer,
 	providerInformer cache.SharedIndexInformer,
 ) *controller {
@@ -78,6 +81,7 @@ func NewController(
 	c := &controller{
 		context:                 context,
 		clientset:               clientset,
+		k8sClientset:            k8sClientset,
 		logger:                  klog.FromContext(context),
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,

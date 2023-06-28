@@ -29,7 +29,8 @@ import (
 
 	ksclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	clustermanager "github.com/kubestellar/kubestellar/pkg/clustermanager"
+	"github.com/kubestellar/kubestellar/pkg/clustermanager"
+	kubeclient "k8s.io/client-go/kubernetes"
 )
 
 var (
@@ -37,7 +38,7 @@ var (
 	numThreads   = 2
 )
 
-const nameLogicalClusterManagerCluster string = "management-cluster"
+const managerClusterContext string = "kind-management-cluster"
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -54,7 +55,7 @@ func main() {
 
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: *kubeconfig},
-		&clientcmd.ConfigOverrides{CurrentContext: nameLogicalClusterManagerCluster}).ClientConfig()
+		&clientcmd.ConfigOverrides{CurrentContext: managerClusterContext}).ClientConfig()
 	if err != nil {
 		logger.Error(err, "Error")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
@@ -66,16 +67,20 @@ func main() {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	doneCh := ctx.Done()
+	k8sClientset, err := kubeclient.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "failed to create k8s clientset for controller")
+		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+	}
 
 	informerFactory := ksinformers.NewSharedScopedInformerFactory(clientset, resyncPeriod, metav1.NamespaceAll)
 	informerLC := informerFactory.Logicalcluster().V1alpha1().LogicalClusters().Informer()
 	informerProvider := informerFactory.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()
-	informerFactory.Start(doneCh)
 
 	controller := clustermanager.NewController(
 		ctx,
 		clientset,
+		k8sClientset,
 		informerLC,
 		informerProvider,
 	)
@@ -83,6 +88,10 @@ func main() {
 		logger.Error(err, "failed to create controller")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
+
+	doneCh := ctx.Done()
+	informerFactory.Start(doneCh)
+	informerFactory.WaitForCacheSync(doneCh)
 
 	controller.Run(numThreads)
 }
