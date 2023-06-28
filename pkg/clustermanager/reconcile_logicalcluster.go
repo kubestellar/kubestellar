@@ -75,7 +75,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	}
 
 	// Update status to NotReady
-	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
+	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
 		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
@@ -88,15 +88,14 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	// Create cluster
 	var opts pclient.Options
 	//ES: what exactly is this kubeconfig
-	createdCluster, err := provider.Create(c.context, clusterName, opts)
+	err = provider.Create(c.context, clusterName, opts)
 	if err != nil {
 		logger.Error(err, "failed to create cluster")
 		return err
 	}
 	logger.Info("Done creating cluster", "clusterName", clusterName)
 
-	// Update the new cluster's status - specifically the config string and the phase
-	newCluster.Status.ClusterConfig = createdCluster.Config
+	// Update the new cluster's status
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().

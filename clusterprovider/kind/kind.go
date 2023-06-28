@@ -18,7 +18,6 @@ package kindprovider
 
 import (
 	"context"
-	"strings"
 	"sync"
 	"time"
 
@@ -46,26 +45,16 @@ func New(providerName string) KindClusterProvider {
 	}
 }
 
-func (k KindClusterProvider) Create(ctx context.Context,
-	name string,
-	opts clusterprovider.Options) (clusterprovider.LogicalClusterInfo, error) {
-	var resCluster clusterprovider.LogicalClusterInfo
-
+func (k KindClusterProvider) Create(ctx context.Context, name string, opts clusterprovider.Options) error {
+	logger := klog.FromContext(ctx)
 	err := k.kindProvider.Create(name)
+
 	if err != nil {
-		if strings.HasPrefix(err.Error(), "node(s) already exist for a cluster with the name") {
-			// TODO: check whether it's the same cluster and return success if true
-		} else {
-			return resCluster, err
-		}
+		// TODO:  Need to differentiate between "already exists" and an error
+		logger.Error(err, "Provider.Create error")
 	}
 
-	cfg, err := k.kindProvider.KubeConfig(name, false)
-	if err != nil {
-		return resCluster, err
-	}
-	resCluster = *clusterprovider.New(cfg, opts)
-	return resCluster, err
+	return err
 }
 
 func (k KindClusterProvider) Delete(ctx context.Context,
@@ -75,7 +64,7 @@ func (k KindClusterProvider) Delete(ctx context.Context,
 	return k.kindProvider.Delete(name, opts.KubeconfigPath)
 }
 
-func (k KindClusterProvider) List() ([]string, error) {
+func (k KindClusterProvider) ListClustersNames(ctx context.Context) ([]string, error) {
 	list, err := k.kindProvider.List()
 	if err != nil {
 		return nil, err
@@ -83,6 +72,45 @@ func (k KindClusterProvider) List() ([]string, error) {
 	logicalNameList := make([]string, 0, len(list))
 	logicalNameList = append(logicalNameList, list...)
 	return logicalNameList, err
+}
+
+func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterprovider.LogicalClusterInfo, error) {
+	logger := klog.FromContext(ctx)
+	cfg, err := k.kindProvider.KubeConfig(lcName, false)
+	if err != nil {
+		logger.Error(err, "couldn't fetch config for cluster")
+		return clusterprovider.LogicalClusterInfo{}, err
+	}
+
+	lcInfo := clusterprovider.LogicalClusterInfo{
+		Name:   lcName,
+		Config: cfg,
+	}
+	return lcInfo, err
+}
+
+func (k KindClusterProvider) ListClusters(ctx context.Context) ([]clusterprovider.LogicalClusterInfo, error) {
+	logger := klog.FromContext(ctx)
+	lcNames, err := k.ListClustersNames(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	lcInfoList := make([]clusterprovider.LogicalClusterInfo, 0, len(lcNames))
+
+	for _, lcName := range lcNames {
+		cfg, err := k.kindProvider.KubeConfig(lcName, false)
+		if err != nil {
+			logger.Error(err, "couldn't fetch config for cluster")
+		}
+
+		lcInfoList = append(lcInfoList, clusterprovider.LogicalClusterInfo{
+			Name:   lcName,
+			Config: cfg,
+		})
+	}
+
+	return lcInfoList, err
 }
 
 func (k KindClusterProvider) Watch() (clusterprovider.Watcher, error) {
@@ -123,7 +151,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 				select {
 				// TODO replace the 2 with a param at the cluster-provider-client level
 				case <-time.After(5 * time.Second):
-					list, err := k.provider.List()
+					list, err := k.provider.ListClustersNames(ctx)
 					if err != nil {
 						// TODO add logging
 						logger.Error(err, "Getting provider list.")
@@ -131,11 +159,18 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					}
 					newSetClusters := sets.NewString(list...)
 					// Check for new clusters.
-					for _, cl := range newSetClusters.Difference(setClusters).UnsortedList() {
+					for _, name := range newSetClusters.Difference(setClusters).UnsortedList() {
 						logger.Info("Detected a new cluster")
+						lcInfo, err := k.provider.Get(ctx, name)
+						if err != nil {
+							// Can't get the cluster info, so let's discover it again
+							newSetClusters.Delete(name)
+							continue
+						}
 						k.ch <- clusterprovider.WatchEvent{
-							Type: watch.Added,
-							Name: cl,
+							Type:   watch.Added,
+							Name:   name,
+							LCInfo: lcInfo,
 						}
 					}
 					// Check for deleted clusters.
