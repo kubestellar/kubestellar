@@ -75,7 +75,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	}
 
 	// Update status to NotReady
-	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
+	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
 		LogicalClusters(GetNamespace(newCluster.Spec.ClusterProviderDescName)).
@@ -95,7 +95,7 @@ func (c *controller) processAddLC(newCluster *lcv1alpha1.LogicalCluster) error {
 	}
 	logger.Info("Done creating cluster", "clusterName", clusterName)
 
-	// Update the new cluster's status - specifically the config string and the phase
+	// Update the new cluster's status
 	newCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseReady
 	_, err = c.clientset.
 		LogicalclusterV1alpha1().
