@@ -82,10 +82,10 @@ kubectl ws root:compute
 
 Create two Locations and two SyncTargets.
 ```shell
-kubectl create -f ../KubeStellar/config/samples/location_prod.yaml
-kubectl create -f ../KubeStellar/config/samples/location_dev.yaml
-kubectl create -f ../KubeStellar/config/samples/synctarget_prod.yaml
-kubectl create -f ../KubeStellar/config/samples/synctarget_dev.yaml
+kubectl create -f ../kubestellar/config/samples/location_prod.yaml
+kubectl create -f ../kubestellar/config/samples/location_dev.yaml
+kubectl create -f ../kubestellar/config/samples/synctarget_prod.yaml
+kubectl create -f ../kubestellar/config/samples/synctarget_dev.yaml
 sleep 5
 ```
 
@@ -108,7 +108,7 @@ synctarget.workload.kcp.io/prod   2m12s
 Go to Workload Management Workspace (WMW) and create an EdgePlacement `all2all`.
 ```shell
 kubectl ws \~
-kubectl create -f ../KubeStellar/config/samples/edgeplacement_all2all.yaml
+kubectl create -f ../kubestellar/config/samples/edgeplacement_all2all.yaml
 sleep 3
 ```
 
@@ -154,7 +154,7 @@ EdgePlacement `all2all` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```shell
-kubectl create -f ../KubeStellar/config/samples/edgeplacement_dev.yaml
+kubectl create -f ../kubestellar/config/samples/edgeplacement_dev.yaml
 sleep 3
 ```
 
