@@ -64,7 +64,7 @@ func (k KindClusterProvider) Delete(ctx context.Context,
 	return k.kindProvider.Delete(name, opts.KubeconfigPath)
 }
 
-func (k KindClusterProvider) ListNames(ctx context.Context) ([]string, error) {
+func (k KindClusterProvider) ListClustersNames(ctx context.Context) ([]string, error) {
 	list, err := k.kindProvider.List()
 	if err != nil {
 		return nil, err
@@ -88,9 +88,9 @@ func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterpro
 	return lcInfo, err
 }
 
-func (k KindClusterProvider) List(ctx context.Context) ([]clusterprovider.LogicalClusterInfo, error) {
+func (k KindClusterProvider) ListClusters(ctx context.Context) ([]clusterprovider.LogicalClusterInfo, error) {
 	logger := klog.FromContext(ctx)
-	lcNames, err := k.ListNames(ctx)
+	lcNames, err := k.ListClustersNames(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 				select {
 				// TODO replace the 2 with a param at the cluster-provider-client level
 				case <-time.After(5 * time.Second):
-					list, err := k.provider.ListNames(ctx)
+					list, err := k.provider.ListClustersNames(ctx)
 					if err != nil {
 						// TODO add logging
 						logger.Error(err, "Getting provider list.")

@@ -99,12 +99,12 @@ type ProviderClient interface {
 	// List returns a list of logical clusters.
 	// This method is used to discover the initial set of logical clusters
 	// and to refresh the list of logical clusters periodically.
-	List(ctx context.Context) ([]LogicalClusterInfo, error)
+	ListClusters(ctx context.Context) ([]LogicalClusterInfo, error)
 
 	// List returns a list of logical cluster names.
 	// This method is used to discover the initial set of logical clusters
 	// and to refresh the list of logical clusters periodically.
-	ListNames(ctx context.Context) ([]string, error)
+	ListClustersNames(ctx context.Context) ([]string, error)
 
 	// List returns a list of logical clusters.
 	// This method is used to discover the initial set of logical clusters
