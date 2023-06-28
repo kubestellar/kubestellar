@@ -10,15 +10,15 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
-[![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
+[![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
 [![QuickStart test](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - example1](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-example1.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - placement-translator](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - mailbox-controller](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - kubestellar-scheduler](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
-[![docs-ecutable - kubestellar-syncer](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=release-0.2)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - example1](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-example1.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-example1.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - placement-translator](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - mailbox-controller](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-scheduler](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - kubestellar-syncer](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml)&nbsp;&nbsp;&nbsp;
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
