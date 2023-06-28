@@ -1,4 +1,5 @@
 name: Generate and push docs
+run-name: Generate and push docs - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed
@@ -24,8 +25,8 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: ${{ github.workflow }}
+# concurrency:
+#   group: ${{ github.workflow }}
 
 jobs:
   generate-and-push:
