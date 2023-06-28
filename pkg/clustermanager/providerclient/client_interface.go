@@ -83,6 +83,8 @@ type WatchEvent struct {
 	// 		A periodic event is sent that contains no new data: ignored.
 	Type watch.EventType
 
+	LCInfo LogicalClusterInfo
+
 	// Name is the name of the logical cluster related to the event.
 	Name string
 }
@@ -91,13 +93,23 @@ type WatchEvent struct {
 // The provider is responsible for discovering and managing the lifecycle of each
 // cluster.
 type ProviderClient interface {
-	Create(ctx context.Context, name string, opts Options) (LogicalClusterInfo, error)
+	Create(ctx context.Context, name string, opts Options) error
 	Delete(ctx context.Context, name string, opts Options) error
 
 	// List returns a list of logical clusters.
 	// This method is used to discover the initial set of logical clusters
 	// and to refresh the list of logical clusters periodically.
-	List() ([]string, error)
+	List(ctx context.Context) ([]LogicalClusterInfo, error)
+
+	// List returns a list of logical cluster names.
+	// This method is used to discover the initial set of logical clusters
+	// and to refresh the list of logical clusters periodically.
+	ListNames(ctx context.Context) ([]string, error)
+
+	// List returns a list of logical clusters.
+	// This method is used to discover the initial set of logical clusters
+	// and to refresh the list of logical clusters periodically.
+	Get(ctx context.Context, name string) (LogicalClusterInfo, error)
 
 	// Watch returns a Watcher that watches for changes to a list of logical clusters
 	// and react to potential changes.

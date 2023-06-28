@@ -128,6 +128,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				lcluster.Name = lcName
 				lcluster.Spec.ClusterProviderDescName = providerName
 				lcluster.Spec.Managed = false
+				lcluster.Status.ClusterConfig = event.LCInfo.Config
 				lcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Create(ctx, &lcluster, v1.CreateOptions{})
 				if err != nil {
@@ -139,6 +140,8 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				// TODO: when finalizers added - cheeck the logicalcluster delete timestamp
 				// Logical cluster exists , just update its status
 				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
+				// TODO: Should we really update the config ?
+				reflcluster.Status.ClusterConfig = event.LCInfo.Config
 				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
 				if err != nil {
 					// TODO: how do we handle failure?
