@@ -106,9 +106,7 @@ type ProviderClient interface {
 	// and to refresh the list of logical clusters periodically.
 	ListClustersNames(ctx context.Context) ([]string, error)
 
-	// List returns a list of logical clusters.
-	// This method is used to discover the initial set of logical clusters
-	// and to refresh the list of logical clusters periodically.
+	// Get returns a logical cluster.
 	Get(ctx context.Context, name string) (LogicalClusterInfo, error)
 
 	// Watch returns a Watcher that watches for changes to a list of logical clusters

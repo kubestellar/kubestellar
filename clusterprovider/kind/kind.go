@@ -79,6 +79,7 @@ func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterpro
 	cfg, err := k.kindProvider.KubeConfig(lcName, false)
 	if err != nil {
 		logger.Error(err, "couldn't fetch config for cluster")
+		return clusterprovider.LogicalClusterInfo{}, err
 	}
 
 	lcInfo := clusterprovider.LogicalClusterInfo{
