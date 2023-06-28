@@ -1,4 +1,5 @@
 name: Broken Links Crawler
+run-name: Broken Links Crawler - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed
