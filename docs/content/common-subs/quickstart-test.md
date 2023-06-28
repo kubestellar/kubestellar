@@ -11,7 +11,7 @@
     ~4 minutes
    
 {%
-   include-markdown "required-packages.md"
+   include-markdown "./required-packages.md"
    start="<!--required-packages-start-->"
    end="<!--required-packages-end-->"
 %}
