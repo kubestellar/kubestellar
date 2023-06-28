@@ -1,5 +1,5 @@
 name: Generate and push docs
-run-name: Deploy to ${{ github.event.inputs.branch }} by @${{ github.actor }}
+run-name: Deploy to ${{ github.ref_name }} by @${{ github.actor }}
 
 on:
   # So we can trigger manually if needed
@@ -33,9 +33,6 @@ jobs:
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
-      - id: step1
-        run: echo "${{ github.event.inputs }}"
-
       - uses: actions/checkout@v3.5.3
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
