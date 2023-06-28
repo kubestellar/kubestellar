@@ -1,5 +1,5 @@
 name: Generate and push docs
-run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
+run-name: Deploy to ${GITHUB_REF##*/} by @${{ github.actor }}
 
 on:
   # So we can trigger manually if needed
