@@ -144,15 +144,17 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 
 		case watch.Deleted:
 			logger.Info("A cluster was removed", "cluster", event.Name)
-			if found {
-				if !reflcluster.DeletionTimestamp.IsZero() {
-					//TODO: When using finalizers check if LC was deleted and if so remove the finalizer.
-					return
-				}
-				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
-				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
-				chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
+			if !found {
+				// There is no LC object so there is nothing we should do
+				return
 			}
+			if !reflcluster.DeletionTimestamp.IsZero() {
+				//TODO: When using finalizers check if LC was deleted and if so remove the finalizer.
+				return
+			}
+			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
+			_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+			chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
 
 		default:
 			logger.Info("unknown event type", "type", event.Type)
