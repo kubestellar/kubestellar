@@ -100,6 +100,7 @@ func (c *controller) StopDiscovery(providerName string) error {
 		return errors.New("failed to stop provider discovery. provider watcher does not exist")
 	}
 	providerInfo.providerWatcher.Stop()
+	delete(c.providers, providerName)
 	return nil
 }
 
@@ -108,14 +109,12 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 	for {
 		event, ok := <-w.ResultChan()
 		if !ok {
-			w.Stop()
-			logger.Info("Stopping cluster provider watch", "provider", providerName)
-			// TODO: return an error
+			logger.Info("Cluster provider watch was stopped", "provider", providerName)
 			return
 		}
 		lcName := event.Name
 		reflcluster, err := clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Get(ctx, lcName, v1.GetOptions{})
-		found := reflcluster != nil && err != nil
+		found := reflcluster != nil && err == nil
 
 		switch event.Type {
 		case watch.Added:
