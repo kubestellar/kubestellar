@@ -70,8 +70,8 @@ const (
 
 // LogicalClusterStatus represents information about the status of a cluster.
 type LogicalClusterStatus struct {
-	// Phase of the workspace (Initializing,NotReady,Ready).
-	// +kubebuilder:default=Initializing
+	// Phase of the logical cluster (Initializing,NotReady,Ready).
+	// +kubebuilder
 	Phase LogicalClusterPhaseType `json:"Phase"`
 
 	// Cluster config from the kube config file in string format.
