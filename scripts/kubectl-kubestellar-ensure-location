@@ -132,7 +132,7 @@ if ! kubectl "${kubectl_flags[@]}" get Location "$objname" &> /dev/null; then
 apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 spec:
-  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
+  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"id":"$objname"}
 metadata:
