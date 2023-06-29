@@ -18,7 +18,7 @@ To create a release branch, identify the current 'release' branches' name (e.g. 
 
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}/docs
+cd {{ config.repo_default_file_path }}/docs
 git checkout main
 git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```

@@ -36,7 +36,7 @@ There are many global variables defined in the <a href="{{ config.repo_raw_url }
     - site_name: {{ config.site_name }}
     - repo_url: {{ config.repo_url }}
     - site_url: {{ config.site_url }}
-    - repo_default_file_path: {{ config.repo_default_path }}
+    - repo_default_file_path: {{ config.repo_default_file_path }}
     - repo_short_name: {{ config.repo_short_name }}
     - docs_url: {{ config.docs_url }}
     - repo_raw_url: {{ config.repo_raw_url }}
@@ -73,7 +73,7 @@ You can view and modify our documentation in your local development environment.
 
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}/docs
+cd {{ config.repo_default_file_path }}/docs
 git checkout {{ config.ks_branch }}
 ```
 
@@ -89,7 +89,7 @@ Another way to view (not modify - this method reflects what has been deployed to
 
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}
+cd {{ config.repo_default_file_path }}
 git checkout {{ config.ks_branch }}
 make serve-docs
 ```
