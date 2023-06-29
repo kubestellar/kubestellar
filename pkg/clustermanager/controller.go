@@ -26,6 +26,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
@@ -58,6 +59,7 @@ type providerInfo struct {
 type controller struct {
 	context                 context.Context
 	clientset               edgeclient.Interface
+	k8sClientset            *kubeclient.Clientset
 	logger                  logr.Logger
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
@@ -70,6 +72,7 @@ type controller struct {
 func NewController(
 	context context.Context,
 	clientset edgeclient.Interface,
+	k8sClientset *kubeclient.Clientset,
 	logicalClusterInformer cache.SharedIndexInformer,
 	providerInformer cache.SharedIndexInformer,
 ) *controller {
@@ -78,6 +81,7 @@ func NewController(
 	c := &controller{
 		context:                 context,
 		clientset:               clientset,
+		k8sClientset:            k8sClientset,
 		logger:                  klog.FromContext(context),
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,
