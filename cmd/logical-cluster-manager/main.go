@@ -23,6 +23,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
@@ -30,7 +31,6 @@ import (
 	ksclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/clustermanager"
-	kubeclient "k8s.io/client-go/kubernetes"
 )
 
 var (
