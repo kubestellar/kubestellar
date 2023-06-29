@@ -20,11 +20,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-logr/logr"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
 
-	"github.com/go-logr/logr"
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
