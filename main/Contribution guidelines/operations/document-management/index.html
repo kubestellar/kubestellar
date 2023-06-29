@@ -2065,7 +2065,7 @@ scripts in <code>hack</code>).</p>
 <div class="highlight"><pre><span></span><code>- site_name: KubeStellar
 - repo_url: https://github.com/kubestellar/kubestellar
 - site_url: https://docs.kubestellar.io/main
-- repo_default_file_path: {{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;repo_default_path&#39;] }}
+- repo_default_file_path: kubestellar
 - repo_short_name: kubestellar/kubestellar
 - docs_url: https://docs.kubestellar.io
 - repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
@@ -2090,7 +2090,7 @@ scripts in <code>hack</code>).</p>
 <h3 id="serving-up-documents-locally">Serving up documents locally<a class="headerlink" href="#serving-up-documents-locally" title="Permanent link">#</a></h3>
 <p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>/docs
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar/docs
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 </code></pre></div>
 <p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
@@ -2100,7 +2100,7 @@ scripts in <code>hack</code>).</p>
 Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span><span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;repo_default_path&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
 </code></pre></div>
