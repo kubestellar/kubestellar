@@ -24,6 +24,8 @@ import (
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
+
+	//edgeapisv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 )
 
 // SyncTarget describes a member cluster capable of running workloads.
