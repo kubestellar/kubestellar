@@ -20,6 +20,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-logr/logr"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
@@ -130,11 +132,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				lcluster.Status.ClusterConfig = event.LCInfo.Config
 				lcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Create(ctx, &lcluster, v1.CreateOptions{})
-				if err != nil {
-					// TODO: how do we handle failure?
-					logger.Error(err, "New cluster detected,  couldn't create the corresponding LogicalCluster")
-					return
-				}
+				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't create the corresponding LogicalCluster", "cluster name", lcName)
 			} else {
 				// TODO: when finalizers added - cheeck the logicalcluster delete timestamp
 				// Logical cluster exists , just update its status
@@ -142,28 +140,32 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				// TODO: Should we really update the config ?
 				reflcluster.Status.ClusterConfig = event.LCInfo.Config
 				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
-				if err != nil {
-					// TODO: how do we handle failure?
-					logger.Error(err, "New cluster detected, Couldn't update the LogicalCluster status")
-					return
-				}
+				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't update the corresponding LogicalCluster status", "cluster name", lcName)
 			}
 
 		case watch.Deleted:
 			logger.Info("A cluster was removed", "cluster", event.Name)
-			if found {
-				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
-				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
-				if err != nil {
-					// TODO: how do we handle failure?
-					logger.Error(err, "Cluster was removed, Couldn't update the LogicalCluster status")
-					return
-				}
-				//TODO: When using finalizers we need to remove the finalizer in this point.
+			if !found {
+				// There is no LC object so there is nothing we should do
+				return
 			}
+			if !reflcluster.DeletionTimestamp.IsZero() {
+				//TODO: When using finalizers check if LC was deleted and if so remove the finalizer.
+				return
+			}
+			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
+			_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+			chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
 
 		default:
 			logger.Info("unknown event type", "type", event.Type)
 		}
+	}
+}
+
+func chkErrAndReturn(logger logr.Logger, err error, msg string, keysAndValues ...interface{}) {
+	if err != nil {
+		logger.Error(err, "Cluster was removed, Couldn't update the LogicalCluster status")
+		return
 	}
 }
