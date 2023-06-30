@@ -1,11 +1,11 @@
 site_name: KubeStellar
-repo_url: https://github.com/KPRoche/kubestellar
+repo_url: https://github.com/kubestellar/kubestellar
 site_url: https://docs.kubestellar.io/
 
-repo_short_name: KPRoche/kubestellar
+repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
 docs_url: https://docs.kubestellar.io
-repo_raw_url: https://raw.githubusercontent.com/KPRoche/kubestellar
+repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
@@ -160,11 +160,11 @@ plugins:
       include_dir: 'overrides'
       module_name: 'main'
   # Configure multiple language support
-  - i18n:
-      default_language: en
-      languages:
-        en:
-          name: English
+  #- i18n:
+  #    default_language: en
+  #    languages:
+  #      en:
+  #        name: English
   # - redirects:
   #       redirect_maps:
   #           'docs': 'docs/Coding%20Milestones/PoC2023q1/outline/'
