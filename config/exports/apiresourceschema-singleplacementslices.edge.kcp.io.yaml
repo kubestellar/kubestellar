@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230618-23cd8129.singleplacementslices.edge.kcp.io
+  name: v230630-f011ab29.singleplacementslices.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -16,12 +16,11 @@ spec:
   versions:
   - name: v1alpha1
     schema:
-      description: SinglePlacementSlice is the interface between "scheduling" and
-        syncing. For a given EdgePlacement object, the scheduler figures out which
-        Locations match that EdgePlacement and selects the SyncTarget to use within
-        that Location, then puts these results into some SinglePlacementSlice API
-        objects. We use potentially multiple API objects so that no one of them has
-        to get very big.
+      description: SinglePlacementSlice holds results of resolving a "where predicate".
+        For a given EdgePlacement object, the Where Resolver figures out which Locations
+        match that EdgePlacement and selects the SyncTarget to use within that Location,
+        then puts these results into some SinglePlacementSlice API objects. We use
+        potentially multiple API objects so that no one of them has to get very big.
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -29,7 +28,7 @@ spec:
             internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         destinations:
-          description: '`destinations` holds some of the results of scheduling.'
+          description: '`destinations` holds some of the matching locations'
           items:
             description: SinglePlacement describes one Location that matches the relevant
               EdgePlacement.

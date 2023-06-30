@@ -90,7 +90,7 @@ kubeconfig_valid() {
 }
 
 kubestellar_installed() {
-    if [[ "$(which mailbox-controller)" == "" || "$(which placement-translator)" == "" || "$(which kubestellar-scheduler)" == "" ]]; then
+    if [[ "$(which mailbox-controller)" == "" || "$(which placement-translator)" == "" || "$(which kubestellar-where-resolver)" == "" ]]; then
         echo "false"
     else
         echo "true"
@@ -110,7 +110,7 @@ kubestellar_install() {
 }
 
 kubestellar_running() {
-    if [[ "$(pgrep -f mailbox-controller)" == "" ||  "$(pgrep -f placement-translator)" == "" || "$(pgrep -f 'kubestellar-scheduler')" == "" ]]; then
+    if [[ "$(pgrep -f mailbox-controller)" == "" ||  "$(pgrep -f placement-translator)" == "" || "$(pgrep -f 'kubestellar-where-resolver')" == "" ]]; then
         echo "false"
     else
         echo "true"

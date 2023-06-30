@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package scheduler
+package where_resolver
 
 import (
 	"context"
@@ -43,7 +43,7 @@ import (
 )
 
 const (
-	ControllerName = "kubestellar-scheduler"
+	ControllerName = "where-resolver"
 )
 
 type triggeringKind string

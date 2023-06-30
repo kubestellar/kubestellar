@@ -234,7 +234,7 @@ How do we ensure that our documented examples work?  Simple, we 'execute' our do
 - you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.
 
 #### The GitHub Workflow:
-- One example of the GitHub Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml)
+- One example of the GitHub Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-where-resolver.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-where-resolver.yml)
 
 #### The secret sauce:
 - The code that makes all this possible is at <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh">{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh</a>
