@@ -16,10 +16,6 @@ noted that the florin or guilder cluster is being accessed.
 It is also assumed that you have the usual kcp kubectl plugins on your
 `$PATH`.
 
-```shell
-git clone -b {{ config.ks_branch }} {{ config.repo_url }}
-```
-
 clone the v0.11.0 branch kcp source:
 ```shell
 git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
