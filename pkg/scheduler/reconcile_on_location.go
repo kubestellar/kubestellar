@@ -25,8 +25,6 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	//schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	//workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
@@ -83,7 +81,6 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	epsSelectedLoc := store.epsBySelectedLoc[locKey]
 
 	// 2a)
-	//stsFilteredByLoc := []*workloadv1alpha1.SyncTarget{}
 	stsFilteredByLoc := []*edgev1alpha1.SyncTarget{}
 	if !locDeleted {
 		stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
@@ -229,7 +226,6 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 }
 
 // filterStsByLoc returns those SyncTargets that selected by the Location
-//func filterStsByLoc(sts []*workloadv1alpha1.SyncTarget, loc *schedulingv1alpha1.Location) ([]*workloadv1alpha1.SyncTarget, error) {
 func filterStsByLoc(sts []*edgev1alpha1.SyncTarget, loc *edgev1alpha1.Location) ([]*edgev1alpha1.SyncTarget, error) {
 	filtered := []*edgev1alpha1.SyncTarget{}
 	for _, st := range sts {
@@ -296,7 +292,6 @@ func cleanSPSByLoc(sps *edgev1alpha1.SinglePlacementSlice, lws, lName string) *e
 }
 
 func makeSinglePlacementsForLoc(locSelectingSts *edgev1alpha1.Location, sts []*edgev1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
-//func makeSinglePlacementsForLoc(locSelectingSts *schedulingv1alpha1.Location, sts []*edgev1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
 	made := []edgev1alpha1.SinglePlacement{}
 	if locSelectingSts == nil || len(sts) == 0 {
 		return made

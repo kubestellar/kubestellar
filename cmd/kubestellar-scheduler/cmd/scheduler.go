@@ -38,12 +38,10 @@ import (
 
 	scheduleroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+
+	//edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-
 	"github.com/kubestellar/kubestellar/pkg/scheduler"
-
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	
 )
 
 func NewSchedulerCommand() *cobra.Command {
@@ -163,11 +161,8 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		edgeClusterClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
 		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
-		// should these next two lines be commented out? Or should we still allow kcp objects?
-		//schedulingSharedInformerFactory.Scheduling().V1alpha1().Locations(),
-		//workloadSharedInformerFactory.Workload().V1alpha1().SyncTargets(),
 		edgeSharedInformerFactory.Edge().V1alpha1().Locations(),
-		edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets(),		
+		edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets(),
 	)
 	if err != nil {
 		logger.Error(err, "failed to create controller", "name", scheduler.ControllerName)

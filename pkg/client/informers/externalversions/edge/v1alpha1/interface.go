@@ -36,6 +36,10 @@ type ClusterInterface interface {
 	SinglePlacementSlices() SinglePlacementSliceClusterInformer
 	// SyncerConfigs returns a SyncerConfigClusterInformer
 	SyncerConfigs() SyncerConfigClusterInformer
+	// SyncTargets returns a SyncTargetClusterInformer
+	SyncTargets() SyncTargetClusterInformer
+	// Locations returns a LocationClusterInformer
+	Locations() LocationClusterInformer
 }
 
 type version struct {
@@ -73,6 +77,16 @@ func (v *version) SyncerConfigs() SyncerConfigClusterInformer {
 	return &syncerConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// SyncTargets returns a SyncTargetClusterInformer
+func (v *version) SyncTargets() SyncTargetClusterInformer {
+	return &syncTargetClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Locations returns a LocationClusterInformer
+func (v *version) Locations() LocationClusterInformer {
+	return &locationClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 type Interface interface {
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
@@ -84,6 +98,10 @@ type Interface interface {
 	SinglePlacementSlices() SinglePlacementSliceInformer
 	// SyncerConfigs returns a SyncerConfigInformer
 	SyncerConfigs() SyncerConfigInformer
+	// SyncTargets returns a SyncTargetInformer
+	SyncTargets() SyncTargetInformer
+	// Locations returns a LocationInformer
+	Locations() LocationInformer
 }
 
 type scopedVersion struct {
@@ -120,4 +138,14 @@ func (v *scopedVersion) SinglePlacementSlices() SinglePlacementSliceInformer {
 // SyncerConfigs returns a SyncerConfigInformer
 func (v *scopedVersion) SyncerConfigs() SyncerConfigInformer {
 	return &syncerConfigScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// SyncTargets returns a SyncTargetInformer
+func (v *scopedVersion) SyncTargets() SyncTargetInformer {
+	return &syncTargetScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Locations returns a LocationInformer
+func (v *scopedVersion) Locations() LocationInformer {
+	return &locationScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

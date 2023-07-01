@@ -99,6 +99,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SinglePlacementSlices().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("syncerconfigs"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncerConfigs().Informer()}, nil
+	case edgev1alpha1.SchemeGroupVersion.WithResource("synctargets"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncTargets().Informer()}, nil
+	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Locations().Informer()}, nil
 	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
 	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()}, nil
@@ -131,6 +135,12 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("syncerconfigs"):
 		informer := f.Edge().V1alpha1().SyncerConfigs().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	case edgev1alpha1.SchemeGroupVersion.WithResource("synctargets"):
+		informer := f.Edge().V1alpha1().SyncTargets().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
+		informer := f.Edge().V1alpha1().Locations().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
 	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
