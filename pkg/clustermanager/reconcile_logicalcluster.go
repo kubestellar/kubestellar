@@ -22,8 +22,22 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	pclient "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
+
+const finalizerName = "LCFinalizer"
+
+// containsFinalizer: returns true if the finalizer list contains the logical cluster finalizer
+func containsFinalizer(lcluster *lcv1alpha1apis.LogicalCluster, finalizer string) bool {
+	finalizersList := lcluster.ObjectMeta.Finalizers
+	for _, f := range finalizersList {
+		if f == finalizer {
+			return true
+		}
+	}
+	return false
+}
 
 func (c *controller) reconcileLogicalCluster(key string) error {
 	clusterObj, exists, err := c.logicalClusterInformer.GetIndexer().GetByKey(key)
@@ -90,6 +104,9 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		}
 
 		// Update status Initializing
+		if !containsFinalizer(logicalCluster, finalizerName) {
+			logicalCluster.ObjectMeta.Finalizers = append(logicalCluster.ObjectMeta.Finalizers, finalizerName)
+		}
 		logicalCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
 		_, err = c.clientset.
 			LogicalclusterV1alpha1().
@@ -122,7 +139,6 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 
 // processDeleteLC: process an LC object deleted event
 // If the cluster is managed, then async delete the physical cluster.
-// TODO: add a finalizer to the logical cluster object
 func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) error {
 	if delCluster.Spec.Managed {
 		provider, ok := c.providers[delCluster.Spec.ClusterProviderDescName]

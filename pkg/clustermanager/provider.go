@@ -139,7 +139,6 @@ func (p *provider) processProviderWatchEvents() {
 				_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Create(ctx, &lcluster, v1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't create the corresponding LogicalCluster", "cluster name", lcName)
 			} else {
-				// TODO: when finalizers added - cheeck the logicalcluster delete timestamp
 				// Logical cluster exists , just update its status
 				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				// TODO: Should we really update the config ?
@@ -155,7 +154,18 @@ func (p *provider) processProviderWatchEvents() {
 				return
 			}
 			if !reflcluster.DeletionTimestamp.IsZero() {
-				//TODO: When using finalizers check if LC was deleted and if so remove the finalizer.
+				if reflcluster.Spec.Managed {
+					// If managed then we need to remove the finalizer.
+					f := reflcluster.ObjectMeta.Finalizers
+					for i := 0; i < len(reflcluster.ObjectMeta.Finalizers); i++ {
+						if f[i] == finalizerName {
+							reflcluster.ObjectMeta.Finalizers = append(f[:i], f[i+1:]...)
+							i--
+						}
+					}
+					_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
+					chkErrAndReturn(logger, err, "Could not remove logical cluster finalizer", "cluster name", lcName)
+				}
 				return
 			}
 			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
