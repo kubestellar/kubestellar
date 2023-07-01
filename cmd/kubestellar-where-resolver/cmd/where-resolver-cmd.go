@@ -152,9 +152,9 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		ctx,
 		edgeClusterClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
-		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),	
+		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
 		edgeSharedInformerFactory.Edge().V1alpha1().Locations(),
-		edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets(),		
+		edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets(),
 	)
 	if err != nil {
 		logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)

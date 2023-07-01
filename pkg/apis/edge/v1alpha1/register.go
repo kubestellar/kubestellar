@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-  	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge"
 )
 
 // SchemeGroupVersion is group version used to register these objects

@@ -41,8 +41,16 @@ func (c *FakeEdgeV1alpha1) EdgeSyncConfigs() v1alpha1.EdgeSyncConfigInterface {
 	return &FakeEdgeSyncConfigs{c}
 }
 
+func (c *FakeEdgeV1alpha1) Locations() v1alpha1.LocationInterface {
+	return &FakeLocations{c}
+}
+
 func (c *FakeEdgeV1alpha1) SinglePlacementSlices() v1alpha1.SinglePlacementSliceInterface {
 	return &FakeSinglePlacementSlices{c}
+}
+
+func (c *FakeEdgeV1alpha1) SyncTargets() v1alpha1.SyncTargetInterface {
+	return &FakeSyncTargets{c}
 }
 
 func (c *FakeEdgeV1alpha1) SyncerConfigs() v1alpha1.SyncerConfigInterface {

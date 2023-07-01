@@ -24,8 +24,6 @@ import (
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
-
-	//edgeapisv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 )
 
 // SyncTarget describes a member cluster capable of running workloads.
@@ -35,7 +33,7 @@ import (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:scope=Cluster,categories=kcp
+// +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Location",type="string",JSONPath=`.metadata.name`,priority=1
 // +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=`.status.conditions[?(@.type=="Ready")].status`,priority=2
 // +kubebuilder:printcolumn:name="Synced API resources",type="string",JSONPath=`.status.syncedResources`,priority=3

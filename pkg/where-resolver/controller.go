@@ -30,11 +30,10 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
-
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 )
 
 const (

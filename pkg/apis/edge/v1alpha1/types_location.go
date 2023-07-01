@@ -41,7 +41,7 @@ const (
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:scope=Cluster,categories=kcp
+// +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Resource",type=string,JSONPath=`.spec.resource.resource`,description="Type of the workspace"
 // +kubebuilder:printcolumn:name="Available",type=string,JSONPath=`.status.availableInstances`,description="Available instances in this location"
 // +kubebuilder:printcolumn:name="Instances",type=string,JSONPath=`.status.instances`,description="Instances in this location"

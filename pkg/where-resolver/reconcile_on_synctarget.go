@@ -25,8 +25,6 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	//schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	//workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"

@@ -52,12 +52,8 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
-
-	//edgev1alpha1 "github.com/kcp-dev/edge-mc/pkg/apis/edge/v1alpha1"
-	//edgev1alpha1listers "github.com/kcp-dev/edge-mc/pkg/client/listers/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-
+	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
 
 func main() {
@@ -115,26 +111,17 @@ func main() {
 	inventoryClientConfig.UserAgent = "mailbox-controller"
 
 	// Get client config for view of SyncTarget objects
-	//syncTargetViewConfig, err := configForViewOfExport(ctx, inventoryClientConfig, "workload.kcp.io")
 	syncTargetViewConfig, err := configForViewOfExport(ctx, inventoryClientConfig, "edge.kcp.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of SyncTarget exports")
 		os.Exit(4)
 	}
 
-	//stViewClusterClientset, err := kcpclusterclientset.NewForConfig(syncTargetViewConfig)
-	//if err != nil {
-	//	logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
-	//	os.Exit(6)
-	//}
 	stViewClusterClientset, err := edgeclusterclientset.NewForConfig(syncTargetViewConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
 		os.Exit(6)
 	}
-
-	//stViewInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(stViewClusterClientset, resyncPeriod)
-	//syncTargetClusterPreInformer := stViewInformerFactory.Workload().V1alpha1().SyncTargets()
 
 	stViewInformerFactory := edgev1alpha1informers.NewSharedInformerFactoryWithOptions(stViewClusterClientset, resyncPeriod)
 	syncTargetClusterPreInformer := stViewInformerFactory.Edge().V1alpha1().SyncTargets()

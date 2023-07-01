@@ -1,0 +1,35 @@
+I0701 01:23:54.167793  536195 main.go:121] "Command line flag" add_dir_header="false"
+I0701 01:23:54.167879  536195 main.go:121] "Command line flag" allclusters-cluster=""
+I0701 01:23:54.167889  536195 main.go:121] "Command line flag" allclusters-context="system:admin"
+I0701 01:23:54.167897  536195 main.go:121] "Command line flag" allclusters-kubeconfig=""
+I0701 01:23:54.167904  536195 main.go:121] "Command line flag" allclusters-user=""
+I0701 01:23:54.167912  536195 main.go:121] "Command line flag" alsologtostderr="false"
+I0701 01:23:54.167920  536195 main.go:121] "Command line flag" concurrency="4"
+I0701 01:23:54.167927  536195 main.go:121] "Command line flag" espw-cluster=""
+I0701 01:23:54.167934  536195 main.go:121] "Command line flag" espw-context=""
+I0701 01:23:54.167941  536195 main.go:121] "Command line flag" espw-kubeconfig=""
+I0701 01:23:54.167948  536195 main.go:121] "Command line flag" espw-user=""
+I0701 01:23:54.167956  536195 main.go:121] "Command line flag" log_backtrace_at=":0"
+I0701 01:23:54.167963  536195 main.go:121] "Command line flag" log_dir=""
+I0701 01:23:54.167970  536195 main.go:121] "Command line flag" log_file=""
+I0701 01:23:54.167979  536195 main.go:121] "Command line flag" log_file_max_size="1800"
+I0701 01:23:54.167986  536195 main.go:121] "Command line flag" logtostderr="true"
+I0701 01:23:54.167993  536195 main.go:121] "Command line flag" one_output="false"
+I0701 01:23:54.168011  536195 main.go:121] "Command line flag" server-bind-address=":10204"
+I0701 01:23:54.168023  536195 main.go:121] "Command line flag" skip_headers="false"
+I0701 01:23:54.168031  536195 main.go:121] "Command line flag" skip_log_headers="false"
+I0701 01:23:54.168038  536195 main.go:121] "Command line flag" sspw-cluster=""
+I0701 01:23:54.168046  536195 main.go:121] "Command line flag" sspw-context="root"
+I0701 01:23:54.168053  536195 main.go:121] "Command line flag" sspw-kubeconfig=""
+I0701 01:23:54.168060  536195 main.go:121] "Command line flag" sspw-user=""
+I0701 01:23:54.168068  536195 main.go:121] "Command line flag" stderrthreshold="2"
+I0701 01:23:54.168075  536195 main.go:121] "Command line flag" v="2"
+I0701 01:23:54.168082  536195 main.go:121] "Command line flag" vmodule=""
+I0701 01:23:54.201405  536195 main.go:278] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://10.0.2.15:6443/services/apiexport/05we4jfbtl8h61yg/edge.kcp.io"
+I0701 01:23:54.207794  536195 main.go:278] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://10.0.2.15:6443/services/apiexport/root/scheduling.kcp.io"
+I0701 01:23:54.208644  536195 shared_informer.go:282] Waiting for caches to sync for placement-translator
+I0701 01:23:54.509992  536195 shared_informer.go:289] Caches are synced for placement-translator
+I0701 01:23:54.510358  536195 shared_informer.go:282] Waiting for caches to sync for what-resolver
+I0701 01:23:54.510380  536195 shared_informer.go:289] Caches are synced for what-resolver
+I0701 01:23:54.510470  536195 shared_informer.go:282] Waiting for caches to sync for where-resolver
+I0701 01:23:54.510484  536195 shared_informer.go:289] Caches are synced for where-resolver
