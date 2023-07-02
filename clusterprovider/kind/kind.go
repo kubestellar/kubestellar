@@ -75,10 +75,8 @@ func (k KindClusterProvider) ListClustersNames(ctx context.Context) ([]string, e
 }
 
 func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterprovider.LogicalClusterInfo, error) {
-	logger := klog.FromContext(ctx)
 	cfg, err := k.kindProvider.KubeConfig(lcName, false)
 	if err != nil {
-		logger.Error(err, "couldn't fetch config for cluster")
 		return clusterprovider.LogicalClusterInfo{}, err
 	}
 
@@ -163,6 +161,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 						logger.Info("Detected a new cluster")
 						lcInfo, err := k.provider.Get(ctx, name)
 						if err != nil {
+							logger.Info("Kind cluster is not ready. Retrying.", "cluster", name)
 							// Can't get the cluster info, so let's discover it again
 							newSetClusters.Delete(name)
 							continue

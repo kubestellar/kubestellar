@@ -139,7 +139,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				// TODO: Should we really update the config ?
 				reflcluster.Status.ClusterConfig = event.LCInfo.Config
-				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+				_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Update(ctx, reflcluster, v1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't update the corresponding LogicalCluster status", "cluster name", lcName)
 			}
 
@@ -154,7 +154,7 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 				return
 			}
 			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
-			_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).UpdateStatus(ctx, reflcluster, v1.UpdateOptions{})
+			_, err = clientset.LogicalclusterV1alpha1().LogicalClusters(GetNamespace(providerName)).Update(ctx, reflcluster, v1.UpdateOptions{})
 			chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
 
 		default:
@@ -165,7 +165,6 @@ func processProviderWatchEvents(ctx context.Context, w clusterprovider.Watcher, 
 
 func chkErrAndReturn(logger logr.Logger, err error, msg string, keysAndValues ...interface{}) {
 	if err != nil {
-		logger.Error(err, "Cluster was removed, Couldn't update the LogicalCluster status")
-		return
+		logger.Error(err, msg)
 	}
 }

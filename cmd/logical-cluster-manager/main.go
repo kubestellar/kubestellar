@@ -34,7 +34,7 @@ import (
 )
 
 var (
-	resyncPeriod = 4 * time.Second
+	resyncPeriod = 30 * time.Second
 	numThreads   = 2
 )
 
