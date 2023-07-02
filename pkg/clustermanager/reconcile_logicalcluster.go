@@ -32,13 +32,18 @@ func (c *controller) reconcileLogicalCluster(key string) error {
 		return err
 	}
 
+	if !exists {
+		c.logger.V(2).Info("LogicalCluster deleted", "cluster", key)
+		return nil
+	}
+
 	cluster, ok := clusterObj.(*lcv1alpha1.LogicalCluster)
 	if !ok {
 		return errors.New("unexpected object type. expected LogicalCluster")
 	}
 
-	if !exists {
-		c.logger.V(2).Info("LogicalCluster deleted", "resource", cluster.Name)
+	if cluster.ObjectMeta.DeletionTimestamp != nil {
+		c.logger.V(2).Info("reconcile LogicalCluster delete", "resource", cluster.Name)
 		err := c.processDeleteLC(cluster)
 		if err != nil {
 			return err

@@ -1,6 +1,6 @@
 apiVersion: logicalcluster.kubestellar.io/v1alpha1
 kind: ClusterProviderDesc
 metadata:
-  name: dev2
+  name: default
 spec:
   ProviderType: "kind"

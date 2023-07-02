@@ -1,7 +1,8 @@
 apiVersion: logicalcluster.kubestellar.io/v1alpha1
 kind: LogicalCluster
 metadata:
-  name: dev2
+  name: dev
+  namespace: lcprovider-default
 spec:
-  ClusterProviderDesc: "dev2"
-  ClusterName: "kind-fleet-test2"
+  ClusterProviderDescName: "default"
+  Managed: true

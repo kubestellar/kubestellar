@@ -51,8 +51,15 @@ func (c *controller) reconcileClusterProviderDesc(key string) error {
 }
 
 func (c *controller) handleAdd(provider *lcv1alpha1.ClusterProviderDesc) error {
-	if provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseInitializing || provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseReady {
+	if provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseInitializing {
 		return nil
+	}
+	name := provider.Name
+	if provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseReady {
+		// check if we have this provider in cache
+		if _, ok := c.providers[name]; ok {
+			return nil
+		}
 	}
 	// set provider status to Initializing
 	provider, err := c.setProviderStatus(provider, lcv1alpha1.ClusterProviderDescPhaseInitializing)
@@ -60,7 +67,6 @@ func (c *controller) handleAdd(provider *lcv1alpha1.ClusterProviderDesc) error {
 		return err
 	}
 
-	name := provider.Name
 	_, err = c.CreateProvider(name, provider.Spec.ProviderType)
 	if err != nil {
 		// TODO: Check if the err is because the provider already exists
