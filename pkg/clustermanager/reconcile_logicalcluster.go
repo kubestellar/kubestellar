@@ -20,7 +20,6 @@ import (
 	"errors"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog/v2"
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	pclient "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
@@ -66,23 +65,22 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		// If the cluster is unmanaged, then delete the corresponding object.
 		return c.clientset.
 			LogicalclusterV1alpha1().
-			LogicalClusters(GetNamespace(logicalCluster.Spec.ClusterProviderDescName)).
+			LogicalClusters(c.providers[logicalCluster.Spec.ClusterProviderDescName].nameSpace).
 			Delete(c.context, logicalCluster.Name, v1.DeleteOptions{})
 	}
 	if logicalCluster.Status.Phase == "" && logicalCluster.Spec.Managed {
 		// The client created a new logical cluster object and we need to
 		// create the corresponding physical cluster.
-		logger := klog.FromContext(c.context)
 		providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
 			c.context, logicalCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
 		if err != nil {
-			logger.Error(err, "failed to get the provider resource")
+			c.logger.Error(err, "failed to get the provider resource")
 			return err
 		}
 
-		provider, err := c.GetProvider(providerInfo.Name)
-		if err != nil {
-			logger.Error(err, "failed to get provider client")
+		provider := c.providers[providerInfo.Name].providerClient
+		if provider == nil {
+			c.logger.Error(err, "failed to get provider client")
 			return err
 		}
 
@@ -90,10 +88,10 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		logicalCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
 		_, err = c.clientset.
 			LogicalclusterV1alpha1().
-			LogicalClusters(GetNamespace(logicalCluster.Spec.ClusterProviderDescName)).
+			LogicalClusters(c.providers[providerInfo.Name].nameSpace).
 			Update(c.context, logicalCluster, v1.UpdateOptions{})
 		if err != nil {
-			logger.Error(err, "failed to update cluster status.")
+			c.logger.Error(err, "failed to update cluster status.")
 			return err
 		}
 
@@ -122,10 +120,10 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 // TODO: add a finalizer to the logical cluster object
 func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) error {
 	if delCluster.Spec.Managed {
-		logger := klog.FromContext(c.context)
-		provider, err := c.GetProvider(delCluster.Spec.ClusterProviderDescName)
-		if err != nil {
-			logger.Error(err, "failed to get provider client")
+		provider := c.providers[delCluster.Spec.ClusterProviderDescName].providerClient
+		if provider == nil {
+			err := errors.New("failed to get provider client")
+			c.logger.Error(err, "failed to get provider client")
 			return err
 		}
 		go provider.Delete(c.context, delCluster.Name, pclient.Options{})

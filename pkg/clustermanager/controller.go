@@ -33,7 +33,6 @@ import (
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	edgeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 const ()
@@ -51,11 +50,6 @@ type queueItem struct {
 	key            string
 }
 
-type providerInfo struct {
-	providerClient  clusterprovider.ProviderClient
-	providerWatcher clusterprovider.Watcher
-}
-
 type controller struct {
 	context                 context.Context
 	clientset               edgeclient.Interface
@@ -64,7 +58,7 @@ type controller struct {
 	queue                   workqueue.RateLimitingInterface
 	logicalClusterInformer  cache.SharedIndexInformer
 	clusterProviderInformer cache.SharedIndexInformer
-	providers               map[string]providerInfo
+	providers               map[string]*provider
 	lock                    sync.Mutex
 }
 
@@ -86,7 +80,7 @@ func NewController(
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,
 		clusterProviderInformer: providerInformer,
-		providers:               make(map[string]providerInfo),
+		providers:               make(map[string]*provider),
 	}
 
 	logicalClusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
