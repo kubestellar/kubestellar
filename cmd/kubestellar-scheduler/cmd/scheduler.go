@@ -39,7 +39,6 @@ import (
 	scheduleroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-
 	"github.com/kubestellar/kubestellar/pkg/scheduler"
 )
 
