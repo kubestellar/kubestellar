@@ -803,6 +803,19 @@
     Overview
   </a>
   
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serving-up-documents-locally" class="md-nav__link">
+    Serving up documents locally
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -823,13 +836,6 @@
           <li class="md-nav__item">
   <a href="#including-external-markdown" class="md-nav__link">
     Including external markdown
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#serving-up-documents-locally" class="md-nav__link">
-    Serving up documents locally
   </a>
   
 </li>
@@ -1819,6 +1825,19 @@
     Overview
   </a>
   
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serving-up-documents-locally" class="md-nav__link">
+    Serving up documents locally
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1839,13 +1858,6 @@
           <li class="md-nav__item">
   <a href="#including-external-markdown" class="md-nav__link">
     Including external markdown
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#serving-up-documents-locally" class="md-nav__link">
-    Serving up documents locally
   </a>
   
 </li>
@@ -2010,6 +2022,24 @@ additional plugins and tools:</p>
 </ul>
 <p>We have support in place for multiple languages (i18n), although we currently only have documentation in English. If 
 you're interested in contributing translations, please let us know!</p>
+<h3 id="serving-up-documents-locally">Serving up documents locally<a class="headerlink" href="#serving-up-documents-locally" title="Permanent link">#</a></h3>
+<p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar/docs
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+</code></pre></div>
+<p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mkdocs<span class="w"> </span>serve
+</code></pre></div>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
+<p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
+</code></pre></div>
+Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <h2 id="file-structure">File structure<a class="headerlink" href="#file-structure" title="Permanent link">#</a></h2>
 <p>All documentation-related items live in <code>docs</code> (with the small exception of various <code>make</code> targets and some helper 
 scripts in <code>hack</code>).</p>
@@ -2087,24 +2117,6 @@ scripts in <code>hack</code>).</p>
 <p>In the document you want to include, add the start and end tags you configured in the include-markdown block in your original document:
 <img alt="Included Markdown" src="../included-markdown-example.png" /></p>
 <p>for more information on the 'include-markdown' plugin for mkdocs look <a href="https://github.com/mondeja/mkdocs-include-markdown-plugin">here</a></p>
-<h3 id="serving-up-documents-locally">Serving up documents locally<a class="headerlink" href="#serving-up-documents-locally" title="Permanent link">#</a></h3>
-<p>You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar/docs
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
-</code></pre></div>
-<p>You can view and modify our documentation in the branch you have checked out by using <code>mkdocs serve</code> from <a href="https://www.mkdocs.org/../../..">mkdocs</a>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>mkdocs<span class="w"> </span>serve
-</code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
-<p>Another way to view (not modify - this method reflects what has been deployed to the <code>gh-pages</code> branch of our repo) all branches/versions of our documentation locally using 'mike' <a href="https://github.com/jimporter/mike">mike for mkdocs</a>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kubestellar/kubestellar.git
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>serve-docs
-</code></pre></div>
-Then open a browser to <a href="http://localhost:8000/"><code>http://localhost:8000/</code></a></p>
 <h3 id="supported-aliases-for-our-documentation">Supported aliases for our documentation<a class="headerlink" href="#supported-aliases-for-our-documentation" title="Permanent link">#</a></h3>
 <p>We currently support 3 aliases for our documentation:</p>
 <div class="highlight"><pre><span></span><code>- from the release major.minor branch:
