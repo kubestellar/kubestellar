@@ -64,22 +64,22 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 			LogicalClusters(GetNamespace(logicalCluster.Spec.ClusterProviderDescName)).
 			Delete(c.context, logicalCluster.Name, v1.DeleteOptions{})
 	}
-	if logicalCluster.Status.Phase == "" && logicalCluster.Spec.Managed {
-		// The client created a new logical cluster object and we need to
-		// create the corresponding physical cluster.
-		logger := klog.FromContext(c.context)
-		providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
-			c.context, logicalCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
-		if err != nil {
-			logger.Error(err, "failed to get the provider resource")
-			return err
-		}
+	providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
+		c.context, logicalCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
+	if err != nil {
+		c.logger.Error(err, "failed to get the provider resource")
+		return err
+	}
 
-		provider, err := c.GetProvider(providerInfo.Name)
-		if err != nil {
-			logger.Error(err, "failed to get provider client")
-			return err
-		}
+	provider, err := c.GetProvider(providerInfo.Name)
+	if err != nil {
+		c.logger.Error(err, "failed to get provider client")
+		return err
+	}
+
+	if logicalCluster.Status.Phase == "" && logicalCluster.Spec.Managed {
+		// The user created a new logical cluster object and we need to
+		// create the corresponding physical cluster.
 
 		// Update status Initializing
 		logicalCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
@@ -88,7 +88,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 			LogicalClusters(GetNamespace(logicalCluster.Spec.ClusterProviderDescName)).
 			Update(c.context, logicalCluster, v1.UpdateOptions{})
 		if err != nil {
-			logger.Error(err, "failed to update cluster status.")
+			c.logger.Error(err, "failed to update cluster status.")
 			return err
 		}
 
@@ -97,18 +97,22 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		go provider.Create(c.context, logicalCluster.Name, pclient.Options{})
 		return nil
 	}
-	// case lcv1alpha1.LogicalClusterPhaseInitializing:
-	// A managed cluster is being created by the provider. Need to wait for
-	// the cluster to be created at which point discovery will change the
-	// state to READY and update the cluster config.
-	//
-	// case lcv1alpha1.LogicalClusterPhaseReady:
-	// The cluster is ready - we have nothing to do but celebrate!
-	// Likely we got here after the provider finished creating a managed
-	// cluster and dicovery moved it into the Ready state.
-	//
-	// If a logical cluster has been created for an unmanaged physical
-	// cluster, then wait for discovery to move the phase to Ready.
+
+	// The code from here deals with the case of provider deleted cluster events that might be missed
+	_, err = provider.Get(c.context, logicalCluster.Name)
+
+	if err != nil {
+		// Cluster is missing on the provider, update the status
+		logicalCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
+		_, err = c.clientset.LogicalclusterV1alpha1().
+			LogicalClusters(GetNamespace(logicalCluster.Spec.ClusterProviderDescName)).
+			UpdateStatus(c.context, logicalCluster, v1.UpdateOptions{})
+		if err != nil {
+			c.logger.Error(err, "failed to update cluster status.")
+			return err
+		}
+	}
+
 	return nil
 }
 
