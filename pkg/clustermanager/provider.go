@@ -33,6 +33,10 @@ import (
 // Each provider gets its own namespace named prefixNamespace+providerName
 const prefixNamespace = "lcprovider-"
 
+func ProviderNS(name string) string {
+	return prefixNamespace + name
+}
+
 type provider struct {
 	name            string
 	providerClient  clusterprovider.ProviderClient
@@ -75,7 +79,7 @@ func CreateProvider(c *controller, providerName string,
 		name:           providerName,
 		providerClient: newProviderClient,
 		c:              c,
-		nameSpace:      prefixNamespace + providerName,
+		nameSpace:      ProviderNS(providerName),
 	}
 
 	c.providers[providerName] = p

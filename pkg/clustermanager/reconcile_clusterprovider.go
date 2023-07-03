@@ -74,7 +74,7 @@ func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) err
 	}
 
 	// create namespace for provider clusters
-	nsName := provider.nameSpace
+	nsName := ProviderNS(name)
 	ns := &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: nsName,
@@ -99,10 +99,13 @@ func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) err
 }
 
 func (c *controller) handleDelete(providerName string) error {
-	ns := c.providers[providerName].nameSpace
-	err := c.providers[providerName].StopDiscovery()
-	if err != nil {
-		runtime.HandleError(err)
+	ns := ProviderNS(providerName)
+	provider, ok := c.providers[providerName]
+	if ok {
+		err := provider.StopDiscovery()
+		if err != nil {
+			runtime.HandleError(err)
+		}
 	}
 	// 1. delete unmanaged Logicalclusters.
 	// 2. set managed Logicalclusters to NotReady.

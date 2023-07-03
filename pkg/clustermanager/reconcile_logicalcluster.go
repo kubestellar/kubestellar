@@ -65,7 +65,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		// If the cluster is unmanaged, then delete the corresponding object.
 		return c.clientset.
 			LogicalclusterV1alpha1().
-			LogicalClusters(c.providers[logicalCluster.Spec.ClusterProviderDescName].nameSpace).
+			LogicalClusters(ProviderNS(logicalCluster.Spec.ClusterProviderDescName)).
 			Delete(c.context, logicalCluster.Name, v1.DeleteOptions{})
 	}
 	if logicalCluster.Status.Phase == "" && logicalCluster.Spec.Managed {
@@ -77,9 +77,14 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 			c.logger.Error(err, "failed to get the provider resource")
 			return err
 		}
+		provider, ok := c.providers[providerInfo.Name]
+		if !ok {
+			c.logger.Error(err, "failed to get provider from controller")
+			return err
+		}
 
-		provider := c.providers[providerInfo.Name].providerClient
-		if provider == nil {
+		providerClient := provider.providerClient
+		if providerClient == nil {
 			c.logger.Error(err, "failed to get provider client")
 			return err
 		}
@@ -88,7 +93,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		logicalCluster.Status.Phase = lcv1alpha1.LogicalClusterPhaseInitializing
 		_, err = c.clientset.
 			LogicalclusterV1alpha1().
-			LogicalClusters(c.providers[providerInfo.Name].nameSpace).
+			LogicalClusters(ProviderNS(providerInfo.Name)).
 			Update(c.context, logicalCluster, v1.UpdateOptions{})
 		if err != nil {
 			c.logger.Error(err, "failed to update cluster status.")
@@ -97,7 +102,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 
 		// Async call the provider to create the cluster. Once created, discovery
 		// will set the logical cluster in the Ready state.
-		go provider.Create(c.context, logicalCluster.Name, pclient.Options{})
+		go providerClient.Create(c.context, logicalCluster.Name, pclient.Options{})
 		return nil
 	}
 	// case lcv1alpha1.LogicalClusterPhaseInitializing:
