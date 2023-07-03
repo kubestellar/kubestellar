@@ -127,13 +127,11 @@ func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) erro
 	if delCluster.Spec.Managed {
 		provider, ok := c.providers[delCluster.Spec.ClusterProviderDescName]
 		if !ok {
-			c.logger.Error("failed to get provider from controller")
 			return errors.New("failed to get provider client")
 		}
 
 		client := provider.providerClient
-		if provider == nil {
-			c.logger.Error("failed to get provider client")
+		if client == nil {
 			return errors.New("failed to get provider client")
 		}
 		go client.Delete(c.context, delCluster.Name, pclient.Options{})
