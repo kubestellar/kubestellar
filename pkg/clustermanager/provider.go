@@ -19,10 +19,12 @@ package clustermanager
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/go-logr/logr"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 
 	kindprovider "github.com/kubestellar/kubestellar/clusterprovider/kind"
@@ -38,11 +40,12 @@ func ProviderNS(name string) string {
 }
 
 type provider struct {
-	name            string
-	providerClient  clusterprovider.ProviderClient
-	c               *controller
-	providerWatcher clusterprovider.Watcher
-	nameSpace       string
+	name             string
+	providerClient   clusterprovider.ProviderClient
+	c                *controller
+	providerWatcher  clusterprovider.Watcher
+	nameSpace        string
+	discoveryPresfix string
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
@@ -64,6 +67,8 @@ func CreateProvider(c *controller, providerName string,
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
+	discoveryPresfix := "*"
+
 	_, exists := c.providers[providerName]
 	if exists {
 		err := errors.New("provider already in the list")
@@ -75,15 +80,31 @@ func CreateProvider(c *controller, providerName string,
 		return nil, errors.New("unknown provider type")
 	}
 
+	providerDescObj, found, _ := c.clusterProviderInformer.GetIndexer().GetByKey(LCKeyFunc("", providerName))
+	if found {
+		providerDesc, ok := providerDescObj.(*lcv1alpha1apis.ClusterProviderDesc)
+		if ok {
+			discoveryPresfix = providerDesc.Spec.ClusterPrefixForDiscovery
+		}
+	}
+
 	p := &provider{
-		name:           providerName,
-		providerClient: newProviderClient,
-		c:              c,
-		nameSpace:      ProviderNS(providerName),
+		name:             providerName,
+		providerClient:   newProviderClient,
+		c:                c,
+		nameSpace:        ProviderNS(providerName),
+		discoveryPresfix: discoveryPresfix,
 	}
 
 	c.providers[providerName] = p
 	return p, nil
+}
+
+func (p *provider) filterOut(lcName string) bool {
+	if p.discoveryPresfix == "*" {
+		return false
+	}
+	return !strings.HasPrefix(lcName, p.discoveryPresfix)
 }
 
 // StartDiscovery will start watching provider clusters for changes
@@ -113,6 +134,7 @@ func (p *provider) StopDiscovery() error {
 func (p *provider) processProviderWatchEvents() {
 	logger := p.c.logger
 	ctx := p.c.context
+	var reflcluster *lcv1alpha1apis.LogicalCluster
 	for {
 		event, ok := <-p.providerWatcher.ResultChan()
 		if !ok {
@@ -120,14 +142,26 @@ func (p *provider) processProviderWatchEvents() {
 			return
 		}
 		lcName := event.Name
-		reflcluster, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Get(ctx, lcName, v1.GetOptions{})
-		found := reflcluster != nil && err == nil
+		reflclusterObj, found, errLC := p.c.logicalClusterInformer.GetIndexer().GetByKey(LCKeyFunc(p.nameSpace, lcName))
 
+		if found {
+			reflcluster, ok = reflclusterObj.(*lcv1alpha1apis.LogicalCluster)
+			if !ok {
+				runtime.HandleError(errors.New("unexpected object type. expected ClusterProviderDesc"))
+				continue
+			}
+		}
+
+		if !found || (found && !reflcluster.Spec.Managed) {
+			if p.filterOut(lcName) {
+				continue
+			}
+		}
 		switch event.Type {
 		case watch.Added:
 			logger.Info("New cluster was detected", "cluster", event.Name)
 			// A new cluster was detected either create it or change the status to READY
-			if !found {
+			if !found || errLC != nil {
 				// No corresponding Logicalcluster, let's create it
 				logger.Info("Creating new LogicalCluster object", "cluster", event.Name)
 				lcluster := lcv1alpha1apis.LogicalCluster{}
@@ -136,7 +170,7 @@ func (p *provider) processProviderWatchEvents() {
 				lcluster.Spec.Managed = false
 				lcluster.Status.ClusterConfig = event.LCInfo.Config
 				lcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
-				_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Create(ctx, &lcluster, v1.CreateOptions{})
+				_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Create(ctx, &lcluster, v1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't create the corresponding LogicalCluster", "cluster name", lcName)
 			} else {
 				// TODO: when finalizers added - cheeck the logicalcluster delete timestamp
@@ -144,7 +178,7 @@ func (p *provider) processProviderWatchEvents() {
 				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				// TODO: Should we really update the config ?
 				reflcluster.Status.ClusterConfig = event.LCInfo.Config
-				_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
+				_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't update the corresponding LogicalCluster status", "cluster name", lcName)
 			}
 
@@ -159,7 +193,7 @@ func (p *provider) processProviderWatchEvents() {
 				return
 			}
 			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
-			_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
+			_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 			chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
 
 		default:
