@@ -22,14 +22,13 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
-	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	pclient "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
 const finalizerName = "LCFinalizer"
 
 // containsFinalizer: returns true if the finalizer list contains the logical cluster finalizer
-func containsFinalizer(lcluster *lcv1alpha1apis.LogicalCluster, finalizer string) bool {
+func containsFinalizer(lcluster *lcv1alpha1.LogicalCluster, finalizer string) bool {
 	finalizersList := lcluster.ObjectMeta.Finalizers
 	for _, f := range finalizersList {
 		if f == finalizer {

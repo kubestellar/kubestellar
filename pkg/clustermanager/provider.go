@@ -208,7 +208,7 @@ func (p *provider) processProviderWatchEvents() {
 							i--
 						}
 					}
-					_, err = p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
+					_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 					chkErrAndReturn(logger, err, "Could not remove logical cluster finalizer", "cluster name", lcName)
 				}
 				return
