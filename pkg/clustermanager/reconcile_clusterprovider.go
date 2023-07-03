@@ -50,31 +50,31 @@ func (c *controller) reconcileClusterProviderDesc(key string) error {
 	return nil
 }
 
-func (c *controller) handleAdd(provider *lcv1alpha1.ClusterProviderDesc) error {
-	if provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseInitializing {
+func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) error {
+	if providerDesc.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseInitializing {
 		return nil
 	}
-	name := provider.Name
-	if provider.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseReady {
+	name := providerDesc.Name
+	if providerDesc.Status.Phase == lcv1alpha1.ClusterProviderDescPhaseReady {
 		// check if we have this provider in cache
 		if _, ok := c.providers[name]; ok {
 			return nil
 		}
 	}
 	// set provider status to Initializing
-	provider, err := c.setProviderStatus(provider, lcv1alpha1.ClusterProviderDescPhaseInitializing)
+	providerDesc, err := c.setProviderStatus(providerDesc, lcv1alpha1.ClusterProviderDescPhaseInitializing)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.CreateProvider(name, provider.Spec.ProviderType)
+	provider, err := CreateProvider(c, name, providerDesc.Spec.ProviderType)
 	if err != nil {
 		// TODO: Check if the err is because the provider already exists
 		return err
 	}
 
 	// create namespace for provider clusters
-	nsName := GetNamespace(name)
+	nsName := ProviderNS(name)
 	ns := &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: nsName,
@@ -85,12 +85,12 @@ func (c *controller) handleAdd(provider *lcv1alpha1.ClusterProviderDesc) error {
 		return err
 	}
 
-	err = c.StartDiscovery(name)
+	err = provider.StartDiscovery()
 	if err != nil {
 		return err
 	}
 	// set provider status to Ready
-	_, err = c.setProviderStatus(provider, lcv1alpha1.ClusterProviderDescPhaseReady)
+	_, err = c.setProviderStatus(providerDesc, lcv1alpha1.ClusterProviderDescPhaseReady)
 	if err != nil {
 		return err
 	}
@@ -99,14 +99,17 @@ func (c *controller) handleAdd(provider *lcv1alpha1.ClusterProviderDesc) error {
 }
 
 func (c *controller) handleDelete(providerName string) error {
-	err := c.StopDiscovery(providerName)
-	if err != nil {
-		runtime.HandleError(err)
+	ns := ProviderNS(providerName)
+	provider, ok := c.providers[providerName]
+	if ok {
+		err := provider.StopDiscovery()
+		if err != nil {
+			runtime.HandleError(err)
+		}
 	}
 	// 1. delete unmanaged Logicalclusters.
 	// 2. set managed Logicalclusters to NotReady.
 	// 3. remove provider namespace if it's empty from Logicalclusters.
-	ns := GetNamespace(providerName)
 	isNsEmpty := true
 	lclusters := c.logicalClusterInformer.GetIndexer().List()
 	for _, lcObj := range lclusters {
@@ -131,6 +134,7 @@ func (c *controller) handleDelete(providerName string) error {
 		}
 	}
 	if isNsEmpty {
+		delete(c.providers, providerName)
 		err := c.k8sClientset.CoreV1().Namespaces().Delete(c.context, ns, metav1.DeleteOptions{})
 		if err != nil && !apierrors.IsNotFound(err) {
 			return err
