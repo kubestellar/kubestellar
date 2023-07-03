@@ -45,13 +45,6 @@ const (
 	controllerName                                   = "logicalcluster-manager"
 )
 
-func LCKeyFunc(ns string, name string) string {
-	if ns != "" {
-		return ns + "/" + name
-	}
-	return name
-}
-
 type queueItem struct {
 	triggeringKind triggeringKind
 	key            string

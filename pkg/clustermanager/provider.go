@@ -39,13 +39,20 @@ func ProviderNS(name string) string {
 	return prefixNamespace + name
 }
 
+func lcKeyFunc(ns string, name string) string {
+	if ns != "" {
+		return ns + "/" + name
+	}
+	return name
+}
+
 type provider struct {
-	name             string
-	providerClient   clusterprovider.ProviderClient
-	c                *controller
-	providerWatcher  clusterprovider.Watcher
-	nameSpace        string
-	discoveryPresfix string
+	name            string
+	providerClient  clusterprovider.ProviderClient
+	c               *controller
+	providerWatcher clusterprovider.Watcher
+	nameSpace       string
+	discoveryPrefix string
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
@@ -67,7 +74,7 @@ func CreateProvider(c *controller, providerName string,
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	discoveryPresfix := "*"
+	discoveryPrefix := "*"
 
 	_, exists := c.providers[providerName]
 	if exists {
@@ -80,20 +87,23 @@ func CreateProvider(c *controller, providerName string,
 		return nil, errors.New("unknown provider type")
 	}
 
-	providerDescObj, found, _ := c.clusterProviderInformer.GetIndexer().GetByKey(LCKeyFunc("", providerName))
+	providerDescObj, found, _ := c.clusterProviderInformer.GetIndexer().GetByKey(lcKeyFunc("", providerName))
 	if found {
 		providerDesc, ok := providerDescObj.(*lcv1alpha1apis.ClusterProviderDesc)
 		if ok {
-			discoveryPresfix = providerDesc.Spec.ClusterPrefixForDiscovery
+			discoveryPrefix = providerDesc.Spec.ClusterPrefixForDiscovery
+			if discoveryPrefix == "" {
+				discoveryPrefix = "*"
+			}
 		}
 	}
 
 	p := &provider{
-		name:             providerName,
-		providerClient:   newProviderClient,
-		c:                c,
-		nameSpace:        ProviderNS(providerName),
-		discoveryPresfix: discoveryPresfix,
+		name:            providerName,
+		providerClient:  newProviderClient,
+		c:               c,
+		nameSpace:       ProviderNS(providerName),
+		discoveryPrefix: discoveryPrefix,
 	}
 
 	c.providers[providerName] = p
@@ -101,10 +111,10 @@ func CreateProvider(c *controller, providerName string,
 }
 
 func (p *provider) filterOut(lcName string) bool {
-	if p.discoveryPresfix == "*" {
+	if p.discoveryPrefix == "*" {
 		return false
 	}
-	return !strings.HasPrefix(lcName, p.discoveryPresfix)
+	return !strings.HasPrefix(lcName, p.discoveryPrefix)
 }
 
 // StartDiscovery will start watching provider clusters for changes
@@ -142,7 +152,7 @@ func (p *provider) processProviderWatchEvents() {
 			return
 		}
 		lcName := event.Name
-		reflclusterObj, found, errLC := p.c.logicalClusterInformer.GetIndexer().GetByKey(LCKeyFunc(p.nameSpace, lcName))
+		reflclusterObj, found, errLC := p.c.logicalClusterInformer.GetIndexer().GetByKey(lcKeyFunc(p.nameSpace, lcName))
 
 		if found {
 			reflcluster, ok = reflclusterObj.(*lcv1alpha1apis.LogicalCluster)
@@ -153,6 +163,7 @@ func (p *provider) processProviderWatchEvents() {
 		}
 
 		if !found || (found && !reflcluster.Spec.Managed) {
+			// For unmanaged clusters discover & ypdate only clusters that match the provider prefix
 			if p.filterOut(lcName) {
 				continue
 			}
