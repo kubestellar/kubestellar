@@ -36,7 +36,8 @@ include_pattern="\s*include-markdown\s*"
 
 # array to store the shell code blocks
 code_blocks=()
-code_blocks+=("cd $REPO_ROOT/docs/scripts/")
+# code_blocks+=("cd $REPO_ROOT/docs/scripts/")
+code_blocks+=("cd $REPO_ROOT")
 
 if [ -f "/etc/os-release" ]; then
   if [[ $(grep -i "ubuntu" /etc/os-release) ]]; then
@@ -122,7 +123,13 @@ for code_block in "${code_blocks[@]}"; do
   echo "$code_block"  >> "$generated_script_file"
 done
 
+echo
+echo "Generated script file follows"
 cat "$generated_script_file"
+
+echo
+echo "Execution follows"
+set -o xtrace
 
 # make the generated script executable
 chmod +x "$generated_script_file"

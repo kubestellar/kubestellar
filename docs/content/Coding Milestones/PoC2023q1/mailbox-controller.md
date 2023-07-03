@@ -86,9 +86,9 @@ Open a terminal window(1) and clone the latest KubeStellar source:
 Open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
 
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
-   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
-   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-build-kubestellar.md"
+   start="<!--kubestellar-scheduler-1-build-kubestellar-start-->"
+   end="<!--kubestellar-scheduler-1-build-kubestellar-end-->"
 %}
 
 {%
