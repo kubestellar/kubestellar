@@ -125,13 +125,18 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 // TODO: add a finalizer to the logical cluster object
 func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) error {
 	if delCluster.Spec.Managed {
-		provider := c.providers[delCluster.Spec.ClusterProviderDescName].providerClient
-		if provider == nil {
-			err := errors.New("failed to get provider client")
-			c.logger.Error(err, "failed to get provider client")
-			return err
+		provider, ok := c.providers[delCluster.Spec.ClusterProviderDescName]
+		if !ok {
+			c.logger.Error("failed to get provider from controller")
+			return errors.New("failed to get provider client")
 		}
-		go provider.Delete(c.context, delCluster.Name, pclient.Options{})
+
+		client := provider.providerClient
+		if provider == nil {
+			c.logger.Error("failed to get provider client")
+			return errors.New("failed to get provider client")
+		}
+		go client.Delete(c.context, delCluster.Name, pclient.Options{})
 	}
 	return nil
 }
