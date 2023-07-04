@@ -10,10 +10,10 @@
 <p align="center">
 <b>Distinguishing features of KubeStellar</b>
 </p>
-- <b>[ multi-cluster down-syncing](https://kubestellar.io/quickstart)</b> deploy, configure, and collect status <b>across pre-existing clusters</b>
-- <b>[up-syncing](https://docs.kubestellar.io/{{ config.ks_branch }}/Coding%20Milestones/PoC2023q1/kubestellar-syncer/)</b> from remote clusters (return <i>any</i> object, not just status)
+- <b>[ multi-cluster down-syncing]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)</b> deploy, configure, and collect status <b>across pre-existing clusters</b>
+- <b>[up-syncing]({{ config.docs_url }}/{{ config.ks_branch }}/Coding%20Milestones/PoC2023q1/kubestellar-syncer/)</b> from remote clusters (return <i>any</i> object, not just status)
 - <b>lightweight logical cluster</b> support ([KubeFlex](https://github.com/kubestellar/kubeflex), [kcp](https://kcp.io), [kind](https://kind.io), etc.)
-- <b>[resiliency](https://docs.kubestellar.io/{{ config.ks_branch }}/Coding%20Milestones/PoC2023q1/mailbox-controller/)</b> to support disconnected operation and intermittent connectivity
+- <b>[resiliency]({{ config.docs_url }}/{{ config.ks_branch }}/Coding%20Milestones/PoC2023q1/mailbox-controller/)</b> to support disconnected operation and intermittent connectivity
 
 <br/>
 <p align="center">
@@ -26,7 +26,7 @@
 
 [Learn more about KubeStellar](./readme.md)
 
-[Try our QuickStart](https://kubestellar.io/quickstart)
+[Try our QuickStart]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
 
 <br/>
 <p align="center">

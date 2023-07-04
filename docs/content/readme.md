@@ -47,11 +47,11 @@ KubeStellar is an opensource project focused on concerns arising from multi-clus
 
 ## QuickStart
 
-Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
+Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
 
 ## Contributing
 
-We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing](https://docs.kubestellar.io/stable/Contribution%20guidelines/CONTRIBUTING/) guide.
+We ❤️ our contributors! If you're interested in helping us out, please head over to our [Contributing]({{ config.docs_url }}/{{ config.ks_branch }}/Contribution%20guidelines/CONTRIBUTING/) guide.
 
 ## Getting in touch
 
@@ -67,7 +67,7 @@ There are several ways to communicate with us:
 - See [upcoming](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity-meeting) and [past](https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aclosed+label%3Acommunity-meeting) community meeting agendas and notes
 - Browse the [shared Google Drive](https://drive.google.com/drive/folders/1p68MwkX0sYdTvtup0DcnAEsnXElobFLS?usp=sharing) to share design docs, notes, etc.
     - Members of the [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) mailing list can view this drive
-- Read our [documentation](https://kubestellar.io)
+- Read our [documentation]({{ config.docs_url }})
 - Follow us on:
    - LinkedIn - [#kubestellar](https://www.linkedin.com/feed/hashtag/?keywords=kubestellar)
    - Medium - [kubestellar.medium.com](https://medium.com/@kubestellar/list/predefined:e785a0675051:READING_LIST)

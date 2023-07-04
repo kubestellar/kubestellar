@@ -73,7 +73,7 @@ cd ..
 ```
 
 ### Test your doc site
-Open a Chrome Incognito browser to [https://kubestellar.io](https://kubestellar.io) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
+Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
 
 ### Create a build
 ```shell
