@@ -105,14 +105,30 @@ fi
 
 trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 
+echo "--- current directory is $PWD"
+cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
+cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
+echo "current ws is $cwsi"
+echo "imw is $imw"
+
 if [ "$imw" != "$original_ws" ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
-     echo "prep for cluster using workspace $imw"
-     echo "current dir is $PWD"
-     eval kubectl apply -f "$PWD/../config/exports" $verbdir
-     echo "applied $PWD/../config/exports yaml to $imw workspace"
-     kubectl kcp bind apiexport $imw:edge.kcp.io
-     echo "executed kubectl kcp bind against $imw"
+     cwsi=$imw
+fi
+
+echo "current cwsi is $cwsi"
+if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
+   if [[ $PWD == *bin ]]; then
+      eval kubectl apply -f "$PWD/../config/exports" $verbdir
+   else
+      eval kubectl apply -f "$PWD/config/exports" $verbdir
+   fi
+   echo "applied config/exports yaml to $cwsi workspace"
+   if ! kubectl kcp bind apiexport $cwsi:edge.kcp.io; then
+      echo "unable to bind apiexport to $cwsi:edge.kcp.io"
+   else echo "executed kubectl kcp bind against $cwsi"
+   fi
+else echo "edge.kcp.io apibinding exists in workspace $cwsi"
 fi
 
 "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
