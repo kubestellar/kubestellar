@@ -118,7 +118,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 
 		// Async call the provider to create the cluster. Once created, discovery
 		// will set the logical cluster in the Ready state.
-		go providerClient.Create(c.context, logicalCluster.Name, pclient.Options{})
+		go providerClient.Create(logicalCluster.Name, pclient.Options{})
 		return nil
 	}
 	// case lcv1alpha1.LogicalClusterPhaseInitializing:
@@ -149,7 +149,7 @@ func (c *controller) processDeleteLC(delCluster *lcv1alpha1.LogicalCluster) erro
 		if client == nil {
 			return errors.New("failed to get provider client")
 		}
-		go client.Delete(c.context, delCluster.Name, pclient.Options{})
+		go client.Delete(delCluster.Name, pclient.Options{})
 	}
 	return nil
 }

@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/klog/v2"
 
 	kindprovider "github.com/kubestellar/kubestellar/clusterprovider/kind"
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
@@ -56,8 +57,7 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(ctx context.Context, providerName string,
-	providerType lcv1alpha1apis.ClusterProviderType) clusterprovider.ProviderClient {
+func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterProviderType) clusterprovider.ProviderClient {
 	var pClient clusterprovider.ProviderClient = nil
 	switch providerType {
 	case lcv1alpha1apis.KindProviderType:
@@ -69,8 +69,7 @@ func newProviderClient(ctx context.Context, providerName string,
 }
 
 // CreateProvider returns new provider client
-func CreateProvider(c *controller, providerName string,
-	providerType lcv1alpha1apis.ClusterProviderType) (*provider, error) {
+func CreateProvider(c *controller, providerName string, providerType lcv1alpha1apis.ClusterProviderType) (*provider, error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -82,7 +81,7 @@ func CreateProvider(c *controller, providerName string,
 		return nil, err
 	}
 
-	newProviderClient := newProviderClient(c.context, providerName, providerType)
+	newProviderClient := newProviderClient(providerName, providerType)
 	if newProviderClient == nil {
 		return nil, errors.New("unknown provider type")
 	}
@@ -142,8 +141,8 @@ func (p *provider) StopDiscovery() error {
 }
 
 func (p *provider) processProviderWatchEvents() {
-	logger := p.c.logger
-	ctx := p.c.context
+	ctx := context.Background()
+	logger := klog.FromContext(ctx)
 	var reflcluster *lcv1alpha1apis.LogicalCluster
 	for {
 		event, ok := <-p.providerWatcher.ResultChan()
@@ -170,7 +169,6 @@ func (p *provider) processProviderWatchEvents() {
 		}
 		switch event.Type {
 		case watch.Added:
-			logger.Info("New cluster was detected", "cluster", event.Name)
 			// A new cluster was detected either create it or change the status to READY
 			if !found || errLC != nil {
 				// No corresponding Logicalcluster, let's create it
@@ -193,10 +191,9 @@ func (p *provider) processProviderWatchEvents() {
 			}
 
 		case watch.Deleted:
-			logger.Info("A cluster was removed", "cluster", event.Name)
 			if !found {
 				// There is no LC object so there is nothing we should do
-				return
+				continue
 			}
 			if !reflcluster.DeletionTimestamp.IsZero() {
 				if reflcluster.Spec.Managed {
@@ -211,7 +208,7 @@ func (p *provider) processProviderWatchEvents() {
 					_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 					chkErrAndReturn(logger, err, "Could not remove logical cluster finalizer", "cluster name", lcName)
 				}
-				return
+				continue
 			}
 			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
 			_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})

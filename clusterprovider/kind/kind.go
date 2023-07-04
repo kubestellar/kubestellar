@@ -45,26 +45,26 @@ func New(providerName string) KindClusterProvider {
 	}
 }
 
-func (k KindClusterProvider) Create(ctx context.Context, name string, opts clusterprovider.Options) error {
-	logger := klog.FromContext(ctx)
+func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) error {
+	logger := klog.Background()
+	logger.Info("Creating Kind cluster", "name", name)
 	err := k.kindProvider.Create(name)
 
 	if err != nil {
 		// TODO:  Need to differentiate between "already exists" and an error
-		logger.Error(err, "Provider.Create error")
+		logger.Error(err, "Failed to create cluster", "name", name)
 	}
 
 	return err
 }
 
-func (k KindClusterProvider) Delete(ctx context.Context,
-	name string,
-	opts clusterprovider.Options) error {
-
+func (k KindClusterProvider) Delete(name string, opts clusterprovider.Options) error {
+	logger := klog.Background()
+	logger.Info("Deleting kind cluster", "name", name)
 	return k.kindProvider.Delete(name, opts.KubeconfigPath)
 }
 
-func (k KindClusterProvider) ListClustersNames(ctx context.Context) ([]string, error) {
+func (k KindClusterProvider) ListClustersNames() ([]string, error) {
 	list, err := k.kindProvider.List()
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (k KindClusterProvider) ListClustersNames(ctx context.Context) ([]string, e
 	return logicalNameList, err
 }
 
-func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterprovider.LogicalClusterInfo, error) {
+func (k KindClusterProvider) Get(lcName string) (clusterprovider.LogicalClusterInfo, error) {
 	cfg, err := k.kindProvider.KubeConfig(lcName, false)
 	if err != nil {
 		return clusterprovider.LogicalClusterInfo{}, err
@@ -87,9 +87,9 @@ func (k KindClusterProvider) Get(ctx context.Context, lcName string) (clusterpro
 	return lcInfo, err
 }
 
-func (k KindClusterProvider) ListClusters(ctx context.Context) ([]clusterprovider.LogicalClusterInfo, error) {
-	logger := klog.FromContext(ctx)
-	lcNames, err := k.ListClustersNames(ctx)
+func (k KindClusterProvider) ListClusters() ([]clusterprovider.LogicalClusterInfo, error) {
+	logger := klog.Background()
+	lcNames, err := k.ListClustersNames()
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (k KindClusterProvider) ListClusters(ctx context.Context) ([]clusterprovide
 	for _, lcName := range lcNames {
 		cfg, err := k.kindProvider.KubeConfig(lcName, false)
 		if err != nil {
-			logger.Error(err, "couldn't fetch config for cluster")
+			logger.Error(err, "Failed to fetch config for cluster", "name", lcName)
 		}
 
 		lcInfoList = append(lcInfoList, clusterprovider.LogicalClusterInfo{
@@ -148,20 +148,19 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 			for {
 				select {
 				// TODO replace the 2 with a param at the cluster-provider-client level
-				case <-time.After(5 * time.Second):
-					list, err := k.provider.ListClustersNames(ctx)
+				case <-time.After(2 * time.Second):
+					list, err := k.provider.ListClustersNames()
 					if err != nil {
-						// TODO add logging
-						logger.Error(err, "Getting provider list.")
+						logger.Error(err, "Failed to list Kind clusters")
 						continue
 					}
 					newSetClusters := sets.NewString(list...)
 					// Check for new clusters.
 					for _, name := range newSetClusters.Difference(setClusters).UnsortedList() {
-						logger.Info("Detected a new cluster")
-						lcInfo, err := k.provider.Get(ctx, name)
+						logger.Info("Processing Kind cluster", "name", name)
+						lcInfo, err := k.provider.Get(name)
 						if err != nil {
-							logger.Info("Kind cluster is not ready. Retrying.", "cluster", name)
+							logger.Info("Kind cluster is not ready. Retrying", "cluster", name)
 							// Can't get the cluster info, so let's discover it again
 							newSetClusters.Delete(name)
 							continue
@@ -174,7 +173,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					}
 					// Check for deleted clusters.
 					for _, cl := range setClusters.Difference(newSetClusters).UnsortedList() {
-						logger.Info("Detected cluster was deleted.")
+						logger.Info("Processing Kind cluster delete", "name", cl)
 						k.ch <- clusterprovider.WatchEvent{
 							Type: watch.Deleted,
 							Name: cl,

@@ -88,7 +88,7 @@ func NewController(
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			old := oldObj.(*lcv1alpha1.LogicalCluster)
 			new := newObj.(*lcv1alpha1.LogicalCluster)
-			if !new.DeletionTimestamp.IsZero() || !reflect.DeepEqual(old.Status, new.Status) {
+			if !reflect.DeepEqual(old, new) {
 				c.enqueueLogicalCluster(newObj)
 			}
 		},
