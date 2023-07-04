@@ -4,6 +4,9 @@
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
         ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        brew install yq
+        ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         brew install docker
         open -a Docker
@@ -14,10 +17,16 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         brew install kubectl
         ```
-        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
+        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
+        brew install ko
+        ```
+        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
     === "Ubuntu"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        sudo apt-get install yq
         ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         sudo mkdir -p /etc/apt/keyrings
@@ -32,6 +41,16 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
+        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
+        VERSION=TODO # choose the latest version (without v prefix)
+        OS=Linux     # or Darwin
+        ARCH=x86_64  # or arm64, i386, s390x
+        curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
+        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
+        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
+        tar xzf ko.tar.gz ko
+        chmod +x ./ko
+        ```
         ``` title="GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19"
         curl -L "https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz" -o go.tar.gz
         tar -C /usr/local -xzf go.tar.gz
@@ -44,6 +63,9 @@
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        yum -y install yq
+        ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
@@ -53,11 +75,27 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
         ```
-        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
-    === "WSL"
+        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
+        VERSION=TODO # choose the latest version (without v prefix)
+        OS=Linux     # or Darwin
+        ARCH=x86_64  # or arm64, i386, s390x
+        curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
+        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
+        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
+        tar xzf ko.tar.gz ko
+        chmod +x ./ko
+        ```
+        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
+    === "Windows"
+        ``` title="Chocolatey - https://chocolatey.org/install#individual"
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        ```
         ``` title="jq - https://stedolan.github.io/jq/download/"
         choco install jq -y
         choco install curl -y
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        choco install yq -y
         ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         choco install docker -y
@@ -68,7 +106,17 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)"
         curl.exe -LO "https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe"
         ```
-        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.
+        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
+        VERSION=TODO # choose the latest version (without v prefix)
+        OS=Linux     # or Darwin
+        ARCH=x86_64  # or arm64, i386, s390x
+        curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
+        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
+        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
+        tar xzf ko.tar.gz ko
+        chmod +x ./ko
+        ```
+        [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
 <!--required-packages-end-->
 <!-- 
 ## 
