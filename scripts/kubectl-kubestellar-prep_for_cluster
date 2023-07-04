@@ -107,6 +107,12 @@ trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 
 if [ "$imw" != "$original_ws" ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
+     echo "prep for cluster using workspace $imw"
+     echo "current dir is $PWD"
+     eval kubectl apply -f "$PWD/../config/exports" $verbdir
+     echo "applied $PWD/../config/exports yaml to $imw workspace"
+     kubectl kcp bind apiexport $imw:edge.kcp.io
+     echo "executed kubectl kcp bind against $imw"
 fi
 
 "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"

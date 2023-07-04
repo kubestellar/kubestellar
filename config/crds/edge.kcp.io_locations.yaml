@@ -151,7 +151,7 @@ spec:
                   group:
                     description: group is the name of an API group.
                     enum:
-                    - workload.kcp.io
+                    - edge.kcp.io
                     pattern: ^(|[a-z0-9]([-a-z0-9]*[a-z0-9](\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?)$
                     type: string
                   resource:

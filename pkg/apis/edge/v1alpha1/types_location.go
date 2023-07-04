@@ -92,7 +92,7 @@ type GroupVersionResource struct {
 	// group is the name of an API group.
 	//
 	// +kubebuilder:validation:Pattern=`^(|[a-z0-9]([-a-z0-9]*[a-z0-9](\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?)$`
-	// +kubebuilder:validation:Enum="workload.kcp.io"
+	// +kubebuilder:validation:Enum="edge.kcp.io"
 	// +optional
 	Group string `json:"group,omitempty"`
 

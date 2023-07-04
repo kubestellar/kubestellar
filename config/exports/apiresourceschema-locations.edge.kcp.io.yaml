@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230701-83e8956c.locations.edge.kcp.io
+  name: v230704-a60bb94c.locations.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -146,7 +146,7 @@ spec:
                 group:
                   description: group is the name of an API group.
                   enum:
-                  - workload.kcp.io
+                  - edge.kcp.io
                   pattern: ^(|[a-z0-9]([-a-z0-9]*[a-z0-9](\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?)$
                   type: string
                 resource:
