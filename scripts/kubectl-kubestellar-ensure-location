@@ -159,16 +159,16 @@ while (( index < ${#labels[*]} )); do
     let index=index+2
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
+	   if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
 	    echo "$0: failed to add label to SyncTarget" >&2
 	    exit 4
-	fi
+	   fi
     fi
     locval=$(jq -r <<<"$loclabs" ".[\"${key}\"]")
     if [ "$locval" != "$val" ]; then
-	if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kcp.io "$objname" "${key}=${val}" ; then
-	    echo "$0: failed to add label to Location" >&2
-	    exit 4
-	fi
+	   if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kcp.io "$objname" "${key}=${val}" ; then
+	     echo "$0: failed to add label to Location" >&2
+	     exit 4
+	   fi
     fi
 done
