@@ -4,6 +4,9 @@
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
         ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        brew install yq
+        ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         brew install docker
         open -a Docker
@@ -21,6 +24,9 @@
     === "Ubuntu"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        sudo apt-get install yq
         ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         sudo mkdir -p /etc/apt/keyrings
@@ -57,6 +63,9 @@
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        yum -y install yq
+        ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
@@ -77,10 +86,16 @@
         chmod +x ./ko
         ```
         [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
-    === "WSL"
+    === "Windows"
+        ``` title="Chocolatey - https://chocolatey.org/install#individual"
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        ```
         ``` title="jq - https://stedolan.github.io/jq/download/"
         choco install jq -y
         choco install curl -y
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        choco install yq -y
         ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         choco install docker -y
