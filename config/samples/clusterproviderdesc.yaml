@@ -4,3 +4,4 @@ metadata:
   name: default
 spec:
   ProviderType: "kind"
+  ClusterPrefixForDiscovery: "ks-"

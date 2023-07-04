@@ -17,8 +17,6 @@ limitations under the License.
 package providerclient
 
 import (
-	"context"
-
 	"k8s.io/apimachinery/pkg/watch"
 )
 
@@ -93,21 +91,21 @@ type WatchEvent struct {
 // The provider is responsible for discovering and managing the lifecycle of each
 // cluster.
 type ProviderClient interface {
-	Create(ctx context.Context, name string, opts Options) error
-	Delete(ctx context.Context, name string, opts Options) error
+	Create(name string, opts Options) error
+	Delete(name string, opts Options) error
 
 	// List returns a list of logical clusters.
 	// This method is used to discover the initial set of logical clusters
 	// and to refresh the list of logical clusters periodically.
-	ListClusters(ctx context.Context) ([]LogicalClusterInfo, error)
+	ListClusters() ([]LogicalClusterInfo, error)
 
 	// List returns a list of logical cluster names.
 	// This method is used to discover the initial set of logical clusters
 	// and to refresh the list of logical clusters periodically.
-	ListClustersNames(ctx context.Context) ([]string, error)
+	ListClustersNames() ([]string, error)
 
 	// Get returns a logical cluster.
-	Get(ctx context.Context, name string) (LogicalClusterInfo, error)
+	Get(name string) (LogicalClusterInfo, error)
 
 	// Watch returns a Watcher that watches for changes to a list of logical clusters
 	// and react to potential changes.
