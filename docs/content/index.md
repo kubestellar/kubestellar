@@ -8,6 +8,9 @@
 # Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
  -->
 <p align="center">
+<b>Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box?  KubeStellar adds multi-cluster support to Kubernetes distributions.</b>
+<br/>
+<br/>
 <b>Distinguishing features of KubeStellar</b>
 </p>
 - <b>[ multi-cluster down-syncing]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)</b> deploy, configure, and collect status <b>across pre-existing clusters</b>
