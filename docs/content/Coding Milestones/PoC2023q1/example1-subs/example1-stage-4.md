@@ -21,12 +21,19 @@ workspace.  This is driven by the `SyncerConfig` object named
 Using the kubeconfig that `kind` modified, examine the florin cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
-``` {.bash .hide-me}
-sleep 15
-```
-
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
+( KUBECONFIG=~/.kube/config
+  let tries=1
+  while ! kubectl --context kind-florin get ns commonstuff &> /dev/null; do
+    if (( tries >= 30)); then
+      echo "The commonstuff namespace failed to appear in florin!" >&2
+      exit 10
+    fi
+    let tries=tries+1
+    sleep 10
+  done
+  kubectl --context kind-florin get ns
+)
 ```
 ``` { .bash .no-copy }
 NAME                                 STATUS   AGE
@@ -103,10 +110,16 @@ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get rs -n commonstuff c
 
 Check that the common workload on the florin cluster is working.
 
-``` {.bash .hide-me}
-sleep 15
-```
 ```shell
+let tries=1
+while ! curl http://localhost:8094 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The common workload failed to come up on florin!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8094
 ```
 ``` { .bash .no-copy }
@@ -120,10 +133,16 @@ curl http://localhost:8094
 ```
 
 Check that the special workload on the guilder cluster is working.
-``` {.bash .hide-me}
-sleep 15
-```
 ```shell
+let tries=1
+while ! curl http://localhost:8097 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The special workload failed to come up on guilder!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8097
 ```
 ``` { .bash .no-copy }
@@ -138,11 +157,16 @@ curl http://localhost:8097
 
 Check that the common workload on the guilder cluster is working.
 
-``` {.bash .hide-me}
-sleep 15
-```
-
 ```shell
+let tries=1
+while ! curl http://localhost:8096 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The common workload failed to come up on guilder!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8096
 ```
 ``` { .bash .no-copy }
