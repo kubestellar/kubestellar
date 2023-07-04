@@ -6,6 +6,6 @@ kubectl ws \~
 
 Bind APIs.
 ```shell
-kubectl apply -f ../kubestellar/config/imports/
+kubectl apply -f config/imports/
 ```
 <!--kubestellar-scheduler-imports-end-->

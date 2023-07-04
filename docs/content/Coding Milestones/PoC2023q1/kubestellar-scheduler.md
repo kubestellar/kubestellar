@@ -16,33 +16,28 @@ pre_req_name: 'docs/content/common-subs/pre-req.md'
 %}
 ## Steps to try the scheduler
 
-### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
-Open a terminal window(1) and clone the latest KubeStellar source:
+### Pull the kcp source code, build kcp, and start kcp
+
+At this point you should have cloned the KubeStellar repo and `cd`ed into it as directed above.
 {%
    include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
    start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
    end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
 %}
 
-### Create the Edge Service Provider Workspace (ESPW) and populate it with CRDs and APIs
-Open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
+### Build and initialize KubeStellar
+
+First build KubeStellar and add the result to your `$PATH`.
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
-   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
-   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-build-kubestellar.md"
+   start="<!--kubestellar-scheduler-1-build-kubestellar-start-->"
+   end="<!--kubestellar-scheduler-1-build-kubestellar-end-->"
 %}
 
 {%
    include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md"
    start="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->"
    end="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->"
-%}
-
-Install CRDs and APIExport.
-{%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-exports.md"
-   start="<!--kubestellar-scheduler-exports-start-->"
-   end="<!--kubestellar-scheduler-exports-end-->"
 %}
 
 ### Create the Workload Management Workspace (WMW) and bind it to the ESPW APIs
@@ -68,12 +63,6 @@ I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controlle
 ```
 
 ### Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets
-open another terminal window(3) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in $PATH.
-```shell
-cd ../kcp
-export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/bin:$PATH
-```
 
 Use workspace `root:compute` as the Inventory Management Workspace (IMW).
 ```shell
@@ -82,10 +71,10 @@ kubectl ws root:compute
 
 Create two Locations and two SyncTargets.
 ```shell
-kubectl create -f ../kubestellar/config/samples/location_prod.yaml
-kubectl create -f ../kubestellar/config/samples/location_dev.yaml
-kubectl create -f ../kubestellar/config/samples/synctarget_prod.yaml
-kubectl create -f ../kubestellar/config/samples/synctarget_dev.yaml
+kubectl create -f config/samples/location_prod.yaml
+kubectl create -f config/samples/location_dev.yaml
+kubectl create -f config/samples/synctarget_prod.yaml
+kubectl create -f config/samples/synctarget_dev.yaml
 sleep 5
 ```
 
@@ -108,7 +97,7 @@ synctarget.workload.kcp.io/prod   2m12s
 Go to Workload Management Workspace (WMW) and create an EdgePlacement `all2all`.
 ```shell
 kubectl ws \~
-kubectl create -f ../kubestellar/config/samples/edgeplacement_all2all.yaml
+kubectl create -f config/samples/edgeplacement_all2all.yaml
 sleep 3
 ```
 
@@ -154,7 +143,7 @@ EdgePlacement `all2all` selects all the 3 Locations in `root:compute`.
 
 Create a more specific EdgePlacement which selects Locations labeled by `env: dev`.
 ```shell
-kubectl create -f ../kubestellar/config/samples/edgeplacement_dev.yaml
+kubectl create -f config/samples/edgeplacement_dev.yaml
 sleep 3
 ```
 

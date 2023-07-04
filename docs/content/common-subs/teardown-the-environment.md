@@ -13,7 +13,7 @@ kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
 
-Stop and uninstall KubeStellar use the following command:
+The following command will stop whatever KubeStellar controllers are running.
 
 ``` {.bash}
 kubestellar stop

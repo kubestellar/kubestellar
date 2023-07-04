@@ -1,9 +1,7 @@
 <!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->
-Next, create the edge service provider workspace:
+Next, use the command that makes sure the Edge Service Provider Workspace (ESPW), which is `root:espw`, and the TMC provider workspace (`root:compute`) are properly set up.
 
-Use workspace `root:espw` as the Edge Service Provider Workspace (ESPW).
 ```shell
-kubectl ws root
-kubectl ws create espw
+kubestellar init
 ```
 <!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->

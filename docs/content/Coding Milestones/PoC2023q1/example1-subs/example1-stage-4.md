@@ -22,7 +22,18 @@ Using the kubeconfig that `kind` modified, examine the florin cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-florin get ns
+( KUBECONFIG=~/.kube/config
+  let tries=1
+  while ! kubectl --context kind-florin get ns commonstuff &> /dev/null; do
+    if (( tries >= 30)); then
+      echo "The commonstuff namespace failed to appear in florin!" >&2
+      exit 10
+    fi
+    let tries=tries+1
+    sleep 10
+  done
+  kubectl --context kind-florin get ns
+)
 ```
 ``` { .bash .no-copy }
 NAME                                 STATUS   AGE
@@ -33,6 +44,10 @@ kube-node-lease                      Active   57m
 kube-public                          Active   57m
 kube-system                          Active   57m
 local-path-storage                   Active   57m
+```
+
+``` {.bash .hide-me}
+sleep 15
 ```
 
 ```shell
@@ -46,6 +61,10 @@ commonstuff                          replicaset.apps/commond                    
 
 Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.
+
+``` {.bash .hide-me}
+sleep 15
+```
 
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get ns | egrep NAME\|stuff
@@ -70,6 +89,10 @@ specialstuff                          replicaset.apps/speciald-76cdbb69b5       
 Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
 
+``` {.bash .hide-me}
+sleep 15
+```
+
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context kind-guilder get rs -n commonstuff commond -o yaml
 ```
@@ -87,10 +110,16 @@ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get rs -n commonstuff c
 
 Check that the common workload on the florin cluster is working.
 
-``` {.bash .hide-me}
-sleep 10
-```
 ```shell
+let tries=1
+while ! curl http://localhost:8094 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The common workload failed to come up on florin!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8094
 ```
 ``` { .bash .no-copy }
@@ -104,10 +133,16 @@ curl http://localhost:8094
 ```
 
 Check that the special workload on the guilder cluster is working.
-``` {.bash .hide-me}
-sleep 10
-```
 ```shell
+let tries=1
+while ! curl http://localhost:8097 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The special workload failed to come up on guilder!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8097
 ```
 ``` { .bash .no-copy }
@@ -123,6 +158,15 @@ curl http://localhost:8097
 Check that the common workload on the guilder cluster is working.
 
 ```shell
+let tries=1
+while ! curl http://localhost:8096 &> /dev/null; do
+  if (( tries >= 30 )); then
+    echo "The common workload failed to come up on guilder!" >&2
+    exit 10
+  fi
+  let tries=tries+1
+  sleep 10
+done
 curl http://localhost:8096
 ```
 ``` { .bash .no-copy }

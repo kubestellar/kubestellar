@@ -8,27 +8,28 @@ kubectl ws root
 kubectl ws create imw-1 --enter
 ```
 
-### Get KubeStellar
+### Get and build or install KubeStellar
 
-Download and build or install
-<a href="{{ config.repo_url }}">KubeStellar</a>, according to your
-preference.  That is, either (a) `git clone` the repo and then `make
-build` to populate its `bin` directory, or (b) fetch the binary
-archive appropriate for your machine from a release and unpack it
-(creating a `bin` directory).  In the following exhibited command
-lines, the commands described as "KubeStellar commands" and the commands
-that start with `kubectl kubestellar` rely on the KubeStellar `bin` directory
-being on the `$PATH`.  Alternatively you could invoke them with
-explicit pathnames.  The kubectl plugin lines use fully specific
-executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
-`bin/kubectl-kubestellar-prep_for_syncer`).
+Download and build, or install, <a href="{{config.repo_url}}">KubeStellar</a>,
+according to your preference.  That is, either (a) `git clone` the
+repo and then `make build` to populate its `bin` directory, or (b)
+fetch the binary archive appropriate for your machine from a release
+and unpack it (creating a `bin` directory).  The commands exhibited
+just below assume that the repo has been fetched but not yet buit.
 
 ```shell
-git clone -b {{ config.ks_branch }} {{ config.repo_url }}
-cd ../kubestellar
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
+
+In the following exhibited command lines, the commands described as
+"KubeStellar commands" and the commands that start with `kubectl
+kubestellar` rely on the KubeStellar `bin` directory being on the
+`$PATH`.  Alternatively you could invoke them with explicit pathnames.
+The kubectl plugin lines use fully specific executables (e.g.,
+`kubectl kubestellar prep-for-syncer` corresponds to
+`bin/kubectl-kubestellar-prep_for_syncer`).
+
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands. They label both florin and guilder
