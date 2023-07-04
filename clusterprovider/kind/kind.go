@@ -47,7 +47,7 @@ func New(providerName string) KindClusterProvider {
 
 func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) error {
 	logger := klog.Background()
-	logger.Info("Creating Kind cluster", "name", name)
+	logger.V(2).Info("Creating Kind cluster", "name", name)
 	err := k.kindProvider.Create(name)
 
 	if err != nil {
@@ -60,7 +60,7 @@ func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) e
 
 func (k KindClusterProvider) Delete(name string, opts clusterprovider.Options) error {
 	logger := klog.Background()
-	logger.Info("Deleting kind cluster", "name", name)
+	logger.V(2).Info("Deleting kind cluster", "name", name)
 	return k.kindProvider.Delete(name, opts.KubeconfigPath)
 }
 
@@ -157,10 +157,10 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					newSetClusters := sets.NewString(list...)
 					// Check for new clusters.
 					for _, name := range newSetClusters.Difference(setClusters).UnsortedList() {
-						logger.Info("Processing Kind cluster", "name", name)
+						logger.V(2).Info("Processing Kind cluster", "name", name)
 						lcInfo, err := k.provider.Get(name)
 						if err != nil {
-							logger.Info("Kind cluster is not ready. Retrying", "cluster", name)
+							logger.V(2).Info("Kind cluster is not ready. Retrying", "cluster", name)
 							// Can't get the cluster info, so let's discover it again
 							newSetClusters.Delete(name)
 							continue
@@ -173,7 +173,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					}
 					// Check for deleted clusters.
 					for _, cl := range setClusters.Difference(newSetClusters).UnsortedList() {
-						logger.Info("Processing Kind cluster delete", "name", cl)
+						logger.V(2).Info("Processing Kind cluster delete", "name", cl)
 						k.ch <- clusterprovider.WatchEvent{
 							Type: watch.Deleted,
 							Name: cl,

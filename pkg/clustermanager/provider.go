@@ -169,10 +169,11 @@ func (p *provider) processProviderWatchEvents() {
 		}
 		switch event.Type {
 		case watch.Added:
+			logger.Info("New cluster was detected", "cluster", event.Name, "provider", p.name)
 			// A new cluster was detected either create it or change the status to READY
 			if !found || errLC != nil {
 				// No corresponding Logicalcluster, let's create it
-				logger.Info("Creating new LogicalCluster object", "cluster", event.Name)
+				logger.V(2).Info("Creating new LogicalCluster object", "cluster", event.Name)
 				lcluster := lcv1alpha1apis.LogicalCluster{}
 				lcluster.Name = lcName
 				lcluster.Spec.ClusterProviderDescName = p.name
@@ -191,6 +192,7 @@ func (p *provider) processProviderWatchEvents() {
 			}
 
 		case watch.Deleted:
+			logger.Info("A cluster was removed", "cluster", event.Name, "provider", p.name)
 			if !found {
 				// There is no LC object so there is nothing we should do
 				continue
