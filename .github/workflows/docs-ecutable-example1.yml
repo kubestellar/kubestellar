@@ -30,9 +30,6 @@ env:
   docs-ecutable-filename: example1
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/example1.md'"
 
-permissions:
-  contents: write
-
 jobs:
   docs-ecutable:
     name: docs-ecutable - for example1 e2e
