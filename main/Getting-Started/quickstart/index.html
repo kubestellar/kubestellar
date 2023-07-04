@@ -1877,63 +1877,102 @@
 
 <div class="admonition tip">
 <p class="admonition-title">Required Packages:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Mac</label><label for="__tabbed_1_2">Ubuntu</label><label for="__tabbed_1_3">RHEL</label><label for="__tabbed_1_4">WSL</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Mac</label><label for="__tabbed_1_2">Ubuntu</label><label for="__tabbed_1_3">RHEL</label><label for="__tabbed_1_4">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>brew install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install docker
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>open -a Docker
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kind
+<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install docker
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>open -a Docker
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install kubectl
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install kind
 </code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</p>
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>brew install kubectl
+</code></pre></div>
+<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>brew install ko
+</code></pre></div>
+<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo apt-get install jq
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo mkdir -p /etc/apt/keyrings
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>sudo apt update
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo apt-get install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo mkdir -p /etc/apt/keyrings
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>sudo apt update
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div>
-<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>tar -C /usr/local -xzf go.tar.gz
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>rm go.tar.gz
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>source /etc/profile
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>go version
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+</code></pre></div>
+<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>VERSION=TODO # choose the latest version (without v prefix)
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>OS=Linux     # or Darwin
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>ARCH=x86_64  # or arm64, i386, s390x
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl &gt; provenance.intoto.jsonl
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag &quot;v${VERSION}&quot;
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>tar xzf ko.tar.gz ko
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>chmod +x ./ko
+</code></pre></div>
+<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>rm go.tar.gz
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>source /etc/profile
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>go version
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>yum -y install jq
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>yum -y install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>yum -y install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64 &amp;&amp; chmod +x ./kind &amp;&amp; mv ./kind /usr/local/bin
+<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64 &amp;&amp; chmod +x ./kind &amp;&amp; mv ./kind /usr/local/bin
 </code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</p>
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+</code></pre></div>
+<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>VERSION=TODO # choose the latest version (without v prefix)
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>OS=Linux     # or Darwin
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>ARCH=x86_64  # or arm64, i386, s390x
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl &gt; provenance.intoto.jsonl
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag &quot;v${VERSION}&quot;
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>tar xzf ko.tar.gz ko
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>chmod +x ./ko
+</code></pre></div>
+<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>choco install jq -y
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>choco install curl -y
+<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>choco install docker -y
+<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>choco install jq -y
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>choco install curl -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install yq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;
+<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install docker -y
 </code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19.</p>
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+</code></pre></div>
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;
+</code></pre></div>
+<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>VERSION=TODO # choose the latest version (without v prefix)
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>OS=Linux     # or Darwin
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>ARCH=x86_64  # or arm64, i386, s390x
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl &gt; provenance.intoto.jsonl
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag &quot;v${VERSION}&quot;
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>tar xzf ko.tar.gz ko
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>chmod +x ./ko
+</code></pre></div>
+<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
 </div>
 </div>
 </div>
@@ -1958,28 +1997,28 @@
 
 <h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong><a class="headerlink" href="#1-install-and-run-kubestellar" title="Permanent link">#</a></h2>
 <p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>latest
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/.kcp/admin.kubeconfig&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>latest
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/.kcp/admin.kubeconfig&quot;</span>
 </code></pre></div>
 <p>Check that <code>KubeStellar</code> is running:</p>
 <p>First, check that controllers are running with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span>mailbox-controller<span class="w"> </span>-e<span class="w"> </span>placement-translator<span class="w"> </span>-e<span class="w"> </span>kubestellar-scheduler
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span>mailbox-controller<span class="w"> </span>-e<span class="w"> </span>placement-translator<span class="w"> </span>-e<span class="w"> </span>kubestellar-scheduler
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>user<span class="w">     </span><span class="m">1892</span><span class="w">  </span><span class="m">0</span>.0<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">747644</span><span class="w"> </span><span class="m">29628</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:00<span class="w"> </span>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>user<span class="w">     </span><span class="m">1902</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">743652</span><span class="w"> </span><span class="m">27504</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>kubestellar-scheduler<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>user<span class="w">     </span><span class="m">1912</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.5<span class="w"> </span><span class="m">760428</span><span class="w"> </span><span class="m">41660</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>placement-translator<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>user<span class="w">     </span><span class="m">1892</span><span class="w">  </span><span class="m">0</span>.0<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">747644</span><span class="w"> </span><span class="m">29628</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:00<span class="w"> </span>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>user<span class="w">     </span><span class="m">1902</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">743652</span><span class="w"> </span><span class="m">27504</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>kubestellar-scheduler<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>user<span class="w">     </span><span class="m">1912</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.5<span class="w"> </span><span class="m">760428</span><span class="w"> </span><span class="m">41660</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>placement-translator<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
 </code></pre></div>
 <p>Second, check that the Edge Service Provider Workspace (<code>espw</code>) is created with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
 </code></pre></div>
 <p>which should yield:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>.
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>└──<span class="w"> </span>root
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span>├──<span class="w"> </span>compute
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span>└──<span class="w"> </span>espw
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>.
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>└──<span class="w"> </span>root
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span>├──<span class="w"> </span>compute
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span>└──<span class="w"> </span>espw
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -1995,15 +2034,15 @@ workload and summarization aspirations removed.</p>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-florin.md '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-florin-end--&gt;' -->
 
 <p>Create the first edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="s">kind: Cluster</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="s">nodes:</span>
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="s">- role: control-plane</span>
-<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="s">  extraPortMappings:</span>
-<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="s">  - containerPort: 8081</span>
-<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="s">    hostPort: 8094</span>
-<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="s">kind: Cluster</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="s">nodes:</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="s">- role: control-plane</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="s">  extraPortMappings:</span>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="s">  - containerPort: 8081</span>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="s">    hostPort: 8094</span>
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Note: if you already have a cluster named 'florin' from a previous exercise of KubeStellar, please delete the florin cluster ('kind delete cluster --name florin') and create it using the instruction above.</p>
 <!-- END INCLUDE -->
@@ -2011,17 +2050,17 @@ workload and summarization aspirations removed.</p>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder.md '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-end--&gt;' -->
 
 <p>Create the second edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="s">kind: Cluster</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="s">nodes:</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="s">- role: control-plane</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="s">  extraPortMappings:</span>
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="s">  - containerPort: 8081</span>
-<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="s">    hostPort: 8096</span>
-<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="s">  - containerPort: 8082</span>
-<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="s">    hostPort: 8097</span>
-<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder<span class="w"> </span>--config<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="s">kind: Cluster</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="s">apiVersion: kind.x-k8s.io/v1alpha4</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="s">nodes:</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="s">- role: control-plane</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="s">  extraPortMappings:</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="s">  - containerPort: 8081</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="s">    hostPort: 8096</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="s">  - containerPort: 8082</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="s">    hostPort: 8097</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Note: if you already have a cluster named 'guilder' from a previous exercise of KubeStellar, please delete the guilder cluster ('kind delete cluster --name guilder') and create it using the instruction above.</p>
 <!-- END INCLUDE -->
@@ -2029,14 +2068,14 @@ workload and summarization aspirations removed.</p>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end--&gt;' -->
 
 <p>IMWs are used by KubeStellar to store inventory objects (<code>SyncTargets</code> and <code>Locations</code>). Create an IMW named <code>example-imw</code> with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>root
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>root
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
 </code></pre></div>
 <p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> in a <code>my-org</code> workspace with the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
 <!-- END INCLUDE -->
@@ -2045,73 +2084,73 @@ workload and summarization aspirations removed.</p>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start--&gt;' '&lt;!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end--&gt;' -->
 
 <p>Let's begin by onboarding the <code>florin</code> cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:example-imw<span class="w"> </span>florin<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:example-imw<span class="w"> </span>florin<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>synctarget.workload.kcp.io/florin<span class="w"> </span>created
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>location.scheduling.kcp.io/florin<span class="w"> </span>created
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>synctarget.workload.kcp.io/florin<span class="w"> </span>labeled
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>location.scheduling.kcp.io/florin<span class="w"> </span>labeled
-<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
-<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
-<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
-<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>
-<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
-<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
-<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>
-<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>.
-<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>
-<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>florin-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>.<span class="w"> </span>Use
-<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a>
-<a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;florin-syncer.yaml&quot;</span>
-<a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a>
-<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
-<a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>
-<a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>kubestellar-syncer-florin-1yi5q9c4
-<a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>
-<a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
-<a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
-<a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>synctarget.workload.kcp.io/florin<span class="w"> </span>created
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>location.scheduling.kcp.io/florin<span class="w"> </span>created
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>synctarget.workload.kcp.io/florin<span class="w"> </span>labeled
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>location.scheduling.kcp.io/florin<span class="w"> </span>labeled
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a>
+<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>
+<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
+<a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a>
+<a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>.
+<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a>
+<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>florin-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a>
+<a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;florin-syncer.yaml&quot;</span>
+<a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a>
+<a id="__codelineno-36-21" name="__codelineno-36-21" href="#__codelineno-36-21"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
+<a id="__codelineno-36-22" name="__codelineno-36-22" href="#__codelineno-36-22"></a>
+<a id="__codelineno-36-23" name="__codelineno-36-23" href="#__codelineno-36-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>kubestellar-syncer-florin-1yi5q9c4
+<a id="__codelineno-36-24" name="__codelineno-36-24" href="#__codelineno-36-24"></a>
+<a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
+<a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
+<a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div>
 <p>An edge syncer manifest yaml file was created in your current director: <code>florin-syncer.yaml</code>. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.</p>
 <p>Now let's deploy the edge syncer to the <code>florin</code> edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>namespace/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>serviceaccount/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>secret/kubestellar-syncer-florin-1yi5q9c4-token<span class="w"> </span>created
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
-<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
-<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>secret/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
-<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>deployment.apps/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>namespace/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>serviceaccount/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>secret/kubestellar-syncer-florin-1yi5q9c4-token<span class="w"> </span>created
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>secret/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>deployment.apps/kubestellar-syncer-florin-1yi5q9c4<span class="w"> </span>created
 </code></pre></div>
 <p>Optionally, check that the edge syncer pod is running:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>kubestellar-syncer-florin-1yi5q9c4<span class="w">   </span>kubestellar-syncer-florin-1yi5q9c4-77cb588c89-xc5qr<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>12m
-<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>kube-system<span class="w">                          </span>coredns-565d847f94-92f4k<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>kube-system<span class="w">                          </span>coredns-565d847f94-kgddm<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>kube-system<span class="w">                          </span>etcd-florin-control-plane<span class="w">                             </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>kube-system<span class="w">                          </span>kindnet-p8vkv<span class="w">                                         </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>kube-system<span class="w">                          </span>kube-apiserver-florin-control-plane<span class="w">                   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>kube-system<span class="w">                          </span>kube-controller-manager-florin-control-plane<span class="w">          </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>kube-system<span class="w">                          </span>kube-proxy-jmxsg<span class="w">                                      </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>kube-system<span class="w">                          </span>kube-scheduler-florin-control-plane<span class="w">                   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
-<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>local-path-storage<span class="w">                   </span>local-path-provisioner-684f458cdd-kw2xz<span class="w">               </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>kubestellar-syncer-florin-1yi5q9c4<span class="w">   </span>kubestellar-syncer-florin-1yi5q9c4-77cb588c89-xc5qr<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>12m
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>kube-system<span class="w">                          </span>coredns-565d847f94-92f4k<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>kube-system<span class="w">                          </span>coredns-565d847f94-kgddm<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>kube-system<span class="w">                          </span>etcd-florin-control-plane<span class="w">                             </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a>kube-system<span class="w">                          </span>kindnet-p8vkv<span class="w">                                         </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a>kube-system<span class="w">                          </span>kube-apiserver-florin-control-plane<span class="w">                   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>kube-system<span class="w">                          </span>kube-controller-manager-florin-control-plane<span class="w">          </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a>kube-system<span class="w">                          </span>kube-proxy-jmxsg<span class="w">                                      </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>kube-system<span class="w">                          </span>kube-scheduler-florin-control-plane<span class="w">                   </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>local-path-storage<span class="w">                   </span>local-path-provisioner-684f458cdd-kw2xz<span class="w">               </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58m
 </code></pre></div>
 <p>Now, let's onboard the <code>guilder</code> cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:example-imw<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>si
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:example-imw<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>si
 </code></pre></div>
 <p>Apply the created edge syncer manifest:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
 </code></pre></div>
 <!-- END INCLUDE -->
 
@@ -2120,199 +2159,199 @@ workload and summarization aspirations removed.</p>
 
 <p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters.</p>
 <p>In the <code>example-wmw</code> workspace create the following <code>EdgePlacement</code> object: </p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-34-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-34-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-34-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-34-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-34-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-34-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-34-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-34-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-34-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-34-10">10</a></span>
-<span class="normal"><a href="#__codelineno-34-11">11</a></span>
-<span class="normal"><a href="#__codelineno-34-12">12</a></span>
-<span class="normal"><a href="#__codelineno-34-13">13</a></span>
-<span class="normal"><a href="#__codelineno-34-14">14</a></span>
-<span class="normal"><a href="#__codelineno-34-15">15</a></span>
-<span class="normal"><a href="#__codelineno-34-16">16</a></span>
-<span class="normal"><a href="#__codelineno-34-17">17</a></span>
-<span class="normal"><a href="#__codelineno-34-18">18</a></span>
-<span class="normal"><a href="#__codelineno-34-19">19</a></span>
-<span class="normal"><a href="#__codelineno-34-20">20</a></span>
-<span class="normal"><a href="#__codelineno-34-21">21</a></span>
-<span class="normal"><a href="#__codelineno-34-22">22</a></span>
-<span class="normal"><a href="#__codelineno-34-23">23</a></span>
-<span class="normal"><a href="#__codelineno-34-24">24</a></span>
-<span class="normal"><a href="#__codelineno-34-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org:example-wmw
-<a id="__codelineno-34-2" name="__codelineno-34-2"></a>
-<a id="__codelineno-34-3" name="__codelineno-34-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-34-4" name="__codelineno-34-4"></a><span class="s">apiVersion: edge.kcp.io/v1alpha1</span>
-<a id="__codelineno-34-5" name="__codelineno-34-5"></a><span class="s">kind: EdgePlacement</span>
-<a id="__codelineno-34-6" name="__codelineno-34-6"></a><span class="s">metadata:</span>
-<a id="__codelineno-34-7" name="__codelineno-34-7"></a><span class="s">  name: edge-placement-c</span>
-<a id="__codelineno-34-8" name="__codelineno-34-8"></a><span class="s">spec:</span>
-<a id="__codelineno-34-9" name="__codelineno-34-9"></a><span class="s">  locationSelectors:</span>
-<a id="__codelineno-34-10" name="__codelineno-34-10"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;}</span>
-<a id="__codelineno-34-11" name="__codelineno-34-11"></a><span class="s">  namespaceSelector:</span>
-<a id="__codelineno-34-12" name="__codelineno-34-12"></a><span class="s">    matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-34-13" name="__codelineno-34-13"></a><span class="s">  nonNamespacedObjects:</span>
-<a id="__codelineno-34-14" name="__codelineno-34-14"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-34-15" name="__codelineno-34-15"></a><span class="s">    resources: [ &quot;apibindings&quot; ]</span>
-<a id="__codelineno-34-16" name="__codelineno-34-16"></a><span class="s">    resourceNames: [ &quot;bind-kubernetes&quot; ]</span>
-<a id="__codelineno-34-17" name="__codelineno-34-17"></a><span class="s">  upsync:</span>
-<a id="__codelineno-34-18" name="__codelineno-34-18"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-34-19" name="__codelineno-34-19"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-34-20" name="__codelineno-34-20"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-34-21" name="__codelineno-34-21"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-34-22" name="__codelineno-34-22"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-34-23" name="__codelineno-34-23"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-34-24" name="__codelineno-34-24"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-34-25" name="__codelineno-34-25"></a><span class="s">EOF</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-43-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-43-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-43-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-43-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-43-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-43-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-43-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-43-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-43-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-43-10">10</a></span>
+<span class="normal"><a href="#__codelineno-43-11">11</a></span>
+<span class="normal"><a href="#__codelineno-43-12">12</a></span>
+<span class="normal"><a href="#__codelineno-43-13">13</a></span>
+<span class="normal"><a href="#__codelineno-43-14">14</a></span>
+<span class="normal"><a href="#__codelineno-43-15">15</a></span>
+<span class="normal"><a href="#__codelineno-43-16">16</a></span>
+<span class="normal"><a href="#__codelineno-43-17">17</a></span>
+<span class="normal"><a href="#__codelineno-43-18">18</a></span>
+<span class="normal"><a href="#__codelineno-43-19">19</a></span>
+<span class="normal"><a href="#__codelineno-43-20">20</a></span>
+<span class="normal"><a href="#__codelineno-43-21">21</a></span>
+<span class="normal"><a href="#__codelineno-43-22">22</a></span>
+<span class="normal"><a href="#__codelineno-43-23">23</a></span>
+<span class="normal"><a href="#__codelineno-43-24">24</a></span>
+<span class="normal"><a href="#__codelineno-43-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org:example-wmw
+<a id="__codelineno-43-2" name="__codelineno-43-2"></a>
+<a id="__codelineno-43-3" name="__codelineno-43-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4"></a><span class="s">apiVersion: edge.kcp.io/v1alpha1</span>
+<a id="__codelineno-43-5" name="__codelineno-43-5"></a><span class="s">kind: EdgePlacement</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6"></a><span class="s">metadata:</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7"></a><span class="s">  name: edge-placement-c</span>
+<a id="__codelineno-43-8" name="__codelineno-43-8"></a><span class="s">spec:</span>
+<a id="__codelineno-43-9" name="__codelineno-43-9"></a><span class="s">  locationSelectors:</span>
+<a id="__codelineno-43-10" name="__codelineno-43-10"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;}</span>
+<a id="__codelineno-43-11" name="__codelineno-43-11"></a><span class="s">  namespaceSelector:</span>
+<a id="__codelineno-43-12" name="__codelineno-43-12"></a><span class="s">    matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-43-13" name="__codelineno-43-13"></a><span class="s">  nonNamespacedObjects:</span>
+<a id="__codelineno-43-14" name="__codelineno-43-14"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-43-15" name="__codelineno-43-15"></a><span class="s">    resources: [ &quot;apibindings&quot; ]</span>
+<a id="__codelineno-43-16" name="__codelineno-43-16"></a><span class="s">    resourceNames: [ &quot;bind-kubernetes&quot; ]</span>
+<a id="__codelineno-43-17" name="__codelineno-43-17"></a><span class="s">  upsync:</span>
+<a id="__codelineno-43-18" name="__codelineno-43-18"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-43-19" name="__codelineno-43-19"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-43-20" name="__codelineno-43-20"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-43-21" name="__codelineno-43-21"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-43-22" name="__codelineno-43-22"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-43-23" name="__codelineno-43-23"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-43-24" name="__codelineno-43-24"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-43-25" name="__codelineno-43-25"></a><span class="s">EOF</span>
 </code></pre></div></td></tr></table></div>
 <p>Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (<code>edge-placement-c</code>) object created above. </p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-35-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-35-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-35-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-35-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-35-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-35-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-35-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-35-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-35-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-35-10">10</a></span>
-<span class="normal"><a href="#__codelineno-35-11">11</a></span>
-<span class="normal"><a href="#__codelineno-35-12">12</a></span>
-<span class="normal"><a href="#__codelineno-35-13">13</a></span>
-<span class="normal"><a href="#__codelineno-35-14">14</a></span>
-<span class="normal"><a href="#__codelineno-35-15">15</a></span>
-<span class="normal"><a href="#__codelineno-35-16">16</a></span>
-<span class="normal"><a href="#__codelineno-35-17">17</a></span>
-<span class="normal"><a href="#__codelineno-35-18">18</a></span>
-<span class="normal"><a href="#__codelineno-35-19">19</a></span>
-<span class="normal"><a href="#__codelineno-35-20">20</a></span>
-<span class="normal"><a href="#__codelineno-35-21">21</a></span>
-<span class="normal"><a href="#__codelineno-35-22">22</a></span>
-<span class="normal"><a href="#__codelineno-35-23">23</a></span>
-<span class="normal"><a href="#__codelineno-35-24">24</a></span>
-<span class="normal"><a href="#__codelineno-35-25">25</a></span>
-<span class="normal"><a href="#__codelineno-35-26">26</a></span>
-<span class="normal"><a href="#__codelineno-35-27">27</a></span>
-<span class="normal"><a href="#__codelineno-35-28">28</a></span>
-<span class="normal"><a href="#__codelineno-35-29">29</a></span>
-<span class="normal"><a href="#__codelineno-35-30">30</a></span>
-<span class="normal"><a href="#__codelineno-35-31">31</a></span>
-<span class="normal"><a href="#__codelineno-35-32">32</a></span>
-<span class="normal"><a href="#__codelineno-35-33">33</a></span>
-<span class="normal"><a href="#__codelineno-35-34">34</a></span>
-<span class="normal"><a href="#__codelineno-35-35">35</a></span>
-<span class="normal"><a href="#__codelineno-35-36">36</a></span>
-<span class="normal"><a href="#__codelineno-35-37">37</a></span>
-<span class="normal"><a href="#__codelineno-35-38">38</a></span>
-<span class="normal"><a href="#__codelineno-35-39">39</a></span>
-<span class="normal"><a href="#__codelineno-35-40">40</a></span>
-<span class="normal"><a href="#__codelineno-35-41">41</a></span>
-<span class="normal"><a href="#__codelineno-35-42">42</a></span>
-<span class="normal"><a href="#__codelineno-35-43">43</a></span>
-<span class="normal"><a href="#__codelineno-35-44">44</a></span>
-<span class="normal"><a href="#__codelineno-35-45">45</a></span>
-<span class="normal"><a href="#__codelineno-35-46">46</a></span>
-<span class="normal"><a href="#__codelineno-35-47">47</a></span>
-<span class="normal"><a href="#__codelineno-35-48">48</a></span>
-<span class="normal"><a href="#__codelineno-35-49">49</a></span>
-<span class="normal"><a href="#__codelineno-35-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2"></a><span class="s">apiVersion: v1</span>
-<a id="__codelineno-35-3" name="__codelineno-35-3"></a><span class="s">kind: Namespace</span>
-<a id="__codelineno-35-4" name="__codelineno-35-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-35-5" name="__codelineno-35-5"></a><span class="s">  name: commonstuff</span>
-<a id="__codelineno-35-6" name="__codelineno-35-6"></a><span class="s">  labels: {common: &quot;si&quot;}</span>
-<a id="__codelineno-35-7" name="__codelineno-35-7"></a><span class="s">---</span>
-<a id="__codelineno-35-8" name="__codelineno-35-8"></a><span class="s">apiVersion: v1</span>
-<a id="__codelineno-35-9" name="__codelineno-35-9"></a><span class="s">kind: ConfigMap</span>
-<a id="__codelineno-35-10" name="__codelineno-35-10"></a><span class="s">metadata:</span>
-<a id="__codelineno-35-11" name="__codelineno-35-11"></a><span class="s">  namespace: commonstuff</span>
-<a id="__codelineno-35-12" name="__codelineno-35-12"></a><span class="s">  name: httpd-htdocs</span>
-<a id="__codelineno-35-13" name="__codelineno-35-13"></a><span class="s">data:</span>
-<a id="__codelineno-35-14" name="__codelineno-35-14"></a><span class="s">  index.html: |</span>
-<a id="__codelineno-35-15" name="__codelineno-35-15"></a><span class="s">    &lt;!DOCTYPE html&gt;</span>
-<a id="__codelineno-35-16" name="__codelineno-35-16"></a><span class="s">    &lt;html&gt;</span>
-<a id="__codelineno-35-17" name="__codelineno-35-17"></a><span class="s">      &lt;body&gt;</span>
-<a id="__codelineno-35-18" name="__codelineno-35-18"></a><span class="s">        This is a common web site.</span>
-<a id="__codelineno-35-19" name="__codelineno-35-19"></a><span class="s">      &lt;/body&gt;</span>
-<a id="__codelineno-35-20" name="__codelineno-35-20"></a><span class="s">    &lt;/html&gt;</span>
-<a id="__codelineno-35-21" name="__codelineno-35-21"></a><span class="s">---</span>
-<a id="__codelineno-35-22" name="__codelineno-35-22"></a><span class="s">apiVersion: apps/v1</span>
-<a id="__codelineno-35-23" name="__codelineno-35-23"></a><span class="s">kind: Deployment</span>
-<a id="__codelineno-35-24" name="__codelineno-35-24"></a><span class="s">metadata:</span>
-<a id="__codelineno-35-25" name="__codelineno-35-25"></a><span class="s">  namespace: commonstuff</span>
-<a id="__codelineno-35-26" name="__codelineno-35-26"></a><span class="s">  name: commond</span>
-<a id="__codelineno-35-27" name="__codelineno-35-27"></a><span class="s">spec:</span>
-<a id="__codelineno-35-28" name="__codelineno-35-28"></a><span class="s">  selector: {matchLabels: {app: common} }</span>
-<a id="__codelineno-35-29" name="__codelineno-35-29"></a><span class="s">  template:</span>
-<a id="__codelineno-35-30" name="__codelineno-35-30"></a><span class="s">    metadata:</span>
-<a id="__codelineno-35-31" name="__codelineno-35-31"></a><span class="s">      labels: {app: common}</span>
-<a id="__codelineno-35-32" name="__codelineno-35-32"></a><span class="s">    spec:</span>
-<a id="__codelineno-35-33" name="__codelineno-35-33"></a><span class="s">      containers:</span>
-<a id="__codelineno-35-34" name="__codelineno-35-34"></a><span class="s">      - name: httpd</span>
-<a id="__codelineno-35-35" name="__codelineno-35-35"></a><span class="s">        image: library/httpd:2.4</span>
-<a id="__codelineno-35-36" name="__codelineno-35-36"></a><span class="s">        ports:</span>
-<a id="__codelineno-35-37" name="__codelineno-35-37"></a><span class="s">        - name: http</span>
-<a id="__codelineno-35-38" name="__codelineno-35-38"></a><span class="s">          containerPort: 80</span>
-<a id="__codelineno-35-39" name="__codelineno-35-39"></a><span class="s">          hostPort: 8081</span>
-<a id="__codelineno-35-40" name="__codelineno-35-40"></a><span class="s">          protocol: TCP</span>
-<a id="__codelineno-35-41" name="__codelineno-35-41"></a><span class="s">        volumeMounts:</span>
-<a id="__codelineno-35-42" name="__codelineno-35-42"></a><span class="s">        - name: htdocs</span>
-<a id="__codelineno-35-43" name="__codelineno-35-43"></a><span class="s">          readOnly: true</span>
-<a id="__codelineno-35-44" name="__codelineno-35-44"></a><span class="s">          mountPath: /usr/local/apache2/htdocs</span>
-<a id="__codelineno-35-45" name="__codelineno-35-45"></a><span class="s">      volumes:</span>
-<a id="__codelineno-35-46" name="__codelineno-35-46"></a><span class="s">      - name: htdocs</span>
-<a id="__codelineno-35-47" name="__codelineno-35-47"></a><span class="s">        configMap:</span>
-<a id="__codelineno-35-48" name="__codelineno-35-48"></a><span class="s">          name: httpd-htdocs</span>
-<a id="__codelineno-35-49" name="__codelineno-35-49"></a><span class="s">          optional: false</span>
-<a id="__codelineno-35-50" name="__codelineno-35-50"></a><span class="s">EOF</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-44-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-44-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-44-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-44-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-44-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-44-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-44-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-44-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-44-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-44-10">10</a></span>
+<span class="normal"><a href="#__codelineno-44-11">11</a></span>
+<span class="normal"><a href="#__codelineno-44-12">12</a></span>
+<span class="normal"><a href="#__codelineno-44-13">13</a></span>
+<span class="normal"><a href="#__codelineno-44-14">14</a></span>
+<span class="normal"><a href="#__codelineno-44-15">15</a></span>
+<span class="normal"><a href="#__codelineno-44-16">16</a></span>
+<span class="normal"><a href="#__codelineno-44-17">17</a></span>
+<span class="normal"><a href="#__codelineno-44-18">18</a></span>
+<span class="normal"><a href="#__codelineno-44-19">19</a></span>
+<span class="normal"><a href="#__codelineno-44-20">20</a></span>
+<span class="normal"><a href="#__codelineno-44-21">21</a></span>
+<span class="normal"><a href="#__codelineno-44-22">22</a></span>
+<span class="normal"><a href="#__codelineno-44-23">23</a></span>
+<span class="normal"><a href="#__codelineno-44-24">24</a></span>
+<span class="normal"><a href="#__codelineno-44-25">25</a></span>
+<span class="normal"><a href="#__codelineno-44-26">26</a></span>
+<span class="normal"><a href="#__codelineno-44-27">27</a></span>
+<span class="normal"><a href="#__codelineno-44-28">28</a></span>
+<span class="normal"><a href="#__codelineno-44-29">29</a></span>
+<span class="normal"><a href="#__codelineno-44-30">30</a></span>
+<span class="normal"><a href="#__codelineno-44-31">31</a></span>
+<span class="normal"><a href="#__codelineno-44-32">32</a></span>
+<span class="normal"><a href="#__codelineno-44-33">33</a></span>
+<span class="normal"><a href="#__codelineno-44-34">34</a></span>
+<span class="normal"><a href="#__codelineno-44-35">35</a></span>
+<span class="normal"><a href="#__codelineno-44-36">36</a></span>
+<span class="normal"><a href="#__codelineno-44-37">37</a></span>
+<span class="normal"><a href="#__codelineno-44-38">38</a></span>
+<span class="normal"><a href="#__codelineno-44-39">39</a></span>
+<span class="normal"><a href="#__codelineno-44-40">40</a></span>
+<span class="normal"><a href="#__codelineno-44-41">41</a></span>
+<span class="normal"><a href="#__codelineno-44-42">42</a></span>
+<span class="normal"><a href="#__codelineno-44-43">43</a></span>
+<span class="normal"><a href="#__codelineno-44-44">44</a></span>
+<span class="normal"><a href="#__codelineno-44-45">45</a></span>
+<span class="normal"><a href="#__codelineno-44-46">46</a></span>
+<span class="normal"><a href="#__codelineno-44-47">47</a></span>
+<span class="normal"><a href="#__codelineno-44-48">48</a></span>
+<span class="normal"><a href="#__codelineno-44-49">49</a></span>
+<span class="normal"><a href="#__codelineno-44-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3"></a><span class="s">kind: Namespace</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-44-5" name="__codelineno-44-5"></a><span class="s">  name: commonstuff</span>
+<a id="__codelineno-44-6" name="__codelineno-44-6"></a><span class="s">  labels: {common: &quot;si&quot;}</span>
+<a id="__codelineno-44-7" name="__codelineno-44-7"></a><span class="s">---</span>
+<a id="__codelineno-44-8" name="__codelineno-44-8"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-44-9" name="__codelineno-44-9"></a><span class="s">kind: ConfigMap</span>
+<a id="__codelineno-44-10" name="__codelineno-44-10"></a><span class="s">metadata:</span>
+<a id="__codelineno-44-11" name="__codelineno-44-11"></a><span class="s">  namespace: commonstuff</span>
+<a id="__codelineno-44-12" name="__codelineno-44-12"></a><span class="s">  name: httpd-htdocs</span>
+<a id="__codelineno-44-13" name="__codelineno-44-13"></a><span class="s">data:</span>
+<a id="__codelineno-44-14" name="__codelineno-44-14"></a><span class="s">  index.html: |</span>
+<a id="__codelineno-44-15" name="__codelineno-44-15"></a><span class="s">    &lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-44-16" name="__codelineno-44-16"></a><span class="s">    &lt;html&gt;</span>
+<a id="__codelineno-44-17" name="__codelineno-44-17"></a><span class="s">      &lt;body&gt;</span>
+<a id="__codelineno-44-18" name="__codelineno-44-18"></a><span class="s">        This is a common web site.</span>
+<a id="__codelineno-44-19" name="__codelineno-44-19"></a><span class="s">      &lt;/body&gt;</span>
+<a id="__codelineno-44-20" name="__codelineno-44-20"></a><span class="s">    &lt;/html&gt;</span>
+<a id="__codelineno-44-21" name="__codelineno-44-21"></a><span class="s">---</span>
+<a id="__codelineno-44-22" name="__codelineno-44-22"></a><span class="s">apiVersion: apps/v1</span>
+<a id="__codelineno-44-23" name="__codelineno-44-23"></a><span class="s">kind: Deployment</span>
+<a id="__codelineno-44-24" name="__codelineno-44-24"></a><span class="s">metadata:</span>
+<a id="__codelineno-44-25" name="__codelineno-44-25"></a><span class="s">  namespace: commonstuff</span>
+<a id="__codelineno-44-26" name="__codelineno-44-26"></a><span class="s">  name: commond</span>
+<a id="__codelineno-44-27" name="__codelineno-44-27"></a><span class="s">spec:</span>
+<a id="__codelineno-44-28" name="__codelineno-44-28"></a><span class="s">  selector: {matchLabels: {app: common} }</span>
+<a id="__codelineno-44-29" name="__codelineno-44-29"></a><span class="s">  template:</span>
+<a id="__codelineno-44-30" name="__codelineno-44-30"></a><span class="s">    metadata:</span>
+<a id="__codelineno-44-31" name="__codelineno-44-31"></a><span class="s">      labels: {app: common}</span>
+<a id="__codelineno-44-32" name="__codelineno-44-32"></a><span class="s">    spec:</span>
+<a id="__codelineno-44-33" name="__codelineno-44-33"></a><span class="s">      containers:</span>
+<a id="__codelineno-44-34" name="__codelineno-44-34"></a><span class="s">      - name: httpd</span>
+<a id="__codelineno-44-35" name="__codelineno-44-35"></a><span class="s">        image: library/httpd:2.4</span>
+<a id="__codelineno-44-36" name="__codelineno-44-36"></a><span class="s">        ports:</span>
+<a id="__codelineno-44-37" name="__codelineno-44-37"></a><span class="s">        - name: http</span>
+<a id="__codelineno-44-38" name="__codelineno-44-38"></a><span class="s">          containerPort: 80</span>
+<a id="__codelineno-44-39" name="__codelineno-44-39"></a><span class="s">          hostPort: 8081</span>
+<a id="__codelineno-44-40" name="__codelineno-44-40"></a><span class="s">          protocol: TCP</span>
+<a id="__codelineno-44-41" name="__codelineno-44-41"></a><span class="s">        volumeMounts:</span>
+<a id="__codelineno-44-42" name="__codelineno-44-42"></a><span class="s">        - name: htdocs</span>
+<a id="__codelineno-44-43" name="__codelineno-44-43"></a><span class="s">          readOnly: true</span>
+<a id="__codelineno-44-44" name="__codelineno-44-44"></a><span class="s">          mountPath: /usr/local/apache2/htdocs</span>
+<a id="__codelineno-44-45" name="__codelineno-44-45"></a><span class="s">      volumes:</span>
+<a id="__codelineno-44-46" name="__codelineno-44-46"></a><span class="s">      - name: htdocs</span>
+<a id="__codelineno-44-47" name="__codelineno-44-47"></a><span class="s">        configMap:</span>
+<a id="__codelineno-44-48" name="__codelineno-44-48"></a><span class="s">          name: httpd-htdocs</span>
+<a id="__codelineno-44-49" name="__codelineno-44-49"></a><span class="s">          optional: false</span>
+<a id="__codelineno-44-50" name="__codelineno-44-50"></a><span class="s">EOF</span>
 </code></pre></div></td></tr></table></div>
 <p>Now, let's check that the deployment was created in the <code>florin</code> edge cluster - it may take a few 10s of seconds to appear:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>commonstuff<span class="w">                          </span>commond<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>6m48s
-<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>kubestellar-syncer-florin-2upj1awn<span class="w">   </span>kubestellar-syncer-florin-2upj1awn<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>16m
-<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>kube-system<span class="w">                          </span>coredns<span class="w">                              </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>28m
-<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>local-path-storage<span class="w">                   </span>local-path-provisioner<span class="w">               </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>28m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>commonstuff<span class="w">                          </span>commond<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>6m48s
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>kubestellar-syncer-florin-2upj1awn<span class="w">   </span>kubestellar-syncer-florin-2upj1awn<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>16m
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>kube-system<span class="w">                          </span>coredns<span class="w">                              </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>28m
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>local-path-storage<span class="w">                   </span>local-path-provisioner<span class="w">               </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>28m
 </code></pre></div>
 <p>Also, let's check that the deployment was created in the <code>guilder</code> edge cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
 </code></pre></div>
 <p>which should yield something like:</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>commonstuff<span class="w">                           </span>commond<span class="w">                               </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>7m54s
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>kubestellar-syncer-guilder-6tuay5d6<span class="w">   </span>kubestellar-syncer-guilder-6tuay5d6<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>12m
-<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>kube-system<span class="w">                           </span>coredns<span class="w">                               </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>27m
-<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>local-path-storage<span class="w">                    </span>local-path-provisioner<span class="w">                </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>27m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>commonstuff<span class="w">                           </span>commond<span class="w">                               </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>7m54s
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a>kubestellar-syncer-guilder-6tuay5d6<span class="w">   </span>kubestellar-syncer-guilder-6tuay5d6<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>12m
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>kube-system<span class="w">                           </span>coredns<span class="w">                               </span><span class="m">2</span>/2<span class="w">     </span><span class="m">2</span><span class="w">            </span><span class="m">2</span><span class="w">           </span>27m
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a>local-path-storage<span class="w">                    </span>local-path-provisioner<span class="w">                </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>27m
 </code></pre></div>
 <p>Lastly, let's check that the workload is working in both clusters:</p>
 <p>For <code>florin</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;app=common&quot;</span><span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].status.phase}&#39;</span><span class="k">)</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>sleep<span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="p">;</span>curl<span class="w"> </span>http://localhost:8094
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;app=common&quot;</span><span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].status.phase}&#39;</span><span class="k">)</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>sleep<span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="p">;</span>curl<span class="w"> </span>http://localhost:8094
 </code></pre></div>
 <p>which should eventually yield:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>    This is a common web site.
-<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>    This is a common web site.
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>For <code>guilder</code>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;app=common&quot;</span><span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].status.phase}&#39;</span><span class="k">)</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>sleep<span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="p">;</span>curl<span class="w"> </span>http://localhost:8096
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;app=common&quot;</span><span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].status.phase}&#39;</span><span class="k">)</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>sleep<span class="w"> </span><span class="m">5</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="p">;</span>curl<span class="w"> </span>http://localhost:8096
 </code></pre></div>
 which should eventually yield:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>    This is a common web site.
-<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>    This is a common web site.
+<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>Congratulations, you’ve just deployed a workload to two edge clusters using kubestellar! To learn more about kubestellar please visit our <a href="../user-guide">User Guide</a></p>
 <!-- END INCLUDE -->
@@ -2321,21 +2360,21 @@ which should eventually yield:</p>
 <!-- BEGIN INCLUDE ../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
-<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
-<a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-53-6" name="__codelineno-53-6" href="#__codelineno-53-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-53-7" name="__codelineno-53-7" href="#__codelineno-53-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
+<a id="__codelineno-53-8" name="__codelineno-53-8" href="#__codelineno-53-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-53-9" name="__codelineno-53-9" href="#__codelineno-53-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Stop and uninstall KubeStellar use the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>remove-kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
