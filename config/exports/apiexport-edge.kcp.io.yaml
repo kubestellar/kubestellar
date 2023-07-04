@@ -12,4 +12,5 @@ spec:
   - v230630-f011ab29.singleplacementslices.edge.kcp.io
   - v230701-83e8956c.locations.edge.kcp.io
   - v230701-83e8956c.synctargets.edge.kcp.io
+  - v230704-a60bb94c.locations.edge.kcp.io
 status: {}

@@ -132,7 +132,7 @@ if ! kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io "$objname" &> /dev/
 apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 spec:
-  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"id":"$objname"}
 metadata:
@@ -159,8 +159,7 @@ while (( index < ${#labels[*]} )); do
     let index=index+2
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	#if ! kubectl "${kubectl_flags[@]}" label --overwrite SyncTarget "$objname" "${key}=${val}" ; then
-    if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
+	if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
 	    echo "$0: failed to add label to SyncTarget" >&2
 	    exit 4
 	fi

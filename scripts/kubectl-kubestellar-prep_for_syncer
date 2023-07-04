@@ -118,7 +118,7 @@ trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 
 kubectl ws "${kubectl_flags[@]}" "$imw"
 
-mbwsname=$(kubectl "${kubectl_flags[@]}" get SyncTarget "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
 kubectl ws "${kubectl_flags[@]}" "$espw"
 
