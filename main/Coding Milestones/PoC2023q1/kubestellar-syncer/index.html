@@ -963,8 +963,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-kubestellar" class="md-nav__link">
-    Get KubeStellar
+  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
+    Get and build or install KubeStellar
   </a>
   
 </li>
@@ -1906,8 +1906,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-kubestellar" class="md-nav__link">
-    Get KubeStellar
+  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
+    Get and build or install KubeStellar
   </a>
   
 </li>
@@ -2232,16 +2232,14 @@
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>git clone -n -b main https://github.com/kubestellar/kubestellar --depth 1 KubeStellar-kubestellar-syncer
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>cd KubeStellar-kubestellar-syncer
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>git checkout Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md&#39;&quot; docs-ecutable
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>cd kubestellar
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md&#39;&quot; docs-ecutable
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a># done? remove everything
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>make MANIFEST=&quot;docs/content/common-subs/remove-all.md&quot; docs-ecutable
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>cd ../
-<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>rm -rf KubeStellar-kubestellar-syncer
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>cd ..
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>rm -rf kubestellar
 </code></pre></div>
 </div>
 <!-- END INCLUDE -->
@@ -2322,13 +2320,14 @@ noted that the florin or guilder cluster is being accessed.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
 </code></pre></div>
 build the kubectl-ws binary and include it in <code>$PATH</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">cd</span><span class="w"> </span>kcp
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>make<span class="w"> </span>build
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="nb">popd</span>
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w"> </span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
@@ -2340,24 +2339,23 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>--enter
 </code></pre></div>
-<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
-<p>Download and build or install
-<a href="https://github.com/kubestellar/kubestellar">KubeStellar</a>, according to your
-preference.  That is, either (a) <code>git clone</code> the repo and then <code>make
-build</code> to populate its <code>bin</code> directory, or (b) fetch the binary
-archive appropriate for your machine from a release and unpack it
-(creating a <code>bin</code> directory).  In the following exhibited command
-lines, the commands described as "KubeStellar commands" and the commands
-that start with <code>kubectl kubestellar</code> rely on the KubeStellar <code>bin</code> directory
-being on the <code>$PATH</code>.  Alternatively you could invoke them with
-explicit pathnames.  The kubectl plugin lines use fully specific
-executables (e.g., <code>kubectl kubestellar prep-for-syncer</code> corresponds to
-<code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>main<span class="w"> </span>https://github.com/kubestellar/kubestellar
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="nb">cd</span><span class="w"> </span>../kubestellar
-<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>make<span class="w"> </span>build
-<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<h3 id="get-and-build-or-install-kubestellar">Get and build or install KubeStellar<a class="headerlink" href="#get-and-build-or-install-kubestellar" title="Permanent link">#</a></h3>
+<p>Download and build, or install, <a href="https://github.com/kubestellar/kubestellar">KubeStellar</a>,
+according to your preference.  That is, either (a) <code>git clone</code> the
+repo and then <code>make build</code> to populate its <code>bin</code> directory, or (b)
+fetch the binary archive appropriate for your machine from a release
+and unpack it (creating a <code>bin</code> directory).  The commands exhibited
+just below assume that the repo has been fetched but not yet buit.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>make<span class="w"> </span>build
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
+<p>In the following exhibited command lines, the commands described as
+"KubeStellar commands" and the commands that start with <code>kubectl
+kubestellar</code> rely on the KubeStellar <code>bin</code> directory being on the
+<code>$PATH</code>.  Alternatively you could invoke them with explicit pathnames.
+The kubectl plugin lines use fully specific executables (e.g.,
+<code>kubectl kubestellar prep-for-syncer</code> corresponds to
+<code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
 <h3 id="create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters">Create SyncTarget and Location objects to represent the florin and guilder clusters<a class="headerlink" href="#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters" title="Permanent link">#</a></h3>
 <p>Use the following two commands. They label both florin and guilder
 with <code>env=prod</code>, and also label guilder with <code>extended=si</code>.</p>
@@ -2607,7 +2605,7 @@ SyncTarget name, you could do it as follows.</p>
 <a id="__codelineno-65-8" name="__codelineno-65-8" href="#__codelineno-65-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-65-9" name="__codelineno-65-9" href="#__codelineno-65-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Stop and uninstall KubeStellar use the following command:</p>
+<p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
@@ -2924,7 +2922,7 @@ e.g.
 <a id="__codelineno-86-8" name="__codelineno-86-8" href="#__codelineno-86-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-86-9" name="__codelineno-86-9" href="#__codelineno-86-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Stop and uninstall KubeStellar use the following command:</p>
+<p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
