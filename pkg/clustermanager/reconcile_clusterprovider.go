@@ -84,6 +84,7 @@ func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) err
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
+	c.logger.Info("Provider namespace created", "provider", name, "namespace", ns.Name)
 
 	err = provider.StartDiscovery()
 	if err != nil {
