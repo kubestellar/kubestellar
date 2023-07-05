@@ -41,6 +41,8 @@ func main() {
 		panic(err)
 	}
 
+	// Create the MC aware client --> initiate the underlying MC aware library
+	// The library actively watches for LC updates, and maintain an updated list of accessible clusters
 	mcclient, err := mcclient.NewMultiCluster(ctx, managementClusterConfig)
 	if err != nil {
 		logger.Error(err, "get client failed")
@@ -49,6 +51,8 @@ func main() {
 
 	clusterName := "ks-lc1"
 
+	// Demonstrate a Watch() on a logical cluster
+	// Using the mcclient to get access to a LC directly (clientset, informer, etc..)
 	watcher, err := mcclient.Cluster(clusterName).Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
 	if err == nil {
 		for {
