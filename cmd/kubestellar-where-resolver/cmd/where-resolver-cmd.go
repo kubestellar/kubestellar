@@ -143,11 +143,6 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	kcpClusterClientset, err := kcpclientset.NewForConfig(sysAdmRestConfig)
-	if err != nil {
-		logger.Error(err, "failed to create kcp clientset for controller")
-		return err
-	}
 	edgeClusterClientset, err := edgeclientset.NewForConfig(sysAdmRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create edge clientset for controller")
@@ -155,7 +150,6 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 	es, err := wheresolver.NewController(
 		ctx,
-		kcpClusterClientset,
 		edgeClusterClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
 		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
