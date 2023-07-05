@@ -17,46 +17,50 @@
 . demo-magic.sh
 clear
 
-TYPE_SPEED=10
+TYPE_SPEED=20
 DEMO_PROMPT="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
 
 MGT_NAME="mgt"
 MGT_CTX="kind-$MGT_NAME"
 
+# For live demo use 'pe'  for recording or auto demo use 'pei'
+#PCMD="pe"
+PCMD="pei"
+
 #1 Create mgt cluster
-pei "kind create cluster --name $MGT_NAME"
+$PCMD "kind create cluster --name $MGT_NAME"
 echo "  "
 
 #2 list the kind clusters
-pei "kind get clusters"
+$PCMD "kind get clusters"
 echo "  "
 
 #3 Apply the LC and provider CRDs on the mgt cluster
-pei "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml"
-pei "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_clusterproviderdescs.yaml"
-p "Start the manager in a second window and press <enter> to continue."
+$PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml"
+$PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_clusterproviderdescs.yaml"
+echo "Start the manager in a second window and press <enter> to continue."
 
 #4 Start the manager in a second window
 echo "  "
 
 #5 Create a provider (show the provider yaml,  filter prefix, etc..)
-pei "cat config/samples/clusterproviderdesc.yaml" 
+$PCMD "cat config/samples/clusterproviderdesc.yaml" 
 echo " "
 echo " "
-pei "kubectl --context $MGT_CTX create -f config/samples/clusterproviderdesc.yaml" 
+$PCMD "kubectl --context $MGT_CTX create -f config/samples/clusterproviderdesc.yaml" 
 echo " "
-pei  "kubectl --context $MGT_CTX get clusterproviderdescs"
+$PCMD  "kubectl --context $MGT_CTX get clusterproviderdescs"
 echo " "
 
 #6 Show the created NS
-pei "kubectl --context $MGT_CTX get namespaces" 
+$PCMD "kubectl --context $MGT_CTX get namespaces" 
 echo " "
 
 #7 Create a LC-X1
-pei "cat config/samples/logicalcluster_lc1.yaml" 
+$PCMD "cat config/samples/logicalcluster_lc1.yaml" 
 echo " "
 echo " "
-pei "kubectl --context $MGT_CTX create -f config/samples/logicalcluster_lc1.yaml" 
+$PCMD "kubectl --context $MGT_CTX create -f config/samples/logicalcluster_lc1.yaml" 
 echo " "
 
 #8 Show status of LC-X1 changes from initializing to READY
@@ -67,7 +71,7 @@ echo " "
 
 #9 Create a LC-X1
 echo " "
-pei "kubectl --context $MGT_CTX create -f config/samples/logicalcluster_lc2.yaml" 
+$PCMD "kubectl --context $MGT_CTX create -f config/samples/logicalcluster_lc2.yaml" 
 echo " "
 
 #10 Show status of LC-X1 changes from initializing to READY
@@ -77,44 +81,48 @@ kubectl --context $MGT_CTX describe logicalcluster lc2 -n lcprovider-default  2>
 echo " "
 
 #11 list kind clusters - show the created clusters X1 & X2
-pei "kind get clusters"
+$PCMD "kind get clusters"
 echo "  "
 
+$PCMD "kubectl --context $MGT_CTX get logicalcluster -A"
+echo "  "
+
+
 #12 delete LC-X1
-pei "kubectl --context $MGT_CTX delete logicalcluster -n lcprovider-default lc1"
+$PCMD "kubectl --context $MGT_CTX delete logicalcluster -n lcprovider-default lc1"
 echo "  "
 
 #13 List kinds - show that X1 is deleted
-pei "kind get clusters"
+$PCMD "kind get clusters"
 echo "  "
 
 #14 Delete X2 on the kind
-pei "kind delete cluster --name lc2"
+$PCMD "kind delete cluster --name lc2"
 echo "  "
 
 #15 Show LC-X2 is in "not-ready" state
-pei "kubectl --context $MGT_CTX describe logicalcluster lc2 -n lcprovider-default | grep 'Phase: '"
+$PCMD "kubectl --context $MGT_CTX describe logicalcluster lc2 -n lcprovider-default | grep 'Phase: '"
 echo "  "
 
 #16 Delete LC-X2
-pei "kubectl --context $MGT_CTX delete logicalcluster -n lcprovider-default lc2"
+$PCMD "kubectl --context $MGT_CTX delete logicalcluster -n lcprovider-default lc2"
 echo "  "
 
 #17 Create Y1 on kind
-pei "kind create cluster --name lc3"
+$PCMD "kind create cluster --name lc3"
 echo "  "
 
-pei "kind get clusters"
+$PCMD "kind get clusters"
 echo "  "
 
-pei "kubectl --context $MGT_CTX get logicalclusters -A"
+$PCMD "kubectl --context $MGT_CTX get logicalclusters -A"
 echo "  "
 
 #18 Create prefix-Y2 on kind
-pei "kind create cluster --name ks-lc4"
+$PCMD "kind create cluster --name ks-lc4"
 echo "  "
 
 #19 List LCs - show that we discover only prefix-Y2
-pei "kubectl --context $MGT_CTX get logicalclusters -A"
+$PCMD "kubectl --context $MGT_CTX get logicalclusters -A"
 echo "  "
 
