@@ -38,7 +38,7 @@ var (
 	numThreads   = 2
 )
 
-const managerClusterContext string = "kind-management-cluster"
+const managerClusterContext string = "kind-mgt"
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
