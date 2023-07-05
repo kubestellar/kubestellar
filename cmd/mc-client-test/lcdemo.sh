@@ -39,7 +39,7 @@ echo "  "
 $PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml"
 $PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_clusterproviderdescs.yaml"
 echo "Start the manager in a second window and press <enter> to continue."
-
+p "wait"
 #4 Start the manager in a second window
 echo "  "
 
