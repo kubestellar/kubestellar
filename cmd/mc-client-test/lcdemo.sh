@@ -34,13 +34,15 @@ echo "  "
 #3 Apply the LC and provider CRDs on the mgt cluster
 pei "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml"
 pei "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_clusterproviderdescs.yaml"
-echo "  "
+p "Start the manager in a second window and press <enter> to continue."
 
 #4 Start the manager in a second window
-pe "echo 'Start the manager in a second window and press <enter> to continue.'"
 echo "  "
 
 #5 Create a provider (show the provider yaml,  filter prefix, etc..)
+pei "cat config/samples/clusterproviderdesc.yaml" 
+echo " "
+echo " "
 pei "kubectl --context $MGT_CTX create -f config/samples/clusterproviderdesc.yaml" 
 echo " "
 pei  "kubectl --context $MGT_CTX get clusterproviderdescs"
@@ -51,6 +53,9 @@ pei "kubectl --context $MGT_CTX get namespaces"
 echo " "
 
 #7 Create a LC-X1
+pei "cat config/samples/logicalcluster_lc1.yaml" 
+echo " "
+echo " "
 pei "kubectl --context $MGT_CTX create -f config/samples/logicalcluster_lc1.yaml" 
 echo " "
 

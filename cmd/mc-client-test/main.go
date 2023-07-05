@@ -47,7 +47,7 @@ func main() {
 		panic(err)
 	}
 
-	clusterName := "stellar-lc1"
+	clusterName := "ks-lc1"
 
 	watcher, err := mcclient.Cluster(clusterName).Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
 	if err == nil {
