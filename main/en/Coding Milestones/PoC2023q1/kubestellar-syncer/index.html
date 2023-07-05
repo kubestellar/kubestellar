@@ -1210,8 +1210,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -2169,7 +2169,7 @@
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>tar xzf ko.tar.gz ko
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>chmod +x ./ko
 </code></pre></div>
-<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
+<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>rm go.tar.gz
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile

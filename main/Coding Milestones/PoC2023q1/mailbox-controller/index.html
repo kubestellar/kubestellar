@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller/">
       
       
-        <link rel="prev" href="../kubestellar-scheduler/">
+        <link rel="prev" href="../where-resolver/">
       
       
         <link rel="next" href="../placement-translator/">
@@ -969,8 +969,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -1841,7 +1841,7 @@
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>tar xzf ko.tar.gz ko
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>chmod +x ./ko
 </code></pre></div>
-<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
+<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>rm go.tar.gz
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile
@@ -1967,7 +1967,7 @@ consume the <code>Workspace</code> objects from there.</p>
 <h2 id="try-out-the-mailbox-controller">Try out the mailbox controller<a class="headerlink" href="#try-out-the-mailbox-controller" title="Permanent link">#</a></h2>
 <h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp<a class="headerlink" href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" title="Permanent link">#</a></h3>
 <p>Open a terminal window(1) and clone the latest KubeStellar source:</p>
-<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
+<!-- BEGIN INCLUDE where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
 <p>Clone the v0.11.0 branch kcp source:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
@@ -1988,14 +1988,14 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 
 <h3 id="create-the-edge-service-provider-workspace-espw">Create the Edge Service Provider Workspace (ESPW)<a class="headerlink" href="#create-the-edge-service-provider-workspace-espw" title="Permanent link">#</a></h3>
 <p>Open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
-<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-1-build-kubestellar.md '&lt;!--kubestellar-scheduler-1-build-kubestellar-start--&gt;' '&lt;!--kubestellar-scheduler-1-build-kubestellar-end--&gt;' -->
+<!-- BEGIN INCLUDE where-resolver-subs/where-resolver-1-build-kubestellar.md '&lt;!--where-resolver-1-build-kubestellar-start--&gt;' '&lt;!--where-resolver-1-build-kubestellar-end--&gt;' -->
 
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>make<span class="w"> </span>build
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
-<!-- BEGIN INCLUDE kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start--&gt;' '&lt;!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end--&gt;' -->
+<!-- BEGIN INCLUDE where-resolver-subs/where-resolver-2-ws-root-and-ws-create-edge.md '&lt;!--where-resolver-2-ws-root-and-ws-create-edge-start--&gt;' '&lt;!--where-resolver-2-ws-root-and-ws-create-edge-end--&gt;' -->
 
 <p>Next, use the command that makes sure the Edge Service Provider Workspace (ESPW), which is <code>root:espw</code>, and the TMC provider workspace (<code>root:compute</code>) are properly set up.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>kubestellar<span class="w"> </span>init
@@ -2163,7 +2163,7 @@ and watch the mailbox controller react as follows.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../kubestellar-scheduler/" class="md-footer__link md-footer__link--prev" aria-label="Previous: KubeStellar Scheduler" rel="prev">
+          <a href="../where-resolver/" class="md-footer__link md-footer__link--prev" aria-label="Previous: KubeStellar Where Resolver" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -2172,7 +2172,7 @@ and watch the mailbox controller react as follows.</p>
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                KubeStellar Scheduler
+                KubeStellar Where Resolver
               </div>
             </div>
           </a>

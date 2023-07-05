@@ -14,7 +14,7 @@
         <link rel="prev" href="../kubestellar-syncer/">
       
       
-        <link rel="next" href="../kubestellar-scheduler/">
+        <link rel="next" href="../where-resolver/">
       
       <link rel="icon" href="../../../favicons/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.0">
@@ -597,8 +597,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#edge-scheduling" class="md-nav__link">
-    Edge scheduling
+  <a href="#where-resolver" class="md-nav__link">
+    Where Resolver
   </a>
   
 </li>
@@ -1212,8 +1212,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#edge-scheduling" class="md-nav__link">
-    Edge scheduling
+  <a href="#where-resolver" class="md-nav__link">
+    Where Resolver
   </a>
   
 </li>
@@ -1301,8 +1301,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -2066,8 +2066,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#edge-scheduling" class="md-nav__link">
-    Edge scheduling
+  <a href="#where-resolver" class="md-nav__link">
+    Where Resolver
   </a>
   
 </li>
@@ -2185,7 +2185,7 @@
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>tar xzf ko.tar.gz ko
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>chmod +x ./ko
 </code></pre></div>
-<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar scheduler.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
+<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>rm go.tar.gz
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile
@@ -2594,9 +2594,9 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 <!-- BEGIN INCLUDE ./example1-stage-2.md '&lt;!--example1-stage-2-start--&gt;' '&lt;!--example1-stage-2-end--&gt;' -->
 
 <h2 id="stage-2">Stage 2<a class="headerlink" href="#stage-2" title="Permanent link">#</a></h2>
-<p><img alt="Placement and scheduling" src="../Edge-PoC-2023q1-Scenario-1-stage-2.svg" title="Stage 2 summary" /></p>
+<p><img alt="Placement and Where Resolving" src="../Edge-PoC-2023q1-Scenario-1-stage-2.svg" title="Stage 2 summary" /></p>
 <p>Stage 2 creates two workloads, called "common" and "special", and lets
-the scheduler react.  It has the following steps.</p>
+the Where Resolver react.  It has the following steps.</p>
 <h3 id="create-and-populate-the-workload-management-workspace-for-the-common-workload">Create and populate the workload management workspace for the common workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-common-workload" title="Permanent link">#</a></h3>
 <p>One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".</p>
@@ -2849,8 +2849,8 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
-<h3 id="edge-scheduling">Edge scheduling<a class="headerlink" href="#edge-scheduling" title="Permanent link">#</a></h3>
-<p>In response to each EdgePlacement, the scheduler will create a
+<h3 id="where-resolver">Where Resolver<a class="headerlink" href="#where-resolver" title="Permanent link">#</a></h3>
+<p>In response to each EdgePlacement, the Where Resolver will create a
 corresponding SinglePlacementSlice object.  These will indicate the
 following resolutions of the "where" predicates.</p>
 <table>
@@ -2872,23 +2872,23 @@ following resolutions of the "where" predicates.</p>
 </tbody>
 </table>
 <p>Eventually there will be automation that conveniently runs the
-scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the KubeStellar command that runs the scheduler.</p>
+Where Resolver.  In the meantime, you can run it by hand: switch to the
+ESPW and invoke the KubeStellar command that runs the Where Resolver.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/kubestellar-scheduler<span class="w"> </span><span class="p">&amp;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/kubestellar-where-resolver<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>kubestellar-scheduler.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>main.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io&quot;</span>
 <a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>...
-<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.320859<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-scheduler&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|florin&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;florin&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
+<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.320859<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|florin&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;florin&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
 <a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>...
-<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.391772<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-scheduler&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|guilder&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;guilder&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
+<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.391772<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|guilder&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;guilder&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
 <a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a>^C
 </code></pre></div></p>
-<p>In this simple scenario you do not need to keep the scheduler running
+<p>In this simple scenario you do not need to keep the Where Resolver running
 after it gets its initial work done; normally it would run
 continually.</p>
 <p>Check out the SinglePlacementSlice objects as follows.</p>
@@ -3487,13 +3487,13 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
         
         
           
-          <a href="../kubestellar-scheduler/" class="md-footer__link md-footer__link--next" aria-label="Next: KubeStellar Scheduler" rel="next">
+          <a href="../where-resolver/" class="md-footer__link md-footer__link--next" aria-label="Next: KubeStellar Where Resolver" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                KubeStellar Scheduler
+                KubeStellar Where Resolver
               </div>
             </div>
             <div class="md-footer__button md-icon">

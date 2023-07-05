@@ -1153,8 +1153,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-scheduler" class="md-nav__link">
-    KubeStellar Scheduler
+  <a href="#where-resolver" class="md-nav__link">
+    Where Resolver
   </a>
   
 </li>
@@ -1299,8 +1299,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -2213,8 +2213,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kubestellar-scheduler" class="md-nav__link">
-    KubeStellar Scheduler
+  <a href="#where-resolver" class="md-nav__link">
+    Where Resolver
   </a>
   
 </li>
@@ -2450,8 +2450,8 @@ is not among the things that this PoC takes a position on.</p>
 includes the following things.</p>
 <ul>
 <li>An APIExport of the edge API group.</li>
-<li>The edge controllers: scheduler, placement translator, mailbox
-  controller, and status summarizer.</li>
+<li>The edge controllers: Where Resolver, Placement Translator, Mailbox
+  Controller, and Status Summarizer.</li>
 </ul>
 <h2 id="workload-management-workspaces-wmw">Workload Management workspaces (WMW)<a class="headerlink" href="#workload-management-workspaces-wmw" title="Permanent link">#</a></h2>
 <p>The users of edge multi-cluster primarily maintain these.  Each one of
@@ -3187,7 +3187,7 @@ of these mailbox workspaces is used for a distinct syncing problem:
 downsynced objects go here from their workload management workspaces,
 and upsynced objects go here from the edge cluster.  These workspaces
 are all children of the edge service provider workspace.</p>
-<h2 id="kubestellar-scheduler">KubeStellar Scheduler<a class="headerlink" href="#kubestellar-scheduler" title="Permanent link">#</a></h2>
+<h2 id="where-resolver">Where Resolver<a class="headerlink" href="#where-resolver" title="Permanent link">#</a></h2>
 <p>This controller monitors the EdgePlacement, Location, and SyncTarget
 objects and maintains the results of matching.  For each EdgePlacement
 object this controller maintains an associated collection of
@@ -3208,10 +3208,10 @@ following five parts.</p>
 <ul>
 <li>Resolve each EdgePlacement's "what" part to a list of particular
   workspace items (namespaces and non-namespaced objects).</li>
-<li>Monitor the SinglePlacementSlice objects that report the scheduler's
+<li>Monitor the SinglePlacementSlice objects that report the Where Resolver's
   resolutions of the "where" part of the EdgePlacement objects.</li>
-<li>Maintain the association between the resolved "where" from the
-  scheduler and the resolved what.</li>
+<li>Maintain the association between the resolved "where" (from the
+  Where Resolver) and the resolved what.</li>
 <li>Maintain the copies, with customization, of the workload objects
   from source workspace to mailbox workspaces.</li>
 <li>Maintain the SyncerConfig object in each mailbox workspace to direct
@@ -3267,7 +3267,7 @@ user creates if the workload type did not already provide.</p>
 <ul>
 <li>An APIBinding to the APIExport of <code>edge.kcp.io</code> from the edge
   service provider workspace.</li>
-<li>For each of the Scheduler, the Placement Translator, and the
+<li>For each of the Where Resolver, the Placement Translator, and the
   Status Summarizer:</li>
 <li>A ServiceAccount for that controller to authenticate as;</li>
 <li>A ClusterRole granting the privileges needed by that controller;</li>
