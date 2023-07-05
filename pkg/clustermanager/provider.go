@@ -187,6 +187,12 @@ func (p *provider) processProviderWatchEvents() {
 				reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseReady
 				// TODO: Should we really update the config ?
 				reflcluster.Status.ClusterConfig = event.LCInfo.Config
+				if reflcluster.Spec.Managed && !containsFinalizer(reflcluster, finalizerName) {
+					// When a physical cluster is removed we remove its finalizer
+					// from the logical cluster object. when the cluster returns, we
+					// need to restore the finalizer.
+					reflcluster.ObjectMeta.Finalizers = append(reflcluster.ObjectMeta.Finalizers, finalizerName)
+				}
 				_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New cluster. Couldn't update the corresponding LogicalCluster status", "cluster name", lcName)
 			}
@@ -197,21 +203,17 @@ func (p *provider) processProviderWatchEvents() {
 				// There is no LC object so there is nothing we should do
 				continue
 			}
-			if !reflcluster.DeletionTimestamp.IsZero() {
-				if reflcluster.Spec.Managed {
-					// If managed then we need to remove the finalizer.
-					f := reflcluster.ObjectMeta.Finalizers
-					for i := 0; i < len(reflcluster.ObjectMeta.Finalizers); i++ {
-						if f[i] == finalizerName {
-							reflcluster.ObjectMeta.Finalizers = append(f[:i], f[i+1:]...)
-							i--
-						}
+			if reflcluster.Spec.Managed {
+				// If managed then we need to remove the finalizer.
+				f := reflcluster.ObjectMeta.Finalizers
+				for i := 0; i < len(reflcluster.ObjectMeta.Finalizers); i++ {
+					if f[i] == finalizerName {
+						reflcluster.ObjectMeta.Finalizers = append(f[:i], f[i+1:]...)
+						i--
 					}
-					_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
-					chkErrAndReturn(logger, err, "Could not remove logical cluster finalizer", "cluster name", lcName)
 				}
-				continue
 			}
+			// If managed then we need to remove the finalizer.
 			reflcluster.Status.Phase = lcv1alpha1apis.LogicalClusterPhaseNotReady
 			_, err := p.c.clientset.LogicalclusterV1alpha1().LogicalClusters(p.nameSpace).Update(ctx, reflcluster, v1.UpdateOptions{})
 			chkErrAndReturn(logger, err, "Cluster was removed, Couldn't update the LogicalCluster status")
