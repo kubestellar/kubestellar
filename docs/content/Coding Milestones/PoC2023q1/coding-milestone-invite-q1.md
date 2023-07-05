@@ -11,7 +11,7 @@ This coding sprint will provide a great opportunity for you to showcase your ski
 
 The coding sprint will be dedicated to completing the following workload management elements:
 
-- Implementing an Where Resolver and Placement Translator, including customization options,
+- Implementing a Where Resolver and a Placement Translator, including customization options,
 - Incorporating existing customization API into the [KubeStellar repo]({{ config.repo_url }}),
 - Investigating implementation of a status summarizer, starting with basic implicit status, and later adding programmed summarization,
 - Updating summarization API and integrating it into the [KubeStellar repo]({{ config.repo_url }}),
