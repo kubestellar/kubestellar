@@ -1,11 +1,11 @@
 <!--example1-stage-2-start-->
 ## Stage 2
 
-![Placement and scheduling](../Edge-PoC-2023q1-Scenario-1-stage-2.svg
+![Placement and Where Resolving](../Edge-PoC-2023q1-Scenario-1-stage-2.svg
 "Stage 2 summary")
 
 Stage 2 creates two workloads, called "common" and "special", and lets
-the scheduler react.  It has the following steps.
+the Where Resolver react.  It has the following steps.
 
 ### Create and populate the workload management workspace for the common workload
 
@@ -291,9 +291,9 @@ EOF
 sleep 10
 ```
 
-### Edge scheduling
+### Where Resolver
 
-In response to each EdgePlacement, the scheduler will create a
+In response to each EdgePlacement, the Where Resolver will create a
 corresponding SinglePlacementSlice object.  These will indicate the
 following resolutions of the "where" predicates.
 
@@ -303,8 +303,8 @@ following resolutions of the "where" predicates.
 | edge-placement-s | guilder |
 
 Eventually there will be automation that conveniently runs the
-scheduler.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the KubeStellar command that runs the scheduler.
+Where Resolver.  In the meantime, you can run it by hand: switch to the
+ESPW and invoke the KubeStellar command that runs the Where Resolver.
 
 ```shell
 kubectl ws root:espw
@@ -313,19 +313,19 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-go run ./cmd/kubestellar-scheduler &
+go run ./cmd/kubestellar-where-resolver &
 sleep 45
 ```
 ``` { .bash .no-copy }
-I0423 01:33:37.036752   11305 kubestellar-scheduler.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
+I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
-I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
+I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
-I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-scheduler" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
+I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ^C
 ```
 
-In this simple scenario you do not need to keep the scheduler running
+In this simple scenario you do not need to keep the Where Resolver running
 after it gets its initial work done; normally it would run
 continually.
 

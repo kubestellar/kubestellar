@@ -102,7 +102,7 @@ else
 fi
 
 ps -ef | grep mailbox-controller | grep -v grep | grep -v make | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
-ps -ef | grep kubestellar-scheduler | grep -v grep | grep -v make | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
+ps -ef | grep where-resolver | grep -v grep | grep -v make | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
 ps -ef | grep placement-translator | grep -v grep | grep -v make | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
 ps -ef | grep kcp | grep -v grep | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true
 ps -ef | grep 'exe/main -v 2' | grep -v grep | awk '{print $2}' | xargs kill >/dev/null 2>&1 || true

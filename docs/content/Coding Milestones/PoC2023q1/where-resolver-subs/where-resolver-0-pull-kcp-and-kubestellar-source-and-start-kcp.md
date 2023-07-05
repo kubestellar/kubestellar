@@ -1,4 +1,4 @@
-<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->
+<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->
 Clone the v0.11.0 branch kcp source:
 ```shell
 git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
@@ -18,4 +18,4 @@ export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 popd
 sleep 30
 ```
-<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->
+<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->

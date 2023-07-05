@@ -17,7 +17,7 @@
 
 # Purpose: control whether the controllers are running, setting up the ESPW if necessary.. The following components are created:
 #           (a) 1 kcp workspace: edge service provider workspace (espw)
-#           (b) 3 kubestellar controllers: kubestellar-scheduler, mailbox-controller and placement-translator
+#           (b) 3 kubestellar controllers: kubestellar-where-resolver, mailbox-controller and placement-translator
 
 # Assumption: kcp server is running.
 
@@ -266,11 +266,11 @@ then
     pkill -f mailbox-controller
 fi
 
-# Check kubestellar-scheduler is already running
-if [ $(process_running "kubestellar-scheduler") == "running" ]
+# Check kubestellar-where-resolver is already running
+if [ $(process_running "kubestellar-where-resolver") == "running" ]
 then
-    echo "An older deployment of kubestellar-scheduler is already running - terminating it ...."
-    pkill -f "kubestellar-scheduler"
+    echo "An older deployment of kubestellar-where-resolver is already running - terminating it ...."
+    pkill -f "kubestellar-where-resolver"
 fi
 
 # Check placement-translator is already running
@@ -332,15 +332,15 @@ else
 fi
 
 
-# Start the kubestellar scheduler
+# Start the kubestellar where-resolver
 sleep 3
-kubestellar-scheduler -v 2 >& $log_folder/kubestellar-scheduler-log.txt &
+kubestellar-where-resolver -v 2 >& $log_folder/kubestellar-where-resolver-log.txt &
 
-run_status=$(wait_for_process "kubestellar-scheduler")
+run_status=$(wait_for_process "kubestellar-where-resolver")
 if [ $run_status -eq 0 ]; then
-    echo " scheduler is running (log file: $log_folder/kubestellar-scheduler-log.txt)"
+    echo " where-resolver is running (log file: $log_folder/kubestellar-where-resolver-log.txt)"
 else
-    echo " scheduler failed to start ..... exiting"
+    echo " where-resolver failed to start ..... exiting"
     exit 1
 fi
  

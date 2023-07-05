@@ -36,17 +36,17 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
-	scheduleroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/options"
+	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	"github.com/kubestellar/kubestellar/pkg/scheduler"
+	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
 )
 
-func NewSchedulerCommand() *cobra.Command {
-	options := scheduleroptions.NewOptions()
-	schedulerCommand := &cobra.Command{
-		Use:   "scheduler",
-		Short: "Reconciles SinglePlacementSlice API objects",
+func NewResolverCommand() *cobra.Command {
+	options := resolveroptions.NewOptions()
+	resolverCommand := &cobra.Command{
+		Use:   "where-resolver",
+		Short: "Maintains SinglePlacementSlice API objects for EdgePlacements",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := options.Logs.ValidateAndApply(kcpfeatures.DefaultFeatureGate); err != nil {
 				return err
@@ -70,18 +70,18 @@ func NewSchedulerCommand() *cobra.Command {
 		},
 	}
 
-	options.AddFlags(schedulerCommand.Flags())
+	options.AddFlags(resolverCommand.Flags())
 
 	if v := version.Get().String(); len(v) == 0 {
-		schedulerCommand.Version = "<unknown>"
+		resolverCommand.Version = "<unknown>"
 	} else {
-		schedulerCommand.Version = v
+		resolverCommand.Version = v
 	}
 
-	return schedulerCommand
+	return resolverCommand
 }
 
-func Run(ctx context.Context, options *scheduleroptions.Options) error {
+func Run(ctx context.Context, options *resolveroptions.Options) error {
 	const resyncPeriod = 10 * time.Hour
 	const numThreads = 2
 
@@ -137,7 +137,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 	}
 	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
 
-	// create edge-scheduler
+	// create where-resolver
 	sysAdmRestConfig, err := options.SysAdmClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
@@ -153,7 +153,7 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
 	}
-	es, err := scheduler.NewController(
+	es, err := wheresolver.NewController(
 		ctx,
 		kcpClusterClientset,
 		edgeClusterClientset,
@@ -163,11 +163,11 @@ func Run(ctx context.Context, options *scheduleroptions.Options) error {
 		workloadSharedInformerFactory.Workload().V1alpha1().SyncTargets(),
 	)
 	if err != nil {
-		logger.Error(err, "failed to create controller", "name", scheduler.ControllerName)
+		logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)
 		return err
 	}
 
-	// run edge-scheduler
+	// run where-resolver
 	doneCh := ctx.Done()
 
 	edgeSharedInformerFactory.Start(doneCh)
