@@ -163,7 +163,7 @@ func (c *controller) handleAdd(cluster interface{}, clusterKey string) {
 		runtime.HandleError(err)
 		return
 	}
-
+	c.logger.Info("New logical cluster detected", "cluster", clusterInfo.Name)
 	c.multiClusterClient.lock.Lock()
 	defer c.multiClusterClient.lock.Unlock()
 	c.multiClusterClient.configs[clusterKey] = config
