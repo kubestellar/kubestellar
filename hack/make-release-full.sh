@@ -28,8 +28,8 @@ set -e
 srcdir=$(dirname "$0")
 $srcdir/make-release-container.sh $kcpe_version
 
-os_names=( darwin darwin linux linux linux )
-arch_names=( arm64 amd64 arm64 amd64 ppc64le )
+os_names=( darwin darwin linux linux linux linux )
+arch_names=( arm64 amd64 arm64 amd64 ppc64le s390x)
 length=${#os_names[@]}
 for (( i=0; i<length; i++ ));
 do
