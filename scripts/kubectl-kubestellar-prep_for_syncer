@@ -34,7 +34,7 @@ imw=.
 espw="root:espw"
 stname=""
 output=""
-syncer_image="quay.io/kubestellar/syncer:v0.3.0"
+syncer_image="quay.io/kubestellar/syncer:v0.3.1"
 kubectl_flags=()
 
 while (( $# > 0 )); do
