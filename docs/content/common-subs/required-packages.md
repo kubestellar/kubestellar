@@ -10,8 +10,8 @@
         ```
         ``` title="kind  - https://kind.sigs.k8s.io/docs/user/quick-start/"         
         ```
-        ``` title="kubectl  - https://kubernetes.io/docs/tasks/tools/" (version range expected: 1.23-1.25)"         ```
-        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"         
+        ``` title="kubectl  - https://kubernetes.io/docs/tasks/tools/" (version range expected: 1.23-1.25)         ```
+        ``` title="ko - https://github.com/ko-build/ko" (required for compiling KubeStellar Syncer)
         ```
         ``` title="GO v1.19 -(https://gist.github.com/jniltinho/8758e15a9ef80a189fce)"         You will need GO to compile and run kcp and the Kubestellar processes         
         ```
