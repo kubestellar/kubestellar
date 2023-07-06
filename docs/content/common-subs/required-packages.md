@@ -1,20 +1,27 @@
 <!--required-packages-start-->
 !!! tip "Required Packages:"
     === "General"
-        You will need the following tools to run this KubeStellar quickstart example. Select the tab for your environment for suggested commands to install them
-        ``` title="jq  - https://stedolan.github.io/jq/download/"         
-        ```
-        ``` title="yq  - https://github.com/mikefarah/yq#install"         
-        ```
-        ``` title="docker  - https://docs.docker.com/engine/install/"         
-        ```
-        ``` title="kind  - https://kind.sigs.k8s.io/docs/user/quick-start/"         
-        ```
-        ``` title="kubectl  - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"         ```
-        ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
-        ```
-        ``` title="GO v1.19 -(https://gist.github.com/jniltinho/8758e15a9ef80a189fce)         You will need GO to compile and run kcp and the Kubestellar processes         "
-        ```
+        You will need the following tools to run this KubeStellar quickstart example. 
+        Select the tab for your environment for suggested commands to install them
+
+        + make (only needed if you do more advanced builds; omitted from OS-specific instructions)
+
+        + __curl__ (omitted from most OS-specific instructions)
+
+        + [__jq__](https://stedolan.github.io/jq/download/)       
+
+        + [__yq__](https://github.com/mikefarah/yq#install)
+
+        + [__docker__](https://docs.docker.com/engine/install/)         
+
+        + [__kind__](https://kind.sigs.k8s.io/docs/user/quick-start/)        
+
+        + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25) 
+
+        + [__ko__](https://github.com/ko-build/ko) (required for compiling KubeStellar Syncer)
+
+        + [__GO v1.19__](https://gist.github.com/jniltinho/8758e15a9ef80a189fce)         You will need GO to compile and run kcp and the Kubestellar processes         
+
     === "Mac"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
@@ -116,9 +123,11 @@
         ``` title="Chocolatey - https://chocolatey.org/install#individual"
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         ```
+        ``` title="curl"
+        choco install curl -y
+        ```
         ``` title="jq - https://stedolan.github.io/jq/download/"
         choco install jq -y
-        choco install curl -y
         ```
         ``` title="yq - https://github.com/mikefarah/yq#install"
         choco install yq -y
@@ -133,14 +142,17 @@
         curl.exe -LO "https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe"
         ```
         ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
-        VERSION=TODO # choose the latest version (without v prefix)
-        OS=Linux     # or Darwin
-        ARCH=x86_64  # or arm64, i386, s390x
+        VERSION="0.14.1" # choose the latest version (without v prefix)
+        OS="Linux"    # or Darwin
+        # set proper architecture ( ARCH=x86_64  # or arm64, i386, s390x)
+        # for AMD64 / x86_64
+        [ $(uname -m) = x86_64 ] && ARCH="x86_64"
+        # for ARM64 / aarch64
+        [ $(uname -m) = aarch64 ] && ARCH="arm64"
+        # (simplified install without running slsa-verifier)
         curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
-        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
-        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
         tar xzf ko.tar.gz ko
-        chmod +x ./ko
+        chmod +x ./ko && sudo mv ./ko /usr/local/bin/ko
         ```
         [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
 <!--required-packages-end-->
