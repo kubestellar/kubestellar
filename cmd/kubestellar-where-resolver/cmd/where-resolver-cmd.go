@@ -138,12 +138,12 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
 
 	// create where-resolver
-	sysAdmRestConfig, err := options.SysAdmClientOpts.ToRESTConfig()
+	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	edgeClusterClientset, err := edgeclientset.NewForConfig(sysAdmRestConfig)
+	edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
