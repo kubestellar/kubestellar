@@ -1,5 +1,14 @@
 <!--required-packages-start-->
 !!! tip "Required Packages:"
+    === "General"
+        You will need the following tools to run the KubeStellar quickstart. Check the appropriate tab for your environment for suggested commands to install them
+        + jq ``` title="jq - https://stedolan.github.io/jq/download/"        ```
+        + yq ``` title="yq - https://github.com/mikefarah/yq#install"        ```
+        + docker ``` title="docker - https://docs.docker.com/engine/install/"        ```
+        + kind ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"         ```
+        + kubectl ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"    ```
+        + ko ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"        ```
+        + Go [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the Kubestellar processes
     === "Mac"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
