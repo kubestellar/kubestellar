@@ -32,6 +32,8 @@ Table of contents:
 
 This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
 
+## 1. Install and run **KubeStellar**
+
 {%
    include-markdown "quickstart-subs/quickstart-1-install-and-run-kubestellar.md"
    start="<!--quickstart-1-install-and-run-kubestellar-start-->"
