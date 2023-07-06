@@ -59,31 +59,42 @@
         source /etc/profile
         go version
         ```
-    === "RHEL"
+   === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
         ``` title="yq - https://github.com/mikefarah/yq#install"
-        yum -y install yq
+        # easiest to install with snap
+        snap install yq
         ```
         ``` title="docker - https://docs.docker.com/engine/install/"
         yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64 && chmod +x ./kind && mv ./kind /usr/local/bin
+        # For AMD64 / x86_64
+        [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
+        # For ARM64
+        [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
+        chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
+        # For AMD64 / x86_64
+        [ $(uname -m) = x86_64 ] && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
+        # for ARM64 / aarch64
+        [ $(uname -m) = aarch64 ] && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl" && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
         ```
         ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
-        VERSION=TODO # choose the latest version (without v prefix)
-        OS=Linux     # or Darwin
-        ARCH=x86_64  # or arm64, i386, s390x
+        VERSION="0.14.1" # choose the latest version (without v prefix)
+        OS="Linux"    # or Darwin
+        # set proper architecture ( ARCH=x86_64  # or arm64, i386, s390x)
+        # for AMD64 / x86_64
+        [ $(uname -m) = x86_64 ] && ARCH="x86_64"
+        # for ARM64 / aarch64
+        [ $(uname -m) = aarch64 ] && ARCH="arm64"
+        # (simplified install without running slsa-verifier)
         curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
-        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
-        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
         tar xzf ko.tar.gz ko
-        chmod +x ./ko
+        chmod +x ./ko && sudo mv ./ko /usr/local/bin/ko
         ```
         [GO v1.19](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.
     === "Windows"
