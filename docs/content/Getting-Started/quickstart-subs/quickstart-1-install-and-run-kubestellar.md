@@ -1,5 +1,4 @@
 <!--quickstart-1-install-and-run-kubestellar-start-->
-## 1. Install and run **KubeStellar**
 
 KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
 
