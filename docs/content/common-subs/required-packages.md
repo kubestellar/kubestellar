@@ -59,7 +59,7 @@
         source /etc/profile
         go version
         ```
-   === "Fedora/RHEL/CentOS"
+    === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
