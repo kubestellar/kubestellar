@@ -797,6 +797,7 @@ func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef de
 	return finish()
 }
 
+// Returns `retry bool`.
 func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceObjectRef) bool {
 	namespaced := soRef.namespace != noNamespace
 	logger := klog.FromContext(ctx)
@@ -856,7 +857,7 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 		var tryAgain bool
 		remWork := []func() bool{}
 		destinations.Visit(func(destination SinglePlacement) error {
-			retryThis, rem := wp.syncSourceToDest(ctx, logger, soRef, srcMRObject, namespaced, deleted, modesForSync, destination)
+			retryThis, rem := wp.syncSourceToDestLocked(ctx, logger, soRef, srcMRObject, namespaced, deleted, modesForSync, destination)
 			tryAgain = tryAgain || retryThis
 			if rem != nil {
 				remWork = append(remWork, rem)
@@ -880,7 +881,9 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 var returnFalse = func() bool { return false }
 var returnTrue = func() bool { return true }
 
-func (wp *workloadProjector) syncSourceToDest(ctx context.Context, logger klog.Logger,
+// Sync a source object to one MBWS.
+// Returns `(retry bool, unlocked func() (retry bool))`
+func (wp *workloadProjector) syncSourceToDestLocked(ctx context.Context, logger klog.Logger,
 	soRef sourceObjectRef, srcMRObject mrObject, namespaced, deleted bool,
 	modesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal],
 	destination SinglePlacement) (bool, func() bool) {
@@ -1315,6 +1318,8 @@ func (wps *wpPerSource) enqueueSourceObject(gr metav1.GroupResource, namespaced 
 	wps.wp.queue.Add(ref)
 }
 
+// enqueueDestinationObject enqueues a reference to a particular object in a particular MBWS.
+// Calls to this happen only after the object's resource was defined (although it might later be undefined).
 func (wpd *wpPerDestination) enqueueDestinationObject(gr metav1.GroupResource, namespaced bool, obj any, action string) {
 	dfu, ok := obj.(k8scache.DeletedFinalStateUnknown)
 	if ok {
