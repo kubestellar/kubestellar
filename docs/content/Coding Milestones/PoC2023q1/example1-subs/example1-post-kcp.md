@@ -24,6 +24,7 @@ executables (e.g., `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
 ```shell
+git clone -b {{ config.ks_branch }} {{ config.repo_url }}
 cd ../kubestellar
 make build
 export PATH=$(pwd)/bin:$PATH
