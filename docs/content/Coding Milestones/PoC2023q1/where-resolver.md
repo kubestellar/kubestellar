@@ -3,7 +3,7 @@ short_name: where-resolver
 manifest_name: 'docs/content/Coding Milestones/PoC2023q1/where-resolver.md'
 pre_req_name: 'docs/content/common-subs/pre-req.md'
 ---
-[![docs-ecutable - where-resolver]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-scheduler.yml)&nbsp;&nbsp;&nbsp;
+[![docs-ecutable - where-resolver]({{config.repo_url}}/actions/workflows/docs-ecutable-where-resolver.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-where-resolver.yml)&nbsp;&nbsp;&nbsp;
 {%
    include-markdown "../../common-subs/required-packages.md"
    start="<!--required-packages-start-->"

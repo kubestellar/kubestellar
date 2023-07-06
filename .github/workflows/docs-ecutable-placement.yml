@@ -12,7 +12,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-placement.yml"
@@ -24,7 +24,7 @@ on:
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator.md"
       - "docs/content/Coding Milestones/PoC2023q1/mailbox-controller-subs/**"
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/placement-translator-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-placement.yml"
