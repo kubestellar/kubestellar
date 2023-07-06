@@ -76,7 +76,7 @@ kcp_version() {
 }
 
 kcp_get_latest_version() {
-    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 kubeconfig_valid() {
@@ -118,7 +118,7 @@ kubestellar_running() {
 }
 
 kubestellar_get_latest_version() {
-    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_os_type() {
