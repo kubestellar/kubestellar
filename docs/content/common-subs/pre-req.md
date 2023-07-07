@@ -2,6 +2,7 @@
 os_type=""
 arch_type=""
 folder=""
+
 get_os_type() {
   case "$OSTYPE" in
       linux*)   echo "linux" ;;
@@ -70,7 +71,14 @@ else
 fi
 
 if command -v go >/dev/null 2>&1; then
+    go_version_output=$(go version)
+    go_version=$(echo "$go_version_output" | awk '{print $3}')
     echo "GO is installed"
+    if [[ "$go_version" == "go1.19"* ]]; then
+      echo "Go version 1.19 is installed."
+    else
+      echo "Go version 1.19 is not installed.  Please install Go version 1.19 to continue"
+    fi
 else
     if [ "$os_type" == "darwin" ]; then
       brew install go@1.19
