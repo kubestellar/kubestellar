@@ -4,9 +4,8 @@ run-name: elapsed time collector - ${{ github.ref_name }}
 on:
     schedule:
       - cron: "0 0 * * *"
-# on:
-#   # So we can trigger manually if needed
-#   workflow_dispatch:
+    # So we can trigger manually if needed
+    workflow_dispatch:
 #   # To confirm any changes to docs build successfully, without deploying them
 #   push:
 #     branches:
@@ -18,10 +17,10 @@ on:
 #         - "docs/content/common-subs/**"
 #         - "docs/scripts/get-elapsed-time.sh"
 #         - ".github/workflows/elapsed-time-collector.yml"
- 
-env:
-  docs-ecutable-filename: mailbox
 
+env:
+  GH_TOKEN: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+  
 permissions:
   contents: write
 

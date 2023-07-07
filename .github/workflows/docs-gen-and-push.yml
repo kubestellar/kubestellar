@@ -25,8 +25,8 @@ on:
 permissions:
   contents: write
 
-# concurrency:
-#   group: ${{ github.workflow }}
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   generate-and-push:
