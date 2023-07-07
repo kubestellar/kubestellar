@@ -1,4 +1,4 @@
-# KubeStellar in a container
+# Building KubeStellar deployment as a container
 
 Table of contents:
 - [KubeStellar in a container](#kubestellar-in-a-container)
