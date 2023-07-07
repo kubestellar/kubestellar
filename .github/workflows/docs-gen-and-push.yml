@@ -25,11 +25,12 @@ on:
 permissions:
   contents: write
 
-# concurrency:
-#   group: ${{ github.workflow }}
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   generate-and-push:
+    if: github.repository_owner == 'kubestellar'
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:

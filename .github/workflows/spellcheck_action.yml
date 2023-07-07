@@ -28,6 +28,7 @@ on:
 
 jobs:
   build:
+    if: github.repository_owner == 'kubestellar'
     name: Spellcheck
     runs-on: ubuntu-latest
     steps:

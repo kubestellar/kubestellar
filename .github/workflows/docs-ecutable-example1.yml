@@ -25,6 +25,8 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-example1.yml"
       - "docs/scripts/docs-ecutable.sh"
+    tags:
+      - 'v*'
 
 env:
   docs-ecutable-filename: example1
@@ -32,6 +34,7 @@ env:
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for example1 e2e
     runs-on: ubuntu-latest
     outputs:
