@@ -46,16 +46,17 @@ RUN curl -SL -o kubestellar.tar.gz https://github.com/kubestellar/kubestellar/re
     mkdir kubestellar && \
     tar -C kubestellar -zxf kubestellar.tar.gz
 
-# add entry script
-ADD . /
-
 ###############################################################################
 # KubeStellar image
 ###############################################################################
 FROM redhat/ubi9
 
 # install requirements (for running inside the container)
-RUN yum install -y jq procps
+RUN yum install -y jq procps && \
+    groupadd kubestellar && \
+    adduser -g kubestellar kubestellar && \
+    mkdir -p /.kcp /kubestellar-logs && \
+    chown -R kubestellar:kubestellar /.kcp /kubestellar-logs
 
 WORKDIR /
 
@@ -64,7 +65,13 @@ COPY --from=builder /kubectl         /usr/local/bin/kubectl
 COPY --from=builder /kcp/bin         /kcp
 COPY --from=builder /kcp-plugins/bin /kcp-plugins
 COPY --from=builder /kubestellar     /kubestellar
-COPY --from=builder /entry.sh        /entry.sh
+
+# add entry script
+ADD entry.sh /entry.sh
+
+VOLUME [ "/.kcp", "/kubestellar-logs", "/kcp", "/kcp-plugins", "/kubestellar"]
+
+USER kubestellar
 
 # setup the environment variables
 ENV PATH=$PATH:/kcp:/kcp-plugins:/kubestellar/bin

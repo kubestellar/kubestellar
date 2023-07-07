@@ -48,9 +48,11 @@ run:
 	$(info Arguments: IMG=${IMG})
 	$(info Arguments: KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION})
 	$(info Arguments: NAME=${NAME})
+	mkdir -p ~/.kcp
 	docker run -d \
 		-p 6443:6443 \
 		-v ~/.kcp:/.kcp \
+		--user $(shell id -u) \
 		--name ${NAME} ${IMG}:${KUBESTELLAR_VERSION}
 	docker cp ${IMG}:/kcp-plugins ~/kcp
 	docker cp ${IMG}:/kubestellar ~/kubestellar
@@ -81,6 +83,4 @@ clean:
 	$(info Arguments: NAME=${NAME})
 	docker rm --force ${NAME}
 	docker image rm ${IMG}:${KUBESTELLAR_VERSION}
-	sudo rm -rf ~/kcp ~/kubestellar ~/.kcp
-
-
+	rm -rf ~/kcp ~/kubestellar ~/.kcp
