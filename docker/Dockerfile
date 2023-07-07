@@ -15,7 +15,7 @@
 ###############################################################################
 # Builder image
 ###############################################################################
-FROM ubuntu AS builder
+FROM redhat/ubi9 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -25,8 +25,7 @@ ARG KUBESTELLAR_VERSION=v0.3.1
 WORKDIR /
 
 # install requirements
-RUN apt-get update && \
-    apt-get install -y curl wget
+RUN yum install -y wget
 
 # download kubectl binaries
 RUN wget -nv "https://dl.k8s.io/release/v1.25.3/bin/${TARGETPLATFORM}/kubectl" -O kubectl && \
@@ -53,11 +52,10 @@ ADD . /
 ###############################################################################
 # KubeStellar image
 ###############################################################################
-FROM ubuntu
+FROM redhat/ubi9
 
 # install requirements (for running inside the container)
-RUN apt-get update && \
-    apt-get install -y jq
+RUN yum install -y jq procps
 
 WORKDIR /
 
