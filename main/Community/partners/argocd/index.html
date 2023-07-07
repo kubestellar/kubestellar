@@ -1821,14 +1821,14 @@ The command and output should be similar to
 
 ### Create Argo CD Applications
 Once KubeStellar's workspaces are added, Argo CD Applications can be created as normal.
-There are a few examples listed [here](https://github.com/edge-experiments/gitops-source/tree/main/edge-mc),
+There are a few examples listed [here](https://github.com/edge-experiments/gitops-source/tree/main/kubestellar),
 and the commands to use the examples are listed as follows.
 
 #### Create Argo CD Applications against KubeStellar's IMW
 Create two Locations. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>locations<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>--path<span class="w"> </span>edge-mc/locations/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>--path<span class="w"> </span>kubestellar/locations/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="go">application &#39;locations&#39; created</span>
@@ -1837,7 +1837,7 @@ Create two Locations. The command and output should be similar to
 Create two SyncTargets. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>synctargets<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--path<span class="w"> </span>edge-mc/synctargets/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--path<span class="w"> </span>kubestellar/synctargets/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:imw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="go">application &#39;synctargets&#39; created</span>
@@ -1847,7 +1847,7 @@ Create two SyncTargets. The command and output should be similar to
 Create a Namespace. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>--path<span class="w"> </span>edge-mc/namespaces/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>--path<span class="w"> </span>kubestellar/namespaces/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="go">application &#39;namespace&#39; created</span>
@@ -1856,7 +1856,7 @@ Create a Namespace. The command and output should be similar to
 Create a Deployment for 'cpumemload'. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>cpumemload<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>--path<span class="w"> </span>edge-mc/workloads/cpumemload/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>--path<span class="w"> </span>kubestellar/workloads/cpumemload/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="go">application &#39;cpumemload&#39; created</span>
@@ -1865,7 +1865,7 @@ Create a Deployment for 'cpumemload'. The command and output should be similar t
 Create an EdgePlacement. The command and output should be similar to
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="gp">$ </span>argocd<span class="w"> </span>app<span class="w"> </span>create<span class="w"> </span>edgeplacement<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>--repo<span class="w"> </span>https://github.com/edge-experiments/gitops-source.git<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>--path<span class="w"> </span>edge-mc/placements/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>--path<span class="w"> </span>kubestellar/placements/<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>--dest-server<span class="w"> </span>https://172.31.31.125:6443/clusters/root:my-org:wmw-turbo<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>--sync-policy<span class="w"> </span>automated
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="go">application &#39;edgeplacement&#39; created</span>
