@@ -18,6 +18,7 @@ env:
 
 jobs:
   goreleaser:
+    if: github.repository_owner == 'kubestellar'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout

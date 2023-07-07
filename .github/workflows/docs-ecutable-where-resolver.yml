@@ -25,13 +25,16 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-where-resolver.yml"
       - "docs/scripts/docs-ecutable.sh"
-
+    tags:
+      - 'v*'
+      
 env:
   docs-ecutable-filename: where-resolver
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/where-resolver.md'"
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for where resolver e2e
     runs-on: ubuntu-latest
     outputs:

@@ -9,6 +9,7 @@ on:
 jobs:
   issue:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'kubestellar'
     steps:
       - name: Check Bi-Weekly Condition
         id: check_condition

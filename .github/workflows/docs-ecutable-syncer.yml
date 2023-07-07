@@ -28,6 +28,8 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-syncer.yml"
       - "docs/scripts/docs-ecutable.sh"
+    tags:
+      - 'v*'
 
 env:
   docs-ecutable-filename: syncer
@@ -35,6 +37,7 @@ env:
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for syncer e2e
     runs-on: ubuntu-latest
     outputs:

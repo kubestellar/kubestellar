@@ -26,6 +26,7 @@ permissions:
 
 jobs:
   elapsed-time-collector:
+    if: github.repository_owner == 'kubestellar'
     name: elapsed time collector
     runs-on: ubuntu-latest
     strategy:

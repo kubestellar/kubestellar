@@ -25,13 +25,16 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-qs.yml"
       - "docs/scripts/docs-ecutable.sh"
-
+    tags:
+      - 'v*'
+      
 env:
   docs-ecutable-filename: qs
   docs-ecutable-md-filename: "'docs/content/Getting-Started/quickstart.md'"
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for quickstart e2e
     runs-on: ubuntu-latest
     outputs:

@@ -29,6 +29,8 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-placement.yml"
       - "docs/scripts/docs-ecutable.sh"
+    tags:
+      - 'v*'
 
 env:
   docs-ecutable-filename: placement
@@ -36,6 +38,7 @@ env:
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for placement e2e
     runs-on: ubuntu-latest
     outputs:

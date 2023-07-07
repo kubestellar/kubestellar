@@ -21,6 +21,7 @@ env:
 
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: create KubeStellar-Syncer image
     runs-on: ubuntu-latest
     steps:
