@@ -2301,8 +2301,9 @@ repo and then <code>make build</code> to populate its <code>bin</code> directory
 fetch the binary archive appropriate for your machine from a release
 and unpack it (creating a <code>bin</code> directory).  The commands exhibited
 just below assume that the repo has been fetched but not yet buit.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>make<span class="w"> </span>build
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>main<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>make<span class="w"> </span>build
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <p>In the following exhibited command lines, the commands described as
 "KubeStellar commands" and the commands that start with <code>kubectl
