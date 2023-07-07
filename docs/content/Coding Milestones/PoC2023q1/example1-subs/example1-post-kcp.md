@@ -19,6 +19,7 @@ just below assume that the repo has been fetched but not yet buit.
 
 ```shell
 git clone -b {{ config.ks_branch }} {{ config.repo_url }}
+cd kubestellar
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
