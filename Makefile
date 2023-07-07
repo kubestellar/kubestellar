@@ -136,9 +136,10 @@ build-all:
 build-kubestellar-syncer-image: DOCKER_REPO ?= 
 build-kubestellar-syncer-image: IMAGE_TAG ?= latest
 build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
+build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= --sbom=none # quay.io hasn't supported SPDX media type for SBOM yet (https://github.com/ko-build/ko/issues/970#issuecomment-1456951250)
 build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 .PHONY: build-kubestellar-syncer-image-local

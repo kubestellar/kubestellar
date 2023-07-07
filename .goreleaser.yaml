@@ -1,0 +1,31 @@
+# .goreleaser.yaml
+builds:
+- skip: true # skip build for now since we have another mechanism to build all kubestellar binaries
+  id: kubestellar-syncer
+  main: ./cmd/syncer
+  binary: kubestellar-syncer
+  goos:
+  - linux
+  - darwin
+  goarch:
+  - amd64
+  - arm64
+  - s390x
+
+kos:
+- build: kubestellar-syncer
+  main: ./cmd/syncer
+  repository: quay.io/kubestellar/syncer
+  tags:
+  - '{{.Version}}'
+  bare: true
+  base_image: cgr.dev/chainguard/static
+  preserve_import_paths: false
+  sbom: none
+  platforms:
+  - linux/amd64
+  - linux/arm64
+  - linux/s390x
+
+release:
+  disable: true # disable to publish artifacts to Github release since we have another mechanism to do it.
