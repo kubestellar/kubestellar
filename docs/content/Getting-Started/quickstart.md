@@ -9,28 +9,35 @@
 %}
 
 !!! tip "Estimated time to complete this example:" 
-    ~4 minutes
+    ~4 minutes (after installing prerequisites)
+
+
+## Setup Instructions
+
+Table of contents:
+
+1. [Check Required Packages](#1-check-required-packages)
+2. [Install and run **KubeStellar**](#2-install-and-run-kubestellar)
+3. [Example deployment of Apache HTTP Server workload into two local kind clusters](#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
+      1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
+      2. [Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
+      3. [Onboarding the clusters](#c-onboarding-the-clusters)
+      4. [Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+4. [Teardown the environment](#4-teardown-the-environment)
+5. [Next Steps](#5-next-steps)
+
+
+This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
+
+## 1. Check Required Packages
    
 {%
    include-markdown "../common-subs/required-packages.md"
    start="<!--required-packages-start-->"
    end="<!--required-packages-end-->"
 %}
-## Setup Instructions
 
-Table of contents:
-
-1. [Install and run **KubeStellar**](#1-install-and-run-kubestellar)
-2. [Example deployment of Apache HTTP Server workload into two local kind clusters](#2-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
-      1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
-      2. [Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
-      3. [Onboarding the clusters](#c-onboarding-the-clusters)
-      4. [Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
-3. [Teardown the environment](#3-teardown-the-environment)
-4. [Next Steps](#4-next-steps)
-
-
-This guide is intended to show how to (1) quickly bring up a **KubeStellar** environment with its dependencies from a binary release and then (2) run through a simple example usage.
+## 2. Install and run **KubeStellar**
 
 {%
    include-markdown "quickstart-subs/quickstart-1-install-and-run-kubestellar.md"
@@ -38,7 +45,7 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
    end="<!--quickstart-1-install-and-run-kubestellar-end-->"
 %}
 
-## 2. Example deployment of Apache HTTP Server workload into two local kind clusters
+## 3. Example deployment of Apache HTTP Server workload into two local kind clusters
 
 In this example you will create two edge clusters and define one
 workload that will be distributed from the center to those edge
@@ -85,7 +92,7 @@ workload and summarization aspirations removed.
    end="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end-->"
 %}
 
-## 3. Teardown the environment
+## 4. Teardown the environment
 
 {%
    include-markdown "../common-subs/teardown-the-environment.md"
@@ -93,7 +100,7 @@ workload and summarization aspirations removed.
    end="<!--teardown-the-environment-end-->"
 %}
 
-## 4. Next Steps
+## 5. Next Steps
 
 What you just did is a shortened version of the 
 [more detailed example](../../Coding%20Milestones/PoC2023q1/example1/) on the website,
