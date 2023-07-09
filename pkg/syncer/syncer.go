@@ -56,11 +56,11 @@ const (
 func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) error {
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("syncTargetName", cfg.SyncTargetName)
-	logger.V(2).Info("starting edge-mc syncer")
+	logger.V(2).Info("starting kubestellar syncer")
 	kcpVersion := version.Get().GitVersion
 
 	bootstrapConfig := rest.CopyConfig(cfg.UpstreamConfig)
-	rest.AddUserAgent(bootstrapConfig, "edge-mc#syncer/"+kcpVersion)
+	rest.AddUserAgent(bootstrapConfig, "kubestellar#syncer/"+kcpVersion)
 
 	// For edgeSyncConfig
 	syncConfigClientSet, err := edgeclientset.NewForConfig(bootstrapConfig)
@@ -93,7 +93,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	syncerConfigInformerFactory.WaitForCacheSync(ctx.Done())
 
 	upstreamConfig := rest.CopyConfig(cfg.UpstreamConfig)
-	rest.AddUserAgent(upstreamConfig, "edge-mc#syncer/"+kcpVersion)
+	rest.AddUserAgent(upstreamConfig, "kubestellar#syncer/"+kcpVersion)
 	upstreamDynamicClient, err := dynamic.NewForConfig(upstreamConfig)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	}
 
 	downstreamConfig := rest.CopyConfig(cfg.DownstreamConfig)
-	rest.AddUserAgent(downstreamConfig, "edge-mc#syncer/"+kcpVersion)
+	rest.AddUserAgent(downstreamConfig, "kubestellar#syncer/"+kcpVersion)
 	downstreamDynamicClient, err := dynamic.NewForConfig(downstreamConfig)
 	if err != nil {
 		return err

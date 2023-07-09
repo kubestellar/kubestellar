@@ -76,7 +76,7 @@ kcp_version() {
 }
 
 kcp_get_latest_version() {
-    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 kubeconfig_valid() {
@@ -90,7 +90,7 @@ kubeconfig_valid() {
 }
 
 kubestellar_installed() {
-    if [[ "$(which mailbox-controller)" == "" || "$(which placement-translator)" == "" || "$(which kubestellar-scheduler)" == "" ]]; then
+    if [[ "$(which mailbox-controller)" == "" || "$(which placement-translator)" == "" || "$(which kubestellar-where-resolver)" == "" ]]; then
         echo "false"
     else
         echo "true"
@@ -110,7 +110,7 @@ kubestellar_install() {
 }
 
 kubestellar_running() {
-    if [[ "$(pgrep -f mailbox-controller)" == "" ||  "$(pgrep -f placement-translator)" == "" || "$(pgrep -f 'kubestellar-scheduler')" == "" ]]; then
+    if [[ "$(pgrep -f mailbox-controller)" == "" ||  "$(pgrep -f placement-translator)" == "" || "$(pgrep -f 'kubestellar-where-resolver')" == "" ]]; then
         echo "false"
     else
         echo "true"
@@ -118,7 +118,7 @@ kubestellar_running() {
 }
 
 kubestellar_get_latest_version() {
-    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | head -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_os_type() {

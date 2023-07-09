@@ -1,4 +1,5 @@
 name: Generate and push docs
+run-name: Generate and push docs - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed
@@ -29,6 +30,7 @@ concurrency:
 
 jobs:
   generate-and-push:
+    if: github.repository_owner == 'kubestellar'
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:

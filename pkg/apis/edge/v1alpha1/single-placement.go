@@ -27,8 +27,8 @@ import (
 // on a resource defined by a CRD.
 const SourcePlacementLabelKey string = "edge.kcp.io/source-placement"
 
-// SinglePlacementSlice is the interface between "scheduling" and syncing.
-// For a given EdgePlacement object, the scheduler figures out which Locations
+// SinglePlacementSlice holds results of resolving a "where predicate".
+// For a given EdgePlacement object, the Where Resolver figures out which Locations
 // match that EdgePlacement and selects the SyncTarget to use within that Location, then
 // puts these results into some SinglePlacementSlice API objects.
 // We use potentially multiple API objects so that no one of them has to get
@@ -46,7 +46,7 @@ type SinglePlacementSlice struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// `destinations` holds some of the results of scheduling.
+	// `destinations` holds some of the matching locations
 	Destinations []SinglePlacement `json:"destinations"`
 }
 

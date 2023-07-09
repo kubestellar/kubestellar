@@ -1,5 +1,5 @@
-name: docs-ecutable - Scheduler
-run-name: docs-ecutable - Scheduler - ${{ github.ref_name }}
+name: docs-ecutable - Where Resolver
+run-name: docs-ecutable - Where Resolver - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed
@@ -7,32 +7,35 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request_target:
     branches:
+      - main
       - "release-*"
     paths:
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver.md"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/docs-ecutable-scheduler.yml"
+      - ".github/workflows/docs-ecutable-where-resolver.yml"
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
+      - main
       - "release-*"
     paths:
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
-      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver.md"
+      - "docs/content/Coding Milestones/PoC2023q1/where-resolver-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/docs-ecutable-scheduler.yml"
+      - ".github/workflows/docs-ecutable-where-resolver.yml"
       - "docs/scripts/docs-ecutable.sh"
-
-
+    tags:
+      - 'v*'
+      
 env:
-  docs-ecutable-filename: scheduler
-  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'"
+  docs-ecutable-filename: where-resolver
+  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/where-resolver.md'"
 
 jobs:
   docs-ecutable:
     if: github.repository_owner == 'kubestellar'
-    name: docs-ecutable - for scheduler e2e
+    name: docs-ecutable - for where resolver e2e
     runs-on: ubuntu-latest
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}

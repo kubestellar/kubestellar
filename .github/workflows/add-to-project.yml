@@ -11,6 +11,7 @@ permissions:
   
 jobs:
   create-update-project:
+    if: github.repository_owner == 'kubestellar'
     name: Create/update project issue
     runs-on: ubuntu-latest
     steps:

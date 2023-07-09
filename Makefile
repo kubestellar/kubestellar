@@ -130,15 +130,16 @@ build-all:
 
 # build and push kubestellar-syncer image by ko
 # e.g. usage:
-#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/edge-mc/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-# This example builds ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/edge-mc/syncer:dev-2023-04-24-x
+#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+# This example builds ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
 .PHONY: build-kubestellar-syncer-image
 build-kubestellar-syncer-image: DOCKER_REPO ?= 
 build-kubestellar-syncer-image: IMAGE_TAG ?= latest
 build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
+build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= --sbom=none # quay.io hasn't supported SPDX media type for SBOM yet (https://github.com/ko-build/ko/issues/970#issuecomment-1456951250)
 build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) ./cmd/syncer))
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 .PHONY: build-kubestellar-syncer-image-local

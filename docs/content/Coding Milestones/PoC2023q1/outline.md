@@ -184,8 +184,8 @@ The edge multi-cluster service is provided by one workspace that
 includes the following things.
 
 - An APIExport of the edge API group.
-- The edge controllers: scheduler, placement translator, mailbox
-  controller, and status summarizer.
+- The edge controllers: Where Resolver, Placement Translator, Mailbox
+  Controller, and Status Summarizer.
 
 ## Workload Management workspaces (WMW)
 
@@ -639,7 +639,7 @@ downsynced objects go here from their workload management workspaces,
 and upsynced objects go here from the edge cluster.  These workspaces
 are all children of the edge service provider workspace.
 
-## KubeStellar Scheduler
+## Where Resolver
 
 This controller monitors the EdgePlacement, Location, and SyncTarget
 objects and maintains the results of matching.  For each EdgePlacement
@@ -664,10 +664,10 @@ following five parts.
 
 - Resolve each EdgePlacement's "what" part to a list of particular
   workspace items (namespaces and non-namespaced objects).
-- Monitor the SinglePlacementSlice objects that report the scheduler's
+- Monitor the SinglePlacementSlice objects that report the Where Resolver's
   resolutions of the "where" part of the EdgePlacement objects.
-- Maintain the association between the resolved "where" from the
-  scheduler and the resolved what.
+- Maintain the association between the resolved "where" (from the
+  Where Resolver) and the resolved what.
 - Maintain the copies, with customization, of the workload objects
   from source workspace to mailbox workspaces.
 - Maintain the SyncerConfig object in each mailbox workspace to direct
@@ -732,7 +732,7 @@ user creates if the workload type did not already provide.
 
 - An APIBinding to the APIExport of `edge.kcp.io` from the edge
   service provider workspace.
-- For each of the Scheduler, the Placement Translator, and the
+- For each of the Where Resolver, the Placement Translator, and the
   Status Summarizer:
   - A ServiceAccount for that controller to authenticate as;
   - A ClusterRole granting the privileges needed by that controller;

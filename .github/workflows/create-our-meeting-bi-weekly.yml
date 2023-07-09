@@ -1,4 +1,6 @@
 name: Create KubeStellar bi-Weekly Meeting issue
+run-name: Create KubeStellar bi-Weekly Meeting issue - ${{ github.ref_name }}
+
 on:
   workflow_dispatch:
   schedule:
@@ -7,6 +9,7 @@ on:
 jobs:
   issue:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'kubestellar'
     steps:
       - name: Check Bi-Weekly Condition
         id: check_condition

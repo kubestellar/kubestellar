@@ -16,25 +16,22 @@ noted that the florin or guilder cluster is being accessed.
 It is also assumed that you have the usual kcp kubectl plugins on your
 `$PATH`.
 
-```shell
-git clone {{ config.repo_url }} KubeStellar
-```
-
 clone the v0.11.0 branch kcp source:
 ```shell
 git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
 ```
 build the kubectl-ws binary and include it in `$PATH`
 ```shell
-cd kcp
+pushd kcp
 make build
+export PATH=$(pwd)/bin:$PATH
 ```
 
 run kcp (kcp will spit out tons of information and stay running in this terminal window)
 ```shell
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-export PATH=$(pwd)/bin:$PATH
 kcp start &> /dev/null &
+popd
 sleep 30 
 ```
 <!--example1-start-kcp-end-->
