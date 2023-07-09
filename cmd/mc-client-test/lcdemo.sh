@@ -18,7 +18,8 @@
 clear
 
 TYPE_SPEED=20
-DEMO_PROMPT="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+#DEMO_PROMPT="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+DEMO_PROMPT="\[\033[01;32m\]\u@WSL2\[\033[00m\]:\[\033[01;34m\]\[\033[00m\]\$"
 
 MGT_NAME="mgt"
 MGT_CTX="kind-$MGT_NAME"
@@ -26,6 +27,10 @@ MGT_CTX="kind-$MGT_NAME"
 # For live demo use 'pe'  for recording or auto demo use 'pei'
 #PCMD="pe"
 PCMD="pei"
+
+# add wait to be able to start a demo
+p ""
+#wait
 
 #1 Create mgt cluster
 $PCMD "kind create cluster --name $MGT_NAME"
@@ -38,8 +43,8 @@ echo "  "
 #3 Apply the LC and provider CRDs on the mgt cluster
 $PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_logicalclusters.yaml"
 $PCMD "kubectl --context $MGT_CTX create -f config/crds/logicalcluster.kubestellar.io_clusterproviderdescs.yaml"
-echo "Start the manager in a second window and press <enter> to continue."
-p "wait"
+echo "Start the manager in a second window "
+p "press <enter> to continue."
 #4 Start the manager in a second window
 echo "  "
 
@@ -92,12 +97,21 @@ echo "  "
 $PCMD "kubectl --context $MGT_CTX delete logicalcluster -n lcprovider-default lc1"
 echo "  "
 
+$PCMD "kubectl --context $MGT_CTX get logicalcluster -A"
+echo "  "
+
 #13 List kinds - show that X1 is deleted
 $PCMD "kind get clusters"
 echo "  "
 
 #14 Delete X2 on the kind
 $PCMD "kind delete cluster --name lc2"
+echo "  "
+
+$PCMD "kind get clusters"
+echo "  "
+
+$PCMD "kubectl --context $MGT_CTX get logicalcluster -A"
 echo "  "
 
 #15 Show LC-X2 is in "not-ready" state

@@ -49,7 +49,7 @@ func main() {
 		panic(err)
 	}
 
-	clusterName := "ks-lc1"
+	clusterName := "ks-lc4"
 
 	// Demonstrate a Watch() on a logical cluster
 	// Using the mcclient to get access to a LC directly (clientset, informer, etc..)

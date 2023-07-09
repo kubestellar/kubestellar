@@ -20,7 +20,7 @@ TYPE_SPEED=10
 DEMO_PROMPT="${GREEN}(cluster aware client)➜ ${CYAN}\W ${COLOR_RESET}"
 clear
 
-pei  "kind create cluster --name ks-lc4"
+pei  "kind create cluster --name ks-client1"
 echo " "
-pe "kubectl --context kind-ks-lc1 create configmap lc1-cm"
+pe "kubectl --context kind-ks-lc4 create configmap lc1-cm"
 echo " "
