@@ -94,10 +94,13 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
-	if err != nil {
-		logger.Error(err, "failed to create config for view of edge exports")
-		return err
+	var edgeViewConfig *rest.Config = espwRestConfig
+	if options.Provider == resolveroptions.ClusterProviderKCP {
+		edgeViewConfig, err = configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+		if err != nil {
+			logger.Error(err, "failed to create config for view of edge exports")
+			return err
+		}
 	}
 	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
@@ -112,10 +115,13 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	schedulingViewConfig, err := configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
-	if err != nil {
-		logger.Error(err, "failed to create config for view of scheduling exports")
-		return err
+	var schedulingViewConfig *rest.Config = rootRestConfig
+	if options.Provider == resolveroptions.ClusterProviderKCP {
+		schedulingViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
+		if err != nil {
+			logger.Error(err, "failed to create config for view of scheduling exports")
+			return err
+		}
 	}
 	schedulingViewClusterClientset, err := kcpclientset.NewForConfig(schedulingViewConfig)
 	if err != nil {
@@ -125,10 +131,13 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
 
 	// create workloadSharedInformerFactory
-	workloadViewConfig, err := configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
-	if err != nil {
-		logger.Error(err, "failed to create config for view of workload exports")
-		return err
+	var workloadViewConfig *rest.Config = rootRestConfig
+	if options.Provider == resolveroptions.ClusterProviderKCP {
+		workloadViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
+		if err != nil {
+			logger.Error(err, "failed to create config for view of workload exports")
+			return err
+		}
 	}
 	workloadViewClusterClientset, err := kcpclientset.NewForConfig(workloadViewConfig)
 	if err != nil {
