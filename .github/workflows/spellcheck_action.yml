@@ -22,7 +22,7 @@ on:
       - ".github/workflows/spellcheck_action.yaml"
       - ".github/spellcheck/.spellcheck.yml"
       - ".github/spellcheck/.wordlist.yml"
-      - "docs/**"
+#      - "docs/**"
 # #       - "cmd/**"
 # #       - "pkg/**"
 
