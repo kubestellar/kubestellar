@@ -21,7 +21,7 @@ on:
     paths:
       - ".github/workflows/spellcheck_action.yml"
       - ".github/spellcheck/.spellcheck.yml"
-      - ".github/spellcheck/.wordlist.yml"
+      - ".github/spellcheck/.wordlist.txt"
 #      - "docs/**"
 
 jobs:
