@@ -34,18 +34,14 @@ jobs:
     name: Spellcheck
     runs-on: ubuntu-latest
     steps:
-    # The checkout step
     - uses: actions/checkout@v3.5.3
-#       with:
-#         token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-#         persist-credentials: 'false'
 
     - uses: rojopolis/spellcheck-github-actions@0.33.0
       name: Spellcheck
       with:
-        source_files: "docs/content/*"
         task_name: Markdown
         output_file: spellcheck-output.txt
+#         source_files: "docs/content/*"
         
     - uses: actions/upload-artifact@v3
       with:
