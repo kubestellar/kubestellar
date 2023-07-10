@@ -43,7 +43,7 @@ jobs:
     - uses: rojopolis/spellcheck-github-actions@0.33.0
       name: Spellcheck
       with:
-        source_files: docs/content/*
+        source_files: "docs/content/*"
         task_name: Markdown
         output_file: spellcheck-output.txt
         
