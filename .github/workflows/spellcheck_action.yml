@@ -36,12 +36,12 @@ jobs:
     steps:
     # The checkout step
     - uses: actions/checkout@v3.5.3
-      with:
-        token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-        persist-credentials: 'false'
+#       with:
+#         token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
+#         persist-credentials: 'false'
     - uses: rojopolis/spellcheck-github-actions@v0
       name: Spellcheck
       with:
         config_path: .github/spellcheck/.spellcheck.yml # put path to configuration file here
         task_name: Markdown
-#         source_files: docs/content/*
+        source_files: docs/content/*
