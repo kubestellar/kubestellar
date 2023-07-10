@@ -29,6 +29,7 @@ import (
 	"k8s.io/klog/v2"
 
 	kindprovider "github.com/kubestellar/kubestellar/clusterprovider/kind"
+	kflexprovider "github.com/kubestellar/kubestellar/clusterprovider/kubeflex"
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
@@ -62,6 +63,8 @@ func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterP
 	switch providerType {
 	case lcv1alpha1apis.KindProviderType:
 		pClient = kindprovider.New(providerName)
+	case lcv1alpha1apis.KubeflexProviderType:
+		pClient = kflexprovider.New(providerName)
 	default:
 		return nil
 	}

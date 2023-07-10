@@ -23,7 +23,8 @@ import (
 type ClusterProviderType string
 
 const (
-	KindProviderType ClusterProviderType = "kind"
+	KindProviderType     ClusterProviderType = "kind"
+	KubeflexProviderType ClusterProviderType = "kubeflex"
 )
 
 // ClusterProviderDesc represents a provider.
