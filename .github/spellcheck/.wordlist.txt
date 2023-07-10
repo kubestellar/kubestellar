@@ -83,6 +83,7 @@ FlowSchema
 FluxCD
 GenerateName
 GH
+GitOps
 GitOpsCon
 GoDaddy
 GPG
@@ -99,6 +100,7 @@ JSON
 KCP
 Karve
 Kube
+KubeFlex
 KubeStellar
 KubeStellar's
 Kubernetes
@@ -116,6 +118,7 @@ MERCHANTABILITY
 MVI
 Makefile
 ManagedFields
+Maximo
 MicroShift
 MikeSpreitzer
 Mishi
@@ -142,6 +145,7 @@ PodDisruptionBudget
 PodTemplate
 PolicyReport
 Postgresql
+PRs
 PriorityClass
 PriorityLevelConfiguration
 PVP
@@ -152,6 +156,7 @@ README
 RemainingItemCount
 ReplicaSet
 ReplicationController
+Resolver's
 ResourceQuota
 ResourceVersion
 RHEL
@@ -203,6 +208,7 @@ WMW
 WMWs
 WSL
 Youtube
+admissionregistration
 afterall
 amd
 andy
@@ -215,6 +221,8 @@ apiGroups
 apiVersion
 apiexport
 apiextensions
+apiregistration
+apiresource
 apiresourceimports
 apis
 apiserver
@@ -226,6 +234,7 @@ autoscaling
 awk
 boto
 buildDate
+cd
 clientset
 cliplugins
 clubanderson
@@ -240,6 +249,7 @@ commond
 commonstuff
 config
 configMap
+configmap
 configmaps
 configs
 containerPort
@@ -266,6 +276,7 @@ downsynced
 downsyncing
 dropdown
 ecutable
+edgeplacement
 edgesync
 edgesyncer
 egrep
@@ -278,12 +289,14 @@ exe
 executables
 faq
 fi
+flowcontrol
 george
 gh
 gitCommit
 gitTreeState
 gitVersion
 github
+gitops
 googlegroups
 goVersion
 goroutine
@@ -306,6 +319,7 @@ inspectable
 instanceSelector
 io
 ipaddr
+ipport
 jaggy
 joinus
 jq
@@ -318,6 +332,7 @@ kubeconfig
 kubectl
 kubernetes
 kubestellar
+kubeturbo
 kyverno
 lgtm
 licensable
@@ -333,6 +348,7 @@ locationSelectors
 loopback
 mailboxwatch
 matchLabels
+mb
 md
 mishi
 mkdocs
@@ -362,6 +378,7 @@ pathname
 pathnames
 policyreport
 policyreports
+pprof
 pre
 programmatically
 prometheus
@@ -370,9 +387,11 @@ proxying
 quickstart
 rbac
 readOnly
+reconciler
 renature
 renatured
 renaturing
+replicaset
 repo
 req
 resourceNames
@@ -399,6 +418,7 @@ struct
 structs
 subcommand
 subcommands
+subresources
 subfolder
 sublicense
 summarization
