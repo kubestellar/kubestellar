@@ -4,6 +4,8 @@ run-name: Spellcheck Action - ${{ github.ref_name }}
 on:
   # So we can trigger manually if needed
   workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 5"
   # To confirm any changes to docs build successfully, without deploying them
 #   pull_request:
 #     branches:
