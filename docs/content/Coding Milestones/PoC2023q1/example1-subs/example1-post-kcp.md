@@ -15,7 +15,7 @@ according to your preference.  That is, either (a) `git clone` the
 repo and then `make build` to populate its `bin` directory, or (b)
 fetch the binary archive appropriate for your machine from a release
 and unpack it (creating a `bin` directory).  The commands exhibited
-just below assume that the repo has been fetched but not yet buit.
+just below assume that the repo has been fetched but not yet built.
 
 ```shell
 git clone -b {{ config.ks_branch }} {{ config.repo_url }}
