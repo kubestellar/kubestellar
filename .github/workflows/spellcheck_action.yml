@@ -40,6 +40,7 @@ jobs:
       name: Spellcheck
       with:
         task_name: Markdown
+        config_path: .github/spellcheck/.spellcheck.yml
         output_file: spellcheck-output.txt
 #         source_files: "docs/content/*"
         
