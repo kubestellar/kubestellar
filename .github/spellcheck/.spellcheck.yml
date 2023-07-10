@@ -16,25 +16,3 @@ matrix:
   sources:
   - '**/*.md'
   default_encoding: utf-8
-
-
-# matrix:
-# - name: python
-#   sources:
-#   - pyspelling
-#   pipeline:
-#   - pyspelling.filters.python:
-#       comments: false
-#   - pyspelling.filters.context:
-#       context_visible_first: true
-#       escapes: '\\[\\`~]'
-#       delimiters:
-#       # Ignore multiline content between fences (fences can have 3 or more back ticks)
-#       # ```
-#       # content
-#       # ```
-#       - open: '(?s)^(?P<open> *`{3,})$'
-#         close: '^(?P=open)$'
-#       # Ignore text between inline back ticks
-#       - open: '(?P<open>`+)'
-        close: '(?P=open)'
