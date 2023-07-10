@@ -21,7 +21,7 @@ on:
       - main
       - "release-*"
     paths:
-      - ".github/workflows/spellcheck_action.yaml"
+      - ".github/workflows/spellcheck_action.yml"
       - ".github/spellcheck/.spellcheck.yml"
       - ".github/spellcheck/.wordlist.yml"
 #      - "docs/**"
