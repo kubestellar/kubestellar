@@ -12,9 +12,7 @@ on:
 #       - main
 #       - "release-*"
 #     paths:
-# #       - "cmd/**"
 #       - "docs/**"
-# #       - "pkg/**"
 #       - ".github/workflows/spellcheck_action.yaml"
   push:
     branches:
@@ -25,8 +23,6 @@ on:
       - ".github/spellcheck/.spellcheck.yml"
       - ".github/spellcheck/.wordlist.yml"
 #      - "docs/**"
-# #       - "cmd/**"
-# #       - "pkg/**"
 
 jobs:
   build:
@@ -39,7 +35,6 @@ jobs:
     - uses: rojopolis/spellcheck-github-actions@0.33.0
       name: Spellcheck
       with:
-        task_name: Markdown
         config_path: .github/spellcheck/.spellcheck.yml
         output_file: spellcheck-output.txt
 #         source_files: "docs/content/*"
