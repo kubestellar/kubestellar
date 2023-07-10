@@ -22,8 +22,8 @@ on:
       - ".github/workflows/spellcheck_action.yaml"
       - ".github/spellcheck/.spellcheck.yml"
       - ".github/spellcheck/.wordlist.yml"
+      - "docs/**"
 # #       - "cmd/**"
-#       - "docs/**"
 # #       - "pkg/**"
 
 jobs:
