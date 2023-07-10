@@ -64,9 +64,10 @@ const FieldManager = "placement-translator"
 // (a) maintains SyncerConfig objects in mailbox workspaces, and
 // (b) propagates changes from source workspaces to mailbox workspaces.
 //
-// This workload projector currently does not react to changes in workload objects
-// in mailbox workspaces. There is currently no designed need for that, except
-// perhaps the general principal that a controller should overwriting competing writes.
+// For a given mailbox workspace, for every resource that the WP is
+// projecting to that MBWS, the WP has an informer on that resource
+// and reacts to the presence of objects previously projected that
+// should not now be projected by deleting that object.
 //
 // This workload projector maintains a dynamic informer for each relevant combination
 // of source cluster, API group, and resource.  Further filtering is done here,

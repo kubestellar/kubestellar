@@ -1,4 +1,5 @@
 name: docs-ecutable - Syncer
+run-name: docs-ecutable - Syncer - ${{ github.ref_name }}
 
 on:
   # So we can trigger manually if needed
@@ -27,19 +28,18 @@ on:
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
       - ".github/workflows/docs-ecutable-syncer.yml"
       - "docs/scripts/docs-ecutable.sh"
+    tags:
+      - 'v*'
 
 env:
   docs-ecutable-filename: syncer
   docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md'"
 
-permissions:
-  contents: write
-
 jobs:
   docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for syncer e2e
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'ok-to-test') || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
     steps:
@@ -49,31 +49,7 @@ jobs:
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
       - uses: actions/checkout@v3.5.3
-        with:
-          token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
-          persist-credentials: 'false'
-
-      - name: echo fetching workflow_dispatch branch
-        run: git fetch origin ${GITHUB_REF##*/}
-        # run: echo running on branch ${GITHUB_REF##*/}
-        if: github.event_name == 'workflow_dispatch'
-
-      - name: echo fetching push or pull_request branch
-        run: git fetch origin ${{ github.ref_name }}
-        # run: echo running on branch ${{ github.ref_name }}
-        if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-
-      # - name: Check for Makefile
-      #   id: check_makefile
-      #   if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-      #   run: |
-      #     if [[ -f "Makefile" ]]; then
-      #       echo "Makefile found"
-      #       exit 1
-      #     else
-      #       echo "Makefile not found"
-      #     fi
-
+      
       - uses: actions/setup-go@v4
         with:
           go-version: v1.19

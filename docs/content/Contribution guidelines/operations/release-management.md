@@ -14,11 +14,11 @@ You currently need write access to the [{{ config.repo_url }}]({{ config.repo_ur
 <!-- You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS). -->
 
 ### Create a release-major.minor branch
-To create a release branch, identify the current 'release' branches' name (e.g. release-0.2).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.
+To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.3', you might name the new release branch 'release-0.4'.
 
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}/docs
+cd {{ config.repo_default_file_path }}
 git checkout main
 git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
@@ -33,24 +33,26 @@ vi docs/mkdocs.yml
 <b>before:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3"
 ...
-ks_branch: 'release-0.2'
-ks_tag: 'v0.2.2'
+ks_branch: 'release-0.3'
+ks_tag: 'v0.3.2'
 ...
 ```
 
 <b>after:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
-ks_branch: 'release-0.2'
-ks_tag: 'v0.3.0'
+ks_branch: 'release-0.4'
+ks_tag: 'v0.4.0'
 ...
 ```
 
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
+cd docs
 mike delete stable # remove the 'stable' alias from the current 'release-<major>.<minor>' branches' doc set
 mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
+cd ..
 ```
 
 
@@ -58,21 +60,24 @@ mike deploy --push --rebase --update-aliases main stable # this generates the 'm
 ```shell
 git add .
 git commit -m "new release version <major>.<minor>"
-git push -u origin release-<major>.<minor> replace <major>.<minor> with your incremented <major>.<minor> pair
+git push -u origin release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'stable' alias using 'mike'
 ```shell
+cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
-mike deploy --push --rebase --update-aliases releae-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+git pull
+mike deploy --push --rebase --update-aliases release-0.4 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+cd ..
 ```
 
 ### Test your doc site
-Open a Chrome Incognito browser to [https://kubestellar.io](https://kubestellar.io) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
+Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
 
 ### Create a build
 ```shell
-./hack/make-release-full.sh v0.3.0
+./hack/make-release-full.sh v0.4.0
 ```
 
 ### Create a tagged release
@@ -83,20 +88,20 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.2.2' to 'v0.3.0'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.4.0'
 
 ```shell
-TAG=v0.3.0
-REF=release-0.3
+TAG=v0.4.0
+REF=release-0.4
 git tag --sign --message "$TAG" "$TAG" "$REF"
-git push ??? "$TAG"  #TODO - not sure if this is right
+git push origin --tags
 ```
 
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
-- Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
-    - Select the new release branch you just created (release-0.3)
-    - Add a release title (v.0.3.0)
+- Click 'Draft a new release' and create a new tag ('v0.4.0' in our example)
+    - Select the new release branch you just created (release-0.4)
+    - Add a release title (v.0.4.0)
     - Add some release notes
     - Attach the binaries that were created in the 'make build-all' process above
         - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files

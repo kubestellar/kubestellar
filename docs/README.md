@@ -11,6 +11,33 @@ additional plugins and tools:
 We have support in place for multiple languages (i18n), although we currently only have documentation in English. If 
 you're interested in contributing translations, please let us know!
 
+### Serving up documents locally
+You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.
+
+```shell
+git clone git@github.com:{{ config.repo_short_name }}.git
+cd {{ config.repo_default_file_path }}/docs
+git checkout {{ config.ks_branch }}
+```
+
+You can view and modify our documentation in the branch you have checked out by using `mkdocs serve` from [mkdocs](https://www.mkdocs.org):
+
+```shell
+pip install -r requirements.txt
+mkdocs serve
+```
+Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
+
+Another way to view (not modify - this method reflects what has been deployed to the `gh-pages` branch of our repo) all branches/versions of our documentation locally using 'mike' [mike for mkdocs](https://github.com/jimporter/mike):
+
+```shell
+git clone git@github.com:{{ config.repo_short_name }}.git
+cd {{ config.repo_default_file_path }}
+git checkout {{ config.ks_branch }}
+make serve-docs
+```
+Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
+
 ## File structure
 
 All documentation-related items live in `docs` (with the small exception of various `make` targets and some helper 
@@ -36,7 +63,7 @@ There are many global variables defined in the <a href="{{ config.repo_raw_url }
     - site_name: {{ config.site_name }}
     - repo_url: {{ config.repo_url }}
     - site_url: {{ config.site_url }}
-    - repo_default_file_path: {{ config.repo_default_path }}
+    - repo_default_file_path: {{ config.repo_default_file_path }}
     - repo_short_name: {{ config.repo_short_name }}
     - docs_url: {{ config.docs_url }}
     - repo_raw_url: {{ config.repo_raw_url }}
@@ -67,33 +94,6 @@ In the document you want to include, add the start and end tags you configured i
 ![Included Markdown](./content/Contribution%20guidelines/operations/included-markdown-example.png)
 
 for more information on the 'include-markdown' plugin for mkdocs look [here](https://github.com/mondeja/mkdocs-include-markdown-plugin)
-
-### Serving up documents locally
-You can view and modify our documentation in your local development environment.  Simply checkout one of our branches.
-
-```shell
-git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}/docs
-git checkout {{ config.ks_branch }}
-```
-
-You can view and modify our documentation in the branch you have checked out by using `mkdocs serve` from [mkdocs](https://www.mkdocs.org):
-
-```shell
-pip install -r requirements.txt
-mkdocs serve
-```
-Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
-
-Another way to view (not modify - this method reflects what has been deployed to the `gh-pages` branch of our repo) all branches/versions of our documentation locally using 'mike' [mike for mkdocs](https://github.com/jimporter/mike):
-
-```shell
-git clone git@github.com:{{ config.repo_short_name }}.git
-cd {{ config.repo_default_path }}
-git checkout {{ config.ks_branch }}
-make serve-docs
-```
-Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
 
 ### Supported aliases for our documentation
 We currently support 3 aliases for our documentation:
@@ -234,7 +234,7 @@ How do we ensure that our documented examples work?  Simple, we 'execute' our do
 - you can use 'include-markdown' blocks, and they will also be executed (or not), depending on the codeblock style you use in the included markdown files.
 
 #### The GitHub Workflow:
-- One example of the GitHub Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-scheduler.yml)
+- One example of the GitHub Workflow is located in our {{ config.repo_short_name }} at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-where-resolver.yml]({{ config.repo_url }}/blob/{{ config.ks_branch }}/.github/workflows/docs-ecutable-where-resolver.yml)
 
 #### The secret sauce:
 - The code that makes all this possible is at <a href="{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh">{{ config.repo_url }}/blob/{{ config.ks_branch }}/docs/scripts/docs-ecutable.sh</a>

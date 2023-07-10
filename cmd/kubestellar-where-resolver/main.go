@@ -22,11 +22,11 @@ import (
 	"k8s.io/component-base/cli"
 	_ "k8s.io/component-base/logs/json/register"
 
-	"github.com/kubestellar/kubestellar/cmd/kubestellar-scheduler/cmd"
+	"github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/cmd"
 )
 
 func main() {
-	schedulerCommand := cmd.NewSchedulerCommand()
-	code := cli.Run(schedulerCommand)
+	resolverCommand := cmd.NewResolverCommand()
+	code := cli.Run(resolverCommand)
 	os.Exit(code)
 }

@@ -9,6 +9,7 @@ permissions:
   
 jobs:
   assignAuthor:
+    if: github.repository_owner == 'kubestellar'
     name: Assign author to PR
     runs-on: ubuntu-latest
     steps:

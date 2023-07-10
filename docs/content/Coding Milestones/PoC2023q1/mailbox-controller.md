@@ -77,24 +77,24 @@ The command line flags, beyond the basics, are as follows.
 Open a terminal window(1) and clone the latest KubeStellar source:
 
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
-   start="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
-   end="<!--kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
+   include-markdown "where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
+   start="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
+   end="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
 %}
 
 ### Create the Edge Service Provider Workspace (ESPW)
 Open another terminal window(2) and point `$KUBECONFIG` to the admin kubeconfig for the kcp server and include the location of kubectl-ws in `$PATH`.
 
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp.md"
-   start="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-start-->"
-   end="<!--kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp-end-->"
+   include-markdown "where-resolver-subs/where-resolver-1-build-kubestellar.md"
+   start="<!--where-resolver-1-build-kubestellar-start-->"
+   end="<!--where-resolver-1-build-kubestellar-end-->"
 %}
 
 {%
-   include-markdown "kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge.md"
-   start="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-start-->"
-   end="<!--kubestellar-scheduler-2-ws-root-and-ws-create-edge-end-->"
+   include-markdown "where-resolver-subs/where-resolver-2-ws-root-and-ws-create-edge.md"
+   start="<!--where-resolver-2-ws-root-and-ws-create-edge-start-->"
+   end="<!--where-resolver-2-ws-root-and-ws-create-edge-end-->"
 %}
 
 After that, a run of the controller should look like the following.

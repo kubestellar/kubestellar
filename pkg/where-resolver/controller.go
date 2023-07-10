@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package scheduler
+package where_resolver
 
 import (
 	"context"
@@ -31,7 +31,6 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 	workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
-	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	schedulingv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	workloadv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/workload/v1alpha1"
 	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
@@ -43,7 +42,7 @@ import (
 )
 
 const (
-	ControllerName = "kubestellar-scheduler"
+	ControllerName = "where-resolver"
 )
 
 type triggeringKind string
@@ -63,7 +62,6 @@ type controller struct {
 	context context.Context
 	queue   workqueue.RateLimitingInterface
 
-	kcpClusterClient  kcpclientset.ClusterInterface
 	edgeClusterClient edgeclientset.ClusterInterface
 
 	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
@@ -81,7 +79,6 @@ type controller struct {
 
 func NewController(
 	context context.Context,
-	kcpClusterClient kcpclientset.ClusterInterface,
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
 	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
@@ -95,7 +92,6 @@ func NewController(
 		context: context,
 		queue:   queue,
 
-		kcpClusterClient:  kcpClusterClient,
 		edgeClusterClient: edgeClusterClient,
 
 		edgePlacementLister:  edgePlacementAccess.Lister(),
