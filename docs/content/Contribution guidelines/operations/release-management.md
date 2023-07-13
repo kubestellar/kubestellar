@@ -30,7 +30,7 @@ vi scripts/kubectl-kubestellar-prep_for_syncer
 
 change the version in the following line:
 ```shell
-syncer_image="quay.io/kubestellar/syncer:v0.3.3"
+syncer_image="quay.io/kubestellar/syncer:v0.4.0"
 ```
 
 ### Update the mkdocs.yml file
@@ -51,8 +51,8 @@ ks_tag: 'v0.3.2'
 <b>after:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.3'
+ks_branch: 'release-0.4'
+ks_tag: 'v0.4.0'
 ...
 ```
 
