@@ -20,10 +20,6 @@ To create a release branch, identify the current 'release' branches' name (e.g. 
 git clone git@github.com:{{ config.repo_short_name }}.git
 cd {{ config.repo_default_file_path }}
 git checkout main
-```
-
-if this is a new <major> version release, checkout a new branch
-```shell
 git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
