@@ -23,6 +23,16 @@ git checkout main
 git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
+### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
+```shell
+vi scripts/kubectl-kubestellar-prep_for_syncer
+```
+
+change the version in the following line:
+```shell
+syncer_image="quay.io/kubestellar/syncer:v0.3.3"
+```
+
 ### Update the mkdocs.yml file
 The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
 
@@ -41,8 +51,8 @@ ks_tag: 'v0.3.2'
 <b>after:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
-ks_branch: 'release-0.4'
-ks_tag: 'v0.4.0'
+ks_branch: 'release-0.3'
+ks_tag: 'v0.3.3'
 ...
 ```
 
@@ -77,7 +87,7 @@ Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}
 
 ### Create a build
 ```shell
-./hack/make-release-full.sh v0.4.0
+./hack/make-release-full.sh v0.3.3
 ```
 
 ### Create a tagged release
@@ -88,20 +98,20 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.4.0'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.3.3'
 
 ```shell
-TAG=v0.4.0
-REF=release-0.4
+TAG=v0.3.3
+REF=release-0.3
 git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
 
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
-- Click 'Draft a new release' and create a new tag ('v0.4.0' in our example)
-    - Select the new release branch you just created (release-0.4)
-    - Add a release title (v.0.4.0)
+- Click 'Draft a new release' and create a new tag ('v0.3.3' in our example)
+    - Select the release branch (release-0.3)
+    - Add a release title (v.0.3.3)
     - Add some release notes
     - Attach the binaries that were created in the 'make build-all' process above
         - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
