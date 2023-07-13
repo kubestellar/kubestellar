@@ -31,7 +31,7 @@ import (
 	api "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
 
-	corev1alpha1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
+	kcpv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 
@@ -192,21 +192,9 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 						name := ws.Name
 						if event.Type == "MODIFIED" {
 							k.provider.logger.V(2).Info("KCP workspace modify event", "ws", ws.Name)
+
 							_, ok := k.provider.workspaces[name]
-							// check ws is ready
-							if ws.Status.Phase != corev1alpha1.LogicalClusterPhaseReady {
-								k.provider.logger.V(2).Info("KCP workspace is not ready")
-								if ok {
-									delete(k.provider.workspaces, name)
-									k.ch <- clusterprovider.WatchEvent{
-										Type: watch.Deleted,
-										Name: name,
-									}
-								}
-								continue
-							}
-							// workspace is ready. Event was already sent if it's cached.
-							if !ok {
+							if !ok && ws.Status.Phase == kcpv1alpha1.LogicalClusterPhaseReady {
 								lcInfo, err := k.provider.Get(ws.Name)
 								if err != nil {
 									continue
@@ -220,11 +208,19 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 									LCInfo: lcInfo,
 								}
 							}
-
+							if ok && ws.Status.Phase != kcpv1alpha1.LogicalClusterPhaseReady {
+								k.provider.logger.V(2).Info("KCP workspace is not ready")
+								if ok {
+									delete(k.provider.workspaces, name)
+									k.ch <- clusterprovider.WatchEvent{
+										Type: watch.Deleted,
+										Name: name,
+									}
+								}
+							}
 						}
 						if event.Type == "DELETED" {
 							k.provider.logger.V(2).Info("KCP workspace deleted", "ws", ws.Name)
-							// TODO delete from cache
 							delete(k.provider.workspaces, name)
 							k.ch <- clusterprovider.WatchEvent{
 								Type: watch.Deleted,
