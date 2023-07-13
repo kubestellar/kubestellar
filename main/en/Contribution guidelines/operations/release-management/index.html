@@ -832,6 +832,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-the-kubectl-kubestellar-prep_for_syncer-file-with-a-reference-to-the-new-version-of-the-kubestellar-syncer-version" class="md-nav__link">
+    Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-the-mkdocsyml-file" class="md-nav__link">
     Update the mkdocs.yml file
   </a>
@@ -1828,6 +1835,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-the-kubectl-kubestellar-prep_for_syncer-file-with-a-reference-to-the-new-version-of-the-kubestellar-syncer-version" class="md-nav__link">
+    Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-the-mkdocsyml-file" class="md-nav__link">
     Update the mkdocs.yml file
   </a>
@@ -1949,65 +1963,71 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
 </code></pre></div>
+<h3 id="update-the-kubectl-kubestellar-prep_for_syncer-file-with-a-reference-to-the-new-version-of-the-kubestellar-syncer-version">Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version<a class="headerlink" href="#update-the-kubectl-kubestellar-prep_for_syncer-file-with-a-reference-to-the-new-version-of-the-kubestellar-syncer-version" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>vi<span class="w"> </span>scripts/kubectl-kubestellar-prep_for_syncer
+</code></pre></div>
+<p>change the version in the following line:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">syncer_image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.3.3&quot;</span>
+</code></pre></div></p>
 <h3 id="update-the-mkdocsyml-file">Update the mkdocs.yml file<a class="headerlink" href="#update-the-mkdocsyml-file" title="Permanent link">#</a></h3>
 <p>The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>vi<span class="w"> </span>docs/mkdocs.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vi<span class="w"> </span>docs/mkdocs.yml
 </code></pre></div>
 <p><b>before:</b>
-<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>...
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.3&#39;</span>
-</span><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.3.2&#39;</span>
-</span><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>...
+<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>...
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.3&#39;</span>
+</span><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.3.2&#39;</span>
+</span><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>...
 </code></pre></div></p>
 <p><b>after:</b>
-<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>...
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.4&#39;</span>
-</span><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.4.0&#39;</span>
-</span><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
+<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>...
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.3&#39;</span>
+</span><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.3.3&#39;</span>
+</span><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>...
 </code></pre></div></p>
 <h3 id="remove-the-current-stable-alias-using-mike-danger">Remove the current 'stable' alias using 'mike' (DANGER!)<a class="headerlink" href="#remove-the-current-stable-alias-using-mike-danger" title="Permanent link">#</a></h3>
 <p>Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">cd</span><span class="w"> </span>docs
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the current &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>stable<span class="w"> </span><span class="c1"># this generates the &#39;main&#39; branches&#39; docs set and points &#39;stable&#39; at it temporarily</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">cd</span><span class="w"> </span>..
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the current &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>stable<span class="w"> </span><span class="c1"># this generates the &#39;main&#39; branches&#39; docs set and points &#39;stable&#39; at it temporarily</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div></p>
 <h3 id="push-the-new-release-branch">Push the new release branch<a class="headerlink" href="#push-the-new-release-branch" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;new release version &lt;major&gt;.&lt;minor&gt;&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;new release version &lt;major&gt;.&lt;minor&gt;&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>release-&lt;major&gt;.&lt;minor&gt;<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
 </code></pre></div>
 <h3 id="update-the-stable-alias-using-mike">Update the 'stable' alias using 'mike'<a class="headerlink" href="#update-the-stable-alias-using-mike" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>docs
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>git<span class="w"> </span>pull
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.4<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nb">cd</span><span class="w"> </span>..
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>git<span class="w"> </span>pull
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.4<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-&lt;major&gt;.&lt;minor&gt;&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div>
 <h3 id="test-your-doc-site">Test your doc site<a class="headerlink" href="#test-your-doc-site" title="Permanent link">#</a></h3>
 <p>Open a Chrome Incognito browser to <a href="https://docs.kubestellar.io">https://docs.kubestellar.io</a> and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'</p>
 <h3 id="create-a-build">Create a build<a class="headerlink" href="#create-a-build" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.4.0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.3.3
 </code></pre></div>
 <h3 id="create-a-tagged-release">Create a tagged release<a class="headerlink" href="#create-a-tagged-release" title="Permanent link">#</a></h3>
 <p>View the existing tags you have for the repo</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>git<span class="w"> </span>tag
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>git<span class="w"> </span>tag
 </code></pre></div>
-<p>create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.4.0'</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">TAG</span><span class="o">=</span>v0.4.0
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">REF</span><span class="o">=</span>release-0.4
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>--tags
+<p>create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.3.3'</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">TAG</span><span class="o">=</span>v0.3.3
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">REF</span><span class="o">=</span>release-0.3
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>--tags
 </code></pre></div>
 <h3 id="create-a-release-in-gh-ui">Create a release in GH UI<a class="headerlink" href="#create-a-release-in-gh-ui" title="Permanent link">#</a></h3>
 <ul>
 <li>Navigate to the KubeStellar GitHub Source Repository Releases section at https://github.com/kubestellar/kubestellar/releases</li>
 <li>
-<p>Click 'Draft a new release' and create a new tag ('v0.4.0' in our example)</p>
+<p>Click 'Draft a new release' and create a new tag ('v0.3.3' in our example)</p>
 <ul>
-<li>Select the new release branch you just created (release-0.4)</li>
-<li>Add a release title (v.0.4.0)</li>
+<li>Select the release branch (release-0.3)</li>
+<li>Add a release title (v.0.3.3)</li>
 <li>Add some release notes</li>
 <li>Attach the binaries that were created in the 'make build-all' process above<ul>
 <li>You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files</li>
@@ -2031,15 +2051,15 @@
     - Edit the new file
     - Change main to the name of the release branch, such as release-0.8
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>zz_generated_metadata:
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  branch: main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>zz_generated_metadata:
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>  branch: main
 </code></pre></div>
 Change latest to the name of the release branch
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>promotion:
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  namespace: kubestellar
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>  tag: latest
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  tag_by_commit: true
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>promotion:
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>  namespace: kubestellar
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>  tag: latest
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>  tag_by_commit: true
 </code></pre></div>
     - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
     - Copy the main branch configuration to a new release-x.y entry
@@ -2078,7 +2098,7 @@ Publish the release
 Notify -->
 
 <h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="https://kubestellar.io/joinus">kubestellar-dev@googlegroups.com</a> and <a href="https://groups.google.com/g/kubestellar-users">kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Subject: [release] &lt;major&gt;&lt;minor&gt;
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Subject: [release] &lt;major&gt;&lt;minor&gt;
 </code></pre></div>
     - In the body, include noteworthy changes
     - Provide a link to the release in GitHub for the full release notes
