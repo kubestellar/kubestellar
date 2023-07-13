@@ -14,7 +14,7 @@ You currently need write access to the [{{ config.repo_url }}]({{ config.repo_ur
 <!-- You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS). -->
 
 ### Create a release-major.minor branch
-To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.3', you might name the new release branch 'release-0.4'.
+To create a release branch, identify the current 'release' branches' name (e.g. release-0.4).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.4', you might name the new release branch 'release-0.4'.
 
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
@@ -43,8 +43,8 @@ vi docs/mkdocs.yml
 <b>before:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3"
 ...
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.2'
+ks_branch: 'main'
+ks_tag: 'latest'
 ...
 ```
 
@@ -87,7 +87,7 @@ Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}
 
 ### Create a build
 ```shell
-./hack/make-release-full.sh v0.3.3
+./hack/make-release-full.sh v0.4.0
 ```
 
 ### Create a tagged release
@@ -98,20 +98,20 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.3.3'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.4.0'
 
 ```shell
-TAG=v0.3.3
-REF=release-0.3
+TAG=v0.4.0
+REF=release-0.4
 git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
 
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
-- Click 'Draft a new release' and create a new tag ('v0.3.3' in our example)
-    - Select the release branch (release-0.3)
-    - Add a release title (v.0.3.3)
+- Click 'Draft a new release' and create a new tag ('v0.4.0' in our example)
+    - Select the release branch (release-0.4)
+    - Add a release title (v.0.4.0)
     - Add some release notes
     - Attach the binaries that were created in the 'make build-all' process above
         - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
