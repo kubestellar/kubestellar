@@ -7,8 +7,8 @@ repo_default_file_path: kubestellar
 docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.2'
+ks_branch: 'main'
+ks_tag: 'latest'
 
 # Site content
 docs_dir: 'content'
