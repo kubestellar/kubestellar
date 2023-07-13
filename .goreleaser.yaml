@@ -17,7 +17,7 @@ kos:
   main: ./cmd/syncer
   repository: quay.io/kubestellar/syncer
   tags:
-  - '{{.Version}}'
+  - 'v{{.Version}}'
   bare: true
   base_image: cgr.dev/chainguard/static
   preserve_import_paths: false
