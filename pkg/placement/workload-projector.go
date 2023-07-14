@@ -857,7 +857,7 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 		var tryAgain bool
 		remWork := []func() bool{}
 		destinations.Visit(func(destination SinglePlacement) error {
-			retryThis, rem := wp.syncSourceToDestLocked(ctx, logger, soRef, srcMRObject, namespaced, deleted, modesForSync, destination)
+			retryThis, rem := wp.syncSourceToDestWhileLocked(ctx, logger, soRef, srcMRObject, namespaced, deleted, modesForSync, destination)
 			tryAgain = tryAgain || retryThis
 			if rem != nil {
 				remWork = append(remWork, rem)
@@ -883,7 +883,7 @@ var returnTrue = func() bool { return true }
 
 // Sync a source object to one MBWS.
 // Returns `(retry bool, unlocked func() (retry bool))`
-func (wp *workloadProjector) syncSourceToDestLocked(ctx context.Context, logger klog.Logger,
+func (wp *workloadProjector) syncSourceToDestWhileLocked(ctx context.Context, logger klog.Logger,
 	soRef sourceObjectRef, srcMRObject mrObject, namespaced, deleted bool,
 	modesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal],
 	destination SinglePlacement) (bool, func() bool) {
