@@ -13,31 +13,37 @@
 # limitations under the License.
 
 # Global arguments
-IMG := kubestellar
-NAME := kubestellar
-PLATFORMS := linux/amd64,linux/arm64,linux/ppc64le
-KUBESTELLAR_VERSION := $(shell curl -sL https://github.com/kubestellar/kubestellar/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs)
+IMG ?= kubestellar
+NAME ?= kubestellar
+PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+KUBESTELLAR_STABLE := $(shell curl -sL https://raw.githubusercontent.com/kubestellar/kubestellar/main/VERSION | grep stable | sed -n -e 's/^.*=//p')
+KUBESTELLAR_LATEST := $(shell curl -sL https://raw.githubusercontent.com/kubestellar/kubestellar/main/VERSION | grep latest | sed -n -e 's/^.*=//p')
+KUBESTELLAR_VERSION ?= ${KUBESTELLAR_STABLE}
+TAG ?= ${KUBESTELLAR_VERSION}
+BASEPATH ?= ${HOME}
 
 
 # Build a local container image for the host architecture
 .PHONY: build
 build:
-	$(info Building the KubeStellar container using Dockerfile...)
-	$(info Arguments: IMG=${IMG})
+	$(info Building the KubeStellar container using the Dockerfile...)
 	$(info Arguments: KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION})
-	# docker buildx build --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${KUBESTELLAR_VERSION} .
-	docker build --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${KUBESTELLAR_VERSION} .
+	$(info Arguments: IMG=${IMG})
+	$(info Arguments: TAG=${TAG})
+	docker build --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${TAG} .
 
 
 # Build and push a multi-arch container image (docker buildx is required)
 .PHONY: buildx
 buildx:
 	$(info Building the KubeStellar container using Dockerfile...)
-	$(info Arguments: IMG=${IMG})
 	$(info Arguments: KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION})
+	$(info Arguments: IMG=${IMG})
+	$(info Arguments: TAG=${TAG})
 	$(info Arguments: PLATFORMS=${PLATFORMS})
-	- docker buildx create --name kubestellar-builder --use
-	docker buildx build --push --platform ${PLATFORMS} --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${KUBESTELLAR_VERSION} .
+	- docker buildx rm kubestellar-builder
+	docker buildx create --name kubestellar-builder --use
+	docker buildx build --push --platform ${PLATFORMS} --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${TAG} .
 	- docker buildx rm kubestellar-builder
 
 
@@ -46,18 +52,20 @@ buildx:
 run:
 	$(info Running a new container container...)
 	$(info Arguments: IMG=${IMG})
-	$(info Arguments: KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION})
+	$(info Arguments: TAG=${TAG})
 	$(info Arguments: NAME=${NAME})
-	mkdir -p ~/.kcp
+	$(info Arguments: BASEPATH=${BASEPATH})
+	mkdir -p ${BASEPATH}/.kcp ${BASEPATH}/kubestellar-logs
+		# -p 6443:6443 \
 	docker run -d \
-		-p 6443:6443 \
-		-v ~/.kcp:/.kcp \
+		-v ${BASEPATH}/.kcp:/.kcp \
+		-v ${BASEPATH}/kubestellar-logs:/kubestellar-logs \
 		--user $(shell id -u) \
-		--name ${NAME} ${IMG}:${KUBESTELLAR_VERSION}
-	docker cp ${IMG}:/kcp-plugins ~/kcp
-	docker cp ${IMG}:/kubestellar ~/kubestellar
-	$(info export KUBECONFIG=${HOME}/.kcp/admin.kubeconfig)
-	$(info export PATH=$$PATH:${HOME}/kcp:${HOME}/kubestellar/bin)
+		--name ${NAME} ${IMG}:${TAG}
+	docker cp ${NAME}:/kcp-plugins ${BASEPATH}/kcp
+	docker cp ${NAME}:/kubestellar ${BASEPATH}/kubestellar
+	$(info export KUBECONFIG=${BASEPATH}/.kcp/admin.kubeconfig)
+	$(info export PATH=$$PATH:${BASEPATH}/kcp:${BASEPATH}/kubestellar/bin)
 
 
 # Login into the running container
@@ -71,6 +79,8 @@ exec:
 # Show container logs
 .PHONY: logs
 logs:
+	$(info Shwoing container log...)
+	$(info Arguments: NAME=${NAME})
 	@docker logs ${NAME}
 
 
@@ -79,8 +89,9 @@ logs:
 clean:
 	$(info Cleaning up...)
 	$(info Arguments: IMG=${IMG})
-	$(info Arguments: KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION})
+	$(info Arguments: TAG=${TAG})
 	$(info Arguments: NAME=${NAME})
-	docker rm --force ${NAME}
-	docker image rm ${IMG}:${KUBESTELLAR_VERSION}
-	rm -rf ~/kcp ~/kubestellar ~/.kcp
+	$(info Arguments: BASEPATH=${BASEPATH})
+	- docker rm --force ${NAME}
+	- docker image rm ${IMG}:${TAG}
+	- rm -rf  ${BASEPATH}/.kcp ${BASEPATH}/kcp ${BASEPATH}/kubestellar ${BASEPATH}/kubestellar-logs
