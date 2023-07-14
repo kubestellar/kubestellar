@@ -26,8 +26,7 @@ echo "< Starting kcp >-------------------------------------------"
 
 echo -n "Running kcp... "
 kcp start >& /kubestellar-logs/kcp.log &
-# kcp start --external-hostname "127.0.0.1" --bind-address "127.0.0.1" >& /kubestellar-logs/kcp.log &
-echo "pid=$(pgrep kcp) logfile=/kubestellar-logs/kcp.log"
+echo "logfile=/kubestellar-logs/kcp.log"
 
 echo "Waiting for kcp to be ready... it may take a while"
 until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]
