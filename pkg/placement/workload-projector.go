@@ -1339,6 +1339,8 @@ func (wpd *wpPerDestination) enqueueDestinationObject(gr metav1.GroupResource, n
 	wpd.wp.queue.Add(ref)
 }
 
+// ObjectIsSystem says whether an object of a kind that _can_ be workload
+// is in fact part of the infrastructure of the space where that object appears.
 func ObjectIsSystem(objm metav1.Object) bool {
 	obju := objm.(*unstructured.Unstructured)
 	objt := objm.(metav1.Type)
