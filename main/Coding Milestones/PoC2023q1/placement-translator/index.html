@@ -1974,7 +1974,7 @@
 
   <h1>KubeStellar Placement Translator</h1>
 
-<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml"><img alt="docs-ecutable - placement-translator" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=release-0.3" /></a>&nbsp;&nbsp;&nbsp;</p>
+<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml"><img alt="docs-ecutable - placement-translator" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-placement.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
 
 <div class="admonition tip">
@@ -2132,7 +2132,7 @@ Select the tab for your environment for suggested commands to install them</p>
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>git clone -b release-0.3 https://github.com/kubestellar/kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>cd kubestellar
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/placement-translator.md&#39;&quot; docs-ecutable
 </code></pre></div>
@@ -2349,7 +2349,7 @@ repo and then <code>make build</code> to populate its <code>bin</code> directory
 fetch the binary archive appropriate for your machine from a release
 and unpack it (creating a <code>bin</code> directory).  The commands exhibited
 just below assume that the repo has been fetched but not yet built.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-0.3<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>main<span class="w"> </span>https://github.com/kubestellar/kubestellar
 <a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 <a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>make<span class="w"> </span>build
 <a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
