@@ -56,6 +56,29 @@ ks_tag: 'v0.3.3'
 ...
 ```
 
+### Update the VERSION file
+The VERSION file points to the 'latest' and 'stable' release tags associated with the most recent release (latest) and the most stable release (stable).  Update the 'stable' and 'latest tags accordingly
+
+```shell
+vi VERSION
+```
+
+<b>before:</b>
+```shell title="VERSION" hl_lines="2 3"
+...
+stable=v0.4.0
+latest=v0.4.0
+...
+```
+
+<b>after:</b>
+```shell title="VERSION" hl_lines="2 3" 
+...
+stable=v0.4.0
+latest=v0.4.1
+...
+```
+
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
