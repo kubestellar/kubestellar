@@ -51,8 +51,8 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
+	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
-	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"	
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
@@ -130,25 +130,25 @@ func main() {
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
-	
+
 	// create config for accessing edge service provider workspace
-	
+
 	workspaceClientConfig, err := workloadClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make workspaces config")
 		os.Exit(8)
 	}
-    
+
 	workspaceClientConfig.UserAgent = "mailbox-controller"
 
 	workspaceScopedClientset, err := kcpscopedclientset.NewForConfig(workspaceClientConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for workspaces")
 	}
-    
+
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
-    
+
 	mbwsClientConfig, err := mbwsClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make all-cluster config")
@@ -160,18 +160,18 @@ func main() {
 		logger.Error(err, "Failed to create all-cluster clientset")
 		os.Exit(24)
 	}
-    
+
 	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
 		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
 		mbwsClientset.ApisV1alpha1().APIBindings(),
 	)
-    
+
 	doneCh := ctx.Done()
-	
+
 	edgeSharedInformerFactory.Start(doneCh)
-	
+
 	workspaceScopedInformerFactory.Start(doneCh)
-    
+
 	ctl.Run(concurrency)
 
 	logger.Info("Time to stop")
@@ -208,7 +208,6 @@ func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exp
 	viewConfig.Host = serverURL
 	return viewConfig, nil
 }
-
 
 func isAPIExportReady(logger klog.Logger, apiExport *apisv1alpha1.APIExport) bool {
 	if !conditions.IsTrue(apiExport, apisv1alpha1.APIExportVirtualWorkspaceURLsReady) {
