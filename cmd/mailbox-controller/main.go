@@ -52,8 +52,9 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"	
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
 
 func main() {
@@ -110,39 +111,44 @@ func main() {
 
 	inventoryClientConfig.UserAgent = "mailbox-controller"
 
-	// Get client config for view of SyncTarget objects
-	syncTargetViewConfig, err := configForViewOfExport(ctx, inventoryClientConfig, "edge.kcp.io")
+	// create edgeSharedInformerFactory
+	options := resolveroptions.NewOptions()
+	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to create client config for view of SyncTarget exports")
-		os.Exit(4)
+		logger.Error(err, "failed to create config from flags")
+		//return err
 	}
-
-	stViewClusterClientset, err := edgeclusterclientset.NewForConfig(syncTargetViewConfig)
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
-		os.Exit(6)
+		logger.Error(err, "failed to create config for view of edge exports")
+		//return err
 	}
-
-	stViewInformerFactory := edgev1alpha1informers.NewSharedInformerFactoryWithOptions(stViewClusterClientset, resyncPeriod)
-	syncTargetClusterPreInformer := stViewInformerFactory.Edge().V1alpha1().SyncTargets()
-
+	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+	if err != nil {
+		logger.Error(err, "failed to create clientset for view of edge exports")
+		//return err
+	}
+	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
+	
 	// create config for accessing edge service provider workspace
+	
 	workspaceClientConfig, err := workloadClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make workspaces config")
 		os.Exit(8)
 	}
-
+    
 	workspaceClientConfig.UserAgent = "mailbox-controller"
 
 	workspaceScopedClientset, err := kcpscopedclientset.NewForConfig(workspaceClientConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for workspaces")
 	}
-
+    
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
-
+    
 	mbwsClientConfig, err := mbwsClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make all-cluster config")
@@ -154,16 +160,18 @@ func main() {
 		logger.Error(err, "Failed to create all-cluster clientset")
 		os.Exit(24)
 	}
-
+    
 	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
 		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
 		mbwsClientset.ApisV1alpha1().APIBindings(),
 	)
-
+    
 	doneCh := ctx.Done()
-	stViewInformerFactory.Start(doneCh)
+	
+	edgeSharedInformerFactory.Start(doneCh)
+	
 	workspaceScopedInformerFactory.Start(doneCh)
-
+    
 	ctl.Run(concurrency)
 
 	logger.Info("Time to stop")
@@ -188,6 +196,7 @@ func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exp
 			return nil, fmt.Errorf("error reading APIExport %s: %w", exportName, err)
 		}
 		if isAPIExportReady(logger, apiExport) {
+			logger.Info(" ### export is ready, exportName: ", exportName)
 			break
 		}
 		logger.V(2).Info("Pause because APIExport not ready", "exportName", exportName)
@@ -199,6 +208,7 @@ func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exp
 	viewConfig.Host = serverURL
 	return viewConfig, nil
 }
+
 
 func isAPIExportReady(logger klog.Logger, apiExport *apisv1alpha1.APIExport) bool {
 	if !conditions.IsTrue(apiExport, apisv1alpha1.APIExportVirtualWorkspaceURLsReady) {
