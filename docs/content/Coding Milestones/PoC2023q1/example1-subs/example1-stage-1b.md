@@ -2,7 +2,7 @@
 ### Connect guilder edge cluster with its mailbox workspace
 
 The following command will (a) create, in the mailbox workspace for
-guilder, an identity and authorizations for the edge syncer and (b)
+guilder, an identity and authorizations for the Kubestellar-syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
