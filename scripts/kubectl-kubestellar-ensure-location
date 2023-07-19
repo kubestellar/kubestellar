@@ -119,16 +119,8 @@ then kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 echo "current cwsi is $cwsi"
 if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
-   if [[ $PWD == *bin ]]; then
-      eval kubectl apply -f "$PWD/../config/exports" $verbdir
-   else
-      eval kubectl apply -f "$PWD/config/exports" $verbdir
-   fi
-   echo "applied config/exports yaml to $cwsi workspace"
-   if ! kubectl kcp bind apiexport $cwsi:edge.kcp.io; then
-      echo "unable to bind apiexport to $cwsi:edge.kcp.io"
-   else echo "executed kubectl kcp bind against $cwsi"
-   fi
+   kubectl kcp bind apiexport root:espw:edge.kcp.io
+   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
 else echo "edge.kcp.io apibinding exists in workspace $cwsi"
 fi
 
