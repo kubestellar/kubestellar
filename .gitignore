@@ -5,6 +5,9 @@ tools
 build
 .vscode
 
+# Python virtual environment for working on docs
+docs/.venv
+
 # JetBrains IDE files
 .idea/
 *.iml

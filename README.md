@@ -45,6 +45,14 @@ KubeStellar is an opensource project focused on concerns arising from multi-clus
 - Status from many destinations​: Center clients may need a way to access status from individual edge copies
 - Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
+## Roadmap for the Project
+
+We have defined and largely completed the
+[PoC2023q1](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/outline/).
+The current activity is refining the definition of, and producing, the
+[PoC2023q3](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q3/outline/).
+Goals not addressed in that PoC are to be explored later.
+
 ## QuickStart
 
 Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)

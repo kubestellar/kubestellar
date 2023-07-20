@@ -20,10 +20,23 @@ cd {{ config.repo_default_file_path }}/docs
 git checkout {{ config.ks_branch }}
 ```
 
-You can view and modify our documentation in the branch you have checked out by using `mkdocs serve` from [mkdocs](https://www.mkdocs.org):
+You can view and modify our documentation in the branch you have checked out by using `mkdocs serve` from [mkdocs](https://www.mkdocs.org).  We have a Python requirements file in `requirements.txt`.  You can either install those requirements into your global Python environment or make and use a virtual environment for this purpose.  To install those requirements into your global Python environment, do the following usual thing.
 
 ```shell
 pip install -r requirements.txt
+```
+
+Alternatively, you could make and install the requirements into a virtual environment in the usual way.  The following commands illustrate that.
+
+```shell
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then, using your chosen environment with the requirements installed, build and serve the documents with the following command.
+
+```shell
 mkdocs serve
 ```
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)

@@ -1,7 +1,7 @@
 ## Background
 
 The outline [mentions features that need not be implement at
-first](../outline/#development-roadmap).  In the following sections we
+first](../outline/#development-roadmap-for-this-poc).  In the following sections we
 consider some particular use cases.
 
 ## MVI
