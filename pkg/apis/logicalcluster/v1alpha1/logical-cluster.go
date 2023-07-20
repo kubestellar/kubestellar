@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The KubeStellar Authors.
+Copyright 2023 The KubeStellar Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,13 +45,8 @@ type LogicalCluster struct {
 // LogicalClusterSpec describes a cluster.
 type LogicalClusterSpec struct {
 	// ClusterProviderDescName is a reference to a ClusterProviderDesc resource
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ProviderName is immutable"
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="ClusterProviderDescName is immutable"
 	ClusterProviderDescName string `json:"ClusterProviderDescName"`
-
-	// ClusterName is the name of the logical cluster created by the provider.
-	// +optional
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="clusterName is immutable"
-	ClusterName string `json:"ClusterName,omitempty"`
 
 	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
 	// Currently this is immutable.
@@ -75,8 +70,8 @@ const (
 
 // LogicalClusterStatus represents information about the status of a cluster.
 type LogicalClusterStatus struct {
-	// Phase of the workspace (Initializing,NotReady,Ready).
-	// +kubebuilder:default=Initializing
+	// Phase of the logical cluster (Initializing,NotReady,Ready).
+	// +kubebuilder
 	Phase LogicalClusterPhaseType `json:"Phase"`
 
 	// Cluster config from the kube config file in string format.

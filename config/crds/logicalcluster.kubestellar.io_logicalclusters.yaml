@@ -37,19 +37,12 @@ spec:
           spec:
             description: '`spec` describes a cluster.'
             properties:
-              ClusterName:
-                description: ClusterName is the name of the logical cluster created
-                  by the provider.
-                type: string
-                x-kubernetes-validations:
-                - message: clusterName is immutable
-                  rule: self == oldSelf
               ClusterProviderDescName:
                 description: ClusterProviderDescName is a reference to a ClusterProviderDesc
                   resource
                 type: string
                 x-kubernetes-validations:
-                - message: ProviderName is immutable
+                - message: ClusterProviderDescName is immutable
                   rule: self == oldSelf
               Managed:
                 default: true
@@ -72,8 +65,7 @@ spec:
                 description: Cluster config from the kube config file in string format.
                 type: string
               Phase:
-                default: Initializing
-                description: Phase of the workspace (Initializing,NotReady,Ready).
+                description: Phase of the logical cluster (Initializing,NotReady,Ready).
                 enum:
                 - Initializing
                 - NotReady

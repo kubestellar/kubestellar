@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The KubeStellar Authors.
+Copyright 2023 The KubeStellar Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,12 +44,12 @@ type ClusterProviderDesc struct {
 	// +optional
 	Spec ClusterProviderDescSpec `json:"spec,omitempty"`
 
-	// `status` describes the status of the cluster object.
+	// `status` describes the status of the provider object.
 	// +optional
 	Status ClusterProviderDescStatus `json:"status"`
 }
 
-// ClusterProviderDescSpec describes a cluster.
+// ClusterProviderDescSpec describes a cluster provider.
 // TODO: We are currently only listing the type and config.
 // There will be additional fields in the future.
 type ClusterProviderDescSpec struct {
@@ -67,10 +67,23 @@ type ClusterProviderDescSpec struct {
 	ClusterPrefixForDiscovery string `json:"ClusterPrefixForDiscovery,omitempty"`
 }
 
-// ClusterProviderDescStatus describes a cluster.
+// ClusterProviderDescPhaseType is the type of the current phase of the provider.
+//
+// +kubebuilder:validation:Enum=Initializing;Ready
+type ClusterProviderDescPhaseType string
+
+const (
+	ClusterProviderDescPhaseInitializing ClusterProviderDescPhaseType = "Initializing"
+	ClusterProviderDescPhaseReady        ClusterProviderDescPhaseType = "Ready"
+)
+
+// ClusterProviderDescStatus describes a provider status.
 // TODO: in the future we may want to hold a list of logic cluster resources that
 // use this provider.
 type ClusterProviderDescStatus struct {
+	// Phase of the provider (Initializing,Ready).
+	// +kubebuilder:default=Initializing
+	Phase ClusterProviderDescPhaseType `json:"Phase"`
 }
 
 // ClusterProviderDescList is the API type for a list of ClusterProviderDesc
