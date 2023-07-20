@@ -42,6 +42,8 @@ import (
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
 )
 
+// NewResolverCommand
+
 func NewResolverCommand() *cobra.Command {
 	options := resolveroptions.NewOptions()
 	resolverCommand := &cobra.Command{
