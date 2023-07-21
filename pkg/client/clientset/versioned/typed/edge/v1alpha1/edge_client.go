@@ -32,7 +32,9 @@ type EdgeV1alpha1Interface interface {
 	CustomizersGetter
 	EdgePlacementsGetter
 	EdgeSyncConfigsGetter
+	LocationsGetter
 	SinglePlacementSlicesGetter
+	SyncTargetsGetter
 	SyncerConfigsGetter
 }
 
@@ -53,8 +55,16 @@ func (c *EdgeV1alpha1Client) EdgeSyncConfigs() EdgeSyncConfigInterface {
 	return newEdgeSyncConfigs(c)
 }
 
+func (c *EdgeV1alpha1Client) Locations() LocationInterface {
+	return newLocations(c)
+}
+
 func (c *EdgeV1alpha1Client) SinglePlacementSlices() SinglePlacementSliceInterface {
 	return newSinglePlacementSlices(c)
+}
+
+func (c *EdgeV1alpha1Client) SyncTargets() SyncTargetInterface {
+	return newSyncTargets(c)
 }
 
 func (c *EdgeV1alpha1Client) SyncerConfigs() SyncerConfigInterface {

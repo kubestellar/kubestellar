@@ -25,8 +25,6 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
@@ -81,7 +79,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	epsUsedSt := store.findEpsUsedSt(stKey)
 
 	// 2a)
-	locsFilteredBySt := []*schedulingv1alpha1.Location{}
+	locsFilteredBySt := []*edgev1alpha1.Location{}
 	if !stDeleted {
 		locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
 		if err != nil {
@@ -229,8 +227,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 }
 
 // filterLocsBySt returns those Locations that select the SyncTarget
-func filterLocsBySt(locs []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) ([]*schedulingv1alpha1.Location, error) {
-	filtered := []*schedulingv1alpha1.Location{}
+func filterLocsBySt(locs []*edgev1alpha1.Location, st *edgev1alpha1.SyncTarget) ([]*edgev1alpha1.Location, error) {
+	filtered := []*edgev1alpha1.Location{}
 	for _, l := range locs {
 		s := l.Spec.InstanceSelector
 		selector, err := metav1.LabelSelectorAsSelector(s)
@@ -245,8 +243,8 @@ func filterLocsBySt(locs []*schedulingv1alpha1.Location, st *workloadv1alpha1.Sy
 }
 
 // filterLocsByEp returns those Locations that are selected by the EdgePlacement
-func filterLocsByEp(locs []*schedulingv1alpha1.Location, ep *edgev1alpha1.EdgePlacement) ([]*schedulingv1alpha1.Location, error) {
-	filtered := []*schedulingv1alpha1.Location{}
+func filterLocsByEp(locs []*edgev1alpha1.Location, ep *edgev1alpha1.EdgePlacement) ([]*edgev1alpha1.Location, error) {
+	filtered := []*edgev1alpha1.Location{}
 	for _, l := range locs {
 		for _, s := range ep.Spec.LocationSelectors {
 			selector, err := metav1.LabelSelectorAsSelector(&s)
@@ -262,7 +260,7 @@ func filterLocsByEp(locs []*schedulingv1alpha1.Location, ep *edgev1alpha1.EdgePl
 	return filtered, nil
 }
 
-func makeSinglePlacementsForSt(locsSelectingSt []*schedulingv1alpha1.Location, st *workloadv1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
+func makeSinglePlacementsForSt(locsSelectingSt []*edgev1alpha1.Location, st *edgev1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
 	made := []edgev1alpha1.SinglePlacement{}
 	if len(locsSelectingSt) == 0 || st == nil {
 		return made
@@ -281,7 +279,7 @@ func makeSinglePlacementsForSt(locsSelectingSt []*schedulingv1alpha1.Location, s
 }
 
 // packLocKeys extracts keys from given Locations and put the keys in a map
-func packLocKeys(locs []*schedulingv1alpha1.Location) map[string]empty {
+func packLocKeys(locs []*edgev1alpha1.Location) map[string]empty {
 	keys := map[string]empty{}
 	for _, l := range locs {
 		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(l)
