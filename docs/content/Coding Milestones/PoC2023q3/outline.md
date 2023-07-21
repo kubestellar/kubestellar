@@ -30,7 +30,7 @@ highlighted.
 - **Compared to PoC2023q1, decoupling from kcp TMC by making our own
   copy of the definitions of SyncTarget and Location.**
 - **Potentialy: switch from using SyncTarget and Location to some
-  other representatin of inventory.**
+  other representation of inventory.**
 - **Compared to PoC2023q1, decoupling from kcp core by (1) introducing
   an abstraction layer that delivers the essential functionality of
   kcp's logical clusters based on a variety of implementations and (2)
@@ -59,9 +59,12 @@ highlighted.
 - The TCP connections are opened in the inward direction, not outward.
 - A platform "product" that can be deployed (as opposed to a service
   that is used).
-- **Codified support for scenarios where the syncers in the workload
-  execution clusters have to go through load balancers and/or other
-  proxies to reach the central server(s).**
+- **Codified support for scenarios where some KubeStellar clients and
+  the syncers in some of the workload execution clusters have to go
+  through load balancers and/or other proxies to reach the central
+  server(s).**
+- **Compared to PoC2023q1, codification of closer to production grade
+  deployment technique(s).**
 - **A hierarchy with more than two levels.**
 
 Some important things that are not attempted in this PoC include the following.
