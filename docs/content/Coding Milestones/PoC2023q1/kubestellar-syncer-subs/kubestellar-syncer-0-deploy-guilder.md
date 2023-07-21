@@ -27,11 +27,11 @@ Creating or updating cluster role binding "kubestellar-syncer-guilder-wfeig2lv" 
 
 Wrote physical cluster manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
 
-  KUBECONFIG=<pcluster-config> kubectl apply -f "guilder-syncer.yaml"
+  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "guilder-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-guilder-wfeig2lv" kubestellar-syncer-guilder-wfeig2lv
+  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-guilder-wfeig2lv" kubestellar-syncer-guilder-wfeig2lv
 
 to verify the syncer pod is running.
 Current workspace is "root:espw".
