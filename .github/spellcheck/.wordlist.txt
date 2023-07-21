@@ -205,6 +205,7 @@ Upsynced
 Upsyncing
 ValidatingWebhookConfiguration
 VolumeAttachment
+WEC
 WorkspaceType
 WMW
 WMWs
@@ -459,6 +460,7 @@ urls
 usr
 volumeMounts
 watchall
+wec
 webhook
 webhooks
 wgpolicyk
