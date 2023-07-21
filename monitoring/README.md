@@ -4,7 +4,7 @@
 
 
 ### Description
-This example shows how to deploy monitoring tools (Prometheus, Grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KCP edge. A Prometheus agent is deployed in the edge regions running the edge pclusters
+This example shows how to deploy monitoring tools (Prometheus, Grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KCP edge. A Prometheus agent is deployed in the edge regions running the edge workload execution cluster (wec)
 
 1. Create your hosts file with the list of target hosts (KCP server & Edge Workload Execution Clusters (WEC))
 

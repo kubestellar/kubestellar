@@ -215,6 +215,7 @@ Youtube
 aarch
 admissionregistration
 afterall
+allclusters
 amd
 andy
 apache
@@ -225,6 +226,7 @@ apiGroup
 apiGroups
 apiVersion
 apiexport
+apiexports
 apiextensions
 apiregistration
 apiresource
