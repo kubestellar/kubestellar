@@ -1,0 +1,60 @@
+name: docs-ecutable - Scheduler
+run-name: docs-ecutable - Scheduler - ${{ github.ref_name }}
+
+on:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - "release-0.2"
+      - "release-0.3"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-scheduler.yml"
+      - "docs/scripts/docs-ecutable.sh"
+  push:
+    branches:
+      - "release-0.2"
+      - "release-0.3"
+    paths:
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md"
+      - "docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-scheduler.yml"
+      - "docs/scripts/docs-ecutable.sh"
+
+
+env:
+  docs-ecutable-filename: scheduler
+  docs-ecutable-md-filename: "'docs/content/Coding Milestones/PoC2023q1/kubestellar-scheduler.md'"
+
+jobs:
+  docs-ecutable:
+    if: github.repository_owner == 'kubestellar'
+    name: docs-ecutable - for scheduler e2e
+    runs-on: ubuntu-latest
+    outputs:
+      docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
+    steps:
+      - id: step1
+        run: echo "docs-ecutable-filename=${{ env.docs-ecutable-filename }}" >> "$GITHUB_OUTPUT"
+
+      - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
+
+      - uses: actions/checkout@v3.5.3
+      
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+  
+      - run: |
+          make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
+          docs-ecutable
