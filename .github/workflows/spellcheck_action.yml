@@ -40,6 +40,7 @@ jobs:
 #         source_files: "docs/content/*"
         
     - uses: actions/upload-artifact@v3
+      if: always()
       with:
         name: Spellcheck Output
         path: spellcheck-output.txt
