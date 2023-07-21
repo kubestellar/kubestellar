@@ -206,6 +206,7 @@ Upsyncing
 ValidatingWebhookConfiguration
 VolumeAttachment
 WEC
+WECs
 WorkspaceType
 WMW
 WMWs
@@ -461,6 +462,7 @@ usr
 volumeMounts
 watchall
 wec
+wecs
 webhook
 webhooks
 wgpolicyk
