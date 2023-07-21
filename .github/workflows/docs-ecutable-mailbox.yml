@@ -5,7 +5,7 @@ on:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
-  pull_request_target:
+  pull_request:
     types: [labeled]
     branches:
       - main
