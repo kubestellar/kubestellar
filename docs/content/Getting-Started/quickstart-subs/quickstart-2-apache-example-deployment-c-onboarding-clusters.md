@@ -27,18 +27,18 @@ Creating or updating cluster role binding "kubestellar-syncer-florin-1yi5q9c4" t
 
 Wrote physical cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-1yi5q9c4". Use
 
-  KUBECONFIG=<pcluster-config> kubectl apply -f "florin-syncer.yaml"
+  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-florin-1yi5q9c4" kubestellar-syncer-florin-1yi5q9c4
+  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-florin-1yi5q9c4" kubestellar-syncer-florin-1yi5q9c4
 
 to verify the syncer pod is running.
 Current workspace is "root:example-imw".
 Current workspace is "root".
 ```
 
-An edge syncer manifest yaml file was created in your current director: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
+An edge syncer manifest yaml file was created in your current directory: `florin-syncer.yaml`. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.
 
 Now let's deploy the edge syncer to the `florin` edge cluster:
 

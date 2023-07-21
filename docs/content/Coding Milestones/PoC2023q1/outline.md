@@ -609,7 +609,7 @@ A mailbox workspace contains the following items.
 
 ## Edge cluster
 
-Also called edge pcluster.
+Also called workload execution cluster.
 
 One of these contains the following items.  FYI, these are the things
 in the YAML output by `kubectl kcp workload edge-sync`.  The

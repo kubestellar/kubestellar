@@ -1,3 +1,4 @@
+Aashni
 Aleksander
 API
 APIBinding
@@ -118,6 +119,7 @@ MERCHANTABILITY
 MVI
 Makefile
 ManagedFields
+Manroa
 Maximo
 MicroShift
 MikeSpreitzer
@@ -208,6 +210,7 @@ WMW
 WMWs
 WSL
 Youtube
+aarch
 admissionregistration
 afterall
 amd
@@ -266,6 +269,7 @@ denature
 denatured
 denaturing
 deployers
+dest
 dev
 discoverable
 dismayingly
@@ -279,12 +283,15 @@ ecutable
 edgeplacement
 edgesync
 edgesyncer
+ef
 egrep
 enablement
 env
 envar
+esac
 espw
 etcd
+exclusioninclusion
 exe
 executables
 faq
@@ -384,9 +391,11 @@ programmatically
 prometheus
 provisioner
 proxying
+ps
 quickstart
 rbac
 readOnly
+readthedocs
 reconciler
 renature
 renatured
