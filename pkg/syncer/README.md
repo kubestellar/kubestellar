@@ -45,43 +45,43 @@
     ```
 1. Run kubestellar-syncer registration command
     ```
-    $ kubectl kubestellar sync-gen pcluster1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/kubestellar-syncer.yaml
-    Creating service account "kubestellar-syncer-pcluster1-1na3tqcd"
-    Creating cluster role "kubestellar-syncer-pcluster1-1na3tqcd" to give service account "kubestellar-syncer-pcluster1-1na3tqcd"
+    $ kubectl kubestellar sync-gen wec1 --syncer-image $EMC_SYNCER_IMAGE -o /tmp/kubestellar-syncer.yaml
+    Creating service account "kubestellar-syncer-wec1-1na3tqcd"
+    Creating cluster role "kubestellar-syncer-wec1-1na3tqcd" to give service account "kubestellar-syncer-wec1-1na3tqcd"
 
-    1. write and sync access to the synctarget "kubestellar-syncer-pcluster1-1na3tqcd"
+    1. write and sync access to the synctarget "kubestellar-syncer-wec1-1na3tqcd"
     2. write access to apiresourceimports.
 
-    Creating or updating cluster role binding "kubestellar-syncer-pcluster1-1na3tqcd" to bind service account "kubestellar-syncer-pcluster1-1na3tqcd" to cluster role "kubestellar-syncer-pcluster1-1na3tqcd".
+    Creating or updating cluster role binding "kubestellar-syncer-wec1-1na3tqcd" to bind service account "kubestellar-syncer-wec1-1na3tqcd" to cluster role "kubestellar-syncer-wec1-1na3tqcd".
 
-    Wrote physical cluster manifest to /tmp/kubestellar-syncer.yaml for namespace "kubestellar-syncer-pcluster1-1na3tqcd". Use
+    Wrote physical cluster manifest to /tmp/kubestellar-syncer.yaml for namespace "kubestellar-syncer-wec1-1na3tqcd". Use
 
-      KUBECONFIG=<pcluster-config> kubectl apply -f "/tmp/kubestellar-syncer.yaml"
+      KUBECONFIG=<wec1-config> kubectl apply -f "/tmp/kubestellar-syncer.yaml"
 
     to apply it. Use
 
-      KUBECONFIG=<pcluster-config> kubectl get deployment -n "kubestellar-syncer-pcluster1-1na3tqcd" kubestellar-syncer-pcluster1-1na3tqcd
+      KUBECONFIG=<wec1-config> kubectl get deployment -n "kubestellar-syncer-wec1-1na3tqcd" kubestellar-syncer-wec1-1na3tqcd
 
     to verify the syncer pod is running.
     ```
 1. Deploy the generated bootstrap manifest (`/tmp/kubestellar-syncer.yaml`) in a p-cluster
     ```
-    $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl apply -f /tmp/kubestellar-syncer.yaml
-    namespace/kubestellar-syncer-pcluster1-1na3tqcd created
-    serviceaccount/kubestellar-syncer-pcluster1-1na3tqcd created
-    secret/kubestellar-syncer-pcluster1-1na3tqcd-token created
-    clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
-    clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-pcluster1-1na3tqcd created
-    role.rbac.authorization.k8s.io/kubestellar-syncer-dns-pcluster1-1na3tqcd created
-    rolebinding.rbac.authorization.k8s.io/kubestellar-syncer-dns-pcluster1-1na3tqcd created
-    secret/kubestellar-syncer-pcluster1-1na3tqcd created
-    deployment.apps/kubestellar-syncer-pcluster1-1na3tqcd created
+    $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl apply -f /tmp/kubestellar-syncer.yaml
+    namespace/kubestellar-syncer-wec1-1na3tqcd created
+    serviceaccount/kubestellar-syncer-wec1-1na3tqcd created
+    secret/kubestellar-syncer-wec1-1na3tqcd-token created
+    clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-wec1-1na3tqcd created
+    clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-wec1-1na3tqcd created
+    role.rbac.authorization.k8s.io/kubestellar-syncer-dns-wec1-1na3tqcd created
+    rolebinding.rbac.authorization.k8s.io/kubestellar-syncer-dns-wec1-1na3tqcd created
+    secret/kubestellar-syncer-wec1-1na3tqcd created
+    deployment.apps/kubestellar-syncer-wec1-1na3tqcd created
     ```
 1. Edge Syncer successfully runs and interact with the mailbox workspace
     ```
-    $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get pod -A
+    $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl get pod -A
     NAMESPACE                               NAME                                                     READY   STATUS    RESTARTS   AGE
-    kubestellar-syncer-pcluster1-1na3tqcd   kubestellar-syncer-pcluster1-1na3tqcd-7467d4bf7f-7rqnt   1/1     Running   0          31s
+    kubestellar-syncer-wec1-1na3tqcd   kubestellar-syncer-wec1-1na3tqcd-7467d4bf7f-7rqnt   1/1     Running   0          31s
     ...
     ```
 1. Try downsync a namespace
@@ -91,25 +91,25 @@
         apiVersion: edge.kcp.io/v1alpha1
         kind: EdgeSyncConfig
         metadata:
-          name: pcluster1
+          name: wec1
         spec:
           downSyncedResources:
           - kind: Namespace
-            name: from-ws-to-pcluster
+            name: from-ws-to-wec
             version: v1
         EOL
         ```
     1. Create the namespace
         ```
-        $ kubectl create ns from-ws-to-pcluster
+        $ kubectl create ns from-ws-to-wec
         ```
-    1. The namespace `from-ws-to-pcluster` is successfully downsynced
+    1. The namespace `from-ws-to-wec` is successfully downsynced
         ```
-        $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get ns
+        $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl get ns
         NAME                                    STATUS   AGE
         default                                 Active   13m
-        from-ws-to-pcluster                     Active   1s
-        kubestellar-syncer-pcluster1-1na3tqcd   Active   11m
+        from-ws-to-wec                     Active   1s
+        kubestellar-syncer-wec1-1na3tqcd   Active   11m
         kube-node-lease                         Active   13m
         kube-public                             Active   13m
         kube-system                             Active   13m
@@ -127,9 +127,9 @@
     STATUS: deployed
     ...
     ```
-1. Now Kyverno is running on pcluster
+1. Now Kyverno is running on workload execution cluster (wec)
     ```
-    $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get pod -n kyverno
+    $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl get pod -n kyverno
     NAME                      READY   STATUS    RESTARTS   AGE
     kyverno-9c494576b-dgpjt   1/1     Running   0          78s
     ```
@@ -138,10 +138,10 @@
     $ kubectl apply -f /tmp/kyverno/sample-policy.yaml
     policy.kyverno.io/sample-policy created
     ```
-1. The policy is distributed to pcluster and the generated policy report is upsynced
-  1. On the pcluster
+1. The policy is distributed to workload execution cluster (wec) and the generated policy report is upsynced
+  1. On the workload execution cluster (wec)
       ```
-      $ KUBECONFIG=/tmp/kind-pcluster1/kubeconfig.yaml kubectl get policy,policyreport
+      $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl get policy,policyreport
       NAME                              BACKGROUND   VALIDATE ACTION   READY
       policy.kyverno.io/sample-policy   true         enforce           true
 
