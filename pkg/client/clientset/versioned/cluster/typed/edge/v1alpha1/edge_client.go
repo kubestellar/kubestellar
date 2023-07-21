@@ -39,6 +39,8 @@ type EdgeV1alpha1ClusterInterface interface {
 	EdgeSyncConfigsClusterGetter
 	SinglePlacementSlicesClusterGetter
 	SyncerConfigsClusterGetter
+	SyncTargetsClusterGetter
+	LocationsClusterGetter
 }
 
 type EdgeV1alpha1ClusterScoper interface {
@@ -74,6 +76,14 @@ func (c *EdgeV1alpha1ClusterClient) SinglePlacementSlices() SinglePlacementSlice
 
 func (c *EdgeV1alpha1ClusterClient) SyncerConfigs() SyncerConfigClusterInterface {
 	return &syncerConfigsClusterInterface{clientCache: c.clientCache}
+}
+
+func (c *EdgeV1alpha1ClusterClient) SyncTargets() SyncTargetClusterInterface {
+	return &syncTargetsClusterInterface{clientCache: c.clientCache}
+}
+
+func (c *EdgeV1alpha1ClusterClient) Locations() LocationClusterInterface {
+	return &locationsClusterInterface{clientCache: c.clientCache}
 }
 
 // NewForConfig creates a new EdgeV1alpha1ClusterClient for the given config.

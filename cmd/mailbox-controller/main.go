@@ -51,7 +51,10 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
+	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
 
 func main() {
@@ -108,23 +111,28 @@ func main() {
 
 	inventoryClientConfig.UserAgent = "mailbox-controller"
 
-	// Get client config for view of SyncTarget objects
-	syncTargetViewConfig, err := configForViewOfExport(ctx, inventoryClientConfig, "workload.kcp.io")
+	// create edgeSharedInformerFactory
+	options := resolveroptions.NewOptions()
+	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to create client config for view of SyncTarget exports")
+		logger.Error(err, "failed to create config from flags")
+		os.Exit(3)
+	}
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
+	if err != nil {
+		logger.Error(err, "failed to create config for view of edge exports")
 		os.Exit(4)
 	}
-
-	stViewClusterClientset, err := kcpclusterclientset.NewForConfig(syncTargetViewConfig)
+	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for view of SyncTarget exports")
+		logger.Error(err, "failed to create clientset for view of edge exports")
 		os.Exit(6)
 	}
-
-	stViewInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(stViewClusterClientset, resyncPeriod)
-	syncTargetClusterPreInformer := stViewInformerFactory.Workload().V1alpha1().SyncTargets()
+	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
 
 	// create config for accessing edge service provider workspace
+
 	workspaceClientConfig, err := workloadClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make workspaces config")
@@ -159,7 +167,8 @@ func main() {
 	)
 
 	doneCh := ctx.Done()
-	stViewInformerFactory.Start(doneCh)
+	edgeSharedInformerFactory.Start(doneCh)
+
 	workspaceScopedInformerFactory.Start(doneCh)
 
 	ctl.Run(concurrency)
@@ -186,6 +195,7 @@ func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exp
 			return nil, fmt.Errorf("error reading APIExport %s: %w", exportName, err)
 		}
 		if isAPIExportReady(logger, apiExport) {
+			logger.Info(" ### export is ready, exportName: ", exportName)
 			break
 		}
 		logger.V(2).Info("Pause because APIExport not ready", "exportName", exportName)

@@ -29,13 +29,8 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	workloadv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/workload/v1alpha1"
-	schedulingv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
-	workloadv1alpha1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/workload/v1alpha1"
-	schedulingv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
-	workloadv1alpha1listers "github.com/kcp-dev/kcp/pkg/client/listers/workload/v1alpha1"
 
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
@@ -70,10 +65,10 @@ type controller struct {
 	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
 	edgePlacementIndexer cache.Indexer
 
-	locationLister  schedulingv1alpha1listers.LocationClusterLister
+	locationLister  edgev1alpha1listers.LocationClusterLister
 	locationIndexer cache.Indexer
 
-	synctargetLister  workloadv1alpha1listers.SyncTargetClusterLister
+	synctargetLister  edgev1alpha1listers.SyncTargetClusterLister
 	synctargetIndexer cache.Indexer
 }
 
@@ -82,8 +77,8 @@ func NewController(
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
 	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
-	locationAccess schedulingv1alpha1informers.LocationClusterInformer,
-	syncTargetAccess workloadv1alpha1informers.SyncTargetClusterInformer,
+	locationAccess edgev1alpha1informers.LocationClusterInformer,
+	syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
@@ -116,8 +111,8 @@ func NewController(
 	locationAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueLocation,
 		UpdateFunc: func(old, obj interface{}) {
-			oldLoc := old.(*schedulingv1alpha1.Location)
-			newLoc := obj.(*schedulingv1alpha1.Location)
+			oldLoc := old.(*edgev1alpha1.Location)
+			newLoc := obj.(*edgev1alpha1.Location)
 			if !apiequality.Semantic.DeepEqual(oldLoc.Spec, newLoc.Spec) || !apiequality.Semantic.DeepEqual(oldLoc.Labels, newLoc.Labels) {
 				c.enqueueLocation(obj)
 			}
@@ -128,8 +123,8 @@ func NewController(
 	syncTargetAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueSyncTarget,
 		UpdateFunc: func(old, obj interface{}) {
-			oldST := old.(*workloadv1alpha1.SyncTarget)
-			newST := obj.(*workloadv1alpha1.SyncTarget)
+			oldST := old.(*edgev1alpha1.SyncTarget)
+			newST := obj.(*edgev1alpha1.SyncTarget)
 			if !apiequality.Semantic.DeepEqual(oldST.Spec, newST.Spec) || !apiequality.Semantic.DeepEqual(oldST.Labels, newST.Labels) {
 				c.enqueueSyncTarget((obj))
 			}

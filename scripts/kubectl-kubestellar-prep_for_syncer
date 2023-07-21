@@ -118,7 +118,20 @@ trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 
 kubectl ws "${kubectl_flags[@]}" "$imw"
 
-mbwsname=$(kubectl "${kubectl_flags[@]}" get SyncTarget "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+echo "--- current directory is $PWD"
+cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
+cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
+echo "current ws is $cwsi"
+echo "imw is $imw"
+
+echo "current cwsi is $cwsi"
+if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
+   kubectl kcp bind apiexport root:espw:edge.kcp.io
+   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
+else echo "edge.kcp.io apibinding exists in workspace $cwsi"
+fi	 
+
+mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
 kubectl ws "${kubectl_flags[@]}" "$espw"
 

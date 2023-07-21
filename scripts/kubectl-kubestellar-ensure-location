@@ -108,13 +108,25 @@ fi
 
 set -e
 
+echo "--- current directory is $PWD"
+cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
+cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
+echo "current ws is $cwsi"
+echo "imw is $imw"
 if [ "$imw" != "." ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
+     cwsi=$imw
+fi
+echo "current cwsi is $cwsi"
+if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
+   kubectl kcp bind apiexport root:espw:edge.kcp.io
+   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
+else echo "edge.kcp.io apibinding exists in workspace $cwsi"
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get SyncTarget "$objname" &> /dev/null; then
+if ! kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$objname" &> /dev/null; then
 (cat <<EOF
-apiVersion: workload.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
   name: "$objname"
@@ -127,12 +139,12 @@ EOF
 }
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get Location "$objname" &> /dev/null; then
+if ! kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io "$objname" &> /dev/null; then
 (cat <<EOF
-apiVersion: scheduling.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 spec:
-  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {"id":"$objname"}
 metadata:
@@ -144,13 +156,13 @@ EOF
 }
 fi
 
-if kubectl "${kubectl_flags[@]}" get Location default &> /dev/null; then
-    kubectl "${kubectl_flags[@]}" delete Location default &> /dev/null
+if kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io default &> /dev/null; then
+    kubectl "${kubectl_flags[@]}" delete locations.edge.kcp.io default &> /dev/null
 fi
 
 
-stlabs=$(kubectl "${kubectl_flags[@]}" get SyncTarget "$objname" -o json | jq .metadata.labels)
-loclabs=$(kubectl "${kubectl_flags[@]}" get Location "$objname" -o json | jq .metadata.labels)
+stlabs=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io  "$objname" -o json | jq .metadata.labels)
+loclabs=$(kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io "$objname" -o json | jq .metadata.labels)
 
 let index=0 1
 while (( index < ${#labels[*]} )); do
@@ -159,16 +171,16 @@ while (( index < ${#labels[*]} )); do
     let index=index+2
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	if ! kubectl "${kubectl_flags[@]}" label --overwrite SyncTarget "$objname" "${key}=${val}" ; then
+	   if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
 	    echo "$0: failed to add label to SyncTarget" >&2
 	    exit 4
-	fi
+	   fi
     fi
     locval=$(jq -r <<<"$loclabs" ".[\"${key}\"]")
     if [ "$locval" != "$val" ]; then
-	if ! kubectl "${kubectl_flags[@]}" label --overwrite Location "$objname" "${key}=${val}" ; then
-	    echo "$0: failed to add label to Location" >&2
-	    exit 4
-	fi
+	   if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kcp.io "$objname" "${key}=${val}" ; then
+	     echo "$0: failed to add label to Location" >&2
+	     exit 4
+	   fi
     fi
 done
