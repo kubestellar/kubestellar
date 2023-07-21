@@ -11,6 +11,6 @@ mkdocs-static-i18n==0.53
 Pygments==2.14.0
 pymdown-extensions==9.9.2
 mkdocs-open-in-new-tab==1.0.2
-# mkdocs-include-markdown-plugin==4.0.4
+mkdocs-include-markdown-plugin==4.0.4
 # ../../mkdocs-include-markdown-plugin
-mkdocs-include-markdown-plugin @ git+https://github.com/clubanderson/mkdocs-include-markdown-plugin@releases/tag/v4.0.4
+# mkdocs-include-markdown-plugin @ git+https://github.com/clubanderson/mkdocs-include-markdown-plugin@releases/tag/v4.0.4
