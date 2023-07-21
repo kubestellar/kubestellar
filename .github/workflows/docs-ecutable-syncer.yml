@@ -37,7 +37,7 @@ env:
 
 jobs:
   docs-ecutable:
-    if: github.repository_owner == 'kubestellar'
+    #if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for syncer e2e
     runs-on: ubuntu-latest
     outputs:
