@@ -2,6 +2,7 @@ name: docs-ecutable - Placement
 run-name: docs-ecutable - Placement - ${{ github.ref_name }}
 
 on:
+  workflow_call:
   # So we can trigger manually if needed
   workflow_dispatch:
   # To confirm any changes to docs build successfully, without deploying them
@@ -38,7 +39,6 @@ env:
 
 jobs:
   docs-ecutable:
-    if: github.repository_owner == 'kubestellar'
     name: docs-ecutable - for placement e2e
     runs-on: ubuntu-latest
     outputs:
