@@ -1,0 +1,19 @@
+name: docs-ecutable - ALL
+run-name: docs-ecutable - ALL - ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example1:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-example1@main
+  mailbox:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-mailbox@main
+  placement:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-placement@main
+  qs:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-qs@main
+  syncer:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-syncer@main
+  where-resolver:
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-where-resolver@main
