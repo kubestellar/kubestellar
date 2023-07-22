@@ -6,14 +6,14 @@ on:
 
 jobs:
   example1:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-example1@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-example1.yml@main
   mailbox:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-mailbox@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-mailbox.yml@main
   placement:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-placement@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-placement.yml@main
   qs:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-qs@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-qs.yml@main
   syncer:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-syncer@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-syncer.yml@main
   where-resolver:
-    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-where-resolver@main
+    uses: kubestellar/kubestellar/.github/workflows/docs-ecutable-where-resolver.yml@main
