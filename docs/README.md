@@ -34,6 +34,9 @@ Another way to view (not modify - this method reflects what has been deployed to
 git clone git@github.com:{{ config.repo_short_name }}.git
 cd {{ config.repo_default_file_path }}
 git checkout {{ config.ks_branch }}
+cd docs
+mike set-default {{ config.ks_branch }}
+cd ..
 make serve-docs
 ```
 Then open a browser to [`http://localhost:8000/`](http://localhost:8000/)
