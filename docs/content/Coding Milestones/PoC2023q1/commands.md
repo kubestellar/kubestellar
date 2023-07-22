@@ -257,7 +257,7 @@ The acceptable flags include all those of `kubectl` except for
   provider workspace.  The default is the standard location,
   `root:espw`.
 - `--syncer-image image_ref`: specifies the container image that runs
-  the syncer.  The default is `quay.io/kubestellar/syncer:v0.2.1`.
+  the syncer.  The default is `quay.io/kubestellar/syncer:{{ config.ks_tag }}`.
 - `-o output_pathname`: specifies where to write the YAML definitions
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is `synctarget_name +
