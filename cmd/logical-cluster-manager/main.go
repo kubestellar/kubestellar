@@ -84,10 +84,6 @@ func main() {
 		informerLC,
 		informerProvider,
 	)
-	if err != nil {
-		logger.Error(err, "failed to create controller")
-		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
-	}
 
 	doneCh := ctx.Done()
 	informerFactory.Start(doneCh)

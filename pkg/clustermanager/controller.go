@@ -51,7 +51,7 @@ type queueItem struct {
 }
 
 type controller struct {
-	context                 context.Context
+	ctx                     context.Context
 	clientset               edgeclient.Interface
 	k8sClientset            *kubeclient.Clientset
 	logger                  logr.Logger
@@ -64,19 +64,19 @@ type controller struct {
 
 // NewController returns logicalcluster-manager controller
 func NewController(
-	context context.Context,
+	ctx context.Context,
 	clientset edgeclient.Interface,
 	k8sClientset *kubeclient.Clientset,
 	logicalClusterInformer cache.SharedIndexInformer,
 	providerInformer cache.SharedIndexInformer,
 ) *controller {
-	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", controllerName))
+	ctx = klog.NewContext(ctx, klog.FromContext(ctx).WithValues("controller", controllerName))
 
 	c := &controller{
-		context:                 context,
+		ctx:                     ctx,
 		clientset:               clientset,
 		k8sClientset:            k8sClientset,
-		logger:                  klog.FromContext(context),
+		logger:                  klog.FromContext(ctx),
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
 		logicalClusterInformer:  logicalClusterInformer,
 		clusterProviderInformer: providerInformer,
@@ -144,10 +144,10 @@ func (c *controller) Run(numThreads int) {
 	defer c.logger.Info("shutting down manager logicalcluster controller")
 
 	for i := 0; i < numThreads; i++ {
-		go wait.UntilWithContext(c.context, c.runWorker, time.Second)
+		go wait.UntilWithContext(c.ctx, c.runWorker, time.Second)
 	}
 
-	<-c.context.Done()
+	<-c.ctx.Done()
 }
 
 func (c *controller) runWorker(ctx context.Context) {
@@ -167,7 +167,6 @@ func (c *controller) processNextItem() bool {
 	defer c.queue.Done(i)
 
 	if err := c.process(item); err != nil {
-		runtime.HandleError(err)
 		c.queue.AddRateLimited(i)
 		return true
 	}
