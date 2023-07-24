@@ -2,15 +2,13 @@
 title: "Details"
 ---
 
-Want to get involved? Check out our [good-first-issue list]({{ config.repo_url }}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
-
-
 ![poc2023q1 architecture](Edge-PoC-2023q1.svg)
 
 ## Status of this memo
 
-This summarizes the current state of design work that is still in
-progress.
+This summarizes the design for a Proof-of-Concept intended to be
+completed in early 2023.  It has been completed except for the
+summarization feature.
 
 ## Introduction
 
@@ -57,7 +55,7 @@ Some important things that are not attempted in this PoC include the following.
 - Very strong isolation between tenants in the edge computing
   platform.
 
-## Development Roadmap
+## Development Roadmap for this PoC
 
 Some features will get implemented later than others, so that we can
 start being able to run interesting end-to-end scenarios relatively

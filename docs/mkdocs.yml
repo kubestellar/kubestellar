@@ -47,7 +47,7 @@ nav:
               - KubeStellar Where Resolver: Coding Milestones/PoC2023q1/where-resolver.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
               - KubeStellar Placement Translator: Coding Milestones/PoC2023q1/placement-translator.md
-          - Roadmap: Coding Milestones/PoC2023q1/roadmap-uses.md
+          - Use Cases Affecting the Roadmap for PoC2023q1: Coding Milestones/PoC2023q1/roadmap-uses.md
           - Environments:
               - Overview: Coding Milestones/PoC2023q1/environments/_index.md
               - Cloud Environment: Coding Milestones/PoC2023q1/environments/cloud-env.md
