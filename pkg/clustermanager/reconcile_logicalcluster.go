@@ -79,13 +79,13 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		return c.clientset.
 			LogicalclusterV1alpha1().
 			LogicalClusters(ProviderNS(logicalCluster.Spec.ClusterProviderDescName)).
-			Delete(c.context, logicalCluster.Name, v1.DeleteOptions{})
+			Delete(c.ctx, logicalCluster.Name, v1.DeleteOptions{})
 	}
 	if logicalCluster.Status.Phase == "" && logicalCluster.Spec.Managed {
 		// The client created a new logical cluster object and we need to
 		// create the corresponding physical cluster.
 		providerInfo, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Get(
-			c.context, logicalCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
+			c.ctx, logicalCluster.Spec.ClusterProviderDescName, v1.GetOptions{})
 		if err != nil {
 			c.logger.Error(err, "failed to get the provider resource")
 			return err
@@ -110,7 +110,7 @@ func (c *controller) processAddOrUpdateLC(logicalCluster *lcv1alpha1.LogicalClus
 		_, err = c.clientset.
 			LogicalclusterV1alpha1().
 			LogicalClusters(ProviderNS(providerInfo.Name)).
-			Update(c.context, logicalCluster, v1.UpdateOptions{})
+			Update(c.ctx, logicalCluster, v1.UpdateOptions{})
 		if err != nil {
 			c.logger.Error(err, "failed to update cluster status.")
 			return err

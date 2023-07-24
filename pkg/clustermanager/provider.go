@@ -73,7 +73,7 @@ func CreateProvider(c *controller, providerName string, providerType lcv1alpha1a
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	discoveryPrefix := "*"
+	discoveryPrefix := ""
 
 	_, exists := c.providers[providerName]
 	if exists {

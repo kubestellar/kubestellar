@@ -80,7 +80,7 @@ func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) err
 			Name: nsName,
 		},
 	}
-	_, err = c.k8sClientset.CoreV1().Namespaces().Create(c.context, ns, metav1.CreateOptions{})
+	_, err = c.k8sClientset.CoreV1().Namespaces().Create(c.ctx, ns, metav1.CreateOptions{})
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
@@ -119,14 +119,14 @@ func (c *controller) handleDelete(providerName string) error {
 			if lc.Spec.Managed {
 				//set managed Logicalcluster to NotReady
 				lc.Status.Phase = lcv1alpha1.LogicalClusterPhaseNotReady
-				_, err := c.clientset.LogicalclusterV1alpha1().LogicalClusters(ns).Update(c.context, lc, metav1.UpdateOptions{})
+				_, err := c.clientset.LogicalclusterV1alpha1().LogicalClusters(ns).Update(c.ctx, lc, metav1.UpdateOptions{})
 				if err != nil {
 					runtime.HandleError(err)
 				}
 				isNsEmpty = false
 			} else {
 				//delete unmanaged Logicalcluster
-				err := c.clientset.LogicalclusterV1alpha1().LogicalClusters(ns).Delete(c.context, lc.Name, metav1.DeleteOptions{})
+				err := c.clientset.LogicalclusterV1alpha1().LogicalClusters(ns).Delete(c.ctx, lc.Name, metav1.DeleteOptions{})
 				if err != nil {
 					runtime.HandleError(err)
 					isNsEmpty = false
@@ -136,7 +136,7 @@ func (c *controller) handleDelete(providerName string) error {
 	}
 	if isNsEmpty {
 		delete(c.providers, providerName)
-		err := c.k8sClientset.CoreV1().Namespaces().Delete(c.context, ns, metav1.DeleteOptions{})
+		err := c.k8sClientset.CoreV1().Namespaces().Delete(c.ctx, ns, metav1.DeleteOptions{})
 		if err != nil && !apierrors.IsNotFound(err) {
 			return err
 		}
@@ -146,7 +146,7 @@ func (c *controller) handleDelete(providerName string) error {
 
 func (c *controller) setProviderStatus(provider *lcv1alpha1.ClusterProviderDesc, status lcv1alpha1.ClusterProviderDescPhaseType) (*lcv1alpha1.ClusterProviderDesc, error) {
 	provider.Status.Phase = status
-	updated, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Update(c.context, provider, metav1.UpdateOptions{})
+	updated, err := c.clientset.LogicalclusterV1alpha1().ClusterProviderDescs().Update(c.ctx, provider, metav1.UpdateOptions{})
 	if err != nil {
 		return updated, err
 	}
