@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#coming-soon" class="md-skip">
+        <a href="#status-of-this-memo" class="md-skip">
           Skip to content
         </a>
       
@@ -1015,7 +1015,7 @@
   
     <li class="md-nav__item">
       <a href="../../PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Roadmap
+        Use Cases Affecting the Roadmap for PoC2023q1
       </a>
     </li>
   
@@ -1210,12 +1210,46 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Details
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         Details
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#status-of-this-memo" class="md-nav__link">
+    Status of this memo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1636,8 +1670,28 @@
   
   
   
-    
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#status-of-this-memo" class="md-nav__link">
+    Status of this memo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1668,7 +1722,81 @@
   
 
 
-<h1 id="coming-soon">Coming Soon<a class="headerlink" href="#coming-soon" title="Permanent link">#</a></h1>
+  <h1>Details</h1>
+
+<p>Want to get involved? Check out our <a href="https://github.com/kubestellar/kubestellar/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">good-first-issue list</a>.</p>
+<p>TODO: draw new picture</p>
+<h2 id="status-of-this-memo">Status of this memo<a class="headerlink" href="#status-of-this-memo" title="Permanent link">#</a></h2>
+<p>This document outlines near-term plans for building on what was
+produced in the work on <a href="../../PoC2023q1/outline/">the PoC for 2023q1</a>.</p>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
+<p>PoC2023q1 was defined with the over-arching goal of supporting edge
+computing scenarios.  Since then we have realized that the technical
+problems that we took on are not that specific, they appear in other
+multi-cluster scenarios as well.</p>
+<p>The goals of this PoC are as follows.  Ones that are substantially
+different from what has been accomplished for PoC2023q1 are
+highlighted.</p>
+<ul>
+<li>Separation of infrastructure and workload management.</li>
+<li>The focus here is on workload management, and that strictly reads
+  an inventory of infrastructure.</li>
+<li>What passes from inventory to workload management is kcp TMC
+  Location and SyncTarget objects.</li>
+<li><strong>Compared to PoC2023q1, decoupling from kcp TMC by making our own
+  copy of the definitions of SyncTarget and Location.</strong></li>
+<li><strong>Potentialy: switch from using SyncTarget and Location to some
+  other representation of inventory.</strong></li>
+<li><strong>Compared to PoC2023q1, decoupling from kcp core by (1) introducing
+  an abstraction layer that delivers the essential functionality of
+  kcp's logical clusters based on a variety of implementations and (2)
+  using <a href="https://github.com/kube-bind/kube-bind">kube-bind</a> instead of
+  kcp's APIExport/APIBinding.  Where PoC2023q1 used the concept of a
+  kcp workspace, PoC2023q3 uses the abstract concept that we call a
+  "space".</strong></li>
+<li>Use of a space as the container for the central spec of a workload.</li>
+<li>Propagation of desired state from center outward, as directed by
+  EdgePlacement objects and the referenced inventory objects.</li>
+<li>Interfaces designed for a large number of workload execution clusters.</li>
+<li>Interfaces designed with the intention that workload execution
+  clusters operate independently of each other and the center (e.g.,
+  can tolerate only occasional connectivity) and thus any "service
+  providers" (in the technical sense from kcp) in the center or
+  elsewhere.</li>
+<li>Rule-based customization of desired state.</li>
+<li>Propagation of reported state from workload execution clusters to center.</li>
+<li>Summarization of reported state in the center.</li>
+<li><strong>Exact, not summarized, reported state returned to workload
+  description space in the case of placement on exactly 1 workload
+  execution cluster.</strong></li>
+<li>Return and/or summarization of state from associated objects (e.g.,
+  ReplicaSet or Pod objects associated with a given Deployment
+  object).</li>
+<li>The TCP connections are opened in the inward direction, not outward.</li>
+<li>A platform "product" that can be deployed (as opposed to a service
+  that is used).</li>
+<li><strong>Codified support for scenarios where some KubeStellar clients and
+  the syncers in some of the workload execution clusters have to go
+  through load balancers and/or other proxies to reach the central
+  server(s).</strong></li>
+<li><strong>Compared to PoC2023q1, codification of closer to production grade
+  deployment technique(s).</strong></li>
+<li><strong>A hierarchy with more than two levels.</strong></li>
+</ul>
+<p>Some important things that are not attempted in this PoC include the following.</p>
+<ul>
+<li>An implementation that supports a very large volume of reported
+  state (which could come from either a large number of workload
+  executino clusters and/or a large amount of reported state in each
+  one of those).</li>
+<li>User control over ordering of propagation from center outward,
+  either among destinations or kinds of objects.</li>
+<li>More than baseline security (baseline being, e.g., HTTPS, Secret
+  objects, non-rotating bearer token based service authentication).</li>
+<li>A good design for bootstrapping the workload management in the
+  workload execution clusters.</li>
+<li>Very strong isolation between tenants of this platform.</li>
+</ul>
 
 
   
