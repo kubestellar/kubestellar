@@ -1730,7 +1730,29 @@
 <h2 id="kubestellar-primer">KubeStellar Primer<a class="headerlink" href="#kubestellar-primer" title="Permanent link">#</a></h2>
 <p>This is a description of the concepts behind KubeStellar.</p>
 <h2 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">#</a></h2>
-<p>This is a glossary of various terms used throughout this site. </p>
+<p>There have been some nomenclature changes: </p>
+<ul>
+<li>The term <code>edge cluster</code> has been replaced by <code>workload execution cluster</code></li>
+<li>The term <code>workload management workspace</code> has been replaced by <code>workload description space</code></li>
+<li>The term <code>inventory management workspace</code> has been by <code>inventory space</code></li>
+<li>The term <code>edge service provider workspace</code> has been replaced by <code>kubestellar core space</code></li>
+<li>The term <code>mailbox workspace</code> has been replaced by <code>mailbox space</code></li>
+</ul>
+<p><strong>Edge Cluster</strong> - A Kubernetes cluster which can execute a workload. In the examples on this website, we use Kind clusters. </p>
+<p><strong>EdgePlacement</strong> - Contains the 'what' and 'where' of the workload in the <code>spec.namespaceSelector</code> and <code>spec.locationSelectors</code> fields respectively. It describes which cluster(s) to send the workload to.</p>
+<p><strong>Edge Service Provider Workspace (ESPW)</strong> - Exports the Kubestellar API.</p>
+<p><strong>Inventory Management Workspace (IMW)</strong> - Stores the SyncTarget and Location objects for the edge clusters. </p>
+<p><strong>Kubestellar Syncer</strong> - Syncs Kubernetes resource objects from the cluster to the mailbox workspace, and vice versa. </p>
+<p><strong>Location</strong> - An object that tells Kubestellar where the cluster is located. It is a vendor-facing API. </p>
+<p><strong>Mailbox Controller</strong> - Creates a Mailbox Workspace for each SyncTarget object and puts an APIBinding in each Mailbox Workspace. </p>
+<p><strong>Mailbox Workspace</strong> - There is one Mailbox Workspace for each cluster. It stores the SyncerConfig object and copies of the workload(s).</p>
+<p><strong>PlacementTranslator</strong> - </p>
+<p><strong>SinglePlacementSlice</strong> - </p>
+<p><strong>Status Summarizer</strong> - Creates a StatusSummary object with a summary of the Deployment objects in a workload's workspace.</p>
+<p><strong>SyncerConfig</strong> - </p>
+<p><strong>Sync Target</strong> - A vendor-facing API that describes the cluster. This is referenced by the Location object. </p>
+<p><strong>Where Resolver</strong> - Creates a SinglePlacementSlice object for each Edge Placement object. It runs from the ESPW. </p>
+<p><strong>Workload Management Workspace (WMW)</strong> - This can store one workload description.</p>
 
 
   
