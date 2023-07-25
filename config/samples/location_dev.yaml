@@ -1,5 +1,5 @@
 ---
-apiVersion: scheduling.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 metadata:
   name: dev
@@ -10,6 +10,6 @@ spec:
     matchLabels:
       env: dev
   resource:
-    group: workload.kcp.io
+    group: edge.kcp.io
     resource: synctargets
     version: v1alpha1

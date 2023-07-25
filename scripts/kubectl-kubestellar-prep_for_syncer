@@ -175,7 +175,7 @@ if ! kubectl get APIBinding bind-edge &> /dev/null; then
 fi
 
 # Now the needed APIBinding exists, has it taken effect?
-sleep 5 # hope so
+sleep 10 # hope so
 
 
 "$bindir/kubectl-kubestellar-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"

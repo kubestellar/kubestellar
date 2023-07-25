@@ -34,9 +34,9 @@ provider workspace).
 
 The mailbox controller needs three Kubernetes client configurations.
 One --- concerned with reading inventory --- is to access the
-APIExport view of the `workload.kcp.io` API group, to read the
+APIExport view of the `edge.kcp.io` API group, to read the
 `SyncTarget` objects.  This must be a client config that is pointed at
-the workspace (which is always `root`, as far as I know) that has this
+the workspace (which is always `root:espw`, as far as I know) that has this
 APIExport and is authorized to read its view.  Another client config
 is needed to give read/write access to all the mailbox workspaces, so
 that the controller can create `APIBinding` objects to the edge
@@ -135,13 +135,14 @@ In a separate terminal window(3), create an inventory management workspace as fo
 ```shell
 kubectl ws \~
 kubectl ws create imw --enter
+kubectl kcp bind apiexport root:espw:edge.kcp.io
 ```
 
 Then in that workspace, run the following command to create a `SyncTarget` object.
 
 ```shell
 cat <<EOF | kubectl apply -f -
-apiVersion: workload.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
   name: stest1
@@ -160,6 +161,11 @@ I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 
 And you can verify that as follows:
 
 ```shell
+kubectl ws .
+kubectl get synctargets.edge.kcp.io
+```
+
+```shell
 kubectl ws root:espw
 ```
 ``` {.bash .no-copy }
@@ -167,6 +173,7 @@ Current workspace is "root:espw".
 ```
 
 ```shell
+kubectl ws tree 
 kubectl get workspaces
 ```
 ``` { .bash .no-copy }
@@ -191,8 +198,11 @@ Finally, go back to your inventory workspace to delete the `SyncTarget`:
 
 ```shell
 kubectl ws \~
+kubectl ws .
 kubectl ws imw
-kubectl delete SyncTarget stest1
+kubectl ws .
+kubectl get synctargets.edge.kcp.io
+kubectl delete synctargets.edge.kcp.io stest1
 ```
 and watch the mailbox controller react as follows.
 

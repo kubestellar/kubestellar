@@ -82,7 +82,7 @@ data:
     <html>
       <body>
         This is a common web site.
-        Running in %(loc-name).
+        Running in %(env).
       </body>
     </html>
 ---
