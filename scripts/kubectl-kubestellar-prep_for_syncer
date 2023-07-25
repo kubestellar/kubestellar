@@ -36,6 +36,7 @@ stname=""
 output=""
 syncer_image="quay.io/kubestellar/syncer:v0.4.0"
 kubectl_flags=()
+silent="false"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -59,6 +60,8 @@ while (( $# > 0 )); do
 	    then output="$2"; shift
 	    else echo "$0: missing output filename" >&2; exit 1
 	    fi;;
+    (-s|--silent)
+        silent="true";;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
@@ -114,26 +117,26 @@ elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
     exit 1
 fi
 
-trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 
-kubectl ws "${kubectl_flags[@]}" "$imw"
+if [ "$silent" == "true" ]; then
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws" > /dev/null' EXIT
+else
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
+fi
 
-echo "--- current directory is $PWD"
-cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
-cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
-echo "current ws is $cwsi"
-echo "imw is $imw"
+if [ "$silent" == "true" ]; then
+    kubectl ws "${kubectl_flags[@]}" "$imw" > /dev/null
+else
+    kubectl ws "${kubectl_flags[@]}" "$imw"
+fi
 
-echo "current cwsi is $cwsi"
-if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
-   kubectl kcp bind apiexport root:espw:edge.kcp.io
-   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
-else echo "edge.kcp.io apibinding exists in workspace $cwsi"
-fi	 
+mbwsname=$(kubectl "${kubectl_flags[@]}" get SyncTarget "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
-mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
-
-kubectl ws "${kubectl_flags[@]}" "$espw"
+if [ "$silent" == "true" ]; then
+    kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
+else
+    kubectl ws "${kubectl_flags[@]}" "$espw"
+fi
 
 if ! kubectl "${kubectl_flags[@]}" get APIExport edge.kcp.io &> /dev/null ; then
     echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
