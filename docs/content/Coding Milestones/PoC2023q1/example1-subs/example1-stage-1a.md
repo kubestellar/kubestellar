@@ -10,7 +10,7 @@ echo "about to start the mailbox controller - example1-stage-1a"
 kubectl ws root:espw
 kubectl api-resources
 go run ./cmd/mailbox-controller -v=2 &
-sleep 360
+sleep 90
 ```
 ``` { .bash .no-copy }
 ...
