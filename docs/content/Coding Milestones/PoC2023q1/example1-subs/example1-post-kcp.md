@@ -1,5 +1,5 @@
 <!--example1-post-kcp-start-->
-### Create an inventory management workspace.
+### Use the root workspace.
 
 Use the following commands.
 
@@ -46,15 +46,18 @@ are namespaced and are meaningful in KubeStellar.
 ```shell
 kubestellar init
 ```
- 
+
+### Create an inventory management workspace.
+```shell
+kubectl ws root
+kubectl ws create imw-1 --enter
+```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands. They label both florin and guilder
 with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
-kubectl ws root
-kubectl ws create imw-1 --enter
 kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
 ```
