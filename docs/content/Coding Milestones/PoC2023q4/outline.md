@@ -36,7 +36,7 @@ highlighted.
   kcp's logical clusters based on a variety of implementations and (2)
   using [kube-bind](https://github.com/kube-bind/kube-bind) instead of
   kcp's APIExport/APIBinding.  Where PoC2023q1 used the concept of a
-  kcp workspace, PoC2023q3 uses the abstract concept that we call a
+  kcp workspace, PoC2023q4 uses the abstract concept that we call a
   "space".**
 - Use of a space as the container for the central spec of a workload.
 - Propagation of desired state from center outward, as directed by
