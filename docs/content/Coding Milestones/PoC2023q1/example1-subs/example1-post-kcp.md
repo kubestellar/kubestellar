@@ -5,7 +5,6 @@ Use the following commands.
 
 ```shell
 kubectl ws root
-kubectl ws create imw-1 --enter
 ```
 
 ### Get and build or install KubeStellar
@@ -32,68 +31,6 @@ The kubectl plugin lines use fully specific executables (e.g.,
 `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
-### Create SyncTarget and Location objects to represent the florin and guilder clusters
-
-Use the following two commands. They label both florin and guilder
-with `env=prod`, and also label guilder with `extended=si`.
-
-```shell
-kubectl kubestellar ensure location florin  loc-name=florin  env=prod
-kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
-```
-
-Those two script invocations are equivalent to creating the following
-four objects.
-
-```yaml
-apiVersion: workload.kcp.io/v1alpha1
-kind: SyncTarget
-metadata:
-  name: florin
-  labels:
-    id: florin
-    loc-name: florin
-    env: prod
----
-apiVersion: scheduling.kcp.io/v1alpha1
-kind: Location
-metadata:
-  name: florin
-  labels:
-    loc-name: florin
-    env: prod
-spec:
-  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
-  instanceSelector:
-    matchLabels: {id: florin}
----
-apiVersion: workload.kcp.io/v1alpha1
-kind: SyncTarget
-metadata:
-  name: guilder
-  labels:
-    id: guilder
-    loc-name: guilder
-    env: prod
-    extended: si
----
-apiVersion: scheduling.kcp.io/v1alpha1
-kind: Location
-metadata:
-  name: guilder
-  labels:
-    loc-name: guilder
-    env: prod
-    extended: si
-spec:
-  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}
-  instanceSelector:
-    matchLabels: {id: guilder}
-```
-
-That script also deletes the Location named `default`, which is not
-used in this PoC, if it shows up.
-
 ### Initialize the KubeStellar platform
 
 In this step KubeStellar creates and populates the Edge Service
@@ -109,5 +46,68 @@ are namespaced and are meaningful in KubeStellar.
 ```shell
 kubestellar init
 ```
+ 
+### Create SyncTarget and Location objects to represent the florin and guilder clusters
+
+Use the following two commands. They label both florin and guilder
+with `env=prod`, and also label guilder with `extended=si`.
+
+```shell
+kubectl ws create imw-1 --enter
+kubectl kubestellar ensure location florin  loc-name=florin  env=prod
+kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
+```
+
+Those two script invocations are equivalent to creating the following
+four objects.
+
+```yaml
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncTarget
+metadata:
+  name: florin
+  labels:
+    id: florin
+    loc-name: florin
+    env: prod
+---
+apiVersion: edge.kcp.io/v1alpha1
+kind: Location
+metadata:
+  name: florin
+  labels:
+    loc-name: florin
+    env: prod
+spec:
+  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
+  instanceSelector:
+    matchLabels: {id: florin}
+---
+apiVersion: edge.kcp.io/v1alpha1
+kind: SyncTarget
+metadata:
+  name: guilder
+  labels:
+    id: guilder
+    loc-name: guilder
+    env: prod
+    extended: si
+---
+apiVersion: edge.kcp.io/v1alpha1
+kind: Location
+metadata:
+  name: guilder
+  labels:
+    loc-name: guilder
+    env: prod
+    extended: si
+spec:
+  resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
+  instanceSelector:
+    matchLabels: {id: guilder}
+```
+
+That script also deletes the Location named `default`, which is not
+used in this PoC, if it shows up.
 
 <!--example1-post-kcp-end-->

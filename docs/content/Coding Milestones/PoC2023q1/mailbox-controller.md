@@ -34,9 +34,9 @@ provider workspace).
 
 The mailbox controller needs three Kubernetes client configurations.
 One --- concerned with reading inventory --- is to access the
-APIExport view of the `workload.kcp.io` API group, to read the
+APIExport view of the `edge.kcp.io` API group, to read the
 `SyncTarget` objects.  This must be a client config that is pointed at
-the workspace (which is always `root`, as far as I know) that has this
+the workspace (which is always `root:espw`, as far as I know) that has this
 APIExport and is authorized to read its view.  Another client config
 is needed to give read/write access to all the mailbox workspaces, so
 that the controller can create `APIBinding` objects to the edge
@@ -141,7 +141,7 @@ Then in that workspace, run the following command to create a `SyncTarget` objec
 
 ```shell
 cat <<EOF | kubectl apply -f -
-apiVersion: workload.kcp.io/v1alpha1
+apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
   name: stest1

@@ -11,11 +11,17 @@ sleep 45
 ```
 ``` { .bash .no-copy }
 ...
-I0423 01:09:37.991080   10624 main.go:196] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io"
+I0721 17:37:10.186848  189094 main.go:206] "Found APIExport view" exportName="e
+dge.kcp.io" serverURL="https://10.0.2.15:6443/services/apiexport/cseslli1ddit3s
+a5/edge.kcp.io"
 ...
-I0423 01:09:38.449395   10624 controller.go:299] "Created APIBinding" worker=1 mbwsName="apmziqj9p9fqlflm-mb-bf452e1f-45a0-4d5d-b35c-ef1ece2879ba" mbwsCluster="yk9a66vjms1pi8hu" bindingName="bind-edge" resourceVersion="914"
+I0721 19:17:21.906984  189094 controller.go:300] "Created APIBinding" worker=1
+mbwsName="1d55jhazpo3d3va6-mb-551bebfd-b75e-47b1-b2e0-ff0a4cb7e006" mbwsCluster
+="32x6b03ixc49cj48" bindingName="bind-edge" resourceVersion="1247"
 ...
-I0423 01:09:38.842881   10624 controller.go:299] "Created APIBinding" worker=3 mbwsName="apmziqj9p9fqlflm-mb-b8c64c64-070c-435b-b3bd-9c0f0c040a54" mbwsCluster="12299slctppnhjnn" bindingName="bind-edge" resourceVersion="968"
+I0721 19:18:56.203057  189094 controller.go:300] "Created APIBinding" worker=0
+mbwsName="1d55jhazpo3d3va6-mb-732cf72a-1ca9-4def-a5e7-78fd0e36e61c" mbwsCluster
+="q31lsrpgur3eg9qk" bindingName="bind-edge" resourceVersion="1329"
 ^C
 ```
 
