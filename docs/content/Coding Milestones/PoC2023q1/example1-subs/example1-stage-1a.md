@@ -7,7 +7,7 @@ here.
 
 ```shell
 echo "about to start the mailbox controller - example1-stage-1a"
-kubectl ws .
+kubectl ws root:espw
 kubectl api-resources
 go run ./cmd/mailbox-controller -v=2 &
 sleep 360
@@ -44,6 +44,7 @@ echo "stage-1a continuing"
 kubectl ws .
 kubectl api-resources
 kubectl get Workspaces
+kubectl get workspaces
 ```
 ``` { .bash .no-copy }
 NAME                                                       TYPE        REGION   PHASE   URL                                                     AGE
