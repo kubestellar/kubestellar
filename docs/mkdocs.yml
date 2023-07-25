@@ -54,8 +54,8 @@ nav:
               - Developer Environment: Coding Milestones/PoC2023q1/environments/dev-env.md
           - Reference:
               - Commands: Coding Milestones/PoC2023q1/commands.md
-      - PoC2023q3:
-          - Details: Coding Milestones/PoC2023q3/outline.md
+      - PoC2023q4:
+          - Details: Coding Milestones/PoC2023q4/outline.md
   - Community: 
     - Get Involved: Community/_index.md
     - Contributor Guidelines: https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/

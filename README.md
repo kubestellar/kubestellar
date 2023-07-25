@@ -50,7 +50,7 @@ KubeStellar is an opensource project focused on concerns arising from multi-clus
 We have defined and largely completed the
 [PoC2023q1](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/outline/).
 The current activity is refining the definition of, and producing, the
-[PoC2023q3](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q3/outline/).
+[PoC2023q4](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q4/outline/).
 Goals not addressed in that PoC are to be explored later.
 
 ## QuickStart
