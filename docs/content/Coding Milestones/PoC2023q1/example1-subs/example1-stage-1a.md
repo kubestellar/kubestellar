@@ -6,6 +6,9 @@ Eventually.  In the meantime, you can use the KubeStellar command shown
 here.
 
 ```shell
+echo "about to start the mailbox controller - example1-stage-1a"
+kubectl ws .
+kubectl api-resources
 go run ./cmd/mailbox-controller -v=2 &
 sleep 45
 ```
