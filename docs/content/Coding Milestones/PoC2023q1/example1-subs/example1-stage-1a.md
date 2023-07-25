@@ -10,7 +10,7 @@ echo "about to start the mailbox controller - example1-stage-1a"
 kubectl ws .
 kubectl api-resources
 go run ./cmd/mailbox-controller -v=2 &
-sleep 45
+sleep 360
 ```
 ``` { .bash .no-copy }
 ...
@@ -40,6 +40,9 @@ normally it would run continuously.
 You can get a listing of those mailbox workspaces as follows.
 
 ```shell
+echo "stage-1a continuing"
+kubectl ws .
+kubectl api-resources
 kubectl get Workspaces
 ```
 ``` { .bash .no-copy }
