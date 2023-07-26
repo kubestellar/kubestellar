@@ -58,6 +58,7 @@ Use the following two commands. They label both florin and guilder
 with `env=prod`, and also label guilder with `extended=si`.
 
 ```shell
+kubectl ws root:imw-1
 kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
 echo "decribe the florin location object"
