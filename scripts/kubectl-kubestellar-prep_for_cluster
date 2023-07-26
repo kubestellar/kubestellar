@@ -26,56 +26,60 @@ stname=""
 labels=()
 kubectl_flags=()
 prep_flags=()
+silent="false"
 
 while (( $# > 0 )); do
     case "$1" in
-	(--imw)
-	    if (( $# >1 ))
-	    then imw="$2"; shift
-	    else echo "$0: missing IMW pathname" >&2; exit 1
-	    fi;;
-	(--espw)
-	    if (( $# >1 ))
-	    then espw="$2"; shift
-	    else echo "$0: missing ESPW pathname" >&2; exit 1
-	    fi;;
-	(--syncer-image)
-	    if (( $# >1 ))
-	    then prep_flags[${#prep_flags[*]}]="--syncer-image"
-		 prep_flags[${#prep_flags[*]}]="$2"
-		 shift
-	    else echo "$0: missing syncer image reference" >&2; exit 1
-	    fi;;
-	(-o)
-	    if (( $# >1 ))
-	    then prep_flags[${#prep_flags[*]}]="-o"
-		 prep_flags[${#prep_flags[*]}]="$2"
-		 shift
-	    else echo "$0: missing output filename" >&2; exit 1
-	    fi;;
-	(--context*)
-	    # TODO: support --context
-	    echo "$0: --context flag not supported" >&2; exit 1;;
-	(--*=*|-?=*)
-	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
-	(-h)
-	    echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
-	    exit 0;;
-	(--*|-?)
-	    if (( $# > 1 ))
-	    then kubectl_flags[${#kubectl_flags[*]}]="$1"
-		 kubectl_flags[${#kubectl_flags[*]}]="$2"
-		 shift
-	    else echo "$0: missing value for long flag $1" >&2; exit 1
-	    fi;;
-	(-*)
-	    echo "$0: flag syntax error" >&2
-	    exit 1;;
-	(*)
-	    if [ -z "$stname" ]
-	    then stname="$1"
-	    else labels[${#labels[*]}]="$1"
-	    fi
+    (--imw)
+        if (( $# >1 ))
+        then imw="$2"; shift
+        else echo "$0: missing IMW pathname" >&2; exit 1
+        fi;;
+    (--espw)
+        if (( $# >1 ))
+        then espw="$2"; shift
+        else echo "$0: missing ESPW pathname" >&2; exit 1
+        fi;;
+    (--syncer-image)
+        if (( $# >1 ))
+        then prep_flags[${#prep_flags[*]}]="--syncer-image"
+         prep_flags[${#prep_flags[*]}]="$2"
+         shift
+        else echo "$0: missing syncer image reference" >&2; exit 1
+        fi;;
+    (-o)
+        if (( $# >1 ))
+        then prep_flags[${#prep_flags[*]}]="-o"
+         prep_flags[${#prep_flags[*]}]="$2"
+         shift
+        else echo "$0: missing output filename" >&2; exit 1
+        fi;;
+    (-s|--silent)
+        prep_flags[${#prep_flags[*]}]="-s"
+        silent="true";;
+    (--context*)
+        # TODO: support --context
+        echo "$0: --context flag not supported" >&2; exit 1;;
+    (--*=*|-?=*)
+        kubectl_flags[${#kubectl_flags[*]}]="$1";;
+    (-h)
+        echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
+        exit 0;;
+    (--*|-?)
+        if (( $# > 1 ))
+        then kubectl_flags[${#kubectl_flags[*]}]="$1"
+         kubectl_flags[${#kubectl_flags[*]}]="$2"
+         shift
+        else echo "$0: missing value for long flag $1" >&2; exit 1
+        fi;;
+    (-*)
+        echo "$0: flag syntax error" >&2
+        exit 1;;
+    (*)
+        if [ -z "$stname" ]
+        then stname="$1"
+        else labels[${#labels[*]}]="$1"
+        fi
     esac
     shift
 done
@@ -103,26 +107,24 @@ elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
     exit 1
 fi
 
-trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
-
-echo "--- current directory is $PWD"
-cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
-cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
-echo "current ws is $cwsi"
-echo "imw is $imw"
-
-if [ "$imw" != "$original_ws" ]
-then kubectl ws "${kubectl_flags[@]}" "$imw"
-     cwsi=$imw
+if [ "$silent" == "true" ]; then
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws" > /dev/null' EXIT
+else
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 fi
 
-echo "current cwsi is $cwsi"
-if ! kubectl get apibinding "edge.kcp.io" &> /dev/null; then
-   kubectl kcp bind apiexport root:espw:edge.kcp.io
-   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
-else echo "edge.kcp.io apibinding exists in workspace $cwsi"
+if [ "$imw" != "$original_ws" ]; then
+    if [ "$silent" == "true" ]; then
+        kubectl ws "${kubectl_flags[@]}" "$imw" > /dev/null
+    else
+        kubectl ws "${kubectl_flags[@]}" "$imw"
+    fi
 fi
 
-"$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
+if [ "$silent" == "true" ]; then
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" > /dev/null
+else
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
+fi
 
 "$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"
