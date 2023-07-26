@@ -60,6 +60,8 @@ with `env=prod`, and also label guilder with `extended=si`.
 ```shell
 kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
+echo "decribe the florin location object"
+kubectl describe location.edge.kcp.io florin
 ```
 
 Those two script invocations are equivalent to creating the following
