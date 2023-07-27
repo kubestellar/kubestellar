@@ -161,6 +161,11 @@ I0305 18:07:20.490417   85556 main.go:369] "Created missing workspace" worker=0 
 And you can verify that as follows:
 
 ```shell
+kubectl ws .
+kubectl get synctargets.edge.kcp.io
+```
+
+```shell
 kubectl ws root:espw
 ```
 ``` {.bash .no-copy }
@@ -168,6 +173,7 @@ Current workspace is "root:espw".
 ```
 
 ```shell
+kubectl ws tree 
 kubectl get workspaces
 ```
 ``` { .bash .no-copy }
