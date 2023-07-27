@@ -18,14 +18,18 @@ echo -e
 
 echo "< Starting Kubestellar container >-------------------------"
 
-mkdir -p /kubestellar-logs
+# mkdir -p /kubestellar-logs
 # chown -R $USER:$USER .kcp logs
 
 # Start kcp
 echo "< Starting kcp >-------------------------------------------"
 
 echo -n "Running kcp... "
-kcp start >& /kubestellar-logs/kcp.log &
+if [ -z "$EXTERNAL_HOSTNAME" ]; then
+    kcp start &>> /kubestellar-logs/kcp.log &
+else
+    kcp start --external-hostname "$EXTERNAL_HOSTNAME" &>> /kubestellar-logs/kcp.log &
+fi
 echo "logfile=/kubestellar-logs/kcp.log"
 
 echo "Waiting for kcp to be ready... it may take a while"
