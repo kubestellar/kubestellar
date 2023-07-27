@@ -78,7 +78,7 @@ exec:
 
 # Kill the container, remove the container image and files
 .PHONY: stop
-clean:
+stop:
 	$(info Arguments: NAME=${NAME})
 	- docker rm --force ${NAME}
 
