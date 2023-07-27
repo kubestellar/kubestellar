@@ -21,6 +21,7 @@ KUBESTELLAR_LATEST := $(shell curl -sL https://raw.githubusercontent.com/kubeste
 KUBESTELLAR_VERSION ?= ${KUBESTELLAR_STABLE}
 TAG ?= ${KUBESTELLAR_VERSION}
 BASEPATH ?= ${HOME}
+EXTERNAL_HOSTNAME ?= "" # $(shell ifconfig | grep -A 1 "enp0s8" | tail -1 | awk '{print $$2}')
 
 
 # Build a local container image for the host architecture
@@ -55,11 +56,13 @@ run:
 	$(info Arguments: TAG=${TAG})
 	$(info Arguments: NAME=${NAME})
 	$(info Arguments: BASEPATH=${BASEPATH})
+	$(info Arguments: EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME})
 	mkdir -p ${BASEPATH}/.kcp ${BASEPATH}/kubestellar-logs
-		# -p 6443:6443 \
 	docker run -d \
+		-p 6443:6443 \
 		-v ${BASEPATH}/.kcp:/.kcp \
 		-v ${BASEPATH}/kubestellar-logs:/kubestellar-logs \
+		-e EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME} \
 		--user $(shell id -u) \
 		--name ${NAME} ${IMG}:${TAG}
 	docker cp ${NAME}:/kcp-plugins ${BASEPATH}/kcp
