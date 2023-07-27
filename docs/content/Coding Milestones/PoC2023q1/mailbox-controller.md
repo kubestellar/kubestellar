@@ -135,6 +135,7 @@ In a separate terminal window(3), create an inventory management workspace as fo
 ```shell
 kubectl ws \~
 kubectl ws create imw --enter
+kubectl kcp bind apiexport root:espw:edge.kcp.io
 ```
 
 Then in that workspace, run the following command to create a `SyncTarget` object.
