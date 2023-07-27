@@ -201,6 +201,7 @@ kubectl ws \~
 kubectl ws .
 kubectl ws imw
 kubectl ws .
+kubectl get synctargets.edge.kcp.io
 kubectl delete SyncTarget stest1
 ```
 and watch the mailbox controller react as follows.
