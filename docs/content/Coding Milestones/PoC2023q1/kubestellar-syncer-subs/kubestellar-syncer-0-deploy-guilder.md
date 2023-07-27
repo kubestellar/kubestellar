@@ -5,8 +5,8 @@ kubectl ws root:imw-1
 kubectl get SyncTargets
 kubectl get synctargets.edge.kcp.io
 kubectl describe synctargets.edge.kcp.io guilder
-kubectl describe Synctarget guilder
-mbws=`kubectl get SyncTarget guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
+#kubectl describe Synctarget guilder
+mbws=`kubectl get synctargets.edge.kcp.io guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
 echo "mailbox workspace name = $mbws"
 ```
 ``` { .bash .no-copy }
