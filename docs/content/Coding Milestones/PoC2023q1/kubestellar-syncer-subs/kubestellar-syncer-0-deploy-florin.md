@@ -2,6 +2,7 @@
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
 kubectl ws root:imw-1
+kubectl ws .
 mbws=`kubectl get SyncTarget florin -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
 echo "mailbox workspace name = $mbws"
 ```
