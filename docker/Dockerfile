@@ -20,29 +20,26 @@ FROM redhat/ubi9 AS builder
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETPLATFORM
-ARG KUBESTELLAR_VERSION=v0.3.1
+ARG KUBESTELLAR_VERSION
 
 WORKDIR /
 
-# install requirements
-RUN yum install -y wget
-
 # download kubectl binaries
-RUN wget -nv "https://dl.k8s.io/release/v1.25.3/bin/${TARGETPLATFORM}/kubectl" -O kubectl && \
+RUN curl -SL -o kubectl "https://dl.k8s.io/release/v1.25.3/bin/${TARGETPLATFORM}/kubectl" && \
     chmod 0755 kubectl
 
 # download kcp binaries
-RUN curl -SL -o kcp.tar.gz https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kcp_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz && \
+RUN curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kcp_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kcp && \
     tar -C kcp -zxf kcp.tar.gz
 
 # download kcp plugins
-RUN curl -SL -o kcp-plugins.tar.gz https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kubectl-kcp-plugin_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz && \
+RUN curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kubectl-kcp-plugin_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kcp-plugins && \
     tar -C kcp-plugins -zxf kcp-plugins.tar.gz
 
 # download KubeStellar binaries
-RUN curl -SL -o kubestellar.tar.gz https://github.com/kubestellar/kubestellar/releases/download/${KUBESTELLAR_VERSION}/kubestellar_${KUBESTELLAR_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz && \
+RUN curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${KUBESTELLAR_VERSION}/kubestellar_${KUBESTELLAR_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kubestellar && \
     tar -C kubestellar -zxf kubestellar.tar.gz
 
@@ -76,6 +73,7 @@ USER kubestellar
 # setup the environment variables
 ENV PATH=$PATH:/kcp:/kcp-plugins:/kubestellar/bin
 ENV KUBECONFIG=/.kcp/admin.kubeconfig
+ENV EXTERNAL_HOSTNAME=""
 
 # start KubeStellar
 CMD [ "/entry.sh" ]
