@@ -192,7 +192,7 @@ Finally, go back to your inventory workspace to delete the `SyncTarget`:
 
 ```shell
 kubectl ws \~
-kubectl ws imw
+#kubectl ws imw
 kubectl delete SyncTarget stest1
 ```
 and watch the mailbox controller react as follows.
