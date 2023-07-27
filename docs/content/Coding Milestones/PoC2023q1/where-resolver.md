@@ -107,6 +107,7 @@ I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controlle
 Use workspace `root:compute` as the Inventory Management Workspace (IMW).
 ```shell
 kubectl ws root:compute
+kubectl kcp bind apiexport root:espw:edge.kcp.io
 ```
 
 Create two Locations and two SyncTargets.
