@@ -15,6 +15,9 @@
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
 
+CENTER_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +built-%F-%H-%M-%S)
+
 GO_INSTALL = ./hack/go-install.sh
 
 TOOLS_DIR=hack/tools
@@ -119,6 +122,15 @@ build: require-jq require-go require-git verify-go-versions ## Build the project
 build-all:
 	GOOS=$(OS) GOARCH=$(ARCH) $(MAKE) build WHAT='./cmd/...'
 #'  ./tmc/cmd/...'
+
+.PHONY: kubestellar-image
+kubestellar-image:
+	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar; fi
+	docker buildx --builder kubestellar build --push --sbom=true --platform $(CENTER_PLATFORMS) --tag $(CENTER_IMAGE) -f center.Dockerfile .
+
+.PHONY: kubestellar-image-local
+kubestellar-image-local:
+	docker build --tag $(CENTER_IMAGE) -f center.Dockerfile .
 
 # .PHONY: build-kind-images
 # build-kind-images-ko: require-ko

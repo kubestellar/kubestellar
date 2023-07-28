@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: deploy the KubeStellar Helm chart
+
+# Usage: $0 (--external-endpoint $domain_name:$port | --openshift $bool | -X | kubectl_flag)*
+
+KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
+
+image_tag=built-2023-08-08-06-40-38
+
+external_endpoint=localhost:6443
+openshift=false
+helm_flags=()
+
+while (( $# > 0 )); do
+    case "$1" in
+	(--external-endpoint)
+	    if (( $# >1 ))
+	    then external_endpoint="$2"; shift
+	    else echo "$0: missing external_endpoint value" >&2; exit 1
+	    fi;;
+	(--openshift)
+	    if (( $# >1 ))
+	    then openshift="$2"; shift
+	    else echo "$0: missing openshift value" >&2; exit 1
+	    fi;;
+	(--*=*|-?=*)
+	    helm_flags[${#helm_flags[*]}]="$1";;
+	(-X) set -x;;
+	(-h)
+	    echo "Usage: kubectl kubestellar deploy (\$kubectl_flag | --external_endpoint \$domain_name:$port | --openshift \$boolean)*"
+	    exit 0;;
+	(--*|-?)
+	    if (( $# > 1 ))
+	    then helm_flags[${#helm_flags[*]}]="$1"
+		 helm_flags[${#helm_flags[*]}]="$2"
+		 shift
+	    else echo "$0: missing value for long flag $1" >&2; exit 1
+	    fi;;
+	(-*)
+	    echo "$0: flag syntax error" >&2
+	    exit 1;;
+	(*)
+	    echo "$0: no positional arguments accepted" >&2
+	    exit 1
+    esac
+    shift
+done
+
+case "$openshift" in
+    (true)  cluster_type=OpenShift;;
+    (false) cluster_type=Kubernetes;;
+    (*) echo "$0: --openshift should be true or false" >&2
+	exit 1;;
+esac
+
+case "$external_endpoint" in
+    (*:*:*) echo "$0: external_endpoint should only have one colon" >&2
+	    exit 1;;
+    (*:*)   external_hostname=$(cut -d: -f1 <<<"$external_endpoint")
+	    external_port=$(    cut -d: -f2 <<<"$external_endpoint");;
+    (*)     echo "$0: external_endpoint should have a colon in it" >&2
+	    exit 1;;
+esac
+
+set -e
+
+helm upgrade -i "${helm_flags[@]}" kubestellar ${KSDIR}/user/helm-chart --set clusterType=$cluster_type --set-string "EXTERNAL_HOSTNAME=$external_hostname" --set "EXTERNAL_PORT=$external_port" --set image.tag=$image_tag
+
