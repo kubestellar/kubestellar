@@ -532,6 +532,19 @@
     Glossary
   </a>
   
+    <nav class="md-nav" aria-label="Glossary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#older-terminology" class="md-nav__link">
+    Older Terminology
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1693,6 +1706,19 @@
     Glossary
   </a>
   
+    <nav class="md-nav" aria-label="Glossary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#older-terminology" class="md-nav__link">
+    Older Terminology
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1730,29 +1756,34 @@
 <h2 id="kubestellar-primer">KubeStellar Primer<a class="headerlink" href="#kubestellar-primer" title="Permanent link">#</a></h2>
 <p>This is a description of the concepts behind KubeStellar.</p>
 <h2 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">#</a></h2>
-<p>There have been some nomenclature changes: </p>
+<p><strong>Downsynced Object</strong> - One of two categories of workload object, complementary to "upsynced object".  In KubeStellar, a downsynced object first appears in a Workload Description Space and the object's desired state propagates from there through Mailbox Spaces to Workload Execution Clusters and that object's reported state originates in the Workload Execution Clusters and propagates back to the Mailbox Spaces and in the future will be summarized into the Workload Description Space.</p>
+<p><strong>EdgePlacement</strong> - A kind of Kubernetes API object, in a Workload Description Space. One of objects these binds some workload ("what") with a set of workload execution clusters ("where") it should run. The workload is identified by a predicate over namespaced objects and a predicate over cluster-scoped objects. The where is identified by a predicate over workload execution clusters as represented by <code>Location</code> objects.</p>
+<p><strong>Inventory Space (IS)</strong> - Holds the <code>SyncTarget</code> and <code>Location</code> objects describing the Workload Execution Clusters. </p>
+<p><strong>KubeStellar Core Space (KCS)</strong> - Exports the Kubestellar API.</p>
+<p><strong>KubeStellar Syncer</strong> - The KubeStellar agent in a Workload Execution Cluster; syncs workload objects between the Workload Execution Cluster and the corresponding Mailbox Space.</p>
+<p><strong>Location</strong> - A kind of Kubernetes API object, in an Inventory Space. Paired one-to-one with a <code>SyncTarget</code> object in the same space. Together these describe a workload execution cluster. The Location's labels are tested by the "where predicate" in an <code>EdgePlacement</code> object, and this object's labels and annotations provide values used in customization of workload objects going to the workload execution cluster.</p>
+<p><strong>Mailbox Controller</strong> - One of the central KubeStellar controllers; maintains a Mailbox Space for each <code>SyncTarget</code> object. This includes putting an APIBinding to the KubeStellar API into those mailbox spaces.</p>
+<p><strong>Mailbox Space</strong> - There is one Mailbox Space for each workload execution cluster. It stores the <code>SyncerConfig</code> object and copies of the workload(s).</p>
+<p><strong>PlacementTranslator</strong> - One of the central KubeStellar controllers; maintains the <code>SyncerConfig</code> objects in the Mailbox Spaces and syncs workload objects between the Workload Description Spaces and the Mailbox Spaces.</p>
+<p><strong>SinglePlacementSlice</strong> - A kind of Kubernetes API object, in a Workload Description Space.  Such an object holds a list of references to <code>Location</code> &amp; <code>SyncTarget</code> objects that match the "where predicate" of an <code>EdgePlacement</code>.  Currently there is exactly one <code>SinglePlacementSlice</code> for each <code>EdgePlacement</code> but in the future the matches for one <code>EdgePlacement</code> could be spread among several <code>SinglePlacementSlice</code> objects (analogously to <code>EndpointSlice</code> vs <code>Service</code> in Kubernetes).</p>
+<p><strong>Space</strong> - A thing that behaves like a Kubernetes kube-apiserver (and the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (not management of containerized workloads). A kcp logical cluster is an example. A regular Kubernetes cluster includes a space.</p>
+<p><strong>Status Summarizer</strong> - A planned central KubeStellar controller that will maintain the status summary objects in the Workload Description Spaces as a function of the <code>EdgePlacement</code> objects and the workload objects in the Mailbox Spaces.</p>
+<p><strong>SyncerConfig</strong> - A kind of Kubernetes API object, in a Mailbox Space. Such an object holds the dynamic configuration for the syncer in the corresponding workload execution cluster.</p>
+<p><strong>SyncTarget</strong> - A kind of Kubernetes API object, in an Inventory Space. Paired one-to-one with a Location in the same space, jointly representing a Workload Execution Cluster.</p>
+<p><strong>Upsynced Object</strong> - One of two categories of workload object, complementary to "downsynced object".  Upsynced objects originate in Workload Execution Clusters and propagate inward to Mailbox Spaces and in the future will be summarized into Workload Description Spaces.</p>
+<p><strong>Where Resolver</strong> - One of the central KubeStellar controllers; tests the <code>Location</code> objects against the "where predicates" in the <code>EdgePlacement</code> objects to maintain the corresponding <code>SinglePlacementSlice</code> objects.</p>
+<p><strong>Workload Description Space (WDS)</strong> - Holds workload objects and the adjacent KubeStellar control objects, which are the <code>EdgePlacement</code>, <code>SinglePlacementSlice</code>, and <code>Customizer</code> objects and, eventually, the ones developed to prescribe summarization.</p>
+<p><strong>Workload Execution Cluster</strong> - A Kubernetes cluster which can execute a workload. In the examples on this website, we use <a href="https://kind.sigs.k8s.io/">Kind</a> clusters.</p>
+<h3 id="older-terminology">Older Terminology<a class="headerlink" href="#older-terminology" title="Permanent link">#</a></h3>
+<p>There have been some terminology shifts since the start of the project.  The project started with a focus on edge computing scenarios; later we realized that the technical problems addressed are not limited to those scenarios.  The project started in the context of <a href="https://github.com/kcp-dev/kcp">kcp</a> and unabashedly used concepts from kcp; later we began working on generalizing KubeStellar so that it can run in the context of kcp and also can run in other contexts that do not have kcp.</p>
 <ul>
-<li>The term <code>edge cluster</code> has been replaced by <code>workload execution cluster</code></li>
-<li>The term <code>workload management workspace</code> has been replaced by <code>workload description space</code></li>
-<li>The term <code>inventory management workspace</code> has been by <code>inventory space</code></li>
-<li>The term <code>edge service provider workspace</code> has been replaced by <code>kubestellar core space</code></li>
-<li>The term <code>mailbox workspace</code> has been replaced by <code>mailbox space</code></li>
+<li>The term "space" is intended to be a generalization covering both a kcp "logical cluster" or "workspace" and other things that have the same essential behavior</li>
+<li>The term "workload execution cluster" was formerly "edge cluster"</li>
+<li>The term "workload description space" was formerly "workload management workspace"</li>
+<li>The term "inventory space" was formerly "inventory management workspace"</li>
+<li>The term "kubestellar core space" was formerly "edge service provider workspace"</li>
+<li>The term "mailbox space" was formerly "mailbox workspace"</li>
 </ul>
-<p><strong>Edge Cluster</strong> - A Kubernetes cluster which can execute a workload. In the examples on this website, we use Kind clusters. </p>
-<p><strong>EdgePlacement</strong> - Contains the 'what' and 'where' of the workload in the <code>spec.namespaceSelector</code> and <code>spec.locationSelectors</code> fields respectively. It describes which cluster(s) to send the workload to.</p>
-<p><strong>Edge Service Provider Workspace (ESPW)</strong> - Exports the Kubestellar API.</p>
-<p><strong>Inventory Management Workspace (IMW)</strong> - Stores the SyncTarget and Location objects for the edge clusters. </p>
-<p><strong>Kubestellar Syncer</strong> - Syncs Kubernetes resource objects from the cluster to the mailbox workspace, and vice versa. </p>
-<p><strong>Location</strong> - An object that tells Kubestellar where the cluster is located. It is a vendor-facing API. </p>
-<p><strong>Mailbox Controller</strong> - Creates a Mailbox Workspace for each SyncTarget object and puts an APIBinding in each Mailbox Workspace. </p>
-<p><strong>Mailbox Workspace</strong> - There is one Mailbox Workspace for each cluster. It stores the SyncerConfig object and copies of the workload(s).</p>
-<p><strong>PlacementTranslator</strong> - </p>
-<p><strong>SinglePlacementSlice</strong> - </p>
-<p><strong>Status Summarizer</strong> - Creates a StatusSummary object with a summary of the Deployment objects in a workload's workspace.</p>
-<p><strong>SyncerConfig</strong> - </p>
-<p><strong>Sync Target</strong> - A vendor-facing API that describes the cluster. This is referenced by the Location object. </p>
-<p><strong>Where Resolver</strong> - Creates a SinglePlacementSlice object for each Edge Placement object. It runs from the ESPW. </p>
-<p><strong>Workload Management Workspace (WMW)</strong> - This can store one workload description.</p>
 
 
   
