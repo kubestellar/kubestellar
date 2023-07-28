@@ -29,7 +29,7 @@ highlighted.
   Location and SyncTarget objects.
 - **Compared to PoC2023q1, decoupling from kcp TMC by making our own
   copy of the definitions of SyncTarget and Location.**
-- **Potentialy: switch from using SyncTarget and Location to some
+- **Potentially: switch from using SyncTarget and Location to some
   other representation of inventory.**
 - **Compared to PoC2023q1, decoupling from kcp core by (1) introducing
   an abstraction layer that delivers the essential functionality of
@@ -71,7 +71,7 @@ Some important things that are not attempted in this PoC include the following.
 
 - An implementation that supports a very large volume of reported
   state (which could come from either a large number of workload
-  executino clusters and/or a large amount of reported state in each
+  execution clusters and/or a large amount of reported state in each
   one of those).
 - User control over ordering of propagation from center outward,
   either among destinations or kinds of objects.
