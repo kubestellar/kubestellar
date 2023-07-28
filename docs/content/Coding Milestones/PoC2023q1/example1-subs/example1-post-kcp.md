@@ -32,12 +32,12 @@ Build step:
 echo "post kcp build step"
 echo $HOME
 echo $PWD
-if [ "$PWD" = "$HOME/kubestellar" ]
-then echo "pwd is $PWD"
-else 
-  cd kubestellar
-  echo "cd to kubestellar, now in $PWD"
-fi
+#if [ "$PWD" = "$HOME/kubestellar" ]
+#then echo "pwd is $PWD"
+#else 
+#  cd kubestellar
+#  echo "cd to kubestellar, now in $PWD"
+#fi
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
