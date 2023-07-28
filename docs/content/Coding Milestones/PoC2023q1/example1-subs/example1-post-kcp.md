@@ -24,20 +24,13 @@ Fetch step:
 
 ```{.base}
 git clone -b {{ config.ks_branch }} {{ config.repo_url }}
+cd kubestellar
 ```
 
 Build step:
 
 ```shell
-echo "post kcp build step"
-echo $HOME
-echo $PWD
-#if [ "$PWD" = "$HOME/kubestellar" ]
-#then echo "pwd is $PWD"
-#else 
-#  cd kubestellar
-#  echo "cd to kubestellar, now in $PWD"
-#fi
+echo "current path is $PWD"
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
