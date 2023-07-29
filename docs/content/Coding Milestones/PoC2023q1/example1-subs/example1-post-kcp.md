@@ -62,7 +62,7 @@ kubestellar init
 ### Create an inventory management workspace.
 ```shell
 kubectl ws root
-kubectl ws create imw-1 --enter
+kubectl ws create imw-1 
 ```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
