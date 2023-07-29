@@ -28,10 +28,10 @@ import (
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
-	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
-	fakelogicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1/fake"
 	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
+	fakespacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -89,12 +89,12 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.FakeEdgeV1alpha1{Fake: &c.Fake}
 }
 
-// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1Client
-func (c *Clientset) LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
-	return &fakelogicalclusterv1alpha1.FakeLogicalclusterV1alpha1{Fake: &c.Fake}
-}
-
 // MetaV1alpha1 retrieves the MetaV1alpha1Client
 func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
 	return &fakemetav1alpha1.FakeMetaV1alpha1{Fake: &c.Fake}
+}
+
+// SpaceV1alpha1 retrieves the SpaceV1alpha1Client
+func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
+	return &fakespacev1alpha1.FakeSpaceV1alpha1{Fake: &c.Fake}
 }

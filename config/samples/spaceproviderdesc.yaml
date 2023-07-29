@@ -1,0 +1,7 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: default
+spec:
+  ProviderType: "kind"
+  SpacePrefixForDiscovery: "ks-"

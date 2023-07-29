@@ -38,8 +38,8 @@ import (
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
 	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
-	logicalclusterinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/logicalcluster"
 	metainformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/meta"
+	spaceinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/space"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
@@ -185,20 +185,20 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.ClusterInterface
-	Logicalcluster() logicalclusterinformers.ClusterInterface
 	Meta() metainformers.ClusterInterface
+	Space() spaceinformers.ClusterInterface
 }
 
 func (f *sharedInformerFactory) Edge() edgeinformers.ClusterInterface {
 	return edgeinformers.New(f, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Logicalcluster() logicalclusterinformers.ClusterInterface {
-	return logicalclusterinformers.New(f, f.tweakListOptions)
-}
-
 func (f *sharedInformerFactory) Meta() metainformers.ClusterInterface {
 	return metainformers.New(f, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Space() spaceinformers.ClusterInterface {
+	return spaceinformers.New(f, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Cluster(clusterName logicalcluster.Name) ScopedDynamicSharedInformerFactory {
@@ -345,18 +345,18 @@ type SharedScopedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.Interface
-	Logicalcluster() logicalclusterinformers.Interface
 	Meta() metainformers.Interface
+	Space() spaceinformers.Interface
 }
 
 func (f *sharedScopedInformerFactory) Edge() edgeinformers.Interface {
 	return edgeinformers.NewScoped(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedScopedInformerFactory) Logicalcluster() logicalclusterinformers.Interface {
-	return logicalclusterinformers.NewScoped(f, f.namespace, f.tweakListOptions)
-}
-
 func (f *sharedScopedInformerFactory) Meta() metainformers.Interface {
 	return metainformers.NewScoped(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedScopedInformerFactory) Space() spaceinformers.Interface {
+	return spaceinformers.NewScoped(f, f.namespace, f.tweakListOptions)
 }

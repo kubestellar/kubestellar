@@ -1,0 +1,69 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIResourceSchema
+metadata:
+  creationTimestamp: null
+  name: v230729-f70497310.spaceproviderdescs.space.kubestellar.io
+spec:
+  group: space.kubestellar.io
+  names:
+    kind: SpaceProviderDesc
+    listKind: SpaceProviderDescList
+    plural: spaceproviderdescs
+    shortNames:
+    - spd
+    singular: spaceproviderdesc
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      description: SpaceProviderDesc represents a provider.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: '`spec` describes a provider.'
+          properties:
+            Config:
+              description: 'TODO: this should be stored as a secret! Config is the
+                provider config'
+              type: string
+            ProviderType:
+              description: ProviderType is the type of the provider of the space.
+              type: string
+              x-kubernetes-validations:
+              - message: space provider type is immutable
+                rule: self == oldSelf
+            SpacePrefixForDiscovery:
+              description: SpacePrefixForDiscovery contains the prefix used during
+                space discovery.
+              type: string
+          required:
+          - ProviderType
+          type: object
+        status:
+          description: '`status` describes the status of the provider object.'
+          properties:
+            Phase:
+              default: Initializing
+              description: Phase of the provider (Initializing,Ready).
+              enum:
+              - Initializing
+              - Ready
+              type: string
+          required:
+          - Phase
+          type: object
+      type: object
+    served: true
+    storage: true
+    subresources: {}

@@ -27,24 +27,24 @@ import (
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/logicalcluster/v1alpha1"
 	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface
-	LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface
 	MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface
+	SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	edgeV1alpha1           *edgev1alpha1.EdgeV1alpha1Client
-	logicalclusterV1alpha1 *logicalclusterv1alpha1.LogicalclusterV1alpha1Client
-	metaV1alpha1           *metav1alpha1.MetaV1alpha1Client
+	edgeV1alpha1  *edgev1alpha1.EdgeV1alpha1Client
+	metaV1alpha1  *metav1alpha1.MetaV1alpha1Client
+	spaceV1alpha1 *spacev1alpha1.SpaceV1alpha1Client
 }
 
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client
@@ -52,14 +52,14 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return c.edgeV1alpha1
 }
 
-// LogicalclusterV1alpha1 retrieves the LogicalclusterV1alpha1Client
-func (c *Clientset) LogicalclusterV1alpha1() logicalclusterv1alpha1.LogicalclusterV1alpha1Interface {
-	return c.logicalclusterV1alpha1
-}
-
 // MetaV1alpha1 retrieves the MetaV1alpha1Client
 func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
 	return c.metaV1alpha1
+}
+
+// SpaceV1alpha1 retrieves the SpaceV1alpha1Client
+func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
+	return c.spaceV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -110,11 +110,11 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
-	cs.logicalclusterV1alpha1, err = logicalclusterv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.metaV1alpha1, err = metav1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
-	cs.metaV1alpha1, err = metav1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.spaceV1alpha1, err = spacev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +140,8 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.edgeV1alpha1 = edgev1alpha1.New(c)
-	cs.logicalclusterV1alpha1 = logicalclusterv1alpha1.New(c)
 	cs.metaV1alpha1 = metav1alpha1.New(c)
+	cs.spaceV1alpha1 = spacev1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

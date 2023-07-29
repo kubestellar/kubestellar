@@ -1,0 +1,10 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: space.kubestellar.io
+spec:
+  latestResourceSchemas:
+  - v230729-f70497310.spaceproviderdescs.space.kubestellar.io
+  - v230731-c923e86cc.spaces.space.kubestellar.io
+status: {}

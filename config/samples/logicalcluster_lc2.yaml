@@ -1,7 +1,0 @@
-apiVersion: logicalcluster.kubestellar.io/v1alpha1
-kind: LogicalCluster
-metadata:
-  name: lc2
-  namespace: lcprovider-default
-spec:
-  ClusterProviderDescName: "default"
