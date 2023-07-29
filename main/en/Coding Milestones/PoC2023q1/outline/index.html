@@ -2423,8 +2423,8 @@ in an eventually consistent way, it is not just one-and-done.</p>
 <h2 id="inventory-management-workspaces-imw">Inventory Management workspaces (IMW)<a class="headerlink" href="#inventory-management-workspaces-imw" title="Permanent link">#</a></h2>
 <p>In this design the primary interface between infrastructure management
 and workload management is API objects in <em>inventory management</em>
-workspaces.  We abuse the <code>Location</code> and <code>SyncTarget</code> object types
-from <a href="https://github.com/kcp-dev/kcp/tree/v0.11.0/pkg/apis">kcp TMC</a> for
+workspaces.  We use the <code>Location</code> and <code>SyncTarget</code> object types
+from Kubestellar's edge.kcp.io api group (created by <code>kubestellar init</code>) for
 this purpose.  The people doing infrastructure management are
 responsible for creating the inventory management workspaces and
 populating them with <code>Location</code> and <code>SyncTarget</code> objects, one
@@ -2736,9 +2736,9 @@ their workload desired and reported state.</p>
 <td>true</td>
 </tr>
 <tr>
-<td>scheduling.kcp.io/v1alpha1</td>
+<td>~~ scheduling.kcp.io/v1alpha1</td>
 <td>Location</td>
-<td>false</td>
+<td>false ~~</td>
 </tr>
 <tr>
 <td>scheduling.kcp.io/v1alpha1</td>
@@ -2791,9 +2791,9 @@ their workload desired and reported state.</p>
 <td>false</td>
 </tr>
 <tr>
-<td>workload.kcp.io/v1alpha1</td>
+<td>~~workload.kcp.io/v1alpha1</td>
 <td>SyncTarget</td>
-<td>false</td>
+<td>false~~</td>
 </tr>
 </tbody>
 </table>

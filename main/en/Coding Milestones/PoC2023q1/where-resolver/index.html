@@ -2104,6 +2104,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <h3 id="create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets">Create the Inventory Management Workspace (IMW) and populate it with locations and synctargets<a class="headerlink" href="#create-the-inventory-management-workspace-imw-and-populate-it-with-locations-and-synctargets" title="Permanent link">#</a></h3>
 <p>Use workspace <code>root:compute</code> as the Inventory Management Workspace (IMW).
 <div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:compute
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>kubectl<span class="w"> </span>kcp<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>apiexport<span class="w"> </span>root:espw:edge.kcp.io
 </code></pre></div></p>
 <p>Create two Locations and two SyncTargets.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>config/samples/location_prod.yaml
@@ -2116,13 +2117,13 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>locations,synctargets
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>NAME<span class="w">                                 </span>RESOURCE<span class="w">      </span>AVAILABLE<span class="w">   </span>INSTANCES<span class="w">   </span>LABELS<span class="w">   </span>AGE
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>location.scheduling.kcp.io/default<span class="w">   </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">2</span><span class="w">                    </span>2m12s
-<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>location.scheduling.kcp.io/dev<span class="w">       </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>2m39s
-<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>location.scheduling.kcp.io/prod<span class="w">      </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>3m13s
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>location.edge.kcp.io/default<span class="w">   </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">2</span><span class="w">                    </span>2m12s
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>location.edge.kcp.io/dev<span class="w">       </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>2m39s
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>location.edge.kcp.io/prod<span class="w">      </span>synctargets<span class="w">   </span><span class="m">0</span><span class="w">           </span><span class="m">1</span><span class="w">                    </span>3m13s
 <a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>
 <a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>NAME<span class="w">                              </span>AGE
-<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>synctarget.workload.kcp.io/dev<span class="w">    </span>110s
-<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>synctarget.workload.kcp.io/prod<span class="w">   </span>2m12s
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>synctarget.edge.kcp.io/dev<span class="w">    </span>110s
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>synctarget.edge.kcp.io/prod<span class="w">   </span>2m12s
 </code></pre></div></p>
 <h3 id="create-some-edgeplacements-in-the-wmw">Create some EdgePlacements in the WMW<a class="headerlink" href="#create-some-edgeplacements-in-the-wmw" title="Permanent link">#</a></h3>
 <p>Go to Workload Management Workspace (WMW) and create an EdgePlacement <code>all2all</code>.
