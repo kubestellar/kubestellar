@@ -19,6 +19,7 @@ package clustermanager
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -28,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
 
+	providerkcp "github.com/kubestellar/kubestellar/clusterprovider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/clusterprovider/kind"
 	kflexprovider "github.com/kubestellar/kubestellar/clusterprovider/kubeflex"
 	lcv1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
@@ -65,6 +67,13 @@ func newProviderClient(providerDesc *lcv1alpha1apis.ClusterProviderDesc) cluster
 		pClient = kindprovider.New(providerDesc.Name)
 	case lcv1alpha1apis.KubeflexProviderType:
 		pClient = kflexprovider.New(providerDesc.Name)
+	case lcv1alpha1apis.KcpProviderType:
+		pClient, err := providerkcp.New()
+		if err != nil {
+			runtime.HandleError(err)
+			return nil
+		}
+		return pClient
 	default:
 		return nil
 	}
@@ -79,13 +88,12 @@ func CreateProvider(c *controller, providerDesc *lcv1alpha1apis.ClusterProviderD
 
 	_, exists := c.providers[providerName]
 	if exists {
-		err := errors.New("provider already in the list")
-		return nil, err
+		return nil, fmt.Errorf("provider %s already in the list", string(providerType))
 	}
 
 	newProviderClient := newProviderClient(providerDesc)
 	if newProviderClient == nil {
-		return nil, errors.New("unknown provider type")
+		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerType))
 	}
 
 	discoveryPrefix := providerDesc.Spec.ClusterPrefixForDiscovery
@@ -158,7 +166,7 @@ func (p *provider) processProviderWatchEvents() {
 		}
 
 		if !found || (found && !reflcluster.Spec.Managed) {
-			// For unmanaged clusters discover & ypdate only clusters that match the provider prefix
+			// For unmanaged clusters discover & update only clusters that match the provider prefix
 			if p.filterOut(lcName) {
 				continue
 			}

@@ -25,6 +25,7 @@ type ClusterProviderType string
 const (
 	KindProviderType     ClusterProviderType = "kind"
 	KubeflexProviderType ClusterProviderType = "kubeflex"
+	KcpProviderType      ClusterProviderType = "kcp"
 )
 
 // ClusterProviderDesc represents a provider.
