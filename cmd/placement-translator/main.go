@@ -59,8 +59,6 @@ import (
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-
-	//schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
@@ -209,9 +207,7 @@ func main() {
 	}
 
 	sspwInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedViewClusterClientset, resyncPeriod)
-	//locationClusterPreInformer := sspwInformerFactory.Scheduling().V1alpha1().Locations()
 	locationClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Locations()
-	//var _ schedulingv1a1informers.LocationClusterInformer = locationClusterPreInformer
 	var _ edgev1a1informers.LocationClusterInformer = locationClusterPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)

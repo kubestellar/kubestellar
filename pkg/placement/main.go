@@ -33,10 +33,10 @@ import (
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
-	//schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+
+	//schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
 )

@@ -50,13 +50,11 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-
-	//schedulingv1a1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
-
-	//schedulingv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
+	//schedulingv1a1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
+	//schedulingv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 )
 
 const SyncerConfigName = "the-one"
@@ -1090,7 +1088,6 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 			expandParameters = expandParameters || customizer.Annotations[edgeapi.ParameterExpansionAnnotationKey] == "true"
 		}
 	}
-	//var location *schedulingv1a1.Location
 	var location *edgeapi.Location
 	if expandParameters {
 		location, err = wp.locationClusterLister.Cluster(logicalcluster.Name(destSP.Cluster)).Get(destSP.LocationName)
