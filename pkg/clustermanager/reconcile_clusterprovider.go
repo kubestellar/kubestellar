@@ -67,7 +67,7 @@ func (c *controller) handleAdd(providerDesc *lcv1alpha1.ClusterProviderDesc) err
 		return err
 	}
 
-	provider, err := CreateProvider(c, name, providerDesc.Spec.ProviderType)
+	provider, err := CreateProvider(c, providerDesc)
 	if err != nil {
 		// TODO: Check if the err is because the provider already exists
 		return err

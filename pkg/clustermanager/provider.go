@@ -58,7 +58,7 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterProviderType) clusterprovider.ProviderClient {
+func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterProviderType, config string) clusterprovider.ProviderClient {
 	var pClient clusterprovider.ProviderClient = nil
 	switch providerType {
 	case lcv1alpha1apis.KindProviderType:
@@ -72,11 +72,10 @@ func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterP
 }
 
 // CreateProvider returns new provider client
-func CreateProvider(c *controller, providerName string, providerType lcv1alpha1apis.ClusterProviderType) (*provider, error) {
+func CreateProvider(c *controller, providerDesc *lcv1alpha1apis.ClusterProviderDesc) (*provider, error) {
+	providerName := providerDesc.Name
 	c.lock.Lock()
 	defer c.lock.Unlock()
-
-	discoveryPrefix := ""
 
 	_, exists := c.providers[providerName]
 	if exists {
@@ -84,20 +83,14 @@ func CreateProvider(c *controller, providerName string, providerType lcv1alpha1a
 		return nil, err
 	}
 
-	newProviderClient := newProviderClient(providerName, providerType)
+	newProviderClient := newProviderClient(providerName, providerDesc.Spec.ProviderType, providerDesc.Spec.Config)
 	if newProviderClient == nil {
 		return nil, errors.New("unknown provider type")
 	}
 
-	providerDescObj, found, _ := c.clusterProviderInformer.GetIndexer().GetByKey(lcKeyFunc("", providerName))
-	if found {
-		providerDesc, ok := providerDescObj.(*lcv1alpha1apis.ClusterProviderDesc)
-		if ok {
-			discoveryPrefix = providerDesc.Spec.ClusterPrefixForDiscovery
-			if discoveryPrefix == "" {
-				discoveryPrefix = "*"
-			}
-		}
+	discoveryPrefix := providerDesc.Spec.ClusterPrefixForDiscovery
+	if discoveryPrefix == "" {
+		discoveryPrefix = "*"
 	}
 
 	p := &provider{
