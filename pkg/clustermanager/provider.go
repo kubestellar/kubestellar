@@ -58,13 +58,13 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(providerName string, providerType lcv1alpha1apis.ClusterProviderType, config string) clusterprovider.ProviderClient {
+func newProviderClient(providerDesc *lcv1alpha1apis.ClusterProviderDesc) clusterprovider.ProviderClient {
 	var pClient clusterprovider.ProviderClient = nil
-	switch providerType {
+	switch providerDesc.Spec.ProviderType {
 	case lcv1alpha1apis.KindProviderType:
-		pClient = kindprovider.New(providerName)
+		pClient = kindprovider.New(providerDesc.Name)
 	case lcv1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(providerName)
+		pClient = kflexprovider.New(providerDesc.Name)
 	default:
 		return nil
 	}
@@ -83,7 +83,7 @@ func CreateProvider(c *controller, providerDesc *lcv1alpha1apis.ClusterProviderD
 		return nil, err
 	}
 
-	newProviderClient := newProviderClient(providerName, providerDesc.Spec.ProviderType, providerDesc.Spec.Config)
+	newProviderClient := newProviderClient(providerDesc)
 	if newProviderClient == nil {
 		return nil, errors.New("unknown provider type")
 	}
