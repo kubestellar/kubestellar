@@ -31,8 +31,8 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	logicalclusterv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
 	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 )
 
 type GenericClusterInformer interface {
@@ -103,14 +103,14 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncTargets().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Locations().Informer()}, nil
-	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
-	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()}, nil
-	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Logicalcluster().V1alpha1().LogicalClusters().Informer()}, nil
 	// Group=meta.kcp.io, Version=V1alpha1
 	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Meta().V1alpha1().APIResources().Informer()}, nil
+	// Group=space.kubestellar.io, Version=V1alpha1
+	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().SpaceProviderDescs().Informer()}, nil
+	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().Spaces().Informer()}, nil
 	}
 
 	return nil, fmt.Errorf("no informer found for %v", resource)
@@ -142,16 +142,16 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		informer := f.Edge().V1alpha1().Locations().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	// Group=logicalcluster.kubestellar.io, Version=V1alpha1
-	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("clusterproviderdescs"):
-		informer := f.Logicalcluster().V1alpha1().ClusterProviderDescs().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	case logicalclusterv1alpha1.SchemeGroupVersion.WithResource("logicalclusters"):
-		informer := f.Logicalcluster().V1alpha1().LogicalClusters().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	// Group=meta.kcp.io, Version=V1alpha1
 	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
 		informer := f.Meta().V1alpha1().APIResources().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	// Group=space.kubestellar.io, Version=V1alpha1
+	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
+		informer := f.Space().V1alpha1().SpaceProviderDescs().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
+		informer := f.Space().V1alpha1().Spaces().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	}
 

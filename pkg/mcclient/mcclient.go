@@ -16,7 +16,7 @@ limitations under the License.
 
 package mcclient
 
-// kubestellar cluster-aware client impl
+// kubestellar space-aware client impl
 
 import (
 	"context"
@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 
-	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	mcclientset "github.com/kubestellar/kubestellar/pkg/mcclient/clientset"
@@ -38,14 +38,14 @@ import (
 
 const defaultProviderNs = "lcprovider-default"
 
-type KubestellarClusterInterface interface {
-	// Cluster returns clientset for given cluster.
-	Cluster(name string, namespace ...string) (client mcclientset.Interface)
-	// ConfigForCluster returns rest config for given cluster.
-	ConfigForCluster(name string, namespace ...string) (*rest.Config, error)
+type KubestellarSpaceInterface interface {
+	// Space returns clientset for given space.
+	Space(name string, namespace ...string) (client mcclientset.Interface)
+	// ConfigForSpace returns rest config for given space.
+	ConfigForSpace(name string, namespace ...string) (*rest.Config, error)
 }
 
-type multiClusterClient struct {
+type multiSpaceClient struct {
 	ctx              context.Context
 	configs          map[string]*rest.Config
 	clientsets       map[string]*mcclientset.Clientset
@@ -53,36 +53,36 @@ type multiClusterClient struct {
 	lock             sync.Mutex
 }
 
-func (mcc *multiClusterClient) Cluster(name string, namespace ...string) mcclientset.Interface {
+func (mcc *multiSpaceClient) Space(name string, namespace ...string) mcclientset.Interface {
 	key, ns := namespaceKey(name, namespace)
 	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	clientset, ok := mcc.clientsets[key]
 	if !ok {
-		// Try to get LogicalCluster from API server.
+		// Try to get Space from API server.
 		if clientset, err = mcc.getFromServer(name, ns); err != nil {
-			panic(fmt.Sprintf("invalid cluster name: %s. error: %v", name, err))
+			panic(fmt.Sprintf("invalid space name: %s. error: %v", name, err))
 		}
 	}
 	return clientset
 }
 
-func (mcc *multiClusterClient) ConfigForCluster(name string, namespace ...string) (*rest.Config, error) {
+func (mcc *multiSpaceClient) ConfigForSpace(name string, namespace ...string) (*rest.Config, error) {
 	key, _ := namespaceKey(name, namespace)
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	if _, ok := mcc.configs[key]; !ok {
-		return nil, fmt.Errorf("failed to get config for cluster: %s", name)
+		return nil, fmt.Errorf("failed to get config for space: %s", name)
 	}
 	return mcc.configs[key], nil
 }
 
-var client *multiClusterClient
+var client *multiSpaceClient
 var clientLock = &sync.Mutex{}
 
-// NewMultiCluster creates new multi-cluster client and starts collecting cluster configs
-func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (KubestellarClusterInterface, error) {
+// NewMultiSpace creates new multi-space client and starts collecting space configs
+func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (KubestellarSpaceInterface, error) {
 	clientLock.Lock()
 	defer clientLock.Unlock()
 
@@ -95,7 +95,7 @@ func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (Kubestell
 		return client, err
 	}
 
-	client = &multiClusterClient{
+	client = &multiSpaceClient{
 		ctx:              ctx,
 		configs:          make(map[string]*rest.Config),
 		clientsets:       make(map[string]*mcclientset.Clientset),
@@ -103,36 +103,36 @@ func NewMultiCluster(ctx context.Context, managerConfig *rest.Config) (Kubestell
 		lock:             sync.Mutex{},
 	}
 
-	client.startClusterCollection(ctx, managerClientset)
+	client.startSpaceCollection(ctx, managerClientset)
 	return client, nil
 }
 
-func (mcc *multiClusterClient) startClusterCollection(ctx context.Context, managerClientset *ksclientset.Clientset) {
+func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerClientset *ksclientset.Clientset) {
 	numThreads := 2
 	resyncPeriod := time.Duration(0)
 
-	clusterInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, resyncPeriod, metav1.NamespaceAll)
-	clusterInformer := clusterInformerFactory.Logicalcluster().V1alpha1().LogicalClusters().Informer()
+	spaceInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, resyncPeriod, metav1.NamespaceAll)
+	spaceInformer := spaceInformerFactory.Space().V1alpha1().Spaces().Informer()
 
-	clusterInformerFactory.Start(ctx.Done())
-	cache.WaitForNamedCacheSync("logicalclusters-management", ctx.Done(), clusterInformer.HasSynced)
+	spaceInformerFactory.Start(ctx.Done())
+	cache.WaitForNamedCacheSync("spaces-management", ctx.Done(), spaceInformer.HasSynced)
 
-	logicalClusterController := newController(ctx, clusterInformer, mcc)
-	go logicalClusterController.Run(numThreads)
+	spaceController := newController(ctx, spaceInformer, mcc)
+	go spaceController.Run(numThreads)
 }
 
-// getFromServer will query API server for specific LogicalCluster and cache it if it exists and ready.
+// getFromServer will query API server for specific Space and cache it if it exists and ready.
 // getFromServer caller function should acquire the mcc lock.
-func (mcc *multiClusterClient) getFromServer(name string, namespace string) (*mcclientset.Clientset, error) {
-	cluster, err := mcc.managerClientset.LogicalclusterV1alpha1().LogicalClusters(namespace).Get(mcc.ctx, name, metav1.GetOptions{})
+func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*mcclientset.Clientset, error) {
+	space, err := mcc.managerClientset.SpaceV1alpha1().Spaces(namespace).Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	if cluster.Status.Phase != lcv1alpha1.LogicalClusterPhaseReady {
-		return nil, errors.New("cluster is not ready")
+	if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
+		return nil, errors.New("space is not ready")
 	}
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(cluster.Status.ClusterConfig))
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(space.Status.SpaceConfig))
 	if err != nil {
 		return nil, err
 	}
@@ -141,8 +141,8 @@ func (mcc *multiClusterClient) getFromServer(name string, namespace string) (*mc
 		return nil, err
 	}
 	// Calling function should acquire the mcc lock
-	mcc.configs[cluster.Name] = config
-	mcc.clientsets[cluster.Name] = cs
+	mcc.configs[space.Name] = config
+	mcc.clientsets[space.Name] = cs
 
 	return cs, nil
 }

@@ -31,42 +31,42 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	lcv1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/logicalcluster/v1alpha1"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 	mcclientset "github.com/kubestellar/kubestellar/pkg/mcclient/clientset"
 )
 
 const (
-	ControllerName = "logicalclusters-client"
+	ControllerName = "multi-space-client"
 )
 
 type controller struct {
-	context                context.Context
-	logger                 logr.Logger
-	queue                  workqueue.RateLimitingInterface
-	logicalClusterInformer cache.SharedIndexInformer
-	multiClusterClient     *multiClusterClient
+	context          context.Context
+	logger           logr.Logger
+	queue            workqueue.RateLimitingInterface
+	spaceInformer    cache.SharedIndexInformer
+	multiSpaceClient *multiSpaceClient
 }
 
 func newController(
 	context context.Context,
-	logicalClusterInformer cache.SharedIndexInformer,
-	multiClusterClient *multiClusterClient,
+	spaceInformer cache.SharedIndexInformer,
+	multiSpaceClient *multiSpaceClient,
 ) *controller {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 
 	c := &controller{
-		context:                context,
-		logger:                 klog.FromContext(context),
-		queue:                  workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
-		logicalClusterInformer: logicalClusterInformer,
-		multiClusterClient:     multiClusterClient,
+		context:          context,
+		logger:           klog.FromContext(context),
+		queue:            workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
+		spaceInformer:    spaceInformer,
+		multiSpaceClient: multiSpaceClient,
 	}
 
-	logicalClusterInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	spaceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueue,
 		UpdateFunc: func(oldObj, newObj interface{}) {
-			oldInfo := oldObj.(*lcv1alpha1.LogicalCluster)
-			newInfo := newObj.(*lcv1alpha1.LogicalCluster)
+			oldInfo := oldObj.(*spacev1alpha1.Space)
+			newInfo := newObj.(*spacev1alpha1.Space)
 			if !reflect.DeepEqual(oldInfo.Status, newInfo.Status) {
 				c.enqueue(newObj)
 			}
@@ -91,8 +91,8 @@ func (c *controller) Run(numThreads int) {
 	defer runtime.HandleCrash()
 	defer c.queue.ShutDown()
 
-	c.logger.Info("starting client logicalcluster controller")
-	defer c.logger.Info("shutting down client logicalcluster controller")
+	c.logger.Info("starting client space controller")
+	defer c.logger.Info("shutting down client space controller")
 
 	for i := 0; i < numThreads; i++ {
 		go wait.UntilWithContext(c.context, c.runWorker, time.Second)
@@ -127,7 +127,7 @@ func (c *controller) processNextItem() bool {
 }
 
 func (c *controller) process(key string) error {
-	cluster, exists, err := c.logicalClusterInformer.GetIndexer().GetByKey(key)
+	space, exists, err := c.spaceInformer.GetIndexer().GetByKey(key)
 	if err != nil {
 		return err
 	}
@@ -135,25 +135,25 @@ func (c *controller) process(key string) error {
 	if !exists {
 		c.handleDelete(key)
 	} else {
-		c.handleAdd(cluster, key)
+		c.handleAdd(space, key)
 	}
 	return nil
 }
 
-func (c *controller) handleAdd(cluster interface{}, clusterKey string) {
-	clusterInfo, ok := cluster.(*lcv1alpha1.LogicalCluster)
+func (c *controller) handleAdd(space interface{}, spaceKey string) {
+	spaceInfo, ok := space.(*spacev1alpha1.Space)
 	if !ok {
-		runtime.HandleError(errors.New("unexpected object type. expected LogicalCluster"))
+		runtime.HandleError(errors.New("unexpected object type. expected Space"))
 		return
 	}
-	// Only clusters in ready state are cached.
-	// We will get another event when the cluster is Ready and then we cache it.
-	if clusterInfo.Status.Phase != lcv1alpha1.LogicalClusterPhaseReady {
-		c.handleDelete(clusterKey)
+	// Only spaces in ready state are cached.
+	// We will get another event when the space is Ready and then we cache it.
+	if spaceInfo.Status.Phase != spacev1alpha1.SpacePhaseReady {
+		c.handleDelete(spaceKey)
 		return
 	}
 
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(clusterInfo.Status.ClusterConfig))
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(spaceInfo.Status.SpaceConfig))
 	if err != nil {
 		runtime.HandleError(err)
 		return
@@ -163,20 +163,20 @@ func (c *controller) handleAdd(cluster interface{}, clusterKey string) {
 		runtime.HandleError(err)
 		return
 	}
-	c.logger.Info("New logical cluster detected", "cluster", clusterInfo.Name)
-	c.multiClusterClient.lock.Lock()
-	defer c.multiClusterClient.lock.Unlock()
-	c.multiClusterClient.configs[clusterKey] = config
-	c.multiClusterClient.clientsets[clusterKey] = cs
+	c.logger.Info("New space detected", "space", spaceInfo.Name)
+	c.multiSpaceClient.lock.Lock()
+	defer c.multiSpaceClient.lock.Unlock()
+	c.multiSpaceClient.configs[spaceKey] = config
+	c.multiSpaceClient.clientsets[spaceKey] = cs
 }
 
-// handleDelete deletes cluster from the cache maps
-func (c *controller) handleDelete(clusterKey string) {
-	c.multiClusterClient.lock.Lock()
-	defer c.multiClusterClient.lock.Unlock()
-	if _, ok := c.multiClusterClient.configs[clusterKey]; !ok {
+// handleDelete deletes space from the cache maps
+func (c *controller) handleDelete(spaceKey string) {
+	c.multiSpaceClient.lock.Lock()
+	defer c.multiSpaceClient.lock.Unlock()
+	if _, ok := c.multiSpaceClient.configs[spaceKey]; !ok {
 		return
 	}
-	delete(c.multiClusterClient.configs, clusterKey)
-	delete(c.multiClusterClient.clientsets, clusterKey)
+	delete(c.multiSpaceClient.configs, spaceKey)
+	delete(c.multiSpaceClient.clientsets, spaceKey)
 }

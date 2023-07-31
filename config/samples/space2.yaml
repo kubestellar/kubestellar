@@ -1,0 +1,7 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: space2
+  namespace: "spaceprovider-default"
+spec:
+  SpaceProviderDescName: "default"
