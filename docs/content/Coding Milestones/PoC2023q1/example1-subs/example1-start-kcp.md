@@ -27,10 +27,10 @@ make build
 export PATH=$(pwd)/bin:$PATH
 ```
 
-run kcp (kcp will spit out tons of information and stay running in this terminal window)
+Run the kcp server in a forked shell.  Even though the subcommand is "start", it does not just launch the server, it continues with running the server.
 ```shell
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
-kcp start &> /dev/null &
+kcp start &> /tmp/kcp.log &
 popd
 sleep 30 
 ```

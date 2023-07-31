@@ -1,36 +1,40 @@
 <!--example1-post-kcp-start-->
-### Use the root workspace.
-
-Use the following commands.
-
-```shell
-kubectl ws root
-```
-
 ### Get and build or install KubeStellar
 
-Contributors interested in running the Continuous Integration scripts
-locally, or from an existing git development branch, should skip the Fetch step
-and resume reading at the Build step.
+You will need a local copy of KubeStellar.  You can either use the
+pre-built archive (containing executables and config files) from a
+release or get any desired version from GitHub and build.
 
-For new users, download and build, or install, <a href="{{config.repo_url}}">KubeStellar</a>,
-according to your preference.  That is, either (a) `git clone` the
-repo and then `make build` to populate its `bin` directory, or (b)
-fetch the binary archive appropriate for your machine from a release
-and unpack it (creating a `bin` directory).  The commands exhibited
-just below assume that the repo has been fetched but not yet built.
+#### Use pre-built archive
 
-Fetch step:
+Fetch the archive for your operating system and instruction set
+architecture as follows, in which `$kubestellar_version` is your
+chosen release of KubeStellar (see
+https://github.com/kubestellar/kubestellar/releases) and `$os_type`
+and `$arch_type` are chosen according to the list of "assets" for your
+chosen release.
 
 ```{.base}
-git clone -b {{ config.ks_branch }} {{ config.repo_url }}
+curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
+tar xzf kubestellar.tar.gz
+export PATH=$PWD/bin:$PATH
+```
+
+#### Get from GitHub
+
+You can get the latest version from GitHub with the following command,
+which will get you the default branch (which is named "main"); add `-b
+$branch` to get a different one.
+
+```{.base}
+git clone {{ config.repo_url }}
 cd kubestellar
 ```
 
-Build step:
+Use the following commands to build and add the executables to your
+`$PATH`.
 
 ```shell
-echo "current path is $PWD"
 make build
 export PATH=$(pwd)/bin:$PATH
 ```
