@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Usage: $0 --subject-alt-names=$names
+
+# Assumes easy-rsa PKI with CA is at $PWD/pki.
+# Creates server public cert and private key at
+# pki/kcp-server.crt and pki/kcp-server.key.
+# Creates an ed25519 key.
+# Makes a cert good for 10000 days.
+
+if [ $# != 1 ] || [[ "$1" != --subject-alt-names=?* ]]; then
+    echo "Usage: $0 --subject-alt-names=\$names" >&2
+    exit 1
+fi
+
+SAN="${1#--subject-alt-names=}"
+
+SERVERNAME=kcp-server
+
+export EASYRSA_PKI=${PWD}/pki
+
+rm -f ${EASYRSA_PKI}/reqs/${SERVERNAME}.req ${EASYRSA_PKI}/issued/${SERVERNAME}.crt ${EASYRSA_PKI}/private/${SERVERNAME}.key
+easyrsa --batch --use-algo=ed --curve=ed25519 \
+    --subject-alt-name="$SAN" \
+    --days=10000 \
+    build-server-full $SERVERNAME nopass

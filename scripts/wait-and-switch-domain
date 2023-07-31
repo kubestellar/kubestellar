@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Waits for kube server to be running then produces an alternate kubeconfig.
+# The alternate kubeconfig goes in a directory whose name equals
+# the name of the original's directory extended with a dash and
+# the given domain name.
+# The alternate kubeconfig equals the given kubeconfig except for
+# the replacement of the protocol://host:port prefix of some
+# `server` fields in some `cluster` values.
+# In particular, the ones that are replaced are the ones that
+# originally equaled the prefix of the cluster of the given context.
+
+if [ $# != 6 ]; then
+   echo "Usage: $0 configdir configfile context domain port cacert" >&2
+   exit 1
+fi
+
+this="$0"
+
+set -e
+
+configdir="$(cd $1; pwd)"
+shift
+configfile="$1"
+shift
+context="$1"
+shift
+domain="$1"
+shift
+port="$1"
+shift
+cacert_file="$1"
+
+inpath="${configdir}/${configfile}"
+
+while ! kubectl --kubeconfig "$inpath" get ns &> /dev/null; do
+      sleep 10
+done
+
+${this%wait-and-switch-domain}switch-domain "$configdir" "$configfile" "$context" "$domain" "$port" "$cacert_file"

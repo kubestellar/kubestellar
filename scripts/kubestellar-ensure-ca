@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Usage: $0
+
+# This script ensures that an [easy-rsa](https://github.com/OpenVPN/easy-rsa)
+# PKI and CA have been created at $PWD/pki.
+
+set -e
+
+export EASYRSA_PKI=${PWD}/pki
+
+if [ -d $EASYRSA_PKI ] &&
+   [ -d $EASYRSA_PKI/reqs ] &&
+   [ -d $EASYRSA_PKI/private ] &&
+   [ -f $EASYRSA_PKI/openssl-easyrsa.cnf ]; then
+    echo "Re-using PKI at $EASYRSA_PKI" >&2
+else
+    # init
+    easyrsa --batch init-pki
+fi
+
+if [ -f $EASYRSA_PKI/ca.crt ] &&
+   [ -d $EASYRSA_PKI/certs_by_serial ] &&
+   [ -f $EASYRSA_PKI/index.txt ] &&
+   [ -f $EASYRSA_PKI/index.txt.attr ] &&
+   [ -d $EASYRSA_PKI/issued ] &&
+   [ -f $EASYRSA_PKI/private/ca.key ] &&
+   [ -d $EASYRSA_PKI/revoked ] &&
+   [ -d $EASYRSA_PKI/revoked/certs_by_serial ] &&
+   [ -d $EASYRSA_PKI/revoked/private_by_serial ] &&
+   [ -d $EASYRSA_PKI/revoked/reqs_by_serial ] &&
+   [ -f $EASYRSA_PKI/serial ]; then
+    echo "Re-using CA at $EASYRSA_PKI/private/ca.key" >&2
+else
+    # Generate a new certificate authority (CA)
+    easyrsa --batch "--req-cn=easy@`date +%s`" build-ca nopass
+fi

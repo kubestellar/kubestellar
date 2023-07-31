@@ -1,3 +1,6 @@
+---
+short_name: commands
+---
 This PoC includes two sorts of commands for users to use.  Most are
 executables delivered in the `bin` directory.  The other sort of
 command for users is a `bash` script that is designed to be fetched
@@ -15,7 +18,180 @@ your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.
 
-## Platform control
+## kcp control
+
+KubeStellar has some commands to support situations in which some
+clients of the kcp server need to connect to it by opening a
+connection to a DNS domain name rather than an IP address that the
+server can bind its socket to.  The key idea is using the
+`--tls-sni-cert-key` command line flag of `kcp start` to configure the
+server to respond with a bespoke server certificate in TLS handshakes
+in which the client addresses the server by a given domain name.
+
+These commands are designed so that they can be used multiple times if
+there are multiple sets of clients that need to use a distinct domain
+name.
+
+### kubestellar-ensure-kcp-server-creds
+
+#### kubestellar-ensure-kcp-server-creds pre-reqs
+
+The `kubestellar-ensure-kcp-server-creds` command requires that
+Easy-RSA is installed.  As outlined in
+https://easy-rsa.readthedocs.io/en/latest/#obtaining-and-using-easy-rsa,
+this involves selecting a release archive from [the list on
+GitHub](https://github.com/OpenVPN/easy-rsa/releases), unpacking it,
+and adding the EasyRSA directory to your `$PATH`; `easyrsa` is a bash
+script, so you do not need to worry about building or fetching a
+binary specific to your OS or ISA.
+
+Easy-RSA uses [OpenSSL](https://www.openssl.org/), so you will need
+that installed too.
+
+#### kubestellar-ensure-kcp-server-creds usage
+
+This command is given exactly one thing on the command line, a DNS
+domain name.  This command creates --- or re-uses if it finds already
+existing --- a private key and public X.509 certificate for the kcp
+server to use.  The certificate has exactly one
+SubjectAlternativeName, which is of the DNS form and specifies the
+given domain name.  For example: `kubestellar-ensure-kcp-server-creds
+foo.bar` creates a certificate with one SAN, commonly rendered as
+`DNS:foo.bar`.
+
+This command uses a Public Key Infrastructure (PKI) and Certificate
+Authority (CA) implemented by
+[easy-rsa](https://github.com/OpenVPN/easy-rsa), rooted at the
+subdirectory `pki` of the current working directory.  This command
+will create the PKI if it does not already exist, and will initialize
+the CA if that has not already been done.  The CA's public certificate
+appears at the usual place for easy-rsa: `pki/ca.crt`.
+
+This command prints some stuff --- mostly progress remarks from
+easy-rsa --- to stderr and prints one line of results to stdout.  The
+`bash` shell will parse that one line as three words.  Each is an
+absolute pathname of one certificate or key.  The three are as
+follows.
+
+1. The CA certificate for the client to use in verifying the server.
+2. The X.509 certificate for the server to put in its ServerHello in a
+   TLS handshake in which the ClientHello has a Server Name Indicator
+   (SNI) that matches the given domain name.
+3. The private key corresponding to that server certificate.
+
+Following is an example of invoking this command and examining its
+results.
+
+```console
+bash-5.2$ eval pieces=($(scripts/kubestellar-ensure-kcp-server-creds yep.yep))
+Re-using PKI at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki
+Re-using CA at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/ca.key
+Accepting existing credentials
+
+bash-5.2$ echo ${pieces[0]}
+/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/ca.crt
+
+bash-5.2$ echo ${pieces[1]}
+/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/issued/kcp-server.crt
+
+bash-5.2$ echo ${pieces[2]}
+/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/kcp-server.key
+```
+
+Following is an example of using those results in launching the kcp
+server.  The `--tls-sni-cert-key` flag can appear multiple times on
+the command line, configuring the server to respond in a different way
+to each of multiple different SNIs.
+
+```console
+bash-5.2$ kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &> /tmp/kcp.log &
+[1] 66974
+```
+
+### wait-and-switch-domain
+
+This command is for using after the kcp server has been launched.
+Since the `kcp start` command really means `kcp run`, all usage of
+that server has to be done by concurrent processes.  The
+`wait-and-switch-domain` command bundles two things: waiting for the
+kcp server to start handling kubectl requests, and making an alternate
+kubeconfig file for a set of clients to use.  This command is pointed
+at an existing kubeconfig file and reads it but does not write it; the
+alternate config file is written, with the same base name, into a
+parallel directory (which this command `mkdir -p`s).  This command
+takes exactly six command line positional arguments, as follows.
+
+1. Pathname (absoute or relative) of the directory holding the input kubeconfig.
+2. Filename of the input kubeconfig (just the base, no directory part).
+3. Name of the kubeconfig "context" that identifies what to replace.
+4. Domain name to put in the replacement server URLs.
+5. Port number to put in the replacement server URLs.
+6. Pathname (absolute or relative) of a file holding the CA
+   certificate to put in the alternate kubeconfig file.
+
+Creation of the alternate kubeconfig file starts by looking in the
+input kubeconfig file for the "context" with the given name, to find
+the name of a "cluster".  The server URL of that cluster is examined,
+and its `protocol://host:port` prefix is extracted.  The alternate
+kubeconfig will differ from the input kubeconfig in the contents of
+the cluster objects whose server URLs start with that same prefix.
+There will be the following two differences.
+
+1. In the server URL's `protocol://host:port` prefix, the host will be
+   replaced by the given domain name and the port will be replaced by
+   the given port.
+2. The cluster will be given a `certificate-authority-data` that holds
+   the contents (base64 encoded, as usual) of the given CA certificate
+   file.
+
+This command does a `mkdir -p` on a directory name that is the input
+kubeconfig directory name followed by a dash ("-") and the given
+domain name.  This command writes the alternate kubeconfig file into
+that directory.
+
+Following is an example of using this command and examining the
+results.  The context and port number chosen work for the kubeconfig
+file that `kcp start` (kcp release v0.11.0) creates by default.
+
+```console
+bash-5.2$ scripts/wait-and-switch-domain .kcp admin.kubeconfig root yep.yep 6443 ${pieces[0]}
+
+bash-5.2$ diff -w .kcp/admin.kubeconfig .kcp-yep.yep/admin.kubeconfig 
+4,5c4,5
+<     certificate-authority-data: LS0...LQo=
+<     server: https://192.168.something.something:6443
+---
+>       certificate-authority-data: LS0...LQo=
+>       server: https://yep.yep:6443
+8,9c8,9
+<     certificate-authority-data: LS0...LQo=
+<     server: https://192.168.something.something:6443/clusters/root
+---
+>       certificate-authority-data: LS0...LQo=
+>       server: https://yep.yep:6443/clusters/root
+```
+
+Following is an example of using the alternate kubeconfig file, in a
+context where the domain name "yep.yep" resolves to an IP address of
+the network namespace in which the kcp server is running.
+
+```console
+bash-5.2$ KUBECONFIG=.kcp-yep.yep/admin.kubeconfig kubectl ws .
+Current workspace is "root".
+```
+
+Because this command reads the given kubeconfig file, it is important
+to invoke this command while nothing is concurrently writing it and
+while the caller reliably knows the name of a kubeconfig context that
+identifies what to replace.
+
+### switch-domain
+
+This command is the second part of `wait-and-switch-domain`: the part
+of creating the alternate kubeconfig file.  It has the same inputs and
+outputs.
+
+## KubeStellar Platform control
 
 The `kubestellar` command has three subcommands, one to finish setup
 and two for process control.
