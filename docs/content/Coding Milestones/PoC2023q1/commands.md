@@ -34,6 +34,22 @@ name.
 
 ### kubestellar-ensure-kcp-server-creds
 
+#### kubestellar-ensure-kcp-server-creds pre-reqs
+
+The `kubestellar-ensure-kcp-server-creds` command requires that
+Easy-RSA is installed.  As outlined in
+https://easy-rsa.readthedocs.io/en/latest/#obtaining-and-using-easy-rsa,
+this involves selecting a release archive from [the list on
+GitHub](https://github.com/OpenVPN/easy-rsa/releases), unpacking it,
+and adding the EasyRSA directory to your `$PATH`; `easyrsa` is a bash
+script, so you do not need to worry about building or fetching a
+binary specific to your OS or ISA.
+
+Easy-RSA uses [OpenSSL](https://www.openssl.org/), so you will need
+that installed too.
+
+#### kubestellar-ensure-kcp-server-creds usage
+
 This command is given exactly one thing on the command line, a DNS
 domain name.  This command creates --- or re-uses if it finds already
 existing --- a private key and public X.509 certificate for the kcp
