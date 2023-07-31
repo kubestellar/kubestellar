@@ -30,7 +30,6 @@ import (
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
-	schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
@@ -38,6 +37,7 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	//schedulingv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/scheduling/v1alpha1"
 )
 
 type placementTranslator struct {
@@ -69,7 +69,8 @@ type placementTranslator struct {
 func NewPlacementTranslator(
 	numThreads int,
 	ctx context.Context,
-	locationClusterPreInformer schedulingv1a1informers.LocationClusterInformer,
+	//locationClusterPreInformer schedulingv1a1informers.LocationClusterInformer,
+	locationClusterPreInformer edgev1a1informers.LocationClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
