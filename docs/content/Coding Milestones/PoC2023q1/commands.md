@@ -118,8 +118,16 @@ kubestellar-version
 In this PoC, the interface between infrastructure and workload
 management is inventory API objects.  Specifically, for each edge
 cluster there is a unique pair of SyncTarget and Location objects in a
-so-called inventory management workspace.  The following command helps
-with making that pair of objects.
+so-called inventory management workspace.  These kinds of objects were
+originally defined in kcp TMC, and now there is a copy of those
+definitions in KubeStellar.  It is the definitions in KubeStellar that
+should be referenced.  Those are in the Kubernetes API group
+`edge.kcp.io`, and they are exported from the
+[KCS](../../../../Getting-Started/user-guide/)) (the kcp workspace
+named `root:espw`).
+
+The following command helps with making that SyncTarget and Location
+pair and adding the APIBinding to `root:espw:edge.kcp.io` if needed.
 
 The usage synopsis is as follows.
 
@@ -144,8 +152,8 @@ The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be your chosen
 IMW.
 
-This command does not depend on the action of any of the 
-KubeStellar controllers.
+This command does not depend on the action of any of the KubeStellar
+controllers but does require that the KCS has been set up.
 
 An example usage follows.
 
@@ -192,10 +200,27 @@ spec:
 EOF
 ```
 
+The creation of the APIBinding is equivalent to the following command
+(in the same workspace).
+
+```shell
+kubectl create -f <<EOF
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIBinding
+metadata:
+  name: edge.kcp.io
+spec:
+  reference:
+    export:
+      path: root:espw
+      name: edge.kcp.io
+EOF
+```
+
 This command operates in idempotent style, making whatever changes (if
 any) are needed to move from the current state to the desired state.
 Current limitation: it does not cast a skeptical eye on the spec of a
-pre-existing Location.
+pre-existing Location or APIBinding object.
 
 ## Removing SyncTarget/Location pairs
 
