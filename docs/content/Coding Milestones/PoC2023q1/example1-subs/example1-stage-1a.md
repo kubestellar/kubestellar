@@ -7,7 +7,7 @@ here.
 
 ```shell
 kubectl ws root:espw
-go run ./cmd/mailbox-controller -v=2 &
+mailbox-controller -v=2 &
 sleep 60
 ```
 ``` { .bash .no-copy }

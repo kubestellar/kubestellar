@@ -19,7 +19,7 @@ kubectl ws root:espw
 Current workspace is "root:espw".
 ```
 ```shell
-go run ./cmd/placement-translator &
+placement-translator &
 sleep 120
 ```
 ``` { .bash .no-copy }
