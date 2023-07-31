@@ -1,5 +1,5 @@
 <!--example1-post-kcp-start-->
-### Get and build or install KubeStellar
+### Get KubeStellar
 
 You will need a local copy of KubeStellar.  You can either use the
 pre-built archive (containing executables and config files) from a
@@ -9,10 +9,10 @@ release or get any desired version from GitHub and build.
 
 Fetch the archive for your operating system and instruction set
 architecture as follows, in which `$kubestellar_version` is your
-chosen release of KubeStellar (see
-https://github.com/kubestellar/kubestellar/releases) and `$os_type`
-and `$arch_type` are chosen according to the list of "assets" for your
-chosen release.
+chosen release of KubeStellar (see [the releases on
+GitHub](https://github.com/kubestellar/kubestellar/releases)) and
+`$os_type` and `$arch_type` are chosen according to the list of
+"assets" for your chosen release.
 
 ```{.base}
 curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
