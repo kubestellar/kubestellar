@@ -956,16 +956,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-the-root-workspace" class="md-nav__link">
-    Use the root workspace.
+  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
+    Get and build or install KubeStellar
+  </a>
+  
+    <nav class="md-nav" aria-label="Get and build or install KubeStellar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-pre-built-archive" class="md-nav__link">
+    Use pre-built archive
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
-    Get and build or install KubeStellar
+  <a href="#get-from-github" class="md-nav__link">
+    Get from GitHub
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1906,16 +1919,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-the-root-workspace" class="md-nav__link">
-    Use the root workspace.
+  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
+    Get and build or install KubeStellar
+  </a>
+  
+    <nav class="md-nav" aria-label="Get and build or install KubeStellar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-pre-built-archive" class="md-nav__link">
+    Use pre-built archive
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
-    Get and build or install KubeStellar
+  <a href="#get-from-github" class="md-nav__link">
+    Get from GitHub
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2386,9 +2412,9 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>make<span class="w"> </span>build
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
-<p>run kcp (kcp will spit out tons of information and stay running in this terminal window)
+<p>Run the kcp server in a forked shell.  Even though the subcommand is "start", it does not just launch the server, it continues with running the server.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="nb">popd</span>
 <a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w"> </span>
 </code></pre></div></p>
@@ -2396,28 +2422,32 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
-<h3 id="use-the-root-workspace">Use the root workspace.<a class="headerlink" href="#use-the-root-workspace" title="Permanent link">#</a></h3>
-<p>Use the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-</code></pre></div>
 <h3 id="get-and-build-or-install-kubestellar">Get and build or install KubeStellar<a class="headerlink" href="#get-and-build-or-install-kubestellar" title="Permanent link">#</a></h3>
-<p>Contributors interested in running the Continuous Integration scripts
-locally, or from an existing git development branch, should skip the Fetch step
-and resume reading at the Build step.</p>
-<p>For new users, download and build, or install, <a href="https://github.com/kubestellar/kubestellar">KubeStellar</a>,
-according to your preference.  That is, either (a) <code>git clone</code> the
-repo and then <code>make build</code> to populate its <code>bin</code> directory, or (b)
-fetch the binary archive appropriate for your machine from a release
-and unpack it (creating a <code>bin</code> directory).  The commands exhibited
-just below assume that the repo has been fetched but not yet built.</p>
-<p>Fetch step:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
+<p>You will need a local copy of KubeStellar.  You can either use the
+pre-built archive (containing executables and config files) from a
+release or get any desired version from GitHub and build.</p>
+<h4 id="use-pre-built-archive">Use pre-built archive<a class="headerlink" href="#use-pre-built-archive" title="Permanent link">#</a></h4>
+<p>Fetch the archive for your operating system and instruction set
+architecture as follows, in which <code>$kubestellar_version</code> is your
+chosen release of KubeStellar (see
+https://github.com/kubestellar/kubestellar/releases) and <code>$os_type</code>
+and <code>$arch_type</code> are chosen according to the list of "assets" for your
+chosen release.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>curl -SL -o kubestellar.tar.gz &quot;https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>tar xzf kubestellar.tar.gz
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>export PATH=$PWD/bin:$PATH
+</code></pre></div>
+<h4 id="get-from-github">Get from GitHub<a class="headerlink" href="#get-from-github" title="Permanent link">#</a></h4>
+<p>You can get the latest version from GitHub with the following command,
+which will get you the default branch (which is named "main"); add <code>-b
+$branch</code> to get a different one.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>git clone https://github.com/kubestellar/kubestellar
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>cd kubestellar
 </code></pre></div>
-<p>Build step:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;current path is </span><span class="nv">$PWD</span><span class="s2">&quot;</span>
-<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>make<span class="w"> </span>build
-<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<p>Use the following commands to build and add the executables to your
+<code>$PATH</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>make<span class="w"> </span>build
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <p>In the following exhibited command lines, the commands described as
 "KubeStellar commands" and the commands that start with <code>kubectl
@@ -2508,7 +2538,7 @@ used in this PoC, if it shows up.</p>
 Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>sleep<span class="w"> </span><span class="m">60</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>...
