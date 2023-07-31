@@ -1070,11 +1070,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
-    Get and build or install KubeStellar
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="Get and build or install KubeStellar">
+    <nav class="md-nav" aria-label="Get KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1867,11 +1867,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#get-and-build-or-install-kubestellar" class="md-nav__link">
-    Get and build or install KubeStellar
+  <a href="#get-kubestellar" class="md-nav__link">
+    Get KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="Get and build or install KubeStellar">
+    <nav class="md-nav" aria-label="Get KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2377,17 +2377,17 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
-<h3 id="get-and-build-or-install-kubestellar">Get and build or install KubeStellar<a class="headerlink" href="#get-and-build-or-install-kubestellar" title="Permanent link">#</a></h3>
+<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
 <p>You will need a local copy of KubeStellar.  You can either use the
 pre-built archive (containing executables and config files) from a
 release or get any desired version from GitHub and build.</p>
 <h4 id="use-pre-built-archive">Use pre-built archive<a class="headerlink" href="#use-pre-built-archive" title="Permanent link">#</a></h4>
 <p>Fetch the archive for your operating system and instruction set
 architecture as follows, in which <code>$kubestellar_version</code> is your
-chosen release of KubeStellar (see
-https://github.com/kubestellar/kubestellar/releases) and <code>$os_type</code>
-and <code>$arch_type</code> are chosen according to the list of "assets" for your
-chosen release.</p>
+chosen release of KubeStellar (see <a href="https://github.com/kubestellar/kubestellar/releases">the releases on
+GitHub</a>) and
+<code>$os_type</code> and <code>$arch_type</code> are chosen according to the list of
+"assets" for your chosen release.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>curl -SL -o kubestellar.tar.gz &quot;https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>tar xzf kubestellar.tar.gz
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>export PATH=$PWD/bin:$PATH
