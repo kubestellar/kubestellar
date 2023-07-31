@@ -169,11 +169,11 @@ fi
 
 # Now the MBWS exists and is ready, but does it have the needed APIBinding?
 
-if ! kubectl get APIBinding bind-edge &> /dev/null; then
+if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-edge &> /dev/null; then
     sleep 15
-    if ! kubectl get APIBinding bind-edge &> /dev/null; then
+    if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-edge &> /dev/null; then
 	sleep 15
-	kubectl get APIBinding bind-edge > /dev/null
+	kubectl "${kubectl_flags[@]}" get APIBinding bind-edge > /dev/null
     fi
 fi
 
