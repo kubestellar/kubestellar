@@ -12,10 +12,9 @@ We can't wait to collaborate with you!
 [Install Go](https://golang.org/doc/install) 1.19+.
   Please note that the go language version numbers in these files must exactly agree:
   
-    Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
+    Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
     
     - In ./ci-operator.yaml the go version is indicated by the "tag" attribute.
-    - In ./Dockerfile it is indicated by the "golang" attribute
     - In go.mod it is indicated by the "go" directive.
     - In the .github/workflows yaml files it is indicated by "go-version"
     
