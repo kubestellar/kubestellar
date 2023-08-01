@@ -38,8 +38,8 @@ export EASYRSA_PKI=${PWD}/pki
 need=true
 
 cacert="${PWD}/pki/ca.crt"
-svrcert="${PWD}/pki/issued/kcp-server.crt"
-svrkey="${PWD}/pki/private/kcp-server.key"
+svrcert="${PWD}/pki/issued/kcp-DNS-$domain.crt"
+svrkey="${PWD}/pki/private/kcp-DNS-$domain.key"
 
 if [ -r "$svrcert" ] && [ -r "$svrkey" ]; then
     if oldsan=$(easyrsa show-cert kcp-server |

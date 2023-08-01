@@ -92,10 +92,10 @@ bash-5.2$ echo ${pieces[0]}
 /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/ca.crt
 
 bash-5.2$ echo ${pieces[1]}
-/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/issued/kcp-server.crt
+/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/issued/kcp-DNS-yep.yep.crt
 
 bash-5.2$ echo ${pieces[2]}
-/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/kcp-server.key
+/Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/kcp-DNS-yep.yep.key
 ```
 
 Following is an example of using those results in launching the kcp

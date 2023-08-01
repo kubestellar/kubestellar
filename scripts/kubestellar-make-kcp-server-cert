@@ -15,12 +15,12 @@ fi
 
 SAN="${1#--subject-alt-names=}"
 
-SERVERNAME=kcp-server
+FILE_NAME_BASE="kcp-${SAN//:/-}"
 
 export EASYRSA_PKI=${PWD}/pki
 
-rm -f ${EASYRSA_PKI}/reqs/${SERVERNAME}.req ${EASYRSA_PKI}/issued/${SERVERNAME}.crt ${EASYRSA_PKI}/private/${SERVERNAME}.key
-easyrsa --batch --use-algo=ed --curve=ed25519 \
+rm -f "${EASYRSA_PKI}/reqs/${FILE_NAME_BASE}.req" "${EASYRSA_PKI}/issued/${FILE_NAME_BASE}.crt" "${EASYRSA_PKI}/private/${FILE_NAME_BASE}.key"
+easyrsa --batch --use-algo=ec \
     --subject-alt-name="$SAN" \
     --days=10000 \
-    build-server-full $SERVERNAME nopass
+    build-server-full "$FILE_NAME_BASE" nopass
