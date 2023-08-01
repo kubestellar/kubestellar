@@ -1870,10 +1870,9 @@
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h3>
 <p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.
   Please note that the go language version numbers in these files must exactly agree:</p>
-<div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
+<div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
 
 - In ./ci-operator.yaml the go version is indicated by the &quot;tag&quot; attribute.
-- In ./Dockerfile it is indicated by the &quot;golang&quot; attribute
 - In go.mod it is indicated by the &quot;go&quot; directive.
 - In the .github/workflows yaml files it is indicated by &quot;go-version&quot;
 </code></pre></div>
