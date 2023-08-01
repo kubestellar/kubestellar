@@ -68,7 +68,7 @@ func newProviderClient(providerDesc *lcv1alpha1apis.ClusterProviderDesc) cluster
 	case lcv1alpha1apis.KubeflexProviderType:
 		pClient = kflexprovider.New(providerDesc.Name)
 	case lcv1alpha1apis.KcpProviderType:
-		pClient, err := providerkcp.New()
+		pClient, err := providerkcp.New(providerDesc.Spec.Config)
 		if err != nil {
 			runtime.HandleError(err)
 			return nil
@@ -88,12 +88,12 @@ func CreateProvider(c *controller, providerDesc *lcv1alpha1apis.ClusterProviderD
 
 	_, exists := c.providers[providerName]
 	if exists {
-		return nil, fmt.Errorf("provider %s already in the list", string(providerType))
+		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
 	newProviderClient := newProviderClient(providerDesc)
 	if newProviderClient == nil {
-		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerType))
+		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
 	}
 
 	discoveryPrefix := providerDesc.Spec.ClusterPrefixForDiscovery

@@ -56,7 +56,9 @@ p "press <enter> to continue."
 #4 Start the manager in a second window
 echo "  "
 
-#5 Create a provider (show the provider yaml,  filter prefix, etc..)
+#5 Create a provider (set config, show the provider yaml,  filter prefix, etc..)
+$PCMD "./cmd/mc-client-test/set-provider-config.sh $KCPCONFIG config/samples/clusterproviderdesc_kcp.yaml"
+echo " "
 $PCMD "cat config/samples/clusterproviderdesc_kcp.yaml" 
 echo " "
 echo " "

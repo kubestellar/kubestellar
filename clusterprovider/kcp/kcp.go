@@ -18,7 +18,6 @@ package providerkcp
 
 import (
 	"context"
-	"os"
 	"strings"
 	"sync"
 
@@ -38,41 +37,32 @@ import (
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/clustermanager/providerclient"
 )
 
-// KcpClusterProvider is a cluster provider that works with a local Kind instance.
+// KcpClusterProvider is a cluster provider for KCP workspaces.
 type KcpClusterProvider struct {
 	ctx        context.Context
 	logger     logr.Logger
-	configPath string
+	kcpConfig  string
 	clientset  tenancyclient.WorkspaceInterface
 	workspaces map[string]string
 	watch      clusterprovider.Watcher
 }
 
 // New returns a new KcpClusterProvider
-func New() (*KcpClusterProvider, error) {
+func New(kcpConfig string) (*KcpClusterProvider, error) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
-
-	kcpConfigPath := os.Getenv("HOME") + "/.kcp/config"
-	if kcpConfig := os.Getenv("KCPCONFIG"); kcpConfig != "" {
-		kcpConfigPath = kcpConfig
-	}
-	clientConfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kcpConfigPath},
-		&clientcmd.ConfigOverrides{CurrentContext: "root"}).ClientConfig()
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kcpConfig))
 	if err != nil {
-		logger.Error(err, "Failed to create rest config")
 		return nil, err
 	}
-	clientset, err := tenancyclient.NewForConfig(clientConfig)
+	clientset, err := tenancyclient.NewForConfig(config)
 	if err != nil {
-		logger.Error(err, "Failed create clientset for workspaces")
 		return nil, err
 	}
 	c := &KcpClusterProvider{
 		ctx:        ctx,
 		logger:     logger,
-		configPath: kcpConfigPath,
+		kcpConfig:  kcpConfig,
 		clientset:  clientset.Workspaces(),
 		workspaces: make(map[string]string),
 	}
@@ -103,17 +93,20 @@ func (k *KcpClusterProvider) Delete(name string, opts clusterprovider.Options) e
 // ListClustersNames is N/A for KCP
 // TODO remove it from ProviderClient interface
 func (k KcpClusterProvider) ListClustersNames() ([]string, error) {
+	k.logger.V(2).Info("Not implemented")
 	return []string{}, nil
 }
 
 func (k *KcpClusterProvider) Get(lcName string) (clusterprovider.LogicalClusterInfo, error) {
-	cfg, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: k.configPath},
-		&clientcmd.ConfigOverrides{CurrentContext: "root"}).RawConfig()
-	if err != nil {
-		k.logger.Error(err, "Failed to get config for workspace", "workspace", lcName)
-	}
 
+	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(k.kcpConfig))
+	if err != nil {
+		k.logger.Error(err, "Failed to get client config for workspace", "workspace", lcName)
+	}
+	cfg, err := clientConfig.RawConfig()
+	if err != nil {
+		k.logger.Error(err, "Failed to get raw config for workspace", "workspace", lcName)
+	}
 	cfgBytes, err := clientcmd.Write(buildRawConfig(cfg, lcName))
 	if err != nil {
 		k.logger.Error(err, "Failed to write workspace config", "workspace", lcName)
