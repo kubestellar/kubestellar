@@ -25,6 +25,7 @@ type SpaceProviderType string
 const (
 	KindProviderType     SpaceProviderType = "kind"
 	KubeflexProviderType SpaceProviderType = "kubeflex"
+	KcpProviderType      SpaceProviderType = "kcp"
 )
 
 // SpaceProviderDesc represents a provider.
