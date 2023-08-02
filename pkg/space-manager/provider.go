@@ -19,6 +19,7 @@ package spacemanager
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -30,6 +31,7 @@ import (
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/pkg/space-manager/providerclient"
+	providerkcp "github.com/kubestellar/kubestellar/space-provider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/space-provider/kind"
 	kflexprovider "github.com/kubestellar/kubestellar/space-provider/kubeflex"
 )
@@ -65,6 +67,13 @@ func newProviderClient(providerDesc *spacev1alpha1apis.SpaceProviderDesc) spacep
 		pClient = kindprovider.New(providerDesc.Name)
 	case spacev1alpha1apis.KubeflexProviderType:
 		pClient = kflexprovider.New(providerDesc.Name)
+	case spacev1alpha1apis.KcpProviderType:
+		pClient, err := providerkcp.New(providerDesc.Spec.Config)
+		if err != nil {
+			runtime.HandleError(err)
+			return nil
+		}
+		return pClient
 	default:
 		return nil
 	}
@@ -79,13 +88,12 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 
 	_, exists := c.providers[providerName]
 	if exists {
-		err := errors.New("provider already in the list")
-		return nil, err
+		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
 	newProviderClient := newProviderClient(providerDesc)
 	if newProviderClient == nil {
-		return nil, errors.New("unknown provider type")
+		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
 	}
 
 	discoveryPrefix := providerDesc.Spec.SpacePrefixForDiscovery
