@@ -1,6 +1,6 @@
 <!--quickstart-1-install-and-run-kubestellar-start-->
 
-KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and **KubeStellar** binaries and scripts into a `kubestellar` subfolder in your current working directory using the following command:
+KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. The following commands will download the kcp and **KubeStellar** executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fecthed, see [kcp control](../../../Coding Milestones/PoC2023q1/commands/#kcp-control) and [KubeStellar platform control](../../../Coding Milestones/PoC2023q1/commands/#kubestellar-platform-control).
 
 ```shell
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}

@@ -73,10 +73,8 @@ script](bootstrap/bootstrap-kubestellar.sh) from the main branch of
 the main repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
-to add the downloaded `bin` at the _front_ of your `$PATH` (contrary
-to [what the scripting currently tells
-you](bootstrap/install-kubestellar.sh)) so that your `git clone`'s
-`bin` does not shadow the one being tested.
+to add the downloaded `bin` at the _front_ of your `$PATH` so that
+your `git clone`'s `bin` does not shadow the one being tested.
 
 Note that changes to the bootstrap script start being used by users as
 soon as your PR merges.  Since this script can only fetch a released
