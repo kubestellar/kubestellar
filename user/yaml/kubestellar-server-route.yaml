@@ -1,0 +1,124 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubestellar
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kubestellar-pvc
+  namespace: kubestellar
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubestellar-service-account
+  namespace: kubestellar
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kubestellar-role
+rules:
+- resources: [ "secrets" ]
+  verbs: [ "create" , "delete" ]
+  apiGroups: [ "" ]
+- resources: [ "routes" ]
+  verbs: [ "get" ]
+  apiGroups: [ "route.openshift.io" ]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kubestellar-role-binding
+subjects:
+- kind: ServiceAccount
+  name: kubestellar-service-account
+  apiGroup: ""
+  namespace: kubestellar
+roleRef:
+  kind: ClusterRole
+  name: kubestellar-role
+  apiGroup: ""
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubestellar-server
+  namespace: kubestellar
+spec:
+  selector:
+    matchLabels:
+      app: kubestellar-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubestellar-server
+    spec:
+      serviceAccountName: kubestellar-service-account
+      containers:
+      - name: kubestellar-server
+        image: quay.io/kubestellar/kubestellar:fs # for testing, change to :stable
+        imagePullPolicy: Always # for testing, change to IfNotPresent
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: ""
+        - name: EXTERNAL_PORT
+          value: "443"
+        volumeMounts:
+        - name: kubestellar-pv
+          mountPath: "/home/kubestellar/kubestellar-logs"
+          readOnly: false
+        ports:
+        - name: ks-port
+          protocol: TCP
+          containerPort: 6443
+      volumes:
+      - name: kubestellar-pv
+        persistentVolumeClaim:
+          claimName: kubestellar-pvc
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubestellar-service
+  namespace: kubestellar
+spec:
+  selector:
+    app: kubestellar-server
+  ports:
+    - protocol: TCP
+      port: 6443 # Default port for image
+      targetPort: ks-port
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: kubestellar-route
+  namespace: kubestellar
+spec:
+  # host: kubestellar.svc.cluster.local
+  port:
+    targetPort: 6443
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
+  to:
+    kind: Service
+    name: kubestellar-service
+

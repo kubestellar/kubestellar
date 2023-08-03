@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Usage: $0 dns-name
+
+# This makes a TLS server certificate and private key.
+# The uses, creating if necessary, a PKI and CA at $PWD/pki.
+# The cert has one SubjectAlternativeName: a DNS form one
+# using the given domain name.
+# This script prints one line that parses as three bash words:
+# the first holds the absolute pathname of the CA's public cert,
+# the second holds the absolute pathname of the server cert,
+# the third holds the absolute pathname of the server's private key.
+# Join the last two with a comma and give that value to the `--tls-sni-cert-key`
+# command line flag of a kcp or plain kube apiserver.
+# Also edit the dns-name and CA cert into kube client config,
+# to make that client connect to that domain name and verify
+# the server's cert against that CA.
+
+if [ $# != 1 ]; then
+    echo "Usage: $0 dns-name" >&2
+    exit 1
+fi
+
+set -e
+
+this="$0"
+domain="$1"
+
+if [ $(wc -w <<<$domain) != 1 ]; then
+    echo "$0: the given domain name must be one word" >&2
+    exit 2
+fi
+
+${this%kcp-server-creds}ca >&2
+
+export EASYRSA_PKI=${PWD}/pki
+
+need=true
+
+cacert="${PWD}/pki/ca.crt"
+svrcert="${PWD}/pki/issued/kcp-DNS-$domain.crt"
+svrkey="${PWD}/pki/private/kcp-DNS-$domain.key"
+
+if [ -r "$svrcert" ] && [ -r "$svrkey" ]; then
+    if oldsan=$(easyrsa show-cert kcp-server |
+		    grep -A1 'X509v3 Subject Alternative Name' |
+		    tail -1 | awk '{ print $1 }'); then
+	if [ "$oldsan" == "DNS:$domain" ]
+	then echo Accepting existing credentials >&2
+	     need=false
+	else echo Rejecting existing credentials with SAN ${oldsan@Q} >&2
+	fi
+    fi
+fi
+
+if [ "$need" == "true" ];
+then ${this%ensure-kcp-server-creds}make-kcp-server-cert --subject-alt-names="DNS:$domain" >&2
+fi
+
+echo ${cacert@Q} ${svrcert@Q} ${svrkey@Q}

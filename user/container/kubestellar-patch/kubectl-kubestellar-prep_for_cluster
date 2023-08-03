@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path)* synctarget_name labelname=labelvalue...
+
+# Purpose: be a convenient combination of ensure-location and prep-for-syncer.
+
+bindir="$(dirname "$0")"
+
+imw=.
+espw="root:espw"
+stname=""
+labels=()
+kubectl_flags=()
+prep_flags=()
+silent="false"
+
+while (( $# > 0 )); do
+    case "$1" in
+    (--imw)
+        if (( $# >1 ))
+        then imw="$2"; shift
+        else echo "$0: missing IMW pathname" >&2; exit 1
+        fi;;
+    (--espw)
+        if (( $# >1 ))
+        then espw="$2"; shift
+        else echo "$0: missing ESPW pathname" >&2; exit 1
+        fi;;
+    (--syncer-image)
+        if (( $# >1 ))
+        then prep_flags[${#prep_flags[*]}]="--syncer-image"
+         prep_flags[${#prep_flags[*]}]="$2"
+         shift
+        else echo "$0: missing syncer image reference" >&2; exit 1
+        fi;;
+    (-o)
+        if (( $# >1 ))
+        then prep_flags[${#prep_flags[*]}]="-o"
+         prep_flags[${#prep_flags[*]}]="$2"
+         shift
+        else echo "$0: missing output filename" >&2; exit 1
+        fi;;
+    (-s|--silent)
+        prep_flags[${#prep_flags[*]}]="-s"
+        silent="true";;
+    (--context*)
+        # TODO: support --context
+        echo "$0: --context flag not supported" >&2; exit 1;;
+    (--*=*|-?=*)
+        kubectl_flags[${#kubectl_flags[*]}]="$1";;
+    (-h)
+        echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
+        exit 0;;
+    (--*|-?)
+        if (( $# > 1 ))
+        then kubectl_flags[${#kubectl_flags[*]}]="$1"
+         kubectl_flags[${#kubectl_flags[*]}]="$2"
+         shift
+        else echo "$0: missing value for long flag $1" >&2; exit 1
+        fi;;
+    (-*)
+        echo "$0: flag syntax error" >&2
+        exit 1;;
+    (*)
+        if [ -z "$stname" ]
+        then stname="$1"
+        else labels[${#labels[*]}]="$1"
+        fi
+    esac
+    shift
+done
+
+if [ "$stname" == "" ]; then
+    echo "$0: SyncTarget name was not specified" >&2
+    exit 1
+fi
+
+set -e
+
+original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
+
+if [ "$imw" == "." ]
+then imw="$original_ws"
+elif ! [[ "$imw" =~ [a-z0-9].* ]]; then
+    echo "$0: imw ${espw@Q} is not valid" >&2
+    exit 1
+fi
+
+if [ "$espw" == "." ]
+then espw="$original_ws"
+elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
+    echo "$0: espw ${espw@Q} is not valid" >&2
+    exit 1
+fi
+
+if [ "$silent" == "true" ]; then
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws" > /dev/null' EXIT
+else
+    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
+fi
+
+if [ "$imw" != "$original_ws" ]; then
+    if [ "$silent" == "true" ]; then
+        kubectl ws "${kubectl_flags[@]}" "$imw" > /dev/null
+    else
+        kubectl ws "${kubectl_flags[@]}" "$imw"
+    fi
+fi
+
+if [ "$silent" == "true" ]; then
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" > /dev/null
+else
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
+fi
+
+"$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"
