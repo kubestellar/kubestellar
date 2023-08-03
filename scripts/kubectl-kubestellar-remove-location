@@ -69,20 +69,9 @@ fi
 
 set -e
 
-echo "--- current directory is $PWD"
-cwsi=$(kubectl ws "${kubectl_flags[@]}" .)
-cwsi=${cwsi#*'"'}; cwsi=${cwsi%'"'*}
-echo "current ws is $cwsi"
-echo "imw is $imw"
+# this assumes that an APIBinding exists for edge.kcp.io objects
 if [ "$imw" != "." ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
-     cwsi=$imw
-fi
-echo "current cwsi is $cwsi"
-if ! kubectl "${kubectl_flags[@]}" get apibinding "edge.kcp.io" &> /dev/null; then
-   kubectl kcp "${kubectl_flags[@]}" bind apiexport root:espw:edge.kcp.io
-   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
-else echo "edge.kcp.io apibinding exists in workspace $cwsi"
 fi
 
 if kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$objname" &> /dev/null

@@ -195,7 +195,7 @@ func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exp
 			return nil, fmt.Errorf("error reading APIExport %s: %w", exportName, err)
 		}
 		if isAPIExportReady(logger, apiExport) {
-			logger.Info(" ### export is ready, exportName: ", exportName)
+			logger.V(2).Info(" ### export is ready, exportName: ", exportName)
 			break
 		}
 		logger.V(2).Info("Pause because APIExport not ready", "exportName", exportName)

@@ -119,8 +119,8 @@ then kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 echo "current cwsi is $cwsi"
 if ! kubectl "${kubectl_flags[@]}" get apibinding "edge.kcp.io" &> /dev/null; then
-   kubectl kcp "${kubectl_flags[@]}" bind apiexport root:espw:edge.kcp.io
-   echo "bound apiexport root:espw:edge.kcp.io to $cwsi:edge.kcp.io"
+    kubectl kcp "${kubectl_flags[@]}" bind apiexport root:espw:edge.kcp.io
+    echo "bound apiexport root:espw:edge.kcp.io into $cwsi:edge.kcp.io"
 else echo "edge.kcp.io apibinding exists in workspace $cwsi"
 fi
 
@@ -171,16 +171,16 @@ while (( index < ${#labels[*]} )); do
     let index=index+2
     stval=$(jq -r <<<"$stlabs" ".[\"${key}\"]")
     if [ "$stval" != "$val" ]; then
-	   if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
-	    echo "$0: failed to add label to SyncTarget" >&2
-	    exit 4
-	   fi
+	    if ! kubectl "${kubectl_flags[@]}" label --overwrite synctargets.edge.kcp.io "$objname" "${key}=${val}" ; then
+	        echo "$0: failed to add label to SyncTarget" >&2
+	        exit 4
+	    fi
     fi
     locval=$(jq -r <<<"$loclabs" ".[\"${key}\"]")
     if [ "$locval" != "$val" ]; then
-	   if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kcp.io "$objname" "${key}=${val}" ; then
-	     echo "$0: failed to add label to Location" >&2
-	     exit 4
+	    if ! kubectl "${kubectl_flags[@]}" label --overwrite locations.edge.kcp.io "$objname" "${key}=${val}" ; then
+	        echo "$0: failed to add label to Location" >&2
+	        exit 4
 	   fi
     fi
 done
