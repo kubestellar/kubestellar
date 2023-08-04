@@ -22,6 +22,7 @@ if [ $# != 1 ]; then
 fi
 
 set -e
+set -o pipefail
 
 this="$0"
 domain="$1"
@@ -37,12 +38,20 @@ export EASYRSA_PKI=${PWD}/pki
 
 need=true
 
+if ! domhash=$(sha256sum <<<"$domain" 2> /dev/null | awk '{ print $1 }')
+then domhash=$(shasum -a 256 <<<"$domain" | awk '{ print $1 }')
+fi
+
+#FILE_NAME_BASE="kcp-DNS-$domain"
+FILE_NAME_BASE="kcp-server-${domhash:1:33}"
+
 cacert="${PWD}/pki/ca.crt"
-svrcert="${PWD}/pki/issued/kcp-DNS-$domain.crt"
-svrkey="${PWD}/pki/private/kcp-DNS-$domain.key"
+svrcert="${PWD}/pki/issued/${FILE_NAME_BASE}.crt"
+svrkey="${PWD}/pki/private/${FILE_NAME_BASE}.key"
+
 
 if [ -r "$svrcert" ] && [ -r "$svrkey" ]; then
-    if oldsan=$(easyrsa show-cert kcp-server |
+    if oldsan=$(easyrsa show-cert $FILE_NAME_BASE |
 		    grep -A1 'X509v3 Subject Alternative Name' |
 		    tail -1 | awk '{ print $1 }'); then
 	if [ "$oldsan" == "DNS:$domain" ]
@@ -54,7 +63,7 @@ if [ -r "$svrcert" ] && [ -r "$svrkey" ]; then
 fi
 
 if [ "$need" == "true" ];
-then ${this%ensure-kcp-server-creds}make-kcp-server-cert --subject-alt-names="DNS:$domain" >&2
+then ${this%ensure-kcp-server-creds}make-kcp-server-cert "$FILE_NAME_BASE" "DNS:$domain" >&2
 fi
 
 echo ${cacert@Q} ${svrcert@Q} ${svrkey@Q}
