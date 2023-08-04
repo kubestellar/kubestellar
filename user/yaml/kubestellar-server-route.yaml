@@ -29,6 +29,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: kubestellar-role
+  namespace: kubestellar
 rules:
 - resources: [ "secrets" ]
   verbs: [ "create" , "delete" ]
@@ -42,13 +43,14 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: kubestellar-role-binding
+  namespace: kubestellar
 subjects:
 - kind: ServiceAccount
   name: kubestellar-service-account
-  apiGroup: ""
   namespace: kubestellar
+  apiGroup: ""
 roleRef:
-  kind: ClusterRole
+  kind: Role
   name: kubestellar-role
   apiGroup: ""
 

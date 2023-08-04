@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 
-# Usage: $0 --subject-alt-names=$names
+# Usage: $0 $FILE_NAME_BASE $subject_alt_names
 
 # Assumes easy-rsa PKI with CA is at $PWD/pki.
 # Creates server public cert and private key at
-# pki/kcp-server.crt and pki/kcp-server.key.
-# Creates an ed25519 key.
+# pki/${FILE_NAME_BASE}.crt and pki/${FILE_NAME_BASE}.key.
+# Creates an elliptic curve key.
 # Makes a cert good for 10000 days.
 
-if [ $# != 1 ] || [[ "$1" != --subject-alt-names=?* ]]; then
-    echo "Usage: $0 --subject-alt-names=\$names" >&2
+if [ $# != 2 ] ; then
+    echo "Usage: $0 \$FILE_NAME_BASE \$subject_alt_names" >&2
     exit 1
 fi
 
-SAN="${1#--subject-alt-names=}"
+set -e
 
-FILE_NAME_BASE="kcp-${SAN//:/-}"
+FILE_NAME_BASE="$1"
+shift
+SAN="$1"
 
 export EASYRSA_PKI=${PWD}/pki
 

@@ -63,7 +63,7 @@ kubectl ws root
 if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp-${EXTERNAL_HOSTNAME}" ]; then
     echo "Switching the admin.kubeconfig domain to ${EXTERNAL_HOSTNAME}..."
     switch-domain .kcp admin.kubeconfig root ${EXTERNAL_HOSTNAME} ${EXTERNAL_PORT} ${pieces[0]}
-    cp ${PWD}/.kcp-${EXTERNAL_HOSTNAME}/admin.kubeconfig ${PWD}/.kcp-${EXTERNAL_HOSTNAME}/external.kubeconfig
+    cp ${PWD}/.kcp-${EXTERNAL_HOSTNAME}/admin.kubeconfig ${PWD}/.kcp/external.kubeconfig
 fi
 
 # Starting KubeStellar
@@ -81,7 +81,7 @@ if kubectl get secret kubestellar &> /dev/null; then
     kubectl delete secret kubestellar
 fi
 if [ -n "${EXTERNAL_HOSTNAME}" ]; then
-    kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp-${EXTERNAL_HOSTNAME}/external.kubeconfig"
+    kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp/external.kubeconfig"
 else
     kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig"
 fi

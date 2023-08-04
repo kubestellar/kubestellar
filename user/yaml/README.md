@@ -221,7 +221,7 @@ kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kube
 
 kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}) -- tar cf - "/home/kubestellar/kubestellar" | tar xf - --strip-components=2
 
-kubectl cp -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}):/home/kubestellar/.kcp-kubestellar.svc.cluster.local/admin.kubeconfig ./admin.kubeconfig
+kubectl cp -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}):/home/kubestellar/.kcp/external.kubeconfig ./admin.kubeconfig
 
 export KUBECONFIG=$PWD/admin.kubeconfig
 export PATH=$PATH:$PWD/kcp-plugins/bin:$PWD/kubestellar/bin
