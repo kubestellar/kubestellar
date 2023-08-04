@@ -154,7 +154,7 @@ in an eventually consistent way, it is not just one-and-done.
 In this design the primary interface between infrastructure management
 and workload management is API objects in _inventory management_
 workspaces.  We use the `Location` and `SyncTarget` object types
-from Kubestellar's edge.kcp.io api group (created by `kubestellar init`) for
+from KubeStellar's edge.kcp.io api group (created by `kubestellar init`) for
 this purpose.  The people doing infrastructure management are
 responsible for creating the inventory management workspaces and
 populating them with `Location` and `SyncTarget` objects, one
