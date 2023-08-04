@@ -3,7 +3,7 @@
 /cmd/mailbox-controller/main.go:198:4: Additional arguments to Info should always be Key Value pairs. Please check if there is any key or value missing.
 /cmd/mailbox-controller/main.go:91:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/placement-translator/main.go:120:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
-/pkg/placement/workload-projector.go:690:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-/pkg/placement/workload-projector.go:712:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-/pkg/placement/workload-projector.go:888:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
-/pkg/placement/workload-projector.go:970:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:687:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:709:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:885:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
+/pkg/placement/workload-projector.go:967:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }

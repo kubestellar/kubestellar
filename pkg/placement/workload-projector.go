@@ -53,8 +53,6 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
-	//schedulingv1a1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
-	//schedulingv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/scheduling/v1alpha1"
 )
 
 const SyncerConfigName = "the-one"
@@ -305,14 +303,13 @@ var _ Runnable = &workloadProjector{}
 //
 // The fields following the Mutex should only be accessed with the Mutex locked.
 type workloadProjector struct {
-	ctx                     context.Context
-	configConcurrency       int
-	resourceModes           ResourceModes
-	delay                   time.Duration // to slow down for debugging
-	queue                   workqueue.RateLimitingInterface
-	mbwsLister              tenancyv1a1listers.WorkspaceLister
-	locationClusterInformer kcpcache.ScopeableSharedIndexInformer
-	//locationClusterLister     schedulingv1a1listers.LocationClusterLister
+	ctx                       context.Context
+	configConcurrency         int
+	resourceModes             ResourceModes
+	delay                     time.Duration // to slow down for debugging
+	queue                     workqueue.RateLimitingInterface
+	mbwsLister                tenancyv1a1listers.WorkspaceLister
+	locationClusterInformer   kcpcache.ScopeableSharedIndexInformer
 	locationClusterLister     edgev1a1listers.LocationClusterLister
 	syncfgClusterInformer     kcpcache.ScopeableSharedIndexInformer
 	syncfgClusterLister       edgev1a1listers.SyncerConfigClusterLister

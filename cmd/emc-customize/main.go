@@ -33,7 +33,6 @@ import (
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
-	//schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 )
 
 func main() {
@@ -59,7 +58,6 @@ func main() {
 
 	scheme := machruntime.NewScheme()
 	edgeapi.AddToScheme(scheme)
-	//schedulingv1alpha1.AddToScheme(scheme)
 
 	codecFactory := machserializer.NewCodecFactory(scheme)
 	decoder := codecFactory.UniversalDeserializer()
@@ -100,16 +98,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	//var location *schedulingv1alpha1.Location
 	var location *edgeapi.Location
 	if fs.NArg() > 1 {
-		//obj, err := readObject(decoder, fs.Arg(1), &schedulingv1alpha1.Location{})
 		obj, err := readObject(decoder, fs.Arg(1), &edgeapi.Location{})
 		if err != nil {
 			logger.Error(err, "Failed to read Location", "locationFilename", fs.Arg(1))
 			os.Exit(30)
 		}
-		//location = obj.(*schedulingv1alpha1.Location)
 		location = obj.(*edgeapi.Location)
 	}
 	logger.V(2).Info("Location", "loc", location)
