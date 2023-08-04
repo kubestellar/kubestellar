@@ -9,16 +9,16 @@
 # matched that of the cluster of the given context.
 
 if [ $# != 6 ]; then
-   echo "Usage: $0 configdir configfile context domain port cacert_file" >&2
+   echo "Usage: $0 inpath outpath context domain port cacert_file" >&2
    exit 1
 fi
 
 set -o errexit
 set -o pipefail
 
-configdir="$(cd $1; pwd)"
+inpath="$1"
 shift
-configfile="$1"
+outpath="$1"
 shift
 context=$1
 shift
@@ -27,10 +27,6 @@ shift
 port=$1
 shift
 cacert_file="$1"
-
-inpath="${configdir}/${configfile}"
-outdir="${configdir}-${domain}"
-outpath="${outdir}/${configfile}"
 
 if ! cacert=$(base64 -w 0 < "$cacert_file" 2>/dev/null) ; then
     cacert=$(base64 < "$cacert_file")
@@ -45,8 +41,6 @@ if [ -z "$protocluster" ]; then
 fi
 export protocluster
 protourl=$(yq '.clusters[] | select(.name == strenv(protocluster)) | .cluster.server' "$inpath")
-
-mkdir -p "${outdir}"
 
 protocol=$(cut -d: -f1 <<<$protourl)
 authpath=$(cut -d: -f2- <<<$protourl)
