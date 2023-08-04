@@ -19,7 +19,7 @@
 # This script installs kcp and Kubestellar binaries to a folder of choice
 #
 # Arguments:
-# [--deploy bool] control whether platform deployment is included
+# [--deploy bool] indicate if kubestellar (and kcp) will be deployed
 # [--kcp-version release] set a specific kcp release version, default: latest
 # [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
