@@ -3,8 +3,8 @@
 Table of contests:
 - [Deploy **KubeStellar** service in a cluster](#deploy-kubestellar-service-in-a-cluster)
   - [Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)](#deploy-kubestellar-in-a-kubernetes-cluster-kind-cluster)
-  - [Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins](#access-kubestellar-service-directly-from-the-host-os-without-adminkubeconfig-or-plugins)
   - [Deploy **KubeStellar** in an **OpenShift** cluster](#deploy-kubestellar-in-an-openshift-cluster)
+  - [Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins](#access-kubestellar-service-directly-from-the-host-os-without-adminkubeconfig-or-plugins)
   - [Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the plugins from the pod](#access-kubestellar-service-from-the-host-os-by-extracting-the-adminkubeconfig-and-the-plugins-from-the-pod)
   - [Access **KubeStellar** from another pod in the same `kubestellar` namespace](#access-kubestellar-from-another-pod-in-the-same-kubestellar-namespace)
 
@@ -202,6 +202,16 @@ After the deployment has completed, **KubeStellar** `admin.kubeconfig` can be in
 - the `kubestellar` secret in the `kubestellar` namespace or any other namespace listed in `SECRET_NAMESPACES` environment variable;
 - directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp/external.kubeconfig`.
 
+## Deploy **KubeStellar** in an **OpenShift** cluster
+
+In this case use the following YAML to deploy  **KubeStellar** `stable` in a `kubestellar` namespace:
+
+```shell
+kubectl apply -f kubestellar-server-route.yaml
+```
+
+Then follow the same instructions for the Kind cluster deployment.
+
 ## Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins
 
 Since **kubectl**, **kcp** plugins, and **KubeStellar** executables are include in the **KubeStellar** container image we can operate KubeStellar directly from the host OS using `kubectl`, for example:
@@ -217,16 +227,6 @@ $ kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=ku
 Workspace "imw" (type root:organization) created. Waiting for it to be ready...
 Workspace "imw" (type root:organization) is ready to use.
 ```
-
-## Deploy **KubeStellar** in an **OpenShift** cluster
-
-In this case use the following YAML to deploy  **KubeStellar** `stable` in a `kubestellar` namespace:
-
-```shell
-kubectl apply -f kubestellar-server-route.yaml
-```
-
-Then follow the same instructions for the Kind cluster deployment.
 
 ## Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the plugins from the pod
 
