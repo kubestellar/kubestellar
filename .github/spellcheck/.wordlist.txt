@@ -219,6 +219,7 @@ URL
 URL's
 ValidatingWebhookConfiguration
 VolumeAttachment
+WDS
 WEC
 WECs
 WorkspaceType
