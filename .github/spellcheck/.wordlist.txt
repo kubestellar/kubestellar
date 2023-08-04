@@ -22,9 +22,11 @@ Ansible
 ArgoCD
 Brainer
 Braulio
+CA's
 CEL
 CICD
 CLI
+ClientHello
 CNAME
 CNCF
 CR
@@ -134,6 +136,7 @@ OLM
 ObjectMeta
 Onboarding
 OpenShift
+OpenSSL
 OSTYPE
 OwnerReferences
 Paolo
@@ -142,6 +145,7 @@ PermissionClaim
 PermissionClaims
 PersistentVolume
 PersistentVolumeClaim
+PKI
 PlacementTranslator
 PoC
 PodDisruptionBudget
@@ -173,11 +177,14 @@ Scalability
 SelfLink
 SelfSubjectAccessReview
 SelfSubjectRulesReview
+ServerHello
 ServiceAccount
 ServiceAccount's
 Silvera
 SinglePlacementSlice
 Slominski
+SNI
+SNIs
 Spreitzer
 StatefulSet
 StatusSummary
@@ -205,6 +212,8 @@ UUID
 Upsync
 Upsynced
 Upsyncing
+URL
+URL's
 ValidatingWebhookConfiguration
 VolumeAttachment
 WEC
@@ -241,6 +250,7 @@ argo
 argocd
 autoscaling
 awk
+balancers
 boto
 buildDate
 cd
@@ -266,7 +276,9 @@ coredns
 cosmo
 cpumemload
 crds
+crt
 creationTimestamp
+creds
 css
 csv
 customizer
@@ -300,6 +312,7 @@ etcd
 exclusioninclusion
 exe
 executables
+eval
 faq
 fi
 filesystem
@@ -390,6 +403,7 @@ ownerReferences
 oyaml
 pathname
 pathnames
+pki
 policyreport
 policyreports
 pprof
@@ -410,6 +424,7 @@ renaturing
 replicaset
 repo
 req
+reqs
 resourceNames
 resourceVersion
 resourcequotas
@@ -417,6 +432,7 @@ rolebinding
 rolebindings
 roleRef
 rollout
+rsa
 scalability
 scalable
 scheduler's
@@ -430,10 +446,13 @@ socio
 speciald
 specialstuff
 src
+stderr
+stdout
 struct
 structs
 subcommand
 subcommands
+subdirectory
 subresources
 subfolder
 sublicense
