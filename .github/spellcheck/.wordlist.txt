@@ -102,6 +102,7 @@ Inclusivity
 IngressClass
 JSON
 KCP
+KCS
 Karve
 Kube
 KubeFlex
