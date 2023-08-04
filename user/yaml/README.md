@@ -256,7 +256,7 @@ or
 kubectl get secrets kubestellar -n kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' | base64 --decode > ./admin.kubeconfig
 ```
 
-Rhe following environment variables need to be set:
+Then, the following environment variables need to be set:
 
 ```shell
 export KUBECONFIG=$PWD/admin.kubeconfig
