@@ -2224,7 +2224,7 @@ originally defined in kcp TMC, and now there is a copy of those
 definitions in KubeStellar.  It is the definitions in KubeStellar that
 should be referenced.  Those are in the Kubernetes API group
 <code>edge.kcp.io</code>, and they are exported from the
-<a href="../../../../Getting-Started/user-guide/">KCS</a>) (the kcp workspace
+<a href="../../../../Getting-Started/user-guide/">KubeStellar Core Space (KCS)</a>) (the kcp workspace
 named <code>root:espw</code>).</p>
 <p>The following command helps with making that SyncTarget and Location
 pair and adding the APIBinding to <code>root:espw:edge.kcp.io</code> if needed.</p>
@@ -2246,7 +2246,7 @@ and have at least the given labels.</p>
 specified.  Upon completion, the current workspace will be your chosen
 IMW.</p>
 <p>This command does not depend on the action of any of the KubeStellar
-controllers but does require that the KCS has been set up.</p>
+controllers but does require that the KubeStellar Core Space (KCS) has been set up.</p>
 <p>An example usage follows.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
 </code></pre></div>
