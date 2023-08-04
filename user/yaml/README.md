@@ -7,6 +7,7 @@ Table of contests:
   - [Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins](#access-kubestellar-service-directly-from-the-host-os-without-adminkubeconfig-or-plugins)
   - [Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the plugins from the pod](#access-kubestellar-service-from-the-host-os-by-extracting-the-adminkubeconfig-and-the-plugins-from-the-pod)
   - [Access **KubeStellar** from another pod in the same `kubestellar` namespace](#access-kubestellar-from-another-pod-in-the-same-kubestellar-namespace)
+  - [Add a new cluster to **KubeStellar** inventory](#add-a-new-cluster-to-kubestellar-inventory)
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
@@ -315,3 +316,12 @@ From within the pod:
     ├── compute
     └── espw
 ```
+
+## Add a new cluster to **KubeStellar** inventory
+
+A syncer can also be generated using pip commands as in the following example:
+
+```shell
+kubectl kubestellar prep-for-cluster --silent --imw root:example-imw some-cluster env=prod -o - 2> /dev/null 1> syncer.yaml
+```
+
