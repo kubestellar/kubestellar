@@ -186,6 +186,11 @@ Ready!
 Note that alternatively, one can wait for the `kubestellar` secret to be created.
 
 ```shell
+kubectl wait -n kubestellar \
+  --for=condition=ready pod \
+  --selector=app=kubestellar-server \
+  --timeout=120s
+
 until kubectl logs -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}) 2>&1 | grep -Fxq "Ready!"
 do
   sleep 1
