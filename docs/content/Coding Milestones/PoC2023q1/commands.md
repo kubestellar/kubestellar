@@ -121,7 +121,7 @@ alternate config file is written, with the same base name, into a
 parallel directory (which this command `mkdir -p`s).  This command
 takes exactly six command line positional arguments, as follows.
 
-1. Pathname (absoute or relative) of the directory holding the input kubeconfig.
+1. Pathname (absolute or relative) of the directory holding the input kubeconfig.
 2. Filename of the input kubeconfig (just the base, no directory part).
 3. Name of the kubeconfig "context" that identifies what to replace.
 4. Domain name to put in the replacement server URLs.
