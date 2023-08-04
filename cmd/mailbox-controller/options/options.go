@@ -27,9 +27,9 @@ import (
 
 type Options struct {
 	EspwClientOpts clientoptions.ClientOpts
-	RootClientOpts clientoptions.ClientOpts
-	BaseClientOpts clientoptions.ClientOpts
-	Logs           *logs.Options
+	//RootClientOpts clientoptions.ClientOpts
+	//BaseClientOpts clientoptions.ClientOpts
+	//Logs           *logs.Options
 }
 
 func NewOptions() *Options {
@@ -39,19 +39,19 @@ func NewOptions() *Options {
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
-		RootClientOpts: *clientoptions.NewClientOpts("root", "access to the root workspace"),
-		BaseClientOpts: *clientoptions.NewClientOpts("base", "access to all logical clusters as kcp-admin"),
-		Logs:           logs,
+		//	RootClientOpts: *clientoptions.NewClientOpts("root", "access to the root workspace"),
+		//	BaseClientOpts: *clientoptions.NewClientOpts("base", "access to all logical clusters as kcp-admin"),
+		//	Logs:           logs,
 	}
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.EspwClientOpts.AddFlags(fs)
-	options.RootClientOpts.SetDefaultUserAndCluster("kcp-admin", "root")
-	options.RootClientOpts.AddFlags(fs)
-	options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
-	options.BaseClientOpts.AddFlags(fs)
-	options.Logs.AddFlags(fs)
+	//options.RootClientOpts.SetDefaultUserAndCluster("kcp-admin", "root")
+	//options.RootClientOpts.AddFlags(fs)
+	//options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
+	//options.BaseClientOpts.AddFlags(fs)
+	//options.Logs.AddFlags(fs)
 }
 
 func (options *Options) Complete() error {

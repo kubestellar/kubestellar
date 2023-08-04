@@ -27,10 +27,7 @@ import (
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/jsonpath"
-	//	schedulingv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/scheduling/v1alpha1"
 )
-
-//func Customize(logger klog.Logger, input *unstructured.Unstructured, customizer *edgeapi.Customizer, loc *schedulingv1alpha1.Location) *unstructured.Unstructured {
 
 func Customize(logger klog.Logger, input *unstructured.Unstructured, customizer *edgeapi.Customizer, loc *edgeapi.Location) *unstructured.Unstructured {
 	expandInput := input.GetAnnotations()[edgeapi.ParameterExpansionAnnotationKey] == "true"
