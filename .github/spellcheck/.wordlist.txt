@@ -68,6 +68,7 @@ Downsync
 Downsyncing
 Duan
 Dumba
+EasyRSA
 EMC
 EOF
 EOL
@@ -192,6 +193,7 @@ Stellari
 StorageClass
 Subresource
 SubjectAccessReview
+SubjectAlternativeName
 Summarization
 SyncTarget
 SyncTargets
