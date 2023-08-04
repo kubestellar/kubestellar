@@ -1,13 +1,14 @@
-# Deploy **KubeStellar** service in a Kind cluster
+# Deploy **KubeStellar** service in a cluster
 
 Table of contests:
-- [Deploy **KubeStellar** service in a Kind cluster](#deploy-kubestellar-service-in-a-kind-cluster)
-  - [Deploy **KubeStellar** in a Kind cluster](#deploy-kubestellar-in-a-kind-cluster)
+- [Deploy **KubeStellar** service in a cluster](#deploy-kubestellar-service-in-a-cluster)
+  - [Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)](#deploy-kubestellar-in-a-kubernetes-cluster-kind-cluster)
   - [Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins](#access-kubestellar-service-directly-from-the-host-os-without-adminkubeconfig-or-plugins)
+  - [Deploy **KubeStellar** in an **OpenShift** cluster](#deploy-kubestellar-in-an-openshift-cluster)
   - [Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the plugins from the pod](#access-kubestellar-service-from-the-host-os-by-extracting-the-adminkubeconfig-and-the-plugins-from-the-pod)
   - [Access **KubeStellar** from another pod in the same `kubestellar` namespace](#access-kubestellar-from-another-pod-in-the-same-kubestellar-namespace)
 
-## Deploy **KubeStellar** in a Kind cluster
+## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
 Create a **Kind** cluster with the `extraPortMappings` for ports `80` and `443`:
 
@@ -194,7 +195,7 @@ done
 After the deployment has completed, **KubeStellar** `admin.kubeconfig` can be in three ways:
 
 - the `kubestellar` secret in the `kubestellar` namespace or any other namespace listed in `SECRET_NAMESPACES` environment variable;
-- directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp-kubestellar.svc.cluster.local/admin.kubeconfig`.
+- directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp/external.kubeconfig`.
 
 ## Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or plugins
 
@@ -212,22 +213,52 @@ Workspace "imw" (type root:organization) created. Waiting for it to be ready...
 Workspace "imw" (type root:organization) is ready to use.
 ```
 
+## Deploy **KubeStellar** in an **OpenShift** cluster
+
+In this case use the following YAML to deploy  **KubeStellar** `stable` in a `kubestellar` namespace:
+
+```shell
+kubectl apply -f kubestellar-server-route.yaml
+```
+
+Then follow the same instructions for the Kind cluster deployment.
+
 ## Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the plugins from the pod
 
-In this case the host OS will need a copy of **kcp** `admin.kubeconfig`, **kcp** plugins, and **KubeStellar** plugins:
+In this case the host OS will need a copy of **kcp** plugins, and **KubeStellar** plugins, assuming that the architecture of the client is the same of the container, the executables can be extracted from the container:
 
 ```shell
 kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}) -- tar cf - "/home/kubestellar/kcp-plugins" | tar xf - --strip-components=2
 
 kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}) -- tar cf - "/home/kubestellar/kubestellar" | tar xf - --strip-components=2
+```
 
+As an alternative the bootstrap script can be used with the `--deploy false` option as follows:
+
+```shell
+bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh) --deploy false
+```
+
+The `admin.kubeconfig` to access **KubeStellar** from outside the cluster can be obtained by:
+
+```shell
 kubectl cp -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath={.items[0].metadata.name}):/home/kubestellar/.kcp/external.kubeconfig ./admin.kubeconfig
+```
 
+or
+
+```shell
+kubectl get secrets kubestellar -n kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' | base64 --decode > ./admin.kubeconfig
+```
+
+Rhe following environment variables need to be set:
+
+```shell
 export KUBECONFIG=$PWD/admin.kubeconfig
 export PATH=$PATH:$PWD/kcp-plugins/bin:$PWD/kubestellar/bin
 ```
 
-Then add the **KubeStellar** ingress `kubestellar.svc.cluster.local` to the `/etc/hosts` files:
+If necessary, add the **KubeStellar** ingress, *e.g.* `kubestellar.svc.cluster.local`, to the `/etc/hosts` files:
 
 ```text
 127.0.0.1       kubestellar.svc.cluster.local
@@ -248,7 +279,7 @@ $ kubectl ws tree
 Any pod in the same namespace can access **KubeStellar** by retrieving the `admin.kubeconfig` via one of the following ways:
 
 - the `kubestellar` secret in the `kubestellar` namespace or any other namespace listed in `SECRET_NAMESPACES` environment variable;
-- directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp-kubestellar.svc.cluster.local/admin.kubeconfig`.
+- directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp/external.kubeconfig`.
 
 Obviously `kubectl`, **kcp** plugins, and **KubeStellar** executables are also needed.
 
