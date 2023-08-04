@@ -43,7 +43,7 @@ this involves selecting a release archive from [the list on
 GitHub](https://github.com/OpenVPN/easy-rsa/releases), unpacking it,
 and adding the EasyRSA directory to your `$PATH`; `easyrsa` is a bash
 script, so you do not need to worry about building or fetching a
-binary specific to your OS or ISA.
+binary specific to your OS or computer architecture.
 
 Easy-RSA uses [OpenSSL](https://www.openssl.org/), so you will need
 that installed too.
