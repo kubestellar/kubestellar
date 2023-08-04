@@ -299,7 +299,7 @@ originally defined in kcp TMC, and now there is a copy of those
 definitions in KubeStellar.  It is the definitions in KubeStellar that
 should be referenced.  Those are in the Kubernetes API group
 `edge.kcp.io`, and they are exported from the
-[KCS](../../../../Getting-Started/user-guide/)) (the kcp workspace
+[KubeStellar Core Space (KCS)](../../../../Getting-Started/user-guide/)) (the kcp workspace
 named `root:espw`).
 
 The following command helps with making that SyncTarget and Location
@@ -329,7 +329,7 @@ specified.  Upon completion, the current workspace will be your chosen
 IMW.
 
 This command does not depend on the action of any of the KubeStellar
-controllers but does require that the KCS has been set up.
+controllers but does require that the KubeStellar Core Space (KCS) has been set up.
 
 An example usage follows.
 
