@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#executables" class="md-skip">
+        <a href="#kcp-control" class="md-skip">
           Skip to content
         </a>
       
@@ -1153,8 +1153,6 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Commands
@@ -1170,8 +1168,6 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
-  
-    
   
   
     <label class="md-nav__title" for="__toc">
@@ -1320,6 +1316,13 @@
         <li class="md-nav__item">
   <a href="#removing-a-workload-management-workspace" class="md-nav__link">
     Removing a Workload Management Workspace
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bootstrap" class="md-nav__link">
+    Bootstrap
   </a>
   
 </li>
@@ -1806,8 +1809,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1959,6 +1960,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#bootstrap" class="md-nav__link">
+    Bootstrap
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1990,14 +1998,21 @@
   
 
 
-<p>This PoC includes two sorts of commands for users to use.  Most are
-executables delivered in the <code>bin</code> directory.  The other sort of
-command for users is a <code>bash</code> script that is designed to be fetched
-from github and fed directly into <code>bash</code>.</p>
-<h1 id="executables">Executables<a class="headerlink" href="#executables" title="Permanent link">#</a></h1>
-<p>The command lines exhibited below presume that you have added the
-<code>bin</code> directory to your <code>$PATH</code>.  Alternatively: these executables can
-be invoked directly using any pathname (not in your <code>$PATH</code>).</p>
+  <h1>Commands</h1>
+
+<p>This PoC includes two sorts of commands for users to use. Most are
+executables designed to be accessed in the usual ways: by appearing in
+a directory on the user's <code>$PATH</code> or by the user writing a pathname
+for the executable on the command line. The one exception is <a href="#bootstrap">the
+bootstrap script</a>, which is designed to be fetched from
+github and fed directly into <code>bash</code>.</p>
+<p>Most of these executables require that the kcp server be running and
+that <code>kubectl</code> is configured to use the kubeconfig file produced by
+<code>kcp start</code>. That is: either <code>$KUBECONFIG</code> holds the pathname of that
+kubeconfig file, its contents appear at <code>~/.kube/config</code>, or
+<code>--kubeconfig $pathname</code> appears on the command line.  The exceptions
+are the bootstrap script and <a href="#kubestellar-ensure-kcp-server-creds">the kcp control script that runs before
+starting the kcp server</a>.</p>
 <p><strong>NOTE</strong>: all of the kubectl plugin usages described here certainly or
 potentially change the setting of which kcp workspace is "current" in
 your chosen kubeconfig file; for this reason, they are not suitable
@@ -2011,9 +2026,12 @@ server can bind its socket to.  The key idea is using the
 <code>--tls-sni-cert-key</code> command line flag of <code>kcp start</code> to configure the
 server to respond with a bespoke server certificate in TLS handshakes
 in which the client addresses the server by a given domain name.</p>
-<p>These commands are designed so that they can be used multiple times if
-there are multiple sets of clients that need to use a distinct domain
-name.</p>
+<p>These commands are used separately from starting the kcp server and
+are designed so that they can be used multiple times if there are
+multiple sets of clients that need to use a distinct domain name.
+Starting the kcp server is not described here, beyond the particular
+consideration needed for the <code>--tls-sni-cert-key</code> flag, because it is
+otherwise ordinary.</p>
 <h3 id="kubestellar-ensure-kcp-server-creds">kubestellar-ensure-kcp-server-creds<a class="headerlink" href="#kubestellar-ensure-kcp-server-creds" title="Permanent link">#</a></h3>
 <h4 id="kubestellar-ensure-kcp-server-creds-pre-reqs">kubestellar-ensure-kcp-server-creds pre-reqs<a class="headerlink" href="#kubestellar-ensure-kcp-server-creds-pre-reqs" title="Permanent link">#</a></h4>
 <p>The <code>kubestellar-ensure-kcp-server-creds</code> command requires that
@@ -2523,8 +2541,7 @@ the parent of the workload management workspace to delete.</p>
 </code></pre></div></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<h1 id="web-to-bash">Web-to-bash<a class="headerlink" href="#web-to-bash" title="Permanent link">#</a></h1>
-<h2 id="quick-setup">Quick Setup<a class="headerlink" href="#quick-setup" title="Permanent link">#</a></h2>
+<h2 id="bootstrap">Bootstrap<a class="headerlink" href="#bootstrap" title="Permanent link">#</a></h2>
 <p>This is a combination of some installation and setup steps, for use in
 <a href="../../../Getting-Started/quickstart/">the
 QuickStart</a>.</p>
@@ -2577,60 +2594,6 @@ the shell running the script.  Of course, if you run the script in a
 sub-shell then those environment effects terminate with that
 sub-shell; this script also prints out messages showing how to update
 the environment in another shell.</p>
-<h2 id="install-kcp-and-its-kubectl-plugins">Install kcp and its kubectl plugins<a class="headerlink" href="#install-kcp-and-its-kubectl-plugins" title="Permanent link">#</a></h2>
-<p>This script is directly available at <a href="https://github.com/kubestellar/kubestellar/blob/main/bootstrap/install-kcp-with-plugins.sh">https://github.com/kubestellar/kubestellar/blob/main/bootstrap/install-kubestellar.sh</a> and does the following things.</p>
-<ul>
-<li>Fetch and install the <code>kcp</code> server executable.</li>
-<li>Fetch and install the kubectl plugins of kcp.</li>
-</ul>
-<p>This script accepts the following command line flags; all are
-optional.</p>
-<ul>
-<li><code>--version $version</code>: specifies the kcp release to use.  The default
-  is the latest.</li>
-<li><code>--OS $OS</code>: specifies the operating system to use in selecting the
-  executables to fetch and install.  Choices are <code>darwin</code> and <code>linux</code>.
-  Auto-detected if omitted.</li>
-<li><code>--arch $ARCH</code>: specifies the instruction set architecture to use in
-  selecting the executables to fetch and install.  Choices are <code>arm64</code>
-  and <code>amd64</code>.  Auto-detected if omitted.</li>
-<li><code>--ensure-folder $install_parent_dir</code>: specifies where to install
-  to.  This will be <code>mkdir -p</code>.  The default is <code>./kcp</code>.</li>
-<li><code>-V</code> or <code>--verbose</code>: increases the verbosity of output.  This is a
-  binary thing, not a matter of degree.</li>
-<li><code>-X</code>: makes the script <code>set -x</code> internally, for debugging.</li>
-<li><code>-h</code> or <code>--help</code>: print brief usage message and exit.</li>
-</ul>
-<p>Here install means only to unpack the downloaded archives, creating
-<code>$install_parent_dir/bin</code>.  If <code>$install_parent_dir/bin</code> is not
-already on your <code>$PATH</code> then this script will print out a message
-telling you to add it.</p>
-<h2 id="install-kubestellar">Install KubeStellar<a class="headerlink" href="#install-kubestellar" title="Permanent link">#</a></h2>
-<p>This script is directly available at
-<a href="https://github.com/kubestellar/kubestellar/blob/main/bootstrap/install-kubestellar.sh">https://github.com/kubestellar/kubestellar/blob/main/bootstrap/install-kubestellar.sh</a>
-and will download and install KubeStellar.</p>
-<p>This script accepts the following command line arguments; all are
-optional.</p>
-<ul>
-<li><code>--version $version</code>: specifies the release of KubeStellar to use.
-  Defaults to the latest regular release.</li>
-<li><code>--OS $OS</code>: specifies the operating system to use in selecting the
-  executables to fetch and install.  Choices are <code>darwin</code> and <code>linux</code>.
-  Auto-detected if omitted.</li>
-<li><code>--arch $ARCH</code>: specifies the instruction set architecture to use in
-  selecting the executables to fetch and install.  Choices are <code>arm64</code>
-  and <code>amd64</code>.  Auto-detected if omitted.</li>
-<li><code>--ensure-folder $install_parent_dir</code>: specifies where to install
-  to.  This will be <code>mkdir -p</code>.  The default is <code>./kubestellar</code>.</li>
-<li><code>-V</code> or <code>--verbose</code>: increases the verbosity of output.  This is a
-  binary thing, not a matter of degree.</li>
-<li><code>-X</code>: makes the script <code>set -x</code> internally, for debugging.</li>
-<li><code>-h</code> or <code>--help</code>: print brief usage message and exit.</li>
-</ul>
-<p>Here install means only to unpack the downloaded archive, creating
-<code>$install_parent_dir/bin</code>.  If <code>$install_parent_dir/bin</code> is not
-already on your <code>$PATH</code> then this script will print out a message
-telling you to add it.</p>
 
 
   
