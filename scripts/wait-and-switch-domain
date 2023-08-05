@@ -11,7 +11,7 @@
 # originally equaled the prefix of the cluster of the given context.
 
 if [ $# != 6 ]; then
-   echo "Usage: $0 configdir configfile context domain port cacert" >&2
+   echo "Usage: $0 inpath outpath context domain port cacert" >&2
    exit 1
 fi
 
@@ -19,9 +19,9 @@ this="$0"
 
 set -e
 
-configdir="$(cd $1; pwd)"
+inpath="$1"
 shift
-configfile="$1"
+outpath="$1"
 shift
 context="$1"
 shift
@@ -31,10 +31,8 @@ port="$1"
 shift
 cacert_file="$1"
 
-inpath="${configdir}/${configfile}"
-
 while ! kubectl --kubeconfig "$inpath" get ns &> /dev/null; do
       sleep 10
 done
 
-${this%wait-and-switch-domain}switch-domain "$configdir" "$configfile" "$context" "$domain" "$port" "$cacert_file"
+${this%wait-and-switch-domain}switch-domain "$inpath" "$outpath" "$context" "$domain" "$port" "$cacert_file"

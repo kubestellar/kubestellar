@@ -117,12 +117,12 @@ that server has to be done by concurrent processes.  The
 kcp server to start handling kubectl requests, and making an alternate
 kubeconfig file for a set of clients to use.  This command is pointed
 at an existing kubeconfig file and reads it but does not write it; the
-alternate config file is written, with the same base name, into a
-parallel directory (which this command `mkdir -p`s).  This command
-takes exactly six command line positional arguments, as follows.
+alternate config file is written (its directory must already exist and
+be writable).  This command takes exactly six command line positional
+arguments, as follows.
 
-1. Pathname (absolute or relative) of the directory holding the input kubeconfig.
-2. Filename of the input kubeconfig (just the base, no directory part).
+1. Pathname (absolute or relative) of the input kubeconfig.
+2. Pathname (absolute or relative) of the output kubeconfig.
 3. Name of the kubeconfig "context" that identifies what to replace.
 4. Domain name to put in the replacement server URLs.
 5. Port number to put in the replacement server URLs.
@@ -144,19 +144,14 @@ There will be the following two differences.
    the contents (base64 encoded, as usual) of the given CA certificate
    file.
 
-This command does a `mkdir -p` on a directory name that is the input
-kubeconfig directory name followed by a dash ("-") and the given
-domain name.  This command writes the alternate kubeconfig file into
-that directory.
-
 Following is an example of using this command and examining the
 results.  The context and port number chosen work for the kubeconfig
 file that `kcp start` (kcp release v0.11.0) creates by default.
 
 ```console
-bash-5.2$ scripts/wait-and-switch-domain .kcp admin.kubeconfig root yep.yep 6443 ${pieces[0]}
+bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
-bash-5.2$ diff -w .kcp/admin.kubeconfig .kcp-yep.yep/admin.kubeconfig 
+bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml 
 4,5c4,5
 <     certificate-authority-data: LS0...LQo=
 <     server: https://192.168.something.something:6443
@@ -189,7 +184,7 @@ identifies what to replace.
 
 This command is the second part of `wait-and-switch-domain`: the part
 of creating the alternate kubeconfig file.  It has the same inputs and
-outputs.
+outputs and concurrency considerations.
 
 ## KubeStellar Platform control
 
