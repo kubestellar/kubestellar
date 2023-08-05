@@ -2085,12 +2085,12 @@ that server has to be done by concurrent processes.  The
 kcp server to start handling kubectl requests, and making an alternate
 kubeconfig file for a set of clients to use.  This command is pointed
 at an existing kubeconfig file and reads it but does not write it; the
-alternate config file is written, with the same base name, into a
-parallel directory (which this command <code>mkdir -p</code>s).  This command
-takes exactly six command line positional arguments, as follows.</p>
+alternate config file is written (its directory must already exist and
+be writable).  This command takes exactly six command line positional
+arguments, as follows.</p>
 <ol>
-<li>Pathname (absolute or relative) of the directory holding the input kubeconfig.</li>
-<li>Filename of the input kubeconfig (just the base, no directory part).</li>
+<li>Pathname (absolute or relative) of the input kubeconfig.</li>
+<li>Pathname (absolute or relative) of the output kubeconfig.</li>
 <li>Name of the kubeconfig "context" that identifies what to replace.</li>
 <li>Domain name to put in the replacement server URLs.</li>
 <li>Port number to put in the replacement server URLs.</li>
@@ -2112,16 +2112,12 @@ There will be the following two differences.</p>
    the contents (base64 encoded, as usual) of the given CA certificate
    file.</li>
 </ol>
-<p>This command does a <code>mkdir -p</code> on a directory name that is the input
-kubeconfig directory name followed by a dash ("-") and the given
-domain name.  This command writes the alternate kubeconfig file into
-that directory.</p>
 <p>Following is an example of using this command and examining the
 results.  The context and port number chosen work for the kubeconfig
 file that <code>kcp start</code> (kcp release v0.11.0) creates by default.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">bash-5.2$ scripts/wait-and-switch-domain .kcp admin.kubeconfig root yep.yep 6443 ${pieces[0]}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">bash-5.2$ diff -w .kcp/admin.kubeconfig .kcp-yep.yep/admin.kubeconfig </span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml </span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">4,5c4,5</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">&lt;     certificate-authority-data: LS0...LQo=</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">&lt;     server: https://192.168.something.something:6443</span>
@@ -2148,7 +2144,7 @@ identifies what to replace.</p>
 <h3 id="switch-domain">switch-domain<a class="headerlink" href="#switch-domain" title="Permanent link">#</a></h3>
 <p>This command is the second part of <code>wait-and-switch-domain</code>: the part
 of creating the alternate kubeconfig file.  It has the same inputs and
-outputs.</p>
+outputs and concurrency considerations.</p>
 <h2 id="kubestellar-platform-control">KubeStellar Platform control<a class="headerlink" href="#kubestellar-platform-control" title="Permanent link">#</a></h2>
 <p>The <code>kubestellar</code> command has three subcommands, one to finish setup
 and two for process control.</p>
