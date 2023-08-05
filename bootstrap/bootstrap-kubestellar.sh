@@ -19,6 +19,7 @@
 # This script installs kcp and Kubestellar binaries to a folder of choice
 #
 # Arguments:
+# [--deploy bool] indicate if kubestellar (and kcp) will be deployed
 # [--kcp-version release] set a specific kcp release version, default: latest
 # [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
@@ -154,6 +155,7 @@ ensure_folder() {
 KCP_REQUIRED_VERSION="v0.11.0"
 kcp_version=""
 kubestellar_version=""
+deploy="true"
 os_type=""
 arch_type=""
 folder=""
@@ -177,6 +179,11 @@ while (( $# > 0 )); do
         if (( $# > 1 ));
         then { kubestellar_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
+        fi;;
+    (--deploy)
+        if (( $# > 1 ));
+        then { deploy="$2"; shift; }
+        else { echo "$0: missing value for --deploy" >&2; exit 1; }
         fi;;
     (--os)
         if (( $# > 1 ));
@@ -214,7 +221,7 @@ while (( $# > 0 )); do
 	set -x
 	flagx="-X";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--deploy bool] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
@@ -246,6 +253,13 @@ if [ "$folder" == "" ]; then
     folder="$PWD"
 fi
 
+case "$deploy" in
+    (true|false) ;;
+    (*) echo "$0: --deploy value must be 'true' or 'false'" >&2
+	exit 1;;
+esac
+
+
 # Ensure kcp is installed
 echo "< Ensure kcp is installed >----------------------"
 if [ "$(kcp_installed)" == "true" ]; then
@@ -271,51 +285,54 @@ else
     fi
 fi
 
-# Ensure kcp is running
-echo "< Ensure kcp is running >-----------------------"
-if [ "$(kcp_running)" == "true" ]; then
-    echo "kcp process is running already: pid=$(pgrep kcp) ... skip running."
-    if [ "$(kubeconfig_valid)" == "false" ]; then
-        echo "KUBECONFIG environment variable is not set correctly: KUBECONFIG='$KUBECONFIG' ... exiting!"
-        exit 3
-    fi
-    echo "Using 'KUBECONFIG=$KUBECONFIG'"
-    echo "Waiting for kcp to be ready... it may take a while"
-    until $(kcp_ready)
-    do
-        sleep 1
-    done
-    if [ "$(kcp_version)" != "$kcp_version" ]; then
-        echo "kcp running version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
-        exit 4
+if [ "$deploy" == true ]; then
+    # Ensure kcp is running
+    echo "< Ensure kcp is running >-----------------------"
+    if [ "$(kcp_running)" == "true" ]; then
+	echo "kcp process is running already: pid=$(pgrep kcp) ... skip running."
+	if [ "$(kubeconfig_valid)" == "false" ]; then
+            echo "KUBECONFIG environment variable is not set correctly: KUBECONFIG='$KUBECONFIG' ... exiting!"
+            exit 3
+	fi
+	echo "Using 'KUBECONFIG=$KUBECONFIG'"
+	echo "Waiting for kcp to be ready... it may take a while"
+	until $(kcp_ready)
+	do
+            sleep 1
+	done
+	if [ "$(kcp_version)" != "$kcp_version" ]; then
+            echo "kcp running version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
+            exit 4
+	else
+            echo "kcp version $(kcp_version) ... ok"
+	fi
     else
-        echo "kcp version $(kcp_version) ... ok"
+	if [ "$kcp_address" == "" ]; then
+            echo "Running kcp... logfile=$PWD/kcp_log.txt"
+            kcp start >& kcp_log.txt &
+	else
+            echo "Running kcp bound to address $kcp_address... logfile=$PWD/kcp_log.txt"
+            kcp start --bind-address $kcp_address >& kcp_log.txt &
+	fi
+	export KUBECONFIG="$PWD/.kcp/admin.kubeconfig"
+	echo "Waiting for kcp to be ready... it may take a while"
+	sleep 10
+	until $(kcp_ready)
+	do
+            sleep 1
+	done
+	sleep 10
+	if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
+            echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+            exit 4
+	else
+            echo "kcp version $(kcp_version) ... ok"
+	fi
+	echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
+	user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
     fi
-else
-    if [ "$kcp_address" == "" ]; then
-        echo "Running kcp... logfile=$PWD/kcp_log.txt"
-        kcp start >& kcp_log.txt &
-    else
-        echo "Running kcp bound to address $kcp_address... logfile=$PWD/kcp_log.txt"
-        kcp start --bind-address $kcp_address >& kcp_log.txt &
-    fi
-    export KUBECONFIG="$PWD/.kcp/admin.kubeconfig"
-    echo "Waiting for kcp to be ready... it may take a while"
-    sleep 10
-    until $(kcp_ready)
-    do
-        sleep 1
-    done
-    sleep 10
-    if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
-        echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
-        exit 4
-    else
-        echo "kcp version $(kcp_version) ... ok"
-    fi
-    echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
-    user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
 fi
+
 
 # Ensure KubeStellar is installed
 echo "< Ensure KubeStellar is installed >-------------"
@@ -342,23 +359,25 @@ else
     fi
 fi
 
-# Ensure KubeStellar is running
-echo "< Ensure KubeStellar is running >---------------"
-kubectl ws root > /dev/null
-if [ "$(kubestellar_running)" == "true" ]; then
-    echo "KubeStellar processes are running ... ok"
-    if ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
-        echo "KubeStellar ESPW does not exists ... run 'kubestellar stop' first ... exiting!"
-        exit 6
+if [ "$deploy" == true ]; then
+    # Ensure KubeStellar is running
+    echo "< Ensure KubeStellar is running >---------------"
+    kubectl ws root > /dev/null
+    if [ "$(kubestellar_running)" == "true" ]; then
+	echo "KubeStellar processes are running ... ok"
+	if ! kubectl get workspaces.tenancy.kcp.io espw &> /dev/null ; then
+            echo "KubeStellar ESPW does not exists ... run 'kubestellar stop' first ... exiting!"
+            exit 6
+	else
+            echo "KubeStellar ESPW found ... ok"
+	fi
     else
-        echo "KubeStellar ESPW found ... ok"
-    fi
-else
-    echo "Starting or restarting KubeStellar..."
-    if [ $verbose == "true" ]; then
-        kubestellar start -V
-    else
-        kubestellar start
+	echo "Starting or restarting KubeStellar..."
+	if [ $verbose == "true" ]; then
+            kubestellar start -V
+	else
+            kubestellar start
+	fi
     fi
 fi
 
@@ -367,9 +386,9 @@ if [ "$kubestellar_imw" != "" ]; then
     echo "Ensuring IMW \"$kubestellar_imw\"..."
     if ! kubectl ws $kubestellar_imw &> /dev/null ; then
         if [ "$verbose" != "" ]; then
-            kubectl ws create $kubestellar_imw
+	    kubectl ws create $kubestellar_imw
         else
-            kubectl ws create $kubestellar_imw > /dev/null
+	    kubectl ws create $kubestellar_imw > /dev/null
         fi
     fi
 fi
@@ -387,11 +406,13 @@ if [ "$kubestellar_wmw" != "" ]; then
 fi
 
 
-if [ "$verbose" == "true" ]; then
-    kubectl ws root
-    kubectl ws tree
-else
-    kubectl ws root > /dev/null
+if [ "$deploy" == true ]; then
+    if [ "$verbose" == "true" ]; then
+	kubectl ws root
+	kubectl ws tree
+    else
+	kubectl ws root > /dev/null
+    fi
 fi
 
 echo "< KubeStellar bootstrap completed successfully >-"

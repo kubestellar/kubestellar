@@ -1,16 +1,21 @@
 ---
 short_name: commands
 ---
-This PoC includes two sorts of commands for users to use.  Most are
-executables delivered in the `bin` directory.  The other sort of
-command for users is a `bash` script that is designed to be fetched
-from github and fed directly into `bash`.
 
-# Executables
+This PoC includes two sorts of commands for users to use. Most are
+executables designed to be accessed in the usual ways: by appearing in
+a directory on the user's `$PATH` or by the user writing a pathname
+for the executable on the command line. The one exception is [the
+bootstrap script](#bootstrap), which is designed to be fetched from
+github and fed directly into `bash`.
 
-The command lines exhibited below presume that you have added the
-`bin` directory to your `$PATH`.  Alternatively: these executables can
-be invoked directly using any pathname (not in your `$PATH`).
+Most of these executables require that the kcp server be running and
+that `kubectl` is configured to use the kubeconfig file produced by
+`kcp start`. That is: either `$KUBECONFIG` holds the pathname of that
+kubeconfig file, its contents appear at `~/.kube/config`, or
+`--kubeconfig $pathname` appears on the command line.  The exceptions
+are the bootstrap script and [the kcp control script that runs before
+starting the kcp server](#kubestellar-ensure-kcp-server-creds).
 
 **NOTE**: all of the kubectl plugin usages described here certainly or
 potentially change the setting of which kcp workspace is "current" in
@@ -28,9 +33,12 @@ server can bind its socket to.  The key idea is using the
 server to respond with a bespoke server certificate in TLS handshakes
 in which the client addresses the server by a given domain name.
 
-These commands are designed so that they can be used multiple times if
-there are multiple sets of clients that need to use a distinct domain
-name.
+These commands are used separately from starting the kcp server and
+are designed so that they can be used multiple times if there are
+multiple sets of clients that need to use a distinct domain name.
+Starting the kcp server is not described here, beyond the particular
+consideration needed for the `--tls-sni-cert-key` flag, because it is
+otherwise ordinary.
 
 ### kubestellar-ensure-kcp-server-creds
 
@@ -707,9 +715,7 @@ Current workspace is "root:my-org".
 kubectl kubestellar remove wmw demo1
 ```
 
-# Web-to-bash
-
-## Quick Setup
+## Bootstrap
 
 This is a combination of some installation and setup steps, for use in
 [the
@@ -764,62 +770,3 @@ the shell running the script.  Of course, if you run the script in a
 sub-shell then those environment effects terminate with that
 sub-shell; this script also prints out messages showing how to update
 the environment in another shell.
-
-## Install kcp and its kubectl plugins
-
-This script is directly available at [{{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kcp-with-plugins.sh) and does the following things.
-
-- Fetch and install the `kcp` server executable.
-- Fetch and install the kubectl plugins of kcp.
-
-This script accepts the following command line flags; all are
-optional.
-
-- `--version $version`: specifies the kcp release to use.  The default
-  is the latest.
-- `--OS $OS`: specifies the operating system to use in selecting the
-  executables to fetch and install.  Choices are `darwin` and `linux`.
-  Auto-detected if omitted.
-- `--arch $ARCH`: specifies the instruction set architecture to use in
-  selecting the executables to fetch and install.  Choices are `arm64`
-  and `amd64`.  Auto-detected if omitted.
-- `--ensure-folder $install_parent_dir`: specifies where to install
-  to.  This will be `mkdir -p`.  The default is `./kcp`.
-- `-V` or `--verbose`: increases the verbosity of output.  This is a
-  binary thing, not a matter of degree.
-- `-X`: makes the script `set -x` internally, for debugging.
-- `-h` or `--help`: print brief usage message and exit.
-
-Here install means only to unpack the downloaded archives, creating
-`$install_parent_dir/bin`.  If `$install_parent_dir/bin` is not
-already on your `$PATH` then this script will print out a message
-telling you to add it.
-
-## Install KubeStellar
-
-This script is directly available at
-[{{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/install-kubestellar.sh)
-and will download and install KubeStellar.
-
-This script accepts the following command line arguments; all are
-optional.
-
-- `--version $version`: specifies the release of KubeStellar to use.
-  Defaults to the latest regular release.
-- `--OS $OS`: specifies the operating system to use in selecting the
-  executables to fetch and install.  Choices are `darwin` and `linux`.
-  Auto-detected if omitted.
-- `--arch $ARCH`: specifies the instruction set architecture to use in
-  selecting the executables to fetch and install.  Choices are `arm64`
-  and `amd64`.  Auto-detected if omitted.
-- `--ensure-folder $install_parent_dir`: specifies where to install
-  to.  This will be `mkdir -p`.  The default is `./kubestellar`.
-- `-V` or `--verbose`: increases the verbosity of output.  This is a
-  binary thing, not a matter of degree.
-- `-X`: makes the script `set -x` internally, for debugging.
-- `-h` or `--help`: print brief usage message and exit.
-
-Here install means only to unpack the downloaded archive, creating
-`$install_parent_dir/bin`.  If `$install_parent_dir/bin` is not
-already on your `$PATH` then this script will print out a message
-telling you to add it.
