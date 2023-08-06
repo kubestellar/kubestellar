@@ -14,23 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo -e
+set -e
 
 echo "< Starting Kubestellar container >-------------------------"
 
 # Try to guess the route/ingress
 if [ -z "$EXTERNAL_HOSTNAME" ]; then
-    EXTERNAL_HOSTNAME=$(kubectl get route kubestellar-route -o yaml -o jsonpath={.spec.host} 2> /dev/null)
+    if kubectl get route kubestellar-route &> /dev/null; then
+        EXTERNAL_HOSTNAME=$(kubectl get route kubestellar-route -o yaml -o jsonpath={.spec.host} 2> /dev/null)
+    fi
 fi
 if [ -z "$EXTERNAL_HOSTNAME" ]; then
-    EXTERNAL_HOSTNAME=$(kubectl get ingress kubestellar-ingress -o yaml -o jsonpath={.spec.rules[0].host} 2> /dev/null)
+    if kubectl get ingress kubestellar-ingress &> /dev/null; then
+        EXTERNAL_HOSTNAME=$(kubectl get ingress kubestellar-ingress -o yaml -o jsonpath={.spec.rules[0].host} 2> /dev/null)
+    fi
 fi
 
 # Create the certificates
 if [ -n "$EXTERNAL_HOSTNAME" ]; then
-    echo "< Creating the TLS certificate >---------------------------"
+    echo "< Ensuring the TLS certificate >---------------------------"
     eval pieces=($(kubestellar-ensure-kcp-server-creds ${EXTERNAL_HOSTNAME}))
-    echo "Server=${EXTERNAL_HOSTNAME}"
+    echo "TLS certificates for server ${EXTERNAL_HOSTNAME}:"
     echo ${pieces[0]}
     echo ${pieces[1]}
     echo ${pieces[2]}
@@ -39,21 +43,20 @@ fi
 # Start kcp
 echo "< Starting kcp >-------------------------------------------"
 
-mkdir -p ${PWD}/kubestellar-logs # required in oc
+mkdir -p ${PWD}/kubestellar-logs # required in Open Shift clusters
 
-if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp/admin.kubeconfig" ]; then
-    echo -n "Running kcp with cert key... "
+if [ -n "$EXTERNAL_HOSTNAME" ]; then
+    echo -n "Running kcp with TLS keys... "
     kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &>> "${PWD}/kubestellar-logs/kcp.log" &
 else
-    echo -n "Running kcp... "
+    echo -n "Running kcp without TLS keys... "
     kcp start &>> "${PWD}/kubestellar-logs/kcp.log" &
 fi
 echo "logfile=./kubestellar-logs/kcp.log"
 
 echo "Waiting for kcp to be ready... it may take a while"
-until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]
-do
-    sleep 1
+until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]; do
+    sleep 5
 done
 
 echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
@@ -61,9 +64,8 @@ echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*
 kubectl ws root
 
 if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp-${EXTERNAL_HOSTNAME}" ]; then
-    echo "Switching the admin.kubeconfig domain to ${EXTERNAL_HOSTNAME}..."
-    switch-domain .kcp admin.kubeconfig root ${EXTERNAL_HOSTNAME} ${EXTERNAL_PORT} ${pieces[0]}
-    cp ${PWD}/.kcp-${EXTERNAL_HOSTNAME}/admin.kubeconfig ${PWD}/.kcp/external.kubeconfig
+    echo "Switching the admin.kubeconfig domain to ${EXTERNAL_HOSTNAME} and port ${EXTERNAL_PORT}..."
+    switch-domain .kcp/admin.kubeconfig .kcp/external.kubeconfig root ${EXTERNAL_HOSTNAME} ${EXTERNAL_PORT} ${pieces[0]}
 fi
 
 # Starting KubeStellar
@@ -77,13 +79,21 @@ echo "< Create secrets >-----------------------------------------"
 KUBECONFIG= #/home/kubestellar/.kube/config
 
 echo "Ensure secret in the current namespace..."
-if kubectl get secret kubestellar &> /dev/null; then
-    kubectl delete secret kubestellar
+if kubectl delete secret kubestellar 2> /dev/null; then
+    echo " Deleted secret in the current namespace."
 fi
 if [ -n "${EXTERNAL_HOSTNAME}" ]; then
-    kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp/external.kubeconfig"
+    if kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp/external.kubeconfig" 2> /dev/null; then
+        echo " Created secret in the current namespace."
+    else
+        echo " Not running in a cluster!"
+    fi
 else
-    kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig"
+    if kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" 2> /dev/null; then
+        echo " Created secret in the current namespace."
+    else
+        echo " Not running in a cluster!"
+    fi
 fi
 
 # Done, sleep forerver...

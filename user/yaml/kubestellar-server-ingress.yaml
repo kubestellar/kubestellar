@@ -87,13 +87,13 @@ spec:
       serviceAccountName: kubestellar-service-account
       containers:
       - name: kubestellar-server
-        image: quay.io/kubestellar/kubestellar:fs # for testing, change to :stable
-        imagePullPolicy: Always # for testing, change to IfNotPresent
+        image: quay.io/kubestellar/kubestellar:stable
+        imagePullPolicy: IfNotPresent
         env:
         - name: EXTERNAL_HOSTNAME
           value: ""
         - name: EXTERNAL_PORT
-          value: "443"
+          value: "1024"
         volumeMounts:
         - name: kubestellar-pv
           mountPath: "/home/kubestellar/kubestellar-logs"

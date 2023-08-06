@@ -63,7 +63,6 @@ run:
 		-p ${EXTERNAL_PORT}:6443 \
 		-e EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME} \
 		-e EXTERNAL_PORT=${EXTERNAL_PORT} \
-		--user $(shell id -u) \
 		--name ${NAME} \
 		${IMG}:${TAG}
 	$(info Waiting for KubeStellar to be ready... it may take a while!)

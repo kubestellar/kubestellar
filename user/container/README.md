@@ -125,7 +125,7 @@ which should return something like:
     └── espw
 ```
 
-At this point, one can follow the instructions and examples in **KubeStellar** [Quickstart](https://docs.kubestellar.io/release-0.3/Getting-Started/quickstart/).
+At this point, one can follow the instructions and examples in **KubeStellar** [Quickstart](https://docs.kubestellar.io/main/Getting-Started/quickstart/).
 
 ## Login into the running container to use **KubeStellar** from inside the container
 

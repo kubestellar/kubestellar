@@ -49,12 +49,11 @@ RUN groupadd kubestellar && \
 ADD entry.sh            entry.sh
 ADD kubestellar-patch   kubestellar/bin
 
-RUN chown -R kubestellar:kubestellar /home/kubestellar && \
-    chgrp -R 0 /home/kubestellar && \
+RUN chown -R kubestellar:0 /home/kubestellar && \
     chmod -R g=u /home/kubestellar
 
 # List volumes of ineterest
-VOLUME [ "/home/kubestellar/.kcp" , "/home/kubestellar/kubestellar-logs" , "/home/kubestellar/kcp" , "/home/kubestellar/kcp-plugins" , "/home/kubestellar/kubestellar" ]
+VOLUME [ "/home/kubestellar/.kcp" , "/home/kubestellar/kubestellar-logs" ]
 
 # Setup the environment variables
 ENV PATH=$PATH:/home/kubestellar/easy-rsa:/home/kubestellar/kcp/bin:/home/kubestellar/kcp-plugins/bin:/home/kubestellar/kubestellar/bin
