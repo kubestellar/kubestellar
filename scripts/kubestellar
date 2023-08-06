@@ -34,6 +34,7 @@ verbdir="&> /dev/null"
 remove=0
 cleanup=0
 espw_name="espw"
+space_mgt_name="space-mgt"
 log_folder=$(pwd)/kubestellar-logs
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -243,6 +244,25 @@ EOF
     echo "Finished augmenting root:compute for KubeStellar"
 }
 
+function ensure_space_mgt() {
+    echo "space-mgt workspace setup" #TODO remove
+    kubectl ws root &> /dev/null
+    $SCRIPT_DIR/space-provider-config "$KUBECONFIG" "$SCRIPT_DIR/../config/space/provider_kcp.yaml"
+    if kubectl get Workspace "$space_mgt_name" &> /dev/null; then
+	echo "space-mgt workspace already exists -- using it:"
+	kubectl ws "$space_mgt_name"
+    else
+        kubectl ws create "$space_mgt_name" --enter
+    fi
+    kubectl ws create-context --overwrite
+    # create space CRDs
+    eval kubectl create -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaces.yaml" $verbdir
+    eval kubectl create -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaceproviderdescs.yaml" $verbdir
+    # deploy KCP provider
+    eval kubectl create -f "$SCRIPT_DIR/../config/space/provider_kcp.yaml" $verbdir
+    echo "Finished populating the space-mgt with kubestellar apiexports"
+}
+
 # current ws at start does not matter, is ESPW on return
 function ensure_espw() {
     kubectl ws root &> /dev/null
@@ -258,8 +278,16 @@ function ensure_espw() {
 
 if [ "$subcommand" == init ]; then
     ensure_root_compute_configd
+    ensure_space_mgt
     ensure_espw
     exit
+fi
+
+# Check space-manager is already running
+if [ $(process_running space-manager) == "running" ]
+then
+    echo "An older deployment of space-manager is already running - terminating it ...."
+    pkill -f space-manager
 fi
 
 # Check mailbox-controller is already running
@@ -289,6 +317,7 @@ if [ $subcommand == stop ]; then
 fi
 
 ensure_root_compute_configd
+ensure_space_mgt
 ensure_espw
 
 wait_for_process(){
@@ -323,6 +352,17 @@ if [[ ! -d $log_folder ]]; then
     mkdir -p $log_folder
 fi
 
+space-manager -context "root:"$space_mgt_name -v=2 >> $log_folder/space-manager-log.txt 2>&1 &
+run_status=$(wait_for_process space-manager)
+if [ $run_status -eq 0 ]; then
+    echo " space-manager is running (log file: $log_folder/space-manager-log.txt)"
+else
+    echo " space-manager failed to start ..... exiting"
+    sleep 2
+    exit 1
+fi
+
+sleep 3
 mailbox-controller -v=2 >> $log_folder/mailbox-controller-log.txt 2>&1 &
 
 run_status=$(wait_for_process mailbox-controller)

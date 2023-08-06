@@ -35,6 +35,7 @@ done
 
 
 pkill -f kcp
+pkill -f space-manager
 pkill -f mailbox-controller
 pkill -f placement-translator
 pkill -f kubestellar-where-resolver
