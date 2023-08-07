@@ -46,9 +46,11 @@ metadata:
   namespace: kubestellar
 rules:
 - resources: [ "secrets" ]
+  resourceNames: [ kubestellar ]
   verbs: [ "create" , "delete" ]
   apiGroups: [ "" ]
 - resources: [ "ingresses" ]
+  resourceNames: [ kubestellar-ingress ]
   verbs: [ "get" ]
   apiGroups: [ "networking.k8s.io" ]
 

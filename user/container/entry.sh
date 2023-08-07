@@ -76,7 +76,8 @@ kubestellar start
 # Create secrets in Kuberntes cluster
 echo "< Create secrets >-----------------------------------------"
 
-KUBECONFIG= #/home/kubestellar/.kube/config
+# set KUBECONFIG to empty string so that `kubectl` falls back on its in-cluster technique for reading credentials from the filesystem.
+KUBECONFIG=
 
 echo "Ensure secret in the current namespace..."
 if kubectl delete secret kubestellar 2> /dev/null; then

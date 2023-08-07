@@ -431,7 +431,7 @@ spec:
         - --validating-webhook-key=/usr/local/certificates/key
         - --watch-ingress-without-class=true
         - --publish-status-address=localhost
-        - --enable-ssl-passthrough=true # FS: TLS passthrough
+        - --enable-ssl-passthrough=true # Enable TLS passthrough
         env:
         - name: POD_NAME
           valueFrom:

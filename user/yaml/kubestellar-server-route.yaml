@@ -46,9 +46,11 @@ metadata:
   namespace: kubestellar
 rules:
 - resources: [ "secrets" ]
+  resourceNames: [ kubestellar ]
   verbs: [ "create" , "delete" ]
   apiGroups: [ "" ]
 - resources: [ "routes" ]
+  resourceNames: [ kubestellar-route ]
   verbs: [ "get" ]
   apiGroups: [ "route.openshift.io" ]
 

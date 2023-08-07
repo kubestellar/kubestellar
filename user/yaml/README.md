@@ -6,7 +6,7 @@ Table of contests:
   - [Deploy **KubeStellar** in an **OpenShift** cluster](#deploy-kubestellar-in-an-openshift-cluster)
   - [Access **KubeStellar** service directly from the host OS without `admin.kubeconfig` or executables](#access-kubestellar-service-directly-from-the-host-os-without-adminkubeconfig-or-executables)
   - [Access **KubeStellar** service from the host OS by extracting the `admin.kubeconfig` and the executables from the pod](#access-kubestellar-service-from-the-host-os-by-extracting-the-adminkubeconfig-and-the-executables-from-the-pod)
-  - [Access **KubeStellar** from another pod in the same `kubestellar` namespace](#access-kubestellar-from-another-pod-in-the-same-kubestellar-namespace)
+  - [Access **KubeStellar** from another pod](#access-kubestellar-from-another-pod)
   - [Add a new cluster to **KubeStellar** inventory](#add-a-new-cluster-to-kubestellar-inventory)
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
@@ -32,7 +32,7 @@ nodes:
 EOF
 ```
 
-Create an `nginx-ingress` with SSL passthrough using the YAML file [kind-nginx-ingress-with-SSL-passthrough.yaml](./kind-nginx-ingress-with-SSL-passthrough.yaml):
+Create an `nginx-ingress` with SSL passthrough. Following [Kind NGINX ingress instructions](https://kind.sigs.k8s.io/docs/user/ingress/), we have modified the YAML at https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml to include the `--enable-ssl-passthrough=true` argument. The modified YAML file is here included as [kind-nginx-ingress-with-SSL-passthrough.yaml](./kind-nginx-ingress-with-SSL-passthrough.yaml):
 
 ```shell
 kubectl apply -f kind-nginx-ingress-with-SSL-passthrough.yaml
@@ -279,16 +279,16 @@ $ kubectl ws tree
     └── espw
 ```
 
-## Access **KubeStellar** from another pod in the same `kubestellar` namespace
+## Access **KubeStellar** from another pod
 
-Any pod in the same namespace can access **KubeStellar** by retrieving the `admin.kubeconfig` via one of the following ways:
+A pod can access **KubeStellar** by retrieving the `admin.kubeconfig` via one of the following ways:
 
 - the `kubestellar` secret in the `kubestellar` namespace;
 - directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp/external.kubeconfig`.
 
 Obviously `kubectl`, **kcp** plugins, and **KubeStellar** executables are also needed.
 
-In this example, we create a `kubestellar-client` pod based on the same image of `kubestellar-server` since it already contains the required executables listed above:
+In this example, we create a `kubestellar-client` pod based on the same image of `kubestellar-server` since it already contains the required executables mentioned above:
 
 ```shell
 $ kubectl apply -f kubestellar-client.yaml
