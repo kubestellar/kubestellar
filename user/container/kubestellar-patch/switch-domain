@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# Usage: $0 inpath outpath context domain port
+
+# Reads a kubeconfig file from $inpath and writes a modified
+# kubeconfig file on $outpath.
+# The modification consists of setting the host:port in the
+# server URL in the clusters whose protocol://host:port originally
+# matched that of the cluster of the given context.
+
+if [ $# != 6 ]; then
+   echo "Usage: $0 inpath outpath context domain port cacert_file" >&2
+   exit 1
+fi
+
+set -o errexit
+set -o pipefail
+
+inpath="$1"
+shift
+outpath="$1"
+shift
+context=$1
+shift
+domain=$1
+shift
+port=$1
+shift
+cacert_file="$1"
+
+if ! cacert=$(base64 -w 0 < "$cacert_file" 2>/dev/null) ; then
+    cacert=$(base64 < "$cacert_file")
+fi
+
+export context
+protocluster=$(yq '.contexts[] | select(.name == strenv(context)) | .context.cluster' "$inpath")
+
+if [ -z "$protocluster" ]; then
+   echo "$0: there is no context named ${context@Q}" >&2
+   exit 10
+fi
+export protocluster
+protourl=$(yq '.clusters[] | select(.name == strenv(protocluster)) | .cluster.server' "$inpath")
+
+protocol=$(cut -d: -f1 <<<$protourl)
+authpath=$(cut -d: -f2- <<<$protourl)
+authority=${protocol}:$(cut -d/ -f1-3 <<<$authpath)
+authpat="^"$(sed 's/\./\\./g' <<<$authority)
+replacement="${protocol}://${domain}:${port}"
+
+export authpat replacement cacert
+
+midpath=/tmp/$$
+
+yq '(.clusters[] | .cluster | select(.server | test(strenv(authpat))) | .certificate-authority-data) = strenv(cacert)' $inpath > $midpath
+yq '(.clusters[] | .cluster | select(.server | test(strenv(authpat))) | .server) |= ( . | sub(strenv(authpat), strenv(replacement)) )' $midpath > $outpath
+
+rm $midpath

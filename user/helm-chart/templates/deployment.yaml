@@ -1,0 +1,51 @@
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.prefix }}-server
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.prefix }}-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.prefix }}-server
+    spec:
+      serviceAccountName: {{ .Values.prefix }}-sa
+      containers:
+      - name: {{ .Values.prefix }}-server
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+        volumeMounts:
+        - name: {{ .Values.prefix }}-pv
+          mountPath: "/home/kubestellar/kubestellar-logs"
+          readOnly: false
+        ports:
+        - name: ks-port
+          protocol: TCP
+          containerPort: 6443
+      volumes:
+      - name: {{ .Values.prefix }}-pv
+        persistentVolumeClaim:
+          claimName: {{ .Values.prefix }}-pvc

@@ -1,0 +1,53 @@
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubestellar-client
+  namespace: kubestellar
+spec:
+  selector:
+    matchLabels:
+      app: kubestellar-client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubestellar-client
+    spec:
+      containers:
+      - name: kubestellar-client
+        image: quay.io/kubestellar/kubestellar:fs
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        # - name: kubestellar-pv
+        #   mountPath: "/kubestellar/home"
+        #   readOnly: true
+        - name: kubestellar-kc
+          mountPath: "/kubestellar/home/.kcp"
+          readOnly: true
+        command: [ "/bin/bash" ]
+        args:
+          - -c
+          - >-
+              echo Sleeping...
+              && sleep 100000
+      volumes:
+      # - name: kubestellar-pv
+      #   persistentVolumeClaim:
+      #     claimName: kubestellar-pvc
+      - name: kubestellar-kc
+        secret:
+          secretName: kubestellar

@@ -21,7 +21,8 @@ KUBESTELLAR_LATEST := $(shell curl -sL https://raw.githubusercontent.com/kubeste
 KUBESTELLAR_VERSION ?= ${KUBESTELLAR_STABLE}
 TAG ?= ${KUBESTELLAR_VERSION}
 BASEPATH ?= ${HOME}
-EXTERNAL_HOSTNAME ?= "" # $(shell ifconfig | grep -A 1 "enp0s8" | tail -1 | awk '{print $$2}')
+EXTERNAL_HOSTNAME ?= localhost
+EXTERNAL_PORT ?= 6443
 
 
 # Build a local container image for the host architecture
@@ -57,18 +58,20 @@ run:
 	$(info Arguments: NAME=${NAME})
 	$(info Arguments: BASEPATH=${BASEPATH})
 	$(info Arguments: EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME})
-	mkdir -p ${BASEPATH}/.kcp ${BASEPATH}/kubestellar-logs
+	$(info Arguments: EXTERNAL_PORT=${EXTERNAL_PORT})
 	docker run -d \
-		-p 6443:6443 \
-		-v ${BASEPATH}/.kcp:/.kcp \
-		-v ${BASEPATH}/kubestellar-logs:/kubestellar-logs \
+		-p ${EXTERNAL_PORT}:6443 \
 		-e EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME} \
-		--user $(shell id -u) \
-		--name ${NAME} ${IMG}:${TAG}
-	docker cp ${NAME}:/kcp-plugins ${BASEPATH}/kcp
-	docker cp ${NAME}:/kubestellar ${BASEPATH}/kubestellar
+		-e EXTERNAL_PORT=${EXTERNAL_PORT} \
+		--name ${NAME} \
+		${IMG}:${TAG}
+	$(info Waiting for KubeStellar to be ready... it may take a while!)
+	until docker logs kubestellar 2>&1 | grep -Fxq "Ready!" ; do sleep 1 ; done
+	docker cp ${NAME}:/home/kubestellar/.kcp ${BASEPATH}/.kcp
+	docker cp ${NAME}:/home/kubestellar/kcp-plugins ${BASEPATH}/kcp-plugins
+	docker cp ${NAME}:/home/kubestellar/kubestellar ${BASEPATH}/kubestellar
 	$(info export KUBECONFIG=${BASEPATH}/.kcp/admin.kubeconfig)
-	$(info export PATH=$$PATH:${BASEPATH}/kcp:${BASEPATH}/kubestellar/bin)
+	$(info export PATH=$$PATH:${BASEPATH}/kcp-plugins/bin:${BASEPATH}/kubestellar/bin)
 
 
 # Login into the running container
@@ -93,4 +96,4 @@ clean:
 	$(info Arguments: TAG=${TAG})
 	$(info Arguments: BASEPATH=${BASEPATH})
 	- docker image rm ${IMG}:${TAG}
-	- rm -rf  ${BASEPATH}/.kcp ${BASEPATH}/kcp ${BASEPATH}/kubestellar ${BASEPATH}/kubestellar-logs
+	- rm -rf  ${BASEPATH}/.kcp ${BASEPATH}/kcp-plugins ${BASEPATH}/kubestellar

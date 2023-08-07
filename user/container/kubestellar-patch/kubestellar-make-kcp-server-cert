@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Usage: $0 $FILE_NAME_BASE $subject_alt_names
+
+# Assumes easy-rsa PKI with CA is at $PWD/pki.
+# Creates server public cert and private key at
+# pki/${FILE_NAME_BASE}.crt and pki/${FILE_NAME_BASE}.key.
+# Creates an elliptic curve key.
+# Makes a cert good for 10000 days.
+
+if [ $# != 2 ] ; then
+    echo "Usage: $0 \$FILE_NAME_BASE \$subject_alt_names" >&2
+    exit 1
+fi
+
+set -e
+
+FILE_NAME_BASE="$1"
+shift
+SAN="$1"
+
+export EASYRSA_PKI=${PWD}/pki
+
+rm -f "${EASYRSA_PKI}/reqs/${FILE_NAME_BASE}.req" "${EASYRSA_PKI}/issued/${FILE_NAME_BASE}.crt" "${EASYRSA_PKI}/private/${FILE_NAME_BASE}.key"
+easyrsa --batch --use-algo=ec \
+    --subject-alt-name="$SAN" \
+    --days=10000 \
+    build-server-full "$FILE_NAME_BASE" nopass
