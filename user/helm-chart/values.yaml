@@ -31,6 +31,6 @@ storageSize: 1Gi
 clusterType: Kubernetes # OpenShift or Kubernetes
 
 # Parameters for setting up the externally accessible kubeconfig
-HOSTNAME: "kubestellar.svc.cluster.local" # leave it empty to let the cluster set it up
+HOSTNAME: "" # leave it empty to let the cluster set it up
 EXTERNAL_HOSTNAME: "" # an empty string will let the container infer its ingress/route
-EXTERNAL_PORT: 1024
+EXTERNAL_PORT: 443

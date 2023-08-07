@@ -197,7 +197,7 @@ done
 
 Note that, alternatively, one can wait for the `kubestellar` secret to be created.
 
-After the deployment has completed, **KubeStellar** `admin.kubeconfig` can be in two ways:
+After the deployment has completed, **KubeStellar** `admin.kubeconfig` can be obtained in two ways:
 
 - the `kubestellar` secret in the `kubestellar` namespace;
 - directly from the `kubestellar` pod in the `kubestellar` namespace at the location `/home/kubestellar/.kcp/external.kubeconfig`.
