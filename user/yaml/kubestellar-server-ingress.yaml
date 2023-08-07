@@ -45,14 +45,14 @@ metadata:
   name: kubestellar-role
   namespace: kubestellar
 rules:
-- resources: [ "secrets" ]
-  resourceNames: [ kubestellar ]
+- apiGroups: [ "" ]
+  resources: [ "secrets" ]
+  # resourceNames: [ "kubestellar" ]
   verbs: [ "create" , "delete" ]
-  apiGroups: [ "" ]
-- resources: [ "ingresses" ]
-  resourceNames: [ kubestellar-ingress ]
+- apiGroups: [ "networking.k8s.io" ]
+  resources: [ "ingresses" ]
+  resourceNames: [ "kubestellar-ingress" ]
   verbs: [ "get" ]
-  apiGroups: [ "networking.k8s.io" ]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

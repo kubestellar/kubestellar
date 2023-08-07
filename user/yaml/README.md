@@ -11,7 +11,7 @@ Table of contests:
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
-Create a **Kind** cluster with the `extraPortMappings` for ports `80` and `443`:
+Create a **Kind** cluster with the `extraPortMappings` for port `1024`:
 
 ```shell
 kind create cluster --config=- <<EOF
