@@ -63,15 +63,24 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
+        ``` title="slsa-verifier - https://github.com/slsa-framework (verify ko signer)
+        SLSA_VERIFIER=slsa-verifier-linux-$(dpkg --print-architecture)
+        curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}
+        chmod +x ${SLSA_VERIFIER}
+        curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}.intoto.jsonl
+        ./${SLSA_VERIFIER} verify-artifact ./${SLSA_VERIFIER} --provenance-path ${SLSA_VERIFIER}.intoto.jsonl --source-uri github.com/slsa-framework/slsa-verifier
+        sudo install ./${SLSA_VERIFIER} /usr/local/bin/slsa-verifier
+        ```
         ``` title="ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)"
-        VERSION=TODO # choose the latest version (without v prefix)
-        OS=Linux     # or Darwin
-        ARCH=x86_64  # or arm64, i386, s390x
-        curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
-        curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl > provenance.intoto.jsonl
-        slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag "v${VERSION}"
+        KO_VERSION=$(curl -sSf https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name') # latest version (with v prefix)
+        OS=$(uname -s)     # Linux, Darwin
+        ARCH=$(uname -m)  # x86_64, arm64, i386, s390x
+        curl -sSfL "https://github.com/ko-build/ko/releases/download/${KO_VERSION}/ko_${KO_VERSION#v}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
+        curl -sSfL https://github.com/ko-build/ko/releases/download/${KO_VERSION}/multiple.intoto.jsonl > multiple.intoto.jsonl
+        slsa-verifier verify-artifact ko.tar.gz --provenance-path multiple.intoto.jsonl --source-uri github.com/ko-build/ko --source-tag "${KO_VERSION}"
         tar xzf ko.tar.gz ko
         chmod +x ./ko
+        ./ko version
         ```
         ``` title="GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19"
         curl -L "https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz" -o go.tar.gz
