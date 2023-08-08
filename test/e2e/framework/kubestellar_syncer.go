@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	workloadcliplugin "github.com/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
 	"github.com/stretchr/testify/require"
 
 	corev1 "k8s.io/api/core/v1"
@@ -49,7 +50,6 @@ import (
 
 	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	workloadcliplugin "github.com/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
