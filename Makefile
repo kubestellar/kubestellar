@@ -16,7 +16,7 @@
 SHELL := /usr/bin/env bash -e
 
 CENTER_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
-CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +built-%F-%H-%M-%S)
+CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +b%y-%m-%d-%H-%M-%S)
 
 GO_INSTALL = ./hack/go-install.sh
 
