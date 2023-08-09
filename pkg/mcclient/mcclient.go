@@ -36,7 +36,7 @@ import (
 	mcclientset "github.com/kubestellar/kubestellar/pkg/mcclient/clientset"
 )
 
-const defaultProviderNs = "lcprovider-default"
+const defaultProviderNs = "spaceprovider-default"
 
 type KubestellarSpaceInterface interface {
 	// Space returns clientset for given space.

@@ -33,7 +33,7 @@ func main() {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	kubeConfigPath := os.Getenv("HOME") + "/.kube/config"
+	kubeConfigPath := os.Getenv("KUBECONFIG")
 
 	managementSpaceConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {

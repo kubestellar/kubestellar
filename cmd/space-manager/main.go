@@ -19,13 +19,12 @@ package main
 import (
 	"context"
 	"flag"
-	"path/filepath"
+	"os"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
 
 	ksclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
@@ -38,24 +37,18 @@ var (
 	numThreads   = 2
 )
 
-const managerSpaceContext string = "kind-mgt"
-
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	klog.InitFlags(flag.CommandLine)
 	logger := klog.FromContext(ctx)
-
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
+	managerSpaceContext := flag.String("context", "kind-mgt", "space management context")
+	kubeconfig := flag.String("kubeconfig", os.Getenv("KUBECONFIG"), "absolute path to the kubeconfig file")
 	flag.Parse()
 
 	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: *kubeconfig},
-		&clientcmd.ConfigOverrides{CurrentContext: managerSpaceContext}).ClientConfig()
+		&clientcmd.ConfigOverrides{CurrentContext: *managerSpaceContext}).ClientConfig()
 	if err != nil {
 		logger.Error(err, "Error")
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
