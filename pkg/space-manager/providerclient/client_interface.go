@@ -20,38 +20,20 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
-func New(cfg string, opts Options) *SpaceInfo {
-	return &SpaceInfo{
-		Name:   opts.Name,
-		Config: cfg,
-	}
-}
-
-// TODO: Overly simplistic and possibly better served as an interface
+// SpaceInfo is a minimal space information.
 type SpaceInfo struct {
-	// the name of the space.
+	// Name is the name of the space.
 	Name string
 
-	// the config as it exists in kubeconfig of the space.
-	// TODO - figure out which fields in the config we need and keep those only
+	// Config is a space raw access config.
 	Config string
 }
 
-// Options are the possible options that can be configured for a SpaceInfo.
-// TODO: for now I am listing just the name and url. Need to add whatever is needed to enable access.
+// Options are the possible options for provider create/delete operations.
 type Options struct {
-	// Name is the unique name of the space.
-	Name string
-
-	// URL
-	Url string
-
-	// Path to kubeconfig
-	KubeconfigPath string
+	// Parent is a name of parent space in space hierarchy.
+	Parent string
 }
-
-// ES: change file name,
-// the Watch is here due to circular dependency. Try to solve
 
 // Watcher watches for changes to spaces and provides events to a channel
 // for the Manager to react to.
@@ -80,6 +62,7 @@ type WatchEvent struct {
 	// 		A periodic event is sent that contains no new data: ignored.
 	Type watch.EventType
 
+	// SpaceInfo is a minimal space information.
 	SpaceInfo SpaceInfo
 
 	// Name is the name of the space related to the event.

@@ -5,3 +5,4 @@ metadata:
   namespace: "spaceprovider-default"
 spec:
   SpaceProviderDescName: "default"
+  Managed: true

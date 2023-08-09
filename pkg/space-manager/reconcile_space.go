@@ -26,6 +26,7 @@ import (
 )
 
 const finalizerName = "SpaceFinalizer"
+const spacePathAnnotationKey = "kubestellar.io/space-path"
 
 // containsFinalizer: returns true if the finalizer list contains the space finalizer
 func containsFinalizer(space *spacev1alpha1.Space, finalizer string) bool {
@@ -116,9 +117,14 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 			return err
 		}
 
+		opts := pclient.Options{}
+		path, ok := space.Annotations[spacePathAnnotationKey]
+		if ok {
+			opts.Parent = path
+		}
 		// Async call the provider to create the space. Once created, discovery
 		// will set the space in the Ready state.
-		go providerClient.Create(space.Name, pclient.Options{})
+		go providerClient.Create(space.Name, opts)
 		return nil
 	}
 	// case spacev1alpha1.SpacePhaseInitializing:
@@ -144,12 +150,16 @@ func (c *controller) processDeleteSpace(delSpace *spacev1alpha1.Space) error {
 		if !ok {
 			return errors.New("failed to get provider client")
 		}
-
+		opts := pclient.Options{}
+		path, ok := delSpace.Annotations[spacePathAnnotationKey]
+		if ok {
+			opts.Parent = path
+		}
 		client := provider.providerClient
 		if client == nil {
 			return errors.New("failed to get provider client")
 		}
-		go client.Delete(delSpace.Name, pclient.Options{})
+		go client.Delete(delSpace.Name, opts)
 	}
 	return nil
 }

@@ -188,6 +188,7 @@ func (p *provider) processProviderWatchEvents() {
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't create the corresponding Space", "space name", spaceName)
 			} else {
 				// Space exists , just update its status
+				logger.V(2).Info("Updating Space object", "space", event.Name)
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				// TODO: Should we really update the config ?
 				refspace.Status.SpaceConfig = event.SpaceInfo.Config
