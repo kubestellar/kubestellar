@@ -7,7 +7,6 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```shell
-kubectl kcp bind apiexport root:espw:edge.kcp.io
 kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
 ```
 ``` { .bash .no-copy }
