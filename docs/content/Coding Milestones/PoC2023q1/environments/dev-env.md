@@ -18,7 +18,7 @@ pick a port number here that does not run afoul of the usual
 prohibition of ordinary user processes listening at low port numbers.
 
 ```shell
-kind create cluster --config=- <<EOF
+kind create cluster --name ks-host --config=- <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
