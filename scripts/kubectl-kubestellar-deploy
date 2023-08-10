@@ -22,7 +22,7 @@ KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
 image_tag=built-2023-08-08-14-55-25
 
-external_endpoint=localhost:6443
+external_endpoint=""
 openshift=false
 helm_flags=()
 
@@ -69,11 +69,18 @@ case "$openshift" in
 esac
 
 case "$external_endpoint" in
-    (*:*:*) echo "$0: external_endpoint should only have one colon" >&2
+    ("") if [ $openshift == false ]
+	 then echo "$0: --external-endpoint cannot be omitted unless --openshift true" >&2;
+	      exit 1;
+	 else
+	     external_hostname=""
+	     external_port=443
+	 fi;;
+    (*:*:*) echo "$0: --external-endpoint value should only have one colon" >&2
 	    exit 1;;
     (*:*)   external_hostname=$(cut -d: -f1 <<<"$external_endpoint")
 	    external_port=$(    cut -d: -f2 <<<"$external_endpoint");;
-    (*)     echo "$0: external_endpoint should have a colon in it" >&2
+    (*)     echo "$0: --external-endpoint value should have a colon in it" >&2
 	    exit 1;;
 esac
 

@@ -277,8 +277,14 @@ following, in any order.
   must be something that the external clients will resolve to an IP
   address where the cluster's Ingress controller or OpenShift router
   will be listening, and the given port must be the corresponding TCP
-  port number.  The default value is `localhost:6443`, but this is
-  unlikely to be what you want.
+  port number.  For a plain Kubernetes cluster, this must be
+  specified.  For an OpenShift cluster this may be omitted, in which
+  case the command will (a) assume that the external port number is
+  443 and (b) extract the external hostname from the Route object
+  after it is created and updated by OpenShift.  FYI, that external
+  hostname will start with a string derived from the Route in the
+  chart (currently "kubestellar-route-kubestellar") and continue with
+  "." and then the ingress domain name for the cluster.
 - a command line flag for the `helm upgrade` command.
 
 For example, to deploy to a plain Kubernetes cluster whose Ingress
@@ -296,7 +302,8 @@ To fetch a kubeconfig for use by clients inside the hosting cluster,
 use the `kubectl kubestellar get-internal-kubeconfig` command.  It
 takes the following on the command line.
 
-- `-o $output_pathname`, saying where to write the kubeconfig.
+- `-o $output_pathname`, saying where to write the kubeconfig. This
+  must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
 
 ### Fetch kubeconfig for external clients
@@ -307,7 +314,8 @@ endpoint specified in the deployment command --- use the `kubectl
 kubestellar get-external-kubeconfig` command.  It takes the following
 on the command line.
 
-- `-o $output_pathname`, saying where to write the kubeconfig.
+- `-o $output_pathname`, saying where to write the kubeconfig. This
+  must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
 
 ## KubeStellar platform user commands
