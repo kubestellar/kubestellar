@@ -67,6 +67,43 @@ including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
 there is a larger example at [this link](../../Coding%20Milestones/PoC2023q1/example1/).
 
+### Testing changes to the KubeStellar central container image
+
+If you make a change that affects the container image holding the
+central components then you will need to build a new image; perhaps
+surprisingly, this is not included in `make build`.  The regular way
+to build this image is with the following command.  It builds a
+multi-platform image, for all the platforms that KubeStellar can run
+its central components on, and pushes it to quay.io.
+
+```bash
+make kubestellar-image
+```
+
+However, that will only succeed if you have done `docker login` to
+quay.io with credentials authorized to write to the
+`kubestellar/kubestellar` repository.  Look on quay.io to find the
+image you just pushed, you will need its tag.
+
+For a less pushy alternative you can build a single-platform image and
+not push it, using the following command.
+
+```bash
+make kubestellar-image-local
+```
+
+Follow that with `docker images` to find the tag of the image you just
+built.  Get that image:tag known where you are going to run the
+central container; for example, if that will be in a local `kind`
+cluster then you can use [kind
+load](https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster).
+
+To get the image you just built used in your testing, edit
+`scripts/kubectl-kubestellar-deploy` and update the line that defines
+`$image_tag`; follow this with your `make build`.  For the sake of
+future users of a merged change, your last edit like this should refer
+to a tag that you pushed to quay.io/kubestellar/kubestellar.
+
 ### Testing changes to the bootstrap script
 
 The quickstart says to fetch the [bootstrap script]({{ config.repo_url }}/blob/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) from the {{ config.ks_branch }} branch of
