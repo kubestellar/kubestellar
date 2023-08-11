@@ -53,3 +53,7 @@ kubectl wait --namespace ingress-nginx \
   --timeout=90s
 ```
 
+### Load a locally-built container image into the kind cluster
+
+Remember that [you can do
+this](https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster).
