@@ -649,6 +649,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#testing-changes-to-the-kubestellar-central-container-image" class="md-nav__link">
+    Testing changes to the KubeStellar central container image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#testing-changes-to-the-bootstrap-script" class="md-nav__link">
     Testing changes to the bootstrap script
   </a>
@@ -1799,6 +1806,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#testing-changes-to-the-kubestellar-central-container-image" class="md-nav__link">
+    Testing changes to the KubeStellar central container image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#testing-changes-to-the-bootstrap-script" class="md-nav__link">
     Testing changes to the bootstrap script
   </a>
@@ -1909,6 +1923,33 @@ example.  As a contributor you will want a different setup flow,
 including <code>git clone</code> of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
 there is a larger example at <a href="../../Coding%20Milestones/PoC2023q1/example1/">this link</a>.</p>
+<h3 id="testing-changes-to-the-kubestellar-central-container-image">Testing changes to the KubeStellar central container image<a class="headerlink" href="#testing-changes-to-the-kubestellar-central-container-image" title="Permanent link">#</a></h3>
+<p>If you make a change that affects the container image holding the
+central components then you will need to build a new image; perhaps
+surprisingly, this is not included in <code>make build</code>.  The regular way
+to build this image is with the following command.  It builds a
+multi-platform image, for all the platforms that KubeStellar can run
+its central components on, and pushes it to quay.io.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>kubestellar-image
+</code></pre></div>
+<p>However, that will only succeed if you have done <code>docker login</code> to
+quay.io with credentials authorized to write to the
+<code>kubestellar/kubestellar</code> repository.  Look on quay.io to find the
+image you just pushed, you will need its tag.</p>
+<p>For a less pushy alternative you can build a single-platform image and
+not push it, using the following command.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>kubestellar-image-local
+</code></pre></div>
+<p>Follow that with <code>docker images</code> to find the tag of the image you just
+built.  Get that image:tag known where you are going to run the
+central container; for example, if that will be in a local <code>kind</code>
+cluster then you can use <a href="https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster">kind
+load</a>.</p>
+<p>To get the image you just built used in your testing, edit
+<code>scripts/kubectl-kubestellar-deploy</code> and update the line that defines
+<code>$image_tag</code>; follow this with your <code>make build</code>.  For the sake of
+future users of a merged change, your last edit like this should refer
+to a tag that you pushed to quay.io/kubestellar/kubestellar.</p>
 <h3 id="testing-changes-to-the-bootstrap-script">Testing changes to the bootstrap script<a class="headerlink" href="#testing-changes-to-the-bootstrap-script" title="Permanent link">#</a></h3>
 <p>The quickstart says to fetch the <a href="https://github.com/kubestellar/kubestellar/blob/main/bootstrap/bootstrap-kubestellar.sh">bootstrap script</a> from the main branch of
 the KubeStellar repo; if you want to contribute a change to that script then
