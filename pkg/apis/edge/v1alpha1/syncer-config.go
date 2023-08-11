@@ -45,10 +45,15 @@ type SyncerConfig struct {
 	Status SyncerConfigStatus `json:"status,omitempty"`
 }
 
-// SyncerConfigSpec is instructions to the syncer
+// SyncerConfigSpec is instructions to the syncer.
+// The namespaced objects to downsync are those that match EITHER `namespaceScope` and/or `namespacedObjects`.
 type SyncerConfigSpec struct {
 	// +optional
 	NamespaceScope NamespaceScopeDownsyncs `json:"namespaceScope,omitempty"`
+
+	// `namespacedObjects` matches if and only if at least one member matches.
+	// +optional
+	NamespacedObjects []NamespaceScopeDownsyncObjects `json:"namespacedObjects,omitempty"`
 
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
@@ -94,6 +99,34 @@ type NamespaceScopeDownsyncResource struct {
 	// `apiVeresion` holds just the version, not the group too.
 	// This is the version to use both upstream and downstream.
 	APIVersion string `json:"apiVersion"`
+}
+
+// NamespaceScopeDownsyncObjects matches some objects of one particular namespaced resource.
+type NamespaceScopeDownsyncObjects struct {
+	// GroupResource holds the API group and resource name.
+	metav1.GroupResource `json:",inline"`
+
+	// `apiVeresion` holds just the version, not the group too.
+	// This is the version to use both upstream and downstream.
+	APIVersion string `json:"apiVersion"`
+
+	// `objectsByNamespace` matches by namespace and name.
+	// An object matches the list if and only if the object matches at least one member of the list.
+	// Thus, no object matches the empty list.
+	// +optional
+	ObjectsByNamespace []NamespaceAndNames `json:"objectsByNamespace,omitempty"`
+}
+
+// NamespaceAndNames identifies some objects of an implied resource that is namespaced.
+// The objects are all in the same namespace.
+type NamespaceAndNames struct {
+	// `namespace` identifies the namespace
+	Namespace string `json:"namespace"`
+
+	// `names` holds the names of the objects that match.
+	// Empty list means none of them.
+	// +optional
+	Names []string `json:"names,omitempty"`
 }
 
 type ClusterScopeDownsyncResource struct {
