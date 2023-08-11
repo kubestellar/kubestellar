@@ -10,10 +10,10 @@ Table of contests:
 
 [Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingreass with SSL passthrough.](../yaml/README.md)
 
-Deploy **KubeStellar** `stable` in a `kubestellar` namespace, with a specific host name `kubestellar.svc.cluster.local` and a `1024` port number:
+Deploy **KubeStellar** `stable` in a `kubestellar` namespace, with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port number:
 
 ```shell
-helm install kubestellar . --set HOSTNAME="kubestellar.svc.cluster.local" --set EXTERNAL_PORT=1024
+helm install kubestellar . --set EXTERNAL_HOSTNAME="my-long-app-name.aregion.some.cloud.com" --set EXTERNAL_PORT=1024
 ```
 
 ## Deploy **KubeStellar** in an **OpenShift** cluster

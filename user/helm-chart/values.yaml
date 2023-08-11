@@ -31,6 +31,5 @@ storageSize: 1Gi
 clusterType: Kubernetes # OpenShift or Kubernetes
 
 # Parameters for setting up the externally accessible kubeconfig
-HOSTNAME: "" # leave it empty to let the cluster set it up
 EXTERNAL_HOSTNAME: "" # an empty string will let the container infer its ingress/route
 EXTERNAL_PORT: 443

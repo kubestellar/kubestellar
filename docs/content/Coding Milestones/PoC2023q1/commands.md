@@ -9,21 +9,33 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
+There are two ways of deploying kcp and the central KubeStellar
+components: (1) as processes on a machine of supported OS and ISA, and
+(2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
+latter is newer and not yet well exercised.
+
+This document describes both commands that a platform administrator
+uses and commands that a platform user uses.
+
 Most of these executables require that the kcp server be running and
 that `kubectl` is configured to use the kubeconfig file produced by
 `kcp start`. That is: either `$KUBECONFIG` holds the pathname of that
 kubeconfig file, its contents appear at `~/.kube/config`, or
 `--kubeconfig $pathname` appears on the command line.  The exceptions
-are the bootstrap script and [the kcp control script that runs before
-starting the kcp server](#kubestellar-ensure-kcp-server-creds).
+are the bootstrap script, [the kcp control script that runs before
+starting the kcp server](#kubestellar-ensure-kcp-server-creds), and
+the admin commands for deploying KubeStellar in a Kubernetes cluster.
 
-**NOTE**: all of the kubectl plugin usages described here certainly or
-potentially change the setting of which kcp workspace is "current" in
-your chosen kubeconfig file; for this reason, they are not suitable
+**NOTE**: most of the kubectl plugin usages described here certainly
+or potentially change the setting of which kcp workspace is "current"
+in your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
-in that file.
+in that file.  The exceptions are the admin commands for deploying
+KubeStellar in a Kubernetes cluster.
 
-## kcp control
+## Bare process deployment
+
+### kcp process control
 
 KubeStellar has some commands to support situations in which some
 clients of the kcp server need to connect to it by opening a
@@ -40,9 +52,9 @@ Starting the kcp server is not described here, beyond the particular
 consideration needed for the `--tls-sni-cert-key` flag, because it is
 otherwise ordinary.
 
-### kubestellar-ensure-kcp-server-creds
+#### kubestellar-ensure-kcp-server-creds
 
-#### kubestellar-ensure-kcp-server-creds pre-reqs
+##### kubestellar-ensure-kcp-server-creds pre-reqs
 
 The `kubestellar-ensure-kcp-server-creds` command requires that
 Easy-RSA is installed.  As outlined in
@@ -56,7 +68,7 @@ binary specific to your OS or computer architecture.
 Easy-RSA uses [OpenSSL](https://www.openssl.org/), so you will need
 that installed too.
 
-#### kubestellar-ensure-kcp-server-creds usage
+##### kubestellar-ensure-kcp-server-creds usage
 
 This command is given exactly one thing on the command line, a DNS
 domain name.  This command creates --- or re-uses if it finds already
@@ -116,7 +128,7 @@ bash-5.2$ kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &> /tmp/kcp.log
 [1] 66974
 ```
 
-### wait-and-switch-domain
+#### wait-and-switch-domain
 
 This command is for using after the kcp server has been launched.
 Since the `kcp start` command really means `kcp run`, all usage of
@@ -188,13 +200,13 @@ to invoke this command while nothing is concurrently writing it and
 while the caller reliably knows the name of a kubeconfig context that
 identifies what to replace.
 
-### switch-domain
+#### switch-domain
 
 This command is the second part of `wait-and-switch-domain`: the part
 of creating the alternate kubeconfig file.  It has the same inputs and
 outputs and concurrency considerations.
 
-## KubeStellar Platform control
+### KubeStellar process control
 
 The `kubestellar` command has three subcommands, one to finish setup
 and two for process control.
@@ -217,7 +229,7 @@ only used in the `start` subcommand.
   `${PWD}/kubestellar-logs`.
 - `-h` or `--help`: print a brief usage message and terminate.
 
-### Kubestellar init
+#### Kubestellar init
 
 This subcommand is used after installation to finish setup and does
 two things.  One is to ensure that the edge service provider workspace
@@ -227,18 +239,89 @@ objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
 
-### KubeStellar start
+#### KubeStellar start
 
 This subcommand is used after installation or process stops.
 
 This subcommand stops any running kubestellar controllers and then
 starts them all.  It also does the same thing as `kubestellar init`.
 
-### KubeStellar stop
+#### KubeStellar stop
 
 This subcommand undoes the primary function of `kubestellar start`,
 stopping any running KubeStellar controllers.  It does _not_ tear down
 the ESPW.
+
+## Deployment into a Kubernetes cluster
+
+These commands administer a deployment of the central components ---
+the kcp server, PKI, and the central KubeStellar components --- in a
+Kubernetes cluster that will be referred to as "the hosting cluster".
+
+### Deploy to cluster
+
+Deployment is done with a "kubectl plugin" that creates a [Helm
+"release"](https://helm.sh/docs/intro/using_helm/#three-big-concepts)
+in the hosting cluster. As such, it relies on explicit (on the command
+line) or implicit (in environment variables and/or `~/.kube/config`
+configuration needed to execute Helm commands). An invocation of this
+plugin starts with `kubectl kubestellar deploy` and continues with the
+following, in any order.
+
+- `--openshift $bool`, saying whether the hosting cluster is an
+  OpenShift cluster.  If so then a Route will be created to the kcp
+  server; otherwise, an Ingress object will direct incoming TLS
+  connections to the kcp server.  The default is `false`.
+- `--external-endpoint $domain_name:$port`, saying how the kcp server
+  will be reached from outside the cluster.  The given domain name
+  must be something that the external clients will resolve to an IP
+  address where the cluster's Ingress controller or OpenShift router
+  will be listening, and the given port must be the corresponding TCP
+  port number.  For a plain Kubernetes cluster, this must be
+  specified.  For an OpenShift cluster this may be omitted, in which
+  case the command will (a) assume that the external port number is
+  443 and (b) extract the external hostname from the Route object
+  after it is created and updated by OpenShift.  FYI, that external
+  hostname will start with a string derived from the Route in the
+  chart (currently "kubestellar-route-kubestellar") and continue with
+  "." and then the ingress domain name for the cluster.
+- a command line flag for the `helm upgrade` command.
+
+For example, to deploy to a plain Kubernetes cluster whose Ingress
+controller can be reached at
+`my-long-application-name.my-region.some.cloud.com:8443`, you would
+issue the following command.
+
+```shell
+kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:8443
+```
+
+### Fetch kubeconfig for internal clients
+
+To fetch a kubeconfig for use by clients inside the hosting cluster,
+use the `kubectl kubestellar get-internal-kubeconfig` command.  It
+takes the following on the command line.
+
+- `-o $output_pathname`, saying where to write the kubeconfig. This
+  must appear exactly once on the command line.
+- a `kubectl` command line flag, for accessing the hosting cluster.
+
+### Fetch kubeconfig for external clients
+
+To fetch a kubeconfig for use by clients outside of the hosting
+cluster --- those that will reach the kcp server via the external
+endpoint specified in the deployment command --- use the `kubectl
+kubestellar get-external-kubeconfig` command.  It takes the following
+on the command line.
+
+- `-o $output_pathname`, saying where to write the kubeconfig. This
+  must appear exactly once on the command line.
+- a `kubectl` command line flag, for accessing the hosting cluster.
+
+## KubeStellar platform user commands
+
+The remainder of the commands in this document are for users rather
+than administrators of the service that KubeStellar provides.
 
 ## KubeStellar-release
 

@@ -20,7 +20,7 @@ metadata:
   name: {{ .Values.prefix }}-route
   namespace: {{ .Values.namespace }}
 spec:
-  host: {{ .Values.HOSTNAME }}
+  host: {{ .Values.EXTERNAL_HOSTNAME }}
   port:
     targetPort: 6443
   tls:
