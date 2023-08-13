@@ -61,7 +61,7 @@ func (mcc *multiSpaceClient) Space(name string, namespace ...string) mcclientset
 	clientset, ok := mcc.clientsets[key]
 	if !ok {
 		// Try to get Space from API server.
-		if clientset, err = mcc.getFromServer(name, ns); err != nil {
+		if _, clientset, err = mcc.getFromServer(name, ns); err != nil {
 			panic(fmt.Sprintf("invalid space name: %s. error: %v", name, err))
 		}
 	}
@@ -69,13 +69,18 @@ func (mcc *multiSpaceClient) Space(name string, namespace ...string) mcclientset
 }
 
 func (mcc *multiSpaceClient) ConfigForSpace(name string, namespace ...string) (*rest.Config, error) {
-	key, _ := namespaceKey(name, namespace)
+	key, ns := namespaceKey(name, namespace)
+	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
-	if _, ok := mcc.configs[key]; !ok {
-		return nil, fmt.Errorf("failed to get config for space: %s", name)
+	config, ok := mcc.configs[key]
+	if !ok {
+		// Try to get Space from API server.
+		if config, _, err = mcc.getFromServer(name, ns); err != nil {
+			return nil, err
+		}
 	}
-	return mcc.configs[key], nil
+	return config, nil
 }
 
 var client *multiSpaceClient
@@ -115,36 +120,36 @@ func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerCl
 	spaceInformer := spaceInformerFactory.Space().V1alpha1().Spaces().Informer()
 
 	spaceInformerFactory.Start(ctx.Done())
-	cache.WaitForNamedCacheSync("spaces-management", ctx.Done(), spaceInformer.HasSynced)
 
 	spaceController := newController(ctx, spaceInformer, mcc)
 	go spaceController.Run(numThreads)
+	cache.WaitForNamedCacheSync("spaces-management", ctx.Done(), spaceInformer.HasSynced)
 }
 
 // getFromServer will query API server for specific Space and cache it if it exists and ready.
 // getFromServer caller function should acquire the mcc lock.
-func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*mcclientset.Clientset, error) {
+func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest.Config, *mcclientset.Clientset, error) {
 	space, err := mcc.managerClientset.SpaceV1alpha1().Spaces(namespace).Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
-		return nil, errors.New("space is not ready")
+		return nil, nil, errors.New("space is not ready")
 	}
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(space.Status.SpaceConfig))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	cs, err := mcclientset.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	// Calling function should acquire the mcc lock
 	mcc.configs[space.Name] = config
 	mcc.clientsets[space.Name] = cs
 
-	return cs, nil
+	return config, cs, nil
 }
 
 func namespaceKey(name string, namespaces []string) (key string, namespace string) {
