@@ -72,7 +72,7 @@ const (
 type SpaceStatus struct {
 	// Phase of the space (Initializing,NotReady,Ready).
 	// +kubebuilder
-	Phase SpacePhaseType `json:"Phase"`
+	Phase SpacePhaseType `json:"Phase,omitempty"`
 
 	// Cluster config from the kube config file in string format.
 	// +kubebuilder
