@@ -1,5 +1,14 @@
 <!--example1-start-kcp-start-->
-### Start kcp
+### Deploy kcp and KubeStellar
+
+You need kcp and KubeStellar and can deploy them in either of two
+ways: as bare processes on whatever host you are using to run this
+example, or as workload in a Kubernetes cluster (an OpenShift cluster
+qualifies).  Do one or the other, not both.
+
+### Deploy kcp and KubeStellar as bare processes
+
+#### Start kcp
 
 Download and build or install [kcp](https://github.com/kcp-dev/kcp/releases/tag/v0.11.0),
 according to your preference.

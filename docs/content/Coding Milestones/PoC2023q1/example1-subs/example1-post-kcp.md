@@ -1,11 +1,11 @@
 <!--example1-post-kcp-start-->
-### Get KubeStellar
+#### Get KubeStellar
 
 You will need a local copy of KubeStellar.  You can either use the
 pre-built archive (containing executables and config files) from a
 release or get any desired version from GitHub and build.
 
-#### Use pre-built archive
+##### Use pre-built archive
 
 Fetch the archive for your operating system and instruction set
 architecture as follows, in which `$kubestellar_version` is your
@@ -20,7 +20,7 @@ tar xzf kubestellar.tar.gz
 export PATH=$PWD/bin:$PATH
 ```
 
-#### Get from GitHub
+##### Get from GitHub
 
 You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add `-b
@@ -47,7 +47,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
-### Initialize the KubeStellar platform
+#### Initialize the KubeStellar platform as bare processes
 
 In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API, and also
@@ -62,6 +62,35 @@ are namespaced and are meaningful in KubeStellar.
 ```shell
 kubestellar init
 ```
+
+### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
+
+First you will need to get a build of KubeStellar.  See
+[above](../#get-kubestellar) and **NOTE WELL**: as yet there is no
+release of KubeStellar that supports this style of deployment, you
+will have to get the latest code from github and `make build`.
+
+To do the deployment and prepare to use it you will be using [the
+commands defined for
+that](../../commands/#deployment-into-a-kubernetes-cluster).  These
+require your shell to be in a state where `kubectl` manipulates the
+hosting cluster (the Kubernetes cluser into which you want to deploy
+kcp and KubeStellar), either by virtue of having set your `KUBECONFIG`
+envar appropriately or putting the relevant contents in
+`~/.kube/config` or by passing `--kubeconfig` explicitly on the
+following command lines.
+
+Use the [kubectl kubestellar deploy
+command](../../commands/#deploy-to-cluster) to do the deployment.
+
+Then use the [kubectl kubestellat get-external-kubeconfig
+command](../../commands/#fetch-kubeconfig-for-external-clients) to put
+into a file the kubeconfig that you will use as a user of kcp and
+KubeStellar.  Do not overwrite the kubeconfig file for your hosting
+cluster.  But _do_ update your `KUBECONFIG` envar setting or remember
+to pass the new file with `--kubeconfig` on the command lines when
+using kcp or KubeStellar.
+
 
 ### Create an inventory management workspace.
 ```shell
