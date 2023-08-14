@@ -949,6 +949,21 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar" class="md-nav__link">
+    Deploy kcp and KubeStellar
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar-as-bare-processes" class="md-nav__link">
+    Deploy kcp and KubeStellar as bare processes
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy kcp and KubeStellar as bare processes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#start-kcp" class="md-nav__link">
     Start kcp
   </a>
@@ -983,8 +998,20 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#initialize-the-kubestellar-platform" class="md-nav__link">
-    Initialize the KubeStellar platform
+  <a href="#initialize-the-kubestellar-platform-as-bare-processes" class="md-nav__link">
+    Initialize the KubeStellar platform as bare processes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" class="md-nav__link">
+    Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
   </a>
   
 </li>
@@ -1912,6 +1939,21 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar" class="md-nav__link">
+    Deploy kcp and KubeStellar
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar-as-bare-processes" class="md-nav__link">
+    Deploy kcp and KubeStellar as bare processes
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy kcp and KubeStellar as bare processes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#start-kcp" class="md-nav__link">
     Start kcp
   </a>
@@ -1946,8 +1988,20 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#initialize-the-kubestellar-platform" class="md-nav__link">
-    Initialize the KubeStellar platform
+  <a href="#initialize-the-kubestellar-platform-as-bare-processes" class="md-nav__link">
+    Initialize the KubeStellar platform as bare processes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" class="md-nav__link">
+    Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
   </a>
   
 </li>
@@ -2401,7 +2455,13 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 
 <!-- BEGIN INCLUDE example1-subs/example1-start-kcp.md '&lt;!--example1-start-kcp-start--&gt;' '&lt;!--example1-start-kcp-end--&gt;' -->
 
-<h3 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h3>
+<h3 id="deploy-kcp-and-kubestellar">Deploy kcp and KubeStellar<a class="headerlink" href="#deploy-kcp-and-kubestellar" title="Permanent link">#</a></h3>
+<p>You need kcp and KubeStellar and can deploy them in either of two
+ways: as bare processes on whatever host you are using to run this
+example, or as workload in a Kubernetes cluster (an OpenShift cluster
+qualifies).  Do one or the other, not both.</p>
+<h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
+<h4 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h4>
 <p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
 according to your preference.</p>
 <p>In some shell that will be used only for this purpose, issue the <code>kcp
@@ -2431,11 +2491,11 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 
 <!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
 
-<h3 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h3>
+<h4 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h4>
 <p>You will need a local copy of KubeStellar.  You can either use the
 pre-built archive (containing executables and config files) from a
 release or get any desired version from GitHub and build.</p>
-<h4 id="use-pre-built-archive">Use pre-built archive<a class="headerlink" href="#use-pre-built-archive" title="Permanent link">#</a></h4>
+<h5 id="use-pre-built-archive">Use pre-built archive<a class="headerlink" href="#use-pre-built-archive" title="Permanent link">#</a></h5>
 <p>Fetch the archive for your operating system and instruction set
 architecture as follows, in which <code>$kubestellar_version</code> is your
 chosen release of KubeStellar (see <a href="https://github.com/kubestellar/kubestellar/releases">the releases on
@@ -2446,7 +2506,7 @@ GitHub</a>) and
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>tar xzf kubestellar.tar.gz
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>export PATH=$PWD/bin:$PATH
 </code></pre></div>
-<h4 id="get-from-github">Get from GitHub<a class="headerlink" href="#get-from-github" title="Permanent link">#</a></h4>
+<h5 id="get-from-github">Get from GitHub<a class="headerlink" href="#get-from-github" title="Permanent link">#</a></h5>
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to get a different one.</p>
@@ -2465,7 +2525,7 @@ kubestellar</code> rely on the KubeStellar <code>bin</code> directory being on t
 The kubectl plugin lines use fully specific executables (e.g.,
 <code>kubectl kubestellar prep-for-syncer</code> corresponds to
 <code>bin/kubectl-kubestellar-prep_for_syncer</code>).</p>
-<h3 id="initialize-the-kubestellar-platform">Initialize the KubeStellar platform<a class="headerlink" href="#initialize-the-kubestellar-platform" title="Permanent link">#</a></h3>
+<h4 id="initialize-the-kubestellar-platform-as-bare-processes">Initialize the KubeStellar platform as bare processes<a class="headerlink" href="#initialize-the-kubestellar-platform-as-bare-processes" title="Permanent link">#</a></h4>
 <p>In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API, and also
 augments the <code>root:compute</code> workspace from kcp TMC as needed here.
@@ -2477,6 +2537,29 @@ containerized workloads from the four resources built into kcp TMC
 are namespaced and are meaningful in KubeStellar.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubestellar<span class="w"> </span>init
 </code></pre></div>
+<h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
+<p>First you will need to get a build of KubeStellar.  See
+<a href="./#get-kubestellar">above</a> and <strong>NOTE WELL</strong>: as yet there is no
+release of KubeStellar that supports this style of deployment, you
+will have to get the latest code from github and <code>make build</code>.</p>
+<p>To do the deployment and prepare to use it you will be using <a href="../commands/#deployment-into-a-kubernetes-cluster">the
+commands defined for
+that</a>.  These
+require your shell to be in a state where <code>kubectl</code> manipulates the
+hosting cluster (the Kubernetes cluser into which you want to deploy
+kcp and KubeStellar), either by virtue of having set your <code>KUBECONFIG</code>
+envar appropriately or putting the relevant contents in
+<code>~/.kube/config</code> or by passing <code>--kubeconfig</code> explicitly on the
+following command lines.</p>
+<p>Use the <a href="../commands/#deploy-to-cluster">kubectl kubestellar deploy
+command</a> to do the deployment.</p>
+<p>Then use the <a href="../commands/#fetch-kubeconfig-for-external-clients">kubectl kubestellat get-external-kubeconfig
+command</a> to put
+into a file the kubeconfig that you will use as a user of kcp and
+KubeStellar.  Do not overwrite the kubeconfig file for your hosting
+cluster.  But <em>do</em> update your <code>KUBECONFIG</code> envar setting or remember
+to pass the new file with <code>--kubeconfig</code> on the command lines when
+using kcp or KubeStellar.</p>
 <h3 id="create-an-inventory-management-workspace">Create an inventory management workspace.<a class="headerlink" href="#create-an-inventory-management-workspace" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw-1<span class="w"> </span>
