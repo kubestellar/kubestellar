@@ -1306,6 +1306,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fetch-a-log-from-a-central-process" class="md-nav__link">
+    Fetch a log from a central process
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2000,6 +2007,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fetch-a-log-from-a-central-process" class="md-nav__link">
+    Fetch a log from a central process
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2317,7 +2331,9 @@ the ESPW.</p>
 <h2 id="deployment-into-a-kubernetes-cluster">Deployment into a Kubernetes cluster<a class="headerlink" href="#deployment-into-a-kubernetes-cluster" title="Permanent link">#</a></h2>
 <p>These commands administer a deployment of the central components ---
 the kcp server, PKI, and the central KubeStellar components --- in a
-Kubernetes cluster that will be referred to as "the hosting cluster".</p>
+Kubernetes cluster that will be referred to as "the hosting cluster".
+These are framed as "kubectl plugins" and thus need to be explicitly
+or implicitly given a kubeconfig file for the hosting cluster.</p>
 <h3 id="deploy-to-cluster">Deploy to cluster<a class="headerlink" href="#deploy-to-cluster" title="Permanent link">#</a></h3>
 <p>Deployment is done with a "kubectl plugin" that creates a <a href="https://helm.sh/docs/intro/using_helm/#three-big-concepts">Helm
 "release"</a>
@@ -2380,6 +2396,30 @@ on the command line.</p>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
+</ul>
+<h3 id="fetch-a-log-from-a-central-process">Fetch a log from a central process<a class="headerlink" href="#fetch-a-log-from-a-central-process" title="Permanent link">#</a></h3>
+<p>The <code>kubectl kubestellar get-log</code> command will fetch the log from one
+of the central process of kcp or KubeStellar.  This command requires
+one positional argument, identifying the process.  The accepted
+identifiers are as follows.</p>
+<ul>
+<li><code>kcp</code></li>
+<li><code>mailbox-controller</code></li>
+<li><code>where-resolver</code></li>
+<li><code>placement-translator</code></li>
+</ul>
+<p>This command accepts some optional flags, which may appear before
+and/or after the positional argument.  The optional flags are as
+follows.</p>
+<ul>
+<li><code>-h</code>: print a brief usage message and exit successfully.</li>
+<li><code>-n $lines</code>: the log is extracted with the Linux <code>tail</code> command, and
+  this optional flag will be passed along to <code>tail</code> if given; the
+  usual syntax and semantics of the <code>-n</code> flag for <code>tail</code> apply.  If
+  not given then <code>tail</code> will be told <code>-n +0</code> to fetch the whole log.</li>
+<li><code>-f</code>: tells <code>tail</code> to "follow".</li>
+<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li><code>-X</code>: for debugging, <code>set -x</code> in the script that implements this command.</li>
 </ul>
 <h2 id="kubestellar-platform-user-commands">KubeStellar platform user commands<a class="headerlink" href="#kubestellar-platform-user-commands" title="Permanent link">#</a></h2>
 <p>The remainder of the commands in this document are for users rather
