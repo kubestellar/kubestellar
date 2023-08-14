@@ -2367,9 +2367,9 @@ following, in any order.</p>
 </ul>
 <p>For example, to deploy to a plain Kubernetes cluster whose Ingress
 controller can be reached at
-<code>my-long-application-name.my-region.some.cloud.com:8443</code>, you would
+<code>my-long-application-name.my-region.some.cloud.com:1234</code>, you would
 issue the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:8443
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:1234
 </code></pre></div>
 <h3 id="fetch-kubeconfig-for-internal-clients">Fetch kubeconfig for internal clients<a class="headerlink" href="#fetch-kubeconfig-for-internal-clients" title="Permanent link">#</a></h3>
 <p>To fetch a kubeconfig for use by clients inside the hosting cluster,
@@ -2585,7 +2585,7 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
   provider workspace.  The default is the standard location,
   <code>root:espw</code>.</li>
 <li><code>--syncer-image image_ref</code>: specifies the container image that runs
-  the syncer.  The default is <code>quay.io/kubestellar/syncer:v0.5.0</code>.</li>
+  the syncer.  The default is <code>quay.io/kubestellar/syncer:latest</code>.</li>
 <li><code>-o output_pathname</code>: specifies where to write the YAML definitions
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is <code>synctarget_name +
@@ -2773,7 +2773,7 @@ the parent of the workload management workspace to delete.</p>
 <a href="../../../Getting-Started/quickstart/">the
 QuickStart</a>.</p>
 <p>The script can be read directly from
-https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.5/bootstrap/bootstrap-kubestellar.sh
+https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh
 and does the following things.</p>
 <ol>
 <li>Downloads and installs kcp if it is not already evident on <code>$PATH</code>

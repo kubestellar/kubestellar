@@ -2216,7 +2216,7 @@
 
   <h1>KubeStellar-Syncer</h1>
 
-<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml"><img alt="docs-ecutable - kubestellar-syncer" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=release-0.5" /></a>&nbsp;&nbsp;&nbsp;</p>
+<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml"><img alt="docs-ecutable - kubestellar-syncer" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
 
 <div class="admonition tip">
@@ -2383,7 +2383,7 @@ sudo install ./${SLSA_VERIFIER} /usr/local/bin/slsa-verifier
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>git clone -b release-0.5 https://github.com/kubestellar/kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>cd kubestellar
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md&#39;&quot; docs-ecutable
 </code></pre></div>
@@ -2855,7 +2855,7 @@ SyncTarget name, you could do it as follows.</p>
 <p>For the upstream access, Syncer's registration command (<code>kubectl kubestellar syncer-gen</code>) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. </p>
 <p>On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addition to that, the command creates an EdgeSyncConfig CRD if it does not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of the EdgeSyncConfig CRD will also no longer be needed since we will switch to using SyncerConfig rather than EdgeSyncConfig in near future.</p>
-<p>The source code of the command is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.5/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go">https://github.com/kubestellar/kubestellar/blob/release-0.5/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go</a>.</p>
+<p>The source code of the command is <a href="https://github.com/kubestellar/kubestellar/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go">https://github.com/kubestellar/kubestellar/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go</a>.</p>
 <p>The equivalent manual steps are as follows: </p>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-start--&gt;' '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-end--&gt;' -->
 
@@ -2960,7 +2960,7 @@ c. Logical cluster name
   - Some objects are denatured if needed.
   - Other objects are as it is
 - APIExport/API Schema corresponding to CRD such as Kubernetes <a href="https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml">ClusterPolicyReport</a>.
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kubestellar/kubestellar/blob/release-0.5/hack/update-codegen-crds.sh#L57">here</a>). 
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/update-codegen-crds.sh#L57">here</a>). 
 - EdgePlacement</p>
 <p><img alt="kubestellar-syncer deploy" src="../images/kubestellar-syncer-deploy.png" /></p>
 <p>After this, KubeStellar will put the following in the mailbox workspace.
@@ -2972,7 +2972,7 @@ c. Logical cluster name
   - The mailbox controller will put API Binding into the mailbox workspace.</p>
 <h3 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)<a class="headerlink" href="#edgesyncconfig-will-be-replaced-to-syncerconfig" title="Permanent link">#</a></h3>
 <ul>
-<li>The example of EdgeSyncConfig CR is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.5/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.5/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
+<li>The example of EdgeSyncConfig CR is <a href="https://github.com/kubestellar/kubestellar/blob/main/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kubestellar/kubestellar/blob/main/config/crds/edge.kcp.io_edgesyncconfigs.yaml">here</a>.</li>
 <li>The CR here is used from edge syncer. </li>
 <li>The CR is placed at mb-ws to define</li>
 <li>object selector</li>
@@ -2992,7 +2992,7 @@ c. Logical cluster name
 </ul>
 <h3 id="syncerconfig">SyncerConfig<a class="headerlink" href="#syncerconfig" title="Permanent link">#</a></h3>
 <ul>
-<li>The spec is defined in https://github.com/kubestellar/kubestellar/blob/release-0.5/pkg/apis/edge/v1alpha1/syncer-config.go</li>
+<li>The spec is defined in https://github.com/kubestellar/kubestellar/blob/main/pkg/apis/edge/v1alpha1/syncer-config.go</li>
 <li><code>namespaceScope</code> field is for namespace scoped objects.<ul>
 <li><code>namespaces</code> is field for which namespaces to be downsynced.</li>
 <li><code>resources</code> is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.</li>
@@ -3011,7 +3011,7 @@ c. Logical cluster name
 <li><code>names</code> is an array of upsynced object name. Wildcard (<code>*</code>) is available.</li>
 </ul>
 </li>
-<li>The example CR is https://github.com/kubestellar/kubestellar/blob/release-0.5/test/e2e/kubestellar-syncer/testdata/kyverno/syncer-config.yaml</li>
+<li>The example CR is https://github.com/kubestellar/kubestellar/blob/main/test/e2e/kubestellar-syncer/testdata/kyverno/syncer-config.yaml</li>
 <li>The CR is used from KubeStellar-Syncer</li>
 <li>The CR is placed in mb-ws to define</li>
 <li>object selector</li>
