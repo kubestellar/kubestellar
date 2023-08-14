@@ -286,6 +286,9 @@ following, in any order.
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.
 - a command line flag for the `helm upgrade` command.
+- `-X` turns on debug echoing of all the commands in the script that
+  implements this command.
+- `-h` prints a brief usage message and terminates with success.
 
 For example, to deploy to a plain Kubernetes cluster whose Ingress
 controller can be reached at
@@ -305,6 +308,9 @@ takes the following on the command line.
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
+- `-X` turns on debug echoing of all the commands in the script that
+  implements this command.
+- `-h` prints a brief usage message and terminates with success.
 
 ### Fetch kubeconfig for external clients
 
@@ -317,6 +323,9 @@ on the command line.
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
+- `-X` turns on debug echoing of all the commands in the script that
+  implements this command.
+- `-h` prints a brief usage message and terminates with success.
 
 ## KubeStellar platform user commands
 
