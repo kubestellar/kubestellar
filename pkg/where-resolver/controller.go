@@ -31,6 +31,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
@@ -58,27 +59,37 @@ type controller struct {
 	queue   workqueue.RateLimitingInterface
 
 	edgeClusterClient edgeclientset.ClusterInterface
+	edgeClient        ksclientset.Interface
 
-	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
+	// singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
+	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceLister
 	singlePlacementSliceIndexer cache.Indexer
 
-	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
+	// edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
+	edgePlacementLister  edgev1alpha1listers.EdgePlacementLister
 	edgePlacementIndexer cache.Indexer
 
-	locationLister  edgev1alpha1listers.LocationClusterLister
+	// locationLister  edgev1alpha1listers.LocationClusterLister
+	locationLister  edgev1alpha1listers.LocationLister
 	locationIndexer cache.Indexer
 
-	synctargetLister  edgev1alpha1listers.SyncTargetClusterLister
+	// synctargetLister  edgev1alpha1listers.SyncTargetClusterLister
+	synctargetLister  edgev1alpha1listers.SyncTargetLister
 	synctargetIndexer cache.Indexer
 }
 
 func NewController(
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
-	edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
-	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
-	locationAccess edgev1alpha1informers.LocationClusterInformer,
-	syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
+	edgeClient ksclientset.Interface,
+	// edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
+	// singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
+	// locationAccess edgev1alpha1informers.LocationClusterInformer,
+	// syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
+	edgePlacementAccess edgev1alpha1informers.EdgePlacementInformer,
+	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceInformer,
+	locationAccess edgev1alpha1informers.LocationInformer,
+	syncTargetAccess edgev1alpha1informers.SyncTargetInformer,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
@@ -88,6 +99,7 @@ func NewController(
 		queue:   queue,
 
 		edgeClusterClient: edgeClusterClient,
+		edgeClient:        edgeClient,
 
 		edgePlacementLister:  edgePlacementAccess.Lister(),
 		edgePlacementIndexer: edgePlacementAccess.Informer().GetIndexer(),

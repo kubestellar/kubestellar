@@ -57,7 +57,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	store.l.Lock()
 	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
 
-	ep, err := c.edgePlacementLister.Cluster(epws).Get(epName)
+	// ep, err := c.edgePlacementLister.Cluster(epws).Get(epName)
+	ep, err := c.edgePlacementLister.Get(epName)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.V(1).Info("EdgePlacement not found")
@@ -86,7 +87,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	for _, loc := range locsFilteredByEp {
 		// 2)
 		lws := logicalcluster.From(loc)
-		stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
+		// stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
+		stsInLws, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "failed to list SyncTargets in Location workspace", "locationWorkspace", lws.String())
 			return err
@@ -114,7 +116,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	}
 
 	// 4)
-	currentSPS, err := c.singlePlacementSliceLister.Cluster(epws).Get(epName)
+	// currentSPS, err := c.singlePlacementSliceLister.Cluster(epws).Get(epName)
+	currentSPS, err := c.singlePlacementSliceLister.Get(epName)
 	if err != nil {
 		if errors.IsNotFound(err) { // create
 			logger.V(1).Info("creating SinglePlacementSlice")
@@ -132,7 +135,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 				},
 				Destinations: singles,
 			}
-			_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			// _, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			_, err = c.edgeClient.EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
 			if err != nil {
 				if !errors.IsAlreadyExists(err) {
 					logger.Error(err, "failed creating SinglePlacementSlice")
@@ -147,7 +151,8 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 		}
 	} else { // update
 		currentSPS.Destinations = singles
-		_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
+		// _, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
+		_, err = c.edgeClient.EdgeV1alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
 		if err != nil {
 			logger.Error(err, "failed updating SinglePlacementSlice")
 			return err

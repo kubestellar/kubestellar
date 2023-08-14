@@ -37,6 +37,7 @@ import (
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
@@ -102,12 +103,14 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 			return err
 		}
 	}
-	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+	// edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+	edgeViewClusterClientset, err := ksclientset.NewForConfig(edgeViewConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for view of edge exports")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	// edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
 	// create schedulingSharedInformerFactory
 	rootRestConfig, err := options.RootClientOpts.ToRESTConfig()
@@ -153,6 +156,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		return err
 	}
 	edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+	edgeClientset := ksclientset.NewForConfigOrDie(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
@@ -160,6 +164,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	es, err := wheresolver.NewController(
 		ctx,
 		edgeClusterClientset,
+		edgeClientset,
 		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
 		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
 		edgeSharedInformerFactory.Edge().V1alpha1().Locations(),

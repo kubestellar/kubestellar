@@ -46,7 +46,8 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	// Default to use kcp
-	var provider ClusterProvider = ClusterProviderKCP
+	// var provider ClusterProvider = ClusterProviderKCP
+	var provider ClusterProvider = ClusterProviderKube
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),

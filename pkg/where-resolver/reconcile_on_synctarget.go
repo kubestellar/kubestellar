@@ -64,7 +64,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	defer store.l.Unlock() // TODO(waltforme): Is it safe to shorten the critical section?
 
 	stDeleted := false
-	st, err := c.synctargetLister.Cluster(stws).Get(stName)
+	// st, err := c.synctargetLister.Cluster(stws).Get(stName)
+	st, err := c.synctargetLister.Get(stName)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.V(1).Info("SyncTarget not found")
@@ -81,7 +82,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	// 2a)
 	locsFilteredBySt := []*edgev1alpha1.Location{}
 	if !stDeleted {
-		locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
+		// locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
+		locsInStws, err := c.locationLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "failed to list Locations")
 			return err
@@ -126,13 +128,15 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			// currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
 				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
 				return err
 			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			// _, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClient.EdgeV1alpha1().SinglePlacementSlices().Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -152,14 +156,16 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			// currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
 				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
 				return err
 			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
 
-			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			// epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			epObj, err := c.edgePlacementLister.Get(name)
 			if err != nil {
 				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
 				return err
@@ -172,7 +178,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			// _, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClient.EdgeV1alpha1().SinglePlacementSlices().Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -193,14 +200,16 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
-			currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			// currentSPS, err := c.singlePlacementSliceLister.Cluster(ws).Get(name)
+			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
 				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
 				return err
 			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
 
-			epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			// epObj, err := c.edgePlacementLister.Cluster(ws).Get(name)
+			epObj, err := c.edgePlacementLister.Get(name)
 			if err != nil {
 				logger.Error(err, "failed to get EdgePlacement", "workloadWorkspace", ws, "edgePlacement", name)
 				return err
@@ -213,7 +222,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			// _, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClient.EdgeV1alpha1().SinglePlacementSlices().Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
