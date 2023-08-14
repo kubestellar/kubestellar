@@ -13,14 +13,11 @@ You currently need write access to the [{{ config.repo_url }}]({{ config.repo_ur
 
 <!-- You also need an available team member with approval permissions from [https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS](https://github.com/openshift/release/blob/master/ci-operator/config/{{ config.repo_short_name }}/OWNERS). -->
 
-### Create a release-major.minor branch
-To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.3', you might name the new release branch 'release-0.4'.
-
+### Checkout the main branch
 ```shell
 git clone git@github.com:{{ config.repo_short_name }}.git
 cd {{ config.repo_default_file_path }}
 git checkout main
-git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
@@ -31,29 +28,6 @@ vi scripts/kubectl-kubestellar-prep_for_syncer
 change the version in the following line:
 ```shell
 syncer_image="quay.io/kubestellar/syncer:v0.3.3"
-```
-
-### Update the mkdocs.yml file
-The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
-
-```shell
-vi docs/mkdocs.yml
-```
-
-<b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3"
-...
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.2'
-...
-```
-
-<b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3" 
-...
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.3'
-...
 ```
 
 ### Update the VERSION file
@@ -76,6 +50,42 @@ latest=v0.4.0
 ...
 stable=v0.4.0
 latest=v0.4.1
+...
+```
+
+### Push the main branch
+```shell
+git add .
+git commit -m "updates to main to support new release"
+git push -u origin main
+```
+
+### Create a release-major.minor branch
+To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.3', you might name the new release branch 'release-0.4'.
+```shell
+git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
+```
+
+### Update the mkdocs.yml file
+The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
+
+```shell
+vi docs/mkdocs.yml
+```
+
+<b>before:</b>
+```shell title="mkdocs.yml" hl_lines="2 3"
+...
+ks_branch: 'release-0.3'
+ks_tag: 'v0.3.2'
+...
+```
+
+<b>after:</b>
+```shell title="mkdocs.yml" hl_lines="2 3" 
+...
+ks_branch: 'release-0.3'
+ks_tag: 'v0.3.3'
 ...
 ```
 
