@@ -26,7 +26,9 @@ import (
 )
 
 const finalizerName = "SpaceFinalizer"
-const spacePathAnnotationKey = "kubestellar.io/space-path"
+
+// SpacePathAnnotationKey is the path under which space will reside(for providers that support hierarchy)
+const SpacePathAnnotationKey = "kubestellar.io/space-path"
 
 // containsFinalizer: returns true if the finalizer list contains the space finalizer
 func containsFinalizer(space *spacev1alpha1.Space, finalizer string) bool {
@@ -118,7 +120,7 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 		}
 
 		opts := pclient.Options{}
-		path, ok := space.Annotations[spacePathAnnotationKey]
+		path, ok := space.Annotations[SpacePathAnnotationKey]
 		if ok {
 			opts.Parent = path
 		}
@@ -151,7 +153,7 @@ func (c *controller) processDeleteSpace(delSpace *spacev1alpha1.Space) error {
 			return errors.New("failed to get provider client")
 		}
 		opts := pclient.Options{}
-		path, ok := delSpace.Annotations[spacePathAnnotationKey]
+		path, ok := delSpace.Annotations[SpacePathAnnotationKey]
 		if ok {
 			opts.Parent = path
 		}
