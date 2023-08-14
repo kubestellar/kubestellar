@@ -294,11 +294,11 @@ following, in any order.
 
 For example, to deploy to a plain Kubernetes cluster whose Ingress
 controller can be reached at
-`my-long-application-name.my-region.some.cloud.com:8443`, you would
+`my-long-application-name.my-region.some.cloud.com:1234`, you would
 issue the following command.
 
 ```shell
-kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:8443
+kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:1234
 ```
 
 ### Fetch kubeconfig for internal clients
