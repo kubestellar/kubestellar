@@ -8,8 +8,8 @@ spec:
   - v230618-23cd8129.customizers.edge.kcp.io
   - v230618-23cd8129.edgeplacements.edge.kcp.io
   - v230618-23cd8129.edgesyncconfigs.edge.kcp.io
-  - v230618-23cd8129.syncerconfigs.edge.kcp.io
   - v230630-f011ab29.singleplacementslices.edge.kcp.io
   - v230721-f4773468.locations.edge.kcp.io
   - v230721-f4773468.synctargets.edge.kcp.io
+  - v230811-a246ac01.syncerconfigs.edge.kcp.io
 status: {}

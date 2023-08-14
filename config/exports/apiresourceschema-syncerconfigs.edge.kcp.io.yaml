@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230618-23cd8129.syncerconfigs.edge.kcp.io
+  name: v230811-a246ac01.syncerconfigs.edge.kcp.io
 spec:
   group: edge.kcp.io
   names:
@@ -33,7 +33,9 @@ spec:
         metadata:
           type: object
         spec:
-          description: SyncerConfigSpec is instructions to the syncer
+          description: SyncerConfigSpec is instructions to the syncer. The namespaced
+            objects to downsync are those that match EITHER `namespaceScope` and/or
+            `namespacedObjects`.
           properties:
             clusterScope:
               description: '`clusterScope` holds a list of individual cluster-scoped
@@ -98,6 +100,50 @@ spec:
                     type: object
                   type: array
               type: object
+            namespacedObjects:
+              description: '`namespacedObjects` matches if and only if at least one
+                member matches.'
+              items:
+                description: NamespaceScopeDownsyncObjects matches some objects of
+                  one particular namespaced resource.
+                properties:
+                  apiVersion:
+                    description: '`apiVeresion` holds just the version, not the group
+                      too. This is the version to use both upstream and downstream.'
+                    type: string
+                  group:
+                    type: string
+                  objectsByNamespace:
+                    description: '`objectsByNamespace` matches by namespace and name.
+                      An object matches the list if and only if the object matches
+                      at least one member of the list. Thus, no object matches the
+                      empty list.'
+                    items:
+                      description: NamespaceAndNames identifies some objects of an
+                        implied resource that is namespaced. The objects are all in
+                        the same namespace.
+                      properties:
+                        names:
+                          description: '`names` holds the names of the objects that
+                            match. Empty list means none of them.'
+                          items:
+                            type: string
+                          type: array
+                        namespace:
+                          description: '`namespace` identifies the namespace'
+                          type: string
+                      required:
+                      - namespace
+                      type: object
+                    type: array
+                  resource:
+                    type: string
+                required:
+                - apiVersion
+                - group
+                - resource
+                type: object
+              type: array
             upsync:
               description: '`upsync` identifies objects to upsync. An object matches
                 `upsync` if and only if it matches at least one member of `upsync`.
