@@ -2345,6 +2345,9 @@ following, in any order.</p>
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.</li>
 <li>a command line flag for the <code>helm upgrade</code> command.</li>
+<li><code>-X</code> turns on debug echoing of all the commands in the script that
+  implements this command.</li>
+<li><code>-h</code> prints a brief usage message and terminates with success.</li>
 </ul>
 <p>For example, to deploy to a plain Kubernetes cluster whose Ingress
 controller can be reached at
@@ -2360,6 +2363,9 @@ takes the following on the command line.</p>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
   must appear exactly once on the command line.</li>
 <li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li><code>-X</code> turns on debug echoing of all the commands in the script that
+  implements this command.</li>
+<li><code>-h</code> prints a brief usage message and terminates with success.</li>
 </ul>
 <h3 id="fetch-kubeconfig-for-external-clients">Fetch kubeconfig for external clients<a class="headerlink" href="#fetch-kubeconfig-for-external-clients" title="Permanent link">#</a></h3>
 <p>To fetch a kubeconfig for use by clients outside of the hosting
@@ -2371,6 +2377,9 @@ on the command line.</p>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
   must appear exactly once on the command line.</li>
 <li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li><code>-X</code> turns on debug echoing of all the commands in the script that
+  implements this command.</li>
+<li><code>-h</code> prints a brief usage message and terminates with success.</li>
 </ul>
 <h2 id="kubestellar-platform-user-commands">KubeStellar platform user commands<a class="headerlink" href="#kubestellar-platform-user-commands" title="Permanent link">#</a></h2>
 <p>The remainder of the commands in this document are for users rather
