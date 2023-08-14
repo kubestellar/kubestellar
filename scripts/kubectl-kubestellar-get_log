@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: Get the log output from a central KubeStellar or kcp process
+
+# Usage: $0 (-f | -n <integer>[multiplier] | -X | kubectl_flag)* which
+
+follow=""
+lines="-n +0"
+which=""
+kubectl_flags=()
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-X) set -x;;
+	(-h)
+	    echo "Usage: kubectl kubestellar get-log (\$kubectl_flag | -f | -n \$lines | -X)* \$which"
+	    exit 0;;
+	(-f) follow="-f";;
+	(-n)
+	    if (( $# >1 ))
+	    then lines="-n $2"; shift
+	    else echo "$0: missing -n value" >&2; exit 1
+	    fi;;
+	(--*=*|-?=*)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
+	(--*|-?)
+	    if (( $# > 1 ))
+	    then kubectl_flags[${#kubectl_flags[*]}]="$1"
+		 kubectl_flags[${#kubectl_flags[*]}]="$2"
+		 shift
+	    else echo "$0: missing value for long flag $1" >&2; exit 1
+	    fi;;
+	(-*)
+	    echo "$0: flag syntax error" >&2
+	    exit 1;;
+	(*) if [ -n "$which" ]
+	    then echo "$0: exactly one positional argument accepted" >&2
+		 exit 1
+	    else
+		which="$1"
+	    fi
+    esac
+    shift
+done
+
+case "$which" in
+    ("")  echo "$0: must be given exactly one positional argument" >&2
+	  exit 1;;
+    (kcp)                  logfile=kcp.log;;
+    (where-resolver)       logfile=kubestellar-where-resolver-log.txt;;
+    (mailbox-controller)   logfile=mailbox-controller-log.txt;;
+    (placement-translator) logfile=placement-translator-log.txt;;
+    (*) echo "$0: argument 1 must be one of: kcp, where-resolver, mailbox-controller, placement-translator" >&2
+	exit 1;;
+esac
+
+set -e
+
+while ! server_pod=$(kubectl "${kubectl_flags[@]}" get pods -n kubestellar -l app=kubestellar-server -o jsonpath='{.items[0].metadata.name}' 2> /dev/null); do
+    sleep 10
+done
+
+while ! kubectl "${kubectl_flags[@]}" exec -n kubestellar $server_pod -- ls /home/kubestellar/ready &> /dev/null; do
+    sleep 10
+done
+
+kubectl "${kubectl_flags[@]}" exec -n kubestellar $server_pod -- tail kubestellar-logs/$logfile $follow $lines

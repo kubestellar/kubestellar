@@ -257,6 +257,8 @@ the ESPW.
 These commands administer a deployment of the central components ---
 the kcp server, PKI, and the central KubeStellar components --- in a
 Kubernetes cluster that will be referred to as "the hosting cluster".
+These are framed as "kubectl plugins" and thus need to be explicitly
+or implicitly given a kubeconfig file for the hosting cluster.
 
 ### Deploy to cluster
 
@@ -326,6 +328,31 @@ on the command line.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
+
+### Fetch a log from a central process
+
+The `kubectl kubestellar get-log` command will fetch the log from one
+of the central process of kcp or KubeStellar.  This command requires
+one positional argument, identifying the process.  The accepted
+identifiers are as follows.
+
+- `kcp`
+- `mailbox-controller`
+- `where-resolver`
+- `placement-translator`
+
+This command accepts some optional flags, which may appear before
+and/or after the positional argument.  The optional flags are as
+follows.
+
+- `-h`: print a brief usage message and exit successfully.
+- `-n $lines`: the log is extracted with the Linux `tail` command, and
+  this optional flag will be passed along to `tail` if given; the
+  usual syntax and semantics of the `-n` flag for `tail` apply.  If
+  not given then `tail` will be told `-n +0` to fetch the whole log.
+- `-f`: tells `tail` to "follow".
+- a `kubectl` command line flag, for accessing the hosting cluster.
+- `-X`: for debugging, `set -x` in the script that implements this command.
 
 ## KubeStellar platform user commands
 
