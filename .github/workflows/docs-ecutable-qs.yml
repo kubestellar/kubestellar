@@ -52,14 +52,14 @@ jobs:
         with:
           go-version: v1.19
           cache: true
-
+          
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.27.4'
         id: install
 
-      # - run: kubectl version
+        # with:
+          # version: 'v1.27.4'
+      - run: kubectl version || true
   
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
