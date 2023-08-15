@@ -340,8 +340,10 @@ if [ "$deploy" == true ] && [ "$deploy_style" == bare ]; then
 	do
             sleep 1
 	done
-	if [ "$(kcp_version)" != "$kcp_version" ]; then
-            echo "kcp running version $(kcp_version) does not match the desired version $kcp_version ... exiting!"
+	found_kcp_version="$(kcp_version)"
+	if [ "$found_kcp_version" != "$kcp_version" ]; then
+            echo "kcp running version ${found_kcp_version@Q} does not match the desired version $kcp_version ... exiting!"
+	    echo "FYI: \`kubectl version --short\` reports: $(kubectl version --short)"
             exit 4
 	else
             echo "kcp version $(kcp_version) ... ok"
@@ -362,8 +364,10 @@ if [ "$deploy" == true ] && [ "$deploy_style" == bare ]; then
             sleep 1
 	done
 	sleep 10
-	if [ "$(kcp_version)" != "$KCP_REQUIRED_VERSION" ]; then
-            echo "kcp version $(kcp_version) is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+	found_kcp_version="$(kcp_version)"
+	if [ "$found_kcp_version" != "$KCP_REQUIRED_VERSION" ]; then
+            echo "kcp version ${found_kcp_version@Q} is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+	    echo "FYI: \`kubectl version --short\` reports: $(kubectl version --short)"
             exit 4
 	else
             echo "kcp version $(kcp_version) ... ok"
