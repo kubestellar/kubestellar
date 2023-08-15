@@ -76,7 +76,13 @@ kcp_ready() {
 }
 
 kcp_version() {
-    echo "$(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+    kubectl version --short
+    RESULT=$?
+    if [ $RESULT -eq 0 ]; then
+        echo "$(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+    else
+        echo "$(kubectl version 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+    fi
 }
 
 kcp_get_latest_version() {
