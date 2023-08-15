@@ -62,7 +62,7 @@ https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.y
 
 <b>after:</b>
 ```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3
 ```
 
 
