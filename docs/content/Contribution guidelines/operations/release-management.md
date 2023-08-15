@@ -27,7 +27,7 @@ vi scripts/kubectl-kubestellar-prep_for_syncer
 
 change the version in the following line:
 ```shell
-syncer_image="quay.io/kubestellar/syncer:v0.3.3"
+syncer_image="quay.io/kubestellar/syncer:v0.3.0"
 ```
 
 ### Update the VERSION file
@@ -40,18 +40,31 @@ vi VERSION
 <b>before:</b>
 ```shell title="VERSION" hl_lines="2 3"
 ...
-stable=v0.4.0
-latest=v0.4.0
+stable=v0.2.0
+latest=v0.2.0
 ...
 ```
 
 <b>after:</b>
 ```shell title="VERSION" hl_lines="2 3" 
 ...
-stable=v0.4.0
-latest=v0.4.1
+stable=v0.2.0
+latest=v0.3.0
 ...
 ```
+
+### Update the branch name in kubestellar/docs/content/readme.md
+There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
+<b>before:</b>
+'''shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
+'''
+
+<b>after:</b>
+'''shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
+'''
+
 
 ### Push the main branch
 ```shell
@@ -61,7 +74,7 @@ git push -u origin main
 ```
 
 ### Create a release-major.minor branch
-To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.3', you might name the new release branch 'release-0.4'.
+To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.
 ```shell
 git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
@@ -76,8 +89,8 @@ vi docs/mkdocs.yml
 <b>before:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3"
 ...
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.2'
+ks_branch: 'release-0.2'
+ks_tag: 'v0.2.0'
 ...
 ```
 
@@ -85,7 +98,7 @@ ks_tag: 'v0.3.2'
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
 ks_branch: 'release-0.3'
-ks_tag: 'v0.3.3'
+ks_tag: 'v0.3.0'
 ...
 ```
 
@@ -111,17 +124,12 @@ git push -u origin release-<major>.<minor> # replace <major>.<minor> with your i
 cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
 git pull
-mike deploy --push --rebase --update-aliases release-0.4 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+mike deploy --push --rebase --update-aliases release-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
 cd ..
 ```
 
 ### Test your doc site
 Open a Chrome Incognito browser to [{{ config.docs_url }}]({{ config.docs_url }}) and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'
-
-### Create a build
-```shell
-./hack/make-release-full.sh v0.3.3
-```
 
 ### Create a tagged release
 View the existing tags you have for the repo
@@ -131,22 +139,27 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.3.2' to 'v0.3.3'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.2.0' to 'v0.3.0'
 
 ```shell
-TAG=v0.3.3
+TAG=v0.3.0
 REF=release-0.3
 git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
 
+### Create a build
+```shell
+./hack/make-release-full.sh v0.3.0
+```
+
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
-- Click 'Draft a new release' and create a new tag ('v0.3.3' in our example)
+- Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
     - Select the release branch (release-0.3)
     - Add a release title (v.0.3.3)
-    - Add some release notes
-    - Attach the binaries that were created in the 'make build-all' process above
+    - Add some release notes ('generate release notes' if you like)
+    - Attach the binaries that were created in the 'make-release-full' process above
         - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
         - GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'
 
