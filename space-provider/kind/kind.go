@@ -61,7 +61,7 @@ func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) e
 func (k KindClusterProvider) Delete(name string, opts clusterprovider.Options) error {
 	logger := klog.Background()
 	logger.V(2).Info("Deleting kind cluster", "name", name)
-	return k.kindProvider.Delete(name, opts.KubeconfigPath)
+	return k.kindProvider.Delete(name, "")
 }
 
 func (k KindClusterProvider) ListSpacesNames() ([]string, error) {

@@ -30,55 +30,79 @@ import (
 	api "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/klog/v2"
 
-	kcpv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
-	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
+	kcpcore "github.com/kcp-dev/kcp/pkg/apis/core"
+	kcpcorev1alpha1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
+	kcptenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
+	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
+	kcpcoreclusteredv1alpha1 "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/core/v1alpha1"
+	kcptenancyclusteredv1alpha1 "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/tenancy/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	clusterprovider "github.com/kubestellar/kubestellar/pkg/space-manager/providerclient"
 )
 
 // KcpClusterProvider is a cluster provider for KCP workspaces.
 type KcpClusterProvider struct {
-	ctx        context.Context
-	logger     logr.Logger
-	kcpConfig  string
-	clientset  tenancyclient.WorkspaceInterface
-	workspaces map[string]string
-	watch      clusterprovider.Watcher
+	ctx            context.Context
+	logger         logr.Logger
+	kcpConfig      string
+	kcpWsClientset kcptenancyclusteredv1alpha1.WorkspaceClusterInterface
+	kcpLcClientset kcpcoreclusteredv1alpha1.LogicalClusterClusterInterface
+	workspaces     map[string]string
+	watch          clusterprovider.Watcher
 }
 
 // New returns a new KcpClusterProvider
 func New(kcpConfig string) (*KcpClusterProvider, error) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kcpConfig))
+
+	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(kcpConfig))
 	if err != nil {
 		return nil, err
 	}
-	clientset, err := tenancyclient.NewForConfig(config)
+	rawConfig, err := clientConfig.RawConfig()
+	if err != nil {
+		return nil, err
+	}
+	baseConfig, err := clientcmd.NewNonInteractiveClientConfig(rawConfig, "base", nil, nil).ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	baseClientset, err := kcpclientset.NewForConfig(baseConfig)
+	if err != nil {
+		return nil, err
+	}
+	adminConfig, err := clientcmd.NewNonInteractiveClientConfig(rawConfig, "system:admin", nil, nil).ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	adminClientset, err := kcpclientset.NewForConfig(adminConfig)
 	if err != nil {
 		return nil, err
 	}
 	c := &KcpClusterProvider{
-		ctx:        ctx,
-		logger:     logger,
-		kcpConfig:  kcpConfig,
-		clientset:  clientset.Workspaces(),
-		workspaces: make(map[string]string),
+		ctx:            ctx,
+		logger:         logger,
+		kcpConfig:      kcpConfig,
+		kcpWsClientset: baseClientset.TenancyV1alpha1().Workspaces(),
+		kcpLcClientset: adminClientset.CoreV1alpha1().LogicalClusters(),
+		workspaces:     make(map[string]string),
 	}
 	return c, nil
 }
 
 func (k *KcpClusterProvider) Create(name string, opts clusterprovider.Options) error {
 	k.logger.V(2).Info("Creating KCP workspace", "name", name)
-	ws := &tenancyv1alpha1.Workspace{
+	ws := &kcptenancyv1alpha1.Workspace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
-		Spec: tenancyv1alpha1.WorkspaceSpec{},
+		Spec: kcptenancyv1alpha1.WorkspaceSpec{},
 	}
-	_, err := k.clientset.Create(k.ctx, ws, metav1.CreateOptions{})
+	_, err := k.kcpWsClientset.Cluster(getClusterPath(opts.Parent)).Create(k.ctx, ws, metav1.CreateOptions{})
 	if err != nil && !k8sapierrors.IsAlreadyExists(err) {
+		k.logger.Error(err, "Failed to create KCP workspace", "space", name)
 		return err
 	}
 	k.logger.V(2).Info("Created KCP workspace for space", "name", name)
@@ -87,7 +111,7 @@ func (k *KcpClusterProvider) Create(name string, opts clusterprovider.Options) e
 
 func (k *KcpClusterProvider) Delete(name string, opts clusterprovider.Options) error {
 	k.logger.V(2).Info("Deleting KCP workspace", "name", name)
-	return k.clientset.Delete(k.ctx, name, metav1.DeleteOptions{})
+	return k.kcpWsClientset.Cluster(getClusterPath(opts.Parent)).Delete(k.ctx, name, metav1.DeleteOptions{})
 }
 
 // ListSpacesNames is N/A for KCP
@@ -120,7 +144,7 @@ func (k *KcpClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, e
 }
 
 func (k *KcpClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) {
-	list, err := k.clientset.List(k.ctx, metav1.ListOptions{})
+	list, err := k.kcpWsClientset.Cluster(kcpcore.RootCluster.Path()).List(k.ctx, metav1.ListOptions{})
 	if err != nil {
 		return []clusterprovider.SpaceInfo{}, err
 	}
@@ -169,7 +193,7 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 		k.wg.Add(1)
 		go func() {
 			defer k.wg.Done()
-			watcher, err := k.provider.clientset.Watch(k.provider.ctx, metav1.ListOptions{})
+			watcher, err := k.provider.kcpLcClientset.Watch(k.provider.ctx, metav1.ListOptions{})
 			if err == nil {
 				for {
 					select {
@@ -181,43 +205,47 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 							k.Stop()
 							return
 						}
-						ws := event.Object.(*tenancyv1alpha1.Workspace)
-						name := ws.Name
-						if event.Type == "MODIFIED" {
-							k.provider.logger.V(2).Info("KCP workspace modify event", "ws", ws.Name)
+						lc := event.Object.(*kcpcorev1alpha1.LogicalCluster)
 
-							_, ok := k.provider.workspaces[name]
-							if !ok && ws.Status.Phase == kcpv1alpha1.LogicalClusterPhaseReady {
-								spaceInfo, err := k.provider.Get(ws.Name)
+						path, ok := lc.Annotations[kcpcore.LogicalClusterPathAnnotationKey]
+						if !ok {
+							continue
+						}
+						if event.Type == "MODIFIED" || event.Type == "ADDED" {
+							k.provider.logger.V(2).Info("KCP workspace modify/add event", "ws", path, "status", lc.Status.Phase)
+							_, ok := k.provider.workspaces[path]
+							if !ok && lc.Status.Phase == kcpcorev1alpha1.LogicalClusterPhaseReady {
+								spaceInfo, err := k.provider.Get(path)
 								if err != nil {
+									k.provider.logger.Info("Failed to get space info")
 									continue
 								}
-								k.provider.logger.V(2).Info("New KCP workspace is ready", "ws", ws.Name)
+								k.provider.logger.V(2).Info("New KCP workspace is ready", "ws", path)
 								// add ready WS to cache and send an event
-								k.provider.workspaces[name] = string(ws.Status.Phase)
+								k.provider.workspaces[path] = string(lc.Status.Phase)
 								k.ch <- clusterprovider.WatchEvent{
 									Type:      watch.Added,
-									Name:      ws.Name,
+									Name:      lc.Spec.Owner.Name,
 									SpaceInfo: spaceInfo,
 								}
 							}
-							if ok && ws.Status.Phase != kcpv1alpha1.LogicalClusterPhaseReady {
+							if ok && lc.Status.Phase != kcpcorev1alpha1.LogicalClusterPhaseReady {
 								k.provider.logger.V(2).Info("KCP workspace is not ready")
 								if ok {
-									delete(k.provider.workspaces, name)
+									delete(k.provider.workspaces, path)
 									k.ch <- clusterprovider.WatchEvent{
 										Type: watch.Deleted,
-										Name: name,
+										Name: lc.Spec.Owner.Name,
 									}
 								}
 							}
 						}
 						if event.Type == "DELETED" {
-							k.provider.logger.V(2).Info("KCP workspace deleted", "ws", ws.Name)
-							delete(k.provider.workspaces, name)
+							k.provider.logger.V(2).Info("KCP workspace deleted", "ws", path)
+							delete(k.provider.workspaces, path)
 							k.ch <- clusterprovider.WatchEvent{
 								Type: watch.Deleted,
-								Name: ws.Name,
+								Name: lc.Spec.Owner.Name,
 							}
 						}
 					}
@@ -230,15 +258,31 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 
 func buildRawConfig(baseRaw api.Config, spaceName string) api.Config {
 	main := "root"
+	delimiter := ":"
 	// remove all clusters and contexts exept main cluster/context
 	clusters := make(map[string]*api.Cluster)
 	contexts := make(map[string]*api.Context)
 	contexts[main] = baseRaw.Contexts[main]
 	// modify server path
-	baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, main+":"+spaceName)
+	if strings.HasPrefix(spaceName, main+delimiter) {
+		// spaceName is full path
+		baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, spaceName)
+	} else {
+		baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, main+delimiter+spaceName)
+	}
+
 	clusters[main] = baseRaw.Clusters[main]
 	baseRaw.Clusters = clusters
 	baseRaw.Contexts = contexts
 	baseRaw.CurrentContext = main
 	return baseRaw
+}
+
+func getClusterPath(parent string) logicalcluster.Path {
+	clusterPath := kcpcore.RootCluster.Path()
+	if parent != "" {
+		parentCluster := logicalcluster.Name(parent)
+		clusterPath = parentCluster.Path()
+	}
+	return clusterPath
 }

@@ -1,8 +1,10 @@
 apiVersion: space.kubestellar.io/v1alpha1
 kind: Space
 metadata:
-  name: space2
+  name: spacex
   namespace: "spaceprovider-default"
+  annotations:
+    kubestellar.io/space-path: "root:my-org"
 spec:
   SpaceProviderDescName: "default"
   Managed: true

@@ -187,9 +187,8 @@ func (p *provider) processProviderWatchEvents() {
 				_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, v1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't create the corresponding Space", "space name", spaceName)
 			} else {
-				// Space exists , just update its status
+				logger.V(2).Info("Updating Space object", "space", event.Name)
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
-				// TODO: Should we really update the config ?
 				refspace.Status.SpaceConfig = event.SpaceInfo.Config
 				if refspace.Spec.Managed && !containsFinalizer(refspace, finalizerName) {
 					// When a physical space is removed we remove its finalizer
