@@ -1,8 +1,13 @@
 <!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start-->
-IMWs are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
+The above use of `kind` has knocked kcp's `kubectl ws` plugin off kilter, as the latter uses the local kubeconfig to store its state about the "current" and "previous" workspaces.  Get it back on track with the following command.
 
 ```shell
 kubectl config use-context root
+```
+
+IMWs are used by KubeStellar to store inventory objects (`SyncTargets` and `Locations`). Create an IMW named `example-imw` with the following command:
+
+```shell
 kubectl ws root
 kubectl ws create example-imw
 ```

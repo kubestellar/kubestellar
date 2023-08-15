@@ -844,15 +844,16 @@ The script can be read directly from
 {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh
 and does the following things.
 
-1. Downloads and installs kcp if it is not already evident on `$PATH`
-   (using [the script below](#install-kcp-and-its-kubectl-plugins).
-2. Starts a kcp server if one is not already running.
-3. Downloads and installs kubestellar if it is not already evident on
-   `$PATH` (using [the script below](#install-kubestellar).
-4. `kubestellar start` if the KubeStellar controllers are not already
-   running or the ESPW does not (yet) exist.
+1. Downloads and installs kcp executables if they are not already
+   evident on `$PATH`.
+2. Downloads and installs kubestellar executables if they are not
+   already evident on `$PATH`.
+3. Ensures that kcp and KubeStellar are deployed (i.e., their
+   processes are running and their initial configurations have been
+   established) either as bare processes or as workload in a
+   pre-existing Kubernetes cluster.
 
-This script accepts the following command line flags; all are optional.
+This script accepts the following command line flags; all are optional.  The `--os`, `--arch`, and `--bind-address` flags are only useful when deploying as bare processes.  The deployment will be into a Kubernetes cluster if either `--external-endpoint` or `--openshift true` is given.
 
 - `--kubestellar-version $version`: specifies the release of
   KubeStellar to use.  When using a specific version, include the
@@ -861,6 +862,12 @@ This script accepts the following command line flags; all are optional.
 - `--kcp-version $version`: specifies the kcp release to use.  The
   default is the one that works with the chosen release of
   KubeStellar.
+- `--openshift $bool`: specifies whether to the hosting cluster is an
+  OpenShift cluster. The default value is `false`.
+- `--endpoint-address $domain_name:$port`: specifies where an Ingress
+  controller or OpenShift router is listening for incoming TLS
+  connections from external (to the hosting cluster) clients of kcp
+  and KubeStellar.
 - `--os $OS`: specifies the operating system to use in selecting the
   executables to download and install.  Choices are `linux` and
   `darwin`.  Auto-detected if omitted.

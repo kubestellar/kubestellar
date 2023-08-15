@@ -16,10 +16,13 @@
 
 # Usage: $0
 
-# This script installs kcp and Kubestellar binaries to a folder of choice
+# This script deploys kcp and Kubestellar, either as bare processes
+# or as Kubernetes workload, and installs executables to a folder of choice
 #
 # Arguments:
 # [--deploy bool] indicate if kubestellar (and kcp) will be deployed
+# [--external-endpoint domain-name:port]
+# [--openshift bool]
 # [--kcp-version release] set a specific kcp release version, default: latest
 # [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
@@ -165,6 +168,8 @@ kubestellar_wmw=""
 verbose="false"
 flagx=""
 user_exports=""
+external_endpoint=""
+openshift=false
 
 echo "< KubeStellar bootstrap started >----------------"
 
@@ -215,6 +220,16 @@ while (( $# > 0 )); do
         then { folder="$2"; shift; }
         else { echo "$0: missing installation folder" >&2; exit 1; }
         fi;;
+    (--external-endpoint)
+        if (( $# > 1 ));
+        then { external_endpoint="$2"; shift; }
+        else { echo "$0: missing external-endpdoint" >&2; exit 1; }
+        fi;;
+    (--openshift)
+        if (( $# > 1 ));
+        then { openshift="$2"; shift; }
+        else { echo "$0: missing openshift setting" >&2; exit 1; }
+        fi;;
     (--verbose|-V)
         verbose="true";;
     (-X)
@@ -259,6 +274,31 @@ case "$deploy" in
 	exit 1;;
 esac
 
+case "$openshift" in
+    ("") ;;
+    (true|false) ;;
+    (*) echo "$0: --openshift value must be 'true' or 'false'" >&2
+	exit 1;;
+esac
+
+deploy_style=bare
+deploy_flags=()
+
+case "$external_endpoint" in
+    ("")    ;;
+    (*:*:*) echo "$0: --external-endpoint must have the form domain-name:port" >& 2
+	    exit 1;;
+    (*:*)   deploy_style=kube
+	    deploy_flags=("--external-endpoint" $external_endpoint);;
+    (*)     echo "$0: --external-endpoint must have the form domain-name:port" >& 2
+	    exit 1;;
+esac
+
+if [ "$openshift" == true ]; then
+    deploy_style=kube
+    deploy_flags[${#deploy_flags[*]}]="--openshift"
+    deploy_flags[${#deploy_flags[*]}]=true
+fi
 
 # Ensure kcp is installed
 echo "< Ensure kcp is installed >----------------------"
@@ -285,7 +325,7 @@ else
     fi
 fi
 
-if [ "$deploy" == true ]; then
+if [ "$deploy" == true ] && [ "$deploy_style" == bare ]; then
     # Ensure kcp is running
     echo "< Ensure kcp is running >-----------------------"
     if [ "$(kcp_running)" == "true" ]; then
@@ -359,7 +399,9 @@ else
     fi
 fi
 
-if [ "$deploy" == true ]; then
+
+if [ "$deploy" == false ]; then :
+elif [ "$deploy_style" == bare ]; then
     # Ensure KubeStellar is running
     echo "< Ensure KubeStellar is running >---------------"
     kubectl ws root > /dev/null
@@ -379,6 +421,14 @@ if [ "$deploy" == true ]; then
             kubestellar start
 	fi
     fi
+else
+    echo "< Deploy kcp and KubeStellar into Kubernetes >---------------"
+    kubectl kubestellar deploy "${deploy_flags[@]}"
+    echo "< Waiting for startup and fetching $folder/kubestellar.kubeconfig >---------------"
+    kubectl kubestellar get-external-kubeconfig -o "$folder"/kubestellar.kubeconfig
+    export KUBECONFIG="$folder/kubestellar.kubeconfig"
+    echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
+    user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
 fi
 
 # Ensure imw
