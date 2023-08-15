@@ -57,9 +57,9 @@ jobs:
         uses: azure/setup-kubectl@v3
         id: install
 
-# with:
-#           version: 'v1.27.4'
-      # - run: kubectl version
+        # with:
+          # version: 'v1.27.4'
+      - run: kubectl version || true
       
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
