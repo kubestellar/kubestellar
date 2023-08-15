@@ -62,7 +62,7 @@ https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.y
 
 <b>after:</b>
 ```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
 ```
 
 
@@ -156,9 +156,10 @@ git push origin --tags
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
 - Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
-    - Select the release branch (release-0.3)
-    - Add a release title (v.0.3.3)
+    - Select the release branch you created above (release-0.3)
+    - Add a release title (v.0.3.0)
     - Add some release notes ('generate release notes' if you like)
+    - select 'pre-release' as a the first step.  Once validated the release is working properly, come back and mark as 'release'
     - Attach the binaries that were created in the 'make-release-full' process above
         - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
         - GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'
