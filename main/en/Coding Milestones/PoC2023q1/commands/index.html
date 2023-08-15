@@ -2776,15 +2776,16 @@ QuickStart</a>.</p>
 https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh
 and does the following things.</p>
 <ol>
-<li>Downloads and installs kcp if it is not already evident on <code>$PATH</code>
-   (using <a href="#install-kcp-and-its-kubectl-plugins">the script below</a>.</li>
-<li>Starts a kcp server if one is not already running.</li>
-<li>Downloads and installs kubestellar if it is not already evident on
-   <code>$PATH</code> (using <a href="#install-kubestellar">the script below</a>.</li>
-<li><code>kubestellar start</code> if the KubeStellar controllers are not already
-   running or the ESPW does not (yet) exist.</li>
+<li>Downloads and installs kcp executables if they are not already
+   evident on <code>$PATH</code>.</li>
+<li>Downloads and installs kubestellar executables if they are not
+   already evident on <code>$PATH</code>.</li>
+<li>Ensures that kcp and KubeStellar are deployed (i.e., their
+   processes are running and their initial configurations have been
+   established) either as bare processes or as workload in a
+   pre-existing Kubernetes cluster.</li>
 </ol>
-<p>This script accepts the following command line flags; all are optional.</p>
+<p>This script accepts the following command line flags; all are optional.  The <code>--os</code>, <code>--arch</code>, and <code>--bind-address</code> flags are only useful when deploying as bare processes.  The deployment will be into a Kubernetes cluster if either <code>--external-endpoint</code> or <code>--openshift true</code> is given.</p>
 <ul>
 <li><code>--kubestellar-version $version</code>: specifies the release of
   KubeStellar to use.  When using a specific version, include the
@@ -2793,6 +2794,12 @@ and does the following things.</p>
 <li><code>--kcp-version $version</code>: specifies the kcp release to use.  The
   default is the one that works with the chosen release of
   KubeStellar.</li>
+<li><code>--openshift $bool</code>: specifies whether to the hosting cluster is an
+  OpenShift cluster. The default value is <code>false</code>.</li>
+<li><code>--endpoint-address $domain_name:$port</code>: specifies where an Ingress
+  controller or OpenShift router is listening for incoming TLS
+  connections from external (to the hosting cluster) clients of kcp
+  and KubeStellar.</li>
 <li><code>--os $OS</code>: specifies the operating system to use in selecting the
   executables to download and install.  Choices are <code>linux</code> and
   <code>darwin</code>.  Auto-detected if omitted.</li>

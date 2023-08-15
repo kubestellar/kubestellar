@@ -1065,6 +1065,26 @@
     Teardown the environment
   </a>
   
+    <nav class="md-nav" aria-label="Teardown the environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teardown-bare-processes" class="md-nav__link">
+    Teardown bare processes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teardown-kubernetes-workload" class="md-nav__link">
+    Teardown Kubernetes workload
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1801,6 +1821,26 @@
     Teardown the environment
   </a>
   
+    <nav class="md-nav" aria-label="Teardown the environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teardown-bare-processes" class="md-nav__link">
+    Teardown bare processes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teardown-kubernetes-workload" class="md-nav__link">
+    Teardown Kubernetes workload
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2221,11 +2261,17 @@ EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:com
 <a id="__codelineno-49-8" name="__codelineno-49-8" href="#__codelineno-49-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-49-9" name="__codelineno-49-9" href="#__codelineno-49-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
+<p>Teardown of KubeStellar depends on which style of deployment was used.</p>
+<h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>remove-kubestellar
+</code></pre></div>
+<h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
+<p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
