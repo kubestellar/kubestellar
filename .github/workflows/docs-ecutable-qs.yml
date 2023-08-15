@@ -56,7 +56,11 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
-  
+
+      - run: echo kubectl version
+      - run: echo kubectl version
+      - run: kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//'
+      
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
           docs-ecutable
