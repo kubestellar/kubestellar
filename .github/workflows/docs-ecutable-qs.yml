@@ -59,7 +59,7 @@ jobs:
           version: 'v1.27.4'
         id: install
 
-      - run: kubectl version
+      # - run: kubectl version
       
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
