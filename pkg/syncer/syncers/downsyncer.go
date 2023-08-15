@@ -229,6 +229,7 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 			return err
 		}
 	}
+	logger.V(4).Info("  listed objects from upstream", "objects", upstreamResourceList)
 
 	resourceForDown := convertToDownstream(resource, conversions)
 	logger.V(3).Info("  list resources from downstream")
@@ -237,6 +238,7 @@ func (ds *DownSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, con
 		logger.Error(err, "failed to list resource from downstream")
 		return err
 	}
+	logger.V(4).Info("  listed objects from downstream", "objects", downstreamResourceList)
 
 	logger.V(3).Info("  compute diff between upstream and downstream")
 	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList, setDownsyncAnnotation, hasDownsyncAnnotation)
@@ -331,10 +333,27 @@ func findWithObject(target unstructured.Unstructured, resourceList *unstructured
 	return nil, false
 }
 
+const downsyncKey = "edge.kcp.io/downsynced"
+
 func setDownsyncAnnotation(resource *unstructured.Unstructured) {
-	setAnnotation(resource, "edge.kcp.io/downsynced", "true")
+	setAnnotation(resource, downsyncKey, makeOwnedValue(resource))
 }
 
+// hasDownsyncAnnotation tests whether the given object has an annotation indicating
+// that this object is owned by the syncer.
+// The Deployment controller, for example, will copy annotations from a Deployment
+// object to owned ReplicaSet objects.
+// So it is not enough that there is some annotation with the right key, the value
+// has to be tested too.
+// But the value test can not be sensitive to something that changes between upstream
+// and downstream.
+// We assume that only the API group changes between upstream and downstream.
 func hasDownsyncAnnotation(resource *unstructured.Unstructured) bool {
-	return hasAnnotation(resource, "edge.kcp.io/downsynced")
+	ownedValue := makeOwnedValue(resource)
+	return getAnnotation(resource, downsyncKey) == ownedValue
+}
+
+func makeOwnedValue(object *unstructured.Unstructured) string {
+	gvk := object.GroupVersionKind()
+	return gvk.Kind + "/" + object.GetNamespace() + "/" + object.GetName()
 }
