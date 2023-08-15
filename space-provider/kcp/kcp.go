@@ -102,7 +102,7 @@ func (k *KcpClusterProvider) Create(name string, opts clusterprovider.Options) e
 	}
 	_, err := k.kcpWsClientset.Cluster(getClusterPath(opts.Parent)).Create(k.ctx, ws, metav1.CreateOptions{})
 	if err != nil && !k8sapierrors.IsAlreadyExists(err) {
-		k.logger.Error(err, "Failed to create KCP workspace", "workspace name", name)
+		k.logger.Error(err, "Failed to create KCP workspace", "space", name)
 		return err
 	}
 	k.logger.V(2).Info("Created KCP workspace for space", "name", name)
