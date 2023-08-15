@@ -57,8 +57,7 @@ jobs:
         uses: azure/setup-kubectl@v3
         id: install
 
-      - run: echo kubectl version
-      - run: echo kubectl version
+      - run: kubectl version
       - run: kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//'
       
       - run: |
