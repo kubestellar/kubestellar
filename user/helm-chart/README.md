@@ -8,7 +8,7 @@ Table of contests:
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
-[Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingreass with SSL passthrough.](../yaml/README.md)
+[Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingress with SSL passthrough.](../yaml/README.md)
 
 Deploy **KubeStellar** `stable` in a `kubestellar` namespace, with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port number:
 
