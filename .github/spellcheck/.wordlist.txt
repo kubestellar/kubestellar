@@ -20,6 +20,7 @@ APIVersion
 APIs
 Ansible
 ArgoCD
+ASN
 Brainer
 Braulio
 CA's
@@ -100,10 +101,12 @@ IMWs
 IncludeNamespaceObject
 Inclusivity
 IngressClass
+ISA
 JSON
 KCP
 KCS
 Karve
+Keypair
 Kube
 KubeFlex
 KubeStellar
@@ -134,6 +137,7 @@ MutatingAdmissionWebhook
 MutatingWebhookConfiguration
 NegotiatedAPIResource
 NetworkPolicy
+NGINX
 OLM
 ObjectMeta
 Onboarding
@@ -188,6 +192,7 @@ Slominski
 SNI
 SNIs
 Spreitzer
+SSL
 StatefulSet
 StatusSummary
 Stellari
@@ -269,6 +274,7 @@ codebase
 codeblock
 codeblocks
 commond
+commonname
 commonstuff
 config
 configMap
@@ -293,6 +299,7 @@ denaturing
 deployers
 dest
 dev
+dir
 discoverable
 dismayingly
 dns
@@ -324,6 +331,7 @@ flowcontrol
 george
 gh
 gitCommit
+githubusercontent
 gitTreeState
 gitVersion
 github
@@ -336,6 +344,7 @@ gpg
 gz
 hostPort
 hostvars
+hostname
 htdocs
 html
 http
@@ -355,11 +364,13 @@ jaggy
 joinus
 jq
 json
+jsonpath
 kcp
 kcp's
 ko
 kube
 kubeconfig
+kubeconfigs
 kubectl
 kubernetes
 kubestellar
@@ -376,6 +387,7 @@ loc
 localhost
 locationName
 locationSelectors
+logfile
 loopback
 mailboxwatch
 matchLabels
@@ -395,16 +407,19 @@ namespaces
 namespacessyncer
 natured
 nav
+nginx
 nonNamespacedObjects
 nonResourceURLs
 ns
 onboarding
 openshift
 opensource
+openssl
 os
 otherstuff
 ownerReferences
 oyaml
+passthrough
 pathname
 pathnames
 pki
@@ -457,11 +472,13 @@ structs
 subcommand
 subcommands
 subdirectory
+subdirectories
 subresources
 subfolder
 sublicense
 summarization
 summarizer
+svc
 syncTargetName
 syncTargetUID
 syncer
