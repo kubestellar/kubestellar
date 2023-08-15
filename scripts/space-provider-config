@@ -16,6 +16,9 @@
 
 set -e
 
+# This is a helper script to set the space provider access from config file
+# as Config value in space provider yaml.
+
 # Check if two parameters are provided
 if [ $# -ne 2 ]; then
     echo "Usage: $0 <config file> <provider yaml>"

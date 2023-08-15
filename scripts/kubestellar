@@ -245,7 +245,6 @@ EOF
 }
 
 function ensure_space_mgt() {
-    echo "space-mgt workspace setup" #TODO remove
     kubectl ws root &> /dev/null
     $SCRIPT_DIR/space-provider-config "$KUBECONFIG" "$SCRIPT_DIR/../config/space/provider_kcp.yaml"
     if kubectl get Workspace "$space_mgt_name" &> /dev/null; then
