@@ -54,14 +54,15 @@ latest=v0.3.0
 ```
 
 ### Update the branch name in kubestellar/docs/content/readme.md
+There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
 <b>before:</b>
 '''shell
-[![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
 '''
 
 <b>after:</b>
 '''shell
-[![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
 '''
 
 
