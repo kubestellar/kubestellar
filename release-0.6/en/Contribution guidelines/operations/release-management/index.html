@@ -2040,13 +2040,14 @@
 </span><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>...
 </code></pre></div></p>
 <h3 id="update-the-branch-name-in-kubestellardocscontentreadmemd">Update the branch name in kubestellar/docs/content/readme.md<a class="headerlink" href="#update-the-branch-name-in-kubestellardocscontentreadmemd" title="Permanent link">#</a></h3>
-<p><b>before:</b>
+<p>There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
+<b>before:</b>
 '''shell
-<a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml"><img alt="Generate and push docs" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
 '''</p>
 <p><b>after:</b>
 '''shell
-<a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml"><img alt="Generate and push docs" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0" /></a>&nbsp;&nbsp;&nbsp;
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
 '''</p>
 <h3 id="push-the-main-branch">Push the main branch<a class="headerlink" href="#push-the-main-branch" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
