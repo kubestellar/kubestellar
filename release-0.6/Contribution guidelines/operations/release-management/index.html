@@ -2045,7 +2045,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch<span class="o">=</span>main
 </code></pre></div></p>
 <p><b>after:</b>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch<span class="o">=</span>release-0.3
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch<span class="o">=</span>release-0.3.0
 </code></pre></div></p>
 <h3 id="push-the-main-branch">Push the main branch<a class="headerlink" href="#push-the-main-branch" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
@@ -2113,9 +2113,10 @@
 <li>
 <p>Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)</p>
 <ul>
-<li>Select the release branch (release-0.3)</li>
-<li>Add a release title (v.0.3.3)</li>
+<li>Select the release branch you created above (release-0.3)</li>
+<li>Add a release title (v.0.3.0)</li>
 <li>Add some release notes ('generate release notes' if you like)</li>
+<li>select 'pre-release' as a the first step.  Once validated the release is working properly, come back and mark as 'release'</li>
 <li>Attach the binaries that were created in the 'make-release-full' process above<ul>
 <li>You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files</li>
 <li>GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'</li>
