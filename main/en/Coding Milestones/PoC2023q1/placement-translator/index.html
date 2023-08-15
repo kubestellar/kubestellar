@@ -2541,14 +2541,14 @@ will have to get the latest code from github and <code>make build</code>.</p>
 commands defined for
 that</a>.  These
 require your shell to be in a state where <code>kubectl</code> manipulates the
-hosting cluster (the Kubernetes cluser into which you want to deploy
+hosting cluster (the Kubernetes cluster into which you want to deploy
 kcp and KubeStellar), either by virtue of having set your <code>KUBECONFIG</code>
 envar appropriately or putting the relevant contents in
 <code>~/.kube/config</code> or by passing <code>--kubeconfig</code> explicitly on the
 following command lines.</p>
 <p>Use the <a href="../commands/#deploy-to-cluster">kubectl kubestellar deploy
 command</a> to do the deployment.</p>
-<p>Then use the <a href="../commands/#fetch-kubeconfig-for-external-clients">kubectl kubestellat get-external-kubeconfig
+<p>Then use the <a href="../commands/#fetch-kubeconfig-for-external-clients">kubectl kubestellar get-external-kubeconfig
 command</a> to put
 into a file the kubeconfig that you will use as a user of kcp and
 KubeStellar.  Do not overwrite the kubeconfig file for your hosting
