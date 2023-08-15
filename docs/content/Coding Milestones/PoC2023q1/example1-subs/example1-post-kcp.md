@@ -74,7 +74,7 @@ To do the deployment and prepare to use it you will be using [the
 commands defined for
 that](../../commands/#deployment-into-a-kubernetes-cluster).  These
 require your shell to be in a state where `kubectl` manipulates the
-hosting cluster (the Kubernetes cluser into which you want to deploy
+hosting cluster (the Kubernetes cluster into which you want to deploy
 kcp and KubeStellar), either by virtue of having set your `KUBECONFIG`
 envar appropriately or putting the relevant contents in
 `~/.kube/config` or by passing `--kubeconfig` explicitly on the
@@ -83,7 +83,7 @@ following command lines.
 Use the [kubectl kubestellar deploy
 command](../../commands/#deploy-to-cluster) to do the deployment.
 
-Then use the [kubectl kubestellat get-external-kubeconfig
+Then use the [kubectl kubestellar get-external-kubeconfig
 command](../../commands/#fetch-kubeconfig-for-external-clients) to put
 into a file the kubeconfig that you will use as a user of kcp and
 KubeStellar.  Do not overwrite the kubeconfig file for your hosting

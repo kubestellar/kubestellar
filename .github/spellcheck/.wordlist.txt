@@ -101,6 +101,7 @@ IMWs
 IncludeNamespaceObject
 Inclusivity
 IngressClass
+IPv
 ISA
 JSON
 KCP
@@ -223,6 +224,7 @@ Upsyncing
 URL
 URL's
 ValidatingWebhookConfiguration
+VM
 VolumeAttachment
 WDS
 WEC
@@ -283,6 +285,7 @@ configmaps
 configs
 containerPort
 coredns
+commonName
 cosmo
 cpumemload
 crds
@@ -435,6 +438,7 @@ ps
 quickstart
 rbac
 readOnly
+readme
 readthedocs
 reconciler
 renature
@@ -466,6 +470,7 @@ speciald
 specialstuff
 src
 stderr
+stdin
 stdout
 struct
 structs

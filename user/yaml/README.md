@@ -238,7 +238,7 @@ kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kube
 kubectl exec -n kubestellar $(kubectl get pod -n kubestellar --selector=app=kubestellar-server -o jsonpath='{.items[0].metadata.name}') -- tar cf - "/home/kubestellar/kubestellar" | tar xf - --strip-components=2
 ```
 
-As an alternative the bootstrap script can be used with the `--deploy false` option as shown below. This alternative option does not require the architecture of the host OS to match the one inside the container. In this use case, it may be necessary to specify the version of **KubeSteller** with the `--kubestellar-version` argument to match the version deployed in the cluster.
+As an alternative the bootstrap script can be used with the `--deploy false` option as shown below. This alternative option does not require the architecture of the host OS to match the one inside the container. In this use case, it may be necessary to specify the version of **KubeStellar** with the `--kubestellar-version` argument to match the version deployed in the cluster.
 
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh) --deploy false
