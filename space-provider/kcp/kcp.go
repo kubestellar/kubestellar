@@ -258,12 +258,19 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 
 func buildRawConfig(baseRaw api.Config, spaceName string) api.Config {
 	main := "root"
+	delimiter := ":"
 	// remove all clusters and contexts exept main cluster/context
 	clusters := make(map[string]*api.Cluster)
 	contexts := make(map[string]*api.Context)
 	contexts[main] = baseRaw.Contexts[main]
 	// modify server path
-	baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, spaceName)
+	if strings.HasPrefix(spaceName, main+delimiter) {
+		// spaceName is full path
+		baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, spaceName)
+	} else {
+		baseRaw.Clusters[main].Server = strings.ReplaceAll(baseRaw.Clusters[main].Server, main, main+delimiter+spaceName)
+	}
+
 	clusters[main] = baseRaw.Clusters[main]
 	baseRaw.Clusters = clusters
 	baseRaw.Contexts = contexts
