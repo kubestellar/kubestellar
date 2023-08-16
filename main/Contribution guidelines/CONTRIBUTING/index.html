@@ -612,6 +612,26 @@
     Prerequisites
   </a>
   
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go" class="md-nav__link">
+    Go
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-packages" class="md-nav__link">
+    Other packages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1769,6 +1789,26 @@
     Prerequisites
   </a>
   
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go" class="md-nav__link">
+    Go
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-packages" class="md-nav__link">
+    Other packages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1882,7 +1922,8 @@
 <p>We can't wait to collaborate with you!</p>
 <h2 id="contributing-code">Contributing Code<a class="headerlink" href="#contributing-code" title="Permanent link">#</a></h2>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h3>
-<p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.
+<h4 id="go">Go<a class="headerlink" href="#go" title="Permanent link">#</a></h4>
+<p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.  See <a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">this gist</a> for another way to install Go.
   Please note that the go language version numbers in these files must exactly agree:</p>
 <div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
 
@@ -1891,6 +1932,12 @@
 - In the .github/workflows yaml files it is indicated by &quot;go-version&quot;
 </code></pre></div>
 <p>Check out our <a href="../../Getting-Started/quickstart/">QuickStart Guide</a></p>
+<h4 id="other-packages">Other packages<a class="headerlink" href="#other-packages" title="Permanent link">#</a></h4>
+<ul>
+<li>GNU make</li>
+<li><a href="https://github.com/ko-build/ko"><strong>ko</strong></a> (required for compiling KubeStellar Syncer)</li>
+<li><a href="https://github.com/slsa-framework"><strong>slsa-verifier</strong></a> needed in Ubuntu for ko signing</li>
+</ul>
 <h3 id="issues">Issues<a class="headerlink" href="#issues" title="Permanent link">#</a></h3>
 <p>Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.</p>
 <p>If you believe that there is a need for a fix and no existing issue covers it, feel free to create a new one.</p>

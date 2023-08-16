@@ -1645,39 +1645,24 @@
 
 <!--required-packages-start-->
 <div class="admonition tip">
-<p class="admonition-title">Required Packages:</p>
+<p class="admonition-title">Required Packages for running and using KubeStellar:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">General</label><label for="__tabbed_1_2">Mac</label><label for="__tabbed_1_3">Ubuntu</label><label for="__tabbed_1_4">Fedora/RHEL/CentOS</label><label for="__tabbed_1_5">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>You will need the following tools to run this KubeStellar quickstart example. 
+<p>You will need the following tools to deploy and use KubeStellar. 
 Select the tab for your environment for suggested commands to install them</p>
 <ul>
-<li>
-<p>make (only needed if you do more advanced builds; omitted from OS-specific instructions)</p>
-</li>
 <li>
 <p><strong>curl</strong> (omitted from most OS-specific instructions)</p>
 </li>
 <li>
-<p><a href="https://stedolan.github.io/jq/download/"><strong>jq</strong></a>       </p>
+<p><a href="https://stedolan.github.io/jq/download/"><strong>jq</strong></a></p>
 </li>
 <li>
 <p><a href="https://github.com/mikefarah/yq#install"><strong>yq</strong></a></p>
 </li>
 <li>
-<p><a href="https://docs.docker.com/engine/install/"><strong>docker</strong></a>         </p>
-</li>
-<li>
-<p><a href="https://kind.sigs.k8s.io/docs/user/quick-start/"><strong>kind</strong></a>        </p>
-</li>
-<li>
-<p><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> (version range expected: 1.23-1.25) </p>
-</li>
-<li>
-<p><a href="https://github.com/ko-build/ko"><strong>ko</strong></a> (required for compiling KubeStellar Syncer)</p>
-</li>
-<li>
-<p><a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce"><strong>GO v1.19</strong></a>         You will need GO to compile and run kcp and the Kubestellar processes         </p>
+<p><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> (version range expected: 1.23-1.25)</p>
 </li>
 </ul>
 </div>
@@ -1686,119 +1671,92 @@ Select the tab for your environment for suggested commands to install them</p>
 </code></pre></div>
 <div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install docker
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>open -a Docker
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install kind
-</code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>brew install kubectl
-</code></pre></div>
-<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>brew install ko
-</code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
-</div>
-<div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo apt-get install jq
-</code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo apt-get install yq
-</code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo mkdir -p /etc/apt/keyrings
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>sudo apt update
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
-</code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
-</code></pre></div>
-``` title="slsa-verifier - https://github.com/slsa-framework (verify ko signer)
-SLSA_VERIFIER=slsa-verifier-linux-$(dpkg --print-architecture)
-curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}
-chmod +x ${SLSA_VERIFIER}
-curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}.intoto.jsonl
-./${SLSA_VERIFIER} verify-artifact ./${SLSA_VERIFIER} --provenance-path ${SLSA_VERIFIER}.intoto.jsonl --source-uri github.com/slsa-framework/slsa-verifier
-sudo install ./${SLSA_VERIFIER} /usr/local/bin/slsa-verifier
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>``` title=&quot;ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)&quot;
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>KO_VERSION=$(curl -sSf https://api.github.com/repos/ko-build/ko/releases/latest | jq -r &#39;.tag_name&#39;) # latest version (with v prefix)
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>OS=$(uname -s)     # Linux, Darwin
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>ARCH=$(uname -m)  # x86_64, arm64, i386, s390x
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/${KO_VERSION}/ko_${KO_VERSION#v}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/${KO_VERSION}/multiple.intoto.jsonl &gt; multiple.intoto.jsonl
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>slsa-verifier verify-artifact ko.tar.gz --provenance-path multiple.intoto.jsonl --source-uri github.com/ko-build/ko --source-tag &quot;${KO_VERSION}&quot;
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>tar xzf ko.tar.gz ko
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>chmod +x ./ko
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>./ko version
-</code></pre></div>
-<div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>rm go.tar.gz
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>echo &#39;export PATH=$PATH:/usr/local/go/bin&#39; &gt;&gt; /etc/profile
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>source /etc/profile
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>go version
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>yum -y install jq
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a># easiest to install with snap
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>snap install yq
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo apt-get install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a># For AMD64 / x86_64
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a># For ARM64
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin/kind
-</code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a># For AMD64 / x86_64
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a># for ARM64 / aarch64
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
-</code></pre></div>
-<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>VERSION=&quot;0.14.1&quot; # choose the latest version (without v prefix)
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>OS=&quot;Linux&quot;    # or Darwin
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a># set proper architecture ( ARCH=x86_64  # or arm64, i386, s390x)
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a># for AMD64 / x86_64
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>[ $(uname -m) = x86_64 ] &amp;&amp; ARCH=&quot;x86_64&quot;
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a># for ARM64 / aarch64
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>[ $(uname -m) = aarch64 ] &amp;&amp; ARCH=&quot;arm64&quot;
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a># (simplified install without running slsa-verifier)
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>tar xzf ko.tar.gz ko
-<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>chmod +x ./ko &amp;&amp; sudo mv ./ko /usr/local/bin/ko
-</code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
+</code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>yum -y install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>choco install curl -y
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># easiest to install with snap
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install jq -y
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># For AMD64 / x86_64
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a># for ARM64 / aarch64
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>choco install yq -y
+<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>choco install curl -y
 </code></pre></div>
-<div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>choco install docker -y
+<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>choco install jq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>choco install yq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Required Packages for the example usage:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:5"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">General</label><label for="__tabbed_2_2">Mac</label><label for="__tabbed_2_3">Ubuntu</label><label for="__tabbed_2_4">Fedora/RHEL/CentOS</label><label for="__tabbed_2_5">Windows</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>You will need the following tools for the example usage of KubeStellar in this quickstart example.
+Select the tab for your environment for suggested commands to install them</p>
+<ul>
+<li>
+<p><a href="https://docs.docker.com/engine/install/"><strong>docker</strong></a> or <a href="https://podman.io/"><strong>podman</strong></a>, to support <code>kind</code></p>
+</li>
+<li>
+<p><a href="https://kind.sigs.k8s.io/docs/user/quick-start/"><strong>kind</strong></a></p>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>brew install docker
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>open -a Docker
 </code></pre></div>
-<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>VERSION=&quot;0.14.1&quot; # choose the latest version (without v prefix)
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>OS=&quot;Linux&quot;    # or Darwin
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a># set proper architecture ( ARCH=x86_64  # or arm64, i386, s390x)
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a># for AMD64 / x86_64
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>[ $(uname -m) = x86_64 ] &amp;&amp; ARCH=&quot;x86_64&quot;
-<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a># for ARM64 / aarch64
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>[ $(uname -m) = aarch64 ] &amp;&amp; ARCH=&quot;arm64&quot;
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a># (simplified install without running slsa-verifier)
-<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
-<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>tar xzf ko.tar.gz ko
-<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a>chmod +x ./ko &amp;&amp; sudo mv ./ko /usr/local/bin/ko
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>brew install kind
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo mkdir -p /etc/apt/keyrings
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>sudo apt update
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre></div>
-<a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">GO v1.19</a> - You will need GO to compile and run kcp and the KubeStellar processes.  Currently kcp requires go version 1.19.</p>
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
+</code></pre></div>
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a># For AMD64 / x86_64
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a># For ARM64
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin/kind
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>choco install docker -y
+</code></pre></div>
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
+</code></pre></div></p>
 </div>
 </div>
 </div>
