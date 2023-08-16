@@ -26,7 +26,7 @@ following:
 - T's UID
 
 The mailbox workspace gets an annotation whose key is
-`edge.kcp.io/sync-target-name` and whose value is the name of the
+`edge.kubestellar.io/sync-target-name` and whose value is the name of the
 workspace object (as seen in its parent workspace, the edge service
 provider workspace).
 
@@ -34,7 +34,7 @@ provider workspace).
 
 The mailbox controller needs three Kubernetes client configurations.
 One --- concerned with reading inventory --- is to access the
-APIExport view of the `edge.kcp.io` API group, to read the
+APIExport view of the `edge.kubestellar.io` API group, to read the
 `SyncTarget` objects.  This must be a client config that is pointed at
 the workspace (which is always `root:espw`, as far as I know) that has this
 APIExport and is authorized to read its view.  Another client config
@@ -135,14 +135,14 @@ In a separate terminal window(3), create an inventory management workspace as fo
 ```shell
 kubectl ws \~
 kubectl ws create imw --enter
-kubectl kcp bind apiexport root:espw:edge.kcp.io
+kubectl kcp bind apiexport root:espw:edge.kubestellar.io
 ```
 
 Then in that workspace, run the following command to create a `SyncTarget` object.
 
 ```shell
 cat <<EOF | kubectl apply -f -
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncTarget
 metadata:
   name: stest1
@@ -162,7 +162,7 @@ And you can verify that as follows:
 
 ```shell
 kubectl ws .
-kubectl get synctargets.edge.kcp.io
+kubectl get synctargets.edge.kubestellar.io
 ```
 
 ```shell
@@ -182,7 +182,7 @@ niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368   universal            
 ```
 
 FYI, if you look inside that workspace you will see an `APIBinding`
-named `bind-edge` that binds to the `APIExport` named `edge.kcp.io`
+named `bind-edge` that binds to the `APIExport` named `edge.kubestellar.io`
 from the edge service provider workspace (and this is why the
 controller needs to know the pathname of that workspace), so that the
 edge API is available in the mailbox workspace.
@@ -201,8 +201,8 @@ kubectl ws \~
 kubectl ws .
 kubectl ws imw
 kubectl ws .
-kubectl get synctargets.edge.kcp.io
-kubectl delete synctargets.edge.kcp.io stest1
+kubectl get synctargets.edge.kubestellar.io
+kubectl delete synctargets.edge.kubestellar.io stest1
 ```
 and watch the mailbox controller react as follows.
 

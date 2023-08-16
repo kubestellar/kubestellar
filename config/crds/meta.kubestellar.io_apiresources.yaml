@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: apiresources.meta.kcp.io
+  name: apiresources.meta.kubestellar.io
 spec:
-  group: meta.kcp.io
+  group: meta.kubestellar.io
   names:
     kind: APIResource
     listKind: APIResourceList

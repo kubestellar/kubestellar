@@ -36,9 +36,9 @@ type FakeSinglePlacementSlices struct {
 	Fake *FakeEdgeV1alpha1
 }
 
-var singleplacementslicesResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "singleplacementslices"}
+var singleplacementslicesResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "singleplacementslices"}
 
-var singleplacementslicesKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "SinglePlacementSlice"}
+var singleplacementslicesKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "SinglePlacementSlice"}
 
 // Get takes name of the singlePlacementSlice, and returns the corresponding singlePlacementSlice object, and an error if there is any.
 func (c *FakeSinglePlacementSlices) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.SinglePlacementSlice, err error) {

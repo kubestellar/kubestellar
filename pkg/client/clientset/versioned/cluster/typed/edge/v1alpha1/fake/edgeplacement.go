@@ -38,8 +38,8 @@ import (
 	edgev1alpha1client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
-var edgePlacementsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "edgeplacements"}
-var edgePlacementsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "EdgePlacement"}
+var edgePlacementsResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "edgeplacements"}
+var edgePlacementsKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "EdgePlacement"}
 
 type edgePlacementsClusterClient struct {
 	*kcptesting.Fake

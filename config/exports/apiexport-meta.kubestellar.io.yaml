@@ -2,8 +2,8 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIExport
 metadata:
   creationTimestamp: null
-  name: meta.kcp.io
+  name: meta.kubestellar.io
 spec:
   latestResourceSchemas:
-  - v230618-23cd8129.apiresources.meta.kcp.io
+  - v230816-2d48e9f7.apiresources.meta.kubestellar.io
 status: {}

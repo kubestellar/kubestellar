@@ -282,7 +282,7 @@ func (us *UpSyncer) getNamespaces() ([]string, error) {
 	return namespaces, nil
 }
 
-const upsyncKey = "edge.kcp.io/upsynced"
+const upsyncKey = "edge.kubestellar.io/upsynced"
 
 func setUpsyncAnnotation(resource *unstructured.Unstructured) {
 	setAnnotation(resource, upsyncKey, makeOwnedValue(resource))

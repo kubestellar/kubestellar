@@ -702,7 +702,7 @@ var GRsNotSupported = NewMapSet(
 )
 
 var GroupsNotForEdge = k8ssets.NewString(
-	"edge.kcp.io",
+	"edge.kubestellar.io",
 	"scheduling.kcp.io",
 	"tenancy.kcp.io",
 	"topology.kcp.io",

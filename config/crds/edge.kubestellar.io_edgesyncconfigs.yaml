@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: edgesyncconfigs.edge.kcp.io
+  name: edgesyncconfigs.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: EdgeSyncConfig
     listKind: EdgeSyncConfigList

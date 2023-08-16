@@ -25,7 +25,7 @@ import (
 // to reference the EdgePlacement that it is part of the response to.
 // We use a label rather than a field because field selectors do not work
 // on a resource defined by a CRD.
-const SourcePlacementLabelKey string = "edge.kcp.io/source-placement"
+const SourcePlacementLabelKey string = "edge.kubestellar.io/source-placement"
 
 // SinglePlacementSlice holds results of resolving a "where predicate".
 // For a given EdgePlacement object, the Where Resolver figures out which Locations

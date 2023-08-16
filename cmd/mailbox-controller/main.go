@@ -118,7 +118,7 @@ func main() {
 		logger.Error(err, "failed to create config from flags")
 		os.Exit(3)
 	}
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of edge exports")
 		os.Exit(4)

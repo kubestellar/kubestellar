@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: customizers.edge.kcp.io
+  name: customizers.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: Customizer
     listKind: CustomizerList
@@ -20,9 +20,9 @@ spec:
       openAPIV3Schema:
         description: "Customizer defines modifications to make to the relevant objects
           as they propagate from center to edge. \n The relevant objects are those
-          with an annotation whose key is \"edge.kcp.io/customizer\" and whose value
-          refers to this object as explained above. \n If this object is marked as
-          being subject to parameter expansion then the parameter-expanded version
+          with an annotation whose key is \"edge.kubestellar.io/customizer\" and whose
+          value refers to this object as explained above. \n If this object is marked
+          as being subject to parameter expansion then the parameter-expanded version
           of this object is what gets applied to a relevant object as it propagates
           to a destination."
         properties:

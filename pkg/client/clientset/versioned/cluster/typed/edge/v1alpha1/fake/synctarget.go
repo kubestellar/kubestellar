@@ -38,8 +38,8 @@ import (
 	edgev1alpha1client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
-var syncTargetsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "synctargets"}
-var syncTargetsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "SyncTarget"}
+var syncTargetsResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "synctargets"}
+var syncTargetsKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "SyncTarget"}
 
 type syncTargetsClusterClient struct {
 	*kcptesting.Fake

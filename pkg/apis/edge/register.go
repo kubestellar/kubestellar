@@ -17,5 +17,5 @@ limitations under the License.
 package workload
 
 const (
-	GroupName = "edge.kcp.io"
+	GroupName = "edge.kubestellar.io"
 )

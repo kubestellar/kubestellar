@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: edgeplacements.edge.kcp.io
+  name: edgeplacements.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: EdgePlacement
     listKind: EdgePlacementList

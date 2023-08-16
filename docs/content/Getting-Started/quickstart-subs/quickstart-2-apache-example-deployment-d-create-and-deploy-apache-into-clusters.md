@@ -7,7 +7,7 @@ In the `example-wmw` workspace create the following `EdgePlacement` object:
 kubectl ws root:my-org:example-wmw
 
 kubectl apply -f - <<EOF
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-c

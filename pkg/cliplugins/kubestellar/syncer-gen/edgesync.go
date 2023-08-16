@@ -637,7 +637,7 @@ func createEdgeSyncConfig(ctx context.Context, cfg *rest.Config, edgeSyncTargetN
 	}
 	discoveryClient := discovery.NewDiscoveryClientForConfigOrDie(cfg)
 	gk := schema.GroupKind{
-		Group: "edge.kcp.io",
+		Group: "edge.kubestellar.io",
 		Kind:  "EdgeSyncConfig",
 	}
 	groupResources, err := restmapper.GetAPIGroupResources(discoveryClient)

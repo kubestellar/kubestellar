@@ -1,9 +1,9 @@
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
-  name: edge.kcp.io
+  name: edge.kubestellar.io
 spec:
   reference:
     export:
-      name: edge.kcp.io
+      name: edge.kubestellar.io
       path: root:espw

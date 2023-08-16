@@ -88,7 +88,7 @@
     1. Configure downSyncResources in EdgeSyncConfig
         ```
         cat << EOL | kubectl apply -f -
-        apiVersion: edge.kcp.io/v1alpha1
+        apiVersion: edge.kubestellar.io/v1alpha1
         kind: EdgeSyncConfig
         metadata:
           name: wec1

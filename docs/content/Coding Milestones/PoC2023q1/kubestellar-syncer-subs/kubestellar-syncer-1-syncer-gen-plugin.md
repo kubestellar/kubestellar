@@ -21,7 +21,7 @@ spec:
   reference:
     export:
       path: root:espw
-      name: edge.kcp.io
+      name: edge.kubestellar.io
 EOL
 ```
 

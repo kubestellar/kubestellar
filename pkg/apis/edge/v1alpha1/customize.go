@@ -35,7 +35,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // the un-expanded string passes the validation conditions of the relevant object type.
 // For more broadly applicable customization, see Customizer objects.
 
-const ParameterExpansionAnnotationKey string = "edge.kcp.io/expand-parameters"
+const ParameterExpansionAnnotationKey string = "edge.kubestellar.io/expand-parameters"
 
 // CustomizerAnnotationKey is the key of an annotation that identifies the Customizer
 // that applies to the annotated object as it propagates from center to edge.
@@ -43,7 +43,7 @@ const ParameterExpansionAnnotationKey string = "edge.kcp.io/expand-parameters"
 // the same namespace and the value of this annotation is the name of the Customizer object;
 // otherwise the value of this annotation uses the form "namespace/name" to reference
 // the desired Customizer.
-const CustomizerAnnotationKey string = "edge.kcp.io/customizer"
+const CustomizerAnnotationKey string = "edge.kubestellar.io/customizer"
 
 // +crd
 // +genclient
@@ -53,7 +53,7 @@ const CustomizerAnnotationKey string = "edge.kcp.io/customizer"
 // from center to edge.
 //
 // The relevant objects are those with an annotation whose key is
-// "edge.kcp.io/customizer" and whose value refers to this object as explained above.
+// "edge.kubestellar.io/customizer" and whose value refers to this object as explained above.
 //
 // If this object is marked as being subject to parameter expansion then
 // the parameter-expanded version of this object is what gets applied to a relevant

@@ -55,7 +55,7 @@ workspace but with the following changes.
 - The `metadata.uid` is emptied.
 - The `metadata.ownerReferences` is emptied.  (Doing better would
   require tracking UID mappings from WMW to MBWS.)
-- In `metadata.labels`, `edge.kcp.io/projected=yes` is added.
+- In `metadata.labels`, `edge.kubestellar.io/projected=yes` is added.
 
 The placement translator does not react to changes to the workload
 objects in the mailbox workspace.
@@ -78,16 +78,16 @@ from the MBWS and making the following changes.
     corresponding annotation in the source is unchanged.
   - A "system" annotation is unchanged.  The system annotations are
     those whose key (a) starts with `kcp.io/` or other stuff followed
-    by `.kcp.io/` and (b) does not start with `edge.kcp.io/`.
+    by `.kcp.io/` and (b) does not start with `edge.kubestellar.io/`.
 - The source object's labels are merged into the destination object
-  using the same rules as for annotations, and `edge.kcp.io/projected`
+  using the same rules as for annotations, and `edge.kubestellar.io/projected`
   is set to `yes`.
 - The remainder of the `metadata` is unchanged.
 
 For objects --- other than `Namespace` objects --- that exist in a
 mailbox workspace and whose API GroupResource has been relevant to the
 placement translator since it started, ones that have the
-`edge.kcp.io/projected=yes` label but are not currently desired are
+`edge.kubestellar.io/projected=yes` label but are not currently desired are
 deleted.  The exclusion for `Namespace` objects is there because the
 placement translator does not take full ownership of them, rather it
 takes the position that there might be other parties that create
@@ -195,8 +195,8 @@ I0412 15:15:57.970014   94634 shared_informer.go:289] Caches are synced for what
 I0412 15:15:57.970178   94634 shared_informer.go:282] Waiting for caches to sync for where-resolver
 I0412 15:15:57.970192   94634 shared_informer.go:289] Caches are synced for where-resolver
 ...
-I0412 15:15:57.972185   94634 map-types.go:338] "Put" map="where" key="r0bdh9oumjkoag3s:edge-placement-s" val="[&{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-s    e1b1033d-49f2-45e8-8a90-6d0295b644b6 1184 1 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:r0bdh9oumjkoag3s] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-s 0e718a31-db21-47f1-b789-cd55835b1418 <nil> <nil>}] []  [{where-resolver Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"0e718a31-db21-47f1-b789-cd55835b1418\\\"}\":{}}}} }]} [{1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
-I0412 15:15:57.973740   94634 map-types.go:338] "Put" map="where" key="1i1weo8uoea04wxr:edge-placement-c" val="[&{SinglePlacementSlice edge.kcp.io/v1alpha1} {edge-placement-c    c446ca9b-8937-4751-89ab-058bcfb079c1 1183 3 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:1i1weo8uoea04wxr] [{edge.kcp.io/v1alpha1 EdgePlacement edge-placement-c c1e038b9-8bd8-4d22-8ab8-916e40c794d1 <nil> <nil>}] []  [{where-resolver Update edge.kcp.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"c1e038b9-8bd8-4d22-8ab8-916e40c794d1\\\"}\":{}}}} }]} [{1xpg93182scl85te location-f sync-target-f e6efb8bd-6755-45ac-b44d-5d38f978f990} {1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
+I0412 15:15:57.972185   94634 map-types.go:338] "Put" map="where" key="r0bdh9oumjkoag3s:edge-placement-s" val="[&{SinglePlacementSlice edge.kubestellar.io/v1alpha1} {edge-placement-s    e1b1033d-49f2-45e8-8a90-6d0295b644b6 1184 1 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:r0bdh9oumjkoag3s] [{edge.kubestellar.io/v1alpha1 EdgePlacement edge-placement-s 0e718a31-db21-47f1-b789-cd55835b1418 <nil> <nil>}] []  [{where-resolver Update edge.kubestellar.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"0e718a31-db21-47f1-b789-cd55835b1418\\\"}\":{}}}} }]} [{1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
+I0412 15:15:57.973740   94634 map-types.go:338] "Put" map="where" key="1i1weo8uoea04wxr:edge-placement-c" val="[&{SinglePlacementSlice edge.kubestellar.io/v1alpha1} {edge-placement-c    c446ca9b-8937-4751-89ab-058bcfb079c1 1183 3 2023-04-12 14:39:21 -0400 EDT <nil> <nil> map[] map[kcp.io/cluster:1i1weo8uoea04wxr] [{edge.kubestellar.io/v1alpha1 EdgePlacement edge-placement-c c1e038b9-8bd8-4d22-8ab8-916e40c794d1 <nil> <nil>}] []  [{where-resolver Update edge.kubestellar.io/v1alpha1 2023-04-12 14:39:21 -0400 EDT FieldsV1 {\"f:destinations\":{},\"f:metadata\":{\"f:ownerReferences\":{\".\":{},\"k:{\\\"uid\\\":\\\"c1e038b9-8bd8-4d22-8ab8-916e40c794d1\\\"}\":{}}}} }]} [{1xpg93182scl85te location-f sync-target-f e6efb8bd-6755-45ac-b44d-5d38f978f990} {1xpg93182scl85te location-g sync-target-g 5ee1c42e-a7d5-4363-ba10-2f13fe578e19}]}]"
 ...
 I0412 15:15:58.173974   94634 map-types.go:338] "Put" map="what" key="1i1weo8uoea04wxr:edge-placement-c" val={Downsync:map[{APIGroup: Resource:namespaces Name:commonstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:group1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group2.test Resources:[cogs] Namespaces:[] Names:[William]}]}
 I0412 15:15:58.180380   94634 map-types.go:338] "Put" map="what" key="r0bdh9oumjkoag3s:edge-placement-s" val={Downsync:map[{APIGroup: Resource:namespaces Name:specialstuff}:{APIVersion:v1 IncludeNamespaceObject:false}] Upsync:[{APIGroup:group1.test Resources:[sprockets flanges] Namespaces:[orbital] Names:[george cosmo]} {APIGroup:group3.test Resources:[widgets] Namespaces:[] Names:[*]}]}
@@ -245,7 +245,7 @@ Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13
 kubectl get SyncerConfig the-one -o yaml                           
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
@@ -341,7 +341,7 @@ Current workspace is "root:work-c"
 kubectl delete EdgePlacement edge-placement-c
 ```
 ``` { .bash .no-copy }
-edgeplacement.edge.kcp.io "edge-placement-c" deleted
+edgeplacement.edge.kubestellar.io "edge-placement-c" deleted
 ```
 
 That will cause the placement translator to log updates, as follows.
@@ -372,7 +372,7 @@ Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b75
 kubectl get SyncerConfig the-one -o yaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
@@ -403,7 +403,7 @@ Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13
 kubectl get SyncerConfig the-one -o yaml                           
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:

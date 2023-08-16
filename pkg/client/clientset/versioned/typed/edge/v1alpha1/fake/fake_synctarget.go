@@ -36,9 +36,9 @@ type FakeSyncTargets struct {
 	Fake *FakeEdgeV1alpha1
 }
 
-var synctargetsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "synctargets"}
+var synctargetsResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "synctargets"}
 
-var synctargetsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "SyncTarget"}
+var synctargetsKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "SyncTarget"}
 
 // Get takes name of the syncTarget, and returns the corresponding syncTarget object, and an error if there is any.
 func (c *FakeSyncTargets) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.SyncTarget, err error) {

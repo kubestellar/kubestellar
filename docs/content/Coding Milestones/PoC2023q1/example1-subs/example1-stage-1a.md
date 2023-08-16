@@ -14,7 +14,7 @@ sleep 60
 ...
 I0721 17:37:10.186848  189094 main.go:206] "Found APIExport view" exportName="e
 dge.kcp.io" serverURL="https://10.0.2.15:6443/services/apiexport/cseslli1ddit3s
-a5/edge.kcp.io"
+a5/edge.kubestellar.io"
 ...
 I0721 19:17:21.906984  189094 controller.go:300] "Created APIBinding" worker=1
 mbwsName="1d55jhazpo3d3va6-mb-551bebfd-b75e-47b1-b2e0-ff0a4cb7e006" mbwsCluster
@@ -50,7 +50,7 @@ More usefully, using custom columns you can get a listing that shows
 the _name_ of the associated SyncTarget.
 
 ```shell
-kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kcp\.io/sync-target-name'],CLUSTER:.spec.cluster"
+kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kubestellar\.io/sync-target-name'],CLUSTER:.spec.cluster"
 ```
 ``` { .bash .no-copy }
 NAME                                                       SYNCTARGET   CLUSTER
@@ -62,7 +62,7 @@ Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```shell
-GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "guilder") | .name')
+GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "guilder") | .name')
 echo The guilder mailbox workspace name is $GUILDER_WS
 ```
 ``` { .bash .no-copy }
@@ -70,7 +70,7 @@ The guilder mailbox workspace name is 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954
 ```
 
 ```shell
-FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kcp.io/sync-target-name"] == "florin") | .name')
+FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "florin") | .name')
 echo The florin mailbox workspace name is $FLORIN_WS
 ```
 ``` { .bash .no-copy }

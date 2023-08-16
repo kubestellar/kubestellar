@@ -40,7 +40,7 @@ spec:
   reference:
     export:
       path: root:espw
-      name: edge.kcp.io
+      name: edge.kubestellar.io
 ---
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
@@ -75,7 +75,7 @@ metadata:
   namespace: commonstuff
   name: httpd-htdocs
   annotations:
-    edge.kcp.io/expand-parameters: "true"
+    edge.kubestellar.io/expand-parameters: "true"
 data:
   index.html: |
     <!DOCTYPE html>
@@ -86,13 +86,13 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Customizer
 metadata:
   namespace: commonstuff
   name: example-customizer
   annotations:
-    edge.kcp.io/expand-parameters: "true"
+    edge.kubestellar.io/expand-parameters: "true"
 replacements:
 - path: "$.spec.template.spec.containers.0.env.0.value"
   value: '"env is %(env)"'
@@ -103,7 +103,7 @@ metadata:
   namespace: commonstuff
   name: commond
   annotations:
-    edge.kcp.io/customizer: example-customizer
+    edge.kubestellar.io/customizer: example-customizer
 spec:
   selector: {matchLabels: {app: common} }
   template:
@@ -143,7 +143,7 @@ directing the common workload to both edge clusters.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-c
@@ -196,7 +196,7 @@ metadata:
   namespace: specialstuff
   name: httpd-htdocs
   annotations:
-    edge.kcp.io/expand-parameters: "true"
+    edge.kubestellar.io/expand-parameters: "true"
 data:
   index.html: |
     <!DOCTYPE html>
@@ -207,13 +207,13 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: Customizer
 metadata:
   namespace: specialstuff
   name: example-customizer
   annotations:
-    edge.kcp.io/expand-parameters: "true"
+    edge.kubestellar.io/expand-parameters: "true"
 replacements:
 - path: "$.spec.template.spec.containers.0.env.0.value"
   value: '"in %(env) env"'
@@ -224,7 +224,7 @@ metadata:
   namespace: specialstuff
   name: speciald
   annotations:
-    edge.kcp.io/customizer: example-customizer
+    edge.kubestellar.io/customizer: example-customizer
 spec:
   selector: {matchLabels: {app: special} }
   template:
@@ -264,7 +264,7 @@ earlier, thus directing the special workload to just one edge cluster.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-s
@@ -317,7 +317,7 @@ kubestellar-where-resolver &
 sleep 45
 ```
 ``` { .bash .no-copy }
-I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
+I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io"
 ...
 I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
@@ -344,7 +344,7 @@ kubectl get SinglePlacementSlice -o yaml
 ``` { .bash .no-copy }
 apiVersion: v1
 items:
-- apiVersion: edge.kcp.io/v1alpha1
+- apiVersion: edge.kubestellar.io/v1alpha1
   destinations:
   - cluster: apmziqj9p9fqlflm
     locationName: florin
@@ -362,7 +362,7 @@ items:
     generation: 4
     name: edge-placement-c
     ownerReferences:
-    - apiVersion: edge.kcp.io/v1alpha1
+    - apiVersion: edge.kubestellar.io/v1alpha1
       kind: EdgePlacement
       name: edge-placement-c
       uid: 199cfe1e-48d9-4351-af5c-e66c83bf50dd

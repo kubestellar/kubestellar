@@ -39,8 +39,8 @@ import (
 	edgev1alpha1client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
-var customizersResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "customizers"}
-var customizersKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "Customizer"}
+var customizersResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "customizers"}
+var customizersKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "Customizer"}
 
 type customizersClusterClient struct {
 	*kcptesting.Fake

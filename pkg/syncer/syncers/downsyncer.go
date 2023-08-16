@@ -333,7 +333,7 @@ func findWithObject(target unstructured.Unstructured, resourceList *unstructured
 	return nil, false
 }
 
-const downsyncKey = "edge.kcp.io/downsynced"
+const downsyncKey = "edge.kubestellar.io/downsynced"
 
 func setDownsyncAnnotation(resource *unstructured.Unstructured) {
 	setAnnotation(resource, downsyncKey, makeOwnedValue(resource))

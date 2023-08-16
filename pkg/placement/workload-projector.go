@@ -984,7 +984,7 @@ func (wp *workloadProjector) syncSourceToDestLocked(ctx context.Context, logger 
 	}
 }
 
-const ProjectedLabelKey string = "edge.kcp.io/projected"
+const ProjectedLabelKey string = "edge.kubestellar.io/projected"
 const ProjectedLabelVal string = "yes"
 
 func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject) *unstructured.Unstructured {
@@ -1104,7 +1104,8 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 }
 
 func kvIsSystem(which, key string) bool {
-	return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/")) && !strings.Contains(key, "edge.kcp.io/")
+	return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/"))
+	// return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/")) && !strings.Contains(key, "edge.kubestellar.io/")
 }
 
 func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {

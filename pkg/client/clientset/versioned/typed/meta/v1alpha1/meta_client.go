@@ -32,7 +32,7 @@ type MetaV1alpha1Interface interface {
 	APIResourcesGetter
 }
 
-// MetaV1alpha1Client is used to interact with features provided by the meta.kcp.io group.
+// MetaV1alpha1Client is used to interact with features provided by the meta.kubestellar.io group.
 type MetaV1alpha1Client struct {
 	restClient rest.Interface
 }

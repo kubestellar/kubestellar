@@ -156,7 +156,7 @@ func main() {
 	}
 
 	// Get client config for view of APIExport of edge API
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kcp.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of edge APIExport")
 		os.Exit(30)
