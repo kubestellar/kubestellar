@@ -33,7 +33,6 @@ import (
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	apisclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/apis/v1alpha1"
-	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -41,6 +40,9 @@ import (
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
+	spaceclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 const wsNameSep = "-mb-"
@@ -55,12 +57,13 @@ const SyncTargetNameAnnotationKey = "edge.kubestellar.io/sync-target-name"
 type mbCtl struct {
 	context                    context.Context
 	espwPath                   string
+	spaceProvider              string
 	syncTargetClusterInformer  kcpcache.ScopeableSharedIndexInformer
 	syncTargetClusterLister    edgev1alpha1listers.SyncTargetClusterLister
 	syncTargetIndexer          cache.Indexer
 	workspaceScopedInformer    cache.SharedIndexInformer
 	workspaceScopedLister      tenancylisters.WorkspaceLister
-	workspaceScopedClient      tenancyclient.WorkspaceInterface
+	spaceMgtClientset          *spaceclientset.Clientset
 	apiBindingClusterInterface apisclient.APIBindingClusterInterface
 	queue                      workqueue.RateLimitingInterface // of mailbox workspace Name
 }
@@ -70,9 +73,10 @@ type mbCtl struct {
 // SyncTarget objects (not limited to one cluster).
 func newMailboxController(ctx context.Context,
 	espwPath string,
+	spaceProvider string,
 	syncTargetClusterPreInformer edgev1alpha1informers.SyncTargetClusterInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
-	workspaceScopedClient tenancyclient.WorkspaceInterface,
+	managerClientset *spaceclientset.Clientset,
 	apiBindingClusterInterface apisclient.APIBindingClusterInterface,
 ) *mbCtl {
 	syncTargetClusterInformer := syncTargetClusterPreInformer.Informer()
@@ -82,12 +86,13 @@ func newMailboxController(ctx context.Context,
 	ctl := &mbCtl{
 		context:                    ctx,
 		espwPath:                   espwPath,
+		spaceProvider:              spaceProvider,
 		syncTargetClusterInformer:  syncTargetClusterInformer,
 		syncTargetClusterLister:    syncTargetClusterPreInformer.Lister(),
 		syncTargetIndexer:          syncTargetClusterInformer.GetIndexer(),
 		workspaceScopedInformer:    workspacesInformer,
 		workspaceScopedLister:      workspaceScopedPreInformer.Lister(),
-		workspaceScopedClient:      workspaceScopedClient,
+		spaceMgtClientset:          managerClientset,
 		apiBindingClusterInterface: apiBindingClusterInterface,
 		queue:                      workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
@@ -220,33 +225,37 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 			logger.V(3).Info("Both SyncTarget and Workspace are absent or deleting, nothing to do", "mbwsName", mbwsName)
 			return false
 		}
-		err := ctl.workspaceScopedClient.Delete(ctx, mbwsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &workspace.UID}})
+		err := ctl.spaceMgtClientset.SpaceV1alpha1().Spaces(spacemanager.ProviderNS(ctl.spaceProvider)).Delete(ctx, mbwsName, metav1.DeleteOptions{})
 		if err == nil || k8sapierrors.IsNotFound(err) {
-			logger.V(2).Info("Deleted unwanted workspace", "mbwsName", mbwsName)
+			logger.V(2).Info("Deleted unwanted space", "mbwsName", mbwsName)
 			return false
 		}
-		logger.Error(err, "Failed to delete unwanted workspace", "mbwsName", mbwsName)
+		logger.Error(err, "Failed to delete unwanted space", "mbwsName", mbwsName)
 		return true
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
 	if workspace == nil {
-		ws := &tenancyv1alpha1.Workspace{
+		//create space for mailbox cluster
+		space := &spacev1alpha1.Space{
 			ObjectMeta: metav1.ObjectMeta{
 				Annotations: map[string]string{SyncTargetNameAnnotationKey: syncTarget.Name},
 				Name:        mbwsName,
 			},
-			Spec: tenancyv1alpha1.WorkspaceSpec{},
+			Spec: spacev1alpha1.SpaceSpec{
+				SpaceProviderDescName: ctl.spaceProvider,
+				Type:                  spacev1alpha1.SpaceTypeManaged,
+			},
 		}
-		_, err := ctl.workspaceScopedClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
+		_, err := ctl.spaceMgtClientset.SpaceV1alpha1().Spaces(spacemanager.ProviderNS(ctl.spaceProvider)).Create(ctx, space, metav1.CreateOptions{FieldManager: "mailbox-controller"})
 		if err == nil {
-			logger.V(2).Info("Created missing workspace", "mbwsName", mbwsName)
+			logger.V(2).Info("Created missing space", "mbwsName", mbwsName)
 			return false
 		}
 		if k8sapierrors.IsAlreadyExists(err) {
-			logger.V(3).Info("Missing workspace was created concurrently", "mbwsName", mbwsName)
+			logger.V(3).Info("Missing space was created concurrently", "mbwsName", mbwsName)
 			return false
 		}
-		logger.Error(err, "Failed to create workspace", "mbwsName", mbwsName)
+		logger.Error(err, "Failed to create space", "mbwsName", mbwsName)
 		return true
 	}
 	if workspace.DeletionTimestamp != nil {
@@ -269,6 +278,8 @@ func (ctl *mbCtl) ensureEdgeBinding(ctx context.Context, workspace *tenancyv1alp
 		return true
 	}
 	logger = logger.WithValues("mbwsCluster", mbwsCluster, "bindingName", TheEdgeBindingName)
+	//TODO discuss: we can use space-aware client here, but because APIBinding is a third-party API,
+	//              we will need to call ConfigForSpace() and create clientset for each MBWS.
 	scopedAPIBindingIfc := ctl.apiBindingClusterInterface.Cluster(mbwsCluster.Path())
 	theBinding, err := scopedAPIBindingIfc.Get(ctx, TheEdgeBindingName, metav1.GetOptions{})
 	if err != nil && !k8sapierrors.IsNotFound(err) {

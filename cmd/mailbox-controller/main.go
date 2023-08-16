@@ -51,16 +51,20 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	spaceclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10203"
+	kcsName := "espw"
+	spaceProvider := "default"
 	espwPath := logicalcluster.Name("root").Path().Join("espw").String()
 	fs := pflag.NewFlagSet("mailbox-controller", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
@@ -70,16 +74,20 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	fs.StringVar(&espwPath, "espw-path", espwPath, "the pathname of the edge service provider workspace")
 
-	inventoryClientOpts := clientopts.NewClientOpts("inventory", "access to APIExport view of SyncTarget objects")
-	inventoryClientOpts.SetDefaultCurrentContext("root")
+	//KubeStellar core space (KCS)
+	fs.StringVar(&kcsName, "kcs-name", kcsName, "the name of the KubeStellar core space")
+	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
 
 	workloadClientOpts := clientopts.NewClientOpts("workload", "access to edge service provider workspace")
 	mbwsClientOpts := clientopts.NewClientOpts("mbws", "access to mailbox workspaces (really all clusters)")
 	mbwsClientOpts.SetDefaultCurrentContext("base")
 
-	inventoryClientOpts.AddFlags(fs)
+	spaceMgtClientOpts := clientopts.NewClientOpts("space-mgt", "access to space management workspace")
+	spaceMgtClientOpts.SetDefaultCurrentContext("root:space-mgt")
+
 	workloadClientOpts.AddFlags(fs)
 	mbwsClientOpts.AddFlags(fs)
+	spaceMgtClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -102,23 +110,28 @@ func main() {
 		}
 	}()
 
-	// create config for accessing TMC service provider workspace
-	inventoryClientConfig, err := inventoryClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to make inventory config")
+		logger.Error(err, "failed to create space management config from flags")
 		os.Exit(2)
 	}
-
-	inventoryClientConfig.UserAgent = "mailbox-controller"
-
-	// create edgeSharedInformerFactory
-	options := resolveroptions.NewOptions()
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	managementClientset, err := spaceclientset.NewForConfig(spaceManagementConfig)
 	if err != nil {
-		logger.Error(err, "failed to create config from flags")
-		os.Exit(3)
+		logger.Error(err, "Failed to create clientset for space management")
 	}
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+	// create space-aware client
+	spaceclient, err := msclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create space-aware client")
+		os.Exit(5)
+	}
+
+	kcsRestConfig, err := spaceclient.ConfigForSpace(kcsName, spacemanager.ProviderNS(spaceProvider))
+	if err != nil {
+		logger.Error(err, "Failed to create config for core space")
+		os.Exit(7)
+	}
+	edgeViewConfig, err := configForViewOfExport(ctx, kcsRestConfig, "edge.kubestellar.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of edge exports")
 		os.Exit(4)
@@ -161,9 +174,8 @@ func main() {
 		os.Exit(24)
 	}
 
-	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
-		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
-		mbwsClientset.ApisV1alpha1().APIBindings(),
+	ctl := newMailboxController(ctx, espwPath, spaceProvider, syncTargetClusterPreInformer, workspaceScopedPreInformer,
+		managementClientset, mbwsClientset.ApisV1alpha1().APIBindings(),
 	)
 
 	doneCh := ctx.Done()
