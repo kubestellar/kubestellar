@@ -282,12 +282,15 @@ func (us *UpSyncer) getNamespaces() ([]string, error) {
 	return namespaces, nil
 }
 
+const upsyncKey = "edge.kcp.io/upsynced"
+
 func setUpsyncAnnotation(resource *unstructured.Unstructured) {
-	setAnnotation(resource, "edge.kcp.io/upsynced", "true")
+	setAnnotation(resource, upsyncKey, makeOwnedValue(resource))
 }
 
 func hasUpsyncAnnotation(resource *unstructured.Unstructured) bool {
-	return hasAnnotation(resource, "edge.kcp.io/upsynced")
+	ownedValue := makeOwnedValue(resource)
+	return getAnnotation(resource, upsyncKey) == ownedValue
 }
 
 func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {

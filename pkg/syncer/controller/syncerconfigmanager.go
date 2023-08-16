@@ -85,7 +85,12 @@ func (s *SyncerConfigManager) Refresh() {
 }
 
 func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
-	s.logger.V(3).Info(fmt.Sprintf("upsert namespace scoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
+	s.logger.V(3).Info("upsert namespace scoped resources as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(syncerConfig.Spec.NamespaceScope.Namespaces))
+	if lgr := s.logger.V(4); lgr.Enabled() {
+		for _, agrs := range upstreamGroupResourcesList {
+			lgr.Info("APIGroupResources", "group", agrs.Group, "bar", agrs.VersionedResources)
+		}
+	}
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	for _, namespace := range syncerConfig.Spec.NamespaceScope.Namespaces {
 		edgeSyncConfigResourceForNamespace := edgev1alpha1.EdgeSyncConfigResource{
@@ -100,6 +105,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 			version := syncerConfigResource.APIVersion
 			resource := syncerConfigResource.Resource
 			versionedResources := findVersionedResourcesByGVR(group, version, resource, upstreamGroupResourcesList, s.logger)
+			s.logger.V(4).Info("Mapped GVR to GVKs", "namespace", namespace, "gvr", syncerConfigResource, "gvks", versionedResources)
 			for _, versionedResource := range versionedResources {
 				edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
 					Group:     group,
@@ -170,7 +176,7 @@ func (s *SyncerConfigManager) upsertClusterScoped(syncerConfig edgev1alpha1.Sync
 }
 
 func (s *SyncerConfigManager) upsertUpsync(syncerConfig edgev1alpha1.SyncerConfig, downstreamGroupResourcesList []*restmapper.APIGroupResources) {
-	s.logger.V(3).Info(fmt.Sprintf("upsert clusterscoped resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
+	s.logger.V(3).Info(fmt.Sprintf("upsert upsynced resources as syncerConfig %s to syncConfigManager stores", syncerConfig.Name))
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
 	upsyncedNamespaces := sets.String{}
 	for _, upsync := range syncerConfig.Spec.Upsync {

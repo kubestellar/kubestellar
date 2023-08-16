@@ -235,11 +235,7 @@ func setAnnotation(resource *unstructured.Unstructured, key string, value string
 	resource.SetAnnotations(annotations)
 }
 
-func hasAnnotation(resource *unstructured.Unstructured, key string) bool {
+func getAnnotation(resource *unstructured.Unstructured, key string) string {
 	annotations := resource.GetAnnotations()
-	if annotations == nil {
-		return false
-	}
-	_, ok := annotations[key]
-	return ok
+	return annotations[key]
 }
