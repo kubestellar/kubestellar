@@ -9,7 +9,9 @@ We can't wait to collaborate with you!
 
 ### Prerequisites
 
-[Install Go](https://golang.org/doc/install/) 1.19+.
+#### Go
+
+[Install Go](https://golang.org/doc/install/) 1.19+.  See [this gist](https://gist.github.com/jniltinho/8758e15a9ef80a189fce) for another way to install Go.
   Please note that the go language version numbers in these files must exactly agree:
   
     Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
@@ -19,6 +21,12 @@ We can't wait to collaborate with you!
     - In the .github/workflows yaml files it is indicated by "go-version"
     
 Check out our [QuickStart Guide](../../Getting-Started/quickstart/)
+
+#### Other packages
+
+- GNU make
+- [__ko__](https://github.com/ko-build/ko) (required for compiling KubeStellar Syncer)
+  - [__slsa-verifier__](https://github.com/slsa-framework) needed in Ubuntu for ko signing
 
 ### Issues
 Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.
