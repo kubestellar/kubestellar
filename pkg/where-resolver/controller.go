@@ -19,6 +19,7 @@ package where_resolver
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -78,7 +79,12 @@ type controller struct {
 	synctargetIndexer cache.Indexer
 }
 
-func NewController(
+func NewController[
+	EpA EpAccess,
+	SpsA SpsAccess,
+	LocA LocAccess,
+	StA StAccess,
+](
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgeClient ksclientset.Interface,
@@ -86,14 +92,19 @@ func NewController(
 	// singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
 	// locationAccess edgev1alpha1informers.LocationClusterInformer,
 	// syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
-	edgePlacementAccess edgev1alpha1informers.EdgePlacementInformer,
-	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceInformer,
-	locationAccess edgev1alpha1informers.LocationInformer,
-	syncTargetAccess edgev1alpha1informers.SyncTargetInformer,
+	edgePlacementAccess EpA,
+	singlePlacementSliceAccess SpsA,
+	locationAccess LocA,
+	syncTargetAccess StA,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
+	// TOOD(waltforme): add all-cluster access
+	epa := reflect.ValueOf(edgePlacementAccess).Interface().(*edgev1alpha1informers.EdgePlacementInformer)
+	spsa := reflect.ValueOf(singlePlacementSliceAccess).Interface().(*edgev1alpha1informers.SinglePlacementSliceInformer)
+	loca := reflect.ValueOf(locationAccess).Interface().(*edgev1alpha1informers.LocationInformer)
+	sta := reflect.ValueOf(syncTargetAccess).Interface().(*edgev1alpha1informers.SyncTargetInformer)
 	c := &controller{
 		context: context,
 		queue:   queue,
@@ -101,26 +112,26 @@ func NewController(
 		edgeClusterClient: edgeClusterClient,
 		edgeClient:        edgeClient,
 
-		edgePlacementLister:  edgePlacementAccess.Lister(),
-		edgePlacementIndexer: edgePlacementAccess.Informer().GetIndexer(),
+		edgePlacementLister:  (*epa).Lister(),
+		edgePlacementIndexer: (*epa).Informer().GetIndexer(),
 
-		singlePlacementSliceLister:  singlePlacementSliceAccess.Lister(),
-		singlePlacementSliceIndexer: singlePlacementSliceAccess.Informer().GetIndexer(),
+		singlePlacementSliceLister:  (*spsa).Lister(),
+		singlePlacementSliceIndexer: (*spsa).Informer().GetIndexer(),
 
-		locationLister:  locationAccess.Lister(),
-		locationIndexer: locationAccess.Informer().GetIndexer(),
+		locationLister:  (*loca).Lister(),
+		locationIndexer: (*loca).Informer().GetIndexer(),
 
-		synctargetLister:  syncTargetAccess.Lister(),
-		synctargetIndexer: syncTargetAccess.Informer().GetIndexer(),
+		synctargetLister:  (*sta).Lister(),
+		synctargetIndexer: (*sta).Informer().GetIndexer(),
 	}
 
-	edgePlacementAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	(*epa).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    c.enqueueEdgePlacement,
 		UpdateFunc: func(_, newObj interface{}) { c.enqueueEdgePlacement(newObj) },
 		DeleteFunc: c.enqueueEdgePlacement,
 	})
 
-	locationAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	(*loca).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueLocation,
 		UpdateFunc: func(old, obj interface{}) {
 			oldLoc := old.(*edgev1alpha1.Location)
@@ -132,7 +143,7 @@ func NewController(
 		DeleteFunc: c.enqueueLocation,
 	})
 
-	syncTargetAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	(*sta).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueSyncTarget,
 		UpdateFunc: func(old, obj interface{}) {
 			oldST := old.(*edgev1alpha1.SyncTarget)

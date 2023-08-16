@@ -40,6 +40,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
 )
 
@@ -95,100 +96,168 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	var edgeViewConfig *rest.Config = espwRestConfig
+
+	var edgeViewConfig *rest.Config
 	if options.Provider == resolveroptions.ClusterProviderKCP {
 		edgeViewConfig, err = configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
 		if err != nil {
 			logger.Error(err, "failed to create config for view of edge exports")
 			return err
 		}
+	} else {
+		edgeViewConfig = espwRestConfig
 	}
-	// edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
-	edgeViewClusterClientset, err := ksclientset.NewForConfig(edgeViewConfig)
-	if err != nil {
-		logger.Error(err, "failed to create clientset for view of edge exports")
-		return err
-	}
-	// edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
-	// create schedulingSharedInformerFactory
-	rootRestConfig, err := options.RootClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "failed to create config from flags")
-		return err
-	}
-	var schedulingViewConfig *rest.Config = rootRestConfig
-	if options.Provider == resolveroptions.ClusterProviderKCP {
-		schedulingViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
+	if options.Provider == resolveroptions.ClusterProviderKube {
+		edgeViewClusterClientset, err := ksclientset.NewForConfig(edgeViewConfig)
 		if err != nil {
-			logger.Error(err, "failed to create config for view of scheduling exports")
+			logger.Error(err, "failed to create clientset for view of edge exports")
 			return err
 		}
-	}
-	schedulingViewClusterClientset, err := kcpclientset.NewForConfig(schedulingViewConfig)
-	if err != nil {
-		logger.Error(err, "failed to create clientset for view of scheduling exports")
-		return err
-	}
-	schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
+		edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
-	// create workloadSharedInformerFactory
-	var workloadViewConfig *rest.Config = rootRestConfig
-	if options.Provider == resolveroptions.ClusterProviderKCP {
-		workloadViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
+		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
 		if err != nil {
-			logger.Error(err, "failed to create config for view of workload exports")
+			logger.Error(err, "failed to create config from flags")
 			return err
 		}
+		edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+		if err != nil {
+			logger.Error(err, "failed to create edge all-cluster clientset for controller")
+			return err
+		}
+		edgeClientset, err := ksclientset.NewForConfig(baseRestConfig)
+		if err != nil {
+			logger.Error(err, "failed to create edge clientset for controller")
+			return err
+		}
+		var edgePlacementAccess = edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements()
+		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
+		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
+		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
+		// experiment
+		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
+		es, err := wheresolver.NewController[
+			*edgev1alpha1informers.EdgePlacementInformer,
+			*edgev1alpha1informers.SinglePlacementSliceInformer,
+		](
+			ctx,
+			edgeClusterClientset,
+			edgeClientset,
+			&edgePlacementAccess,
+			&singlePlacementSliceAccess,
+			&locationAccess,
+			&synctargetAccess,
+		)
+		if err != nil {
+			logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)
+			return err
+		}
+
+		// run where-resolver
+		doneCh := ctx.Done()
+
+		edgeSharedInformerFactory.Start(doneCh)
+		edgeSharedInformerFactory.WaitForCacheSync(doneCh)
+
+		es.Run(numThreads)
+
+		return nil
+	} else { // kcp
+		edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+		if err != nil {
+			logger.Error(err, "failed to create clientset for view of edge exports")
+			return err
+		}
+		edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+
+		// create schedulingSharedInformerFactory
+		rootRestConfig, err := options.RootClientOpts.ToRESTConfig()
+		if err != nil {
+			logger.Error(err, "failed to create config from flags")
+			return err
+		}
+		var schedulingViewConfig *rest.Config = rootRestConfig
+		if options.Provider == resolveroptions.ClusterProviderKCP {
+			schedulingViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
+			if err != nil {
+				logger.Error(err, "failed to create config for view of scheduling exports")
+				return err
+			}
+		}
+		schedulingViewClusterClientset, err := kcpclientset.NewForConfig(schedulingViewConfig)
+		if err != nil {
+			logger.Error(err, "failed to create clientset for view of scheduling exports")
+			return err
+		}
+		schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
+
+		// create workloadSharedInformerFactory
+		var workloadViewConfig *rest.Config = rootRestConfig
+		if options.Provider == resolveroptions.ClusterProviderKCP {
+			workloadViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
+			if err != nil {
+				logger.Error(err, "failed to create config for view of workload exports")
+				return err
+			}
+		}
+		workloadViewClusterClientset, err := kcpclientset.NewForConfig(workloadViewConfig)
+		if err != nil {
+			logger.Error(err, "failed to create clientset for view of workload exports")
+			return err
+		}
+		workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
+
+		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
+		if err != nil {
+			logger.Error(err, "failed to create config from flags")
+			return err
+		}
+		edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+		if err != nil {
+			logger.Error(err, "failed to create edge all-cluster clientset for controller")
+			return err
+		}
+		edgeClientset, err := ksclientset.NewForConfig(baseRestConfig)
+		if err != nil {
+			logger.Error(err, "failed to create edge clientset for controller")
+			return err
+		}
+		var edgePlacementAccess = edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements()
+		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
+		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
+		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
+		// experiment
+		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
+		es, err := wheresolver.NewController[*edgev1alpha1informers.EdgePlacementClusterInformer](
+			ctx,
+			edgeClusterClientset,
+			edgeClientset,
+			&edgePlacementAccess,
+			&singlePlacementSliceAccess,
+			&locationAccess,
+			&synctargetAccess,
+		)
+		if err != nil {
+			logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)
+			return err
+		}
+
+		// run where-resolver
+		doneCh := ctx.Done()
+
+		edgeSharedInformerFactory.Start(doneCh)
+		schedulingSharedInformerFactory.Start(doneCh)
+		workloadSharedInformerFactory.Start(doneCh)
+
+		edgeSharedInformerFactory.WaitForCacheSync(doneCh)
+		schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
+		workloadSharedInformerFactory.WaitForCacheSync(doneCh)
+
+		es.Run(numThreads)
+
+		return nil
 	}
-	workloadViewClusterClientset, err := kcpclientset.NewForConfig(workloadViewConfig)
-	if err != nil {
-		logger.Error(err, "failed to create clientset for view of workload exports")
-		return err
-	}
-	workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
-
-	// create where-resolver
-	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "failed to create config from flags")
-		return err
-	}
-	edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
-	edgeClientset := ksclientset.NewForConfigOrDie(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "failed to create edge clientset for controller")
-		return err
-	}
-	es, err := wheresolver.NewController(
-		ctx,
-		edgeClusterClientset,
-		edgeClientset,
-		edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements(),
-		edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices(),
-		edgeSharedInformerFactory.Edge().V1alpha1().Locations(),
-		edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets(),
-	)
-	if err != nil {
-		logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)
-		return err
-	}
-
-	// run where-resolver
-	doneCh := ctx.Done()
-
-	edgeSharedInformerFactory.Start(doneCh)
-	schedulingSharedInformerFactory.Start(doneCh)
-	workloadSharedInformerFactory.Start(doneCh)
-
-	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
-	schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
-	workloadSharedInformerFactory.WaitForCacheSync(doneCh)
-
-	es.Run(numThreads)
-
-	return nil
 }
 
 func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exportName string) (*rest.Config, error) {
