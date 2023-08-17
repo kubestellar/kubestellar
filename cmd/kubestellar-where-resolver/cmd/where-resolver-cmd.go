@@ -31,9 +31,7 @@ import (
 
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
-	kcpclientsetnoncluster "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
@@ -90,31 +88,28 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	// create edgeSharedInformerFactory
 	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
 
-	var edgeViewConfig *rest.Config
+	var edgeViewConfig = espwRestConfig
 	if options.Provider == wheresolver.ClusterProviderKCP {
 		edgeViewConfig, err = configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
 		if err != nil {
 			logger.Error(err, "failed to create config for view of edge exports")
 			return err
 		}
-	} else {
-		edgeViewConfig = espwRestConfig
 	}
 
 	if options.Provider == wheresolver.ClusterProviderKube {
-		edgeViewClusterClientset, err := ksclientset.NewForConfig(edgeViewConfig)
+		edgeViewClientset, err := ksclientset.NewForConfig(edgeViewConfig)
 		if err != nil {
 			logger.Error(err, "failed to create clientset for view of edge exports")
 			return err
 		}
-		edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+		edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClientset, resyncPeriod)
 
 		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
 		if err != nil {
@@ -174,43 +169,6 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		}
 		edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
 
-		// create schedulingSharedInformerFactory
-		rootRestConfig, err := options.RootClientOpts.ToRESTConfig()
-		if err != nil {
-			logger.Error(err, "failed to create config from flags")
-			return err
-		}
-		var schedulingViewConfig *rest.Config = rootRestConfig
-		if options.Provider == wheresolver.ClusterProviderKCP {
-			schedulingViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
-			if err != nil {
-				logger.Error(err, "failed to create config for view of scheduling exports")
-				return err
-			}
-		}
-		schedulingViewClusterClientset, err := kcpclientset.NewForConfig(schedulingViewConfig)
-		if err != nil {
-			logger.Error(err, "failed to create clientset for view of scheduling exports")
-			return err
-		}
-		schedulingSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedulingViewClusterClientset, resyncPeriod)
-
-		// create workloadSharedInformerFactory
-		var workloadViewConfig *rest.Config = rootRestConfig
-		if options.Provider == wheresolver.ClusterProviderKCP {
-			workloadViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
-			if err != nil {
-				logger.Error(err, "failed to create config for view of workload exports")
-				return err
-			}
-		}
-		workloadViewClusterClientset, err := kcpclientset.NewForConfig(workloadViewConfig)
-		if err != nil {
-			logger.Error(err, "failed to create clientset for view of workload exports")
-			return err
-		}
-		workloadSharedInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(workloadViewClusterClientset, resyncPeriod)
-
 		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
 		if err != nil {
 			logger.Error(err, "failed to create config from flags")
@@ -256,12 +214,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		doneCh := ctx.Done()
 
 		edgeSharedInformerFactory.Start(doneCh)
-		schedulingSharedInformerFactory.Start(doneCh)
-		workloadSharedInformerFactory.Start(doneCh)
-
 		edgeSharedInformerFactory.WaitForCacheSync(doneCh)
-		schedulingSharedInformerFactory.WaitForCacheSync(doneCh)
-		workloadSharedInformerFactory.WaitForCacheSync(doneCh)
 
 		es.Run(numThreads)
 
@@ -270,7 +223,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 }
 
 func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exportName string) (*rest.Config, error) {
-	providerClient, err := kcpclientsetnoncluster.NewForConfig(providerConfig)
+	providerClient, err := kcpclientset.NewForConfig(providerConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client for service provider workspace: %w", err)
 	}
