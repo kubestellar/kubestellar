@@ -22,7 +22,13 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	// edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+)
+
+type ClusterProvider string
+
+const (
+	ClusterProviderKCP  ClusterProvider = "kcp"
+	ClusterProviderKube ClusterProvider = "kubernetes"
 )
 
 type (
@@ -32,15 +38,12 @@ type (
 	EpAccess interface {
 		*edgev1alpha1informers.EdgePlacementInformer | *edgev1alpha1informers.EdgePlacementClusterInformer
 	}
-
 	SpsAccess interface {
 		*edgev1alpha1informers.SinglePlacementSliceInformer | *edgev1alpha1informers.SinglePlacementSliceClusterInformer
 	}
-
 	LocAccess interface {
 		*edgev1alpha1informers.LocationInformer | *edgev1alpha1informers.LocationClusterInformer
 	}
-
 	StAccess interface {
 		*edgev1alpha1informers.SyncTargetInformer | *edgev1alpha1informers.SyncTargetClusterInformer
 	}
@@ -56,7 +59,7 @@ func IdentifyEpAccessScope[A EpAccess](access A) string {
 			return "one cluster EdgePlacement Access"
 		} else if a, ok := any(access).(*edgev1alpha1informers.EdgePlacementClusterInformer); ok {
 			fmt.Printf("pointer of edgev1alpha1informers.EdgePlacementClusterInformer at %v\n", a)
-			return "all Cluster EdgePlacement Access"
+			return "all cluster EdgePlacement Access"
 		}
 	}
 	fmt.Println("something mystery")

@@ -56,8 +56,9 @@ type queueItem struct {
 }
 
 type controller struct {
-	context context.Context
-	queue   workqueue.RateLimitingInterface
+	provider ClusterProvider
+	context  context.Context
+	queue    workqueue.RateLimitingInterface
 
 	edgeClusterClient edgeclientset.ClusterInterface
 	edgeClient        ksclientset.Interface
@@ -85,6 +86,7 @@ func NewController[
 	LocA LocAccess,
 	StA StAccess,
 ](
+	provider ClusterProvider,
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgeClient ksclientset.Interface,
@@ -106,8 +108,9 @@ func NewController[
 	loca := reflect.ValueOf(locationAccess).Interface().(*edgev1alpha1informers.LocationInformer)
 	sta := reflect.ValueOf(syncTargetAccess).Interface().(*edgev1alpha1informers.SyncTargetInformer)
 	c := &controller{
-		context: context,
-		queue:   queue,
+		provider: provider,
+		context:  context,
+		queue:    queue,
 
 		edgeClusterClient: edgeClusterClient,
 		edgeClient:        edgeClient,

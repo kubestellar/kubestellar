@@ -98,7 +98,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 
 	var edgeViewConfig *rest.Config
-	if options.Provider == resolveroptions.ClusterProviderKCP {
+	if options.Provider == wheresolver.ClusterProviderKCP {
 		edgeViewConfig, err = configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
 		if err != nil {
 			logger.Error(err, "failed to create config for view of edge exports")
@@ -108,7 +108,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		edgeViewConfig = espwRestConfig
 	}
 
-	if options.Provider == resolveroptions.ClusterProviderKube {
+	if options.Provider == wheresolver.ClusterProviderKube {
 		edgeViewClusterClientset, err := ksclientset.NewForConfig(edgeViewConfig)
 		if err != nil {
 			logger.Error(err, "failed to create clientset for view of edge exports")
@@ -135,12 +135,15 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
 		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
-		// experiment
+		// TODO(waltforme): sanity check
 		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
 		es, err := wheresolver.NewController[
 			*edgev1alpha1informers.EdgePlacementInformer,
 			*edgev1alpha1informers.SinglePlacementSliceInformer,
+			*edgev1alpha1informers.LocationInformer,
+			*edgev1alpha1informers.SyncTargetInformer,
 		](
+			options.Provider,
 			ctx,
 			edgeClusterClientset,
 			edgeClientset,
@@ -178,7 +181,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 			return err
 		}
 		var schedulingViewConfig *rest.Config = rootRestConfig
-		if options.Provider == resolveroptions.ClusterProviderKCP {
+		if options.Provider == wheresolver.ClusterProviderKCP {
 			schedulingViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "scheduling.kcp.io")
 			if err != nil {
 				logger.Error(err, "failed to create config for view of scheduling exports")
@@ -194,7 +197,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 
 		// create workloadSharedInformerFactory
 		var workloadViewConfig *rest.Config = rootRestConfig
-		if options.Provider == resolveroptions.ClusterProviderKCP {
+		if options.Provider == wheresolver.ClusterProviderKCP {
 			workloadViewConfig, err = configForViewOfExport(ctx, rootRestConfig, "workload.kcp.io")
 			if err != nil {
 				logger.Error(err, "failed to create config for view of workload exports")
@@ -227,9 +230,15 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
 		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
-		// experiment
+		// TODO(waltforme): sanity check
 		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
-		es, err := wheresolver.NewController[*edgev1alpha1informers.EdgePlacementClusterInformer](
+		es, err := wheresolver.NewController[
+			*edgev1alpha1informers.EdgePlacementClusterInformer,
+			*edgev1alpha1informers.SinglePlacementSliceClusterInformer,
+			*edgev1alpha1informers.LocationClusterInformer,
+			*edgev1alpha1informers.SyncTargetClusterInformer,
+		](
+			options.Provider,
 			ctx,
 			edgeClusterClientset,
 			edgeClientset,

@@ -23,13 +23,7 @@ import (
 	"k8s.io/component-base/logs"
 
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
-)
-
-type ClusterProvider string
-
-const (
-	ClusterProviderKCP  = "kcp"
-	ClusterProviderKube = "kubernetes"
+	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
 )
 
 type Options struct {
@@ -37,7 +31,7 @@ type Options struct {
 	RootClientOpts clientoptions.ClientOpts
 	BaseClientOpts clientoptions.ClientOpts
 	Logs           *logs.Options
-	Provider       ClusterProvider
+	Provider       wheresolver.ClusterProvider
 }
 
 func NewOptions() *Options {
@@ -46,8 +40,8 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	// Default to use kcp
-	// var provider ClusterProvider = ClusterProviderKCP
-	var provider ClusterProvider = ClusterProviderKube
+	var provider wheresolver.ClusterProvider = wheresolver.ClusterProviderKCP
+	// var provider wheresolver.ClusterProvider = wheresolver.ClusterProviderKube
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
@@ -63,7 +57,7 @@ func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.RootClientOpts.AddFlags(fs)
 	options.BaseClientOpts.AddFlags(fs)
 
-	if options.Provider == ClusterProviderKCP {
+	if options.Provider == wheresolver.ClusterProviderKCP {
 		options.RootClientOpts.SetDefaultUserAndCluster("kcp-admin", "root")
 		options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
 	}
