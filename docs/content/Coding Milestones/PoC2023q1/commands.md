@@ -354,6 +354,21 @@ follows.
 - a `kubectl` command line flag, for accessing the hosting cluster.
 - `-X`: for debugging, `set -x` in the script that implements this command.
 
+### Remove deployment to a Kubernetes cluster
+
+The deployent of kcp and KubeStellar as a Kubernetes workload is done
+by making a "release" (this is a [technical term in
+Helm](https://helm.sh/docs/intro/cheatsheet/#basic-interpretationscontext)
+whose meaning might surprise you) of a Helm chart.  This release is
+named "kubestellar".  To undo the deployment, just use the Helm
+command to delete that release.
+
+```shell
+helm delete kubestellar
+```
+
+**NOTE**: this is a detail that might change in the future.
+
 ## KubeStellar platform user commands
 
 The remainder of the commands in this document are for users rather
