@@ -63,21 +63,21 @@ type controller struct {
 	edgeClusterClient edgeclientset.ClusterInterface
 	edgeClient        ksclientset.Interface
 
-	// singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
-	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceLister
-	singlePlacementSliceIndexer cache.Indexer
+	edgePlacementClusterLister edgev1alpha1listers.EdgePlacementClusterLister
+	edgePlacementLister        edgev1alpha1listers.EdgePlacementLister
+	edgePlacementIndexer       cache.Indexer
 
-	// edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
-	edgePlacementLister  edgev1alpha1listers.EdgePlacementLister
-	edgePlacementIndexer cache.Indexer
+	singlePlacementSliceClusterLister edgev1alpha1listers.SinglePlacementSliceClusterLister
+	singlePlacementSliceLister        edgev1alpha1listers.SinglePlacementSliceLister
+	singlePlacementSliceIndexer       cache.Indexer
 
-	// locationLister  edgev1alpha1listers.LocationClusterLister
-	locationLister  edgev1alpha1listers.LocationLister
-	locationIndexer cache.Indexer
+	locationClusterLister edgev1alpha1listers.LocationClusterLister
+	locationLister        edgev1alpha1listers.LocationLister
+	locationIndexer       cache.Indexer
 
-	// synctargetLister  edgev1alpha1listers.SyncTargetClusterLister
-	synctargetLister  edgev1alpha1listers.SyncTargetLister
-	synctargetIndexer cache.Indexer
+	synctargetClusterLister edgev1alpha1listers.SyncTargetClusterLister
+	synctargetLister        edgev1alpha1listers.SyncTargetLister
+	synctargetIndexer       cache.Indexer
 }
 
 func NewController[
@@ -90,10 +90,6 @@ func NewController[
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
 	edgeClient ksclientset.Interface,
-	// edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
-	// singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
-	// locationAccess edgev1alpha1informers.LocationClusterInformer,
-	// syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
 	edgePlacementAccess EpA,
 	singlePlacementSliceAccess SpsA,
 	locationAccess LocA,
@@ -102,63 +98,120 @@ func NewController[
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
-	// TOOD(waltforme): add all-cluster access
-	epa := reflect.ValueOf(edgePlacementAccess).Interface().(*edgev1alpha1informers.EdgePlacementInformer)
-	spsa := reflect.ValueOf(singlePlacementSliceAccess).Interface().(*edgev1alpha1informers.SinglePlacementSliceInformer)
-	loca := reflect.ValueOf(locationAccess).Interface().(*edgev1alpha1informers.LocationInformer)
-	sta := reflect.ValueOf(syncTargetAccess).Interface().(*edgev1alpha1informers.SyncTargetInformer)
-	c := &controller{
-		provider: provider,
-		context:  context,
-		queue:    queue,
+	var c *controller
+	if provider == ClusterProviderKube {
+		epa := reflect.ValueOf(edgePlacementAccess).Interface().(*edgev1alpha1informers.EdgePlacementInformer)
+		spsa := reflect.ValueOf(singlePlacementSliceAccess).Interface().(*edgev1alpha1informers.SinglePlacementSliceInformer)
+		loca := reflect.ValueOf(locationAccess).Interface().(*edgev1alpha1informers.LocationInformer)
+		sta := reflect.ValueOf(syncTargetAccess).Interface().(*edgev1alpha1informers.SyncTargetInformer)
+		c = &controller{
+			provider: provider,
+			context:  context,
+			queue:    queue,
 
-		edgeClusterClient: edgeClusterClient,
-		edgeClient:        edgeClient,
+			edgeClient: edgeClient,
 
-		edgePlacementLister:  (*epa).Lister(),
-		edgePlacementIndexer: (*epa).Informer().GetIndexer(),
+			edgePlacementLister:  (*epa).Lister(),
+			edgePlacementIndexer: (*epa).Informer().GetIndexer(),
 
-		singlePlacementSliceLister:  (*spsa).Lister(),
-		singlePlacementSliceIndexer: (*spsa).Informer().GetIndexer(),
+			singlePlacementSliceLister:  (*spsa).Lister(),
+			singlePlacementSliceIndexer: (*spsa).Informer().GetIndexer(),
 
-		locationLister:  (*loca).Lister(),
-		locationIndexer: (*loca).Informer().GetIndexer(),
+			locationLister:  (*loca).Lister(),
+			locationIndexer: (*loca).Informer().GetIndexer(),
 
-		synctargetLister:  (*sta).Lister(),
-		synctargetIndexer: (*sta).Informer().GetIndexer(),
+			synctargetLister:  (*sta).Lister(),
+			synctargetIndexer: (*sta).Informer().GetIndexer(),
+		}
+
+		(*epa).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc:    c.enqueueEdgePlacement,
+			UpdateFunc: func(_, newObj interface{}) { c.enqueueEdgePlacement(newObj) },
+			DeleteFunc: c.enqueueEdgePlacement,
+		})
+
+		(*loca).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: c.enqueueLocation,
+			UpdateFunc: func(old, obj interface{}) {
+				oldLoc := old.(*edgev1alpha1.Location)
+				newLoc := obj.(*edgev1alpha1.Location)
+				if !apiequality.Semantic.DeepEqual(oldLoc.Spec, newLoc.Spec) || !apiequality.Semantic.DeepEqual(oldLoc.Labels, newLoc.Labels) {
+					c.enqueueLocation(obj)
+				}
+			},
+			DeleteFunc: c.enqueueLocation,
+		})
+
+		(*sta).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: c.enqueueSyncTarget,
+			UpdateFunc: func(old, obj interface{}) {
+				oldST := old.(*edgev1alpha1.SyncTarget)
+				newST := obj.(*edgev1alpha1.SyncTarget)
+				if !apiequality.Semantic.DeepEqual(oldST.Spec, newST.Spec) || !apiequality.Semantic.DeepEqual(oldST.Labels, newST.Labels) {
+					c.enqueueSyncTarget((obj))
+				}
+			},
+			DeleteFunc: c.enqueueSyncTarget,
+		})
+
+		return c, nil
+	} else { // kcp
+		epa := reflect.ValueOf(edgePlacementAccess).Interface().(*edgev1alpha1informers.EdgePlacementClusterInformer)
+		spsa := reflect.ValueOf(singlePlacementSliceAccess).Interface().(*edgev1alpha1informers.SinglePlacementSliceClusterInformer)
+		loca := reflect.ValueOf(locationAccess).Interface().(*edgev1alpha1informers.LocationClusterInformer)
+		sta := reflect.ValueOf(syncTargetAccess).Interface().(*edgev1alpha1informers.SyncTargetClusterInformer)
+		c = &controller{
+			provider: provider,
+			context:  context,
+			queue:    queue,
+
+			edgeClusterClient: edgeClusterClient,
+
+			edgePlacementClusterLister: (*epa).Lister(),
+			edgePlacementIndexer:       (*epa).Informer().GetIndexer(),
+
+			singlePlacementSliceClusterLister: (*spsa).Lister(),
+			singlePlacementSliceIndexer:       (*spsa).Informer().GetIndexer(),
+
+			locationClusterLister: (*loca).Lister(),
+			locationIndexer:       (*loca).Informer().GetIndexer(),
+
+			synctargetClusterLister: (*sta).Lister(),
+			synctargetIndexer:       (*sta).Informer().GetIndexer(),
+		}
+
+		(*epa).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc:    c.enqueueEdgePlacement,
+			UpdateFunc: func(_, newObj interface{}) { c.enqueueEdgePlacement(newObj) },
+			DeleteFunc: c.enqueueEdgePlacement,
+		})
+
+		(*loca).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: c.enqueueLocation,
+			UpdateFunc: func(old, obj interface{}) {
+				oldLoc := old.(*edgev1alpha1.Location)
+				newLoc := obj.(*edgev1alpha1.Location)
+				if !apiequality.Semantic.DeepEqual(oldLoc.Spec, newLoc.Spec) || !apiequality.Semantic.DeepEqual(oldLoc.Labels, newLoc.Labels) {
+					c.enqueueLocation(obj)
+				}
+			},
+			DeleteFunc: c.enqueueLocation,
+		})
+
+		(*sta).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: c.enqueueSyncTarget,
+			UpdateFunc: func(old, obj interface{}) {
+				oldST := old.(*edgev1alpha1.SyncTarget)
+				newST := obj.(*edgev1alpha1.SyncTarget)
+				if !apiequality.Semantic.DeepEqual(oldST.Spec, newST.Spec) || !apiequality.Semantic.DeepEqual(oldST.Labels, newST.Labels) {
+					c.enqueueSyncTarget((obj))
+				}
+			},
+			DeleteFunc: c.enqueueSyncTarget,
+		})
+
+		return c, nil
 	}
-
-	(*epa).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    c.enqueueEdgePlacement,
-		UpdateFunc: func(_, newObj interface{}) { c.enqueueEdgePlacement(newObj) },
-		DeleteFunc: c.enqueueEdgePlacement,
-	})
-
-	(*loca).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: c.enqueueLocation,
-		UpdateFunc: func(old, obj interface{}) {
-			oldLoc := old.(*edgev1alpha1.Location)
-			newLoc := obj.(*edgev1alpha1.Location)
-			if !apiequality.Semantic.DeepEqual(oldLoc.Spec, newLoc.Spec) || !apiequality.Semantic.DeepEqual(oldLoc.Labels, newLoc.Labels) {
-				c.enqueueLocation(obj)
-			}
-		},
-		DeleteFunc: c.enqueueLocation,
-	})
-
-	(*sta).Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: c.enqueueSyncTarget,
-		UpdateFunc: func(old, obj interface{}) {
-			oldST := old.(*edgev1alpha1.SyncTarget)
-			newST := obj.(*edgev1alpha1.SyncTarget)
-			if !apiequality.Semantic.DeepEqual(oldST.Spec, newST.Spec) || !apiequality.Semantic.DeepEqual(oldST.Labels, newST.Labels) {
-				c.enqueueSyncTarget((obj))
-			}
-		},
-		DeleteFunc: c.enqueueSyncTarget,
-	})
-
-	return c, nil
 }
 
 func (c *controller) enqueueEdgePlacement(obj interface{}) {
