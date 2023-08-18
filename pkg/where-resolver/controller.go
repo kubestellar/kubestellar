@@ -32,7 +32,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
@@ -61,7 +61,7 @@ type controller struct {
 	queue    workqueue.RateLimitingInterface
 
 	edgeClusterClient edgeclusterclientset.ClusterInterface
-	edgeClient        ksclientset.Interface
+	edgeClient        edgeclientset.Interface
 
 	edgePlacementClusterLister edgev1alpha1listers.EdgePlacementClusterLister
 	edgePlacementLister        edgev1alpha1listers.EdgePlacementLister
@@ -89,7 +89,7 @@ func NewController[
 	provider ClusterProvider,
 	context context.Context,
 	edgeClusterClient edgeclusterclientset.ClusterInterface,
-	edgeClient ksclientset.Interface,
+	edgeClient edgeclientset.Interface,
 	edgePlacementAccess EpA,
 	singlePlacementSliceAccess SpsA,
 	locationAccess LocA,

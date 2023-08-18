@@ -35,7 +35,7 @@ import (
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
-	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
@@ -88,50 +88,51 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	edgeRestConfig, err := options.EspwClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-
-	var edgeViewConfig = espwRestConfig
 	if options.Provider == wheresolver.ClusterProviderKCP {
-		edgeViewConfig, err = configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+		edgeRestConfig, err = configForViewOfExport(ctx, edgeRestConfig, "edge.kubestellar.io")
 		if err != nil {
 			logger.Error(err, "failed to create config for view of edge exports")
 			return err
 		}
 	}
 
-	if options.Provider == wheresolver.ClusterProviderKube {
-		edgeViewClientset, err := ksclientset.NewForConfig(edgeViewConfig)
+	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to create config from flags")
+		return err
+	}
+	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create edge all-cluster clientset for controller")
+		return err
+	}
+	edgeClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create edge clientset for controller")
+		return err
+	}
+
+	if options.Provider == wheresolver.ClusterProviderKube { // plain kube
+		edgeClientset, err := edgeclientset.NewForConfig(edgeRestConfig)
 		if err != nil {
 			logger.Error(err, "failed to create clientset for view of edge exports")
 			return err
 		}
-		edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClientset, resyncPeriod)
+		edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 
-		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
-		if err != nil {
-			logger.Error(err, "failed to create config from flags")
-			return err
-		}
-		edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
-		if err != nil {
-			logger.Error(err, "failed to create edge all-cluster clientset for controller")
-			return err
-		}
-		edgeClientset, err := ksclientset.NewForConfig(baseRestConfig)
-		if err != nil {
-			logger.Error(err, "failed to create edge clientset for controller")
-			return err
-		}
 		var edgePlacementAccess = edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements()
 		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
 		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
-		// TODO(waltforme): sanity check
-		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
+		if !wheresolver.EpAccessScopeCheck(&edgePlacementAccess, options.Provider) {
+			logger.Error(err, "scope of EdgePlacement access mismatches with cluster provider type")
+			return err
+		}
 		es, err := wheresolver.NewController[
 			*edgev1alpha1informers.EdgePlacementInformer,
 			*edgev1alpha1informers.SinglePlacementSliceInformer,
@@ -162,34 +163,21 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 
 		return nil
 	} else { // kcp
-		edgeViewClusterClientset, err := edgeclusterclientset.NewForConfig(edgeViewConfig)
+		edgeClusterClientset, err := edgeclusterclientset.NewForConfig(edgeRestConfig)
 		if err != nil {
 			logger.Error(err, "failed to create clientset for view of edge exports")
 			return err
 		}
-		edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+		edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeClusterClientset, resyncPeriod)
 
-		baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
-		if err != nil {
-			logger.Error(err, "failed to create config from flags")
-			return err
-		}
-		edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
-		if err != nil {
-			logger.Error(err, "failed to create edge all-cluster clientset for controller")
-			return err
-		}
-		edgeClientset, err := ksclientset.NewForConfig(baseRestConfig)
-		if err != nil {
-			logger.Error(err, "failed to create edge clientset for controller")
-			return err
-		}
 		var edgePlacementAccess = edgeSharedInformerFactory.Edge().V1alpha1().EdgePlacements()
 		var singlePlacementSliceAccess = edgeSharedInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
 		var locationAccess = edgeSharedInformerFactory.Edge().V1alpha1().Locations()
 		var synctargetAccess = edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
-		// TODO(waltforme): sanity check
-		wheresolver.IdentifyEpAccessScope(&edgePlacementAccess)
+		if !wheresolver.EpAccessScopeCheck(&edgePlacementAccess, options.Provider) {
+			logger.Error(err, "scope of EdgePlacement access mismatches with cluster provider type")
+			return err
+		}
 		es, err := wheresolver.NewController[
 			*edgev1alpha1informers.EdgePlacementClusterInformer,
 			*edgev1alpha1informers.SinglePlacementSliceClusterInformer,

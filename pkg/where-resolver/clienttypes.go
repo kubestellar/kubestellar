@@ -17,10 +17,6 @@ limitations under the License.
 package where_resolver
 
 import (
-	"fmt"
-
-	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 )
 
@@ -32,9 +28,6 @@ const (
 )
 
 type (
-	OneClusterClient ksclientset.Interface
-	AllClusterClient edgeclusterclientset.ClusterInterface
-
 	EpAccess interface {
 		*edgev1alpha1informers.EdgePlacementInformer | *edgev1alpha1informers.EdgePlacementClusterInformer
 	}
@@ -49,19 +42,14 @@ type (
 	}
 )
 
-func IdentifyEpAccessScope[A EpAccess](access A) string {
+func EpAccessScopeCheck[A EpAccess](access A, provider ClusterProvider) bool {
 	switch any(access).(type) {
-	case string:
-		return "a string"
 	default:
-		if a, ok := any(access).(*edgev1alpha1informers.EdgePlacementInformer); ok {
-			fmt.Printf("pointer of edgev1alpha1informers.EdgePlacementInformer at %v\n", a)
-			return "one cluster EdgePlacement Access"
-		} else if a, ok := any(access).(*edgev1alpha1informers.EdgePlacementClusterInformer); ok {
-			fmt.Printf("pointer of edgev1alpha1informers.EdgePlacementClusterInformer at %v\n", a)
-			return "all cluster EdgePlacement Access"
+		if _, ok := any(access).(*edgev1alpha1informers.EdgePlacementInformer); ok {
+			return provider == ClusterProviderKube
+		} else if _, ok := any(access).(*edgev1alpha1informers.EdgePlacementClusterInformer); ok {
+			return provider == ClusterProviderKCP
 		}
 	}
-	fmt.Println("something mystery")
-	return "something mystery"
+	return false
 }
