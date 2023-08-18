@@ -356,7 +356,7 @@ follows.
 
 ### Remove deployment to a Kubernetes cluster
 
-The deployent of kcp and KubeStellar as a Kubernetes workload is done
+The deployment of kcp and KubeStellar as a Kubernetes workload is done
 by making a "release" (this is a [technical term in
 Helm](https://helm.sh/docs/intro/cheatsheet/#basic-interpretationscontext)
 whose meaning might surprise you) of a Helm chart.  This release is
