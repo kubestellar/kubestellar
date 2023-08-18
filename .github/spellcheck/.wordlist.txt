@@ -465,6 +465,7 @@ sexualized
 sharding
 si
 skillset
+slsa
 socio
 speciald
 specialstuff
@@ -509,6 +510,7 @@ uid
 url
 urls
 usr
+verifier
 volumeMounts
 watchall
 wec
