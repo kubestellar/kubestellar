@@ -21,6 +21,7 @@ nav:
       - Readme: readme.md
   - Getting Started:
       - QuickStart: Getting-Started/quickstart.md
+      - User Example: Coding Milestones/PoC2023q1/user-example1.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
       - KubeStellar - The Infomercial: Getting-Started/infomercial.md
