@@ -36,7 +36,7 @@ import (
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
@@ -116,7 +116,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 			logger.Error(err, "failed to create config from flags")
 			return err
 		}
-		edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+		edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
 		if err != nil {
 			logger.Error(err, "failed to create edge all-cluster clientset for controller")
 			return err
@@ -162,7 +162,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 
 		return nil
 	} else { // kcp
-		edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+		edgeViewClusterClientset, err := edgeclusterclientset.NewForConfig(edgeViewConfig)
 		if err != nil {
 			logger.Error(err, "failed to create clientset for view of edge exports")
 			return err
@@ -174,7 +174,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 			logger.Error(err, "failed to create config from flags")
 			return err
 		}
-		edgeClusterClientset, err := edgeclientset.NewForConfig(baseRestConfig)
+		edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
 		if err != nil {
 			logger.Error(err, "failed to create edge all-cluster clientset for controller")
 			return err

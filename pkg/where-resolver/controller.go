@@ -33,7 +33,7 @@ import (
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
 )
@@ -60,7 +60,7 @@ type controller struct {
 	context  context.Context
 	queue    workqueue.RateLimitingInterface
 
-	edgeClusterClient edgeclientset.ClusterInterface
+	edgeClusterClient edgeclusterclientset.ClusterInterface
 	edgeClient        ksclientset.Interface
 
 	edgePlacementClusterLister edgev1alpha1listers.EdgePlacementClusterLister
@@ -88,7 +88,7 @@ func NewController[
 ](
 	provider ClusterProvider,
 	context context.Context,
-	edgeClusterClient edgeclientset.ClusterInterface,
+	edgeClusterClient edgeclusterclientset.ClusterInterface,
 	edgeClient ksclientset.Interface,
 	edgePlacementAccess EpA,
 	singlePlacementSliceAccess SpsA,

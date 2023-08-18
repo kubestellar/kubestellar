@@ -41,7 +41,6 @@ func NewOptions() *Options {
 
 	// Default to use kcp
 	var provider wheresolver.ClusterProvider = wheresolver.ClusterProviderKCP
-	// var provider wheresolver.ClusterProvider = wheresolver.ClusterProviderKube
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),

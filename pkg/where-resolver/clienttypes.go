@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 )
 
@@ -33,7 +33,7 @@ const (
 
 type (
 	OneClusterClient ksclientset.Interface
-	AllClusterClient edgeclientset.ClusterInterface
+	AllClusterClient edgeclusterclientset.ClusterInterface
 
 	EpAccess interface {
 		*edgev1alpha1informers.EdgePlacementInformer | *edgev1alpha1informers.EdgePlacementClusterInformer
