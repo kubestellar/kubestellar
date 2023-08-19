@@ -2,9 +2,9 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230721-f4773468.locations.edge.kcp.io
+  name: v230810-2d48e9f7.locations.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: Location
     listKind: LocationList
@@ -146,7 +146,7 @@ spec:
                 group:
                   description: group is the name of an API group.
                   enum:
-                  - edge.kcp.io
+                  - edge.kubestellar.io
                   pattern: ^(|[a-z0-9]([-a-z0-9]*[a-z0-9](\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?)$
                   type: string
                 resource:

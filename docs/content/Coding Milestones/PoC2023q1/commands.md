@@ -435,12 +435,12 @@ so-called inventory management workspace.  These kinds of objects were
 originally defined in kcp TMC, and now there is a copy of those
 definitions in KubeStellar.  It is the definitions in KubeStellar that
 should be referenced.  Those are in the Kubernetes API group
-`edge.kcp.io`, and they are exported from the
+`edge.kubestellar.io`, and they are exported from the
 [KubeStellar Core Space (KCS)](../../../../Getting-Started/user-guide/)) (the kcp workspace
 named `root:espw`).
 
 The following command helps with making that SyncTarget and Location
-pair and adding the APIBinding to `root:espw:edge.kcp.io` if needed.
+pair and adding the APIBinding to `root:espw:edge.kubestellar.io` if needed.
 
 The usage synopsis is as follows.
 
@@ -521,12 +521,12 @@ kubectl create -f <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
-  name: edge.kcp.io
+  name: edge.kubestellar.io
 spec:
   reference:
     export:
       path: root:espw
-      name: edge.kcp.io
+      name: edge.kubestellar.io
 EOF
 ```
 

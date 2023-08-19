@@ -69,15 +69,15 @@ fi
 
 set -e
 
-# this assumes that an APIBinding exists for edge.kcp.io objects
+# this assumes that an APIBinding exists for edge.kubestellar.io objects
 if [ "$imw" != "." ]
 then kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 
-if kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$objname" &> /dev/null
-then kubectl "${kubectl_flags[@]}" delete synctargets.edge.kcp.io "$objname"
+if kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$objname" &> /dev/null
+then kubectl "${kubectl_flags[@]}" delete synctargets.edge.kubestellar.io "$objname"
 fi
 
-if kubectl "${kubectl_flags[@]}" get locations.edge.kcp.io "$objname" &> /dev/null
-then kubectl "${kubectl_flags[@]}" delete locations.edge.kcp.io "$objname"
+if kubectl "${kubectl_flags[@]}" get locations.edge.kubestellar.io "$objname" &> /dev/null
+then kubectl "${kubectl_flags[@]}" delete locations.edge.kubestellar.io "$objname"
 fi

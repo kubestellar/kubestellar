@@ -36,9 +36,9 @@ type FakeEdgePlacements struct {
 	Fake *FakeEdgeV1alpha1
 }
 
-var edgeplacementsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "edgeplacements"}
+var edgeplacementsResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "edgeplacements"}
 
-var edgeplacementsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "EdgePlacement"}
+var edgeplacementsKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "EdgePlacement"}
 
 // Get takes name of the edgePlacement, and returns the corresponding edgePlacement object, and an error if there is any.
 func (c *FakeEdgePlacements) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.EdgePlacement, err error) {

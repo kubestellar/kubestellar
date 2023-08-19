@@ -38,8 +38,8 @@ import (
 	metav1alpha1client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 )
 
-var aPIResourcesResource = schema.GroupVersionResource{Group: "meta.kcp.io", Version: "v1alpha1", Resource: "apiresources"}
-var aPIResourcesKind = schema.GroupVersionKind{Group: "meta.kcp.io", Version: "v1alpha1", Kind: "APIResource"}
+var aPIResourcesResource = schema.GroupVersionResource{Group: "meta.kubestellar.io", Version: "v1alpha1", Resource: "apiresources"}
+var aPIResourcesKind = schema.GroupVersionKind{Group: "meta.kubestellar.io", Version: "v1alpha1", Kind: "APIResource"}
 
 type aPIResourcesClusterClient struct {
 	*kcptesting.Fake

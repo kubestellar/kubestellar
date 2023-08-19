@@ -2,9 +2,9 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230721-f4773468.synctargets.edge.kcp.io
+  name: v230810-2d48e9f7.synctargets.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: SyncTarget
     listKind: SyncTargetList

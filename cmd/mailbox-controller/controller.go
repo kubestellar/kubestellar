@@ -50,7 +50,7 @@ const mbwsNameIndexKey = "mbwsName"
 
 // SyncTargetNameAnnotationKey identifies the annotation on a mailbox Workspace
 // that points to the corresponding SyncTarget.
-const SyncTargetNameAnnotationKey = "edge.kcp.io/sync-target-name"
+const SyncTargetNameAnnotationKey = "edge.kubestellar.io/sync-target-name"
 
 type mbCtl struct {
 	context                    context.Context
@@ -259,7 +259,7 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 }
 
 const TheEdgeBindingName = "bind-edge"
-const TheEdgeExportName = "edge.kcp.io"
+const TheEdgeExportName = "edge.kubestellar.io"
 
 func (ctl *mbCtl) ensureEdgeBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
 	logger := klog.FromContext(ctx).WithValues("mbwsName", workspace.Name)

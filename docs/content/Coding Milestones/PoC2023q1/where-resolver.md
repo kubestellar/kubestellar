@@ -19,7 +19,7 @@ pre_req_name: 'docs/content/common-subs/pre-req.md'
 
 The Where Resolver needs three Kubernetes client configurations.
 
-The first is needed to access the APIExport view of the `edge.kcp.io` API group.
+The first is needed to access the APIExport view of the `edge.kubestellar.io` API group.
 It must point to the edge service provider workspace that has this APIExport and
 is authorized to read its view for edge APIs.
 
@@ -96,7 +96,7 @@ Go to the `root:espw` workspace and run the Where Resolver.
 %}
 The outputs from the Where Resolver should be similar to:
 ``` { .bash .no-copy }
-I0605 10:53:00.156100   29786 main.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kcp.io"
+I0605 10:53:00.156100   29786 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kubestellar.io"
 I0605 10:53:00.157874   29786 main.go:212] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io"
 I0605 10:53:00.159242   29786 main.go:212] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io"
 I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controller="where-resolver"
@@ -107,7 +107,7 @@ I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controlle
 Use workspace `root:compute` as the Inventory Management Workspace (IMW).
 ```shell
 kubectl ws root:compute
-kubectl kcp bind apiexport root:espw:edge.kcp.io
+kubectl kcp bind apiexport root:espw:edge.kubestellar.io
 ```
 
 Create two Locations and two SyncTargets.
@@ -125,13 +125,13 @@ kubectl get locations,synctargets
 ```
 ``` { .bash .no-copy }
 NAME                                 RESOURCE      AVAILABLE   INSTANCES   LABELS   AGE
-location.edge.kcp.io/default   synctargets   0           2                    2m12s
-location.edge.kcp.io/dev       synctargets   0           1                    2m39s
-location.edge.kcp.io/prod      synctargets   0           1                    3m13s
+location.edge.kubestellar.io/default   synctargets   0           2                    2m12s
+location.edge.kubestellar.io/dev       synctargets   0           1                    2m39s
+location.edge.kubestellar.io/prod      synctargets   0           1                    3m13s
 
 NAME                              AGE
-synctarget.edge.kcp.io/dev    110s
-synctarget.edge.kcp.io/prod   2m12s
+synctarget.edge.kubestellar.io/dev    110s
+synctarget.edge.kubestellar.io/prod   2m12s
 ```
 
 ### Create some EdgePlacements in the WMW
@@ -147,7 +147,7 @@ The Where Resolver maintains a SinglePlacementSlice for an EdgePlacement in the 
 kubectl get sps all2all -oyaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 destinations:
 - cluster: 1yotsgod0d2p3xa5
   locationName: prod
@@ -173,7 +173,7 @@ metadata:
   generation: 1
   name: all2all
   ownerReferences:
-  - apiVersion: edge.kcp.io/v1alpha1
+  - apiVersion: edge.kubestellar.io/v1alpha1
     kind: EdgePlacement
     name: all2all
     uid: 31915018-6a25-4f01-943e-b8a0a0ed35ba
@@ -193,7 +193,7 @@ The corresponding SinglePlacementSlice has a shorter list of `destinations`:
 kubectl get sps dev -oyaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 destinations:
 - cluster: 1yotsgod0d2p3xa5
   locationName: dev
@@ -207,7 +207,7 @@ metadata:
   generation: 1
   name: dev
   ownerReferences:
-  - apiVersion: edge.kcp.io/v1alpha1
+  - apiVersion: edge.kubestellar.io/v1alpha1
     kind: EdgePlacement
     name: dev
     uid: 1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b

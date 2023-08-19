@@ -32,7 +32,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/syncer/syncers"
 )
 
-// NewEdgeSyncConfigController returns a edgeSyncConfigController watching a [edge.kcp.io.EdgeSyncConfig] and update down/up syncer,
+// NewEdgeSyncConfigController returns a edgeSyncConfigController watching a [edge.kubestellar.io.EdgeSyncConfig] and update down/up syncer,
 func NewEdgeSyncConfigController(
 	logger klog.Logger,
 	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,

@@ -84,13 +84,13 @@ var apibindingGVR = schema.GroupVersionResource{
 }
 
 var edgeSyncConfigGVR = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
+	Group:    "edge.kubestellar.io",
 	Version:  "v1alpha1",
 	Resource: "edgesyncconfigs",
 }
 
 var syncerConfigGVR = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
+	Group:    "edge.kubestellar.io",
 	Version:  "v1alpha1",
 	Resource: "syncerconfigs",
 }
@@ -164,14 +164,14 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 
 	var syncerConfigCRDUnst *unstructured.Unstructured
-	err = LoadFile(repositoryDir()+"/config/crds/edge.kcp.io_syncerconfigs.yaml", &osReader{}, &syncerConfigCRDUnst)
+	err = LoadFile(repositoryDir()+"/config/crds/edge.kubestellar.io_syncerconfigs.yaml", &osReader{}, &syncerConfigCRDUnst)
 	require.NoError(t, err)
 	t.Logf("Create SyncerConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
 	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), syncerConfigCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
 	var edgeSyncConfigCRDUnst *unstructured.Unstructured
-	err = LoadFile(repositoryDir()+"/config/crds/edge.kcp.io_edgesyncconfigs.yaml", &osReader{}, &edgeSyncConfigCRDUnst)
+	err = LoadFile(repositoryDir()+"/config/crds/edge.kubestellar.io_edgesyncconfigs.yaml", &osReader{}, &edgeSyncConfigCRDUnst)
 	require.NoError(t, err)
 	t.Logf("Create EdgeSyncConfig CRD in workspace %q.", sf.edgeSyncTargetPath)
 	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), edgeSyncConfigCRDUnst, v1.CreateOptions{})

@@ -38,7 +38,7 @@ import (
 var embedded embed.FS
 
 var edgeSyncConfigGvr = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
+	Group:    "edge.kubestellar.io",
 	Version:  "v1alpha1",
 	Resource: "edgesyncconfigs",
 }
@@ -92,7 +92,7 @@ var clusterPolicyReportGvr = schema.GroupVersionResource{
 }
 
 var syncerConfigGvr = schema.GroupVersionResource{
-	Group:    "edge.kcp.io",
+	Group:    "edge.kubestellar.io",
 	Version:  "v1alpha1",
 	Resource: "syncerconfigs",
 }

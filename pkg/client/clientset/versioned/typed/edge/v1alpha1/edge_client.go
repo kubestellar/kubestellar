@@ -38,7 +38,7 @@ type EdgeV1alpha1Interface interface {
 	SyncerConfigsGetter
 }
 
-// EdgeV1alpha1Client is used to interact with features provided by the edge.kcp.io group.
+// EdgeV1alpha1Client is used to interact with features provided by the edge.kubestellar.io group.
 type EdgeV1alpha1Client struct {
 	restClient rest.Interface
 }

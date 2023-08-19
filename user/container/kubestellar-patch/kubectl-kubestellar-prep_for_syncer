@@ -130,7 +130,7 @@ else
     kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 
-mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kcp.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
 if [ "$silent" == "true" ]; then
     kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
@@ -138,7 +138,7 @@ else
     kubectl ws "${kubectl_flags[@]}" "$espw"
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get APIExport edge.kcp.io &> /dev/null ; then
+if ! kubectl "${kubectl_flags[@]}" get APIExport edge.kubestellar.io &> /dev/null ; then
     echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
     exit 2
 fi

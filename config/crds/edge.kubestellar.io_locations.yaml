@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: locations.edge.kcp.io
+  name: locations.edge.kubestellar.io
 spec:
-  group: edge.kcp.io
+  group: edge.kubestellar.io
   names:
     kind: Location
     listKind: LocationList
@@ -151,7 +151,7 @@ spec:
                   group:
                     description: group is the name of an API group.
                     enum:
-                    - edge.kcp.io
+                    - edge.kubestellar.io
                     pattern: ^(|[a-z0-9]([-a-z0-9]*[a-z0-9](\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?)$
                     type: string
                   resource:

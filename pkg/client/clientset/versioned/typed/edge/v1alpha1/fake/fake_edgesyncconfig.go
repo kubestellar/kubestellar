@@ -36,9 +36,9 @@ type FakeEdgeSyncConfigs struct {
 	Fake *FakeEdgeV1alpha1
 }
 
-var edgesyncconfigsResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "edgesyncconfigs"}
+var edgesyncconfigsResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "edgesyncconfigs"}
 
-var edgesyncconfigsKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "EdgeSyncConfig"}
+var edgesyncconfigsKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "EdgeSyncConfig"}
 
 // Get takes name of the edgeSyncConfig, and returns the corresponding edgeSyncConfig object, and an error if there is any.
 func (c *FakeEdgeSyncConfigs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.EdgeSyncConfig, err error) {

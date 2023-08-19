@@ -46,7 +46,7 @@ kubectl get SyncerConfig the-one -o yaml
 ```
 
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:
@@ -198,7 +198,7 @@ Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41
 kubectl get SyncerConfig the-one -o yaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kcp.io/v1alpha1
+apiVersion: edge.kubestellar.io/v1alpha1
 kind: SyncerConfig
 metadata:
   annotations:

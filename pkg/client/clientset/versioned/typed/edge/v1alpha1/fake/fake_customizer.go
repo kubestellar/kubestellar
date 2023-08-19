@@ -37,9 +37,9 @@ type FakeCustomizers struct {
 	ns   string
 }
 
-var customizersResource = schema.GroupVersionResource{Group: "edge.kcp.io", Version: "v1alpha1", Resource: "customizers"}
+var customizersResource = schema.GroupVersionResource{Group: "edge.kubestellar.io", Version: "v1alpha1", Resource: "customizers"}
 
-var customizersKind = schema.GroupVersionKind{Group: "edge.kcp.io", Version: "v1alpha1", Kind: "Customizer"}
+var customizersKind = schema.GroupVersionKind{Group: "edge.kubestellar.io", Version: "v1alpha1", Kind: "Customizer"}
 
 // Get takes name of the customizer, and returns the corresponding customizer object, and an error if there is any.
 func (c *FakeCustomizers) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Customizer, err error) {
