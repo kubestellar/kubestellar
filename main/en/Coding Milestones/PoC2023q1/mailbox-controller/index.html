@@ -1980,13 +1980,13 @@ following:</p>
 <li>T's UID</li>
 </ul>
 <p>The mailbox workspace gets an annotation whose key is
-<code>edge.kcp.io/sync-target-name</code> and whose value is the name of the
+<code>edge.kubestellar.io/sync-target-name</code> and whose value is the name of the
 workspace object (as seen in its parent workspace, the edge service
 provider workspace).</p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
 <p>The mailbox controller needs three Kubernetes client configurations.
 One --- concerned with reading inventory --- is to access the
-APIExport view of the <code>edge.kcp.io</code> API group, to read the
+APIExport view of the <code>edge.kubestellar.io</code> API group, to read the
 <code>SyncTarget</code> objects.  This must be a client config that is pointed at
 the workspace (which is always <code>root:espw</code>, as far as I know) that has this
 APIExport and is authorized to read its view.  Another client config
@@ -2092,11 +2092,11 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <p>In a separate terminal window(3), create an inventory management workspace as follows.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>kcp<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>apiexport<span class="w"> </span>root:espw:edge.kcp.io
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>kcp<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>apiexport<span class="w"> </span>root:espw:edge.kubestellar.io
 </code></pre></div>
 <p>Then in that workspace, run the following command to create a <code>SyncTarget</code> object.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="s">apiVersion: edge.kcp.io/v1alpha1</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
 <a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="s">kind: SyncTarget</span>
 <a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="s">  name: stest1</span>
@@ -2110,7 +2110,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 </code></pre></div>
 <p>And you can verify that as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kcp.io
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
 </code></pre></div>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
@@ -2123,7 +2123,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht<span class="w">   </span>22s
 </code></pre></div></p>
 <p>FYI, if you look inside that workspace you will see an <code>APIBinding</code>
-named <code>bind-edge</code> that binds to the <code>APIExport</code> named <code>edge.kcp.io</code>
+named <code>bind-edge</code> that binds to the <code>APIExport</code> named <code>edge.kubestellar.io</code>
 from the edge service provider workspace (and this is why the
 controller needs to know the pathname of that workspace), so that the
 edge API is available in the mailbox workspace.</p>
@@ -2136,8 +2136,8 @@ controller wait for it to be gone and then re-create it.</p>
 <a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
 <a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>imw
 <a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kcp.io
-<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>synctargets.edge.kcp.io<span class="w"> </span>stest1
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>synctargets.edge.kubestellar.io<span class="w"> </span>stest1
 </code></pre></div>
 and watch the mailbox controller react as follows.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>

@@ -2488,11 +2488,11 @@ so-called inventory management workspace.  These kinds of objects were
 originally defined in kcp TMC, and now there is a copy of those
 definitions in KubeStellar.  It is the definitions in KubeStellar that
 should be referenced.  Those are in the Kubernetes API group
-<code>edge.kcp.io</code>, and they are exported from the
+<code>edge.kubestellar.io</code>, and they are exported from the
 <a href="../../../../Getting-Started/user-guide/">KubeStellar Core Space (KCS)</a>) (the kcp workspace
 named <code>root:espw</code>).</p>
 <p>The following command helps with making that SyncTarget and Location
-pair and adding the APIBinding to <code>root:espw:edge.kcp.io</code> if needed.</p>
+pair and adding the APIBinding to <code>root:espw:edge.kubestellar.io</code> if needed.</p>
 <p>The usage synopsis is as follows.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>flag...<span class="w"> </span>objname<span class="w"> </span><span class="nv">labelname</span><span class="o">=</span>labelvalue...
 </code></pre></div>
@@ -2556,12 +2556,12 @@ This was equivalent to the following commands.</p>
 <a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="s">kind: APIBinding</span>
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="s">  name: edge.kcp.io</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="s">  name: edge.kubestellar.io</span>
 <a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="s">spec:</span>
 <a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="s">  reference:</span>
 <a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="s">    export:</span>
 <a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="s">      path: root:espw</span>
-<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="s">      name: edge.kcp.io</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="s">      name: edge.kubestellar.io</span>
 <a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>This command operates in idempotent style, making whatever changes (if

@@ -2424,7 +2424,7 @@ in an eventually consistent way, it is not just one-and-done.</p>
 <p>In this design the primary interface between infrastructure management
 and workload management is API objects in <em>inventory management</em>
 workspaces.  We use the <code>Location</code> and <code>SyncTarget</code> object types
-from KubeStellar's edge.kcp.io api group (created by <code>kubestellar init</code>) for
+from KubeStellar's edge.kubestellar.io api group (created by <code>kubestellar init</code>) for
 this purpose.  The people doing infrastructure management are
 responsible for creating the inventory management workspaces and
 populating them with <code>Location</code> and <code>SyncTarget</code> objects, one
@@ -2600,7 +2600,7 @@ dependent objects.</p>
 </tbody>
 </table>
 <p>A workload management workspace needs an APIBinding to the APIExport
-of the API group <code>edge.kcp.io</code> from the edge service provider
+of the API group <code>edge.kubestellar.io</code> from the edge service provider
 workspace, in order to be able to contain EdgePlacement and related
 objects.  These objects and that APIBinding are not destined for the
 edge clusters.</p>
@@ -3265,7 +3265,7 @@ pre-populated by the workspace type.</p>
 management workspaces.  Each needs to have the following, which that
 user creates if the workload type did not already provide.</p>
 <ul>
-<li>An APIBinding to the APIExport of <code>edge.kcp.io</code> from the edge
+<li>An APIBinding to the APIExport of <code>edge.kubestellar.io</code> from the edge
   service provider workspace.</li>
 <li>For each of the Where Resolver, the Placement Translator, and the
   Status Summarizer:</li>
