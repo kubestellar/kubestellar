@@ -8,7 +8,6 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - main
       - "release-*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
@@ -18,7 +17,6 @@ on:
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
-      - main
       - "release-*"
     paths:
       - "docs/content/Getting-Started/quickstart.md"
