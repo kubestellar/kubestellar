@@ -28,7 +28,6 @@ import (
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
@@ -37,6 +36,7 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 type placementTranslator struct {
@@ -54,7 +54,7 @@ type placementTranslator struct {
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
 	nsClusterPreInformer   kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient        kcpkubecorev1client.NamespaceClusterInterface
+	spaceclient            msclient.KubestellarSpaceInterface
 
 	workloadProjector interface {
 		WorkloadProjector
@@ -96,7 +96,8 @@ func NewPlacementTranslator(
 	// for monitoring namespaces in mailbox workspaces
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
 	// for creating namespaces in mailbox workspaces
-	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	mbwsPreInformer.Lister()
@@ -115,7 +116,7 @@ func NewPlacementTranslator(
 		dynamicClusterClient:   dynamicClusterClient,
 		edgeClusterClientset:   edgeClusterClientset,
 		nsClusterPreInformer:   nsClusterPreInformer,
-		nsClusterClient:        nsClusterClient,
+		spaceclient:            spaceclient,
 		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
@@ -125,7 +126,7 @@ func NewPlacementTranslator(
 		pt.syncfgClusterInformer, pt.syncfgClusterLister,
 		customizerClusterPreInformer.Informer(), customizerClusterPreInformer.Lister(),
 		edgeClusterClientset, dynamicClusterClient,
-		nsClusterPreInformer, nsClusterClient)
+		nsClusterPreInformer, spaceclient, spaceProviderNs)
 
 	return pt
 }

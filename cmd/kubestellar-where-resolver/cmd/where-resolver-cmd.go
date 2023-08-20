@@ -38,6 +38,8 @@ import (
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 func NewResolverCommand() *cobra.Command {
@@ -68,6 +70,9 @@ func NewResolverCommand() *cobra.Command {
 		},
 	}
 
+	resolverCommand.Flags().StringVar(&options.Provider, "space-provider", options.Provider, "the name of the KubeStellar space provider")
+	resolverCommand.Flags().StringVar(&options.KcsName, "kcs-name", options.KcsName, "the name of the KubeStellar core space")
+
 	options.AddFlags(resolverCommand.Flags())
 
 	if v := version.Get().String(); len(v) == 0 {
@@ -86,13 +91,25 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
+	// create space-aware client
+	spaceManagementConfig, err := options.SpaceMgtOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to create space management config from flags")
+		return err
+	}
+	msclient, err := msclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create space-aware client")
+		return err
+	}
+
 	// create edgeSharedInformerFactory
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	kcsRestConfig, err := msclient.ConfigForSpace(options.KcsName, spacemanager.ProviderNS(options.Provider))
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, kcsRestConfig, "edge.kubestellar.io")
 	if err != nil {
 		logger.Error(err, "failed to create config for view of edge exports")
 		return err

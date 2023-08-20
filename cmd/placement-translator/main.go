@@ -62,6 +62,8 @@ import (
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 type ClientOpts struct {
@@ -97,6 +99,8 @@ func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10204"
+	kcsName := "espw"
+	spaceProvider := "default"
 	fs := pflag.NewFlagSet("placement-translator", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
@@ -107,6 +111,10 @@ func main() {
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
+	fs.StringVar(&kcsName, "kcs-name", kcsName, "the name of the KubeStellar core space")
+	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
+	spaceMgtClientOpts := NewClientOpts("space-mgt", "access to space management workspaces")
+	spaceMgtClientOpts.overrides.CurrentContext = ("root:space-mgt")
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -128,10 +136,22 @@ func main() {
 		}
 	}()
 
-	espwRestConfig, err := espwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
-		os.Exit(10)
+		logger.Error(err, "failed to create space management config from flags")
+		os.Exit(2)
+	}
+	// create space-aware client
+	spaceclient, err := msclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create space-aware client")
+		os.Exit(5)
+	}
+	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
+	kcsRestConfig, err := spaceclient.ConfigForSpace(kcsName, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "Failed to create config for core space")
+		os.Exit(7)
 	}
 
 	baseRestConfig, err := baseClientOpts.ToRESTConfig()
@@ -147,7 +167,7 @@ func main() {
 	}
 
 	// Get client config for view of APIExport of edge API
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+	edgeViewConfig, err := configForViewOfExport(ctx, kcsRestConfig, "edge.kubestellar.io")
 	if err != nil {
 		logger.Error(err, "Failed to create client config for view of edge APIExport")
 		os.Exit(30)
@@ -164,7 +184,6 @@ func main() {
 		logger.Error(err, "Failed to create kcp-kube all-cluster client")
 		os.Exit(44)
 	}
-	nsClusterClient := kubeClusterClient.CoreV1().Namespaces()
 	kubeClusterInformerFactory := kcpkubeinformers.NewSharedInformerFactory(kubeClusterClient, 0)
 	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
 
@@ -175,7 +194,7 @@ func main() {
 	customizerClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Customizers()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
-	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
+	espwClientset, err := kcpscopedclientset.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for edge service provider workspace")
 		os.Exit(50)
@@ -216,7 +235,7 @@ func main() {
 	// TODO: more
 	pt := placement.NewPlacementTranslator(concurrency, ctx, locationClusterPreInformer, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer, customizerClusterPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, spaceclient, spaceProviderNs)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)

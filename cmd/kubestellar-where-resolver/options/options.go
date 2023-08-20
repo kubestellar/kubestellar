@@ -25,10 +25,18 @@ import (
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
 )
 
+const (
+	defaultProviderName string = "default"
+	defaultKcsSpaceName string = "espw"
+)
+
 type Options struct {
+	SpaceMgtOpts   clientoptions.ClientOpts
 	EspwClientOpts clientoptions.ClientOpts
 	BaseClientOpts clientoptions.ClientOpts
 	Logs           *logs.Options
+	Provider       string
+	KcsName        string
 }
 
 func NewOptions() *Options {
@@ -37,13 +45,18 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	return &Options{
+		SpaceMgtOpts:   *clientoptions.NewClientOpts("space-mgt", "access to space management workspace"),
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
 		BaseClientOpts: *clientoptions.NewClientOpts("base", "access to all logical clusters as kcp-admin"),
 		Logs:           logs,
+		Provider:       defaultProviderName,
+		KcsName:        defaultKcsSpaceName,
 	}
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
+	options.SpaceMgtOpts.SetDefaultUserAndCluster("kcp-admin", "root:space-mgt")
+	options.SpaceMgtOpts.AddFlags(fs)
 	options.EspwClientOpts.AddFlags(fs)
 	options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
 	options.BaseClientOpts.AddFlags(fs)
