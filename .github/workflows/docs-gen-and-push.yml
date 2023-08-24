@@ -34,7 +34,7 @@ jobs:
     name: Generate and push docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.5.3
+      - uses: actions/checkout@v3.6.0
         with:
           token: ${{ secrets.GH_ALL_PROJECT_TOKEN }}
           persist-credentials: 'true'
