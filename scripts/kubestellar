@@ -100,7 +100,10 @@ function create_or_replace() { # usage: filename
     
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
-    kubectl ws root:compute &> /dev/null
+    if ! kubectl ws root:compute &> /dev/null ; then
+	echo "$0: Something is very wrong, unable to set current kcp workspace to root:compute" >&2
+	exit 1
+    fi
     ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do
