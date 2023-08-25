@@ -100,7 +100,10 @@ function create_or_replace() { # usage: filename
     
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
-    kubectl ws root:compute &> /dev/null
+    if ! kubectl ws root:compute &> /dev/null ; then
+	echo "$0: Something is very wrong, unable to set current kcp workspace to root:compute" >&2
+	exit 1
+    fi
     ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do
@@ -320,7 +323,7 @@ if [[ ! -d $log_folder ]]; then
     mkdir -p $log_folder
 fi
 
-mailbox-controller -v=2 &>> $log_folder/mailbox-controller-log.txt &
+mailbox-controller -v=2 >> $log_folder/mailbox-controller-log.txt 2>&1 &
 
 run_status=$(wait_for_process mailbox-controller)
 if [ $run_status -eq 0 ]; then
@@ -334,7 +337,7 @@ fi
 
 # Start the kubestellar where-resolver
 sleep 3
-kubestellar-where-resolver -v 2 &>> $log_folder/kubestellar-where-resolver-log.txt &
+kubestellar-where-resolver -v 2 >> $log_folder/kubestellar-where-resolver-log.txt 2>&1 &
 
 run_status=$(wait_for_process "kubestellar-where-resolver")
 if [ $run_status -eq 0 ]; then
@@ -346,7 +349,7 @@ fi
  
 # Start the Placement Translator
 sleep 3
-placement-translator --allclusters-context  "system:admin" -v=2 &>> $log_folder/placement-translator-log.txt &
+placement-translator --allclusters-context  "system:admin" -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
 
 run_status=$(wait_for_process placement-translator)
 if [ $run_status -eq 0 ]; then

@@ -45,6 +45,7 @@ import (
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
+	kcpcorev1a1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -222,6 +223,19 @@ func NewWorkloadProjector(
 				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
 				return
 			}
+			switch ws.Status.Phase {
+			case kcpcorev1a1.LogicalClusterPhaseReady: // the happy case
+			case kcpcorev1a1.LogicalClusterPhaseInitializing, kcpcorev1a1.LogicalClusterPhaseScheduling:
+				logger.V(4).Info("Ignoring mailbox workspace that is not ready yet", "wsName", ws.Name, "phase", ws.Status.Phase)
+				return
+			default:
+				logger.V(2).Info("Ignoring mailbox workspace with unexpected phase", "wsName", ws.Name, "phase", ws.Status.Phase)
+				return
+			}
+			if cluster == "" {
+				logger.Error(nil, "Impossible: mailbox workspace with empty cluster name", "wsName", ws.Name)
+				return
+			}
 			wp.mbwsNameToCluster.Put(ws.Name, cluster)
 			wp.clusterToMBWSName.Put(cluster, ws.Name)
 			scRef := syncerConfigRef{cluster, SyncerConfigName}
@@ -235,7 +249,20 @@ func NewWorkloadProjector(
 				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
 				return
 			}
+			switch ws.Status.Phase {
+			case kcpcorev1a1.LogicalClusterPhaseReady: // the happy case
+			case kcpcorev1a1.LogicalClusterPhaseInitializing, kcpcorev1a1.LogicalClusterPhaseScheduling:
+				logger.V(4).Info("Ignoring mailbox workspace that is not ready yet", "wsName", ws.Name, "phase", ws.Status.Phase)
+				return
+			default:
+				logger.V(2).Info("Ignoring mailbox workspace with unexpected phase", "wsName", ws.Name, "phase", ws.Status.Phase)
+				return
+			}
 			oldCluster, has := wp.mbwsNameToCluster.Get(ws.Name)
+			if cluster == "" {
+				logger.Error(nil, "Impossible: mailbox workspace with empty cluster name", "wsName", ws.Name)
+				return
+			}
 			if !has || cluster != oldCluster {
 				wp.mbwsNameToCluster.Put(ws.Name, cluster)
 				wp.clusterToMBWSName.Put(cluster, ws.Name)
@@ -270,6 +297,10 @@ func NewWorkloadProjector(
 		cluster := logicalcluster.From(syncfg)
 		if syncfg.Name != SyncerConfigName {
 			logger.V(4).Info("Ignoring SyncerConfig with non-standard name", "cluster", cluster, "name", syncfg.Name, "standardName", SyncerConfigName)
+			return
+		}
+		if cluster == "" {
+			logger.Error(nil, "Impossible: SyncerConfig with empty cluster name", "syncfg", syncfg)
 			return
 		}
 		scRef := syncerConfigRef{cluster, syncfg.Name}
@@ -646,22 +677,32 @@ func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
 	}
 }
 
+// Returns `retry bool`.
 func (wp *workloadProjector) syncConifgDestination(ctx context.Context, destination SinglePlacement) bool {
 	mbwsName := SPMailboxWorkspaceName(destination)
 	mbwsCluster, ok := wp.mbwsNameToCluster.Get(mbwsName)
 	logger := klog.FromContext(ctx)
-	if ok {
-		scRef := syncerConfigRef{mbwsCluster, SyncerConfigName}
-		logger.V(3).Info("Finally able to enqueue SyncerConfig ref", "scRef", scRef)
-		wp.queue.Add(scRef)
-		return false
+	if !ok {
+		return true
 	}
-	return true
+	if mbwsCluster == "" {
+		logger.Error(nil, "Impossible: mailbox workspace corresponds with empty cluster ID", "mbwsName", mbwsName)
+		return true
+	}
+	scRef := syncerConfigRef{mbwsCluster, SyncerConfigName}
+	logger.V(3).Info("Finally able to enqueue SyncerConfig ref", "scRef", scRef)
+	wp.queue.Add(scRef)
+	return false
 }
 
+// Returns `retry bool`.
 func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerConfigRef) bool {
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("syncerConfig", scRef)
+	if scRef.Cluster == "" {
+		logger.Error(nil, "Impossible: syncerConfigRef with empty string for Cluster")
+		return false
+	}
 	mbwsName, ok := wp.clusterToMBWSName.Get(scRef.Cluster)
 	if !ok {
 		logger.Error(nil, "Failed to map mailbox cluster Name to mailbox WS name")
@@ -719,6 +760,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 	return false
 }
 
+// Returns `retry bool`.
 func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef destinationObjectRef) bool {
 	namespaced := doRef.namespace != noNamespace
 	logger := klog.FromContext(ctx)
@@ -1252,6 +1294,9 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 		mbwsCluster, ok := wp.mbwsNameToCluster.Get(mbwsName)
 		if !ok {
 			logger.Error(nil, "Mailbox workspace not known yet", "destination", destination)
+			wp.queue.Add(destination)
+		} else if mbwsCluster == "" {
+			logger.Error(nil, "Mailbox workspace has empty clustername", "destination", destination)
 			wp.queue.Add(destination)
 		} else {
 			scRef := syncerConfigRef{mbwsCluster, SyncerConfigName}
