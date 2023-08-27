@@ -208,7 +208,7 @@ func (k *KcpWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 						lc := event.Object.(*kcpcorev1alpha1.LogicalCluster)
 
 						path, ok := lc.Annotations[kcpcore.LogicalClusterPathAnnotationKey]
-						if !ok {
+						if !ok || lc.Spec.Owner == nil {
 							continue
 						}
 						if event.Type == "MODIFIED" || event.Type == "ADDED" {
