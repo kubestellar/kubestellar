@@ -180,7 +180,7 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 		if ok {
 			srcResource.SetResourceVersion(destResource.GetResourceVersion())
 			srcResource.SetUID(destResource.GetUID())
-			srcResource.SetManagedFields(nil)
+			srcResource.SetManagedFields(destResource.GetManagedFields())
 			if hasAnnotation(destResource) {
 				setAnnotation(&srcResource)
 				updatedResources = append(updatedResources, srcResource)
