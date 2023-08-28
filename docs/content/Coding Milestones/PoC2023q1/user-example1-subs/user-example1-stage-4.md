@@ -10,36 +10,36 @@ Now we examine what happened.
 You can check that the workloads are running in the edge clusters as
 they should be.
 
-The syncer does its thing between the ren cluster and its mailbox
+The syncer does its thing between the phineas cluster and its mailbox
 workspace.  This is driven by the `SyncerConfig` object named
 `the-one` in that mailbox workspace.
 
-The syncer does its thing between the stimpy cluster and its mailbox
+The syncer does its thing between the ferb cluster and its mailbox
 workspace.  This is driven by the `SyncerConfig` object named
 `the-one` in that mailbox workspace.
 
-Using the kubeconfig that `kind` modified, examine the ren cluster.
+Using the kubeconfig that `kind` modified, examine the phineas cluster.
 Find just the `commonstuff` namespace and the `commond` Deployment.
 
 ```shell
 ( KUBECONFIG=~/.kube/config
   let tries=1
-  while ! kubectl --context kind-ren get ns commonstuff &> /dev/null; do
+  while ! kubectl --context kind-phineas get ns commonstuff &> /dev/null; do
     if (( tries >= 30)); then
-      echo "The commonstuff namespace failed to appear in ren!" >&2
+      echo "The commonstuff namespace failed to appear in phineas!" >&2
       exit 10
     fi
     let tries=tries+1
     sleep 10
   done
-  kubectl --context kind-ren get ns
+  kubectl --context kind-phineas get ns
 )
 ```
 ``` { .bash .no-copy }
 NAME                                 STATUS   AGE
 commonstuff                          Active   6m51s
 default                              Active   57m
-kubestellar-syncer-ren-1t9zgidy   Active   17m
+kubestellar-syncer-phineas-1t9zgidy   Active   17m
 kube-node-lease                      Active   57m
 kube-public                          Active   57m
 kube-system                          Active   57m
@@ -51,7 +51,7 @@ sleep 15
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-ren get deploy,rs -A | egrep 'NAME|stuff'
+KUBECONFIG=~/.kube/config kubectl --context kind-phineas get deploy,rs -A | egrep 'NAME|stuff'
 ```
 ``` { .bash .no-copy }
 NAMESPACE                            NAME                                                 READY   UP-TO-DATE   AVAILABLE   AGE
@@ -59,7 +59,7 @@ NAMESPACE                            NAME                                       
 commonstuff                          replicaset.apps/commond                                         1         1         1       13m
 ```
 
-Examine the stimpy cluster.  Find both workload namespaces and both
+Examine the ferb cluster.  Find both workload namespaces and both
 Deployments.
 
 ``` {.bash .hide-me}
@@ -67,7 +67,7 @@ sleep 15
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-stimpy get ns | egrep NAME\|stuff
+KUBECONFIG=~/.kube/config kubectl --context kind-ferb get ns | egrep NAME\|stuff
 ```
 ``` { .bash .no-copy }
 NAME                               STATUS   AGE
@@ -76,7 +76,7 @@ specialstuff                       Active   8m33s
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-stimpy get deploy,rs -A | egrep NAME\|stuff
+KUBECONFIG=~/.kube/config kubectl --context kind-ferb get deploy,rs -A | egrep NAME\|stuff
 ```
 ``` { .bash .no-copy }
 NAMESPACE                             NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
@@ -86,7 +86,7 @@ commonstuff                           replicaset.apps/commond                   
 specialstuff                          replicaset.apps/speciald-76cdbb69b5                             1         1         1       14s
 ```
 
-Examining the common workload in the stimpy cluster, for example,
+Examining the common workload in the ferb cluster, for example,
 will show that the replacement-style customization happened.
 
 ``` {.bash .hide-me}
@@ -94,7 +94,7 @@ sleep 15
 ```
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-stimpy get rs -n commonstuff commond -o yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-ferb get rs -n commonstuff commond -o yaml
 ```
 ``` { .bash .no-copy }
 ...
@@ -108,13 +108,13 @@ KUBECONFIG=~/.kube/config kubectl --context kind-stimpy get rs -n commonstuff co
 ...
 ```
 
-Check that the common workload on the ren cluster is working.
+Check that the common workload on the phineas cluster is working.
 
 ```shell
 let tries=1
 while ! curl http://localhost:8094 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The common workload failed to come up on ren!" >&2
+    echo "The common workload failed to come up on phineas!" >&2
     exit 10
   fi
   let tries=tries+1
@@ -127,17 +127,17 @@ curl http://localhost:8094
 <html>
   <body>
     This is a common web site.
-    Running in ren.
+    Running in phineas.
   </body>
 </html>
 ```
 
-Check that the special workload on the stimpy cluster is working.
+Check that the special workload on the ferb cluster is working.
 ```shell
 let tries=1
 while ! curl http://localhost:8097 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The special workload failed to come up on stimpy!" >&2
+    echo "The special workload failed to come up on ferb!" >&2
     exit 10
   fi
   let tries=tries+1
@@ -150,18 +150,18 @@ curl http://localhost:8097
 <html>
   <body>
     This is a special web site.
-    Running in stimpy.
+    Running in ferb.
   </body>
 </html>
 ```
 
-Check that the common workload on the stimpy cluster is working.
+Check that the common workload on the ferb cluster is working.
 
 ```shell
 let tries=1
 while ! curl http://localhost:8096 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The common workload failed to come up on stimpy!" >&2
+    echo "The common workload failed to come up on ferb!" >&2
     exit 10
   fi
   let tries=tries+1
@@ -174,7 +174,7 @@ curl http://localhost:8096
 <html>
   <body>
     This is a common web site.
-    Running in stimpy.
+    Running in ferb.
   </body>
 </html>
 ```

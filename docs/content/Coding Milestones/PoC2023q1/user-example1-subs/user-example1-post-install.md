@@ -49,16 +49,16 @@ using kcp or KubeStellar.
 kubectl ws root
 kubectl ws create imw-1 
 ```
-### Create SyncTarget and Location objects to represent the ren and stimpy clusters
+### Create SyncTarget and Location objects to represent the phineas and ferb clusters
 
-Use the following two commands. They label both ren and stimpy
-with `env=prod`, and also label stimpy with `extended=si`.
+Use the following two commands. They label both phineas and ferb
+with `env=prod`, and also label ferb with `extended=si`.
 
 ```shell
 kubectl ws root:imw-1
-kubectl kubestellar ensure location ren  loc-name=ren  env=prod
-kubectl kubestellar ensure location stimpy loc-name=stimpy env=prod extended=si
-echo "decribe the ren location object"
+kubectl kubestellar ensure location phineas  loc-name=ren  env=prod
+kubectl kubestellar ensure location ferb loc-name=ferb env=prod extended=si
+echo "decribe the phineas location object"
 kubectl describe location.edge.kcp.io ren
 ```
 
@@ -69,46 +69,46 @@ four objects.
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: ren
+  name: phineas
   labels:
-    id: ren
-    loc-name: ren
+    id: phineas
+    loc-name: phineas
     env: prod
 ---
 apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: ren
+  name: phineas
   labels:
-    loc-name: ren
+    loc-name: phineas
     env: prod
 spec:
   resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {id: ren}
+    matchLabels: {id: phineas}
 ---
 apiVersion: edge.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
-  name: stimpy
+  name: ferb
   labels:
-    id: stimpy
-    loc-name: stimpy
+    id: ferb
+    loc-name: ferb
     env: prod
     extended: si
 ---
 apiVersion: edge.kcp.io/v1alpha1
 kind: Location
 metadata:
-  name: stimpy
+  name: ferb
   labels:
-    loc-name: stimpy
+    loc-name: ferb
     env: prod
     extended: si
 spec:
   resource: {group: edge.kcp.io, version: v1alpha1, resource: synctargets}
   instanceSelector:
-    matchLabels: {id: stimpy}
+    matchLabels: {id: ferb}
 ```
 
 That script also deletes the Location named `default`, which is not

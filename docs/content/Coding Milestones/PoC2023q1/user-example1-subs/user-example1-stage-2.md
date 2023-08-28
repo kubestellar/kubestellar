@@ -299,8 +299,8 @@ following resolutions of the "where" predicates.
 
 | EdgePlacement | Resolved Where |
 | ------------- | -------------: |
-| edge-placement-c | ren, stimpy |
-| edge-placement-s | stimpy |
+| edge-placement-c | phineas, ferb |
+| edge-placement-s | ferb |
 
 Eventually there will be automation that conveniently runs the
 Where Resolver.  In the meantime, you can run it by hand: switch to the
@@ -319,9 +319,9 @@ sleep 45
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kcp.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kcp.io"
 ...
-I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|ren" locationWorkspace="apmziqj9p9fqlflm" location="ren" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
+I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|phineas" locationWorkspace="apmziqj9p9fqlflm" location="phineas" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
-I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|stimpy" locationWorkspace="apmziqj9p9fqlflm" location="stimpy" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
+I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|ferb" locationWorkspace="apmziqj9p9fqlflm" location="ferb" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ^C
 ```
 
@@ -347,12 +347,12 @@ items:
 - apiVersion: edge.kcp.io/v1alpha1
   destinations:
   - cluster: apmziqj9p9fqlflm
-    locationName: ren
-    syncTargetName: ren
+    locationName: phineas
+    syncTargetName: phineas
     syncTargetUID: b8c64c64-070c-435b-b3bd-9c0f0c040a54
   - cluster: apmziqj9p9fqlflm
-    locationName: stimpy
-    syncTargetName: stimpy
+    locationName: ferb
+    syncTargetName: ferb
     syncTargetUID: bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
   kind: SinglePlacementSlice
   metadata:
@@ -375,5 +375,5 @@ metadata:
 
 Also check out the SinglePlacementSlice objects in
 `root:my-org:wmw-s`.  It should go similarly, but the `destinations`
-should include only the entry for stimpy.
+should include only the entry for ferb.
 <!--user-example1-stage-2-end-->

@@ -57,22 +57,22 @@ class Kcp < Formula
 
   def post_install
     puts "\e[1;37mKCP binary has been installed to '#{prefix}' and are symlinked to '#{HOMEBREW_PREFIX}/bin'\e[0m"
-    kcp_bin_path = "#{HOMEBREW_PREFIX}/bin/kcp start &> /dev/null &"  # Replace with your binary name
     current_user = `whoami`.strip
-    # puts "#{HOMEBREW_PREFIX}"
-    # puts "#{current_user}"
-    ohai "Do you want to start 'kcp'? (y/n)"
-    response = $stdin.gets.chomp.downcase
-    if response == "y" || response == "yes"
-      system "osascript", "-e", <<-EOS
-        do shell script "#{kcp_bin_path}" with administrator privileges
-        do shell script "sleep 3"
-        do shell script "while [ -e '$(pwd)/.kcp/admin.kubeconfig' ]; do sleep 1; done"
-        do shell script "sleep 5"
-        do shell script "chown -R #{current_user}: $(pwd)/.kcp" with administrator privileges
-        EOS
+    if OS.mac?
+      kcp_bin_path = "sudo -u #{current_user} #{HOMEBREW_PREFIX}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
+      ohai "Do you want to start 'kcp'? (y/n)"
+      response = $stdin.gets.chomp.downcase
+      if response == "y" || response == "yes"
+        system "osascript", "-e", <<-EOS
+          do shell script "#{kcp_bin_path}" with administrator privileges
+          do shell script "sleep 10"
+          EOS
+      end
+    elsif OS.linux?
+      kcp_bin_path = "su -c #{HOMEBREW_PREFIX}/bin/kcp start #{current_user} &> /tmp/kcp.log &"  # Replace with your binary name
     end
-    puts "\e[1;37mConnecting to the KCP control plane is easy:
+    
+    puts "\n\e[1;37mConnecting to the KCP control plane is easy:
         export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
         kubectl ws tree
         \e[0m"

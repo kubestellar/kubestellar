@@ -1,111 +1,111 @@
 <!--user-example1-stage-1b-start-->
-### Connect to the stimpy workload execution cluster with its mailbox workspace
+### Connect to the ferb workload execution cluster with its mailbox workspace
 
 The following command will (a) create, in the mailbox workspace for
-stimpy, an identity and authorizations for the edge syncer and (b)
-write a file containing YAML for deploying the syncer in the stimpy
+ferb, an identity and authorizations for the edge syncer and (b)
+write a file containing YAML for deploying the syncer in the ferb
 cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw-1 stimpy
+kubectl kubestellar prep-for-syncer --imw root:imw-1 ferb
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
-Creating service account "kubestellar-syncer-stimpy-wfeig2lv"
-Creating cluster role "kubestellar-syncer-stimpy-wfeig2lv" to give service account "kubestellar-syncer-stimpy-wfeig2lv"
+Creating service account "kubestellar-syncer-ferb-wfeig2lv"
+Creating cluster role "kubestellar-syncer-ferb-wfeig2lv" to give service account "kubestellar-syncer-ferb-wfeig2lv"
 
- 1. write and sync access to the synctarget "kubestellar-syncer-stimpy-wfeig2lv"
+ 1. write and sync access to the synctarget "kubestellar-syncer-ferb-wfeig2lv"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kubestellar-syncer-stimpy-wfeig2lv" to bind service account "kubestellar-syncer-stimpy-wfeig2lv" to cluster role "kubestellar-syncer-stimpy-wfeig2lv".
+Creating or updating cluster role binding "kubestellar-syncer-ferb-wfeig2lv" to bind service account "kubestellar-syncer-ferb-wfeig2lv" to cluster role "kubestellar-syncer-ferb-wfeig2lv".
 
-Wrote physical cluster manifest to stimpy-syncer.yaml for namespace "kubestellar-syncer-stimpy-wfeig2lv". Use
+Wrote physical cluster manifest to ferb-syncer.yaml for namespace "kubestellar-syncer-ferb-wfeig2lv". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "stimpy-syncer.yaml"
+  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "ferb-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-stimpy-wfeig2lv" kubestellar-syncer-stimpy-wfeig2lv
+  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-ferb-wfeig2lv" kubestellar-syncer-ferb-wfeig2lv
 
 to verify the syncer pod is running.
 Current workspace is "root:espw".
 ```
 
 The file written was, as mentioned in the output,
-`stimpy-syncer.yaml`.  Next `kubectl apply` that to the stimpy
+`ferb-syncer.yaml`.  Next `kubectl apply` that to the ferb
 cluster.  That will look something like the following; adjust as
-necessary to make kubectl manipulate **your** stimpy cluster.
+necessary to make kubectl manipulate **your** ferb cluster.
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-stimpy apply -f stimpy-syncer.yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-ferb apply -f ferb-syncer.yaml
 ```
 ``` { .bash .no-copy }
-namespace/kubestellar-syncer-stimpy-wfeig2lv created
-serviceaccount/kubestellar-syncer-stimpy-wfeig2lv created
-secret/kubestellar-syncer-stimpy-wfeig2lv-token created
-clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-stimpy-wfeig2lv created
-clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-stimpy-wfeig2lv created
-secret/kubestellar-syncer-stimpy-wfeig2lv created
-deployment.apps/kubestellar-syncer-stimpy-wfeig2lv created
+namespace/kubestellar-syncer-ferb-wfeig2lv created
+serviceaccount/kubestellar-syncer-ferb-wfeig2lv created
+secret/kubestellar-syncer-ferb-wfeig2lv-token created
+clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-ferb-wfeig2lv created
+clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-ferb-wfeig2lv created
+secret/kubestellar-syncer-ferb-wfeig2lv created
+deployment.apps/kubestellar-syncer-ferb-wfeig2lv created
 ```
 
 You might check that the syncer is running, as follows.
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-stimpy get deploy -A
+KUBECONFIG=~/.kube/config kubectl --context kind-ferb get deploy -A
 ```
 ``` { .bash .no-copy }
 NAMESPACE                          NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-kubestellar-syncer-stimpy-saaywsu5   kubestellar-syncer-stimpy-saaywsu5   1/1     1            1           52s
+kubestellar-syncer-ferb-saaywsu5   kubestellar-syncer-ferb-saaywsu5   1/1     1            1           52s
 kube-system                        coredns                            2/2     2            2           35m
 local-path-storage                 local-path-provisioner             1/1     1            1           35m
 ```
 
-### Connect ren edge cluster with its mailbox workspace
+### Connect phineas edge cluster with its mailbox workspace
 
-Do the analogous stuff for the ren cluster.
+Do the analogous stuff for the phineas cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw-1 ren
+kubectl kubestellar prep-for-syncer --imw root:imw-1 phineas
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw-1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
-Creating service account "kubestellar-syncer-ren-32uaph9l"
-Creating cluster role "kubestellar-syncer-ren-32uaph9l" to give service account "kubestellar-syncer-ren-32uaph9l"
+Creating service account "kubestellar-syncer-phineas-32uaph9l"
+Creating cluster role "kubestellar-syncer-phineas-32uaph9l" to give service account "kubestellar-syncer-phineas-32uaph9l"
 
- 1. write and sync access to the synctarget "kubestellar-syncer-ren-32uaph9l"
+ 1. write and sync access to the synctarget "kubestellar-syncer-phineas-32uaph9l"
  2. write access to apiresourceimports.
 
-Creating or updating cluster role binding "kubestellar-syncer-ren-32uaph9l" to bind service account "kubestellar-syncer-ren-32uaph9l" to cluster role "kubestellar-syncer-ren-32uaph9l".
+Creating or updating cluster role binding "kubestellar-syncer-phineas-32uaph9l" to bind service account "kubestellar-syncer-phineas-32uaph9l" to cluster role "kubestellar-syncer-phineas-32uaph9l".
 
-Wrote physical cluster manifest to ren-syncer.yaml for namespace "kubestellar-syncer-ren-32uaph9l". Use
+Wrote physical cluster manifest to phineas-syncer.yaml for namespace "kubestellar-syncer-phineas-32uaph9l". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "ren-syncer.yaml"
+  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "phineas-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-ren-32uaph9l" kubestellar-syncer-ren-32uaph9l
+  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-phineas-32uaph9l" kubestellar-syncer-phineas-32uaph9l
 
 to verify the syncer pod is running.
 Current workspace is "root:espw".
 ```
 
-And deploy the syncer in the ren cluster.
+And deploy the syncer in the phineas cluster.
 
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context kind-ren apply -f ren-syncer.yaml 
+KUBECONFIG=~/.kube/config kubectl --context kind-phineas apply -f phineas-syncer.yaml 
 ```
 ``` { .bash .no-copy }
-namespace/kubestellar-syncer-ren-32uaph9l created
-serviceaccount/kubestellar-syncer-ren-32uaph9l created
-secret/kubestellar-syncer-ren-32uaph9l-token created
-clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-ren-32uaph9l created
-clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-ren-32uaph9l created
-secret/kubestellar-syncer-ren-32uaph9l created
-deployment.apps/kubestellar-syncer-ren-32uaph9l created
+namespace/kubestellar-syncer-phineas-32uaph9l created
+serviceaccount/kubestellar-syncer-phineas-32uaph9l created
+secret/kubestellar-syncer-phineas-32uaph9l-token created
+clusterrole.rbac.authorization.k8s.io/kubestellar-syncer-phineas-32uaph9l created
+clusterrolebinding.rbac.authorization.k8s.io/kubestellar-syncer-phineas-32uaph9l created
+secret/kubestellar-syncer-phineas-32uaph9l created
+deployment.apps/kubestellar-syncer-phineas-32uaph9l created
 ```
 <!--user-example1-stage-1b-end-->

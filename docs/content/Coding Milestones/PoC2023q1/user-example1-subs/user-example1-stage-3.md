@@ -30,8 +30,8 @@ I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync
 After it stops logging stuff, wait another minute and then you can ^C
 it or use another shell to continue exploring.
 
-The ren cluster gets only the common workload.  Examine ren's
-`SyncerConfig` as follows.  Utilize ren's name (which you stored in Stage 1) here.
+The phineas cluster gets only the common workload.  Examine phineas's
+`SyncerConfig` as follows.  Utilize phineas's name (which you stored in Stage 1) here.
 
 ```shell
 kubectl ws $REN_WS
@@ -176,8 +176,8 @@ NAMESPACE     NAME      DESIRED   CURRENT   READY   AGE
 commonstuff   commond   0         1         1       10m
 ```
 
-The stimpy cluster gets both the common and special workloads.
-Examine stimpy's `SyncerConfig` object and workloads as follows, using
+The ferb cluster gets both the common and special workloads.
+Examine ferb's `SyncerConfig` object and workloads as follows, using
 the name that you stored in Stage 1.
 
 ```shell
@@ -188,7 +188,7 @@ Current workspace is "root:espw".
 ```
 
 ```shell
-kubectl ws $STIMPY_WS
+kubectl ws $ferb_WS
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
