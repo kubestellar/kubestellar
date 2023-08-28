@@ -180,7 +180,12 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 		if ok {
 			srcResource.SetResourceVersion(destResource.GetResourceVersion())
 			srcResource.SetUID(destResource.GetUID())
-			srcResource.SetManagedFields(nil)
+			srcResource.SetManagedFields(destResource.GetManagedFields())
+
+			// Avoid to overwrite status field. Though, not sure this workaround is required.
+			// Actually, when Syncer donwsynces, Syncer doesn't call UpdateStatus() method. Status fields at downstream side aren't updated by downsyncing.
+			setStatusFieldToDestinationStatus(logger, &srcResource, destResource)
+
 			if hasAnnotation(destResource) {
 				setAnnotation(&srcResource)
 				updatedResources = append(updatedResources, srcResource)
@@ -242,4 +247,16 @@ func hasAnnotation(resource *unstructured.Unstructured, key string) bool {
 	}
 	_, ok := annotations[key]
 	return ok
+}
+
+func setStatusFieldToDestinationStatus(logger klog.Logger, srcResource *unstructured.Unstructured, destResource *unstructured.Unstructured) {
+	status, found, err := unstructured.NestedMap(destResource.Object, "status")
+	if found {
+		srcResource.Object["status"] = status
+	} else {
+		if err != nil {
+			logger.V(2).Info(fmt.Sprintf("  %v", err))
+		}
+		logger.V(2).Info(fmt.Sprintf("  failed to extract status from destination object %q. Nothing to do with status field", destResource.GetName()))
+	}
 }
