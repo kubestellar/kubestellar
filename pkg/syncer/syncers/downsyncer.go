@@ -19,6 +19,7 @@ package syncers
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -203,7 +204,7 @@ func (ds *DownSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource
 	}
 	upstreamResource.Object["status"] = status
 	applyConversion(upstreamResource, resourceForUp)
-	if _, err := upstreamClient.UpdateStatus(resourceForUp, upstreamResource); err != nil {
+	if _, err := updateStatusByResource(upstreamClient, resourceForUp, upstreamResource); err != nil {
 		ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
 		return err
 	}
@@ -313,13 +314,25 @@ func (ds *DownSyncer) BackStatusMany(resource edgev1alpha1.EdgeSyncConfigResourc
 			resourceForUp := convertToUpstream(resource, conversions)
 			upstreamResource.Object["status"] = status
 			applyConversion(upstreamResource, resourceForUp)
-			if _, err := upstreamClient.UpdateStatus(resourceForUp, upstreamResource); err != nil {
+			if _, err := updateStatusByResource(upstreamClient, resourceForUp, upstreamResource); err != nil {
 				ds.logger.Error(err, fmt.Sprintf("failed to update resource on upstream %q", resourceToString(resourceForUp)))
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func updateStatusByResource(upstreamClient *Client, resourceForUp edgev1alpha1.EdgeSyncConfigResource, upstreamResource *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	// TODO: make a more informed choice
+	if isKubeResource(resourceForUp) {
+		return upstreamClient.UpdateStatus(resourceForUp, upstreamResource)
+	}
+	return upstreamClient.Update(resourceForUp, upstreamResource)
+}
+
+func isKubeResource(rsc edgev1alpha1.EdgeSyncConfigResource) bool {
+	return strings.HasSuffix(rsc.Group, ".k8s.io") || !strings.Contains(rsc.Group, ".")
 }
 
 func findWithObject(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) (*unstructured.Unstructured, bool) {
