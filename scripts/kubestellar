@@ -255,10 +255,10 @@ function ensure_space_mgt() {
     fi
     kubectl ws create-context --overwrite
     # create space CRDs
-    eval kubectl create -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaces.yaml" $verbdir
-    eval kubectl create -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaceproviderdescs.yaml" $verbdir
+    eval kubectl apply -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaces.yaml" $verbdir
+    eval kubectl apply -f "$SCRIPT_DIR/../config/crds/space.kubestellar.io_spaceproviderdescs.yaml" $verbdir
     # deploy KCP provider
-    eval kubectl create -f "$SCRIPT_DIR/../config/space/provider_kcp.yaml" $verbdir
+    eval kubectl apply -f "$SCRIPT_DIR/../config/space/provider_kcp.yaml" $verbdir
     echo "Finished populating the space-mgt with kubestellar apiexports"
 }
 

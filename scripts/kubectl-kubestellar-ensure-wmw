@@ -17,10 +17,12 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: kubectl ws parent; $0 ($kubectl_flag | --with-kube boolean)* wmw_name
+# Usage: $0 ($kubectl_flag | --with-kube boolean)* wmw_path
 
 want_kube=true
 wmw_name=""
+space_mgt="root:space-mgt"
+spaceprovider_ns="spaceprovider-default"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -35,7 +37,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean)* wm_workspace_name"
+	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean)* wm_workspace_path"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
@@ -58,7 +60,7 @@ while (( $# > 0 )); do
 done
 
 if [ "$wmw_name" == "" ]; then
-    echo "$0: workload management workspace name not specified" >&2
+    echo "$0: workload management workspace path not specified" >&2
     exit 1
 fi
 
@@ -70,20 +72,57 @@ esac
 
 set -e
 
-original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
+IFS=':' read -ra ws_array <<< "$wmw_name"
+first_item="true"
+parent=""
+kubectl config use-context $space_mgt
 
-if [ "$original_ws" != root ]; then
-    kubectl ws "${kubectl_flags[@]}" ..
-    if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null; then
-	echo "Warning: parent has a child with the given WMW name; are you sure the right workspace is current?" >&2
-	sleep 15 # give a chance for ^C
-    fi
-    kubectl ws "${kubectl_flags[@]}" -
-fi
+create_space() {
+    kubectl "${kubectl_flags[@]}" apply -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: $item
+  namespace: $spaceprovider_ns
+  annotations:
+    kubestellar.io/space-path: $parent
+spec:
+  SpaceProviderDescName: default
+  Managed: true
+EOF
+}
 
-if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null
-then kubectl ws "${kubectl_flags[@]}" "$wmw_name"
-else kubectl ws "${kubectl_flags[@]}" create "$wmw_name" --enter
+for item in "${ws_array[@]}"; do
+    case "$item" in
+    (root)
+        if [ "$first_item" == "true" ]; then
+            parent=$item
+        else
+            echo "\"root\" workspace can only be used at the beginning"
+            exit 2
+        fi;;
+    (*)
+        if [ "$verbose" == "true" ]; then
+            if [[ -z "$(kubectl get space $item -n $spaceprovider_ns --ignore-not-found)" ]] ; then
+                echo "Space "$item" does not exist. Creating"
+                create_space
+                sleep 3
+            fi
+        else
+            if [[ -z "$(kubectl get space $item -n $spaceprovider_ns --ignore-not-found)" ]] ; then
+                create_space 1> /dev/null
+                sleep 3
+            fi
+        fi
+        parent=$parent":"$item;;
+    esac
+    first_item="false"
+done
+
+if ! kubectl ws "${kubectl_flags[@]}" "$wmw_name"
+then
+    echo "Can't access workspace ""$wmw_name"".Check space exist and ready"
+    exit 3
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-espw &> /dev/null; then
