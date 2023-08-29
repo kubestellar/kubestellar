@@ -69,20 +69,14 @@ class KubestellarProviderKcp < Formula
       # if response == "y" || response == "yes"
         system "osascript", "-e", <<-EOS
           do shell script "#{kcp_bin_path}" with administrator privileges
-            do shell script "sleep 10"            
           EOS
       # end
-      export_kubeconfig = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig`
-      if $?.success?
-        puts "kubeconfig exported successfully."
-      else
-        puts "kubeconfig export failed."
-      end
 
-      max_attempts = 20
+      max_attempts = 25
       attempts = 0
       success = false
       
+      puts "\nWaiting for KCP to become available for use..."
       while attempts < max_attempts && !success
         kubectl_ws_tree = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig ; kubectl ws tree &> /dev/null`
   
