@@ -38,7 +38,6 @@ class KubestellarProviderKcpKubectl < Formula
   license "Apache-2.0"
 
   depends_on "kubectl"
-  depends_on "kubestellar_provider_kcp"
 
   def install
     bin.install Dir["*"]

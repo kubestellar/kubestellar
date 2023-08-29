@@ -37,20 +37,26 @@ class KubestellarProviderKcp < Formula
 
   license "Apache-2.0"
 
-  depends_on "kubectl"
+  depends_on "kubestellar_provider_kcp_kubectl"
 
   def install
     port_to_check = 6443
     port_in_use = port_open?("#{port_to_check}")
-    if port_in_use
-      odie "Port 6443 is already in use. Please free up the port before installing."
-    end
+    
     prefix.install Dir["*"]
   end
 
   def port_open?(port)
-    `lsof -i :#{port}`
-    $?.success?
+    port_info = `lsof -i -n -P | grep LISTEN | grep :#{port}`.strip
+    # `lsof -i :#{port}`
+    if port_info.empty?
+      # puts "Port #{port} is not in use."
+    else
+      puts "\nPlease remove the process running on #{port} and re-run this formula"
+      puts "Port #{port} is in use by the following command:"
+      puts "#{port_info}\n\n"
+      odie
+    end
   end
 
   def post_install
@@ -58,14 +64,40 @@ class KubestellarProviderKcp < Formula
     current_user = `whoami`.strip
     if OS.mac?
       kcp_bin_path = "sudo -u #{current_user} #{HOMEBREW_PREFIX}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
-      ohai "Do you want to start 'kcp'? (y/n)"
-      response = $stdin.gets.chomp.downcase
-      if response == "y" || response == "yes"
+      # ohai "Do you want to start 'kcp'? (y/n)"
+      # response = $stdin.gets.chomp.downcase
+      # if response == "y" || response == "yes"
         system "osascript", "-e", <<-EOS
           do shell script "#{kcp_bin_path}" with administrator privileges
-          do shell script "sleep 10"
+            do shell script "sleep 10"            
           EOS
+      # end
+      export_kubeconfig = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig`
+      if $?.success?
+        puts "kubeconfig exported successfully."
+      else
+        puts "kubeconfig export failed."
       end
+
+      max_attempts = 20
+      attempts = 0
+      success = false
+      
+      while attempts < max_attempts && !success
+        kubectl_ws_tree = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig ; kubectl ws tree &> /dev/null`
+  
+        if $?.success?
+          puts "'kubectl ws tree' succeeded. KCP is now installed and running properly."
+          success = true
+        else
+          if attempts == max_attempts
+            odie "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
+          end
+          attempts += 1
+          sleep   5
+        end
+      end
+
     elsif OS.linux?
       kcp_bin_path = "su -c #{HOMEBREW_PREFIX}/bin/kcp start #{current_user} &> /tmp/kcp.log &"  # Replace with your binary name
     end
