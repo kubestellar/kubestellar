@@ -41,6 +41,8 @@ class Kubestellar < Formula
   depends_on "yq"
   depends_on "jq"
   depends_on "helm"
+  depends_on "kubestellar_provider_kcp"
+  depends_on "kubestellar_provider_kcp_kubectl"
 
   def install
     

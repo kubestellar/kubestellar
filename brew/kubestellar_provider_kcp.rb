@@ -1,4 +1,4 @@
-class Kcp < Formula
+class KubestellarProviderKcp < Formula
   desc "Simplifying building massively multi-tenant services. Together."
   homepage "https://kcp.io"
   version "v0.11.0"
@@ -38,8 +38,6 @@ class Kcp < Formula
   license "Apache-2.0"
 
   depends_on "kubectl"
-  depends_on "yq"
-  depends_on "jq"
 
   def install
     port_to_check = 6443

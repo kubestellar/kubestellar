@@ -1,4 +1,4 @@
-class KcpKubectl < Formula
+class KubestellarProviderKcpKubectl < Formula
   desc "Simplifying building massively multi-tenant services. Together."
   homepage "https://kcp.io"
   version "v0.11.0"
@@ -38,8 +38,7 @@ class KcpKubectl < Formula
   license "Apache-2.0"
 
   depends_on "kubectl"
-  depends_on "yq"
-  depends_on "jq"
+  depends_on "kubestellar_provider_kcp"
 
   def install
     bin.install Dir["*"]
