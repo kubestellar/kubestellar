@@ -92,11 +92,66 @@ to pass the new file with `--kubeconfig` on the command lines when
 using kcp or KubeStellar.
 
 
+### Space Manager
+
+The Space Manager will use space provider to create and manage underlying cluster
+for each Space object. Space objects are created in `root:space-mgt` context
+under `spaceprovider-default` namespace.
+
+```shell
+space-manager --context root:space-mgt &
+```
+``` { .bash .no-copy }
+...
+I0829 13:35:53.848054  379407 controller.go:143] "starting manager space controller"
+controller="space-manager"
+...
+I0829 13:35:53.865272  379407 reconcile_spaceprovider.go:87] "Provider namespace cre
+ated" controller="space-manager" provider="default" namespace="spaceprovider-default"
+...
+I0829 13:35:53.870486  379407 provider.go:176] "New space was detected" space="espw"
+provider="default"
+```
+
+You can get a listing of Spaces as follows.
+
+```shell
+kubectl config use-context root:space-mgt
+kubectl get spaces -A
+```
+``` { .bash .no-copy }
+NAMESPACE               NAME   AGE
+spaceprovider-default   espw   90s
+```
+
+
 ### Create an inventory management workspace.
 ```shell
-kubectl ws root
-kubectl ws create imw-1 
+kubectl config use-context root:space-mgt
+kubectl apply -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: imw-1
+  namespace: spaceprovider-default
+spec:
+  SpaceProviderDescName: default
+  Managed: true
+EOF
 ```
+``` {.bash .hide-me}
+sleep 5
+```
+
+Check out the Space status as follows.
+
+```shell
+kubectl get space imw-1 -n spaceprovider-default -o yaml | grep Phase
+```
+``` { .bash .no-copy }
+  Phase: Ready
+```
+
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands. They label both florin and guilder

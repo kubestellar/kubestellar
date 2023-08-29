@@ -13,19 +13,12 @@ One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".
 
 In this example, each workload description goes in its own workload
-management workspace (WMW).  Start by creating a common parent for
-those two workspaces, with the following commands.
+management workspace (WMW).
+Create the WMW for the common workload.  The following command
+will create it under "root:my-org" workspace.
 
 ```shell
-kubectl ws root
-kubectl ws create my-org --enter
-```
-
-Next, create the WMW for the common workload.  The following command
-will do that, if issued while "root:my-org" is the current workspace.
-
-```shell
-kubectl kubestellar ensure wmw wmw-c
+kubectl kubestellar ensure wmw root:my-org:wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -176,8 +169,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-kubectl ws root:my-org
-kubectl kubestellar ensure wmw wmw-s
+kubectl kubestellar ensure wmw root:my-org:wmw-s
 ```
 
 Next, use `kubectl` to create the following workload objects in that workspace.
