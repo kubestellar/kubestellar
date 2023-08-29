@@ -55,8 +55,6 @@ type whatResolver struct {
 	queue      workqueue.RateLimitingInterface
 	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
-	sync.Mutex
-
 	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
 	edgePlacementLister   edgev1alpha1listers.EdgePlacementClusterLister
 
@@ -65,10 +63,14 @@ type whatResolver struct {
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
 
-	// workspaceDetails maps lc.Name of a workload LC to all the relevant information for that LC.
+	// Hold this while accessing data listed below
+	sync.Mutex
+
+	// workspaceDetails maps lc.Name of a workload LC (WDS) to all the relevant information for that LC.
 	workspaceDetails map[logicalcluster.Name]*workspaceDetails
 }
 
+// workspaceDetails holds the data for a given WDS
 type workspaceDetails struct {
 	ctx context.Context
 	// placements maps name of relevant EdgePlacement object to that object
@@ -78,24 +80,29 @@ type workspaceDetails struct {
 	apiLister              apiwatch.APIResourceLister
 	dynamicInformerFactory kubedynamicinformer.DynamicSharedInformerFactory
 	// resources maps APIResource.Name to data for that resource,
-	// and only contains entries for non-namespaced resources
-	resources  map[string]*resourceResolver
+	// and formerly only contains entries for non-namespaced resources
+	resources map[string]*resourceResolver
+
+	// maps GroupKind to Name of urmetav1a1.APIResource
 	gkToARName map[schema.GroupKind]string
 }
 
+// resourceResolver holds the data for a given resource in a given WDS
 type resourceResolver struct {
 	gvr      schema.GroupVersionResource
 	informer upstreamcache.SharedInformer
 	lister   upstreamcache.GenericLister
 	stop     func()
 
-	// byObjName maps object name to relevant details
-	byObjName map[string]*objectDetails
+	// byObjName maps object namespace (if namespaced) and name to relevant details
+	byObjName map[NamespacedName]*objectDetails
 }
 
+type NamespacedName = Pair[NamespaceName, ObjectName]
+
+// holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	placements              k8ssets.String
-	placementsWantNamespace k8ssets.String // non-nil only for Namespace objects
+	placements k8ssets.String // the ones that match this object
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -147,14 +154,10 @@ func (wr *whatResolver) Run(ctx context.Context) {
 	wg.Wait()
 }
 
-type queueItem struct {
+type namespacedQueueItem struct {
 	gk      schema.GroupKind
 	cluster logicalcluster.Name
-	name    string
-}
-
-func (qi queueItem) toExternalName() ExternalName {
-	return ExternalName{Cluster: qi.cluster, Name: qi.name}
+	nn      NamespacedName
 }
 
 type WhatResolverClusterHandler struct {
@@ -180,11 +183,14 @@ func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
 		return
 	}
-	cluster, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	cluster, namespace, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
 	if err != nil {
 		wr.logger.Error(err, "Impossible! SplitMetaClusterNamespaceKey failed", "key", key)
 	}
-	item := queueItem{gk: gk, cluster: cluster, name: name}
+	if namespace != "" {
+		panic("Namespace must be empty here")
+	}
+	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -213,11 +219,12 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
 		return
 	}
-	_, name, err := upstreamcache.SplitMetaNamespaceKey(key)
+	namespace, name, err := upstreamcache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		wr.logger.Error(err, "Impossible! SplitMetaNamespaceKey failed", "key", key)
 	}
-	item := queueItem{gk: gk, cluster: cluster, name: name}
+	nn := NewPair(NamespaceName(namespace), ObjectName(name))
+	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: nn}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -245,9 +252,8 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName st
 			if _, found := objDetails.placements[epName]; !found {
 				continue
 			}
-			_, wantNamespace := objDetails.placementsWantNamespace[epName]
-			partID := WorkloadPartID{APIGroup: rr.gvr.Group, Resource: rr.gvr.Resource, Name: objName}
-			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, IncludeNamespaceObject: wantNamespace}
+			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
+			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version}
 			parts[partID] = partDetails
 		}
 	}
@@ -278,34 +284,36 @@ func (wr *whatResolver) processNextWorkItem() bool {
 		return false
 	}
 	defer wr.queue.Done(itemAny)
-	item := itemAny.(queueItem)
+	item := itemAny.(namespacedQueueItem)
 
-	logger := klog.FromContext(wr.ctx).WithValues("group", item.gk.Group, "kind", item.gk.Kind, "cluster", item.cluster, "name", item.name)
+	logger := klog.FromContext(wr.ctx).WithValues("queueItem", item)
 	ctx := klog.NewContext(wr.ctx, logger)
-	logger.V(4).Info("processing queueItem")
+	logger.V(4).Info("Started processing queueItem")
 
 	if wr.process(ctx, item) {
+		logger.V(4).Info("Finished processing queueItem")
 		wr.queue.Forget(itemAny)
 	} else {
+		logger.V(4).Info("Will retry processing queueItem")
 		wr.queue.AddRateLimited(itemAny)
 	}
 	return true
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) process(ctx context.Context, item queueItem) bool {
+func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
 	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.cluster, item.name)
+		return wr.processEdgePlacement(ctx, item.cluster, string(item.nn.Second))
 	} else if item.gk.Group == urmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
-		return wr.processResource(ctx, item.cluster, item.name)
+		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
 	} else {
-		return wr.processObject(ctx, item.cluster, item.gk, item.name)
+		return wr.processObject(ctx, item.cluster, item.gk, item.nn)
 	}
 }
 
-func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluster.Name, gk schema.GroupKind, objName string) bool {
+// process returns true on success or unrecoverable error, false to retry
+func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluster.Name, gk schema.GroupKind, objName NamespacedName) bool {
 	logger := klog.FromContext(ctx)
-	isNamespace := gkIsNamespace(gk)
 	wr.Lock()
 	defer wr.Unlock()
 	wsDetails, detailsFound := wr.workspaceDetails[cluster]
@@ -323,7 +331,11 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 		logger.V(3).Info("Ignoring extinct kind of object")
 		return true
 	}
-	rObj, err := rr.lister.Get(objName)
+	var lister upstreamcache.GenericNamespaceLister = rr.lister
+	if len(objName.First) > 0 {
+		lister = rr.lister.ByNamespace(string(objName.First))
+	}
+	rObj, err := lister.Get(string(objName.Second))
 	if err != nil {
 		if !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Failed to fetch generic object from lister")
@@ -333,20 +345,20 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 	}
 	oldDetails := rr.byObjName[objName]
 	if oldDetails == nil {
-		oldDetails = newObjectDetails(isNamespace)
+		oldDetails = newObjectDetails()
 	}
 	var newDetails *objectDetails
 	if rObj == nil {
 		delete(rr.byObjName, objName)
-		newDetails = newObjectDetails(isNamespace)
+		newDetails = newObjectDetails()
 	} else {
 		mrObj := rObj.(mrObject)
-		newDetails = whatMatchingPlacements(logger, wsDetails.placements, rr.gvr.Resource, mrObj)
+		newDetails = whatMatchingPlacements(logger, wsDetails, wsDetails.placements, rr.gvr.Resource, mrObj)
+		if newDetails == nil {
+			return false
+		}
 	}
 	changedPlacements := newDetails.placements.Difference(oldDetails.placements)
-	if isNamespace {
-		changedPlacements = changedPlacements.Union(newDetails.placementsWantNamespace.Difference(oldDetails.placementsWantNamespace))
-	}
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if len(changedPlacements) == 0 {
 		return true
@@ -358,14 +370,12 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 	return true
 }
 
-func newObjectDetails(isNamespace bool) *objectDetails {
+func newObjectDetails() *objectDetails {
 	ans := &objectDetails{placements: k8ssets.NewString()}
-	if isNamespace {
-		ans.placementsWantNamespace = k8ssets.NewString()
-	}
 	return ans
 }
 
+// process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) processResource(ctx context.Context, cluster logicalcluster.Name, arName string) bool {
 	logger := klog.FromContext(ctx)
 	wr.Lock()
@@ -385,8 +395,8 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 	}
 	rr := wsDetails.resources[arName]
 	// TODO: handle the case where ar.Spec changed
-	if ar == nil || ar.Spec.Namespaced {
-		// APIResource does not exist or is uninteresting
+	if ar == nil {
+		// APIResource does not exist
 		if rr == nil { // no data for the resource
 			logger.V(4).Info("Nothing to do for resource", "isNil", ar == nil, "isNamespaced", ar != nil && ar.Spec.Namespaced)
 			return true
@@ -396,9 +406,6 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		changedPlacements := k8ssets.NewString()
 		for _, objDetails := range rr.byObjName {
 			changedPlacements = changedPlacements.Union(objDetails.placements)
-			if gvrIsNamespace(rr.gvr) {
-				changedPlacements = changedPlacements.Union(objDetails.placementsWantNamespace)
-			}
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -432,10 +439,10 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			informer:  objInformer,
 			lister:    preInformer.Lister(),
 			stop:      stopInformer,
-			byObjName: map[string]*objectDetails{},
+			byObjName: map[NamespacedName]*objectDetails{},
 		}
 		go rr.informer.Run(informerCtx.Done())
-		logger.V(3).Info("Started watching resource")
+		logger.V(3).Info("Started watching resource", "gvr", gvr, "arName", arName, "gk", gk)
 		wsDetails.resources[arName] = rr
 		wsDetails.gkToARName[gk] = arName
 	} else {
@@ -444,12 +451,13 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 	return true
 }
 
+// process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName string) bool {
 	logger := klog.FromContext(ctx)
 	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(epName)
 	if err != nil {
 		if !k8sapierrors.IsNotFound(err) {
-			logger.Error(err, "Failed to fetch EdgePlacement from local cache", "cluster", cluster, "epName", epName)
+			logger.Error(err, "Failed to fetch EdgePlacement from local cache")
 			return true // I think these errors are not transient
 		}
 		ep = nil
@@ -486,7 +494,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		go apiInformer.Run(wsCtx.Done())
 		dynamicInformerFactory.Start(wsCtx.Done())
 		if !upstreamcache.WaitForCacheSync(wsCtx.Done(), apiInformer.HasSynced) {
-			logger.Error(nil, "Failed to sync API informer in time", "cluster", cluster)
+			logger.Error(nil, "Failed to sync API informer in time")
 			return true
 		}
 	}
@@ -500,9 +508,6 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		for _, rr := range wsDetails.resources {
 			for objName, objDetails := range rr.byObjName {
 				delete(objDetails.placements, epName)
-				if objDetails.placementsWantNamespace != nil {
-					delete(objDetails.placementsWantNamespace, epName)
-				}
 				if len(objDetails.placements) == 0 {
 					delete(rr.byObjName, objName)
 				}
@@ -525,38 +530,46 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 	if prevEp == nil {
 		logger.V(3).Info("Starting watching EdgePlacement")
 	} else {
-		whatPredicateUnChanged := (apiequality.Semantic.DeepEqual(prevEp.Spec.NamespaceSelector, ep.Spec.NamespaceSelector) &&
-			apiequality.Semantic.DeepEqual(prevEp.Spec.NonNamespacedObjects, ep.Spec.NonNamespacedObjects))
+		whatPredicateUnChanged := apiequality.Semantic.DeepEqual(prevEp.Spec.Downsync, ep.Spec.Downsync)
 		if whatPredicateUnChanged {
 			logger.V(4).Info(`No change in "what" predicate`)
 			return true
 		}
 	}
 	anyChange := false
+	completeSuccess := true
 	for _, rr := range wsDetails.resources {
-		isNamespace := gvrIsNamespace(rr.gvr)
+		logger := logger.WithValues("gvr", rr.gvr)
 		rObjs, err := rr.lister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "Failed to list objects", "gvr", rr.gvr)
 		}
 		for _, rObj := range rObjs {
 			mrObj := rObj.(mrObject)
-			objName := mrObj.GetName()
-			objDetails, found := rr.byObjName[objName]
+			objNS := NamespaceName(mrObj.GetNamespace())
+			objName := ObjectName(mrObj.GetName())
+			objNN := NewPair(objNS, objName)
+			objDetails, found := rr.byObjName[objNN]
 			if objDetails == nil {
-				objDetails = newObjectDetails(isNamespace)
+				objDetails = newObjectDetails()
 			}
-			objChange := objDetails.setByMatch(logger, &ep.Spec, epName, isNamespace, rr.gvr.Resource, mrObj)
+			objChange, success := objDetails.setByMatch(logger, wsDetails, &ep.Spec, epName, rr.gvr.Resource, mrObj)
+			logger.V(5).Info("From objDetails.setByMatch", "objNN", objNN, "found", found, "objChange", objChange, "success", success)
+			if !success {
+				completeSuccess = false
+				continue
+			}
 			if objChange && !found {
-				rr.byObjName[objName] = objDetails
+				rr.byObjName[objNN] = objDetails
 			}
 			anyChange = anyChange || objChange
 		}
 	}
+	logger.V(5).Info("Finished looping over resources", "numResources", len(wsDetails.resources))
 	if anyChange {
 		wr.notifyReceivers(cluster, epName)
 	}
-	return true
+	return completeSuccess
 }
 
 type mrObject interface {
@@ -564,103 +577,100 @@ type mrObject interface {
 	k8sruntime.Object
 }
 
-func whatMatchingPlacements(logger klog.Logger, candidates map[string]*edgeapi.EdgePlacement, whatResource string, whatObj mrObject) *objectDetails {
-	gvk := whatObj.GetObjectKind().GroupVersionKind()
-	isNamespace := gkIsNamespace(gvk.GroupKind())
-	ans := newObjectDetails(isNamespace)
+// Returns nil when an accurate answer cannot be computed.
+func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidates map[string]*edgeapi.EdgePlacement, whatResource string, whatObj mrObject) *objectDetails {
+	ans := newObjectDetails()
 	for epName, ep := range candidates {
-		ans.setByMatch(logger, &ep.Spec, epName, isNamespace, whatResource, whatObj)
+		_, success := ans.setByMatch(logger, wsd, &ep.Spec, epName, whatResource, whatObj)
+		if !success {
+			return nil
+		}
 	}
 	return ans
 }
 
-func (od *objectDetails) setByMatch(logger klog.Logger, spec *edgeapi.EdgePlacementSpec, epName string, isNamespace bool, whatResource string, whatObj mrObject) bool {
-	_, found := od.placements[epName]
-	if isNamespace {
-		objMatch, nsMatch := whatMatches(logger, spec, whatResource, whatObj)
-		var found2 bool
-		if isNamespace {
-			_, found2 = od.placementsWantNamespace[epName]
-		}
-		if !nsMatch {
-			if !(found || found2) {
-				return false
-			}
-			delete(od.placements, epName)
-			if isNamespace {
-				delete(od.placementsWantNamespace, epName)
-			}
-			return true
-		}
+// returns `(changed bool, success bool)`
+func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName, whatResource string, whatObj mrObject) (bool, bool) {
+	found := od.placements.Has(epName)
+	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
+	if !success {
+		return false, false
+	}
+	if objMatch == found {
+		return false, true
+	}
+	if !found {
 		od.placements.Insert(epName)
-		if objMatch {
-			od.placementsWantNamespace.Insert(epName)
-		}
-		return (!found) || objMatch && !found2
-	}
-	objMatch, _ := whatMatches(logger, spec, whatResource, whatObj)
-	if objMatch {
-		if !found {
-			od.placements.Insert(epName)
-			return true
-		}
-	} else if found {
+	} else {
 		delete(od.placements, epName)
-		return true
 	}
-	return false
+	return true, true
 }
 
 // whatMatches tests the given object against the "what predicate" of an EdgePlacementSpec.
-// The first returned bool indicates whether the given object matches the NonNamespacedObjects part.
-// The first returned bool indicates whether the given object is a Namespace and matches the NamespaceSelector part.
-func whatMatches(logger klog.Logger, spec *edgeapi.EdgePlacementSpec, whatResource string, whatObj mrObject) (bool, bool) {
+// The first returned bool indicates whether there is a match.
+// The second indicates whether an accurate answer was found.
+func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, whatResource string, whatObj mrObject) (bool, bool) {
 	gvk := whatObj.GetObjectKind().GroupVersionKind()
+	objNS := whatObj.GetNamespace()
 	objName := whatObj.GetName()
-	labelSet := labels.Set(whatObj.GetLabels())
-	matches := false
-outer:
-	for _, objSet := range spec.NonNamespacedObjects {
-		if objSet.APIGroup != gvk.Group {
+	objLabels := whatObj.GetLabels()
+	for _, objTest := range spec.Downsync {
+		if objTest.APIGroup != gvk.Group {
 			continue
 		}
-		if !(len(objSet.Resources) == 1 && objSet.Resources[0] == "*" || SliceContains(objSet.Resources, whatResource)) {
+		if !(len(objTest.Resources) == 1 && objTest.Resources[0] == "*" || SliceContains(objTest.Resources, whatResource)) {
 			continue
 		}
-		if len(objSet.ResourceNames) == 1 && objSet.ResourceNames[0] == "*" || SliceContains(objSet.ResourceNames, objName) {
-			matches = true
-			break outer
-		}
-		for _, ls := range objSet.LabelSelectors {
-			sel, err := metav1.LabelSelectorAsSelector(&ls)
-			if err != nil {
-				logger.Info("Failed to convert LabelSelector to labels.Selector", "ls", ls, "err", err)
+		if objNS == "" {
+			if len(objTest.NamespaceSelectors) > 0 {
 				continue
 			}
-			if sel.Matches(labelSet) {
-				matches = true
-				break outer
+		} else {
+			nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
+			nsRR := wsd.resources[nsARName]
+			var objNSR k8sruntime.Object
+			if nsRR != nil {
+				var err error
+				objNSR, err = nsRR.lister.Get(objNS)
+				if err != nil && !k8sapierrors.IsNotFound(err) {
+					logger.Error(err, "Impossible: failed to fetch namespace from Lister", "objNS", objNS)
+					return true, true
+				}
+				if objNSR == nil || err != nil && k8sapierrors.IsNotFound(err) {
+					logger.V(2).Info("Going around again because namespace is not known yet", "objNSR", objNSR)
+					return false, false
+				}
+				objNSM := objNSR.(metav1.Object)
+				nsLabels := objNSM.GetLabels()
+				if !labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors) {
+					continue
+				}
+			} else {
+				logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
+				return false, false
 			}
 		}
-	}
-	if gkIsNamespace(gvk.GroupKind()) {
-		sel, err := metav1.LabelSelectorAsSelector(&spec.NamespaceSelector)
-		if err != nil {
-			logger.Info("Failed to convert spec.NamespaceSelector to labels.Selector", "nsSelector", spec.NamespaceSelector, "err", err)
-			return false, false
+		if len(objTest.ObjectNames) == 1 && objTest.ObjectNames[0] == "*" || SliceContains(objTest.ObjectNames, objName) {
+			return true, true
 		}
-		return matches, sel.Matches(labelSet)
-	} else {
-		return matches, false
+		return labelsMatchAny(logger, objLabels, objTest.LabelSelectors), true
 	}
+	return false, true
 }
 
-func gkIsNamespace(gk schema.GroupKind) bool {
-	return gk.Group == "" && gk.Kind == "Namespace"
-}
-
-func gvrIsNamespace(gr schema.GroupVersionResource) bool {
-	return gr.Group == "" && gr.Resource == "namespaces"
+func labelsMatchAny(logger klog.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
+	for _, ls := range selectors {
+		sel, err := metav1.LabelSelectorAsSelector(&ls)
+		if err != nil {
+			logger.Info("Failed to convert LabelSelector to labels.Selector", "ls", ls, "err", err)
+			continue
+		}
+		if sel.Matches(labels.Set(labelSet)) {
+			return true
+		}
+	}
+	return false
 }
 
 func mkgk(group, kind string) schema.GroupKind {
@@ -750,4 +760,8 @@ func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
 
 func MetaGroupResourceToSchema(gr metav1.GroupResource) schema.GroupResource {
 	return schema.GroupResource{Group: gr.Group, Resource: gr.Resource}
+}
+
+func SchemaGroupResourceToMeta(sgr schema.GroupResource) metav1.GroupResource {
+	return metav1.GroupResource{Group: sgr.Group, Resource: sgr.Resource}
 }

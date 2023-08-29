@@ -1,31 +1,9 @@
--: # github.com/kubestellar/kubestellar/pkg/placement
--: # github.com/kubestellar/kubestellar/pkg/placement [github.com/kubestellar/kubestellar/pkg/placement.test]
-/pkg/placement/what-resolver.go:528:100: ep.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:528:100: ep.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:528:73: prevEp.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:528:73: prevEp.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:529:47: prevEp.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:529:47: prevEp.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:529:77: ep.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:529:77: ep.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:623:30: spec.NonNamespacedObjects undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:623:30: spec.NonNamespacedObjects undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-/pkg/placement/what-resolver.go:647:52: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:647:52: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:649:98: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-/pkg/placement/what-resolver.go:649:98: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-logcheck: 16 errors during loading
-pkg/placement/what-resolver.go:528:100: ep.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:528:100: ep.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:528:73: prevEp.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:528:73: prevEp.Spec.NamespaceSelector undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:529:47: prevEp.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:529:47: prevEp.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:529:77: ep.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:529:77: ep.Spec.NonNamespacedObjects undefined (type "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:623:30: spec.NonNamespacedObjects undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:623:30: spec.NonNamespacedObjects undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NonNamespacedObjects)
-pkg/placement/what-resolver.go:647:52: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:647:52: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:649:98: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
-pkg/placement/what-resolver.go:649:98: spec.NamespaceSelector undefined (type *"github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1".EdgePlacementSpec has no field or method NamespaceSelector)
+/cmd/cluster-watchall/main.go:100:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/cmd/kcp-watchall/main.go:103:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/cmd/mailbox-controller/main.go:198:4: Additional arguments to Info should always be Key Value pairs. Please check if there is any key or value missing.
+/cmd/mailbox-controller/main.go:91:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/cmd/placement-translator/main.go:117:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
+/pkg/placement/workload-projector.go:678:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:700:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
+/pkg/placement/workload-projector.go:877:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
+/pkg/placement/workload-projector.go:959:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }

@@ -14,12 +14,21 @@ metadata:
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod"}
-  namespaceSelector:
-    matchLabels: {"common":"si"}
-  nonNamespacedObjects:
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ "*" ]
+  - apiGroup: apps
+    resources: [ deployments ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ commond ]
   - apiGroup: apis.kcp.io
-    resources: [ "apibindings" ]
-    resourceNames: [ "bind-kubernetes" ]
+    resources: [ apibindings ]
+    namespaceSelectors: []
+    objectNames: [ "bind-kubernetes", "bind-apps" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]

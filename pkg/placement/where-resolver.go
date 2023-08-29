@@ -29,6 +29,7 @@ import (
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
@@ -46,6 +47,16 @@ type whereResolver struct {
 
 	// resolutions maps EdgePlacement name to its ResolvedWhere
 	resolutions RelayMap[ExternalName, ResolvedWhere]
+}
+
+type queueItem struct {
+	gk      schema.GroupKind
+	cluster logicalcluster.Name
+	name    string
+}
+
+func (qi queueItem) toExternalName() ExternalName {
+	return ExternalName{Cluster: qi.cluster, Name: qi.name}
 }
 
 // NewWhereResolver returns a WhereResolver.

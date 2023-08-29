@@ -22,13 +22,9 @@ Current workspace is "root:espw".
 placement-translator &
 sleep 120
 ```
-``` { .bash .no-copy }
-I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
-...
-```
 
-After it stops logging stuff, wait another minute and then you can ^C
-it or use another shell to continue exploring.
+After it stops logging stuff, wait another minute and then you can
+proceed.
 
 The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
