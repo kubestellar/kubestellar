@@ -235,9 +235,9 @@
         systemd=true
         ```
 
-        ## 2.3 Edit /etc/sudoers 
+        ## 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
         ```
-        sudo vi /etc/sudoers
+        sudo vi /etc/sudoers.d/docker
         ``` 
         Insert
         ```
