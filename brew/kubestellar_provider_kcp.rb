@@ -60,7 +60,6 @@ class KubestellarProviderKcp < Formula
   end
 
   def post_install
-    puts "\e[1;37mKCP binary has been installed to '#{prefix}' and are symlinked to '#{HOMEBREW_PREFIX}/bin'\e[0m"
     current_user = `whoami`.strip
     if OS.mac?
       kcp_bin_path = "sudo -u #{current_user} #{HOMEBREW_PREFIX}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
@@ -91,11 +90,10 @@ class KubestellarProviderKcp < Formula
           sleep   5
         end
       end
-
     elsif OS.linux?
       kcp_bin_path = "su -c #{HOMEBREW_PREFIX}/bin/kcp start #{current_user} &> /tmp/kcp.log &"  # Replace with your binary name
     end
-    
+    puts "\e[1;37mKCP binary has been installed to '#{prefix}' and are symlinked to '#{HOMEBREW_PREFIX}/bin'\e[0m"
     puts "\n\e[1;37mConnecting to the KCP control plane is easy:
         export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
         kubectl ws tree

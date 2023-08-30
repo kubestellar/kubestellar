@@ -50,8 +50,24 @@ class Kubestellar < Formula
   end
 
   def post_install
+    # export_kubeconfg = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig`
+    # if !$?.success?
+    #   puts "kubeconfig export failed. Please remove this formula and attempt to install it again"
+    # end
+    # sleep 1
+    ENV["KUBECONFIG"] = ".kcp/admin.kubeconfig"
+    show_tree = `kubectl ws tree`
+    puts "#{show_tree}"
+    if !$?.success?
+      puts "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
+    end
+    switch_to_root_compute = `kubectl ws "root"`
+    puts "#{switch_to_root_compute}"
+    if !$?.success?
+      puts "'kubectl ws root:compute' failed. Please remove this formula and attempt to install it again"
+    end
     puts "\e[1;37mKubeStellar kubectl extensions have been installed to '#{prefix}/bin' and are symlinked to '#{HOMEBREW_PREFIX}/bin'\e[0m"
-    puts "\e[1;37mAll other files have been installed to '#{prefix}'\e[0m"
+    puts "\e[1;37mAll other files have been installed to '#{prefix}'\e[0m\n\n"
   end
 
   test do
