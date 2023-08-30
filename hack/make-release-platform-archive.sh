@@ -38,7 +38,7 @@ cd "$srcdir/.."
 
 rm -rf bin/*
 make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator"
-echo $'#!/usr/bin/env bash\necho' ${kcpe_version@Q} > bin/kubestellar-release
+echo $'#!/usr/bin/env bash\necho' ${kcpe_version} > bin/kubestellar-release
 chmod a+x bin/kubestellar-release
 mkdir -p build/release
 tar czf "build/release/$archname" --exclude bin/.gitignore bin config user/helm-chart README.md LICENSE
