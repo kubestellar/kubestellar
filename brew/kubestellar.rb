@@ -50,11 +50,6 @@ class Kubestellar < Formula
   end
 
   def post_install
-    # export_kubeconfg = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig`
-    # if !$?.success?
-    #   puts "kubeconfig export failed. Please remove this formula and attempt to install it again"
-    # end
-    # sleep 1
     ENV["KUBECONFIG"] = ".kcp/admin.kubeconfig"
     show_tree = `kubectl ws tree`
     puts "#{show_tree}"
