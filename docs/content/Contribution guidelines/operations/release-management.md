@@ -53,19 +53,6 @@ latest=v0.3.0
 ...
 ```
 
-### Update the branch name in kubestellar/docs/content/readme.md
-There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
-<b>before:</b>
-```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
-```
-
-<b>after:</b>
-```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
-```
-
-
 ### Push the main branch
 ```shell
 git add .
@@ -89,8 +76,8 @@ vi docs/mkdocs.yml
 <b>before:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3"
 ...
-ks_branch: 'release-0.2'
-ks_tag: 'v0.2.0'
+ks_branch: 'main'
+ks_tag: 'latest'
 ...
 ```
 
@@ -100,6 +87,18 @@ ks_tag: 'v0.2.0'
 ks_branch: 'release-0.3'
 ks_tag: 'v0.3.0'
 ...
+```
+
+### Update the branch name in kubestellar/docs/content/readme.md
+There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
+<b>before:</b>
+```shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
+```
+
+<b>after:</b>
+```shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
 ```
 
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
