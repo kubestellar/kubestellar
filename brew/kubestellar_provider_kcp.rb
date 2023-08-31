@@ -71,27 +71,28 @@ class KubestellarProviderKcp < Formula
           EOS
       # end
 
-      max_attempts = 25
-      attempts = 0
-      success = false
-      
-      puts "\nWaiting for KCP to become available for use..."
-      while attempts < max_attempts && !success
-        kubectl_ws_tree = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig ; kubectl ws tree &> /dev/null`
-  
-        if $?.success?
-          puts "'kubectl ws tree' succeeded. KCP is now installed and running properly."
-          success = true
-        else
-          if attempts == max_attempts
-            odie "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
-          end
-          attempts += 1
-          sleep   5
-        end
-      end
     elsif OS.linux?
-      kcp_bin_path = "su -c #{HOMEBREW_PREFIX}/bin/kcp start #{current_user} &> /tmp/kcp.log &"  # Replace with your binary name
+      kcp_bin_path = "sudo -u #{current_user} #{HOMEBREW_PREFIX}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
+      system "sudo", "-u", current_user, kcp_bin_path
+    end
+    max_attempts = 25
+    attempts = 0
+    success = false
+      
+    puts "\nWaiting for KCP to become available for use..."
+    while attempts < max_attempts && !success
+      kubectl_ws_tree = `export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig ; kubectl ws tree &> /dev/null`
+  
+      if $?.success?
+        puts "'kubectl ws tree' succeeded. KCP is now installed and running properly."
+        success = true
+      else
+        if attempts == max_attempts
+          odie "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
+        end
+        attempts += 1
+        sleep   5
+      end
     end
     puts "\e[1;37mKCP binary has been installed to '#{prefix}' and are symlinked to '#{HOMEBREW_PREFIX}/bin'\e[0m"
     puts "\n\e[1;37mConnecting to the KCP control plane is easy:
