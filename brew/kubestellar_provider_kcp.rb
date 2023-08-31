@@ -72,7 +72,7 @@ class KubestellarProviderKcp < Formula
       # end
 
     elsif OS.linux?
-      kcp_bin_path = "sudo -u #{current_user} #{prefix}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
+      kcp_bin_path = "#{prefix}/bin/kcp start &> /tmp/kcp.log &"  # Replace with your binary name
       system "sudo", "-u", current_user, kcp_bin_path
     end
     max_attempts = 25
