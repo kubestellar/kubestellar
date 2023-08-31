@@ -56,7 +56,7 @@ class Kubestellar < Formula
     # if !$?.success?
     #   puts "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
     # end
-    switch_to_root_compute = `kubectl ws root`
+    switch_to_root_compute = `kubectl ws .`
     puts "#{switch_to_root_compute}"
     if !$?.success?
       puts "'kubectl ws root:compute' failed. Please remove this formula and attempt to install it again"
