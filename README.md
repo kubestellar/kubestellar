@@ -23,27 +23,22 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-KubeStellar is an opensource project focused on concerns arising from multi-cluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
+Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box? KubeStellar adds multi-cluster support to Kubernetes distributions. 
 
-- Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
-- Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
-- Non-namespaced objects: need general support
-- Cardinality of destinations: A source object may propagate to many thousands of destinations. 
+### Distinguishing features of KubeStellar
 
-## Goals
+- multi-cluster down-syncing deploy, configure, and collect status across pre-existing clusters
+- up-syncing from remote clusters (return any object, not just status)
+- lightweight logical cluster support (KubeFlex, kcp, kind, etc.)
+- resiliency to support disconnected operation and intermittent connectivity
 
-- Collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, scheduler, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
-- Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
-- Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
 
-## Areas of exploration
+### Additional features
 
-- Desired placement expression​: Need a way for one center object to express large number of desired copies​
-- Scheduling/syncing interface​: Need something that scales to large number of destinations​
-- Rollout control​: Client needs programmatic control of rollout, possibly including domain-specific logic​
-- Customization: Need a way for one pattern in the center to express how to customize for all the desired destinations​
-- Status from many destinations​: Center clients may need a way to access status from individual edge copies
-- Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
+- non-wrapped / kubernetes-object-native denaturing (enables hierarchy) (no requirement to wrap objects)
+- rule-based customization (grouping) - automate the customization of your deployments
+- status summarization - summarize the status returned from all your deployments
+- scalability - scale to a large number of objects, overcoming default Kubernetes limitations
 
 ## Roadmap for the Project
 
