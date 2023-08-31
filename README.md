@@ -27,17 +27,12 @@ Did you know kubernetes manages multiple nodes but does not manage multiple clus
 
 ### Distinguishing features of KubeStellar
 
-- multi-cluster down-syncing deploy, configure, and collect status across pre-existing clusters
-- up-syncing from remote clusters (return any object, not just status)
+- just point your kubectl client at KubeStellar and deploy your exisiting kubernetes objects to any remote cluster - no wrapping required
+- use rule-based customization (grouping) to automate the customization of your large-scale deployments (just like kustomize)
+- sync your workload across your pre-existing remote clusters
+- up-sync any object, not just status from your remote clusters
+- support clusters that are disconnected or have intermittent connectivity
 - lightweight logical cluster support (KubeFlex, kcp, kind, etc.)
-- resiliency to support disconnected operation and intermittent connectivity
-
-
-### Additional features
-
-- non-wrapped / kubernetes-object-native denaturing (enables hierarchy) (no requirement to wrap objects)
-- rule-based customization (grouping) - automate the customization of your deployments
-- status summarization - summarize the status returned from all your deployments
 - scalability - scale to a large number of objects, overcoming default Kubernetes limitations
 
 ## Roadmap for the Project
