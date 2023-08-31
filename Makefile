@@ -150,13 +150,13 @@ build-kubestellar-syncer-image: IMAGE_TAG ?= latest
 build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
 build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= 
 build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 .PHONY: build-kubestellar-syncer-image-local
 build-kubestellar-syncer-image-local: require-ko
-	$(eval SYNCER_IMAGE=$(shell ko build --local --platform=linux/$(ARCH) ./cmd/syncer))
+	$(eval SYNCER_IMAGE=$(shell ko build --local --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=linux/$(ARCH) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 install: WHAT ?= ./cmd/...
