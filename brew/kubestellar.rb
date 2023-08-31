@@ -51,11 +51,11 @@ class Kubestellar < Formula
 
   def post_install
     ENV["KUBECONFIG"] = ".kcp/admin.kubeconfig"
-    show_tree = `kubectl ws tree`
-    puts "#{show_tree}"
-    if !$?.success?
-      puts "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
-    end
+    # show_tree = `kubectl ws tree`
+    # puts "#{show_tree}"
+    # if !$?.success?
+    #   puts "'kubectl ws tree' failed. Please remove this formula and attempt to install it again"
+    # end
     switch_to_root_compute = `kubectl ws root`
     puts "#{switch_to_root_compute}"
     if !$?.success?
