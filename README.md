@@ -23,7 +23,7 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box? KubeStellar adds multi-cluster support to Kubernetes distributions. 
+Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box? KubeStellar adds multi-cluster support to Kubernetes 
 
 ### Distinguishing features of KubeStellar
 
