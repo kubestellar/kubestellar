@@ -107,9 +107,6 @@ func main() {
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
-	sspwClientOpts := NewClientOpts("sspw", "access to the scheduling service provider workspace")
-	sspwClientOpts.overrides.CurrentContext = "root"
-	sspwClientOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -141,12 +138,6 @@ func main() {
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags", "which", baseClientOpts.which)
 		os.Exit(15)
-	}
-
-	sspwRestConfig, err := sspwClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", sspwClientOpts.which)
-		os.Exit(20)
 	}
 
 	edgeClusterClientset, err := emcclusterclientset.NewForConfig(baseRestConfig)
@@ -194,19 +185,6 @@ func main() {
 	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
-	// Get client config for view of APIExport of kcp scheduling API
-	schedViewConfig, err := configForViewOfExport(ctx, sspwRestConfig, "scheduling.kcp.io")
-	if err != nil {
-		logger.Error(err, "Failed to create client config for view of kcp scheduling APIExport")
-		os.Exit(60)
-	}
-	schedViewClusterClientset, err := kcpclusterclientset.NewForConfig(schedViewConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create cluster clientset for view of kcp scheduling APIExport")
-		os.Exit(65)
-	}
-
-	sspwInformerFactory := kcpinformers.NewSharedInformerFactoryWithOptions(schedViewClusterClientset, resyncPeriod)
 	locationClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Locations()
 	var _ edgev1a1informers.LocationClusterInformer = locationClusterPreInformer
 
@@ -241,7 +219,6 @@ func main() {
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
 	edgeInformerFactory.Start(doneCh)
 	espwInformerFactory.Start(doneCh)
-	sspwInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
 	kubeClusterInformerFactory.Start(doneCh)
 	pt.Run()
