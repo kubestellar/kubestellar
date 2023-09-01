@@ -460,6 +460,8 @@ The acceptable flags include all those of `kubectl` except for
 - `--imw workspace_path`: specifies which workspace to use as the
   inventory management workspace.  The default value is the current
   workspace.
+- `-X`: turn on debug echoing of the commands inside the script that
+  implements this command.
 
 The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be your chosen
@@ -600,6 +602,9 @@ The acceptable flags include all those of `kubectl` except for
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is `synctarget_name +
   "-syncer.yaml"`.
+- `-s`: exceptionally low info output.
+- `-X`: turn on debug echoing of commands inside the script that
+  implements this command.
 
 The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be what it was
@@ -726,6 +731,8 @@ The acceptable flags include all those of `kubectl` except for
 - `--with-kube boolean`: specifies whether or not the WMW should
   include an APIBinding to the Kubernetes API for management of
   containerized workloads.
+- `-X`: turn on debug echoing of the commands inside the script that
+  implements this command.
 
 This script works in idempotent style, doing whatever work remains to
 be done.
@@ -821,7 +828,7 @@ the parent of the workload management workspace to delete.
 kubectl kubestellar remove wmw -h
 ```
 ``` { .bash .no-copy }
-Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name
+Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name
 ```
 
 ```shell

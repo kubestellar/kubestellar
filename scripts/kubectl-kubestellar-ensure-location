@@ -17,7 +17,7 @@
 # Purpose: ensure the existence of a pair of SyncTarget and Location,
 # and delete the Location named `default` if it appears.
 
-# Usage: $0 ($kubectl_flag | --imw ws_path)* objname labelname=labelvalue ...
+# Usage: $0 ($kubectl_flag | --imw ws_path | -X)* objname labelname=labelvalue ...
 
 # This will ensure that a SyncTarget and a Location exist with that
 # name and having at least the given labels.  The SyncTarget will also
@@ -54,6 +54,7 @@ function add_label() {
 
 while (( $# > 0 )); do
     case "$1" in
+	(-X) set -o xtrace;;
 	(--imw)
 	    if (( $# >1 ))
 	    then imw="$2"; shift
@@ -65,7 +66,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kubestellar ensure location (\$kubectl_flag | --imw ws_path)* objname labelname=labelvalue ..."
+	    echo "Usage: kubectl kubestellar ensure location (\$kubectl_flag | --imw ws_path | -X)* objname labelname=labelvalue ..."
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path)* synctarget_name
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -X)* synctarget_name
 
 # Purpose: For the given SyncTarget, (a) prepare the corresponding
 # mailbox workspace for the syncer and (b) output the YAML that needs
@@ -40,6 +40,7 @@ silent="false"
 
 while (( $# > 0 )); do
     case "$1" in
+	(-X) set -o xtrace;;
 	(--imw)
 	    if (( $# >1 ))
 	    then imw="$2"; shift
@@ -60,15 +61,15 @@ while (( $# > 0 )); do
 	    then output="$2"; shift
 	    else echo "$0: missing output filename" >&2; exit 1
 	    fi;;
-    (-s|--silent)
-        silent="true";;
+	(-s|--silent)
+	    silent="true";;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kubestellar prep-for-syncer (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name"
+	    echo "Usage: kubectl kubestellar prep-for-syncer (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename | -s | -X)* synctarget_name"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
