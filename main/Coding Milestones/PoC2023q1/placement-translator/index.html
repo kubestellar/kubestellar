@@ -1995,17 +1995,13 @@ placement translator does not take full ownership of them, rather it
 takes the position that there might be other parties that create
 <code>Namespace</code> objects or rely on their existence.</p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
-<p>The placement translator needs three kube client configurations.  One
+<p>The placement translator needs two kube client configurations.  One
 points to the edge service provider workspace and provides authority
-to write into the mailbox workspaces.  Another points to the kcp
-server base (i.e., does not identify a particular logical cluster nor
-<code>*</code>) and is authorized to read all clusters.  In the kubeconfig
-created by <code>kcp start</code> that is satisfied by the context named
-<code>system:admin</code>.  The third points to the "scheduling service provider
-workspace", the one that has the APIExport of <code>scheduling.kcp.io</code>.
-This is normally <code>root</code>, which has all the kcp APIExports, and the
-context named <code>root</code> in the kubeconfig created by <code>kcp start</code>
-satisfies this.</p>
+to (a) read the APIExport view of the edge API and (b) write into the
+mailbox workspaces.  The other points to the kcp server base (i.e.,
+does not identify a particular logical cluster nor <code>*</code>) and is
+authorized to read all clusters.  In the kubeconfig created by <code>kcp
+start</code> that is satisfied by the context named <code>system:admin</code>.</p>
 <p>The command line flags, beyond the basics, are as follows.  For a
 string parameter, if no default is explicitly stated then the default
 is the empty string, which usually means "not specified here".  For
@@ -2022,11 +2018,6 @@ command line parameters, then <code>$KUBECONFIG</code>, then <code>~/.kube/confi
 <a id="__codelineno-46-9" name="__codelineno-46-9" href="#__codelineno-46-9"></a><span class="w">      </span>--espw-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 <a id="__codelineno-46-10" name="__codelineno-46-10" href="#__codelineno-46-10"></a>
 <a id="__codelineno-46-11" name="__codelineno-46-11" href="#__codelineno-46-11"></a><span class="w">      </span>--server-bind-address<span class="w"> </span>ipport<span class="w">       </span>The<span class="w"> </span>IP<span class="w"> </span>address<span class="w"> </span>with<span class="w"> </span>port<span class="w"> </span>at<span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> </span>/metrics<span class="w"> </span>and<span class="w"> </span>/debug/pprof/<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>:10204<span class="o">)</span>
-<a id="__codelineno-46-12" name="__codelineno-46-12" href="#__codelineno-46-12"></a>
-<a id="__codelineno-46-13" name="__codelineno-46-13" href="#__codelineno-46-13"></a><span class="w">      </span>--sspw-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>scheduling<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
-<a id="__codelineno-46-14" name="__codelineno-46-14" href="#__codelineno-46-14"></a><span class="w">      </span>--sspw-context<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>scheduling<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
-<a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a><span class="w">      </span>--sspw-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>scheduling<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
-<a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a><span class="w">      </span>--sspw-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>scheduling<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 </code></pre></div>
 <h2 id="try-it">Try It<a class="headerlink" href="#try-it" title="Permanent link">#</a></h2>
 <p>The nascent placement translator can be exercised following the
