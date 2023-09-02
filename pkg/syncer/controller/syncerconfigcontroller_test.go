@@ -73,63 +73,82 @@ var testAPIResourceList = []*metav1.APIResourceList{
 	},
 }
 
-func TestSyncerConfig(t *testing.T) {
-	tests := []struct {
-		description      string
-		op               string
-		syncerConfig     *edgev1alpha1.SyncerConfig
-		syncerConfigSpec edgev1alpha1.SyncerConfigSpec
-		expected         Expected
-	}{
-		{
-			description:  "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig",
-			syncerConfig: syncerConfig("test-sync-config", types.UID("uid")),
-			syncerConfigSpec: edgev1alpha1.SyncerConfigSpec{
-				NamespaceScope: edgev1alpha1.NamespaceScopeDownsyncs{
-					Namespaces: []string{"default"},
-					Resources: []edgev1alpha1.NamespaceScopeDownsyncResource{
-						{
-							GroupResource: metav1.GroupResource{Group: "", Resource: "configmaps"},
-							APIVersion:    "v1",
-						},
-					},
+type typeSyncerConfigTest struct {
+	description      string
+	syncerConfig     *edgev1alpha1.SyncerConfig
+	syncerConfigSpec edgev1alpha1.SyncerConfigSpec
+	expected         Expected
+}
+
+var test1 typeSyncerConfigTest = typeSyncerConfigTest{
+	description:  "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig",
+	syncerConfig: syncerConfig("test-sync-config", types.UID("uid")),
+	syncerConfigSpec: edgev1alpha1.SyncerConfigSpec{
+		NamespaceScope: edgev1alpha1.NamespaceScopeDownsyncs{
+			Namespaces: []string{"default"},
+			Resources: []edgev1alpha1.NamespaceScopeDownsyncResource{
+				{
+					GroupResource: metav1.GroupResource{Group: "", Resource: "configmaps"},
+					APIVersion:    "v1",
 				},
-				ClusterScope: []edgev1alpha1.ClusterScopeDownsyncResource{
-					{
-						GroupResource: metav1.GroupResource{Group: "cheese.testing.k8s.io", Resource: "cheddars"},
-						APIVersion:    "v1",
-						Objects:       nil,
-					},
-				},
-				Upsync: []edgev1alpha1.UpsyncSet{
-					{
-						APIGroup:   "cheese.testing.k8s.io",
-						Resources:  []string{"*"},
-						Namespaces: []string{"*"},
-						Names:      []string{"*"},
-					},
-				},
-			},
-			expected: Expected{
-				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
-					{Group: "", Version: "v1", Kind: "ConfigMap", Namespace: "default", Name: "*"},
-					{Group: "", Version: "v1", Kind: "Namespace", Name: "default"},
-					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Name: "*"},
-				},
-				upSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
-					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Namespace: "*", Name: "*"},
-					{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Gouda", Name: "*"},
-					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Cheddar", Namespace: "*", Name: "*"},
-					{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Gouda", Name: "*"},
-					{Group: "", Version: "v1", Kind: "Namespace", Name: "*"},
-				},
-				conversions: []edgev1alpha1.EdgeSynConversion{{
-					Upstream:   upSyncedResource,
-					Downstream: downSyncedResource,
-				}},
 			},
 		},
-	}
+		ClusterScope: []edgev1alpha1.ClusterScopeDownsyncResource{
+			{
+				GroupResource: metav1.GroupResource{Group: "cheese.testing.k8s.io", Resource: "cheddars"},
+				APIVersion:    "v1",
+				Objects:       nil,
+			},
+		},
+		Upsync: []edgev1alpha1.UpsyncSet{
+			{
+				APIGroup:   "cheese.testing.k8s.io",
+				Resources:  []string{"*"},
+				Namespaces: []string{"*"},
+				Names:      []string{"*"},
+			},
+		},
+	},
+	expected: Expected{
+		downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
+			{Group: "", Version: "v1", Kind: "ConfigMap", Namespace: "default", Name: "*"},
+			{Group: "", Version: "v1", Kind: "Namespace", Name: "default"},
+			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Name: "*"},
+		},
+		upSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
+			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Namespace: "*", Name: "*"},
+			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Gouda", Name: "*"},
+			{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Cheddar", Namespace: "*", Name: "*"},
+			{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Gouda", Name: "*"},
+			{Group: "", Version: "v1", Kind: "Namespace", Name: "*"},
+		},
+		conversions: []edgev1alpha1.EdgeSynConversion{{
+			Upstream:   upSyncedResource,
+			Downstream: downSyncedResource,
+		}},
+	},
+}
+
+var test2 typeSyncerConfigTest = typeSyncerConfigTest{
+	description:  "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig (New SyncerConfig format)",
+	syncerConfig: syncerConfig("test-sync-config2", types.UID("uid")),
+	syncerConfigSpec: edgev1alpha1.SyncerConfigSpec{
+		NamespacedObjects: []edgev1alpha1.NamespaceScopeDownsyncObjects{{
+			GroupResource: metav1.GroupResource{Group: "", Resource: "configmaps"},
+			APIVersion:    "v1",
+			ObjectsByNamespace: []edgev1alpha1.NamespaceAndNames{{
+				Namespace: "default",
+				Names:     []string{"*"},
+			}},
+		}},
+		ClusterScope: test1.syncerConfigSpec.ClusterScope,
+		Upsync:       test1.syncerConfigSpec.Upsync,
+	},
+	expected: test1.expected,
+}
+
+func TestSyncerConfig(t *testing.T) {
+	tests := []typeSyncerConfigTest{test1, test2}
 	for _, tc := range tests {
 		t.Run(tc.description, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -194,7 +213,8 @@ func TestSyncerConfig(t *testing.T) {
 						count++
 					}
 				}
-				return count == 3
+				// Four keys (DOWNSYNC_NAMESPACED_SUFFIX, DOWNSYNC_NAMESPACED_OBJECTS_SUFFIX, DOWNSYNC_CLUSTERSCOPED_SUFFIX, UPSYNC_SUFFIX) should contain SyncerConfig Name
+				return count == 4
 			}, wait.ForeverTestTimeout, 1*time.Second)
 
 			downsyncedResources := syncConfigManager.GetDownSyncedResources()

@@ -1,0 +1,39 @@
+apiVersion: edge.kubestellar.io/v1alpha1
+kind: SyncerConfig
+metadata:
+  name: syncer-config
+spec:
+  namespaceScope:
+    namespaces:
+    - test1
+    resources:
+    - apiVersion: v1
+      group: ""
+      resource: configmaps
+    - apiVersion: v1
+      group: ""
+      resource: secrets
+      
+  namespacedObjects:
+  - apiVersion: v1
+    group: ""
+    resource: configmaps
+    objectsByNamespace:
+    - namespace: test2
+      names:
+      - cm1
+    - namespace: test3
+      names: []
+    - namespace: should-not-synced
+      names: []
+  - apiVersion: v1
+    group: ""
+    resource: secrets
+    objectsByNamespace:
+    - namespace: test2
+      names: []
+    - namespace: test3
+      names:
+      - s1
+    - namespace: should-not-synced
+      names: []
