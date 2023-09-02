@@ -17,19 +17,20 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: kubectl ws parent; $0 kubectl_flag... wmw_name
+# Usage: kubectl ws parent; $0 [-X] kubectl_flag... wmw_name
 
 wmw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
+	(-X) set -o xtrace;;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw kubectl_flag... wm_workspace_name"
+	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))

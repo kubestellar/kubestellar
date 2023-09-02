@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path)* synctarget_name labelname=labelvalue...
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -s | -X)* synctarget_name labelname=labelvalue...
 
 # Purpose: be a convenient combination of ensure-location and prep-for-syncer.
 
@@ -30,6 +30,9 @@ silent="false"
 
 while (( $# > 0 )); do
     case "$1" in
+    (-X)
+         set -o xtrace
+         flags[${#prep_flags[*]}]="$1";;
     (--imw)
         if (( $# >1 ))
         then imw="$2"; shift
@@ -63,7 +66,7 @@ while (( $# > 0 )); do
     (--*=*|-?=*)
         kubectl_flags[${#kubectl_flags[*]}]="$1";;
     (-h)
-        echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename)* synctarget_name labelname=labelvalue..."
+        echo "Usage: kubectl kubestellar prep-for-cluster (\$kubectl_flag | --imw ws_path | --espw ws_path | --syncer-image image_ref | -o filename | -s | -X)* synctarget_name labelname=labelvalue..."
         exit 0;;
     (--*|-?)
         if (( $# > 1 ))

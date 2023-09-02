@@ -17,13 +17,14 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: kubectl ws parent; $0 ($kubectl_flag | --with-kube boolean)* wmw_name
+# Usage: kubectl ws parent; $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
 
 want_kube=true
 wmw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
+	(-X) set -o xtrace;;
 	(--with-kube)
 	    if (( $# >1 ))
 	    then want_kube="$2"; shift
@@ -35,7 +36,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean)* wm_workspace_name"
+	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))

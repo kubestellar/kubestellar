@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 ($kubectl_flag | --imw ws_path)* objname
+# Usage: $0 ($kubectl_flag | --imw ws_path | -X)* objname
 
 # Purpose: ensure the SyncTarget and Location with the given name do not exist.
 
@@ -24,6 +24,7 @@ kubectl_flags=()
 
 while (( $# > 0 )); do
     case "$1" in
+	(-X) set -o xtrace;;
 	(--imw)
 	    if (( $# >1 ))
 	    then imw="$2"; shift
@@ -35,7 +36,7 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
 	(-h)
-	    echo "Usage: kubectl kubestellar remove location (\$kubectl_flag | --imw ws_path)* objname"
+	    echo "Usage: kubectl kubestellar remove location (\$kubectl_flag | --imw ws_path | -X)* objname"
 	    exit 0;;
 	(--*|-?)
 	    if (( $# > 1 ))
