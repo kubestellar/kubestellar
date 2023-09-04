@@ -22,11 +22,12 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
 
-	k8sapps "k8s.io/api/apps/v1"
+	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	machruntime "k8s.io/apimachinery/pkg/runtime"
 	machschema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -124,56 +125,121 @@ func (tot *testObjectTracker) getObjects(gvk machschema.GroupVersionKind) map[ob
 	return MapCopy(tot.objectsByGVK[gvk])
 }
 
-func (tot *testObjectTracker) objectsEqualCond(gvk machschema.GroupVersionKind, byName map[objectName]mrObject) func() (bool, error) {
-	return func() (bool, error) {
+func (tot *testObjectTracker) objectsEqualCond(gvk machschema.GroupVersionKind, byName map[objectName]mrObject) func(context.Context) (bool, error) {
+	return func(context.Context) (bool, error) {
 		tot.Lock()
 		defer tot.Unlock()
-		return MapEqual(tot.objectsByGVK[gvk], byName), nil
+		have := tot.objectsByGVK[gvk]
+		return apiequality.Semantic.DeepEqual(have, byName), nil
 	}
 }
 
 func TestMailboxInformer(t *testing.T) {
-	resource := "syncerconfigs"
 	kind := "SyncerConfig"
+	espwParentClusterS := "root"
 	espwCluster := logicalcluster.Name("espw")
 	scGV := edgeapi.SchemeGroupVersion
 	scGVK := scGV.WithKind(kind)
 	sclGVK := scGV.WithKind(kind + "List")
-	scGVR := scGV.WithResource(resource)
 	wsGV := tenancyv1a1.SchemeGroupVersion
 	wsGVK := wsGV.WithKind("Workspace")
+	var nextRV int64 = 13
+	nextRVS := func() string {
+		nextRV++
+		return strconv.FormatInt(nextRV, 10)
+	}
 	for super := 1; super <= 3; super++ {
-		syncerConfigs := map[objectName]mrObject{}
-		workspaces := map[objectName]mrObject{}
-		kcpClientset := kcpfake.NewSimpleClientset()
-		kcpTracker := kcpClientset.Tracker()
-		edgeClientset := edgefakeclient.NewSimpleClientset()
-		edgeTracker := edgeClientset.Tracker()
 		ctx, stop := context.WithCancel(context.Background())
 		actual := NewTestObjectTracker()
+		expectedWorkspaces := map[objectName]mrObject{}
+		espwParentClusterN := logicalcluster.Name(espwParentClusterS)
+		espwObjName := objectName{cluster: espwParentClusterN, name: "espw"}
+		espwW := &tenancyv1a1.Workspace{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       wsGVK.Kind,
+				APIVersion: wsGV.String(),
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            espwObjName.name,
+				Annotations:     map[string]string{logicalcluster.AnnotationKey: espwParentClusterS},
+				ResourceVersion: nextRVS(),
+			},
+			Spec: tenancyv1a1.WorkspaceSpec{
+				Cluster: "espwclu",
+			}}
+		expectedWorkspaces[espwObjName] = espwW
+		kcpClientset := kcpfake.NewSimpleClientset()
 		kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClientset, 0)
 		wsPreInformer := kcpClusterInformerFactory.Tenancy().V1alpha1().Workspaces()
-		if true {
-			go func() {
-				wsPreInformer.Informer().Run(ctx.Done())
-			}()
+		wsPreInformer.Informer().AddEventHandler(actual)
+		kcpClusterInformerFactory.Start(ctx.Done())
+		wsesOK := actual.objectsEqualCond(wsGVK, expectedWorkspaces)
+		// The fake clientset (kcpfake.NewSimpleClientset) does not implement WATCH properly;
+		// regardless of arguments, it notifies the client of changes that come in after the
+		// start of the WATCH and nothing before.
+		// To cope, try an add-sleep-check sequence with progressively longer sleeps until
+		// one succeeds or exhaustion.
+		setupWSOK := backoffPoll(t, ctx, "create ESPW", "delete failed ESPW",
+			func(ctx context.Context) error {
+				_, err := kcpClientset.TenancyV1alpha1().Cluster(espwParentClusterN.Path()).Workspaces().Create(ctx, espwW, metav1.CreateOptions{FieldManager: "test"})
+				return err
+			},
+			func(ctx context.Context) error {
+				return kcpClientset.TenancyV1alpha1().Cluster(espwParentClusterN.Path()).Workspaces().Delete(ctx, espwW.Name, metav1.DeleteOptions{})
+			},
+			wsesOK, time.Second, 4)
+		if !setupWSOK {
+			t.Fatal("ESPW startup failed")
+			return
 		}
+		t.Logf("ESPW startup succeeded")
+
+		syncerConfigs := map[objectName]mrObject{}
+		scsOK := actual.objectsEqualCond(scGVK, syncerConfigs)
+		dummySCON := objectName{cluster: "foo", name: "bar"}
+		dummySC := &edgeapi.SyncerConfig{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       kind,
+				APIVersion: scGV.String(),
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: dummySCON.name,
+				Annotations: map[string]string{
+					"the-mbws-name":              "dummymbws",
+					logicalcluster.AnnotationKey: "dummycluster",
+				},
+				ResourceVersion: nextRVS(),
+			},
+		}
+		t.Logf("Dummy SyncerConfig=%v", dummySC)
+		// syncerConfigs[dummySCON] = dummySC
+		edgeClientset := edgefakeclient.NewSimpleClientset( /*dummySC*/ )
 		scInformer := NewSharedInformer[edgescopedclient.SyncerConfigInterface, *edgeapi.SyncerConfigList](ctx, sclGVK, wsPreInformer.Cluster(espwCluster),
 			edgeClientset.EdgeV1alpha1().SyncerConfigs(), &edgeapi.SyncerConfig{}, 0, upstreamcache.Indexers{})
 		scInformer.AddEventHandler(actual)
-		kcpClusterInformerFactory.Start(ctx.Done())
-		go scInformer.Run(ctx.Done())
+		go func() {
+			doneCh := ctx.Done()
+			scInformer.Run(doneCh)
+		}()
+
+		// TODO: create a fake clientset for SyncerConfig that has enough fidelity in LIST and WATCH
+		// to make a reasonable test possible.
+		time.Sleep(5 * time.Second)
+
 		for iteration := 1; iteration <= 64; iteration++ {
 			if len(syncerConfigs) > 0 && rand.Intn(2) == 0 {
 				gonerIndex := rand.Intn(len(syncerConfigs))
 				_, gonerObj := MapRemove(syncerConfigs, gonerIndex)
-				gonerSC := gonerObj.(*k8sapps.ReplicaSet)
+				gonerSC := gonerObj.(*edgeapi.SyncerConfig)
 				cluster := logicalcluster.From(gonerSC)
-				err := edgeTracker.Cluster(cluster.Path()).Delete(scGVR, gonerSC.Namespace, gonerSC.Name)
+				//mbwsName := gonerSC.Annotations["the-mbws-name"]
+				//wsObjName := objectName{cluster: espwCluster, name: mbwsName}
+				//delete(expectedWorkspaces, wsObjName)
+				err := edgeClientset.Cluster(cluster.Path()).EdgeV1alpha1().SyncerConfigs().Delete(ctx, gonerSC.Name, metav1.DeleteOptions{})
 				if err != nil {
 					t.Fatalf("Failed to delete goner %+v: %v", gonerSC, err)
 				} else {
-					t.Logf("Removed from tracker: SyncerConfig %+v", gonerSC)
+					t.Logf("At super=%v, iteration=%v: removed from tracker: SyncerConfig %+v", super, iteration, gonerSC)
 				}
 			} else {
 				invWSNum := rand.Intn(int(math.Sqrt(float64(iteration))))
@@ -185,29 +251,30 @@ func TestMailboxInformer(t *testing.T) {
 				mbwsClusterS := fmt.Sprintf("mc%d", mbwsNum)
 				mbwsClusterN := logicalcluster.Name(mbwsClusterS)
 				wsObjName := objectName{cluster: espwCluster, name: mbwsName}
-				workspace := workspaces[wsObjName]
+				workspace := expectedWorkspaces[wsObjName]
 				if workspace == nil {
-					workspace = &tenancyv1a1.Workspace{
+					workspaceW := &tenancyv1a1.Workspace{
 						TypeMeta: metav1.TypeMeta{
 							Kind:       wsGVK.Kind,
 							APIVersion: wsGV.String(),
 						},
 						ObjectMeta: metav1.ObjectMeta{
-							Name:        mbwsName,
-							Annotations: map[string]string{logicalcluster.AnnotationKey: espwCluster.String()},
+							Name:            mbwsName,
+							Annotations:     map[string]string{logicalcluster.AnnotationKey: espwCluster.String()},
+							ResourceVersion: nextRVS(),
 						},
 						Spec: tenancyv1a1.WorkspaceSpec{
 							Cluster: mbwsClusterS,
-						},
-					}
-					scopedTracker := kcpTracker.Cluster(espwCluster.Path())
-					err := scopedTracker.Add(workspace)
+						}}
+					workspace = workspaceW
+					var err error
+					_, err = kcpClientset.TenancyV1alpha1().Cluster(espwCluster.Path()).Workspaces().Create(ctx, workspaceW, metav1.CreateOptions{FieldManager: "test"})
 					if err != nil {
 						t.Fatalf("Failed to add workspace %+v: %v", workspace, err)
 					} else {
 						t.Logf("Added to tracker: Workspace named %q", workspace.GetName())
 					}
-					workspaces[wsObjName] = workspace
+					expectedWorkspaces[wsObjName] = workspace
 				}
 				var objName objectName
 				var obj *edgeapi.SyncerConfig
@@ -229,27 +296,53 @@ func TestMailboxInformer(t *testing.T) {
 						Namespace: objName.namespace,
 						Name:      objName.name,
 						Annotations: map[string]string{
+							"the-mbws-name":              mbwsName,
 							logicalcluster.AnnotationKey: mbwsClusterS,
 						},
+						ResourceVersion: nextRVS(),
 					},
 				}
-				scopedTracker := edgeTracker.Cluster(mbwsClusterN.Path())
-				err := scopedTracker.Add(obj)
+				syncerConfigs[objName] = obj
+				_, err := edgeClientset.Cluster(mbwsClusterN.Path()).EdgeV1alpha1().SyncerConfigs().Create(ctx, obj, metav1.CreateOptions{FieldManager: "test"})
 				if err != nil {
 					t.Fatalf("Failed to add %+v to testing tracker: %v", obj, err)
 				} else {
-					t.Logf("Added to tracker: SyncerConfig named %#v", objName)
+					t.Logf("At super=%v, iteration=%v: added to tracker: SyncerConfig named %#v", super, iteration, objName)
 				}
 			}
-			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(wsGVK, workspaces)) != nil {
-				t.Fatalf("Workspaces did not settle in time: %+v != %+v", actual.getObjects(wsGVK), workspaces)
+			if wait.PollWithContext(ctx, time.Second, 5*time.Second, wsesOK) != nil {
+				t.Fatalf("Workspaces did not settle in time: super=%v, iteration=%v, %+v != %+v", super, iteration, actual.getObjects(wsGVK), expectedWorkspaces)
 			}
-			if wait.PollImmediate(time.Second, 5*time.Second, actual.objectsEqualCond(scGVK, syncerConfigs)) != nil {
-				t.Fatalf("Workspaces did not settle in time: %+v != %+v", actual.getObjects(scGVK), syncerConfigs)
+			if wait.PollWithContext(ctx, time.Second, 5*time.Second, scsOK) != nil {
+				t.Fatalf("SyncerConfigs did not settle in time: super=%v, iteration=%v, %+v != %+v", super, iteration, actual.getObjects(scGVK), syncerConfigs)
 			}
 		}
 		stop()
 	}
+}
+
+func backoffPoll(t *testing.T, ctx context.Context, setupTask, teardownTask string, setup, teardown func(context.Context) error, cond wait.ConditionWithContextFunc, pause1 time.Duration, tries int) bool {
+	pause := pause1
+	for try := 1; try <= tries; try++ {
+		time.Sleep(pause)
+		err := setup(ctx)
+		if err != nil {
+			t.Fatalf("Failed to %s on try %v: %v", setupTask, try, err)
+			return false
+		}
+		time.Sleep(pause * 3)
+		ok, err := cond(ctx)
+		if ok && err == nil {
+			return true
+		}
+		err = teardown(ctx)
+		if err != nil {
+			t.Fatalf("Failed to %s on try %v: %v", teardownTask, try, err)
+			return false
+		}
+		pause = pause * 2
+	}
+	return false
 }
 
 func MapRemove[Key comparable, Val any](from map[Key]Val, gonerIndex int) (Key, Val) {
