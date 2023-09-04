@@ -65,11 +65,12 @@ spec:
                 description: Cluster config from the kube config file in string format.
                 type: string
               Phase:
-                description: Phase of the space (Initializing,NotReady,Ready).
+                description: Phase of the space (Initializing,NotReady,Ready,Incompatible).
                 enum:
                 - Initializing
                 - NotReady
                 - Ready
+                - Incompatible
                 type: string
             type: object
         type: object

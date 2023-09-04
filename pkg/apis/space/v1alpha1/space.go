@@ -59,18 +59,19 @@ type SpaceSpec struct {
 
 // SpacePhaseType is the type of the current phase of the cluster.
 //
-// +kubebuilder:validation:Enum=Initializing;NotReady;Ready
+// +kubebuilder:validation:Enum=Initializing;NotReady;Ready;Incompatible
 type SpacePhaseType string
 
 const (
 	SpacePhaseInitializing SpacePhaseType = "Initializing"
 	SpacePhaseNotReady     SpacePhaseType = "NotReady"
 	SpacePhaseReady        SpacePhaseType = "Ready"
+	SpacePhaseIncompatible SpacePhaseType = "Incompatible"
 )
 
 // SpaceStatus represents information about the status of a cluster.
 type SpaceStatus struct {
-	// Phase of the space (Initializing,NotReady,Ready).
+	// Phase of the space (Initializing,NotReady,Ready,Incompatible).
 	// +kubebuilder
 	Phase SpacePhaseType `json:"Phase,omitempty"`
 

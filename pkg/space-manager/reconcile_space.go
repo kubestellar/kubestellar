@@ -105,6 +105,35 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 			return err
 		}
 
+		opts := pclient.Options{}
+		path, ok := space.Annotations[SpacePathAnnotationKey]
+		if ok {
+			// Ensure that the provider supports space hierarchy
+			foundIt := false
+			for _, cap := range provider.capabilities {
+				if cap == spacev1alpha1.CapabilityHierarchy {
+					opts.Parent = path
+					foundIt = true
+					break
+				}
+			}
+			if !foundIt {
+				space.Status.Phase = spacev1alpha1.SpacePhaseIncompatible
+				_, err = c.clientset.
+					SpaceV1alpha1().
+					Spaces(ProviderNS(providerInfo.Name)).
+					Update(c.ctx, space, v1.UpdateOptions{})
+				if err != nil {
+					c.logger.V(2).Error(err, "failed to update space status", "space", space.Name)
+					// continue and loss the current error in favor returning
+					// the unsupported feature error.
+				}
+				err = errors.New("space objects contains hierarchy feature not supported by provider")
+				c.logger.V(2).Error(err, "space object contains features not supported by provider", "space", space.Name)
+				return err
+			}
+		}
+
 		// Update status Initializing
 		if !containsFinalizer(space, finalizerName) {
 			space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, finalizerName)
@@ -117,12 +146,6 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 		if err != nil {
 			c.logger.Error(err, "failed to update space status.")
 			return err
-		}
-
-		opts := pclient.Options{}
-		path, ok := space.Annotations[SpacePathAnnotationKey]
-		if ok {
-			opts.Parent = path
 		}
 		// Async call the provider to create the space. Once created, discovery
 		// will set the space in the Ready state.
@@ -145,7 +168,8 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 }
 
 // processDeleteSpace: process a space object delete event.
-// If the space is managed, then async delete the physical space.
+// If the space is managed, then async delete the physical space. Note that it's
+// possible that the physical space has not been created yet.
 func (c *controller) processDeleteSpace(delSpace *spacev1alpha1.Space) error {
 	if delSpace.Spec.Managed {
 		provider, ok := c.providers[delSpace.Spec.SpaceProviderDescName]

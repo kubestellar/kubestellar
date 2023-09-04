@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230813-0036646a.spaces.space.kubestellar.io
+  name: v230904-5c577ec78.spaces.space.kubestellar.io
 spec:
   group: space.kubestellar.io
   names:
@@ -61,11 +61,12 @@ spec:
               description: Cluster config from the kube config file in string format.
               type: string
             Phase:
-              description: Phase of the space (Initializing,NotReady,Ready).
+              description: Phase of the space (Initializing,NotReady,Ready,Incompatible).
               enum:
               - Initializing
               - NotReady
               - Ready
+              - Incompatible
               type: string
           type: object
       type: object

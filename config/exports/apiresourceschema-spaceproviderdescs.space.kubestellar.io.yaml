@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230729-f70497310.spaceproviderdescs.space.kubestellar.io
+  name: v230904-5c577ec78.spaceproviderdescs.space.kubestellar.io
 spec:
   group: space.kubestellar.io
   names:
@@ -33,6 +33,13 @@ spec:
         spec:
           description: '`spec` describes a provider.'
           properties:
+            Capabilities:
+              description: ProviderCapabilities lists the capabilities of the provider
+                in a bit flag
+              items:
+                type: string
+              type: array
+              x-kubernetes-list-type: set
             Config:
               description: 'TODO: this should be stored as a secret! Config is the
                 provider config'

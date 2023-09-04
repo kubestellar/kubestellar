@@ -28,6 +28,12 @@ const (
 	KcpProviderType      SpaceProviderType = "kcp"
 )
 
+type Capability string
+
+const (
+	CapabilityHierarchy Capability = "hierarchy"
+)
+
 // SpaceProviderDesc represents a provider.
 //
 // +crd
@@ -58,6 +64,10 @@ type SpaceProviderDescSpec struct {
 	// ProviderType is the type of the provider of the space.
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="space provider type is immutable"
 	ProviderType SpaceProviderType `json:"ProviderType"`
+
+	// ProviderCapabilities lists the capabilities of the provider in a bit flag
+	// +listType=set
+	Capabilities []Capability `json:"Capabilities,omitempty"`
 
 	// TODO: this should be stored as a secret!
 	// Config is the provider config

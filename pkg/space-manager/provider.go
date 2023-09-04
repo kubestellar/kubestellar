@@ -57,6 +57,7 @@ type provider struct {
 	providerWatcher spaceprovider.Watcher
 	nameSpace       string
 	discoveryPrefix string
+	capabilities    []spacev1alpha1apis.Capability
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
@@ -107,6 +108,7 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 		c:               c,
 		nameSpace:       ProviderNS(providerName),
 		discoveryPrefix: discoveryPrefix,
+		capabilities:    providerDesc.Spec.Capabilities,
 	}
 
 	c.providers[providerName] = p

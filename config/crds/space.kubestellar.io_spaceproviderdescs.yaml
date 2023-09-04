@@ -37,6 +37,13 @@ spec:
           spec:
             description: '`spec` describes a provider.'
             properties:
+              Capabilities:
+                description: ProviderCapabilities lists the capabilities of the provider
+                  in a bit flag
+                items:
+                  type: string
+                type: array
+                x-kubernetes-list-type: set
               Config:
                 description: 'TODO: this should be stored as a secret! Config is the
                   provider config'
