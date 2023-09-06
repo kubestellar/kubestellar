@@ -37,16 +37,6 @@ spec:
           spec:
             description: '`spec` describes a cluster.'
             properties:
-              Managed:
-                default: true
-                description: Managed identifies whether a cluster is managed (true)
-                  or unmanaged (false). Currently this is immutable. A space can be
-                  created through the ClusterManager (managed) or discovered/imported
-                  (unmanaged).
-                type: boolean
-                x-kubernetes-validations:
-                - message: Managed is immutable
-                  rule: self == oldSelf
               SpaceProviderDescName:
                 description: SpaceProviderDescName is a reference to a SpaceProviderDesc
                   resource
@@ -54,9 +44,18 @@ spec:
                 x-kubernetes-validations:
                 - message: SpaceProviderDescName is immutable
                   rule: self == oldSelf
+              Type:
+                default: managed
+                description: Type identifies the space type. A space can be created
+                  through the ClusterManager (managed), discovered (unmanaged), or
+                  imported.
+                enum:
+                - managed
+                - unmanaged
+                - imported
+                type: string
             required:
-            - Managed
-            - SpaceProviderDescName
+            - Type
             type: object
           status:
             description: '`status` describes the status of the cluster object.'

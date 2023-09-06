@@ -165,7 +165,7 @@ func (p *provider) processProviderWatchEvents() {
 			}
 		}
 
-		if !found || (found && !refspace.Spec.Managed) {
+		if !found || (found && refspace.Spec.Type != spacev1alpha1apis.SpaceTypeManaged) {
 			// For unmanaged spaces discover & update only spaces that match the provider prefix
 			if p.filterOut(spaceName) {
 				continue
@@ -181,7 +181,7 @@ func (p *provider) processProviderWatchEvents() {
 				space := spacev1alpha1apis.Space{}
 				space.Name = spaceName
 				space.Spec.SpaceProviderDescName = p.name
-				space.Spec.Managed = false
+				space.Spec.Type = spacev1alpha1apis.SpaceTypeUnmanaged
 				space.Status.SpaceConfig = event.SpaceInfo.Config
 				space.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, v1.CreateOptions{})
@@ -190,7 +190,7 @@ func (p *provider) processProviderWatchEvents() {
 				logger.V(2).Info("Updating Space object", "space", event.Name)
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				refspace.Status.SpaceConfig = event.SpaceInfo.Config
-				if refspace.Spec.Managed && !containsFinalizer(refspace, finalizerName) {
+				if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged && !containsFinalizer(refspace, finalizerName) {
 					// When a physical space is removed we remove its finalizer
 					// from the space object. when the space returns, we
 					// need to restore the finalizer.
@@ -206,7 +206,7 @@ func (p *provider) processProviderWatchEvents() {
 				// There is no space object so there is nothing we should do
 				continue
 			}
-			if refspace.Spec.Managed {
+			if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged {
 				// If managed then we need to remove the finalizer.
 				f := refspace.ObjectMeta.Finalizers
 				for i := 0; i < len(refspace.ObjectMeta.Finalizers); i++ {
