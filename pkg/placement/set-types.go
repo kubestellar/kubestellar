@@ -23,6 +23,11 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// Set is the readable aspects of a set.
+// While the elements are logically comparable, their Go language
+// representations are not necessarily "comparable" Go datatypes;
+// it is up to the implementatio to get comparison done in some
+// appropriate manner.
 type Set[Elt any] interface {
 	Emptyable
 	Len() int
@@ -48,6 +53,7 @@ type Emptyable interface {
 	IsEmpty() bool
 }
 
+// MutableSet is a read-write Set.
 type MutableSet[Elt any] interface {
 	Set[Elt]
 	SetWriter[Elt]
@@ -474,6 +480,7 @@ func (si setIntersection[Elt]) Visit(visitor func(Elt) error) error {
 	})
 }
 
+// Comparison is the four possible results of comparing two values in a partial order
 type Comparison struct{ LessOrEqual, GreaterOrEqual bool }
 
 func (comp Comparison) Reverse() Comparison {
