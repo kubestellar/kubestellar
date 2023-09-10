@@ -9,10 +9,10 @@ require (
 	github.com/kcp-dev/kcp/pkg/client v0.0.0-20230328080949-0f3bb69fdc08
 	github.com/kcp-dev/logicalcluster/v3 v3.0.4
 	github.com/kubestellar/kubestellar v0.7.0
-	k8s.io/api v0.28.1
-	k8s.io/apimachinery v0.28.1
-	k8s.io/client-go v0.28.1
-	k8s.io/klog/v2 v2.100.1
+	k8s.io/api v0.24.3
+	k8s.io/apimachinery v0.24.3
+	k8s.io/client-go v0.24.4
+	k8s.io/klog/v2 v2.80.1
 	sigs.k8s.io/kind v0.20.0
 )
 
