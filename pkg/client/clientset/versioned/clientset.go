@@ -27,13 +27,21 @@ import (
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+<<<<<<< HEAD
 	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
+=======
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+>>>>>>> 496b5e990... initial
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface
+<<<<<<< HEAD
 	SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface
+=======
+	MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface
+>>>>>>> 496b5e990... initial
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -41,7 +49,6 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	edgeV1alpha1  *edgev1alpha1.EdgeV1alpha1Client
-	spaceV1alpha1 *spacev1alpha1.SpaceV1alpha1Client
 }
 
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client
@@ -49,9 +56,15 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return c.edgeV1alpha1
 }
 
+<<<<<<< HEAD
 // SpaceV1alpha1 retrieves the SpaceV1alpha1Client
 func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
 	return c.spaceV1alpha1
+=======
+// MetaV1alpha1 retrieves the MetaV1alpha1Client
+func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
+	return c.metaV1alpha1
+>>>>>>> 496b5e990... initial
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -102,7 +115,11 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	cs.spaceV1alpha1, err = spacev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+=======
+	cs.metaV1alpha1, err = metav1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+>>>>>>> 496b5e990... initial
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +145,11 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.edgeV1alpha1 = edgev1alpha1.New(c)
+<<<<<<< HEAD
 	cs.spaceV1alpha1 = spacev1alpha1.New(c)
+=======
+	cs.metaV1alpha1 = metav1alpha1.New(c)
+>>>>>>> 496b5e990... initial
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

@@ -34,22 +34,36 @@ import (
 
 	client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
+<<<<<<< HEAD
 	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1"
+=======
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
+>>>>>>> 496b5e990... initial
 )
 
 type ClusterInterface interface {
 	Cluster(logicalcluster.Path) client.Interface
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface
+<<<<<<< HEAD
 	SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1ClusterInterface
+=======
+	MetaV1alpha1() metav1alpha1.MetaV1alpha1ClusterInterface
+>>>>>>> 496b5e990... initial
 }
 
 // ClusterClientset contains the clients for groups.
 type ClusterClientset struct {
 	*discovery.DiscoveryClient
+<<<<<<< HEAD
 	clientCache   kcpclient.Cache[*client.Clientset]
 	edgeV1alpha1  *edgev1alpha1.EdgeV1alpha1ClusterClient
 	spaceV1alpha1 *spacev1alpha1.SpaceV1alpha1ClusterClient
+=======
+	clientCache  kcpclient.Cache[*client.Clientset]
+	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1ClusterClient
+	metaV1alpha1 *metav1alpha1.MetaV1alpha1ClusterClient
+>>>>>>> 496b5e990... initial
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -65,9 +79,15 @@ func (c *ClusterClientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterf
 	return c.edgeV1alpha1
 }
 
+<<<<<<< HEAD
 // SpaceV1alpha1 retrieves the SpaceV1alpha1ClusterClient.
 func (c *ClusterClientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1ClusterInterface {
 	return c.spaceV1alpha1
+=======
+// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
+func (c *ClusterClientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1ClusterInterface {
+	return c.metaV1alpha1
+>>>>>>> 496b5e990... initial
 }
 
 // Cluster scopes this clientset to one cluster.
@@ -126,7 +146,11 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*ClusterCli
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	cs.spaceV1alpha1, err = spacev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+=======
+	cs.metaV1alpha1, err = metav1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+>>>>>>> 496b5e990... initial
 	if err != nil {
 		return nil, err
 	}

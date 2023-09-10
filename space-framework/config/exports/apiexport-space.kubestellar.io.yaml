@@ -1,0 +1,15 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: space.kubestellar.io
+spec:
+  latestResourceSchemas:
+<<<<<<< HEAD:config/exports/apiexport-space.kubestellar.io.yaml
+  - v230915-8d536c3e3.spaceproviderdescs.space.kubestellar.io
+  - v230915-8d536c3e3.spaces.space.kubestellar.io
+=======
+  - v230910-ddc881969.spaceproviderdescs.space.kubestellar.io
+  - v230910-ddc881969.spaces.space.kubestellar.io
+>>>>>>> 496b5e990... initial:space-framework/config/exports/apiexport-space.kubestellar.io.yaml
+status: {}

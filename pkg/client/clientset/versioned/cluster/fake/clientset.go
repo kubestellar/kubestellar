@@ -33,11 +33,19 @@ import (
 	kcpclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	kcpedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
+<<<<<<< HEAD
 	kcpspacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1"
 	fakespacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1/fake"
 	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
+=======
+	kcpmetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
+	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1/fake"
+	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+>>>>>>> 496b5e990... initial
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -79,9 +87,15 @@ func (c *ClusterClientset) EdgeV1alpha1() kcpedgev1alpha1.EdgeV1alpha1ClusterInt
 	return &fakeedgev1alpha1.EdgeV1alpha1ClusterClient{Fake: c.Fake}
 }
 
+<<<<<<< HEAD
 // SpaceV1alpha1 retrieves the SpaceV1alpha1ClusterClient.
 func (c *ClusterClientset) SpaceV1alpha1() kcpspacev1alpha1.SpaceV1alpha1ClusterInterface {
 	return &fakespacev1alpha1.SpaceV1alpha1ClusterClient{Fake: c.Fake}
+=======
+// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
+func (c *ClusterClientset) MetaV1alpha1() kcpmetav1alpha1.MetaV1alpha1ClusterInterface {
+	return &fakemetav1alpha1.MetaV1alpha1ClusterClient{Fake: c.Fake}
+>>>>>>> 496b5e990... initial
 }
 
 // Cluster scopes this clientset to one cluster.
@@ -121,7 +135,13 @@ func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
 }
 
+<<<<<<< HEAD
 // SpaceV1alpha1 retrieves the SpaceV1alpha1Client.
 func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
 	return &fakespacev1alpha1.SpaceV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
+=======
+// MetaV1alpha1 retrieves the MetaV1alpha1Client.
+func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
+	return &fakemetav1alpha1.MetaV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
+>>>>>>> 496b5e990... initial
 }

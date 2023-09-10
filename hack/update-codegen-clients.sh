@@ -26,14 +26,22 @@ pushd "${SCRIPT_ROOT}"
 BOILERPLATE_HEADER="$( pwd )/hack/boilerplate/boilerplate.go.txt"
 popd
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
+set
 
 # "core:v1alpha1 workload:v1alpha1 apiresource:v1alpha1 tenancy:v1alpha1 tenancy:v1beta1 apis:v1alpha1 scheduling:v1alpha1 topology:v1alpha1" \
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
   github.com/kubestellar/kubestellar/pkg/client github.com/kubestellar/kubestellar/pkg/apis \
-  "edge:v1alpha1 space:v1alpha1" \
+  "edge:v1alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar
+
+#bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
+#  github.com/kubestellar/kubestellar/space-framework/pkg/client github.com/kubestellar/kubestellar/space-framework/pkg/apis \
+#  "space:v1alpha1" \
+#  --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
+#  --output-base "${SCRIPT_ROOT}" \
+#  --trim-path-prefix github.com/kubestellar/kubestellar
 
 pushd ./pkg/apis
 ${CODE_GENERATOR} \
@@ -43,6 +51,15 @@ ${CODE_GENERATOR} \
   "paths={./edge/..., ./space/...}" \
   "output:dir=./../client"
 popd
+
+#pushd ./space-framework/pkg/apis
+#${CODE_GENERATOR} \
+#  "client:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+#  "lister:apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
+#  "informer:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+#  "paths=./..." \
+#  "output:dir=./../client"
+#popd
 
 # bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy" \
 #   github.com/kubestellar/kubestellar/third_party/conditions/client github.com/kubestellar/kubestellar/third_party/conditions/apis \
