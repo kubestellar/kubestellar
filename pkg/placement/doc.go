@@ -160,7 +160,7 @@ package placement
 // - MapKeySet exposes the Set of key values.
 // - MapKeySetReceiver wraps a SetWriter for keys to make a MapChangeReceiver that only passes along the key set changes.
 // - MapKeySetReceiverLossy wraps a SetWriter for keys to make a MappingReceiver that only passes along key information.
-// - NewSetByMapToEmpty takesa MutableMap[Domain,Empty] and casts it to a MutableSet[Domain].
+// - NewSetByMapToEmpty takes a MutableMap[Domain,Empty] and casts it to a MutableSet[Domain].
 // - NewMapToConstant takes a domain set and a single range value and makes a Map that associates
 //   each of those domain values to that one range value.
 // - RotateKeyMap combines a Map with a bijection on its keys.
