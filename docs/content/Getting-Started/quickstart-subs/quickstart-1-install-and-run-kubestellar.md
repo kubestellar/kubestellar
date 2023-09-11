@@ -1,6 +1,8 @@
 <!--quickstart-1-install-and-run-kubestellar-start-->
 
-KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp.
+KubeStellar works in the context of [kcp](https://www.kcp.io/), so to use KubeStellar you also need kcp.
+
+KubeStellar works with release `v0.11.0` of kcp.
 
 We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.
 
