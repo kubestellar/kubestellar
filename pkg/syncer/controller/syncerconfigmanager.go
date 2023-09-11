@@ -132,28 +132,28 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 	s.syncConfigManager.upsert(edgeSyncConfig)
 }
 
-type typeFlatNamespacedObject struct {
+type flatNamespacedObject struct {
 	APIVersion string
 	v1.GroupResource
 	Namespace string
 	Names     []string
 }
 
-type typeTableOfFlatNamespacedObject struct {
-	FlatNamespacedObjects []typeFlatNamespacedObject
+type tableOfFlatNamespacedObject struct {
+	FlatNamespacedObjects []flatNamespacedObject
 }
 
-func (t *typeTableOfFlatNamespacedObject) filter(predicate func(row typeFlatNamespacedObject) bool) *typeTableOfFlatNamespacedObject {
-	flatNamespacedObjects := []typeFlatNamespacedObject{}
+func (t *tableOfFlatNamespacedObject) filter(predicate func(row flatNamespacedObject) bool) *tableOfFlatNamespacedObject {
+	flatNamespacedObjects := []flatNamespacedObject{}
 	for _, obj := range t.FlatNamespacedObjects {
 		if predicate(obj) {
 			flatNamespacedObjects = append(flatNamespacedObjects, obj)
 		}
 	}
-	return &typeTableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
+	return &tableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
 }
 
-func (t *typeTableOfFlatNamespacedObject) getAllNamespaces() []string {
+func (t *tableOfFlatNamespacedObject) getAllNamespaces() []string {
 	namespaces := sets.String{}
 	for _, obj := range t.FlatNamespacedObjects {
 		namespaces.Insert(obj.Namespace)
@@ -162,10 +162,10 @@ func (t *typeTableOfFlatNamespacedObject) getAllNamespaces() []string {
 }
 
 func (s *SyncerConfigManager) upsertNamespacedObjects(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
-	flatNamespacedObjects := []typeFlatNamespacedObject{}
+	flatNamespacedObjects := []flatNamespacedObject{}
 	for _, nsObject := range syncerConfig.Spec.NamespacedObjects {
 		for _, obj := range nsObject.ObjectsByNamespace {
-			flatNamespacedObjects = append(flatNamespacedObjects, typeFlatNamespacedObject{
+			flatNamespacedObjects = append(flatNamespacedObjects, flatNamespacedObject{
 				APIVersion:    nsObject.APIVersion,
 				GroupResource: nsObject.GroupResource,
 				Namespace:     obj.Namespace,
@@ -173,9 +173,9 @@ func (s *SyncerConfigManager) upsertNamespacedObjects(syncerConfig edgev1alpha1.
 			})
 		}
 	}
-	namespacedObjectsTable := typeTableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
+	namespacedObjectsTable := tableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
 
-	requiredNamespaces := namespacedObjectsTable.filter(func(row typeFlatNamespacedObject) bool { return len(row.Names) > 0 }).getAllNamespaces()
+	requiredNamespaces := namespacedObjectsTable.filter(func(row flatNamespacedObject) bool { return len(row.Names) > 0 }).getAllNamespaces()
 
 	s.logger.V(3).Info("upsert namespaced objects as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(requiredNamespaces))
 	if lgr := s.logger.V(4); lgr.Enabled() {
