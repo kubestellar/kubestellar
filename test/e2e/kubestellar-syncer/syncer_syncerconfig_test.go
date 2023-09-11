@@ -48,6 +48,13 @@ func TestKubeStellarSyncerWithWildcardSyncerConfig(t *testing.T) {
 	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
+func TestKubeStellarSyncerWithNamespacedObjectsSyncerConfig(t *testing.T) {
+	var syncerConfigUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
+	require.NoError(t, err)
+	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
+}
+
 func testKubeStellarSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var sampleDownsyncCRDUnst *unstructured.Unstructured

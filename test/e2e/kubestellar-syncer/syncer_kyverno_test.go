@@ -34,13 +34,30 @@ import (
 )
 
 func TestKubeStellarSyncerForKyvernoWithSyncerConfig(t *testing.T) {
-
 	var syncerConfigUnst *unstructured.Unstructured
 	err := edgeframework.LoadFile("testdata/kyverno/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
+	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
+}
+
+func TestKubeStellarSyncerForKyvernoWithNamespacedObjectsSyncerConfig(t *testing.T) {
+	var syncerConfigUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
+	require.NoError(t, err)
+	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
+}
+
+func TestKubeStellarSyncerForKyvernoWithNamespacedObjectsCoexistSyncerConfig(t *testing.T) {
+	var syncerConfigUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects-coexist.yaml", embedded, &syncerConfigUnst)
+	require.NoError(t, err)
+	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
+}
+
+func testKubeStellarSyncerForKyvernoWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var policyReportUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/kyverno/policy-report.yaml", embedded, &policyReportUnst)
+	err := edgeframework.LoadFile("testdata/kyverno/policy-report.yaml", embedded, &policyReportUnst)
 	require.NoError(t, err)
 
 	var clusterPolicyReportUnst *unstructured.Unstructured

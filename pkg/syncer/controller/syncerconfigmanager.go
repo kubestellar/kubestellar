@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog/v2"
@@ -30,9 +31,10 @@ import (
 )
 
 const (
-	DOWNSYNC_NAMESPACED_SUFFIX    string = "_downsync_namespaced"
-	DOWNSYNC_CLUSTERSCOPED_SUFFIX string = "_downsync_clusterscoped"
-	UPSYNC_SUFFIX                 string = "_upsync"
+	DOWNSYNC_NAMESPACED_SUFFIX         string = "_downsync_namespaced"
+	DOWNSYNC_NAMESPACED_OBJECTS_SUFFIX string = "_downsync_namespaced_objects"
+	DOWNSYNC_CLUSTERSCOPED_SUFFIX      string = "_downsync_clusterscoped"
+	UPSYNC_SUFFIX                      string = "_upsync"
 )
 
 func NewSyncerConfigManager(logger klog.Logger, syncConfigManager *SyncConfigManager, upstreamClientFactory clientfactory.ClientFactory, downstreamClientFactory clientfactory.ClientFactory) *SyncerConfigManager {
@@ -78,6 +80,7 @@ func (s *SyncerConfigManager) Refresh() {
 			logger.Error(err, "Failed to get API Group resources from downstream. Skip upsert operation")
 			return
 		}
+		s.upsertNamespacedObjects(syncerConfig, upstreamGroupResourcesList)
 		s.upsertNamespaceScoped(syncerConfig, upstreamGroupResourcesList)
 		s.upsertClusterScoped(syncerConfig, upstreamGroupResourcesList)
 		s.upsertUpsync(syncerConfig, downstreamGroupResourcesList)
@@ -88,7 +91,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 	s.logger.V(3).Info("upsert namespace scoped resources as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(syncerConfig.Spec.NamespaceScope.Namespaces))
 	if lgr := s.logger.V(4); lgr.Enabled() {
 		for _, agrs := range upstreamGroupResourcesList {
-			lgr.Info("APIGroupResources", "group", agrs.Group, "bar", agrs.VersionedResources)
+			lgr.Info("APIGroupResources", "group", agrs.Group, "versionedResources", agrs.VersionedResources)
 		}
 	}
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
@@ -121,6 +124,99 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
 		ObjectMeta: v1.ObjectMeta{
 			Name: syncerConfig.Name + DOWNSYNC_NAMESPACED_SUFFIX,
+		},
+		Spec: edgev1alpha1.EdgeSyncConfigSpec{
+			DownSyncedResources: edgeSyncConfigResources,
+		},
+	}
+	s.syncConfigManager.upsert(edgeSyncConfig)
+}
+
+type flatNamespacedObject struct {
+	APIVersion string
+	v1.GroupResource
+	Namespace string
+	Names     []string
+}
+
+type tableOfFlatNamespacedObject struct {
+	FlatNamespacedObjects []flatNamespacedObject
+}
+
+func (t *tableOfFlatNamespacedObject) filter(predicate func(row flatNamespacedObject) bool) *tableOfFlatNamespacedObject {
+	flatNamespacedObjects := []flatNamespacedObject{}
+	for _, obj := range t.FlatNamespacedObjects {
+		if predicate(obj) {
+			flatNamespacedObjects = append(flatNamespacedObjects, obj)
+		}
+	}
+	return &tableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
+}
+
+func (t *tableOfFlatNamespacedObject) getAllNamespaces() []string {
+	namespaces := sets.String{}
+	for _, obj := range t.FlatNamespacedObjects {
+		namespaces.Insert(obj.Namespace)
+	}
+	return namespaces.List()
+}
+
+func (s *SyncerConfigManager) upsertNamespacedObjects(syncerConfig edgev1alpha1.SyncerConfig, upstreamGroupResourcesList []*restmapper.APIGroupResources) {
+	flatNamespacedObjects := []flatNamespacedObject{}
+	for _, nsObject := range syncerConfig.Spec.NamespacedObjects {
+		for _, obj := range nsObject.ObjectsByNamespace {
+			flatNamespacedObjects = append(flatNamespacedObjects, flatNamespacedObject{
+				APIVersion:    nsObject.APIVersion,
+				GroupResource: nsObject.GroupResource,
+				Namespace:     obj.Namespace,
+				Names:         obj.Names,
+			})
+		}
+	}
+	namespacedObjectsTable := tableOfFlatNamespacedObject{FlatNamespacedObjects: flatNamespacedObjects}
+
+	requiredNamespaces := namespacedObjectsTable.filter(func(row flatNamespacedObject) bool { return len(row.Names) > 0 }).getAllNamespaces()
+
+	s.logger.V(3).Info("upsert namespaced objects as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(requiredNamespaces))
+	if lgr := s.logger.V(4); lgr.Enabled() {
+		for _, agrs := range upstreamGroupResourcesList {
+			lgr.Info("APIGroupResources", "group", agrs.Group, "versionedResources", agrs.VersionedResources)
+		}
+	}
+	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
+	for _, namespace := range requiredNamespaces {
+		edgeSyncConfigResourceForNamespace := edgev1alpha1.EdgeSyncConfigResource{
+			Group:   "",
+			Version: "v1",
+			Kind:    "Namespace",
+			Name:    namespace,
+		}
+		edgeSyncConfigResources = append(edgeSyncConfigResources, edgeSyncConfigResourceForNamespace)
+	}
+
+	for _, object := range namespacedObjectsTable.FlatNamespacedObjects {
+		group := object.Group
+		version := object.APIVersion
+		resource := object.Resource
+		gvr := schema.GroupVersionResource{Group: group, Version: version, Resource: resource}
+		versionedResources := findVersionedResourcesByGVR(group, version, resource, upstreamGroupResourcesList, s.logger)
+		s.logger.V(4).Info("Mapped GVR to GVKs", "namespace", object.Namespace, "gvr", gvr, "gvks", versionedResources)
+		for _, versionedResource := range versionedResources {
+			for _, name := range object.Names {
+				edgeSyncConfigResource := edgev1alpha1.EdgeSyncConfigResource{
+					Group:     group,
+					Version:   version,
+					Kind:      versionedResource.Kind,
+					Namespace: object.Namespace,
+					Name:      name,
+				}
+				edgeSyncConfigResources = append(edgeSyncConfigResources, edgeSyncConfigResource)
+			}
+		}
+	}
+	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
+		ObjectMeta: v1.ObjectMeta{
+			Name: syncerConfig.Name + DOWNSYNC_NAMESPACED_OBJECTS_SUFFIX,
 		},
 		Spec: edgev1alpha1.EdgeSyncConfigSpec{
 			DownSyncedResources: edgeSyncConfigResources,
@@ -239,6 +335,7 @@ func (s *SyncerConfigManager) delete(key string) {
 	defer s.Unlock()
 	delete(s.syncerConfigMap, key)
 	s.syncConfigManager.delete(key + DOWNSYNC_NAMESPACED_SUFFIX)
+	s.syncConfigManager.delete(key + DOWNSYNC_NAMESPACED_OBJECTS_SUFFIX)
 	s.syncConfigManager.delete(key + DOWNSYNC_CLUSTERSCOPED_SUFFIX)
 	s.syncConfigManager.delete(key + UPSYNC_SUFFIX)
 }
@@ -252,16 +349,18 @@ func findVersionedResourcesByGVR(group string, version string, resource string, 
 			break
 		}
 	}
-	if apiGroupResources == nil {
-		return _versionedResources
-	}
-	versionedResources := apiGroupResources.VersionedResources[version]
-	for _, versionedResource := range versionedResources {
-		if resource == versionedResource.Name {
-			_versionedResources = append(_versionedResources, versionedResource)
-		} else if resource == "*" {
-			_versionedResources = append(_versionedResources, versionedResource)
+	if apiGroupResources != nil {
+		versionedResources := apiGroupResources.VersionedResources[version]
+		for _, versionedResource := range versionedResources {
+			if resource == versionedResource.Name {
+				_versionedResources = append(_versionedResources, versionedResource)
+			} else if resource == "*" {
+				_versionedResources = append(_versionedResources, versionedResource)
+			}
 		}
+	}
+	if len(_versionedResources) == 0 {
+		logger.V(2).Info("Any versioned resource is not found from given apiGroupResources", "group", group, "version", version, "resource", resource)
 	}
 	return _versionedResources
 }

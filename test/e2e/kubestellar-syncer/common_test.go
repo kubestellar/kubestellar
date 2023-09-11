@@ -73,6 +73,18 @@ var deploymentGvr = schema.GroupVersionResource{
 	Resource: "deployments",
 }
 
+var configmapGvr = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "configmaps",
+}
+
+var secretGvr = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "secrets",
+}
+
 var policyGvr = schema.GroupVersionResource{
 	Group:    "kyverno.io",
 	Version:  "v1",
