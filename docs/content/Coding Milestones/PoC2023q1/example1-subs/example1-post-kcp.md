@@ -65,7 +65,11 @@ kubestellar init
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
 
-First you will need to get a build of KubeStellar.  See
+First you will need the kcp `kubectl` plugins.  See [the "Start kcp"
+section above](../#start-kcp) for instructions on how to get all of the
+kcp executables.
+
+Next you will need to get a build of KubeStellar.  See
 [above](../#get-kubestellar) and **NOTE WELL**: as yet there is no
 release of KubeStellar that supports this style of deployment, you
 will have to get the latest code from github and `make build`.
