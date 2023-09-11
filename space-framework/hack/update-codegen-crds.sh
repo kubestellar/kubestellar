@@ -36,10 +36,18 @@ cd "${REPO_ROOT}/pkg/apis"
     crd \
     rbac:roleName=manager-role \
     webhook \
-    paths="{./edge/..., ./space/...}" \
+    paths="./..." \
     output:crd:artifacts:config="${REPO_ROOT}"/config/crds
 
-for CRD in "${REPO_ROOT}"/config/crds/*.yaml; do
+cd "${REPO_ROOT}/space-framework/pkg/apis"
+"../../../${CONTROLLER_GEN}" \
+    crd \
+    rbac:roleName=manager-role \
+    webhook \
+    paths="./..." \
+    output:crd:artifacts:config="${REPO_ROOT}"/space-framework/config/crds
+
+for CRD in "${REPO_ROOT}"/config/crds/*.yaml "${REPO_ROOT}"/space-framework/config/crds/*.yaml; do
     if [ -f "${CRD}-patch" ]; then
         echo "Applying ${CRD}"
         ${YAML_PATCH} -o "${CRD}-patch" < "${CRD}" > "${CRD}.patched"
@@ -55,3 +63,4 @@ done
 #     output:crd:artifacts:config="${REPO_ROOT}"/test/e2e/reconciler/cluster/
 
 "${REPO_ROOT}/${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
+"${REPO_ROOT}/${API_GEN}" --input-dir "${REPO_ROOT}"/space-framework/config/crds --output-dir "${REPO_ROOT}"/space-framework/config/exports
