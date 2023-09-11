@@ -91,7 +91,7 @@ func (s *SyncerConfigManager) upsertNamespaceScoped(syncerConfig edgev1alpha1.Sy
 	s.logger.V(3).Info("upsert namespace scoped resources as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(syncerConfig.Spec.NamespaceScope.Namespaces))
 	if lgr := s.logger.V(4); lgr.Enabled() {
 		for _, agrs := range upstreamGroupResourcesList {
-			lgr.Info("APIGroupResources", "group", agrs.Group, "bar", agrs.VersionedResources)
+			lgr.Info("APIGroupResources", "group", agrs.Group, "versionedResources", agrs.VersionedResources)
 		}
 	}
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
@@ -180,7 +180,7 @@ func (s *SyncerConfigManager) upsertNamespacedObjects(syncerConfig edgev1alpha1.
 	s.logger.V(3).Info("upsert namespaced objects as syncerConfig to syncConfigManager stores", "syncerConfigName", syncerConfig.Name, "numNamespaces", len(requiredNamespaces))
 	if lgr := s.logger.V(4); lgr.Enabled() {
 		for _, agrs := range upstreamGroupResourcesList {
-			lgr.Info("APIGroupResources", "group", agrs.Group, "bar", agrs.VersionedResources)
+			lgr.Info("APIGroupResources", "group", agrs.Group, "versionedResources", agrs.VersionedResources)
 		}
 	}
 	edgeSyncConfigResources := []edgev1alpha1.EdgeSyncConfigResource{}
@@ -349,16 +349,18 @@ func findVersionedResourcesByGVR(group string, version string, resource string, 
 			break
 		}
 	}
-	if apiGroupResources == nil {
-		return _versionedResources
-	}
-	versionedResources := apiGroupResources.VersionedResources[version]
-	for _, versionedResource := range versionedResources {
-		if resource == versionedResource.Name {
-			_versionedResources = append(_versionedResources, versionedResource)
-		} else if resource == "*" {
-			_versionedResources = append(_versionedResources, versionedResource)
+	if apiGroupResources != nil {
+		versionedResources := apiGroupResources.VersionedResources[version]
+		for _, versionedResource := range versionedResources {
+			if resource == versionedResource.Name {
+				_versionedResources = append(_versionedResources, versionedResource)
+			} else if resource == "*" {
+				_versionedResources = append(_versionedResources, versionedResource)
+			}
 		}
+	}
+	if len(_versionedResources) == 0 {
+		logger.V(2).Info("Any versioned resource is not found from given apiGroupResources", "group", group, "version", version, "resource", resource)
 	}
 	return _versionedResources
 }
