@@ -36,12 +36,12 @@ bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar
 
-#bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
-#  github.com/kubestellar/kubestellar/space-framework/pkg/client github.com/kubestellar/kubestellar/space-framework/pkg/apis \
-#  "space:v1alpha1" \
-#  --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
-#  --output-base "${SCRIPT_ROOT}" \
-#  --trim-path-prefix github.com/kubestellar/kubestellar
+bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
+  github.com/kubestellar/kubestellar/space-framework/pkg/client github.com/kubestellar/kubestellar/space-framework/pkg/apis \
+  "space:v1alpha1" \
+  --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
+  --output-base "${SCRIPT_ROOT}" \
+  --trim-path-prefix github.com/kubestellar/kubestellar
 
 pushd ./pkg/apis
 ${CODE_GENERATOR} \
@@ -52,14 +52,14 @@ ${CODE_GENERATOR} \
   "output:dir=./../client"
 popd
 
-#pushd ./space-framework/pkg/apis
-#${CODE_GENERATOR} \
-#  "client:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-#  "lister:apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
-#  "informer:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-#  "paths=./..." \
-#  "output:dir=./../client"
-#popd
+pushd ./space-framework/pkg/apis
+${CODE_GENERATOR} \
+  "client:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+  "lister:apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
+  "informer:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
+  "paths=./..." \
+  "output:dir=./../client"
+popd
 
 # bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy" \
 #   github.com/kubestellar/kubestellar/third_party/conditions/client github.com/kubestellar/kubestellar/third_party/conditions/apis \

@@ -30,9 +30,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 
-	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
+	ksclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	ksinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
 	mcclientset "github.com/kubestellar/kubestellar/space-framework/pkg/mcclient/clientset"
 )
 

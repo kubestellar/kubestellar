@@ -27,8 +27,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 
-	ksclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	ksinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	ksclient "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	ksinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
 	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
