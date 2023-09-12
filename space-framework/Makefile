@@ -139,3 +139,6 @@ verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
 imports: $(OPENSHIFT_GOIMPORTS) 
 	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
 
+.PHONY: modules
+modules: ## Run go mod tidy to ensure modules are up to date
+	go mod tidy

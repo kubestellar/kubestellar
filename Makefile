@@ -499,4 +499,8 @@ space-codegen:
 	$(MAKE) -C space-framework codegen
 .PHONY: space-codegen
 
+space-modules: 
+	$(MAKE) -C space-framework modules
+.PHONY: space-modules
+
 include Makefile.venv

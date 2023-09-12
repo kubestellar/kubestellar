@@ -3,6 +3,7 @@ kind: APIResourceSchema
 metadata:
   creationTimestamp: null
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:config/exports/apiresourceschema-spaces.space.kubestellar.io.yaml
   name: v230915-8d536c3e3.spaces.space.kubestellar.io
 =======
@@ -11,6 +12,9 @@ metadata:
 =======
   name: v230912-42dff5c1c.spaces.space.kubestellar.io
 >>>>>>> 1a7264674... separate the build
+=======
+  name: v230912-788cf62d6.spaces.space.kubestellar.io
+>>>>>>> 875602ca8... crate space module
 spec:
   group: space.kubestellar.io
   names:
