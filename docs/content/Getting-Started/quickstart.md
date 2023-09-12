@@ -17,7 +17,7 @@
 Table of contents:
 
 1. [Check Required Packages](#1-check-required-packages)
-2. [Install and run **KubeStellar**](#2-install-and-run-kubestellar)
+2. [Install and run kcp and **KubeStellar**](#2-install-and-run-kcp-and-kubestellar)
 3. [Example deployment of Apache HTTP Server workload into two local kind clusters](#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
       1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
       2. [Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
@@ -37,7 +37,7 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
    end="<!--required-packages-end-->"
 %}
 
-## 2. Install and run **KubeStellar**
+## 2. Install and run kcp and **KubeStellar**
 
 {%
    include-markdown "quickstart-subs/quickstart-1-install-and-run-kubestellar.md"
