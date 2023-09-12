@@ -79,7 +79,6 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 		ctx:              ctx,
 		logger:           logger,
 		clusterName:      clusterName,
-		client:           client,
 		cache:            cachediscovery.NewMemCacheClient(client),
 		resourceVersionI: 1,
 	}
@@ -132,7 +131,6 @@ type resourcesListWatcher struct {
 	ctx         context.Context
 	logger      klog.Logger
 	clusterName string
-	client      upstreamdiscovery.DiscoveryInterface
 	cache       upstreamdiscovery.CachedDiscoveryInterface
 
 	mutex            sync.Mutex
