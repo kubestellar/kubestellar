@@ -2,11 +2,15 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
+<<<<<<< HEAD
 <<<<<<< HEAD:config/exports/apiresourceschema-spaces.space.kubestellar.io.yaml
   name: v230915-8d536c3e3.spaces.space.kubestellar.io
 =======
   name: v230910-ddc881969.spaces.space.kubestellar.io
 >>>>>>> 496b5e990... initial:space-framework/config/exports/apiresourceschema-spaces.space.kubestellar.io.yaml
+=======
+  name: v230912-42dff5c1c.spaces.space.kubestellar.io
+>>>>>>> 1a7264674... separate the build
 spec:
   group: space.kubestellar.io
   names:

@@ -19,12 +19,6 @@ limitations under the License.
 package fake
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/discovery"
-	fakediscovery "k8s.io/client-go/discovery/fake"
-	"k8s.io/client-go/testing"
-
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
@@ -34,7 +28,15 @@ import (
 =======
 	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
+<<<<<<< HEAD
 >>>>>>> 496b5e990... initial
+=======
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/discovery"
+	fakediscovery "k8s.io/client-go/discovery/fake"
+	"k8s.io/client-go/testing"
+>>>>>>> 1a7264674... separate the build
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.

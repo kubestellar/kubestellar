@@ -25,7 +25,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	klog "k8s.io/klog/v2"
 
-	"github.com/kubestellar/kubestellar/space-framework/pkg/mcclient"
+	spaceclient "github.com/kubestellar/kubestellar/pkg/spaceclient"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func main() {
 
 	// Create the MC aware client --> initiate the underlying MC aware library
 	// The library actively watches for space updates, and maintain an updated list of accessible spaces
-	mcclient, err := mcclient.NewMultiSpace(ctx, managementSpaceConfig)
+	spclient, err := spaceclient.NewMultiSpace(ctx, managementSpaceConfig)
 	if err != nil {
 		logger.Error(err, "get client failed")
 		panic(err)
@@ -53,7 +53,7 @@ func main() {
 
 	// Demonstrate a Watch() on a space
 	// Using the mcclient to get access to a space directly (clientset, informer, etc..)
-	watcher, err := mcclient.Space(spaceName).Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
+	watcher, err := spclient.Space(spaceName).Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
 	if err == nil {
 		for {
 			select {

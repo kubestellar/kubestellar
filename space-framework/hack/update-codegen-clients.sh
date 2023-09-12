@@ -26,18 +26,16 @@ pushd "${SCRIPT_ROOT}"
 BOILERPLATE_HEADER="$( pwd )/hack/boilerplate/boilerplate.go.txt"
 popd
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
-set
-exit
 
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
   github.com/kubestellar/kubestellar/space-framework/pkg/client github.com/kubestellar/kubestellar/space-framework/pkg/apis \
   "space:v1alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
-  --trim-path-prefix github.com/kubestellar/kubestellar
-
+  --trim-path-prefix github.com/kubestellar/kubestellar/space-framework
 
 pushd ./pkg/apis
+
 ${CODE_GENERATOR} \
   "client:outputPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
   "lister:apiPackagePath=github.com/kubestellar/kubestellar/space-framework/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
@@ -45,6 +43,5 @@ ${CODE_GENERATOR} \
   "paths=./..." \
   "output:dir=./../client"
 popd
-
 
 go install "${CODEGEN_PKG}"/cmd/openapi-gen

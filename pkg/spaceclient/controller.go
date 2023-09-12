@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mcclient
+package spaceclient
 
 import (
 	"context"
@@ -31,8 +31,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
+	mcclientset "github.com/kubestellar/kubestellar/pkg/spaceclient/clientset"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
-	mcclientset "github.com/kubestellar/kubestellar/space-framework/pkg/mcclient/clientset"
 )
 
 const (

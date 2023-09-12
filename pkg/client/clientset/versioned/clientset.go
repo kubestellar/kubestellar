@@ -22,9 +22,12 @@ import (
 	"fmt"
 	"net/http"
 
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
+<<<<<<< HEAD
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 <<<<<<< HEAD
@@ -32,6 +35,8 @@ import (
 =======
 	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
 >>>>>>> 496b5e990... initial
+=======
+>>>>>>> 1a7264674... separate the build
 )
 
 type Interface interface {

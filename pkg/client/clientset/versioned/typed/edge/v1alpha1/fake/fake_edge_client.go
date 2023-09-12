@@ -19,10 +19,9 @@ limitations under the License.
 package fake
 
 import (
+	v1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
-
-	v1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 )
 
 type FakeEdgeV1alpha1 struct {
