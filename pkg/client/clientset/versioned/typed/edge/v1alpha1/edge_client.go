@@ -21,9 +21,10 @@ package v1alpha1
 import (
 	"net/http"
 
+	rest "k8s.io/client-go/rest"
+
 	v1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
-	rest "k8s.io/client-go/rest"
 )
 
 type EdgeV1alpha1Interface interface {

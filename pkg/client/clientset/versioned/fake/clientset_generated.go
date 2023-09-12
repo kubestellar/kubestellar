@@ -19,6 +19,7 @@ limitations under the License.
 package fake
 
 import (
+<<<<<<< HEAD
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
@@ -31,12 +32,23 @@ import (
 <<<<<<< HEAD
 >>>>>>> 496b5e990... initial
 =======
+=======
+>>>>>>> 429ab226f... regenerate files
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
+<<<<<<< HEAD
 >>>>>>> 1a7264674... separate the build
+=======
+
+	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
+	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
+>>>>>>> 429ab226f... regenerate files
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.

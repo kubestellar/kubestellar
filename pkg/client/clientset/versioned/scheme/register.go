@@ -19,13 +19,12 @@ limitations under the License.
 package scheme
 
 import (
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
@@ -36,6 +35,11 @@ import (
 >>>>>>> 496b5e990... initial
 =======
 >>>>>>> 1a7264674... separate the build
+=======
+
+	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+>>>>>>> 429ab226f... regenerate files
 )
 
 var Scheme = runtime.NewScheme()
