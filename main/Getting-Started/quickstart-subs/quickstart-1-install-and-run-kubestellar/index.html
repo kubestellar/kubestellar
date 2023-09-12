@@ -1672,7 +1672,8 @@
 
 <!--quickstart-1-install-and-run-kubestellar-start-->
 
-<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp.</p>
+<p>KubeStellar works in the context of <a href="https://www.kcp.io/">kcp</a>, so to use KubeStellar you also need kcp.</p>
+<p>KubeStellar works with release <code>v0.11.0</code> of kcp.</p>
 <p>We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.</p>
 <h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
 <p>The following commands will download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar as bare processes, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about <a href="../../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment">the commands for bare process deployment</a>.</p>

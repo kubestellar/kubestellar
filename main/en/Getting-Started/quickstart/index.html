@@ -636,11 +636,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-install-and-run-kubestellar" class="md-nav__link">
-    2. Install and run KubeStellar
+  <a href="#2-install-and-run-kcp-and-kubestellar" class="md-nav__link">
+    2. Install and run kcp and KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="2. Install and run KubeStellar">
+    <nav class="md-nav" aria-label="2. Install and run kcp and KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2063,11 +2063,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-install-and-run-kubestellar" class="md-nav__link">
-    2. Install and run KubeStellar
+  <a href="#2-install-and-run-kcp-and-kubestellar" class="md-nav__link">
+    2. Install and run kcp and KubeStellar
   </a>
   
-    <nav class="md-nav" aria-label="2. Install and run KubeStellar">
+    <nav class="md-nav" aria-label="2. Install and run kcp and KubeStellar">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2231,7 +2231,7 @@
 <p>Table of contents:</p>
 <ol>
 <li><a href="#1-check-required-packages">Check Required Packages</a></li>
-<li><a href="#2-install-and-run-kubestellar">Install and run <strong>KubeStellar</strong></a></li>
+<li><a href="#2-install-and-run-kcp-and-kubestellar">Install and run kcp and <strong>KubeStellar</strong></a></li>
 <li><a href="#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">Example deployment of Apache HTTP Server workload into two local kind clusters</a><ol>
 <li><a href="#a-stand-up-two-kind-clusters-florin-and-guilder">Stand up two kind clusters: florin and guilder</a></li>
 <li><a href="#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw">Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)</a></li>
@@ -2484,10 +2484,11 @@ Insert
 </div>
 <!-- END INCLUDE -->
 
-<h2 id="2-install-and-run-kubestellar">2. Install and run <strong>KubeStellar</strong><a class="headerlink" href="#2-install-and-run-kubestellar" title="Permanent link">#</a></h2>
+<h2 id="2-install-and-run-kcp-and-kubestellar">2. Install and run kcp and <strong>KubeStellar</strong><a class="headerlink" href="#2-install-and-run-kcp-and-kubestellar" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-1-install-and-run-kubestellar.md '&lt;!--quickstart-1-install-and-run-kubestellar-start--&gt;' '&lt;!--quickstart-1-install-and-run-kubestellar-end--&gt;' -->
 
-<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp.</p>
+<p>KubeStellar works in the context of <a href="https://www.kcp.io/">kcp</a>, so to use KubeStellar you also need kcp.</p>
+<p>KubeStellar works with release <code>v0.11.0</code> of kcp.</p>
 <p>We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.</p>
 <h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
 <p>The following commands will download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar as bare processes, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about <a href="../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment">the commands for bare process deployment</a>.</p>
