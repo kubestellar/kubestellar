@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -72,15 +73,16 @@ type APIResourceLister interface {
 // is delayed by a few decaseconds (with Nagling) to support
 // invalidations based on events that merely trigger some process of
 // changing the set of API resources.
-func NewAPIResourceInformer(ctx context.Context, clusterName string, client upstreamdiscovery.DiscoveryInterface, invalidationNotifiers ...ObjectNotifier) (upstreamcache.SharedInformer, APIResourceLister, Invalidatable) {
+func NewAPIResourceInformer(ctx context.Context, clusterName string, client upstreamdiscovery.DiscoveryInterface, includeSubresources bool, invalidationNotifiers ...ObjectNotifier) (upstreamcache.SharedInformer, APIResourceLister, Invalidatable) {
 	logger := klog.FromContext(ctx).WithValues("cluster", clusterName)
 	ctx = klog.NewContext(ctx, logger)
 	rlw := &resourcesListWatcher{
-		ctx:              ctx,
-		logger:           logger,
-		clusterName:      clusterName,
-		cache:            cachediscovery.NewMemCacheClient(client),
-		resourceVersionI: 1,
+		ctx:                 ctx,
+		logger:              logger,
+		includeSubresources: includeSubresources,
+		clusterName:         clusterName,
+		cache:               cachediscovery.NewMemCacheClient(client),
+		resourceVersionI:    1,
 	}
 	rlw.cond = sync.NewCond(&rlw.mutex)
 	go func() {
@@ -128,10 +130,11 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 }
 
 type resourcesListWatcher struct {
-	ctx         context.Context
-	logger      klog.Logger
-	clusterName string
-	cache       upstreamdiscovery.CachedDiscoveryInterface
+	ctx                 context.Context
+	logger              klog.Logger
+	includeSubresources bool
+	clusterName         string
+	cache               upstreamdiscovery.CachedDiscoveryInterface
 
 	mutex            sync.Mutex
 	cond             *sync.Cond
@@ -199,54 +202,143 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 		return rlw.resourceVersionI
 	}()
 	resourceVersionS := strconv.FormatInt(resourceVersionI, 10)
-	groupList, err := rlw.cache.ServerPreferredResources()
-	if err != nil {
-		return nil, err
-	}
 	ans := urmetav1a1.APIResourceList{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "APIResourceList",
 			APIVersion: urmetav1a1.SchemeGroupVersion.String(),
 		},
 		ListMeta: metav1.ListMeta{ResourceVersion: resourceVersionS},
-		Items:    []urmetav1a1.APIResource{},
 	}
+	var err error
+	if rlw.includeSubresources {
+		ans.Items, err = rlw.listWithSubresources(rlw.logger, resourceVersionS)
+	} else {
+		ans.Items, err = rlw.listSansSubresources(resourceVersionS)
+	}
+	return &ans, err
+}
+
+type arMap map[string]*arTuple
+
+type arTuple struct {
+	spec         *urmetav1a1.APIResourceSpec
+	subresources arMap
+}
+
+func (am arMap) insert(name []string, spec *urmetav1a1.APIResourceSpec) {
+	art := am[name[0]]
+	if art == nil {
+		art = &arTuple{subresources: arMap{}}
+		am[name[0]] = art
+	}
+	if len(name) < 2 {
+		art.spec = spec
+	} else {
+		art.subresources.insert(name[1:], spec)
+	}
+}
+
+func (am arMap) toList(logger klog.Logger, prefix []string, consume func(urmetav1a1.APIResourceSpec)) {
+	for name, art := range am {
+		if art.spec == nil {
+			logger.Error(nil, "Gap in subresource structure", "prefix", prefix, "name", name, "subresources", art.subresources)
+			continue
+		}
+		spec := *art.spec
+		spec.Name = name
+		art.subresources.toList(logger, append(prefix, name), func(subSpec urmetav1a1.APIResourceSpec) {
+			spec.SubResources = append(spec.SubResources, &subSpec)
+		})
+		consume(spec)
+	}
+}
+
+func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resourceVersionS string) ([]urmetav1a1.APIResource, error) {
+	groupList, resourceList, err := rlw.cache.ServerGroupsAndResources()
+	if err != nil {
+		return nil, err
+	}
+	groupToVersion := map[string]string{}
+	for _, ag := range groupList {
+		groupToVersion[ag.Name] = ag.PreferredVersion.Version
+	}
+	ans := []urmetav1a1.APIResource{}
+	for _, group := range resourceList {
+		gv, err := schema.ParseGroupVersion(group.GroupVersion)
+		if err != nil {
+			rlw.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
+			continue
+		}
+		if groupToVersion[gv.Group] != gv.Version {
+			rlw.logger.V(4).Info("Ignoring wrong version", "gv", gv, "rightVersion", groupToVersion[gv.Group])
+			continue
+		}
+		am := arMap{}
+		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(ar urmetav1a1.APIResourceSpec) {
+			rscName := ar.Name
+			nameParts := strings.Split(rscName, "/")
+			am.insert(nameParts, &ar)
+		})
+		am.toList(logger, []string{}, func(spec urmetav1a1.APIResourceSpec) {
+			complete := specComplete(spec, resourceVersionS, gv)
+			ans = append(ans, complete)
+		})
+	}
+	return ans, nil
+}
+
+func specComplete(spec urmetav1a1.APIResourceSpec, resourceVersionS string, gv schema.GroupVersion) urmetav1a1.APIResource {
+	return urmetav1a1.APIResource{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "APIResource",
+			APIVersion: urmetav1a1.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			// The normal syntax has a slash, which confuses the usual Store
+			Name:            gv.Group + ":" + gv.Version + ":" + spec.Name,
+			ResourceVersion: resourceVersionS,
+		},
+		Spec: spec}
+}
+
+func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv schema.GroupVersion, mrs []metav1.APIResource, consumer func(urmetav1a1.APIResourceSpec)) {
+	for _, rsc := range mrs {
+		rscVersion := rsc.Version
+		if rscVersion == "" {
+			rscVersion = gv.Version
+		}
+		arSpec := urmetav1a1.APIResourceSpec{
+			Name:         rsc.Name,
+			SingularName: rsc.SingularName,
+			Namespaced:   rsc.Namespaced,
+			Group:        gv.Group,
+			Version:      rscVersion,
+			Kind:         rsc.Kind,
+			Verbs:        rsc.Verbs,
+		}
+		// rlw.logger.V(4).Info("Producing an APIResource", "ar", ar)
+		consumer(arSpec)
+	}
+}
+
+func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) ([]urmetav1a1.APIResource, error) {
+	groupList, err := rlw.cache.ServerPreferredResources()
+	if err != nil {
+		return nil, err
+	}
+	ans := []urmetav1a1.APIResource{}
 	for _, group := range groupList {
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
 		if err != nil {
 			rlw.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
 			continue
 		}
-		for _, rsc := range group.APIResources {
-			rscVersion := rsc.Version
-			if rscVersion == "" {
-				rscVersion = gv.Version
-			}
-			ar := urmetav1a1.APIResource{
-				TypeMeta: metav1.TypeMeta{
-					Kind:       "APIResource",
-					APIVersion: urmetav1a1.SchemeGroupVersion.String(),
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					// The normal syntax has a slash, which confuses the usual Store
-					Name:            gv.Group + ":" + gv.Version + ":" + rsc.Name,
-					ResourceVersion: resourceVersionS,
-				},
-				Spec: urmetav1a1.APIResourceSpec{
-					Name:         rsc.Name,
-					SingularName: rsc.SingularName,
-					Namespaced:   rsc.Namespaced,
-					Group:        gv.Group,
-					Version:      rscVersion,
-					Kind:         rsc.Kind,
-					Verbs:        rsc.Verbs,
-				},
-			}
-			// rlw.logger.V(4).Info("Producing an APIResource", "ar", ar)
-			ans.Items = append(ans.Items, ar)
-		}
+		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(arSpec urmetav1a1.APIResourceSpec) {
+			ar := specComplete(arSpec, resourceVersionS, gv)
+			ans = append(ans, ar)
+		})
 	}
-	return &ans, nil
+	return ans, nil
 }
 
 type resourceLister struct {

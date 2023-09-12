@@ -475,7 +475,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		discoveryScopedClient := wr.discoveryClusterClient.Cluster(cluster.Path())
 		crdInformer := wr.crdClusterPreInformer.Cluster(cluster).Informer()
 		bindingInformer := wr.bindingClusterPreInformer.Cluster(cluster).Informer()
-		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, crdInformer, bindingInformer)
+		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false, crdInformer, bindingInformer)
 		scopedDynamic := wr.dynamicClusterClient.Cluster(cluster.Path())
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
