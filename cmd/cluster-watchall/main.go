@@ -34,10 +34,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	kubedynamicinformer "k8s.io/client-go/dynamic/dynamicinformer"
-	"k8s.io/client-go/rest"
 	upstreamcache "k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
@@ -61,35 +60,13 @@ import (
    for each one of those, all objects in that cluster.
 */
 
-type ClientOpts struct {
-	loadingRules *clientcmd.ClientConfigLoadingRules
-	overrides    clientcmd.ConfigOverrides
-}
-
-func NewClientOpts() *ClientOpts {
-	return &ClientOpts{
-		loadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
-		overrides:    clientcmd.ConfigOverrides{},
-	}
-}
-
-func (opts *ClientOpts) AddFlags(flags *pflag.FlagSet) {
-	flags.StringVar(&opts.loadingRules.ExplicitPath, "kubeconfig", opts.loadingRules.ExplicitPath, "Path to the kubeconfig file to use for CLI requests")
-	flags.StringVar(&opts.overrides.CurrentContext, "context", opts.overrides.CurrentContext, "The name of the kubeconfig context to use")
-}
-
-func (opts *ClientOpts) ToRESTConfig() (*rest.Config, error) {
-	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(opts.loadingRules, &opts.overrides)
-	return clientConfig.ClientConfig()
-}
-
 func main() {
 	serverBindAddress := ":10203"
 	fs := pflag.NewFlagSet("watchall", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
-	cliOpts := NewClientOpts()
-	cliOpts.AddFlags(fs)
+	cliFlags := genericclioptions.NewConfigFlags(false)
+	cliFlags.AddFlags(fs)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.Parse(os.Args[1:])
 
@@ -111,7 +88,7 @@ func main() {
 		}
 	}()
 
-	config, err := cliOpts.ToRESTConfig()
+	config, err := cliFlags.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags")
 		os.Exit(10)
