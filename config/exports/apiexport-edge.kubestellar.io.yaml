@@ -5,11 +5,11 @@ metadata:
   name: edge.kubestellar.io
 spec:
   latestResourceSchemas:
-  - v230810-2d48e9f7.customizers.edge.kubestellar.io
-  - v230810-2d48e9f7.edgesyncconfigs.edge.kubestellar.io
-  - v230810-2d48e9f7.locations.edge.kubestellar.io
-  - v230810-2d48e9f7.singleplacementslices.edge.kubestellar.io
-  - v230810-2d48e9f7.synctargets.edge.kubestellar.io
-  - v230817-d752f622.syncerconfigs.edge.kubestellar.io
-  - v230908-a60d362c.edgeplacements.edge.kubestellar.io
+  - v230915-8d536c3e3.customizers.edge.kubestellar.io
+  - v230915-8d536c3e3.edgeplacements.edge.kubestellar.io
+  - v230915-8d536c3e3.edgesyncconfigs.edge.kubestellar.io
+  - v230915-8d536c3e3.locations.edge.kubestellar.io
+  - v230915-8d536c3e3.singleplacementslices.edge.kubestellar.io
+  - v230915-8d536c3e3.syncerconfigs.edge.kubestellar.io
+  - v230915-8d536c3e3.synctargets.edge.kubestellar.io
 status: {}

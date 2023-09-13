@@ -26,7 +26,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 )
 
@@ -35,7 +34,6 @@ var codecs = serializer.NewCodecFactory(scheme)
 
 var localSchemeBuilder = runtime.SchemeBuilder{
 	edgev1alpha1.AddToScheme,
-	metav1alpha1.AddToScheme,
 	spacev1alpha1.AddToScheme,
 }
 
