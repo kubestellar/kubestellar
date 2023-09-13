@@ -1,15 +1,15 @@
 Jinja2==3.1.2
-Markdown==3.3.7
+Markdown==3.4
 MarkupSafe==2.1.2
 mike==1.1.2
-mkdocs==1.4.2
+mkdocs==1.5.2
 mkdocs-awesome-pages-plugin==2.8.0
 mkdocs-macros-plugin==0.7.0
-mkdocs-material==9.1.0
+mkdocs-material==9.3.1
 mkdocs-material-extensions==1.1.1
 mkdocs-static-i18n==0.53
-Pygments==2.14.0
-pymdown-extensions==9.9.2
+Pygments==2.16.0
+pymdown-extensions==10.3
 mkdocs-open-in-new-tab==1.0.2
 mkdocs-include-markdown-plugin==4.0.4
 # ../../mkdocs-include-markdown-plugin
