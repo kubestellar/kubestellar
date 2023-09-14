@@ -876,7 +876,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Inivitation to Contribute
+        Invitation to Contribute
       </a>
     </li>
   
@@ -952,8 +952,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -1002,7 +1002,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Roadmap
+        Use Cases Affecting the Roadmap for PoC2023q1
       </a>
     </li>
   
@@ -1172,14 +1172,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q3
+          PoC2023q4
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q3
+          PoC2023q4
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1189,7 +1189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
+      <a href="../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1646,16 +1646,14 @@
 <!--save-some-time-start-->
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone -n -b release-0.3 https://github.com/kubestellar/kubestellar --depth 1 KubeStellar-{{ no such element: dict object[&#39;short_name&#39;] }}
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cd KubeStellar-{{ no such element: dict object[&#39;short_name&#39;] }}
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git restore --staged Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git checkout Makefile Makefile.venv go.mod docs/mkdocs.yml docs/content docs/scripts/docs-ecutable.sh
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>make MANIFEST=&quot;&#39;{{ no such element: dict object[&#39;pre_req_name&#39;] }}&#39;,&#39;{{ no such element: dict object[&#39;manifest_name&#39;] }}&#39;&quot; docs-ecutable
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cd kubestellar
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>make MANIFEST=&quot;&#39;{{ no such element: dict object[&#39;pre_req_name&#39;] }}&#39;,&#39;{{ no such element: dict object[&#39;manifest_name&#39;] }}&#39;&quot; docs-ecutable
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># done? remove everything
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make MANIFEST=&quot;docs/content/common-subs/remove-all.md&quot; docs-ecutable
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cd ../
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>rm -rf KubeStellar-{{ no such element: dict object[&#39;short_name&#39;] }}
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cd ..
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>rm -rf kubestellar
 </code></pre></div>
 </div>
 <!--save-some-time-end-->
