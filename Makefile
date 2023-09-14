@@ -102,7 +102,7 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
 
-# So the recursive Space MAkefile can use the same flags
+# For now, Allow the nested makeefiles to use the same values of these variables without explicitly setting them
 export OS ARCH BUILDFLAGS LDFLAGS
 
 all: build
@@ -486,6 +486,9 @@ verify-modules: modules  ## Verify go modules are up to date
 .PHONY: help
 help: ## Show this help.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+#The following are aliases  to targets in space-framework/Makefile. This is a temporary solution to allow
+# the user to just use this Makefile to build everything
 
 space: 
 	$(MAKE) -C space-framework
