@@ -128,6 +128,7 @@ spec:
         - --from-kubeconfig=/kcp/kubeconfig
         - --sync-target-name=sync-target-name
         - --sync-target-uid=sync-target-uid
+        - --from-cluster=123456789abcdefg # TODO: --from-cluster is no longer required but keep it for backward compatibility (see PR#999)
         - --qps=123.4
         - --burst=456
         - --v=3
