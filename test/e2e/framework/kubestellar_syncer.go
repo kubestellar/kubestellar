@@ -367,7 +367,6 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 	return &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfigWithToken,
-		SyncTargetPath:   logicalcluster.NewPath(""),
 		SyncTargetName:   "",
 		SyncTargetUID:    "",
 		Interval:         time.Second * 3,

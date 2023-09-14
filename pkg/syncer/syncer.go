@@ -28,8 +28,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
@@ -41,7 +39,6 @@ import (
 type SyncerConfig struct {
 	UpstreamConfig   *rest.Config
 	DownstreamConfig *rest.Config
-	SyncTargetPath   logicalcluster.Path
 	SyncTargetName   string
 	SyncTargetUID    string
 	Interval         time.Duration

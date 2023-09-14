@@ -112,7 +112,6 @@ spec:
         - --from-kubeconfig=/kcp/{{.SecretConfigKey}}
         - --sync-target-name={{.SyncTarget}}
         - --sync-target-uid={{.SyncTargetUID}}
-        - --from-cluster={{.SyncTargetPath}}
         - --qps={{.QPS}}
         - --burst={{.Burst}}
         - --v=3
