@@ -34,7 +34,7 @@ imw=.
 espw="root:espw"
 stname=""
 output=""
-syncer_image="quay.io/kubestellar/syncer:v0.7.0"
+syncer_image="quay.io/kubestellar/syncer:test-999"
 kubectl_flags=()
 silent="false"
 
