@@ -63,27 +63,26 @@
         curl.exe -LO "https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe"    
         ```  
     === "WSL with Ubuntu"  
-        ```
-        ```
-        # How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
+        ### How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
 
         Tested on a Intel(R) Core(TM) i7-9850H CPU @ 2.60GHz 2.59 GHz with 32GB RAM, a 64-bit operating system, x64-based processor
         Using Windows 11 Enterprise
 
-        # 1. NB: If you're using a VPN, turn it off
+        #### 1. NB: If you're using a VPN, turn it off
 
-        # 2. Install Ubuntu into WSL
+        #### 2. Install Ubuntu into WSL
 
-        ## 2.0 If wsl is not yet installed, open a powershell administrator window, run the following
+        ##### 2.0 If wsl is not yet installed, open a powershell administrator window, run the following
         ```
         wsl --install
         ```
         and then reboot.
 
-        ## 2.1. In a Windows command terminal run the following to list all the linux distributions that are available online
+        ##### 2.1. In a Windows command terminal run the following to list all the linux distributions that are available online
         ```
         wsl -l -o
-        ##2.2 Select a linux distribution and install it into WSL, like this:
+        ```
+        ##### 2.2 Select a linux distribution and install it into WSL, like this:
         ```
         wsl --install -d Ubuntu 22.04.01
         ```
@@ -93,23 +92,23 @@
         For more information visit: https://aka.ms/wslusers
         Enter new UNIX username:
 
-        ## 2.3 Enter your new username and password at the prompts, and you will eventually see something like this
+        ##### 2.3 Enter your new username and password at the prompts, and you will eventually see something like this
         ```
         Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
         ```
 
-        # 2.4 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
+        ##### 2.4 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
         Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.
         Start a VM using your distribution by clicking on the App.
 
-        # 3. Install pre-requisites into your new VM
-        ## 3.1 update and apply apt-get packages
+        #### 3. Install pre-requisites into your new VM
+        ##### 3.1 update and apply apt-get packages
         ```
         sudo apt-get update
         sudo apt-get upgrade
         ```
         
-        ## 3.2 Install golang
+        ##### 3.2 Install golang
         ```
         wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
         sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
@@ -119,12 +118,12 @@
         go version
         ```
         
-        ## 3.3 Install ko (but don't do ko set action step)
+        ##### 3.3 Install ko (but don't do ko set action step)
         ```
         go install github.com/google/ko@latest
         ```
 
-        ## 3.4 Install gcc
+        ##### 3.4 Install gcc
         Either run this:
         ```
         sudo apt install build-essential
@@ -136,24 +135,23 @@
         gcc --version
         ```
 
-        ## 3.5 Install make (if you installed build-essential this may already be installed)
+        ##### 3.5 Install make (if you installed build-essential this may already be installed)
         ```
         apt install make
         ```
 
-        ## 3.6 Install jq
+        ##### 3.6 Install jq
         ```
         DEBIAN_FRONTEND=noninteractive apt-get install -y jq
         jq --version
         ```
 
-        ## 3.7 install kubectl
+        ##### 3.7 install kubectl
         ```
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
         echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-        ```
         ```
 
 !!! tip "Required Packages for the example usage:"
@@ -210,21 +208,19 @@
         curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
         ```
     === "WSL with Ubuntu"  
-        ```
-        ```
-        # How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
+        ## How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
 
-        ## 1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
+        #### 1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
         
-        ## 2.0 Install docker
+        #### 2.0 Install docker
         The installation instructions from docker are not sufficient to get docker working with WSL
 
-        ## 2.1 
+        ##### 2.1 
         Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
 
         Here some additonal steps you will need to take:
 
-        ## 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
+        ##### 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
         If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
         ```
         sudo vi /etc/wsl.conf
@@ -235,7 +231,7 @@
         systemd=true
         ```
 
-        ## 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
+        ##### 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
         ```
         sudo vi /etc/sudoers.d/docker
         ``` 
@@ -245,18 +241,18 @@
         <your user account> ALL=(ALL) NOPASSWD: /usr/bin/dockerd
         ```
 
-        ## 2.4 Add your user to the docker group
+        ##### 2.4 Add your user to the docker group
         ```
         sudo usermod -aG docker $USER
         ```
 
-        ## 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
+        ##### 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
         ```
         sudo systemctl stop docker
         sudo dockerd &
         ```
 
-        ## 2.5.1 I encountered an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
+        ##### 2.5.1 I encountered an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
         The following commands fixed the issue: 
         ```
         sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
@@ -264,16 +260,15 @@
         sudo dockerd & 
         ``` 
 
-        ## 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal 
+        #### 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal 
         ## In your new terminal, 
 
-        ## 3.1 Install kind
+        ##### 3.1 Install kind
         ```
         wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
         sudo install -m 0755 kind /usr/local/bin/kind 
         rm kind 
         kind version
-        ```
         ```
 
 <!--required-packages-end-->
