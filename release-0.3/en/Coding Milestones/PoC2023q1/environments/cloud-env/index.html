@@ -891,7 +891,7 @@
   
     <li class="md-nav__item">
       <a href="../../coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -967,8 +967,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1017,7 +1017,7 @@
   
     <li class="md-nav__item">
       <a href="../../roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1239,14 +1239,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1256,7 +1256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../../PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1741,14 +1741,14 @@
 <h2 id="monitoring-tools-for-kubestellar-prometheus-grafana-and-node-exporter">Monitoring Tools for KubeStellar (Prometheus, Grafana and Node Exporter)<a class="headerlink" href="#monitoring-tools-for-kubestellar-prometheus-grafana-and-node-exporter" title="Permanent link">#</a></h2>
 <p><img alt="kubestellar-architecture-aws" src="../kubestellar-architecture-aws.png" /></p>
 <h3 id="description">Description<a class="headerlink" href="#description" title="Permanent link">#</a></h3>
-<p>This example shows how to deploy monitoring tools (prometheus, grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KubeStellar. A Prometheus agent is deployed in the edge regions running the workload execution clusters.</p>
+<p>This example shows how to deploy monitoring tools (prometheus, grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KubeStellar. A Prometheus agent is deployed in the edge regions running the edge pclusters</p>
 <ol>
-<li>Create your hosts file with the list of target hosts (KCP server &amp; workload execution cluster)</li>
+<li>Create your hosts file with the list of target hosts (KCP server &amp; Edge pclusters)</li>
 </ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[kcp-server]
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>192.168.56.2
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>[workload-execution-clusters]
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>[edge-pclusters]
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>192.160.56.10
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>192.160.56.12
 </code></pre></div>
@@ -1816,9 +1816,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ansible-playbook -i hosts monitoring-kcpServer.yaml
 </code></pre></div>
 <ol>
-<li>Install prometheus agent and node exporter to a workload execution cluster using the following playbook:</li>
+<li>Install prometheus agent and node exporter to an edge pcluster using the following playbook:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>- hosts: workload-execution-clusters
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>- hosts: edge-pclusters
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  remote_user: ubuntu
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  become: yes
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  gather_facts: yes
@@ -1830,7 +1830,7 @@
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    - node-exporter
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    - prometheus
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ansible-playbook -i hosts monitoring-workload-execution-cluster.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ansible-playbook -i hosts monitoring-pcluster.yaml
 </code></pre></div>
 
 

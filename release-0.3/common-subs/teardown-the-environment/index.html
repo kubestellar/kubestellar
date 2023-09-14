@@ -81,11 +81,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#teardown-bare-processes" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -881,7 +876,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -957,8 +952,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1007,7 +1002,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1177,14 +1172,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1194,7 +1189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1617,28 +1612,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#teardown-bare-processes" class="md-nav__link">
-    Teardown bare processes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#teardown-kubernetes-workload" class="md-nav__link">
-    Teardown Kubernetes workload
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1682,17 +1655,11 @@
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Teardown of KubeStellar depends on which style of deployment was used.</p>
-<h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
-<p>The following command will stop whatever KubeStellar controllers are running.</p>
+<p>Stop and uninstall KubeStellar use the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>remove-kubestellar
-</code></pre></div>
-<h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
-<p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!--teardown-the-environment-end-->
 

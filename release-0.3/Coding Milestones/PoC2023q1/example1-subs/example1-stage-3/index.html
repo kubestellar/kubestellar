@@ -881,7 +881,7 @@
   
     <li class="md-nav__item">
       <a href="../../coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -957,8 +957,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1007,7 +1007,7 @@
   
     <li class="md-nav__item">
       <a href="../../roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1177,14 +1177,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1194,7 +1194,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../../PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1676,7 +1676,7 @@ ESPW and use the KubeStellar command that runs the placement translator.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>placement-translator<span class="w"> </span><span class="p">&amp;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/placement-translator<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sleep<span class="w"> </span><span class="m">120</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>I0423<span class="w"> </span><span class="m">01</span>:39:56.362722<span class="w">   </span><span class="m">11644</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>placement-translator
@@ -1692,7 +1692,7 @@ it or use another shell to continue exploring.</p>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>metadata:
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>annotations:
@@ -1827,7 +1827,7 @@ the name that you stored in Stage 1.</p>
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>apiVersion:<span class="w"> </span>edge.kcp.io/v1alpha1
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>metadata:
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>annotations:

@@ -85,11 +85,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#user-guide" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -493,63 +488,10 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          User Guide
-          <span class="md-nav__icon md-icon"></span>
-        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         User Guide
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#kubestellar-primer" class="md-nav__link">
-    KubeStellar Primer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#glossary" class="md-nav__link">
-    Glossary
-  </a>
-  
-    <nav class="md-nav" aria-label="Glossary">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#older-terminology" class="md-nav__link">
-    Older Terminology
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -950,7 +892,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -1026,8 +968,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1076,7 +1018,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1246,14 +1188,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1263,7 +1205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1685,43 +1627,6 @@
   
   
   
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#kubestellar-primer" class="md-nav__link">
-    KubeStellar Primer
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#glossary" class="md-nav__link">
-    Glossary
-  </a>
-  
-    <nav class="md-nav" aria-label="Glossary">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#older-terminology" class="md-nav__link">
-    Older Terminology
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -1752,38 +1657,15 @@
   
 
 
-<h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permanent link">#</a></h1>
-<h2 id="kubestellar-primer">KubeStellar Primer<a class="headerlink" href="#kubestellar-primer" title="Permanent link">#</a></h2>
-<p>This is a description of the concepts behind KubeStellar.</p>
-<h2 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">#</a></h2>
-<p><strong>Downsynced Object</strong> - One of two categories of workload object, complementary to "upsynced object".  In KubeStellar, a downsynced object first appears in a Workload Description Space and the object's desired state propagates from there through Mailbox Spaces to Workload Execution Clusters and that object's reported state originates in the Workload Execution Clusters and propagates back to the Mailbox Spaces and in the future will be summarized into the Workload Description Space.</p>
-<p><strong>EdgePlacement</strong> - A kind of Kubernetes API object, in a Workload Description Space. One of objects these binds some workload ("what") with a set of workload execution clusters ("where") it should run. The workload is identified by a predicate over namespaced objects and a predicate over cluster-scoped objects. The where is identified by a predicate over workload execution clusters as represented by <code>Location</code> objects.</p>
-<p><strong>Inventory Space (IS)</strong> - Holds the <code>SyncTarget</code> and <code>Location</code> objects describing the Workload Execution Clusters. </p>
-<p><strong>KubeStellar Core Space (KCS)</strong> - Exports the Kubestellar API.</p>
-<p><strong>KubeStellar Syncer</strong> - The KubeStellar agent in a Workload Execution Cluster; syncs workload objects between the Workload Execution Cluster and the corresponding Mailbox Space.</p>
-<p><strong>Location</strong> - A kind of Kubernetes API object, in an Inventory Space. Paired one-to-one with a <code>SyncTarget</code> object in the same space. Together these describe a workload execution cluster. The Location's labels are tested by the "where predicate" in an <code>EdgePlacement</code> object, and this object's labels and annotations provide values used in customization of workload objects going to the workload execution cluster.</p>
-<p><strong>Mailbox Controller</strong> - One of the central KubeStellar controllers; maintains a Mailbox Space for each <code>SyncTarget</code> object. This includes putting an APIBinding to the KubeStellar API into those mailbox spaces.</p>
-<p><strong>Mailbox Space</strong> - There is one Mailbox Space for each workload execution cluster. It stores the <code>SyncerConfig</code> object and copies of the workload(s).</p>
-<p><strong>PlacementTranslator</strong> - One of the central KubeStellar controllers; maintains the <code>SyncerConfig</code> objects in the Mailbox Spaces and syncs workload objects between the Workload Description Spaces and the Mailbox Spaces.</p>
-<p><strong>SinglePlacementSlice</strong> - A kind of Kubernetes API object, in a Workload Description Space.  Such an object holds a list of references to <code>Location</code> &amp; <code>SyncTarget</code> objects that match the "where predicate" of an <code>EdgePlacement</code>.  Currently there is exactly one <code>SinglePlacementSlice</code> for each <code>EdgePlacement</code> but in the future the matches for one <code>EdgePlacement</code> could be spread among several <code>SinglePlacementSlice</code> objects (analogously to <code>EndpointSlice</code> vs <code>Service</code> in Kubernetes).</p>
-<p><strong>Space</strong> - A thing that behaves like a Kubernetes kube-apiserver (and the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (not management of containerized workloads). A kcp logical cluster is an example. A regular Kubernetes cluster includes a space.</p>
-<p><strong>Status Summarizer</strong> - A planned central KubeStellar controller that will maintain the status summary objects in the Workload Description Spaces as a function of the <code>EdgePlacement</code> objects and the workload objects in the Mailbox Spaces.</p>
-<p><strong>SyncerConfig</strong> - A kind of Kubernetes API object, in a Mailbox Space. Such an object holds the dynamic configuration for the syncer in the corresponding workload execution cluster.</p>
-<p><strong>SyncTarget</strong> - A kind of Kubernetes API object, in an Inventory Space. Paired one-to-one with a Location in the same space, jointly representing a Workload Execution Cluster.</p>
-<p><strong>Upsynced Object</strong> - One of two categories of workload object, complementary to "downsynced object".  Upsynced objects originate in Workload Execution Clusters and propagate inward to Mailbox Spaces and in the future will be summarized into Workload Description Spaces.</p>
-<p><strong>Where Resolver</strong> - One of the central KubeStellar controllers; tests the <code>Location</code> objects against the "where predicates" in the <code>EdgePlacement</code> objects to maintain the corresponding <code>SinglePlacementSlice</code> objects.</p>
-<p><strong>Workload Description Space (WDS)</strong> - Holds workload objects and the adjacent KubeStellar control objects, which are the <code>EdgePlacement</code>, <code>SinglePlacementSlice</code>, and <code>Customizer</code> objects and, eventually, the ones developed to prescribe summarization.</p>
-<p><strong>Workload Execution Cluster</strong> - A Kubernetes cluster which can execute a workload. In the examples on this website, we use <a href="https://kind.sigs.k8s.io/">Kind</a> clusters.</p>
-<h3 id="older-terminology">Older Terminology<a class="headerlink" href="#older-terminology" title="Permanent link">#</a></h3>
-<p>There have been some terminology shifts since the start of the project.  The project started with a focus on edge computing scenarios; later we realized that the technical problems addressed are not limited to those scenarios.  The project started in the context of <a href="https://github.com/kcp-dev/kcp">kcp</a> and unabashedly used concepts from kcp; later we began working on generalizing KubeStellar so that it can run in the context of kcp and also can run in other contexts that do not have kcp.</p>
-<ul>
-<li>The term "space" is intended to be a generalization covering both a kcp "logical cluster" or "workspace" and other things that have the same essential behavior</li>
-<li>The term "workload execution cluster" was formerly "edge cluster"</li>
-<li>The term "workload description space" was formerly "workload management workspace"</li>
-<li>The term "inventory space" was formerly "inventory management workspace"</li>
-<li>The term "kubestellar core space" was formerly "edge service provider workspace"</li>
-<li>The term "mailbox space" was formerly "mailbox workspace"</li>
-</ul>
+  <h1>User Guide</h1>
+
+<!-- BEGIN INCLUDE ../common-subs/coming-soon.md '&lt;!--coming-soon-start--&gt;' '&lt;!--coming-soon-end--&gt;' -->
+
+<p align="center">
+<img src="https://static.wixstatic.com/media/141bfd_f750b94d365a406f9bf5cf080d97c1c2~mv2.gif" width="600"  />
+</p>
+
+<!-- END INCLUDE -->
 
 
   

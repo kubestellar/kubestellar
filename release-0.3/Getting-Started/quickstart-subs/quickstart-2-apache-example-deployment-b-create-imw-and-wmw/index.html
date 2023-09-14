@@ -876,7 +876,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -952,8 +952,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1002,7 +1002,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1172,14 +1172,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1189,7 +1189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1644,17 +1644,15 @@
   <h1>Quickstart 2 apache example deployment b create imw and wmw</h1>
 
 <!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start-->
-<p>The above use of <code>kind</code> has knocked kcp's <code>kubectl ws</code> plugin off kilter, as the latter uses the local kubeconfig to store its state about the "current" and "previous" workspaces.  Get it back on track with the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>root
-</code></pre></div>
 <p>IMWs are used by KubeStellar to store inventory objects (<code>SyncTargets</code> and <code>Locations</code>). Create an IMW named <code>example-imw</code> with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>root
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
 </code></pre></div>
 <p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> in a <code>my-org</code> workspace with the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
 <!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end-->

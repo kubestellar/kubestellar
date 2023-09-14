@@ -612,26 +612,6 @@
     Prerequisites
   </a>
   
-    <nav class="md-nav" aria-label="Prerequisites">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#go" class="md-nav__link">
-    Go
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-packages" class="md-nav__link">
-    Other packages
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -667,13 +647,6 @@
   
     <nav class="md-nav" aria-label="Testing Locally">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#testing-changes-to-the-kubestellar-central-container-image" class="md-nav__link">
-    Testing changes to the KubeStellar central container image
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#testing-changes-to-the-bootstrap-script" class="md-nav__link">
@@ -1032,7 +1005,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Invitation to Contribute
+        Inivitation to Contribute
       </a>
     </li>
   
@@ -1108,8 +1081,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
-        KubeStellar Where Resolver
+      <a href="../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
+        KubeStellar Scheduler
       </a>
     </li>
   
@@ -1158,7 +1131,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1328,14 +1301,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1345,7 +1318,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1789,26 +1762,6 @@
     Prerequisites
   </a>
   
-    <nav class="md-nav" aria-label="Prerequisites">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#go" class="md-nav__link">
-    Go
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-packages" class="md-nav__link">
-    Other packages
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1844,13 +1797,6 @@
   
     <nav class="md-nav" aria-label="Testing Locally">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#testing-changes-to-the-kubestellar-central-container-image" class="md-nav__link">
-    Testing changes to the KubeStellar central container image
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#testing-changes-to-the-bootstrap-script" class="md-nav__link">
@@ -1922,22 +1868,16 @@
 <p>We can't wait to collaborate with you!</p>
 <h2 id="contributing-code">Contributing Code<a class="headerlink" href="#contributing-code" title="Permanent link">#</a></h2>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h3>
-<h4 id="go">Go<a class="headerlink" href="#go" title="Permanent link">#</a></h4>
-<p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.  See <a href="https://gist.github.com/jniltinho/8758e15a9ef80a189fce">this gist</a> for another way to install Go.
+<p><a href="https://golang.org/doc/install/">Install Go</a> 1.19+.
   Please note that the go language version numbers in these files must exactly agree:</p>
-<div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, and in all the kcp/.github/workflows yaml files that specify go-version.
+<div class="highlight"><pre><span></span><code>Your local go/go.mod file, kcp/.ci-operator.yaml, kcp/Dockerfile, and in all the kcp/.github/workflows yaml files that specify go-version.
 
 - In ./ci-operator.yaml the go version is indicated by the &quot;tag&quot; attribute.
+- In ./Dockerfile it is indicated by the &quot;golang&quot; attribute
 - In go.mod it is indicated by the &quot;go&quot; directive.
 - In the .github/workflows yaml files it is indicated by &quot;go-version&quot;
 </code></pre></div>
 <p>Check out our <a href="../../Getting-Started/quickstart/">QuickStart Guide</a></p>
-<h4 id="other-packages">Other packages<a class="headerlink" href="#other-packages" title="Permanent link">#</a></h4>
-<ul>
-<li>GNU make</li>
-<li><a href="https://github.com/ko-build/ko"><strong>ko</strong></a> (required for compiling KubeStellar Syncer)</li>
-<li><a href="https://github.com/slsa-framework"><strong>slsa-verifier</strong></a> needed in Ubuntu for ko signing</li>
-</ul>
 <h3 id="issues">Issues<a class="headerlink" href="#issues" title="Permanent link">#</a></h3>
 <p>Prioritization for pull requests is given to those that address and resolve existing GitHub issues. Utilize the available issue labels to identify meaningful and relevant issues to work on.</p>
 <p>If you believe that there is a need for a fix and no existing issue covers it, feel free to create a new one.</p>
@@ -1945,7 +1885,7 @@
 <p>Your assistance in improving documentation is highly valued, regardless of your level of experience with the project.</p>
 <p>To claim an issue that you are interested in, kindly leave a comment on the issue and request the maintainers to assign it to you.</p>
 <h3 id="committing">Committing<a class="headerlink" href="#committing" title="Permanent link">#</a></h3>
-<p>We encourage all contributors to adopt <a href="https://gist.github.com/luismts/495d982e8c5b1a0ced4a57cf3d93cf60">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
+<p>We encourage all contributors to adopt <a href="https://www.futurelearn.com/info/blog/telling-stories-with-your-git-history">best practices in git commit management</a> to facilitate efficient reviews and retrospective analysis. Your git commits should provide ample context for reviewers and future codebase readers.</p>
 <p>A recommended format for final commit messages is as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{Short Title}: {Problem this commit is solving and any important contextual information} {issue number if applicable}
 </code></pre></div>
@@ -1970,40 +1910,13 @@ example.  As a contributor you will want a different setup flow,
 including <code>git clone</code> of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
 there is a larger example at <a href="../../Coding%20Milestones/PoC2023q1/example1/">this link</a>.</p>
-<h3 id="testing-changes-to-the-kubestellar-central-container-image">Testing changes to the KubeStellar central container image<a class="headerlink" href="#testing-changes-to-the-kubestellar-central-container-image" title="Permanent link">#</a></h3>
-<p>If you make a change that affects the container image holding the
-central components then you will need to build a new image; perhaps
-surprisingly, this is not included in <code>make build</code>.  The regular way
-to build this image is with the following command.  It builds a
-multi-platform image, for all the platforms that KubeStellar can run
-its central components on, and pushes it to quay.io.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>kubestellar-image
-</code></pre></div>
-<p>However, that will only succeed if you have done <code>docker login</code> to
-quay.io with credentials authorized to write to the
-<code>kubestellar/kubestellar</code> repository.  Look on quay.io to find the
-image you just pushed, you will need its tag.</p>
-<p>For a less pushy alternative you can build a single-platform image and
-not push it, using the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>kubestellar-image-local
-</code></pre></div>
-<p>Follow that with <code>docker images</code> to find the tag of the image you just
-built.  Get that image:tag known where you are going to run the
-central container; for example, if that will be in a local <code>kind</code>
-cluster then you can use <a href="https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster">kind
-load</a>.</p>
-<p>To get the image you just built used in your testing, edit
-<code>scripts/kubectl-kubestellar-deploy</code> and update the line that defines
-<code>$image_tag</code>; follow this with your <code>make build</code>.  For the sake of
-future users of a merged change, your last edit like this should refer
-to a tag that you pushed to quay.io/kubestellar/kubestellar.</p>
 <h3 id="testing-changes-to-the-bootstrap-script">Testing changes to the bootstrap script<a class="headerlink" href="#testing-changes-to-the-bootstrap-script" title="Permanent link">#</a></h3>
-<p>The quickstart says to fetch the <a href="https://github.com/kubestellar/kubestellar/blob/main/bootstrap/bootstrap-kubestellar.sh">bootstrap script</a> from the main branch of
+<p>The quickstart says to fetch the <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/bootstrap/bootstrap-kubestellar.sh">bootstrap script</a> from the release-0.3 branch of
 the KubeStellar repo; if you want to contribute a change to that script then
 you will need to test your changed version.  Just run your local copy
 (perhaps in a special testing directory, just to be safe) and be sure
 to add the downloaded <code>bin</code> at the <em>front</em> of your <code>$PATH</code> (contrary
-to <a href="https://github.com/kubestellar/kubestellar/blob/main/bootstrap/bootstrap-kubestellar.sh">what the scripting currently tells
+to <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/bootstrap/bootstrap-kubestellar.sh">what the scripting currently tells
 you</a>) so that your <code>git clone</code>'s <code>bin</code> does not shadow the one being tested.</p>
 <p>Note that changes to the bootstrap script start being used by users as
 soon as your PR merges.  Since this script can only fetch a released
@@ -2025,7 +1938,7 @@ GitHub pull requests.</p>
 <p>By contributing to this project you agree to the Developer Certificate of
 Origin (DCO). This document was created by the Linux Kernel community and is a
 simple statement that you, as a contributor, have the legal right to make the
-contribution. See the <a href="https://github.com/kubestellar/kubestellar/blob/main/DCO">DCO</a></a> file for details.</p>
+contribution. See the <a href="https://github.com/kubestellar/kubestellar/blob/release-0.3/DCO">DCO</a></a> file for details.</p>
 
 
   
