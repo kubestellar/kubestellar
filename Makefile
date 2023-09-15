@@ -18,6 +18,8 @@ SHELL := /usr/bin/env bash -e
 CENTER_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
 CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +b%y-%m-%d-%H-%M-%S)
 
+SYNCER_PLATFORMS ?= linux/amd64,linux/arm64,linux/s390x
+
 GO_INSTALL = ./hack/go-install.sh
 
 TOOLS_DIR=hack/tools
@@ -142,16 +144,15 @@ kubestellar-image-local:
 
 # build and push kubestellar-syncer image by ko
 # e.g. usage:
-#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
 # This example builds ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
 .PHONY: build-kubestellar-syncer-image
-build-kubestellar-syncer-image: DOCKER_REPO ?= 
-build-kubestellar-syncer-image: IMAGE_TAG ?= latest
-build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
+build-kubestellar-syncer-image: DOCKER_REPO ?= quay.io/kubestellar/syncer
+build-kubestellar-syncer-image: IMAGE_TAG ?= git-${GIT_COMMIT}-${GIT_DIRTY}
 build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= 
 build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 .PHONY: build-kubestellar-syncer-image-local
