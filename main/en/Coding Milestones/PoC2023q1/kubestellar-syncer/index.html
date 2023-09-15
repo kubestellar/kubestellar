@@ -3402,7 +3402,7 @@ SyncTarget name, you could do it as follows.</p>
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
     the <code>bin</code> of KubeStellar.
-    For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:v0.2.2</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar-Syncer Image</a>.</li>
+    For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, <code>--syncer-image quay.io/kubestellar/syncer:git-08289ea05-clean</code>. You can also create a syncer image from the source following <a href="#build-kubestellar-syncer-image">Build KubeStellar-Syncer Image</a>.</li>
 <li>Deploy KubeStellar-Syncer on an Edge cluster</li>
 <li>Syncer starts to run on the Edge cluster<ul>
 <li>KubeStellar-Syncer starts watching and consuming SyncerConfig</li>
@@ -3646,10 +3646,24 @@ e.g.
 </code></pre></div></p>
 <h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry<a class="headerlink" href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" title="Permanent link">#</a></h3>
 <ol>
-<li><code>make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
+<li><code>make build-kubestellar-syncer-image</code></li>
 </ol>
+<p>The behavior can be modified with some make variables; their default values are what get used in a normal build.  The variables are as follows.</p>
+<ul>
+<li><code>DOCKER_REPO</code>, <code>IMAGE_TAG</code>: the built multi-platform manifest will
+  be pushed to <code>$DOCKER_REPO:$IMAGE_TAG</code>.  The default for
+  <code>DOCKER_REPO</code> is <code>quay.io/kubestellar/syncer</code>.  The default for
+  <code>IMAGE_TAG</code> is the concatenation of: "git-", a short ID of the
+  current git commit, "-", and either "clean" or "dirty" depending on
+  what <code>git status</code> has to say about it.</li>
+<li><code>SYNCER_PLATFORMS</code>: a
+  comma-separated list of <code>docker build</code> "platforms".  The default is
+  "linux/amd64,linux/arm64,linux/s390x".</li>
+<li><code>ADDITIONAL_ARGS</code>: a word that will be added into the <code>ko build</code> command line.
+  The default is the empty string.</li>
+</ul>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
 <a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
 <a id="__codelineno-104-3" name="__codelineno-104-3" href="#__codelineno-104-3"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
 <a id="__codelineno-104-4" name="__codelineno-104-4" href="#__codelineno-104-4"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
