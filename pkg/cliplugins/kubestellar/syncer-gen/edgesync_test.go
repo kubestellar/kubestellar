@@ -128,7 +128,7 @@ spec:
         - --from-kubeconfig=/kcp/kubeconfig
         - --sync-target-name=sync-target-name
         - --sync-target-uid=sync-target-uid
-        - --from-cluster=root:default:foo
+        - --from-cluster=123456789abcdefg # TODO: --from-cluster is no longer required but keep it for backward compatibility (see PR#999)
         - --qps=123.4
         - --burst=456
         - --v=3
@@ -153,18 +153,17 @@ spec:
 `
 
 	actualYAML, err := renderKubeStellarSyncerResources(templateInputForEdge{
-		ServerURL:      "server-url",
-		Token:          "token",
-		CAData:         "ca-data",
-		KCPNamespace:   "kcp-namespace",
-		Namespace:      "kubestellar-syncer-sync-target-name-34b23c4k",
-		SyncTargetPath: "root:default:foo",
-		SyncTarget:     "sync-target-name",
-		SyncTargetUID:  "sync-target-uid",
-		Image:          "image",
-		Replicas:       1,
-		QPS:            123.4,
-		Burst:          456,
+		ServerURL:     "server-url",
+		Token:         "token",
+		CAData:        "ca-data",
+		KCPNamespace:  "kcp-namespace",
+		Namespace:     "kubestellar-syncer-sync-target-name-34b23c4k",
+		SyncTarget:    "sync-target-name",
+		SyncTargetUID: "sync-target-uid",
+		Image:         "image",
+		Replicas:      1,
+		QPS:           123.4,
+		Burst:         456,
 	}, "kcp-syncer-sync-target-name-34b23c4k")
 	require.NoError(t, err)
 	require.Empty(t, cmp.Diff(expectedYAML, string(actualYAML)))

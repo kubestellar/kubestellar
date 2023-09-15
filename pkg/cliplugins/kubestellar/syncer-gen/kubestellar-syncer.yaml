@@ -112,7 +112,7 @@ spec:
         - --from-kubeconfig=/kcp/{{.SecretConfigKey}}
         - --sync-target-name={{.SyncTarget}}
         - --sync-target-uid={{.SyncTargetUID}}
-        - --from-cluster={{.SyncTargetPath}}
+        - --from-cluster=123456789abcdefg # TODO: --from-cluster is no longer required but keep it for backward compatibility (see PR#999)
         - --qps={{.QPS}}
         - --burst={{.Burst}}
         - --v=3

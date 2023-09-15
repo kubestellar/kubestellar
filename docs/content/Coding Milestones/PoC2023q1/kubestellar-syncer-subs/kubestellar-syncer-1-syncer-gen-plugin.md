@@ -90,10 +90,6 @@ b. Syncer image
 ```shell
 image="quay.io/kubestellar/syncer:v0.2.2"
 ```
-c. Logical cluster name
-```shell
-cluster_name=`kubectl get logicalclusters.core.kcp.io cluster -o custom-columns=":.metadata.annotations.kcp\.io\/cluster" --no-headers`
-```
 
 Download manifest template.
 ```shell
@@ -102,7 +98,7 @@ curl -LO {{ config.repo_raw_url }}/main/pkg/syncer/scripts/kubestellar-syncer-bo
 
 Generate manifests to bootstrap KubeStellar-Syncer.
 ```shell
-syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image cluster_name=$cluster_name envsubst < kubestellar-syncer-bootstrap.template.yaml
+syncer_id=$syncer_id cacrt=$cacrt token=$token server_url=$server_url downstream_namespace=$downstream_namespace image=$image envsubst < kubestellar-syncer-bootstrap.template.yaml
 ```
 ```
 ---
