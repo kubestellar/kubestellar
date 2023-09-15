@@ -3430,21 +3430,30 @@ directing the common workload to both edge clusters.</p>
 <a id="__codelineno-84-6" name="__codelineno-84-6" href="#__codelineno-84-6"></a><span class="s">spec:</span>
 <a id="__codelineno-84-7" name="__codelineno-84-7" href="#__codelineno-84-7"></a><span class="s">  locationSelectors:</span>
 <a id="__codelineno-84-8" name="__codelineno-84-8" href="#__codelineno-84-8"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;}</span>
-<a id="__codelineno-84-9" name="__codelineno-84-9" href="#__codelineno-84-9"></a><span class="s">  namespaceSelector:</span>
-<a id="__codelineno-84-10" name="__codelineno-84-10" href="#__codelineno-84-10"></a><span class="s">    matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-84-11" name="__codelineno-84-11" href="#__codelineno-84-11"></a><span class="s">  nonNamespacedObjects:</span>
-<a id="__codelineno-84-12" name="__codelineno-84-12" href="#__codelineno-84-12"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-84-13" name="__codelineno-84-13" href="#__codelineno-84-13"></a><span class="s">    resources: [ &quot;apibindings&quot; ]</span>
-<a id="__codelineno-84-14" name="__codelineno-84-14" href="#__codelineno-84-14"></a><span class="s">    resourceNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-84-15" name="__codelineno-84-15" href="#__codelineno-84-15"></a><span class="s">  upsync:</span>
-<a id="__codelineno-84-16" name="__codelineno-84-16" href="#__codelineno-84-16"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-84-17" name="__codelineno-84-17" href="#__codelineno-84-17"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-84-18" name="__codelineno-84-18" href="#__codelineno-84-18"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-84-19" name="__codelineno-84-19" href="#__codelineno-84-19"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-84-20" name="__codelineno-84-20" href="#__codelineno-84-20"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-84-21" name="__codelineno-84-21" href="#__codelineno-84-21"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-84-22" name="__codelineno-84-22" href="#__codelineno-84-22"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-84-23" name="__codelineno-84-23" href="#__codelineno-84-23"></a><span class="s">EOF</span>
+<a id="__codelineno-84-9" name="__codelineno-84-9" href="#__codelineno-84-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-84-10" name="__codelineno-84-10" href="#__codelineno-84-10"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+<a id="__codelineno-84-11" name="__codelineno-84-11" href="#__codelineno-84-11"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-84-12" name="__codelineno-84-12" href="#__codelineno-84-12"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-84-13" name="__codelineno-84-13" href="#__codelineno-84-13"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-84-14" name="__codelineno-84-14" href="#__codelineno-84-14"></a><span class="s">    objectNames: [ httpd-htdocs ]</span>
+<a id="__codelineno-84-15" name="__codelineno-84-15" href="#__codelineno-84-15"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-84-16" name="__codelineno-84-16" href="#__codelineno-84-16"></a><span class="s">    resources: [ replicasets ]</span>
+<a id="__codelineno-84-17" name="__codelineno-84-17" href="#__codelineno-84-17"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-84-18" name="__codelineno-84-18" href="#__codelineno-84-18"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-84-19" name="__codelineno-84-19" href="#__codelineno-84-19"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-84-20" name="__codelineno-84-20" href="#__codelineno-84-20"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-84-21" name="__codelineno-84-21" href="#__codelineno-84-21"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-84-22" name="__codelineno-84-22" href="#__codelineno-84-22"></a><span class="s">    namespaceSelectors: []</span>
+<a id="__codelineno-84-23" name="__codelineno-84-23" href="#__codelineno-84-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-84-24" name="__codelineno-84-24" href="#__codelineno-84-24"></a><span class="s">  upsync:</span>
+<a id="__codelineno-84-25" name="__codelineno-84-25" href="#__codelineno-84-25"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-84-26" name="__codelineno-84-26" href="#__codelineno-84-26"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-84-27" name="__codelineno-84-27" href="#__codelineno-84-27"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-84-28" name="__codelineno-84-28" href="#__codelineno-84-28"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-84-29" name="__codelineno-84-29" href="#__codelineno-84-29"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-84-30" name="__codelineno-84-30" href="#__codelineno-84-30"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-84-31" name="__codelineno-84-31" href="#__codelineno-84-31"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-84-32" name="__codelineno-84-32" href="#__codelineno-84-32"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
@@ -3539,21 +3548,30 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 <a id="__codelineno-89-6" name="__codelineno-89-6" href="#__codelineno-89-6"></a><span class="s">spec:</span>
 <a id="__codelineno-89-7" name="__codelineno-89-7" href="#__codelineno-89-7"></a><span class="s">  locationSelectors:</span>
 <a id="__codelineno-89-8" name="__codelineno-89-8" href="#__codelineno-89-8"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;,&quot;extended&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-89-9" name="__codelineno-89-9" href="#__codelineno-89-9"></a><span class="s">  namespaceSelector: </span>
-<a id="__codelineno-89-10" name="__codelineno-89-10" href="#__codelineno-89-10"></a><span class="s">    matchLabels: {&quot;special&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-89-11" name="__codelineno-89-11" href="#__codelineno-89-11"></a><span class="s">  nonNamespacedObjects:</span>
-<a id="__codelineno-89-12" name="__codelineno-89-12" href="#__codelineno-89-12"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-89-13" name="__codelineno-89-13" href="#__codelineno-89-13"></a><span class="s">    resources: [ &quot;apibindings&quot; ]</span>
-<a id="__codelineno-89-14" name="__codelineno-89-14" href="#__codelineno-89-14"></a><span class="s">    resourceNames: [ &quot;bind-kubernetes&quot; ]</span>
-<a id="__codelineno-89-15" name="__codelineno-89-15" href="#__codelineno-89-15"></a><span class="s">  upsync:</span>
-<a id="__codelineno-89-16" name="__codelineno-89-16" href="#__codelineno-89-16"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-89-17" name="__codelineno-89-17" href="#__codelineno-89-17"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-89-18" name="__codelineno-89-18" href="#__codelineno-89-18"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-89-19" name="__codelineno-89-19" href="#__codelineno-89-19"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-89-20" name="__codelineno-89-20" href="#__codelineno-89-20"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
-<a id="__codelineno-89-21" name="__codelineno-89-21" href="#__codelineno-89-21"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
-<a id="__codelineno-89-22" name="__codelineno-89-22" href="#__codelineno-89-22"></a><span class="s">    names: [&quot;*&quot;]</span>
-<a id="__codelineno-89-23" name="__codelineno-89-23" href="#__codelineno-89-23"></a><span class="s">EOF</span>
+<a id="__codelineno-89-9" name="__codelineno-89-9" href="#__codelineno-89-9"></a><span class="s">  downsync:</span>
+<a id="__codelineno-89-10" name="__codelineno-89-10" href="#__codelineno-89-10"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+<a id="__codelineno-89-11" name="__codelineno-89-11" href="#__codelineno-89-11"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-89-12" name="__codelineno-89-12" href="#__codelineno-89-12"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-89-13" name="__codelineno-89-13" href="#__codelineno-89-13"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-89-14" name="__codelineno-89-14" href="#__codelineno-89-14"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-89-15" name="__codelineno-89-15" href="#__codelineno-89-15"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-89-16" name="__codelineno-89-16" href="#__codelineno-89-16"></a><span class="s">    resources: [ deployments ]</span>
+<a id="__codelineno-89-17" name="__codelineno-89-17" href="#__codelineno-89-17"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-89-18" name="__codelineno-89-18" href="#__codelineno-89-18"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-89-19" name="__codelineno-89-19" href="#__codelineno-89-19"></a><span class="s">    objectNames: [ speciald ]</span>
+<a id="__codelineno-89-20" name="__codelineno-89-20" href="#__codelineno-89-20"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-89-21" name="__codelineno-89-21" href="#__codelineno-89-21"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-89-22" name="__codelineno-89-22" href="#__codelineno-89-22"></a><span class="s">    namespaceSelectors: []</span>
+<a id="__codelineno-89-23" name="__codelineno-89-23" href="#__codelineno-89-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-89-24" name="__codelineno-89-24" href="#__codelineno-89-24"></a><span class="s">  upsync:</span>
+<a id="__codelineno-89-25" name="__codelineno-89-25" href="#__codelineno-89-25"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-89-26" name="__codelineno-89-26" href="#__codelineno-89-26"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-89-27" name="__codelineno-89-27" href="#__codelineno-89-27"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-89-28" name="__codelineno-89-28" href="#__codelineno-89-28"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-89-29" name="__codelineno-89-29" href="#__codelineno-89-29"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
+<a id="__codelineno-89-30" name="__codelineno-89-30" href="#__codelineno-89-30"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
+<a id="__codelineno-89-31" name="__codelineno-89-31" href="#__codelineno-89-31"></a><span class="s">    names: [&quot;*&quot;]</span>
+<a id="__codelineno-89-32" name="__codelineno-89-32" href="#__codelineno-89-32"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
