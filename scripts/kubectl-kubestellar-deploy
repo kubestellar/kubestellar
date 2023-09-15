@@ -20,7 +20,7 @@
 
 KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
-image_tag=b23-08-18-21-58-09
+image_tag=b23-09-15-04-52-13
 
 external_endpoint=""
 openshift=false
