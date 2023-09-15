@@ -3541,26 +3541,23 @@ a. downstream_namespace where Syncer Pod runs
 </code></pre></div>
 b. Syncer image
 <div class="highlight"><pre><span></span><code><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
-</code></pre></div>
-c. Logical cluster name
-<div class="highlight"><pre><span></span><code><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a><span class="nv">cluster_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>logicalclusters.core.kcp.io<span class="w"> </span>cluster<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.annotations.kcp\.io\/cluster&quot;</span><span class="w"> </span>--no-headers<span class="sb">`</span>
 </code></pre></div></p>
 <p>Download manifest template.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span><span class="nv">cluster_name</span><span class="o">=</span><span class="nv">$cluster_name</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>---
-<a id="__codelineno-101-2" name="__codelineno-101-2" href="#__codelineno-101-2"></a>apiVersion: v1
-<a id="__codelineno-101-3" name="__codelineno-101-3" href="#__codelineno-101-3"></a>kind: Namespace
-<a id="__codelineno-101-4" name="__codelineno-101-4" href="#__codelineno-101-4"></a>metadata:
-<a id="__codelineno-101-5" name="__codelineno-101-5" href="#__codelineno-101-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
-<a id="__codelineno-101-6" name="__codelineno-101-6" href="#__codelineno-101-6"></a>---
-<a id="__codelineno-101-7" name="__codelineno-101-7" href="#__codelineno-101-7"></a>apiVersion: v1
-<a id="__codelineno-101-8" name="__codelineno-101-8" href="#__codelineno-101-8"></a>kind: ServiceAccount
-<a id="__codelineno-101-9" name="__codelineno-101-9" href="#__codelineno-101-9"></a>metadata:
-<a id="__codelineno-101-10" name="__codelineno-101-10" href="#__codelineno-101-10"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a>---
+<a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a>apiVersion: v1
+<a id="__codelineno-100-3" name="__codelineno-100-3" href="#__codelineno-100-3"></a>kind: Namespace
+<a id="__codelineno-100-4" name="__codelineno-100-4" href="#__codelineno-100-4"></a>metadata:
+<a id="__codelineno-100-5" name="__codelineno-100-5" href="#__codelineno-100-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
+<a id="__codelineno-100-6" name="__codelineno-100-6" href="#__codelineno-100-6"></a>---
+<a id="__codelineno-100-7" name="__codelineno-100-7" href="#__codelineno-100-7"></a>apiVersion: v1
+<a id="__codelineno-100-8" name="__codelineno-100-8" href="#__codelineno-100-8"></a>kind: ServiceAccount
+<a id="__codelineno-100-9" name="__codelineno-100-9" href="#__codelineno-100-9"></a>metadata:
+<a id="__codelineno-100-10" name="__codelineno-100-10" href="#__codelineno-100-10"></a>...
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -3680,79 +3677,79 @@ c. Logical cluster name
 <ol>
 <li><code>make build-kubestellar-syncer-image-local</code>
 e.g.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a>$ make build-kubestellar-syncer-image-local
-<a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
-<a id="__codelineno-102-3" name="__codelineno-102-3" href="#__codelineno-102-3"></a>2023/04/24 11:50:38 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
-<a id="__codelineno-102-4" name="__codelineno-102-4" href="#__codelineno-102-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-102-5" name="__codelineno-102-5" href="#__codelineno-102-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-102-6" name="__codelineno-102-6" href="#__codelineno-102-6"></a>2023/04/24 11:50:40 Adding tag latest
-<a id="__codelineno-102-7" name="__codelineno-102-7" href="#__codelineno-102-7"></a>2023/04/24 11:50:40 Added tag latest
-<a id="__codelineno-102-8" name="__codelineno-102-8" href="#__codelineno-102-8"></a>kubestellar-syncer image:
-<a id="__codelineno-102-9" name="__codelineno-102-9" href="#__codelineno-102-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<div class="highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>$ make build-kubestellar-syncer-image-local
+<a id="__codelineno-101-2" name="__codelineno-101-2" href="#__codelineno-101-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
+<a id="__codelineno-101-3" name="__codelineno-101-3" href="#__codelineno-101-3"></a>2023/04/24 11:50:38 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
+<a id="__codelineno-101-4" name="__codelineno-101-4" href="#__codelineno-101-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-101-5" name="__codelineno-101-5" href="#__codelineno-101-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-101-6" name="__codelineno-101-6" href="#__codelineno-101-6"></a>2023/04/24 11:50:40 Adding tag latest
+<a id="__codelineno-101-7" name="__codelineno-101-7" href="#__codelineno-101-7"></a>2023/04/24 11:50:40 Added tag latest
+<a id="__codelineno-101-8" name="__codelineno-101-8" href="#__codelineno-101-8"></a>kubestellar-syncer image:
+<a id="__codelineno-101-9" name="__codelineno-101-9" href="#__codelineno-101-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 </code></pre></div>
 <code>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96</code> is the image stored in your local Docker registry.</li>
 </ol>
 <p>You can also set a shell variable to the output of this Make task.</p>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a>image=`make build-kubestellar-syncer-image-local`
+<div class="highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a>image=`make build-kubestellar-syncer-image-local`
 </code></pre></div></p>
 <h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry<a class="headerlink" href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" title="Permanent link">#</a></h3>
 <ol>
 <li><code>make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64</code></li>
 </ol>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
-<a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
-<a id="__codelineno-104-3" name="__codelineno-104-3" href="#__codelineno-104-3"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
-<a id="__codelineno-104-4" name="__codelineno-104-4" href="#__codelineno-104-4"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
-<a id="__codelineno-104-5" name="__codelineno-104-5" href="#__codelineno-104-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
-<a id="__codelineno-104-6" name="__codelineno-104-6" href="#__codelineno-104-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
-<a id="__codelineno-104-7" name="__codelineno-104-7" href="#__codelineno-104-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
-<a id="__codelineno-104-8" name="__codelineno-104-8" href="#__codelineno-104-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
-<a id="__codelineno-104-9" name="__codelineno-104-9" href="#__codelineno-104-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
-<a id="__codelineno-104-10" name="__codelineno-104-10" href="#__codelineno-104-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
-<a id="__codelineno-104-11" name="__codelineno-104-11" href="#__codelineno-104-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
-<a id="__codelineno-104-12" name="__codelineno-104-12" href="#__codelineno-104-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
-<a id="__codelineno-104-13" name="__codelineno-104-13" href="#__codelineno-104-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
-<a id="__codelineno-104-14" name="__codelineno-104-14" href="#__codelineno-104-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
-<a id="__codelineno-104-15" name="__codelineno-104-15" href="#__codelineno-104-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
-<a id="__codelineno-104-16" name="__codelineno-104-16" href="#__codelineno-104-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
-<a id="__codelineno-104-17" name="__codelineno-104-17" href="#__codelineno-104-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
-<a id="__codelineno-104-18" name="__codelineno-104-18" href="#__codelineno-104-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
-<a id="__codelineno-104-19" name="__codelineno-104-19" href="#__codelineno-104-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-104-20" name="__codelineno-104-20" href="#__codelineno-104-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
-<a id="__codelineno-104-21" name="__codelineno-104-21" href="#__codelineno-104-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
-<a id="__codelineno-104-22" name="__codelineno-104-22" href="#__codelineno-104-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-104-23" name="__codelineno-104-23" href="#__codelineno-104-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-<a id="__codelineno-104-24" name="__codelineno-104-24" href="#__codelineno-104-24"></a>kubestellar-syncer image
-<a id="__codelineno-104-25" name="__codelineno-104-25" href="#__codelineno-104-25"></a>ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<div class="highlight"><pre><span></span><code><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+<a id="__codelineno-103-2" name="__codelineno-103-2" href="#__codelineno-103-2"></a>2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
+<a id="__codelineno-103-3" name="__codelineno-103-3" href="#__codelineno-103-3"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
+<a id="__codelineno-103-4" name="__codelineno-103-4" href="#__codelineno-103-4"></a>2023/04/24 11:50:17 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
+<a id="__codelineno-103-5" name="__codelineno-103-5" href="#__codelineno-103-5"></a>2023/04/24 11:50:18 Publishing ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
+<a id="__codelineno-103-6" name="__codelineno-103-6" href="#__codelineno-103-6"></a>2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
+<a id="__codelineno-103-7" name="__codelineno-103-7" href="#__codelineno-103-7"></a>2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
+<a id="__codelineno-103-8" name="__codelineno-103-8" href="#__codelineno-103-8"></a>2023/04/24 11:50:21 ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
+<a id="__codelineno-103-9" name="__codelineno-103-9" href="#__codelineno-103-9"></a>2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
+<a id="__codelineno-103-10" name="__codelineno-103-10" href="#__codelineno-103-10"></a>2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
+<a id="__codelineno-103-11" name="__codelineno-103-11" href="#__codelineno-103-11"></a>2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
+<a id="__codelineno-103-12" name="__codelineno-103-12" href="#__codelineno-103-12"></a>2023/04/24 11:50:23 ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
+<a id="__codelineno-103-13" name="__codelineno-103-13" href="#__codelineno-103-13"></a>2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
+<a id="__codelineno-103-14" name="__codelineno-103-14" href="#__codelineno-103-14"></a>2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
+<a id="__codelineno-103-15" name="__codelineno-103-15" href="#__codelineno-103-15"></a>2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
+<a id="__codelineno-103-16" name="__codelineno-103-16" href="#__codelineno-103-16"></a>2023/04/24 11:50:25 ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
+<a id="__codelineno-103-17" name="__codelineno-103-17" href="#__codelineno-103-17"></a>2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
+<a id="__codelineno-103-18" name="__codelineno-103-18" href="#__codelineno-103-18"></a>2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
+<a id="__codelineno-103-19" name="__codelineno-103-19" href="#__codelineno-103-19"></a>2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-103-20" name="__codelineno-103-20" href="#__codelineno-103-20"></a>2023/04/24 11:50:27 ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
+<a id="__codelineno-103-21" name="__codelineno-103-21" href="#__codelineno-103-21"></a>2023/04/24 11:50:27 Published ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+<a id="__codelineno-103-22" name="__codelineno-103-22" href="#__codelineno-103-22"></a>echo KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-103-23" name="__codelineno-103-23" href="#__codelineno-103-23"></a>KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
+<a id="__codelineno-103-24" name="__codelineno-103-24" href="#__codelineno-103-24"></a>kubestellar-syncer image
+<a id="__codelineno-103-25" name="__codelineno-103-25" href="#__codelineno-103-25"></a>ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
 </code></pre></div>
 <code>ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510</code> is the image pushed to the registry.</p>
 <h2 id="teardown-the-environment_1">Teardown the environment<a class="headerlink" href="#teardown-the-environment_1" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-105-3" name="__codelineno-105-3" href="#__codelineno-105-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-105-4" name="__codelineno-105-4" href="#__codelineno-105-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
-<a id="__codelineno-105-5" name="__codelineno-105-5" href="#__codelineno-105-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-105-6" name="__codelineno-105-6" href="#__codelineno-105-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-105-7" name="__codelineno-105-7" href="#__codelineno-105-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
-<a id="__codelineno-105-8" name="__codelineno-105-8" href="#__codelineno-105-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-105-9" name="__codelineno-105-9" href="#__codelineno-105-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-104-3" name="__codelineno-104-3" href="#__codelineno-104-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-104-4" name="__codelineno-104-4" href="#__codelineno-104-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<a id="__codelineno-104-5" name="__codelineno-104-5" href="#__codelineno-104-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-104-6" name="__codelineno-104-6" href="#__codelineno-104-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-104-7" name="__codelineno-104-7" href="#__codelineno-104-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
+<a id="__codelineno-104-8" name="__codelineno-104-8" href="#__codelineno-104-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-104-9" name="__codelineno-104-9" href="#__codelineno-104-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes_1">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes_1" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload_1">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload_1" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
