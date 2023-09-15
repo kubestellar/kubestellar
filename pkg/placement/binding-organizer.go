@@ -40,27 +40,6 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			workloadProjector: workloadProjector,
 			perSourceCluster:  NewMapMap[logicalcluster.Name, *simpleBindingPerCluster](nil),
 		}
-		namespaceDistributionsRelay := SetWriterFuncs[NamespaceDistributionTuple]{
-			OnAdd: func(tup NamespaceDistributionTuple) bool {
-				logger.V(4).Info("NamespaceDistributionTuple added", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespaceDistributions.Add(tup)
-			},
-			OnRemove: func(tup NamespaceDistributionTuple) bool {
-				logger.V(4).Info("NamespaceDistributionTuple removed", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespaceDistributions.Remove(tup)
-			}}
-		namespacedResourceDistributionRelay := SetWriterFuncs[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]]{
-			OnAdd: func(tup Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]) bool {
-				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
-				logger.V(4).Info("NamespacedResourceDistributionTuple added", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Add(dist)
-			},
-			OnRemove: func(tup Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]) bool {
-				dist := NamespacedResourceDistributionTuple{tup.First, ProjectionModeKey{tup.Second, tup.Third}}
-				logger.V(4).Info("NamespacedResourceDistributionTuple removed", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespacedResourceDistributions.Remove(dist)
-			},
-		}
 		namespacedModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
 				logger.V(4).Info("NamespacedModes.Put", "key", mk, "val", val)
@@ -72,62 +51,65 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		}
 
-		nsToAggregate := NewFactoredMapMapAggregator[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement],
-			ProjectionModeKey, logicalcluster.Name, ProjectionModeVal, ProjectionModeVal](
-			factorNamespacedJoinKeyLessNS,
+		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
+			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
+			},
+			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+			})
+
+		namespacedDistributionsReceiver := SetWriterFuncs[NamespacedDistributionTuple]{
+			OnAdd: func(tup NamespacedDistributionTuple) bool {
+				logger.V(4).Info("NamespacedDistributionTuple added", "tuple", tup)
+				return sbo.workloadProjectionSections.NamespacedDistributions.Add(tup)
+			},
+			OnRemove: func(tup NamespacedDistributionTuple) bool {
+				logger.V(4).Info("NamespacedDistributionTuple removed", "tuple", tup)
+				return sbo.workloadProjectionSections.NamespacedDistributions.Remove(tup)
+			},
+		}
+		aggregateForNamespaced := NewFactoredMapMapAggregator[NamespacedDistributionTuple, ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/, ProjectionModeVal, ProjectionModeVal](
+			PairFactorer[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/](),
 			nil,
 			nil,
-			pickThe1[ProjectionModeKey, logicalcluster.Name](sbo.logger, "Should not happen: version difference between namespaces"),
+			pickThe1[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/](sbo.logger, "Not implemented yet: handling version conflicts for cluster-scoped resources"),
 			namespacedModesReceiver,
 		)
 
-		nsCommon := MappingReceiverFork[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal]{
-			NewLoggingMappingReceiver[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal]("nsCommon", logger.V(4)),
-			MapKeySetReceiverLossy[Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement], ProjectionModeVal](namespacedResourceDistributionRelay),
-			nsToAggregate}
+		var nsSansEPName MappingReceiver[NamespacedDistributionTuple, ProjectionModeVal] = MappingReceiverFork[NamespacedDistributionTuple, ProjectionModeVal]{
+			MapKeySetReceiverLossy[NamespacedDistributionTuple, ProjectionModeVal](namespacedDistributionsReceiver),
+			aggregateForNamespaced,
+		}
 
-		rscDisco, nsSrcAndDest := NewDynamicFullJoin12VWith13[logicalcluster.Name, metav1.GroupResource, SinglePlacement, ProjectionModeVal](
-			logger, nsCommon)
-		// sbo.resourceDiscoveryReceiver = rscDisco
-		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
-			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
-				rscMode := resourceModes(key.Second)
-				if rscMode.GoesToMailbox() {
-					logger.V(4).Info("Binder got namespaced resource", "key", key, "val", val)
-					rscDisco.Put(key, val)
-				} else {
-					logger.V(4).Info("Ignoring namespaced resource because it does not propagate", "key", key, "val", val)
+		pickVersionForEP := func(versions Map[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
+			var version ProjectionModeVal
+			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
+				version = pair.Second
+				return errStop
+			}) == nil {
+				return version, false
+			}
+			return version, true
+		}
+
+		namespacedChangeReceiver := MappingReceiverFuncs[NamespacedDistributionTuple, Map[string /*epName*/, ProjectionModeVal]]{
+			OnPut: func(nndt NamespacedDistributionTuple, versions Map[string /*epName*/, ProjectionModeVal]) {
+				version, ok := pickVersionForEP(versions)
+				if !ok {
+					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
 				}
+				nsSansEPName.Put(nndt, version)
 			},
-			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
-				rscMode := resourceModes(key.Second)
-				if rscMode.GoesToMailbox() {
-					logger.V(4).Info("Binder told there is no such namespaced resource", "key", key)
-					rscDisco.Delete(key)
-				} else {
-					logger.V(4).Info("Ignoring resource because it does not propagate", "key", key)
-				}
-			})
-		nsSrcAndDestAndLog := NewSetWriterFuncs( // logging and the ability to set breakpoints
-			func(elt Pair[logicalcluster.Name, SinglePlacement]) bool {
-				news := nsSrcAndDest.Add(elt)
-				logger.V(4).Info("Add to nsSrcAndDest", "tuple", elt, "news", news)
-				return news
+			OnDelete: func(nndt NamespacedDistributionTuple) {
+				nsSansEPName.Delete(nndt)
 			},
-			func(elt Pair[logicalcluster.Name, SinglePlacement]) bool {
-				news := nsSrcAndDest.Remove(elt)
-				logger.V(4).Info("Remove from nsSrcAndDest", "tuple", elt, "news", news)
-				return news
-			},
+		}
+
+		sbo.namespacedWhatWhereFull = NewFactoredMapMap[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, string /* ep name */, ProjectionModeVal](
+			factorNamespacedWhatWhereFullKey,
+			nil,
+			nil,
+			namespacedChangeReceiver,
 		)
-
-		nsToGoLoseNamespace := NewSetChangeProjectorByMapMap(
-			TripleFactorerTo13and2[logicalcluster.Name, NamespaceName, SinglePlacement](), nsSrcAndDestAndLog)
-
-		nsToGo := SetWriterFork[NamespaceDistributionTuple](false, namespaceDistributionsRelay, nsToGoLoseNamespace)
-
-		sbo.namespacedWhatWhereFull = NewSetChangeProjectorByMapMap(
-			factorNamespacedWhatWhereFullKey, nsToGo)
 
 		clusterDistributionsReceiver := SetWriterFuncs[NonNamespacedDistributionTuple]{
 			OnAdd: func(nnd NonNamespacedDistributionTuple) bool {
@@ -159,16 +141,6 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		var ctSansEPName MappingReceiver[NonNamespacedDistributionTuple, ProjectionModeVal] = MappingReceiverFork[NonNamespacedDistributionTuple, ProjectionModeVal]{
 			MapKeySetReceiverLossy[NonNamespacedDistributionTuple, ProjectionModeVal](clusterDistributionsReceiver),
 			aggregateForCluster,
-		}
-		pickVersionForEP := func(versions Map[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
-			var version ProjectionModeVal
-			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
-				version = pair.Second
-				return errStop
-			}) == nil {
-				return version, false
-			}
-			return version, true
 		}
 		// clusterChangeReceiver receives the change stream of the full map and projects out the EdgePlacement
 		// object name to feed to sansEPName.
@@ -232,28 +204,22 @@ var factorUpsyncTuple = NewFactorer(
 // separately.
 //
 // For the namespaced resources, as a SingleBinder this organizer
-// is given the stream of changes to following three relations:
-// - WhatWheres: set of ((epCluster,epName),(namespace,destination))
-// - DiscoG: map of (epCluster,APIGroup) -> APIVersionInfo
-// - DiscoR: map of (epCluster,GroupResource) -> APIVersion (the preferred one)
-// and produces change streams for the following three relations:
-// - nsToGo: set of NamespaceDistributionTuple (epCluster,namespace,destination)
-// - set of NamespacedResourceDistributionTuple (epCluster,GroupResource,destination)
+// is given the stream of change to following relations:
+// - WhatWheres: map of ((epCluster,epName),(GroupResource,NSName,ObjName),destination) -> APIVersion
+// and produces the change streams to the following two relations:
+// - set of NamespacedDistributionTuple ((GroupResource,destination), (epCluster,NSName,ObjName))
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
-// As a relational expression, the desired computation is as follows.
-// nsToGo = WhatWhere.ProjectOut(epName)
-// nsCommon = DiscoR.Equijoin(nsToGo.ProjectOut(namespace))
-// (that's a map (epCluster,GroupResource,destination) -> APIVesion)
-// NamespacedResourceDistributionTuples = nsCommon.Keys()
-// ProjectionsModes = nsCommon.GroupBy(GroupResource,destination).Aggregate(PickVersion)
+// As a relational algebra expression, the desired computation is as follows.
+// common = WhatWheres.ProjectOut(epName)
+// (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> APIVersion)
+// NamespacedDistributionTuples = common.Keys()
+// ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
-// nsModesReceiver <- nsCommon.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// NamespacedResourceDistributionTuples <- nsCommon.Keys()
-// nsCommon <- Equijoin(DiscoR, nsSrcAndDest)
-// nsSrcAndDest <- nsToGo.ProjectOut(namespace)
-// nsToGo <- WhatWheres.ProjectOut(epName)
+// nsModesReceiver <- nsSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
+// nsDistributionsReceiver <- nsSansEPName.Keys()
+// nsSansEPName <- WhatWheres.ProjectOut(epName)
 //
 // For the cluster-scoped resources, as a SingleBinder this organizer
 // is given the stream of change to following relations:
@@ -303,18 +269,10 @@ type simpleBindingOrganizer struct {
 	// only be invoked during a transaction.
 
 	clusterWhatWhereFull      MappingReceiver[ClusterWhatWhereFullKey, ProjectionModeVal]
-	namespacedWhatWhereFull   SetWriter[NamespacedWhatWhereFullKey]
+	namespacedWhatWhereFull   MappingReceiver[NamespacedWhatWhereFullKey, ProjectionModeVal]
 	upsyncsFull               SetWriter[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]]
 	resourceDiscoveryReceiver MappingReceiver[ResourceDiscoveryKey, ProjectionModeVal]
 }
-
-type NamespaceName string
-
-type NamespaceAndDestination = Pair[NamespaceName, SinglePlacement]
-
-type SourceAndDestination = Pair[logicalcluster.Name, SinglePlacement]
-
-type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]
 
 var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name]{
 	First: func(whole NamespacedJoinKeyLessnS) Pair[ProjectionModeKey, logicalcluster.Name] {
@@ -346,20 +304,19 @@ func pickThe1[KeyPartA, KeyPartB comparable](logger klog.Logger, errmsg string) 
 	}
 }
 
-var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespaceDistributionTuple, string /*epName*/]{
-	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespaceDistributionTuple, string /*epName*/] {
-		return Pair[NamespaceDistributionTuple, string /*epName*/]{
-			First: Triple[logicalcluster.Name, NamespaceName, SinglePlacement]{
-				nfk.First.Cluster,
-				nfk.Second,
-				nfk.Third},
+var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, string /*epName*/]{
+	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespacedDistributionTuple, string /*epName*/] {
+		return Pair[NamespacedDistributionTuple, string /*epName*/]{
+			First: NewPair(
+				ProjectionModeKey{nfk.Second.First, nfk.Third},
+				NewTriple(nfk.First.Cluster, nfk.Second.Second, nfk.Second.Third)),
 			Second: nfk.First.Name}
 	},
-	Second: func(parts Pair[NamespaceDistributionTuple, string /*epName*/]) NamespacedWhatWhereFullKey {
+	Second: func(parts Pair[NamespacedDistributionTuple, string /*epName*/]) NamespacedWhatWhereFullKey {
 		return NamespacedWhatWhereFullKey{
-			First:  ExternalName{parts.First.First, parts.Second},
-			Second: parts.First.Second,
-			Third:  parts.First.Third}
+			First:  ExternalName{parts.First.Second.First, parts.Second},
+			Second: NewTriple(parts.First.First.GroupResource, parts.First.Second.Second, parts.First.Second.Third),
+			Third:  parts.First.First.Destination}
 	},
 }
 
@@ -391,7 +348,7 @@ var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespa
 
 type ResourceDiscoveryKey = Pair[logicalcluster.Name /*wmw*/, metav1.GroupResource]
 
-type NamespacedWhatWhereFullKey = Triple[ExternalName, NamespaceName, SinglePlacement]
+type NamespacedWhatWhereFullKey = Triple[ExternalName, WorkloadPartID, SinglePlacement]
 
 // ClusterWhatWhereFullKey is (EdgePlacement id, (resource, object name), destination)
 type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], SinglePlacement]
@@ -423,27 +380,25 @@ type sboXnOps struct {
 
 func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], val WorkloadPartDetails) {
 	sbo := sxo.sbo
-	rscMode := sbo.resourceModes(metav1.GroupResource{Group: tup.Second.APIGroup, Resource: tup.Second.Resource})
+	rscMode := sbo.resourceModes(tup.Second.First)
 	if !rscMode.GoesToMailbox() {
 		sbo.logger.V(4).Info("Ignoring WhatWhere tuple because it does not go to the mailbox workspaces", "tup", tup, "rscMode", rscMode)
 		return
 	}
 	sbo.getSourceCluster(tup.First.Cluster, true)
-	gr := tup.Second.GroupResource()
-	if mgrIsNamespace(gr) {
-		wwTup := NamespacedWhatWhereFullKey{tup.First, NamespaceName(tup.Second.Name), tup.Third}
-		sbo.namespacedWhatWhereFull.Add(wwTup)
-		if !val.IncludeNamespaceObject {
-			return
-		}
+	gr := tup.Second.First
+	namespaced := len(tup.Second.Second) > 0
+	if namespaced {
+		sbo.namespacedWhatWhereFull.Put(tup, ProjectionModeVal{val.APIVersion})
+	} else {
+		key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, string(tup.Second.Third)}, tup.Third}
+		sbo.clusterWhatWhereFull.Put(key, ProjectionModeVal{APIVersion: val.APIVersion})
 	}
-	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, tup.Second.Name}, tup.Third}
-	sbo.clusterWhatWhereFull.Put(key, ProjectionModeVal{APIVersion: val.APIVersion})
 }
 
 func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacement]) {
 	sbo := sxo.sbo
-	rscMode := sbo.resourceModes(metav1.GroupResource{Group: tup.Second.APIGroup, Resource: tup.Second.Resource})
+	rscMode := sbo.resourceModes(tup.Second.First)
 	if !rscMode.GoesToMailbox() {
 		sbo.logger.V(4).Info("Ignoring WhatWhere tuple because it does not go to the mailbox workspaces", "tup", tup, "rscMode", rscMode)
 		return
@@ -452,12 +407,12 @@ func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacem
 	if sbc == nil {
 		return
 	}
-	gr := tup.Second.GroupResource()
-	if mgrIsNamespace(gr) /* && !val.IncludeNamespaceObject */ {
-		wwTup := NamespacedWhatWhereFullKey{tup.First, NamespaceName(tup.Second.Name), tup.Third}
-		sbo.namespacedWhatWhereFull.Remove(wwTup)
+	gr := tup.Second.First
+	namespaced := len(tup.Second.Second) > 0
+	if namespaced /* && !val.IncludeNamespaceObject */ {
+		sbo.namespacedWhatWhereFull.Delete(tup)
 	}
-	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, tup.Second.Name}, tup.Third}
+	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, string(tup.Second.Third)}, tup.Third}
 	sbo.clusterWhatWhereFull.Delete(key)
 	if false {
 		// TODO: make this happen iff there is no remaining data for the cluster
@@ -538,11 +493,4 @@ func (srr sbcResourceReceiver) Delete(gr metav1.GroupResource) {
 
 func mgrIsNamespace(gr metav1.GroupResource) bool {
 	return gr.Group == "" && gr.Resource == "namespaces"
-}
-
-func (partID WorkloadPartID) GroupResource() metav1.GroupResource {
-	return metav1.GroupResource{
-		Group:    partID.APIGroup,
-		Resource: partID.Resource,
-	}
 }

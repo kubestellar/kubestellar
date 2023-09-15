@@ -6,10 +6,10 @@ metadata:
 spec:
   latestResourceSchemas:
   - v230810-2d48e9f7.customizers.edge.kubestellar.io
-  - v230810-2d48e9f7.edgeplacements.edge.kubestellar.io
   - v230810-2d48e9f7.edgesyncconfigs.edge.kubestellar.io
   - v230810-2d48e9f7.locations.edge.kubestellar.io
   - v230810-2d48e9f7.singleplacementslices.edge.kubestellar.io
   - v230810-2d48e9f7.synctargets.edge.kubestellar.io
   - v230817-d752f622.syncerconfigs.edge.kubestellar.io
+  - v230908-a60d362c.edgeplacements.edge.kubestellar.io
 status: {}

@@ -73,18 +73,15 @@ type EdgePlacement struct {
 }
 
 // EdgePlacementSpec holds a desired binding between (a) a set of Locations and
-// (b) a set of objects to downsync and a way of identifying objects to upsync.
+// (b) a way of identifying objects to downsync and a way of identifying objects to upsync.
 type EdgePlacementSpec struct {
 	// `locationSelectors` identifies the relevant Location objects in terms of their labels.
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
 	LocationSelectors []metav1.LabelSelector `json:"locationSelectors,omitempty"`
 
-	// `namespaceSelector` identifies the relevant Namespace objects in terms of their labels.
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector,omitempty"`
-
-	// `nonNamespacedObjects` defines the non-namespaced objects to bind with the selected Locations.
-	// +optional
-	NonNamespacedObjects []NonNamespacedObjectReferenceSet `json:"nonNamespacedObjects,omitempty"`
+	// `downsync` selects the objects to bind with the selected Locations for downsync.
+	// An object is selected if it matches at least one member of this list.
+	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
 
 	// `upsync` identifies objects to upsync.
 	// An object matches `upsync` if and only if it matches at least one member of `upsync`.
@@ -92,13 +89,13 @@ type EdgePlacementSpec struct {
 	Upsync []UpsyncSet `json:"upsync,omitempty"`
 }
 
-// NonNamespacedObjectReferenceSet specifies a set of non-namespaced objects
-// from one particular API group.
-// An object is in this set if:
-// - its API group is the one listed;
-// - its resource (lowercase plural form of object type) is one of those listed; and
-// - EITHER its name is listed OR its labels match one of the label selectors.
-type NonNamespacedObjectReferenceSet struct {
+// DownsyncObjectTest is a set of criteria that characterize matching objects.
+// An object matches if:
+// - the `apiGroup` criterion is satisfied;
+// - the `resources` criterion is satisfied;
+// - the `namespaceSelectors` criterion is satisfied; and
+// - EITHER the `objectNames` criterion or the `labelSelectors` criterion matches.
+type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	APIGroup string `json:"apiGroup,omitempty"`
 
@@ -107,12 +104,19 @@ type NonNamespacedObjectReferenceSet struct {
 	// Empty list means nothing matches.
 	Resources []string `json:"resources"`
 
-	// `resourceNames` is a list of objects that match by name.
+	// `namespaceSelectors` tests the labels on the object's namespace.
+	// A non-namespaced object matches if and only if this list is empty.
+	// A namespaced object matches if and only if the namespace's labels match
+	// at least one member of this list.
+	NamespaceSelectors []metav1.LabelSelector `json:"namespaceSelectors"`
+
+	// `objectNames` is a list of object names that match.
 	// An entry of `"*"` means that all match.
 	// Empty list means nothing matches.
-	ResourceNames []string `json:"resourceNames,omitempty"`
+	ObjectNames []string `json:"objectNames,omitempty"`
 
 	// `labelSelectors` allows matching objects by a rule rather than listing individuals.
+	// An object maches if and only if its labels match at least one member of this list.
 	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
 }
 

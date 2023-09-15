@@ -150,12 +150,21 @@ metadata:
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod"}
-  namespaceSelector:
-    matchLabels: {"common":"si"}
-  nonNamespacedObjects:
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ httpd-htdocs ]
+  - apiGroup: apps
+    resources: [ replicasets ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ "*" ]
   - apiGroup: apis.kcp.io
-    resources: [ "apibindings" ]
-    resourceNames: [ "bind-kubernetes", "bind-apps" ]
+    resources: [ apibindings ]
+    namespaceSelectors: []
+    objectNames: [ "bind-kubernetes", "bind-apps" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
@@ -271,12 +280,21 @@ metadata:
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod","extended":"si"}
-  namespaceSelector: 
-    matchLabels: {"special":"si"}
-  nonNamespacedObjects:
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaceSelectors:
+    - matchLabels: {"special":"si"}
+    objectNames: [ "*" ]
+  - apiGroup: apps
+    resources: [ deployments ]
+    namespaceSelectors:
+    - matchLabels: {"special":"si"}
+    objectNames: [ speciald ]
   - apiGroup: apis.kcp.io
-    resources: [ "apibindings" ]
-    resourceNames: [ "bind-kubernetes" ]
+    resources: [ apibindings ]
+    namespaceSelectors: []
+    objectNames: [ "bind-kubernetes", "bind-apps" ]
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]

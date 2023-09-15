@@ -16,7 +16,7 @@ limitations under the License.
 
 package placement
 
-// Identity1 is useful in reduers where the accumulator has the same type as the result
+// Identity1 is useful in reducers where the accumulator has the same type as the result
 func Identity1[Val any](val Val) Val { return val }
 
 func NewThunk[Val any](val Val) func() Val { return func() Val { return val } }

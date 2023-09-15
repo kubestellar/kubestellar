@@ -112,6 +112,15 @@ func (vs VisitableStringerVal[Elt]) String() string {
 	return ans.String()
 }
 
+func VisitableMap[Domain, Range any](visitable Visitable[Domain], mapFn func(Domain) Range) Visitable[Range] {
+	return VisitableFunc[Range](func(visitor func(Range) error) error {
+		return visitable.Visit(func(input Domain) error {
+			mapped := mapFn(input)
+			return visitor(mapped)
+		})
+	})
+}
+
 func VisitableMapFnReduceOr[Elt any](visitable Visitable[Elt], test func(Elt) bool) bool {
 	return visitable.Visit(func(elt Elt) error {
 		if test(elt) {
@@ -139,4 +148,35 @@ func MapTransformToSlice[Key, Val, Transformed any](theMap Map[Key, Val], xform 
 		return nil
 	})
 	return ans
+}
+
+type VisitableFunc[Elt any] func(func(Elt) error) error
+
+var _ Visitable[string] = VisitableFunc[string](nil)
+
+func (vf VisitableFunc[Elt]) Visit(visitor func(Elt) error) error {
+	return vf(visitor)
+}
+
+type Slice[Elt any] []Elt
+
+var _ Visitable[float64] = Slice[float64]{}
+
+func NewSlice[Elt any]() Slice[Elt] { return Slice[Elt]{} }
+
+func (slice Slice[Elt]) IsEmpty() bool    { return len(slice) == 0 }
+func (slice Slice[Elt]) Len() int         { return len(slice) }
+func (slice Slice[Elt]) LenIsCheap() bool { return true }
+
+func (slice Slice[Elt]) Visit(visitor func(Elt) error) error {
+	for _, elt := range slice {
+		if err := visitor(elt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (slice Slice[Elt]) Append(elt Elt) Slice[Elt] {
+	return append(slice, elt)
 }

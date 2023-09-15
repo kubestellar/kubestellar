@@ -90,22 +90,18 @@ type WorkloadProjector interface {
 // FooModes add dependent information for set members.
 // The booleans returned from the SetWriters may not be meaningful.
 type WorkloadProjectionSections struct {
-	NamespaceDistributions          SetWriter[NamespaceDistributionTuple]
-	NamespacedResourceDistributions SetWriter[NamespacedResourceDistributionTuple]
-	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedDistributions      SetWriter[NonNamespacedDistributionTuple]
-	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	Upsyncs                         SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
+	NamespacedDistributions    SetWriter[NamespacedDistributionTuple]
+	NamespacedModes            MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NonNamespacedDistributions SetWriter[NonNamespacedDistributionTuple]
+	NonNamespacedModes         MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	Upsyncs                    SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
 }
 
 type SinglePlacement = edgeapi.SinglePlacement
 
-type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, SinglePlacement]
+type ExternalNamespacedName = Triple[logicalcluster.Name, NamespaceName, ObjectName]
 
-type NamespacedResourceDistributionTuple struct {
-	SourceCluster logicalcluster.Name
-	ProjectionModeKey
-}
+type NamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/]
 
 type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of downsynced object*/]
 
@@ -160,8 +156,10 @@ type ResolvedWhat struct {
 //
 // Every WorkloadParts that appears in the interfaces here is immutable.
 //
-// In the case of a Namespace object, this implies that
-// all the objects in that namespace are included.
+// Namespace objects implied by the "what predicate" are included in
+// the results of "what resolution", with IncludeNamespaceObject=false.
+// The user may explicitly request a Namespace object, in which case
+// IncludeNamespaceObject=true.
 //
 // A workload may include objects of kinds that are built into
 // the edge cluster.  By built-in we mean that these kinds are both
@@ -174,14 +172,11 @@ type ResolvedWhat struct {
 type WorkloadParts map[WorkloadPartID]WorkloadPartDetails
 
 // WorkloadPartID identifies part of a workload.
-type WorkloadPartID struct {
-	APIGroup string
+type WorkloadPartID = Triple[metav1.GroupResource, NamespaceName, ObjectName]
 
-	// Resource is the lowercase plural way of identifying the kind of object
-	Resource string
+type ObjectName string
 
-	Name string
-}
+func (objName ObjectName) String() string { return string(objName) }
 
 // WorkloadPartDetails provides additional details about how the WorkloadPart
 // is to be included.
@@ -191,17 +186,6 @@ type WorkloadPartDetails struct {
 	// object itself, not the namespace contents, and is the empty string if
 	// IncludeNamespaceObject is false.
 	APIVersion string
-
-	// IncludeNamespaceObject is only interesting for a Namespace part, and
-	// indicates whether to include the details of the Namespace object;
-	// the objects in the namespace are certainly included.
-	// For other parts, this field holds `false`.
-	IncludeNamespaceObject bool
-}
-
-type WorkloadPartX struct {
-	WorkloadPartID
-	WorkloadPartDetails
 }
 
 // ProjectionKey identifies the topmost level of organization,
@@ -423,3 +407,11 @@ func (where ResolvedWhere) String() string {
 	builder.WriteRune(']')
 	return builder.String()
 }
+
+type NamespaceName string
+
+type NamespaceAndDestination = Pair[NamespaceName, SinglePlacement]
+
+type SourceAndDestination = Pair[logicalcluster.Name, SinglePlacement]
+
+type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]
