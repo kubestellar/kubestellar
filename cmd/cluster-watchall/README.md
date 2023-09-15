@@ -18,6 +18,7 @@ The command line flags include all the usual ones for `kubectl` (see [the kubect
       --kubeconfig string                Path to the kubeconfig file to use for CLI requests
       --context string                   The name of the kubeconfig context to use
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)
+      --include-subresources             list subresources too
 
 ```
 
@@ -40,7 +41,8 @@ The tables have rows of the following formats.
 
 ```console
 CLUSTER,$clusterName
-RESOURCE,$clusterName,$apiGroup,$apiVersion,$kind,$informable
+RESOURCE,$clusterName,$apiGroup,$apiVersion,$kind,$rscname,$informable
+SUBRESOURCE,$clusterName,$apiGroup,$apiVersion,$kind,$rscname,$informable
 OBJECT,$clusterName,$apiGroupVersion,$kind,$namespace,$name
 ```
 
@@ -48,8 +50,9 @@ Following is some sample output.
 
 ```console
 CLUSTER,kvdk2spgmbix
-RESOURCE,1p4q3bat75x35ez3,,v1,ConfigMap,true
-RESOURCE,root,authentication.k8s.io,v1,TokenReview,false
+RESOURCE,root,authentication.k8s.io,v1,TokenReview,tokenreviews,false
+RESOURCE,uxdgppgxmtya0sdf,,v1,Namespace,namespaces,true
+SUBRESOURCE,uxdgppgxmtya0sdf,,v1,Namespace,namespaces/finalize,false
 OBJECT,1p4q3bat75x35ez3,v1,Namespace,,kcp-system
 OBJECT,kvdk2spgmbix,v1,Secret,default,default-token-2fjw9
 OBJECT,kvdk2spgmbix,rbac.authorization.k8s.io/v1,ClusterRoleBinding,,workspace-admin

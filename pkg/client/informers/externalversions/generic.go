@@ -31,7 +31,6 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 )
 
@@ -103,9 +102,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncTargets().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Locations().Informer()}, nil
-	// Group=meta.kubestellar.io, Version=V1alpha1
-	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Meta().V1alpha1().APIResources().Informer()}, nil
 	// Group=space.kubestellar.io, Version=V1alpha1
 	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().SpaceProviderDescs().Informer()}, nil
@@ -141,10 +137,6 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		informer := f.Edge().V1alpha1().Locations().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	// Group=meta.kubestellar.io, Version=V1alpha1
-	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
-		informer := f.Meta().V1alpha1().APIResources().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	// Group=space.kubestellar.io, Version=V1alpha1
 	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):

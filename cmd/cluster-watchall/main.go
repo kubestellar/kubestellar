@@ -68,7 +68,10 @@ func main() {
 	cliFlags := genericclioptions.NewConfigFlags(false)
 	cliFlags.AddFlags(fs)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
-	fs.Parse(os.Args[1:])
+	includeSubresources := false
+	fs.BoolVar(&includeSubresources, "include-subresources", includeSubresources, "list subresources too")
+	args := os.Args[1:]
+	fs.Parse(args)
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -127,7 +130,7 @@ func main() {
 		logger.Error(nil, "Failed to sync all-cluster dynamic informers on CRDs, APIBindings")
 		os.Exit(40)
 	}
-	acw := &allClustersWatcher{watcher, discoveryClusterClient,
+	acw := &allClustersWatcher{watcher, includeSubresources, discoveryClusterClient,
 		crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient,
 		map[logicalcluster.Name]*clusterWatcher{}}
 	lcClusterInformer.AddEventHandler(acw)
@@ -159,6 +162,7 @@ func (wb *watcherBase) WriteCSV(record []string) {
 
 type allClustersWatcher struct {
 	*watcherBase
+	includeSubresources    bool
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface
 	crdClusterInformer     kcpinformers.GenericClusterInformer
 	bindingClusterInformer kcpinformers.GenericClusterInformer
@@ -193,7 +197,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 	crdInformer := acw.crdClusterInformer.Cluster(clusterName).Informer()
 	bindingInformer := acw.bindingClusterInformer.Cluster(clusterName).Informer()
 	resourceInformer, _, _ := apiwatch.NewAPIResourceInformer(context.Background(), clusterName.String(), discoveryScopedClient,
-		crdInformer, bindingInformer)
+		acw.includeSubresources, crdInformer, bindingInformer)
 	cw := &clusterWatcher{
 		watcherBase:      acw.watcherBase,
 		resourceWatchers: map[schema.GroupVersionResource]*resourceWatcher{},
@@ -210,7 +214,8 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 			if _, ok := cw.resourceWatchers[gvr]; ok {
 				return
 			}
-			acw.WriteCSV([]string{"RESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, fmt.Sprintf("%v", informable)})
+			acw.WriteCSV([]string{"RESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, rsc.Spec.Name, fmt.Sprintf("%v", informable)})
+			acw.writeSubresources(clusterName, gvr.GroupVersion(), rsc.Spec.SubResources, rsc.Spec.Name+"/")
 			rw := &resourceWatcher{cw}
 			cw.resourceWatchers[gvr] = rw
 			if informable {
@@ -226,6 +231,14 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 		resourceInformer.Run(acw.ctx.Done())
 	}()
 	return cw
+}
+
+func (acw *allClustersWatcher) writeSubresources(clusterName logicalcluster.Name, gv schema.GroupVersion, subs []*urmetav1a1.APIResourceSpec, prefix string) {
+	for _, sub := range subs {
+		informable := verbsSupportInformers(sub.Verbs)
+		acw.WriteCSV([]string{"SUBRESOURCE", clusterName.String(), gv.Group, gv.Version, sub.Kind, prefix + sub.Name, fmt.Sprintf("%v", informable)})
+		acw.writeSubresources(clusterName, gv, sub.SubResources, prefix+sub.Name+"/")
+	}
 }
 
 func verbsSupportInformers(verbs []string) bool {
