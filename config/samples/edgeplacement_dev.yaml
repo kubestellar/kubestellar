@@ -6,9 +6,6 @@ spec:
   locationSelectors:
   - matchLabels:
       env: dev
-  namespaceSelector:
-    matchLabels:
-      env: dev
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io
     resources:

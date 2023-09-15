@@ -4,7 +4,6 @@ metadata:
   name: all2all
 spec:
   locationSelectors: [{}]
-  namespaceSelector: {}
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io
     resources: ["apibindings"]
