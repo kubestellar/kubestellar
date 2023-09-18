@@ -34,22 +34,19 @@ import (
 
 	client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1"
 )
 
 type ClusterInterface interface {
 	Cluster(logicalcluster.Path) client.Interface
 	Discovery() discovery.DiscoveryInterface
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface
-	SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1ClusterInterface
 }
 
 // ClusterClientset contains the clients for groups.
 type ClusterClientset struct {
 	*discovery.DiscoveryClient
-	clientCache   kcpclient.Cache[*client.Clientset]
-	edgeV1alpha1  *edgev1alpha1.EdgeV1alpha1ClusterClient
-	spaceV1alpha1 *spacev1alpha1.SpaceV1alpha1ClusterClient
+	clientCache  kcpclient.Cache[*client.Clientset]
+	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1ClusterClient
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -63,11 +60,6 @@ func (c *ClusterClientset) Discovery() discovery.DiscoveryInterface {
 // EdgeV1alpha1 retrieves the EdgeV1alpha1ClusterClient.
 func (c *ClusterClientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1ClusterInterface {
 	return c.edgeV1alpha1
-}
-
-// SpaceV1alpha1 retrieves the SpaceV1alpha1ClusterClient.
-func (c *ClusterClientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1ClusterInterface {
-	return c.spaceV1alpha1
 }
 
 // Cluster scopes this clientset to one cluster.
@@ -123,10 +115,6 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*ClusterCli
 	cs.clientCache = cache
 	var err error
 	cs.edgeV1alpha1, err = edgev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	cs.spaceV1alpha1, err = spacev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}

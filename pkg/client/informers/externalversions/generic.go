@@ -31,7 +31,6 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
 )
 
 type GenericClusterInformer interface {
@@ -102,11 +101,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncTargets().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Locations().Informer()}, nil
-	// Group=space.kubestellar.io, Version=V1alpha1
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().SpaceProviderDescs().Informer()}, nil
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().Spaces().Informer()}, nil
 	}
 
 	return nil, fmt.Errorf("no informer found for %v", resource)
@@ -137,13 +131,6 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		informer := f.Edge().V1alpha1().Locations().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	// Group=space.kubestellar.io, Version=V1alpha1
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
-		informer := f.Space().V1alpha1().SpaceProviderDescs().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
-		informer := f.Space().V1alpha1().Spaces().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	}
 
