@@ -101,7 +101,6 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.gitMinor=${KUBE_MINOR_VERSION} \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
-
 all: build
 .PHONY: all
 
@@ -318,6 +317,7 @@ ifdef SUITES
 SUITES_ARG = --suites $(SUITES)
 COMPLETE_SUITES_ARG = -args $(SUITES_ARG)
 endif
+
 
 # .PHONY: test-e2e
 # ifdef USE_GOTESTSUM
