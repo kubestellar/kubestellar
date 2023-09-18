@@ -4,6 +4,7 @@ metadata:
   creationTimestamp: null
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:config/exports/apiresourceschema-spaces.space.kubestellar.io.yaml
   name: v230915-8d536c3e3.spaces.space.kubestellar.io
 =======
@@ -15,6 +16,9 @@ metadata:
 =======
   name: v230912-788cf62d6.spaces.space.kubestellar.io
 >>>>>>> 875602ca8... crate space module
+=======
+  name: v230918-8942b565a.spaces.space.kubestellar.io
+>>>>>>> ebba47704... crds
 spec:
   group: space.kubestellar.io
   names:

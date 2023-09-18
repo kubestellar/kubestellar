@@ -7,6 +7,7 @@ spec:
   latestResourceSchemas:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:config/exports/apiexport-space.kubestellar.io.yaml
   - v230915-8d536c3e3.spaceproviderdescs.space.kubestellar.io
   - v230915-8d536c3e3.spaces.space.kubestellar.io
@@ -22,4 +23,8 @@ spec:
   - v230912-788cf62d6.spaceproviderdescs.space.kubestellar.io
   - v230912-788cf62d6.spaces.space.kubestellar.io
 >>>>>>> 875602ca8... crate space module
+=======
+  - v230918-8942b565a.spaceproviderdescs.space.kubestellar.io
+  - v230918-8942b565a.spaces.space.kubestellar.io
+>>>>>>> ebba47704... crds
 status: {}
