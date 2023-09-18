@@ -2,23 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:config/exports/apiresourceschema-spaceproviderdescs.space.kubestellar.io.yaml
-  name: v230915-8d536c3e3.spaceproviderdescs.space.kubestellar.io
-=======
-  name: v230910-ddc881969.spaceproviderdescs.space.kubestellar.io
->>>>>>> 496b5e990... initial:space-framework/config/exports/apiresourceschema-spaceproviderdescs.space.kubestellar.io.yaml
-=======
-  name: v230912-42dff5c1c.spaceproviderdescs.space.kubestellar.io
->>>>>>> 1a7264674... separate the build
-=======
-  name: v230912-788cf62d6.spaceproviderdescs.space.kubestellar.io
->>>>>>> 875602ca8... crate space module
-=======
-  name: v230918-8942b565a.spaceproviderdescs.space.kubestellar.io
->>>>>>> ebba47704... crds
+  name: v230918-a3bb3be7f.spaceproviderdescs.space.kubestellar.io
 spec:
   group: space.kubestellar.io
   names:

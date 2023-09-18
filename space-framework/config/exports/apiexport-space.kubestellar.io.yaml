@@ -5,26 +5,6 @@ metadata:
   name: space.kubestellar.io
 spec:
   latestResourceSchemas:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:config/exports/apiexport-space.kubestellar.io.yaml
-  - v230915-8d536c3e3.spaceproviderdescs.space.kubestellar.io
-  - v230915-8d536c3e3.spaces.space.kubestellar.io
-=======
-  - v230910-ddc881969.spaceproviderdescs.space.kubestellar.io
-  - v230910-ddc881969.spaces.space.kubestellar.io
->>>>>>> 496b5e990... initial:space-framework/config/exports/apiexport-space.kubestellar.io.yaml
-=======
-  - v230912-42dff5c1c.spaceproviderdescs.space.kubestellar.io
-  - v230912-42dff5c1c.spaces.space.kubestellar.io
->>>>>>> 1a7264674... separate the build
-=======
-  - v230912-788cf62d6.spaceproviderdescs.space.kubestellar.io
-  - v230912-788cf62d6.spaces.space.kubestellar.io
->>>>>>> 875602ca8... crate space module
-=======
-  - v230918-8942b565a.spaceproviderdescs.space.kubestellar.io
-  - v230918-8942b565a.spaces.space.kubestellar.io
->>>>>>> ebba47704... crds
+  - v230918-a3bb3be7f.spaceproviderdescs.space.kubestellar.io
+  - v230918-a3bb3be7f.spaces.space.kubestellar.io
 status: {}
