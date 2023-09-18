@@ -84,14 +84,37 @@ CODE_GENERATOR_BIN := code-generator
 CODE_GENERATOR := $(TOOLS_GOBIN_DIR)/$(CODE_GENERATOR_BIN)-$(CODE_GENERATOR_VER)
 export CODE_GENERATOR # so hack scripts can use it
 
+ARCH := $(shell go env GOARCH)
+OS := $(shell go env GOOS)
+
+KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
+GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
+GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
+BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+LDFLAGS := \
+	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
+	-X k8s.io/client-go/pkg/version.gitTreeState=${GIT_DIRTY} \
+	-X k8s.io/client-go/pkg/version.gitVersion=${GIT_VERSION} \
+	-X k8s.io/client-go/pkg/version.gitMajor=${KUBE_MAJOR_VERSION} \
+	-X k8s.io/client-go/pkg/version.gitMinor=${KUBE_MINOR_VERSION} \
+	-X k8s.io/client-go/pkg/version.buildDate=${BUILD_DATE} \
+	\
+	-X k8s.io/component-base/version.gitCommit=${GIT_COMMIT} \
+	-X k8s.io/component-base/version.gitTreeState=${GIT_DIRTY} \
+	-X k8s.io/component-base/version.gitVersion=${GIT_VERSION} \
+	-X k8s.io/component-base/version.gitMajor=${KUBE_MAJOR_VERSION} \
+	-X k8s.io/component-base/version.gitMinor=${KUBE_MINOR_VERSION} \
+	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
+	-extldflags '-static'
+
 ldflags:
 	@echo $(LDFLAGS)
 
 .PHONY: require-%
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
-
-
 
 $(CODE_GENERATOR):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/code-generator/v2 $(CODE_GENERATOR_BIN) $(CODE_GENERATOR_VER)
