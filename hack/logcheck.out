@@ -3,21 +3,7 @@
 /cmd/mailbox-controller/main.go:198:4: Additional arguments to Info should always be Key Value pairs. Please check if there is any key or value missing.
 /cmd/mailbox-controller/main.go:91:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
 /cmd/placement-translator/main.go:117:3: Key positional arguments are expected to be inlined constant strings. Please replace &{flg Name} provided with string value.
-/pkg/client/clientset/versioned/typed/meta/v1alpha1/apiresource.go:50:2: undeclared name: APIResourceExpansion
-/pkg/client/informers/externalversions/meta/v1alpha1/apiresource.go:162:19: client.MetaV1alpha1 undefined (type versioned.Interface has no field or method MetaV1alpha1)
-/pkg/client/informers/externalversions/meta/v1alpha1/apiresource.go:168:19: client.MetaV1alpha1 undefined (type versioned.Interface has no field or method MetaV1alpha1)
-/pkg/client/informers/externalversions/meta/v1alpha1/apiresource.go:74:19: client.MetaV1alpha1 undefined (type clientset.ClusterInterface has no field or method MetaV1alpha1)
-/pkg/client/informers/externalversions/meta/v1alpha1/apiresource.go:80:19: client.MetaV1alpha1 undefined (type clientset.ClusterInterface has no field or method MetaV1alpha1)
-/pkg/client/listers/meta/v1alpha1/apiresource.go:43:2: undeclared name: APIResourceClusterListerExpansion
-/pkg/client/listers/meta/v1alpha1/apiresource.go:81:2: undeclared name: APIResourceListerExpansion
 /pkg/placement/workload-projector.go:681:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
 /pkg/placement/workload-projector.go:703:2: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
 /pkg/placement/workload-projector.go:880:1: A function should accept either a context or a logger, but not both. Having both makes calling the function harder because it must be defined whether the context must contain the logger and callers have to follow that.
 /pkg/placement/workload-projector.go:962:4: the result of logger.V should be stored in a variable and then be used multiple times: if logger := logger.V(); logger.Enabled() { ... logger.Info ... }
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
-logcheck: analysis skipped due to errors in package
