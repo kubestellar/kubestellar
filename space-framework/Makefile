@@ -26,11 +26,6 @@ TMPDIR := $(shell mktemp -d)
 .PHONY: all
 all: build
 
-.PHONY: build
-build: WHAT ?= ./cmd/space-manager
-build: bin-dir
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-
 .PHONY: bin-dir
 bin-dir:
 	mkdir -p bin
@@ -108,6 +103,11 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.gitMinor=${KUBE_MINOR_VERSION} \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
+
+.PHONY: build
+build: WHAT ?= ./cmd/space-manager
+build: bin-dir
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 
 ldflags:
 	@echo $(LDFLAGS)
