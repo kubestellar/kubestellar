@@ -102,9 +102,6 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
 
-# For now, Allow the nested makeefiles to use the same values of these variables without explicitly setting them
-export OS ARCH BUILDFLAGS LDFLAGS
-
 all: build
 .PHONY: all
 
@@ -115,7 +112,7 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator  ./cmd/syncer ./cmd/space-client-test
+build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator  ./cmd/syncer
 #./tmc/cmd/...
 build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
@@ -486,24 +483,5 @@ verify-modules: modules  ## Verify go modules are up to date
 .PHONY: help
 help: ## Show this help.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-#The following are aliases  to targets in space-framework/Makefile. This is a temporary solution to allow
-# the user to just use this Makefile to build everything
-
-space: 
-	$(MAKE) -C space-framework
-.PHONY: space
-
-space-crds: 
-	$(MAKE) -C space-framework crds
-.PHONY: space-crds
-
-space-codegen: 
-	$(MAKE) -C space-framework codegen
-.PHONY: space-codegen
-
-space-modules: 
-	$(MAKE) -C space-framework modules
-.PHONY: space-modules
 
 include Makefile.venv
