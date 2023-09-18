@@ -2,7 +2,7 @@
 Create the second edge cluster:
 
 ```shell
-kind create cluster --name guilder --config - <<EOF
+sudo kind create cluster --name guilder --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:

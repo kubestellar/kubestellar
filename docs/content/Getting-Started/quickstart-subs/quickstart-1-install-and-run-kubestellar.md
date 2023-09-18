@@ -41,7 +41,6 @@ kubectl ws tree
 which should yield:
 
 ``` { .sh .no-copy }
-kubectl ws tree
 .
 └── root
     ├── compute
@@ -111,7 +110,6 @@ kubectl ws tree
 which should yield:
 
 ``` { .sh .no-copy }
-kubectl ws tree
 .
 └── root
     ├── compute
