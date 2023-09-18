@@ -40,7 +40,7 @@ ${CODE_GENERATOR} \
   "client:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
   "lister:apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
   "informer:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-  "paths={./edge/..., ./space/...}" \
+  "paths={./edge/...}" \
   "output:dir=./../client"
 popd
 

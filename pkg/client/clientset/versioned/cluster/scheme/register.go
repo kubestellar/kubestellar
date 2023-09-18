@@ -29,11 +29,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-<<<<<<< HEAD
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
-=======
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
->>>>>>> 496b5e990... initial
 )
 
 var Scheme = runtime.NewScheme()
@@ -41,11 +36,6 @@ var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
 	edgev1alpha1.AddToScheme,
-<<<<<<< HEAD
-	spacev1alpha1.AddToScheme,
-=======
-	metav1alpha1.AddToScheme,
->>>>>>> 496b5e990... initial
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

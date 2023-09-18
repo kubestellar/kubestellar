@@ -31,32 +31,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 
-<<<<<<< HEAD
-	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-<<<<<<< HEAD
-	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
-	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
-<<<<<<< HEAD
-	spaceinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/space"
-=======
-	metainformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/meta"
->>>>>>> 496b5e990... initial
-=======
-=======
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
->>>>>>> 429ab226f... regenerate files
 	scopedclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge"
 	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
-	metainformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/meta"
-<<<<<<< HEAD
-"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
->>>>>>> 1a7264674... separate the build
-=======
->>>>>>> 429ab226f... regenerate files
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
@@ -202,32 +183,10 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.ClusterInterface
-<<<<<<< HEAD
-	Space() spaceinformers.ClusterInterface
-=======
-	Meta() metainformers.ClusterInterface
->>>>>>> 496b5e990... initial
 }
 
 func (f *sharedInformerFactory) Edge() edgeinformers.ClusterInterface {
 	return edgeinformers.New(f, f.tweakListOptions)
-}
-
-<<<<<<< HEAD
-func (f *sharedInformerFactory) Space() spaceinformers.ClusterInterface {
-	return spaceinformers.New(f, f.tweakListOptions)
-=======
-func (f *sharedInformerFactory) Meta() metainformers.ClusterInterface {
-<<<<<<< HEAD
-<<<<<<< HEAD
-	return metainformers.New(f, f.tweakListOptions)
->>>>>>> 496b5e990... initial
-=======
-  return metainformers.New(f, f.tweakListOptions)
->>>>>>> 1a7264674... separate the build
-=======
-	return metainformers.New(f, f.tweakListOptions)
->>>>>>> 429ab226f... regenerate files
 }
 
 func (f *sharedInformerFactory) Cluster(clusterName logicalcluster.Name) ScopedDynamicSharedInformerFactory {
@@ -374,30 +333,8 @@ type SharedScopedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Edge() edgeinformers.Interface
-<<<<<<< HEAD
-	Space() spaceinformers.Interface
-=======
-	Meta() metainformers.Interface
->>>>>>> 496b5e990... initial
 }
 
 func (f *sharedScopedInformerFactory) Edge() edgeinformers.Interface {
 	return edgeinformers.NewScoped(f, f.namespace, f.tweakListOptions)
-}
-
-<<<<<<< HEAD
-func (f *sharedScopedInformerFactory) Space() spaceinformers.Interface {
-	return spaceinformers.NewScoped(f, f.namespace, f.tweakListOptions)
-=======
-func (f *sharedScopedInformerFactory) Meta() metainformers.Interface {
-<<<<<<< HEAD
-<<<<<<< HEAD
-	return metainformers.NewScoped(f, f.namespace, f.tweakListOptions)
->>>>>>> 496b5e990... initial
-=======
-  return metainformers.NewScoped(f, f.namespace, f.tweakListOptions)
->>>>>>> 1a7264674... separate the build
-=======
-	return metainformers.NewScoped(f, f.namespace, f.tweakListOptions)
->>>>>>> 429ab226f... regenerate files
 }

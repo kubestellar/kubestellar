@@ -30,20 +30,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-<<<<<<< HEAD
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/space/v1alpha1"
-=======
-=======
-		edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
->>>>>>> 1a7264674... separate the build
-=======
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
->>>>>>> 429ab226f... regenerate files
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
->>>>>>> 496b5e990... initial
 )
 
 type GenericClusterInformer interface {
@@ -114,26 +101,7 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().SyncTargets().Informer()}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V1alpha1().Locations().Informer()}, nil
-<<<<<<< HEAD
-	// Group=space.kubestellar.io, Version=V1alpha1
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().SpaceProviderDescs().Informer()}, nil
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Space().V1alpha1().Spaces().Informer()}, nil
-=======
-	// Group=meta.kubestellar.io, Version=V1alpha1
-	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
-		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Meta().V1alpha1().APIResources().Informer()}, nil
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 496b5e990... initial
 	}
-=======
-}
->>>>>>> 1a7264674... separate the build
-=======
-	}
->>>>>>> 429ab226f... regenerate files
 
 	return nil, fmt.Errorf("no informer found for %v", resource)
 }
@@ -163,19 +131,6 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev1alpha1.SchemeGroupVersion.WithResource("locations"):
 		informer := f.Edge().V1alpha1().Locations().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-<<<<<<< HEAD
-	// Group=space.kubestellar.io, Version=V1alpha1
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs"):
-		informer := f.Space().V1alpha1().SpaceProviderDescs().Informer()
-		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
-	case spacev1alpha1.SchemeGroupVersion.WithResource("spaces"):
-		informer := f.Space().V1alpha1().Spaces().Informer()
-=======
-	// Group=meta.kubestellar.io, Version=V1alpha1
-	case metav1alpha1.SchemeGroupVersion.WithResource("apiresources"):
-		informer := f.Meta().V1alpha1().APIResources().Informer()
->>>>>>> 496b5e990... initial
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	}
 

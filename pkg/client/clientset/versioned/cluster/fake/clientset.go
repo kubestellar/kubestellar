@@ -32,37 +32,9 @@ import (
 	client "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	kcpclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	kcpedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-<<<<<<< HEAD
-<<<<<<< HEAD
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
-<<<<<<< HEAD
-	kcpspacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1"
-	fakespacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/space/v1alpha1/fake"
 	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
-=======
-=======
->>>>>>> 1a7264674... separate the build
-	kcpmetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
-=======
->>>>>>> 429ab226f... regenerate files
-	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1/fake"
-	kcpmetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1"
-	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/meta/v1alpha1/fake"
-<<<<<<< HEAD
-<<<<<<< HEAD
-	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
->>>>>>> 496b5e990... initial
-=======
->>>>>>> 1a7264674... separate the build
-=======
-	clientscheme "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/scheme"
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
->>>>>>> 429ab226f... regenerate files
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -104,25 +76,6 @@ func (c *ClusterClientset) EdgeV1alpha1() kcpedgev1alpha1.EdgeV1alpha1ClusterInt
 	return &fakeedgev1alpha1.EdgeV1alpha1ClusterClient{Fake: c.Fake}
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-// SpaceV1alpha1 retrieves the SpaceV1alpha1ClusterClient.
-func (c *ClusterClientset) SpaceV1alpha1() kcpspacev1alpha1.SpaceV1alpha1ClusterInterface {
-	return &fakespacev1alpha1.SpaceV1alpha1ClusterClient{Fake: c.Fake}
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.  
->>>>>>> 1a7264674... separate the build
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1ClusterClient.
->>>>>>> 429ab226f... regenerate files
-func (c *ClusterClientset) MetaV1alpha1() kcpmetav1alpha1.MetaV1alpha1ClusterInterface {
-	return &fakemetav1alpha1.MetaV1alpha1ClusterClient{Fake: c.Fake}
->>>>>>> 496b5e990... initial
-}
-
 // Cluster scopes this clientset to one cluster.
 func (c *ClusterClientset) Cluster(clusterPath logicalcluster.Path) client.Interface {
 	if clusterPath == logicalcluster.Wildcard {
@@ -158,23 +111,4 @@ func (c *Clientset) Tracker() kcptesting.ScopedObjectTracker {
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client.
 func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.EdgeV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
-}
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-// SpaceV1alpha1 retrieves the SpaceV1alpha1Client.
-func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
-	return &fakespacev1alpha1.SpaceV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1Client.
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1Client.  
->>>>>>> 1a7264674... separate the build
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1Client.
->>>>>>> 429ab226f... regenerate files
-func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
-	return &fakemetav1alpha1.MetaV1alpha1Client{Fake: c.Fake, ClusterPath: c.clusterPath}
->>>>>>> 496b5e990... initial
 }

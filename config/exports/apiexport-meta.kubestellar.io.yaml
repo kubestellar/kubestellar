@@ -1,9 +1,0 @@
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIExport
-metadata:
-  creationTimestamp: null
-  name: meta.kubestellar.io
-spec:
-  latestResourceSchemas:
-  - v230910-ddc881969.apiresources.meta.kubestellar.io
-status: {}

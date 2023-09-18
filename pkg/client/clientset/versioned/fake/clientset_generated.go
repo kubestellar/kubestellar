@@ -19,36 +19,15 @@ limitations under the License.
 package fake
 
 import (
-<<<<<<< HEAD
-	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
-<<<<<<< HEAD
-	spacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1"
-	fakespacev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/space/v1alpha1/fake"
-=======
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
-	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
-<<<<<<< HEAD
->>>>>>> 496b5e990... initial
-=======
-=======
->>>>>>> 429ab226f... regenerate files
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
-<<<<<<< HEAD
->>>>>>> 1a7264674... separate the build
-=======
 
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
 	fakeedgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1/fake"
-	metav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1"
-	fakemetav1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/meta/v1alpha1/fake"
->>>>>>> 429ab226f... regenerate files
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -104,15 +83,4 @@ var (
 // EdgeV1alpha1 retrieves the EdgeV1alpha1Client
 func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
 	return &fakeedgev1alpha1.FakeEdgeV1alpha1{Fake: &c.Fake}
-}
-
-<<<<<<< HEAD
-// SpaceV1alpha1 retrieves the SpaceV1alpha1Client
-func (c *Clientset) SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface {
-	return &fakespacev1alpha1.FakeSpaceV1alpha1{Fake: &c.Fake}
-=======
-// MetaV1alpha1 retrieves the MetaV1alpha1Client
-func (c *Clientset) MetaV1alpha1() metav1alpha1.MetaV1alpha1Interface {
-	return &fakemetav1alpha1.FakeMetaV1alpha1{Fake: &c.Fake}
->>>>>>> 496b5e990... initial
 }
