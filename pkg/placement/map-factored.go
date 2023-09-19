@@ -16,21 +16,21 @@ limitations under the License.
 
 package placement
 
-// FactoredMap is a map implemented by two levels of mapping.
+// FactoredMap is a mutable map implemented by two levels of mapping.
 // It has a general key decomposition/composition rotator.
-type FactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any] GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, Map[KeyPartB, Val]]
+type FactoredMap[WholeKey, KeyPartA, KeyPartB, Val any] GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, Map[KeyPartB, Val]]
 
-// GenericFactoredMap is a map implemented by two levels of mapping.
+// GenericFactoredMap is a mutable map implemented by two levels of mapping.
 // It has a general key decomposition/composition rotator
 // and a general representation for the nested maps.
-type GenericFactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val, InnerMap any] interface {
+type GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, InnerMap any] interface {
 	MutableMap[WholeKey, Val]
 	GetIndex() GenericFactoredMapIndex[KeyPartA, KeyPartB, Val, InnerMap]
 }
 
 // GenericFactoredMapIndex is an index into a factored map where the inner maps
 // (from KeyPartB to Val) have a general representation.
-type GenericFactoredMapIndex[KeyPartA, KeyPartB comparable, Val, InnerMap any] interface {
+type GenericFactoredMapIndex[KeyPartA, KeyPartB, Val, InnerMap any] interface {
 	Map[KeyPartA, InnerMap]
 	Visit1to2(KeyPartA, func(Pair[KeyPartB, Val]) error) error
 }
@@ -239,4 +239,46 @@ func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInne
 	}
 	innerMapAsMap := fmi.fm.innerMapAsMap(innerMap)
 	return innerMapAsMap.Visit(visitor)
+}
+
+type SingleIndexedMap2[First, Second, Val any] GenericFactoredMap[Pair[First, Second], First, Second, Val, Map[Second, Val]]
+
+func NewSingleIndexedMapMap2[First, Second comparable, Val any]() SingleIndexedMap2[First, Second, Val] {
+	gfm := NewGenericFactoredMap[Pair[First, Second], First, Second, Val, MutableMap[Second, Val], Map[Second, Val]](
+		PairFactorer[First, Second](),
+		func(First) MutableMap[Second, Val] { return NewMapMap[Second, Val](nil) },
+		Identity1[MutableMap[Second, Val]],
+		MutableMapToReadonly[Second, Val],
+		NewMapMap[First, MutableMap[Second, Val]](nil),
+		nil, nil)
+	return gfm
+}
+
+type SingleIndexedMap3[First, Second, Third, Val any] GenericFactoredMap[Triple[First, Second, Third],
+	First, Pair[Second, Third], Val,
+	GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+]
+
+func NewSingleIndexedMapMap3[First, Second, Third comparable, Val any]() SingleIndexedMap3[First, Second, Third, Val] {
+	gfm := NewGenericFactoredMap[Triple[First, Second, Third], First, Pair[Second, Third], Val,
+		GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+		GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+	](
+		TripleFactorerTo1and23[First, Second, Third](),
+		func(First) GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]] {
+			return NewGenericFactoredMap[Pair[Second, Third], Second, Third, Val, MutableMap[Third, Val], Map[Third, Val]](
+				PairFactorer[Second, Third](),
+				func(Second) MutableMap[Third, Val] { return NewMapMap[Third, Val](nil) },
+				Identity1[MutableMap[Third, Val]],
+				MutableMapToReadonly[Third, Val],
+				NewMapMap[Second, MutableMap[Third, Val]](nil),
+				nil, nil)
+		},
+		func(inner GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]) MutableMap[Pair[Second, Third], Val] {
+			return inner
+		},
+		Identity1[GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]],
+		NewMapMap[First, GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]](nil),
+		nil, nil)
+	return gfm
 }

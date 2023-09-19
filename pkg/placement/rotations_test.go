@@ -106,12 +106,12 @@ func TestFactorers(t *testing.T) {
 	t.Run("factorNamespacedDistributionTupleForSync1", exerciseFactorer(factorNamespacedDistributionTupleForSync1,
 		gen.NamespacedDistributionTuple(),
 		gen.SinglePlacement(),
-		NewPair(gen.GroupResourceNamespacedInstance(), gen.ClusterName())))
+		NewPair(gen.GroupResourceNamespacedName(), gen.ClusterName())))
 
 	t.Run("factorNamespacedDistributionTupleForProj1", exerciseFactorer(factorNamespacedDistributionTupleForProj1,
 		gen.NamespacedDistributionTuple(),
 		gen.ClusterName(),
-		NewPair(gen.GroupResourceNamespacedInstance(), gen.SinglePlacement())))
+		NewPair(gen.GroupResourceNamespacedName(), gen.SinglePlacement())))
 	t.Run("factorNamespacedDistributionTupleForProj1and234", exerciseFactorer(factorNamespacedDistributionTupleForProj1and234,
 		gen.NamespacedDistributionTuple(),
 		gen.ClusterName(),
@@ -120,11 +120,11 @@ func TestFactorers(t *testing.T) {
 	t.Run("factorNonNamespacedDistributionTupleForSync1", exerciseFactorer(factorNonNamespacedDistributionTupleForSync1,
 		gen.NonNamespacedDistributionTuple(),
 		gen.SinglePlacement(),
-		NewPair(gen.GroupResourceNonNamespacedInstance(), gen.ClusterName())))
+		NewPair(gen.GroupResourceObjectName(), gen.ClusterName())))
 	t.Run("factorNonNamespacedDistributionTupleForProj1", exerciseFactorer(factorNonNamespacedDistributionTupleForProj1,
 		gen.NonNamespacedDistributionTuple(),
 		gen.ClusterName(),
-		NewPair(gen.GroupResourceNonNamespacedInstance(), gen.SinglePlacement())))
+		NewPair(gen.GroupResourceObjectName(), gen.SinglePlacement())))
 	t.Run("factorNonNamespacedDistributionTupleForProj1and234", exerciseFactorer(factorNonNamespacedDistributionTupleForProj1and234,
 		gen.NonNamespacedDistributionTuple(),
 		gen.ClusterName(),
@@ -210,11 +210,11 @@ func (gen generator) GroupResource() metav1.GroupResource {
 	return metav1.GroupResource{Group: "g" + gen.String(), Resource: gen.String() + "s"}
 }
 
-func (gen generator) GroupResourceNamespacedInstance() GroupResourceNamespacedInstance {
+func (gen generator) GroupResourceNamespacedName() GroupResourceNamespacedName {
 	return NewPair(gen.GroupResource(), gen.NamespacedName())
 }
 
-func (gen generator) GroupResourceNonNamespacedInstance() GroupResourceNonNamespacedInstance {
+func (gen generator) GroupResourceObjectName() GroupResourceObjectName {
 	return NewPair(gen.GroupResource(), gen.ObjectName())
 }
 

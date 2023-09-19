@@ -101,7 +101,9 @@ func TestWhatResolver(t *testing.T) {
 				{Resources: []string{"namespaces"},
 					ObjectNames: []string{"ns2"},
 				},
-			}}}
+			},
+			WantSingletonReportedState: true,
+		}}
 	ep1EN := ExternalName{wds1N, ObjectName(ep1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(ep1)
 	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
@@ -132,7 +134,7 @@ func TestWhatResolver(t *testing.T) {
 	runnable := whatResolver(rcvr)
 	go runnable.Run(ctx)
 	partid1 := WorkloadPartID{metav1.GroupResource{Resource: "configmaps"}, "default", "cm1"}
-	partdt1 := WorkloadPartDetails{APIVersion: "v1"}
+	partdt1 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true}
 	partid2 := WorkloadPartID{metav1.GroupResource{Resource: "namespaces"}, "", "ns2"}
 	partid3 := WorkloadPartID{metav1.GroupResource{Resource: "configmaps"}, "default", "cm3"}
 	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt1}}
