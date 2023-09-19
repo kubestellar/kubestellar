@@ -172,6 +172,7 @@ package placement
 
 // - FactoredMap is a map (a) whose Domain can be factored into two parts
 //   and (b) has a two-layer index based on those two parts.
+// - GenericFactoredMap is a FactoredMap with a user-supplied inner map type.
 // - NewFactoredMapMapAggregator makes a FactoredMap that also notifies a receiver
 //   of updates to a GROUP BY KeyPartA & aggregate.
 
