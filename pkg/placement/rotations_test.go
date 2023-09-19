@@ -88,11 +88,11 @@ func TestFactorers(t *testing.T) {
 	t.Run("factorClusterWhatWhereFullKey", exerciseFactorer(factorClusterWhatWhereFullKey,
 		gen.ClusterWhatWhereFullKey(),
 		gen.NonNamespacedDistributionTuple(),
-		gen.String()))
+		gen.ObjectName()))
 	t.Run("factorExternalName", exerciseFactorer(factorExternalName,
 		gen.ExternalName(),
 		gen.ClusterName(),
-		gen.String()))
+		gen.ObjectName()))
 	t.Run("factorNamespacedJoinKeyLessNS", exerciseFactorer(
 		factorNamespacedJoinKeyLessNS,
 		gen.NamespacedJoinKeyLessnS(),
@@ -101,7 +101,7 @@ func TestFactorers(t *testing.T) {
 	t.Run("factorNamespacedWhatWhereFullKey", exerciseFactorer(factorNamespacedWhatWhereFullKey,
 		gen.NamespacedWhatWhereFullKey(),
 		gen.NamespacedDistributionTuple(),
-		gen.String()))
+		gen.ObjectName()))
 
 	t.Run("factorNamespacedDistributionTupleForSync1", exerciseFactorer(factorNamespacedDistributionTupleForSync1,
 		gen.NamespacedDistributionTuple(),
@@ -128,7 +128,7 @@ func TestFactorers(t *testing.T) {
 	t.Run("factorNonNamespacedDistributionTupleForProj1and234", exerciseFactorer(factorNonNamespacedDistributionTupleForProj1and234,
 		gen.NonNamespacedDistributionTuple(),
 		gen.ClusterName(),
-		NewTriple(gen.GroupResource(), gen.String(), gen.SinglePlacement())))
+		NewTriple(gen.GroupResource(), gen.ObjectName(), gen.SinglePlacement())))
 
 	t.Run("factorProjectionModeKeyForSyncer", exerciseFactorer(factorProjectionModeKeyForSyncer,
 		gen.ProjectionModeKey(),
@@ -195,7 +195,7 @@ func (gen generator) ObjectName() ObjectName {
 }
 
 func (gen generator) ExternalName() ExternalName {
-	return ExternalName{gen.ClusterName(), gen.String()}
+	return ExternalName{gen.ClusterName(), gen.ObjectName()}
 }
 
 func (gen generator) ExternalNamespacedName() ExternalNamespacedName {
@@ -215,7 +215,7 @@ func (gen generator) GroupResourceNamespacedInstance() GroupResourceNamespacedIn
 }
 
 func (gen generator) GroupResourceNonNamespacedInstance() GroupResourceNonNamespacedInstance {
-	return NewPair(gen.GroupResource(), gen.String())
+	return NewPair(gen.GroupResource(), gen.ObjectName())
 }
 
 func (generator) UID() machtypes.UID {
@@ -254,7 +254,7 @@ func (gen generator) NamespacedWhatWhereFullKey() NamespacedWhatWhereFullKey {
 func (gen generator) ClusterWhatWhereFullKey() ClusterWhatWhereFullKey {
 	return ClusterWhatWhereFullKey{
 		First:  gen.ExternalName(),
-		Second: Pair[metav1.GroupResource, string]{gen.GroupResource(), gen.String()},
+		Second: Pair[metav1.GroupResource, ObjectName]{gen.GroupResource(), gen.ObjectName()},
 		Third:  gen.SinglePlacement()}
 }
 

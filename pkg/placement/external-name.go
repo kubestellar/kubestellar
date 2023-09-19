@@ -25,22 +25,22 @@ type ExternalName struct {
 	// Cluster identifies the cluster.  It is the one-part ID, not a path.
 	Cluster logicalcluster.Name
 
-	Name string
+	Name ObjectName
 }
 
 // NewExternalName assumes the given cluster identifier is proper
 func NewExternalName(cluster, name string) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(cluster), Name: name}
+	return ExternalName{Cluster: logicalcluster.Name(cluster), Name: ObjectName(name)}
 }
 
 func (ExternalName) OfSPLocation(sp SinglePlacement) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: sp.LocationName}
+	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: ObjectName(sp.LocationName)}
 }
 
 func (ExternalName) OfSPTarget(sp SinglePlacement) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: sp.SyncTargetName}
+	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: ObjectName(sp.SyncTargetName)}
 }
 
 func (en ExternalName) String() string {
-	return en.Cluster.String() + ":" + en.Name
+	return en.Cluster.String() + ":" + en.Name.String()
 }
