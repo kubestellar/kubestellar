@@ -85,16 +85,17 @@ type WorkloadProjector interface {
 }
 
 // WorkloadProjectionSections is given, incrementally, instructions
-// for what goes where how, organized for consumption by syncers.
-// The FooDistributions are proper sets, while the
-// FooModes add dependent information for set members.
+// for what goes where how.
+// The "Modes" are organized according to the design for how version agreement
+// is done, not optimized for the initial hack at that.
+// The FooDistributions are denormalized: the `returnSingletonReport bool` is duplicated for all destinations.
 // The booleans returned from the SetWriters may not be meaningful.
 type WorkloadProjectionSections struct {
-	NamespacedDistributions    SetWriter[NamespacedDistributionTuple]
-	NamespacedModes            MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedDistributions SetWriter[NonNamespacedDistributionTuple]
-	NonNamespacedModes         MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	Upsyncs                    SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
+	NamespacedObjectDistributions    MappingReceiver[NamespacedDistributionTuple, bool]
+	NamespacedModes                  MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NonNamespacedObjectDistributions MappingReceiver[NonNamespacedDistributionTuple, bool]
+	NonNamespacedModes               MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	Upsyncs                          SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
 }
 
 type SinglePlacement = edgeapi.SinglePlacement
@@ -180,13 +181,19 @@ func (objName ObjectName) String() string  { return string(objName) }
 // WorkloadPartDetails provides additional details about how the WorkloadPart
 // is to be included.
 type WorkloadPartDetails struct {
-	// APIVersion is version (no group) that the source workspace prefers to serve.
+	// APIVersion is version (no group) that the WDS prefers to serve.
 	// This is denormalized in two ways.
 	// This information is duplicated for all objects of the same kind.
 	// Since each WorkloadParts is specific to one EdgePlacement object,
 	// this information is duplicated among EdgePlacement objects that
 	// refer to the same workload object (i.e., in the same WDS).
 	APIVersion string
+
+	// ReturnSingletonState indicates whether the number of executing copies is expected to
+	// be 1 and the reported state should be returned to the WDS.
+	// This is denormalized: it is duplicated for all the EdgePlacement objects that refer
+	// to the same workload object.
+	ReturnSingletonState bool
 }
 
 // ProjectionKey identifies the topmost level of organization,

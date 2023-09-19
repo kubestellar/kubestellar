@@ -146,6 +146,7 @@ package placement
 //   a MapChangeReceiver that discards information.
 // - TransactionalMappingReceiver adds batching.
 // - MapReadonly wraps a Map to hide mutability.
+// - MutableMapToReadonly is like MapReadonly but only accepts a MutableMap (because Go is dumb about function subtyping).
 // - MutableMapWithKeyObserver wraps a MutableMap with an observer of changes to the set of keys.
 // - TransformMappingReceiver composes two transforms with a MappingReceiver.
 // - WrapMapWithMutex wraps a MutableMap with an RWMutex.
@@ -173,8 +174,11 @@ package placement
 // - FactoredMap is a map (a) whose Domain can be factored into two parts
 //   and (b) has a two-layer index based on those two parts.
 // - GenericFactoredMap is a FactoredMap with a user-supplied inner map type.
+// - GenericFactoredMapIndex defines the indexing behavior of a GenericFactoredMap.
 // - NewFactoredMapMapAggregator makes a FactoredMap that also notifies a receiver
 //   of updates to a GROUP BY KeyPartA & aggregate.
+// - SingleIndexedMap2 is a mutable map whose domain is a Pair and is indexed from left to right.
+// - SingleIndexedMap3 is a mutable map whose domain is a Triple and is indexed from left to right.
 
 // - NewHashMap creates a crummy hashtable given the hash and equality functions.  There has to be a better way!
 // - NewHashSet uses NewHashMap to make a MutableSet.

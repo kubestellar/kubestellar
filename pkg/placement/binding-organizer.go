@@ -53,20 +53,21 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 
 		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
 			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
+				// TODO: implement version agreement
 			},
 			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+				// TODO: implement version agreement
 			})
 
-		namespacedDistributionsReceiver := SetWriterFuncs[NamespacedDistributionTuple]{
-			OnAdd: func(tup NamespacedDistributionTuple) bool {
-				logger.V(4).Info("NamespacedDistributionTuple added", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespacedDistributions.Add(tup)
+		namespacedObjectDistributions := NewMappingReceiverFuncs(
+			func(key NamespacedDistributionTuple, val WorkloadPartDetails) {
+				logger.V(4).Info("NamespacedDistributionTuple added", "key", key, "returnSingleton", val.ReturnSingletonState)
+				sbo.workloadProjectionSections.NamespacedObjectDistributions.Put(key, val.ReturnSingletonState)
 			},
-			OnRemove: func(tup NamespacedDistributionTuple) bool {
-				logger.V(4).Info("NamespacedDistributionTuple removed", "tuple", tup)
-				return sbo.workloadProjectionSections.NamespacedDistributions.Remove(tup)
-			},
-		}
+			func(key NamespacedDistributionTuple) {
+				logger.V(4).Info("NamespacedDistributionTuple removed", "key", key)
+				sbo.workloadProjectionSections.NamespacedObjectDistributions.Delete(key)
+			})
 		aggregateForNamespaced := NewFactoredMapMapAggregator[NamespacedDistributionTuple, ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/, ProjectionModeVal, ProjectionModeVal](
 			PairFactorer[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/](),
 			nil,
@@ -75,50 +76,36 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			namespacedModesReceiver,
 		)
 
-		var nsSansEPName MappingReceiver[NamespacedDistributionTuple, ProjectionModeVal] = MappingReceiverFork[NamespacedDistributionTuple, ProjectionModeVal]{
-			MapKeySetReceiverLossy[NamespacedDistributionTuple, ProjectionModeVal](namespacedDistributionsReceiver),
-			aggregateForNamespaced,
-		}
-
-		pickVersionForEP := func(versions Map[ObjectName /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
-			var version ProjectionModeVal
-			if versions.Visit(func(pair Pair[ObjectName /*epName*/, ProjectionModeVal]) error {
-				version = pair.Second
-				return errStop
-			}) == nil {
-				return version, false
-			}
-			return version, true
-		}
-
-		namespacedChangeReceiver := MappingReceiverFuncs[NamespacedDistributionTuple, Map[ObjectName /*epName*/, ProjectionModeVal]]{
-			OnPut: func(nndt NamespacedDistributionTuple, versions Map[ObjectName /*epName*/, ProjectionModeVal]) {
-				version, ok := pickVersionForEP(versions)
+		namespacedChangeReceiver := MappingReceiverFuncs[NamespacedDistributionTuple, Map[ObjectName /*epName*/, WorkloadPartDetails]]{
+			OnPut: func(nndt NamespacedDistributionTuple, versions Map[ObjectName /*epName*/, WorkloadPartDetails]) {
+				version, ok := detailsSansEP(versions)
 				if !ok {
 					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
 				}
-				nsSansEPName.Put(nndt, version)
+				namespacedObjectDistributions.Put(nndt, version)
+				aggregateForNamespaced.Put(nndt, ProjectionModeVal{APIVersion: version.APIVersion})
 			},
 			OnDelete: func(nndt NamespacedDistributionTuple) {
-				nsSansEPName.Delete(nndt)
+				namespacedObjectDistributions.Delete(nndt)
+				aggregateForNamespaced.Delete(nndt)
 			},
 		}
 
-		sbo.namespacedWhatWhereFull = NewFactoredMapMap[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, ObjectName /* ep name */, ProjectionModeVal](
+		sbo.namespacedWhatWhereFull = NewFactoredMapMap[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, ObjectName /* ep name */, WorkloadPartDetails](
 			factorNamespacedWhatWhereFullKey,
 			nil,
 			nil,
 			namespacedChangeReceiver,
 		)
 
-		clusterDistributionsReceiver := SetWriterFuncs[NonNamespacedDistributionTuple]{
-			OnAdd: func(nnd NonNamespacedDistributionTuple) bool {
-				return sbo.workloadProjectionSections.NonNamespacedDistributions.Add(nnd)
+		clusterObjectDistributionsReceiver := NewMappingReceiverFuncs(
+			func(key NonNamespacedDistributionTuple, val WorkloadPartDetails) {
+				sbo.workloadProjectionSections.NonNamespacedObjectDistributions.Put(key, val.ReturnSingletonState)
 			},
-			OnRemove: func(nnd NonNamespacedDistributionTuple) bool {
-				return sbo.workloadProjectionSections.NonNamespacedDistributions.Remove(nnd)
+			func(key NonNamespacedDistributionTuple) {
+				sbo.workloadProjectionSections.NonNamespacedObjectDistributions.Delete(key)
 			},
-		}
+		)
 		clusterModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
 				sbo.workloadProjectionSections.NonNamespacedModes.Put(mk, val)
@@ -127,7 +114,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 				sbo.workloadProjectionSections.NonNamespacedModes.Delete(mk)
 			},
 		}
-		// aggregateForCluster is driven by the change stream of the map with epName projected out,
+		// aggregateForCluster is driven by the change stream of the map with epName and returnSingleton projected out,
 		// and does a GROUP BY ProjectionModeKey and then aggregates over ExternalName (of downsynced object) solving the version conflicts (if any).
 		aggregateForCluster := NewFactoredMapMapAggregator[NonNamespacedDistributionTuple, ProjectionModeKey, ExternalName /*of downsynced object*/, ProjectionModeVal, ProjectionModeVal](
 			PairFactorer[ProjectionModeKey, ExternalName /*of downsynced object*/](),
@@ -136,30 +123,26 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			pickThe1[ProjectionModeKey, ExternalName /*of downsynced object*/](sbo.logger, "Not implemented yet: handling version conflicts for cluster-scoped resources"),
 			clusterModesReceiver,
 		)
-		// ctSansEPName receives the change stream of clusterWhatWhereFull with epName projected out,
-		// and passes it along to clusterDistributionsReceiver and aggregateForCluster.
-		var ctSansEPName MappingReceiver[NonNamespacedDistributionTuple, ProjectionModeVal] = MappingReceiverFork[NonNamespacedDistributionTuple, ProjectionModeVal]{
-			MapKeySetReceiverLossy[NonNamespacedDistributionTuple, ProjectionModeVal](clusterDistributionsReceiver),
-			aggregateForCluster,
-		}
 		// clusterChangeReceiver receives the change stream of the full map and projects out the EdgePlacement
 		// object name to feed to sansEPName.
 		// This is relatively simple because the API version does not vary for a given resource and source cluster.
-		clusterChangeReceiver := MappingReceiverFuncs[NonNamespacedDistributionTuple, Map[ObjectName /*epName*/, ProjectionModeVal]]{
-			OnPut: func(nndt NonNamespacedDistributionTuple, versions Map[ObjectName /*epName*/, ProjectionModeVal]) {
-				version, ok := pickVersionForEP(versions)
+		clusterChangeReceiver := MappingReceiverFuncs[NonNamespacedDistributionTuple, Map[ObjectName /*epName*/, WorkloadPartDetails]]{
+			OnPut: func(nndt NonNamespacedDistributionTuple, versions Map[ObjectName /*epName*/, WorkloadPartDetails]) {
+				version, ok := detailsSansEP(versions)
 				if !ok {
 					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
 				}
-				ctSansEPName.Put(nndt, version)
+				clusterObjectDistributionsReceiver.Put(nndt, version)
+				aggregateForCluster.Put(nndt, ProjectionModeVal{version.APIVersion})
 			},
 			OnDelete: func(nndt NonNamespacedDistributionTuple) {
-				ctSansEPName.Delete(nndt)
+				clusterObjectDistributionsReceiver.Delete(nndt)
+				aggregateForCluster.Delete(nndt)
 			},
 		}
 		// clusterWhatWhereFull is a map from ClusterWhatWhereFullKey to API version (no group),
 		// factored into a map from NonNamespacedDistributionTuple to epName to API version.
-		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */, ProjectionModeVal](
+		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */, WorkloadPartDetails](
 			factorClusterWhatWhereFullKey,
 			nil,
 			nil,
@@ -184,6 +167,17 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 	}
 }
 
+func detailsSansEP(versions Map[ObjectName /*epName*/, WorkloadPartDetails]) (WorkloadPartDetails, bool) {
+	var ans WorkloadPartDetails
+	if versions.Visit(func(pair Pair[ObjectName /*epName*/, WorkloadPartDetails]) error {
+		ans = pair.Second
+		return errStop
+	}) == nil {
+		return ans, false
+	}
+	return ans, true
+}
+
 var factorUpsyncTuple = NewFactorer(
 	func(whole Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]) Pair[Pair[SinglePlacement, edgeapi.UpsyncSet], ExternalName /* of EdgePlacement object */] {
 		return NewPair(NewPair(whole.Third, whole.Second), whole.First)
@@ -203,40 +197,48 @@ var factorUpsyncTuple = NewFactorer(
 // The namespaced and non-namespaced (AKA cluster-scoped) resources are handled
 // separately.
 //
+// The designed version agreement algorithm belongs in here, but is not
+// implemented yet; instead there is a hack.
+// TODO: implement the designed version agreement.
+//
 // For the namespaced resources, as a SingleBinder this organizer
-// is given the stream of change to following relations:
-// - WhatWheres: map of ((epCluster,epName),(GroupResource,NSName,ObjName),destination) -> APIVersion
-// and produces the change streams to the following two relations:
-// - set of NamespacedDistributionTuple ((GroupResource,destination), (epCluster,NSName,ObjName))
+// is given the stream of changes to the following map:
+// - WhatWheres: map of ((epCluster,epName),(GroupResource,NSName,ObjName),destination) -> (APIVersion, returnSingleton)
+// and produces the change streams to the following two maps:
+// - map of NamespacedObjectDistributions ((GroupResource,destination), (epCluster,NSName,ObjName)) -> returnSingleton
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational algebra expression, the desired computation is as follows.
 // common = WhatWheres.ProjectOut(epName)
-// (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> APIVersion)
-// NamespacedDistributionTuples = common.Keys()
+// (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> (APIVersion, returnSingleton))
+// // NamespacedDistributionTuples = common.Keys()
+// NamespacedObjectDistributions = common.ProjectOut(APIVersion)
 // ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
 // nsModesReceiver <- nsSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// nsDistributionsReceiver <- nsSansEPName.Keys()
+// nsObjectDistributions <- nsSansEPName.ProjectOut(APIVersion)
 // nsSansEPName <- WhatWheres.ProjectOut(epName)
 //
 // For the cluster-scoped resources, as a SingleBinder this organizer
-// is given the stream of change to following relations:
-// - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> APIVersion
-// and produces the change streams to the following two relations:
-// - set of NonNamespacedDistributionTuple (epCluster,GroupResource,ObjName,destination)
+// is given the stream of changes to the following map:
+// - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> (APIVersion, returnSingleton)
+// and produces the change streams to the following two maps:
+// // - set of NonNamespacedDistributionTuple (epCluster,GroupResource,ObjName,destination)
+// - map of NonNamespacedObjectDistribution (epCluster,GroupResource,ObjName,destination) -> returnSingleton
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational algebra expression, the desired computation is as follows.
 // common = WhatWheres.ProjectOut(epName)
 // (that's a map (epCluster,GroupResource,ObjName,destination) -> APIVersion)
-// NonNamespacedDistributionTuples = common.Keys()
+// // NonNamespacedDistributionTuples = common.Keys()
+// NonNamespacedObjectDistributions = common.ProjectOut(APIVersion)
 // ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
 // clusterModesReceiver <- ctSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// clusterDistributionsReceiver <- ctSansEPName.Keys()
+// // clusterDistributionsReceiver <- ctSansEPName.keys()
+// clusterObjectDistributions <- ctSansEPName.ProjectOut(APIVersion)
 // ctSansEPName <- WhatWheres.ProjectOut(epName)
 //
 // For the upsyncs, as a SingleBinder this organizer is given the stream of changes
@@ -268,8 +270,8 @@ type simpleBindingOrganizer struct {
 	// but those values use workloadProjectionSections --- synchronously --- and so can
 	// only be invoked during a transaction.
 
-	clusterWhatWhereFull      MappingReceiver[ClusterWhatWhereFullKey, ProjectionModeVal]
-	namespacedWhatWhereFull   MappingReceiver[NamespacedWhatWhereFullKey, ProjectionModeVal]
+	clusterWhatWhereFull      MappingReceiver[ClusterWhatWhereFullKey, WorkloadPartDetails]
+	namespacedWhatWhereFull   MappingReceiver[NamespacedWhatWhereFullKey, WorkloadPartDetails]
 	upsyncsFull               SetWriter[Triple[ExternalName /* of EdgePlacement object */, edgeapi.UpsyncSet, SinglePlacement]]
 	resourceDiscoveryReceiver MappingReceiver[ResourceDiscoveryKey, ProjectionModeVal]
 }
@@ -389,10 +391,10 @@ func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement
 	gr := tup.Second.First
 	namespaced := len(tup.Second.Second) > 0
 	if namespaced {
-		sbo.namespacedWhatWhereFull.Put(tup, ProjectionModeVal{val.APIVersion})
+		sbo.namespacedWhatWhereFull.Put(tup, val)
 	} else {
 		key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, ObjectName]{gr, tup.Second.Third}, tup.Third}
-		sbo.clusterWhatWhereFull.Put(key, ProjectionModeVal{APIVersion: val.APIVersion})
+		sbo.clusterWhatWhereFull.Put(key, val)
 	}
 }
 

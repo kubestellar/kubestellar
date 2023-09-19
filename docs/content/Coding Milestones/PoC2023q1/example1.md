@@ -53,6 +53,37 @@ they appear in this example.
 
 ## Stage 5
 
+### Singleton reported state return
+
+The workload `ReplicaSet` and `Deployment` objects above request
+return of reported state to the WDS when the number of executing
+copies is exactly 1.
+
+For the common workload, the number of executing copies should be 2.
+Check that this is the number reported.
+
+```shell
+kubectl ws root:my-org:wmw-c
+kubectl get rs -n commonstuff commond -o yaml | grep 'kubestellar.io/executing-count: "2"' || { kubectl get rs -n commonstuff commond -o yaml; false; }
+```
+
+For the special workload, the number of executing copies should be 1.  Check it.
+
+```shell
+kubectl ws root:my-org:wmw-s
+kubectl get deploy -n specialstuff speciald -o yaml | grep 'kubestellar.io/executing-count: "1"' || { kubectl get deploy -n specialstuff speciald -o yaml; false; }
+```
+
+Look at the status section of the "speciald" `Deployment` and see that
+it has been filled in with the information from the guilder cluster.
+
+```shell
+kubectl get deploy -n specialstuff speciald -o yaml
+kubectl get deploy -n specialstuff speciald -o yaml | grep 'readyReplicas: 1'
+```
+
+### Status Summarization (aspirational)
+
 ![Summarization for special](Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
 
 The status summarizer, driven by the EdgePlacement and

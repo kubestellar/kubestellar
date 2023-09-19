@@ -236,6 +236,11 @@ func MapReadonly[Key, Val any](inner Map[Key, Val]) Map[Key, Val] {
 	return mapReadonly[Key, Val]{inner}
 }
 
+// MutableMapToReadonly returns a version of the argument that does not support writes
+func MutableMapToReadonly[Key, Val any](inner MutableMap[Key, Val]) Map[Key, Val] {
+	return MapReadonly[Key, Val](inner)
+}
+
 type mapReadonly[Key, Val any] struct {
 	Map[Key, Val]
 }

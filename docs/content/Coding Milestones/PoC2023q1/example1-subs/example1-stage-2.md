@@ -104,6 +104,7 @@ metadata:
   name: commond
   annotations:
     edge.kubestellar.io/customizer: example-customizer
+    kubestellar.io/want-singleton-report: "true"
 spec:
   selector: {matchLabels: {app: common} }
   template:
@@ -234,6 +235,7 @@ metadata:
   name: speciald
   annotations:
     edge.kubestellar.io/customizer: example-customizer
+    kubestellar.io/want-singleton-report: "true"
 spec:
   selector: {matchLabels: {app: special} }
   template:

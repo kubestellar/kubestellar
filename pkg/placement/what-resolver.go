@@ -102,7 +102,8 @@ type NamespacedName = Pair[NamespaceName, ObjectName]
 
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	placements MapSet[ObjectName] // the ones that match this object
+	placements           MapSet[ObjectName] // the ones that match this object
+	returnSingletonState bool
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -253,7 +254,7 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 				continue
 			}
 			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
-			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version}
+			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, ReturnSingletonState: objDetails.returnSingletonState}
 			parts[partID] = partDetails
 		}
 	}
@@ -307,12 +308,12 @@ func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) b
 	} else if item.gk.Group == urmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
 		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
 	} else {
-		return wr.processObject(ctx, item.cluster, item.gk, item.nn)
+		return wr.processCenterObject(ctx, item.cluster, item.gk, item.nn)
 	}
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluster.Name, gk schema.GroupKind, objName NamespacedName) bool {
+func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logicalcluster.Name, gk schema.GroupKind, objName NamespacedName) bool {
 	logger := klog.FromContext(ctx)
 	wr.Lock()
 	defer wr.Unlock()
@@ -345,12 +346,12 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 	}
 	oldDetails := rr.byObjName[objName]
 	if oldDetails == nil {
-		oldDetails = newObjectDetails()
+		oldDetails = newObjectDetails(nil)
 	}
 	var newDetails *objectDetails
 	if rObj == nil {
 		delete(rr.byObjName, objName)
-		newDetails = newObjectDetails()
+		newDetails = newObjectDetails(nil)
 	} else {
 		mrObj := rObj.(mrObject)
 		newDetails = whatMatchingPlacements(logger, wsDetails, wsDetails.placements, rr.gvr.Resource, mrObj)
@@ -358,7 +359,12 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 			return false
 		}
 	}
-	changedPlacements, _, _ := MapSetSymmetricDifference[ObjectName](true, false, false, newDetails.placements, oldDetails.placements)
+	var changedPlacements [2]MapSet[ObjectName]
+	if oldDetails.returnSingletonState == newDetails.returnSingletonState {
+		changedPlacements[0], _, changedPlacements[1] = MapSetSymmetricDifference[ObjectName](true, false, false, newDetails.placements, oldDetails.placements)
+	} else {
+		changedPlacements[0], changedPlacements[1] = newDetails.placements, oldDetails.placements
+	}
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if len(changedPlacements) == 0 {
 		return true
@@ -366,12 +372,19 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 	if rObj != nil {
 		rr.byObjName[objName] = newDetails
 	}
-	wr.notifyReceiversOfPlacements(cluster, changedPlacements)
+	for _, cps := range changedPlacements {
+		wr.notifyReceiversOfPlacements(cluster, cps)
+	}
 	return true
 }
 
-func newObjectDetails() *objectDetails {
-	ans := &objectDetails{placements: NewEmptyMapSet[ObjectName]()}
+func newObjectDetails(annotations map[string]string) *objectDetails {
+	var returnSingletonS string
+	if annotations != nil {
+		returnSingletonS = annotations[edgeapi.WantSingletonReportKey]
+	}
+	ans := &objectDetails{placements: NewEmptyMapSet[ObjectName](),
+		returnSingletonState: returnSingletonS == "true"}
 	return ans
 }
 
@@ -551,7 +564,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 			objNN := NewPair(objNS, objName)
 			objDetails, found := rr.byObjName[objNN]
 			if objDetails == nil {
-				objDetails = newObjectDetails()
+				objDetails = newObjectDetails(mrObj.GetAnnotations())
 			}
 			objChange, success := objDetails.setByMatch(logger, wsDetails, &ep.Spec, epName, rr.gvr.Resource, mrObj)
 			logger.V(5).Info("From objDetails.setByMatch", "objNN", objNN, "found", found, "objChange", objChange, "success", success)
@@ -579,7 +592,7 @@ type mrObject interface {
 
 // Returns nil when an accurate answer cannot be computed.
 func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidates map[ObjectName]*edgeapi.EdgePlacement, whatResource string, whatObj mrObject) *objectDetails {
-	ans := newObjectDetails()
+	ans := newObjectDetails(whatObj.GetAnnotations())
 	for epName, ep := range candidates {
 		_, success := ans.setByMatch(logger, wsd, &ep.Spec, epName, whatResource, whatObj)
 		if !success {
