@@ -52,7 +52,7 @@ type setBinder struct {
 type setBindingForCluster struct {
 	*setBinder
 	cluster      logicalcluster.Name
-	perPlacement map[string]*setBindingForPlacement
+	perPlacement map[ObjectName]*setBindingForPlacement
 }
 
 type setBindingForPlacement struct {
@@ -199,14 +199,14 @@ func (sb *setBinder) getCluster(cluster logicalcluster.Name, want bool) *setBind
 		sbc = &setBindingForCluster{
 			setBinder:    sb,
 			cluster:      cluster,
-			perPlacement: map[string]*setBindingForPlacement{},
+			perPlacement: map[ObjectName]*setBindingForPlacement{},
 		}
 		sb.perCluster[cluster] = sbc
 	}
 	return sbc
 }
 
-func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPlacement {
+func (sbc *setBindingForCluster) ensurePlacement(epName ObjectName) *setBindingForPlacement {
 	sbp := sbc.perPlacement[epName]
 	if sbp == nil {
 		epID := ExternalName{sbc.cluster, epName}

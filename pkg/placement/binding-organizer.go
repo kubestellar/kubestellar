@@ -80,9 +80,9 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			aggregateForNamespaced,
 		}
 
-		pickVersionForEP := func(versions Map[string /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
+		pickVersionForEP := func(versions Map[ObjectName /*epName*/, ProjectionModeVal]) (ProjectionModeVal, bool) {
 			var version ProjectionModeVal
-			if versions.Visit(func(pair Pair[string /*epName*/, ProjectionModeVal]) error {
+			if versions.Visit(func(pair Pair[ObjectName /*epName*/, ProjectionModeVal]) error {
 				version = pair.Second
 				return errStop
 			}) == nil {
@@ -91,8 +91,8 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			return version, true
 		}
 
-		namespacedChangeReceiver := MappingReceiverFuncs[NamespacedDistributionTuple, Map[string /*epName*/, ProjectionModeVal]]{
-			OnPut: func(nndt NamespacedDistributionTuple, versions Map[string /*epName*/, ProjectionModeVal]) {
+		namespacedChangeReceiver := MappingReceiverFuncs[NamespacedDistributionTuple, Map[ObjectName /*epName*/, ProjectionModeVal]]{
+			OnPut: func(nndt NamespacedDistributionTuple, versions Map[ObjectName /*epName*/, ProjectionModeVal]) {
 				version, ok := pickVersionForEP(versions)
 				if !ok {
 					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
@@ -104,7 +104,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		}
 
-		sbo.namespacedWhatWhereFull = NewFactoredMapMap[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, string /* ep name */, ProjectionModeVal](
+		sbo.namespacedWhatWhereFull = NewFactoredMapMap[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, ObjectName /* ep name */, ProjectionModeVal](
 			factorNamespacedWhatWhereFullKey,
 			nil,
 			nil,
@@ -145,8 +145,8 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		// clusterChangeReceiver receives the change stream of the full map and projects out the EdgePlacement
 		// object name to feed to sansEPName.
 		// This is relatively simple because the API version does not vary for a given resource and source cluster.
-		clusterChangeReceiver := MappingReceiverFuncs[NonNamespacedDistributionTuple, Map[string /*epName*/, ProjectionModeVal]]{
-			OnPut: func(nndt NonNamespacedDistributionTuple, versions Map[string /*epName*/, ProjectionModeVal]) {
+		clusterChangeReceiver := MappingReceiverFuncs[NonNamespacedDistributionTuple, Map[ObjectName /*epName*/, ProjectionModeVal]]{
+			OnPut: func(nndt NonNamespacedDistributionTuple, versions Map[ObjectName /*epName*/, ProjectionModeVal]) {
 				version, ok := pickVersionForEP(versions)
 				if !ok {
 					sbo.logger.Error(nil, "Impossible: addition of empty version map", "nndt", nndt)
@@ -159,7 +159,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		}
 		// clusterWhatWhereFull is a map from ClusterWhatWhereFullKey to API version (no group),
 		// factored into a map from NonNamespacedDistributionTuple to epName to API version.
-		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, string /* ep name */, ProjectionModeVal](
+		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */, ProjectionModeVal](
 			factorClusterWhatWhereFullKey,
 			nil,
 			nil,
@@ -304,15 +304,15 @@ func pickThe1[KeyPartA, KeyPartB comparable](logger klog.Logger, errmsg string) 
 	}
 }
 
-var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, string /*epName*/]{
-	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespacedDistributionTuple, string /*epName*/] {
-		return Pair[NamespacedDistributionTuple, string /*epName*/]{
+var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, NamespacedDistributionTuple, ObjectName /*epName*/]{
+	First: func(nfk NamespacedWhatWhereFullKey) Pair[NamespacedDistributionTuple, ObjectName /*epName*/] {
+		return Pair[NamespacedDistributionTuple, ObjectName /*epName*/]{
 			First: NewPair(
 				ProjectionModeKey{nfk.Second.First, nfk.Third},
 				NewTriple(nfk.First.Cluster, nfk.Second.Second, nfk.Second.Third)),
 			Second: nfk.First.Name}
 	},
-	Second: func(parts Pair[NamespacedDistributionTuple, string /*epName*/]) NamespacedWhatWhereFullKey {
+	Second: func(parts Pair[NamespacedDistributionTuple, ObjectName /*epName*/]) NamespacedWhatWhereFullKey {
 		return NamespacedWhatWhereFullKey{
 			First:  ExternalName{parts.First.Second.First, parts.Second},
 			Second: NewTriple(parts.First.First.GroupResource, parts.First.Second.Second, parts.First.Second.Third),
@@ -322,9 +322,9 @@ var factorNamespacedWhatWhereFullKey = Factorer[NamespacedWhatWhereFullKey, Name
 
 // factorClusterWhatWhereFullKey factors a ClusterWhatWhereFullKey into
 // a (NonNamespacedDistributionTuple, string/*ep name*/) pair.
-var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, string /* ep name */]{
-	First: func(cfk ClusterWhatWhereFullKey) Pair[NonNamespacedDistributionTuple, string /* ep name */] {
-		return Pair[NonNamespacedDistributionTuple, string /* ep name */]{
+var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */]{
+	First: func(cfk ClusterWhatWhereFullKey) Pair[NonNamespacedDistributionTuple, ObjectName /* ep name */] {
+		return Pair[NonNamespacedDistributionTuple, ObjectName /* ep name */]{
 			First: NonNamespacedDistributionTuple{
 				First: ProjectionModeKey{
 					GroupResource: cfk.Second.First,
@@ -337,10 +337,10 @@ var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespa
 			},
 			Second: cfk.First.Name}
 	},
-	Second: func(decomp Pair[NonNamespacedDistributionTuple, string /*ep name*/]) ClusterWhatWhereFullKey {
+	Second: func(decomp Pair[NonNamespacedDistributionTuple, ObjectName /*ep name*/]) ClusterWhatWhereFullKey {
 		return ClusterWhatWhereFullKey{
 			First:  ExternalName{decomp.First.Second.Cluster, decomp.Second},
-			Second: Pair[metav1.GroupResource, string]{decomp.First.First.GroupResource, decomp.First.Second.Name},
+			Second: Pair[metav1.GroupResource, ObjectName]{decomp.First.First.GroupResource, decomp.First.Second.Name},
 			Third:  decomp.First.First.Destination,
 		}
 	},
@@ -351,7 +351,7 @@ type ResourceDiscoveryKey = Pair[logicalcluster.Name /*wmw*/, metav1.GroupResour
 type NamespacedWhatWhereFullKey = Triple[ExternalName, WorkloadPartID, SinglePlacement]
 
 // ClusterWhatWhereFullKey is (EdgePlacement id, (resource, object name), destination)
-type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, string], SinglePlacement]
+type ClusterWhatWhereFullKey = Triple[ExternalName, Pair[metav1.GroupResource, ObjectName], SinglePlacement]
 
 func (sbo *simpleBindingOrganizer) Transact(xn func(SingleBindingOps, UpsyncOps)) {
 	sbo.Lock()
@@ -391,7 +391,7 @@ func (sxo sboXnOps) Put(tup Triple[ExternalName, WorkloadPartID, SinglePlacement
 	if namespaced {
 		sbo.namespacedWhatWhereFull.Put(tup, ProjectionModeVal{val.APIVersion})
 	} else {
-		key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, string(tup.Second.Third)}, tup.Third}
+		key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, ObjectName]{gr, tup.Second.Third}, tup.Third}
 		sbo.clusterWhatWhereFull.Put(key, ProjectionModeVal{APIVersion: val.APIVersion})
 	}
 }
@@ -412,7 +412,7 @@ func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacem
 	if namespaced /* && !val.IncludeNamespaceObject */ {
 		sbo.namespacedWhatWhereFull.Delete(tup)
 	}
-	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, string]{gr, string(tup.Second.Third)}, tup.Third}
+	key := ClusterWhatWhereFullKey{tup.First, Pair[metav1.GroupResource, ObjectName]{gr, tup.Second.Third}, tup.Third}
 	sbo.clusterWhatWhereFull.Delete(key)
 	if false {
 		// TODO: make this happen iff there is no remaining data for the cluster

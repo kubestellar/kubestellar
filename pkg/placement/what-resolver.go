@@ -74,7 +74,7 @@ type whatResolver struct {
 type workspaceDetails struct {
 	ctx context.Context
 	// placements maps name of relevant EdgePlacement object to that object
-	placements             map[string]*edgeapi.EdgePlacement
+	placements             map[ObjectName]*edgeapi.EdgePlacement
 	stop                   func()
 	apiInformer            upstreamcache.SharedInformer
 	apiLister              apiwatch.APIResourceLister
@@ -102,7 +102,7 @@ type NamespacedName = Pair[NamespaceName, ObjectName]
 
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	placements k8ssets.String // the ones that match this object
+	placements MapSet[ObjectName] // the ones that match this object
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -236,7 +236,7 @@ func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
 	kont(resolvedWhat.Downsync)
 }
 
-func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName string) ResolvedWhat {
+func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName ObjectName) ResolvedWhat {
 	parts := WorkloadParts{}
 	var upsyncs []edgeapi.UpsyncSet
 	wsDetails, found := wr.workspaceDetails[wldCluster]
@@ -260,13 +260,13 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName st
 	return ResolvedWhat{parts, upsyncs}
 }
 
-func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements k8ssets.String) {
+func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements MapSet[ObjectName]) {
 	for epName := range placements {
 		wr.notifyReceivers(cluster, epName)
 	}
 }
 
-func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName string) {
+func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName ObjectName) {
 	resolvedWhat := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
 	wr.receiver.Put(epRef, resolvedWhat)
@@ -303,7 +303,7 @@ func (wr *whatResolver) processNextWorkItem() bool {
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
 	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.cluster, string(item.nn.Second))
+		return wr.processEdgePlacement(ctx, item.cluster, item.nn.Second)
 	} else if item.gk.Group == urmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
 		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
 	} else {
@@ -358,7 +358,7 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 			return false
 		}
 	}
-	changedPlacements := newDetails.placements.Difference(oldDetails.placements)
+	changedPlacements, _, _ := MapSetSymmetricDifference[ObjectName](true, false, false, newDetails.placements, oldDetails.placements)
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if len(changedPlacements) == 0 {
 		return true
@@ -371,7 +371,7 @@ func (wr *whatResolver) processObject(ctx context.Context, cluster logicalcluste
 }
 
 func newObjectDetails() *objectDetails {
-	ans := &objectDetails{placements: k8ssets.NewString()}
+	ans := &objectDetails{placements: NewEmptyMapSet[ObjectName]()}
 	return ans
 }
 
@@ -403,9 +403,9 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		}
 		rr.stop()
 		delete(wsDetails.resources, arName)
-		changedPlacements := k8ssets.NewString()
+		changedPlacements := NewEmptyMapSet[ObjectName]()
 		for _, objDetails := range rr.byObjName {
-			changedPlacements = changedPlacements.Union(objDetails.placements)
+			SetAddAll[ObjectName](changedPlacements, objDetails.placements)
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -452,9 +452,9 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName string) bool {
+func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName ObjectName) bool {
 	logger := klog.FromContext(ctx)
-	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(epName)
+	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(string(epName))
 	if err != nil {
 		if !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Failed to fetch EdgePlacement from local cache")
@@ -480,7 +480,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
 			ctx:                    wsCtx,
-			placements:             map[string]*edgeapi.EdgePlacement{},
+			placements:             map[ObjectName]*edgeapi.EdgePlacement{},
 			stop:                   stopWS,
 			apiInformer:            apiInformer,
 			apiLister:              apiLister,
@@ -578,7 +578,7 @@ type mrObject interface {
 }
 
 // Returns nil when an accurate answer cannot be computed.
-func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidates map[string]*edgeapi.EdgePlacement, whatResource string, whatObj mrObject) *objectDetails {
+func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidates map[ObjectName]*edgeapi.EdgePlacement, whatResource string, whatObj mrObject) *objectDetails {
 	ans := newObjectDetails()
 	for epName, ep := range candidates {
 		_, success := ans.setByMatch(logger, wsd, &ep.Spec, epName, whatResource, whatObj)
@@ -590,7 +590,7 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 }
 
 // returns `(changed bool, success bool)`
-func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName, whatResource string, whatObj mrObject) (bool, bool) {
+func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
 	found := od.placements.Has(epName)
 	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
@@ -600,7 +600,7 @@ func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, s
 		return false, true
 	}
 	if !found {
-		od.placements.Insert(epName)
+		od.placements.Add(epName)
 	} else {
 		delete(od.placements, epName)
 	}

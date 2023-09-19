@@ -102,7 +102,7 @@ func TestWhatResolver(t *testing.T) {
 					ObjectNames: []string{"ns2"},
 				},
 			}}}
-	ep1EN := ExternalName{wds1N, ep1.Name}
+	ep1EN := ExternalName{wds1N, ObjectName(ep1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(ep1)
 	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
 	epClusterPreInformer := edgeClusterInformerFactory.Edge().V1alpha1().EdgePlacements()

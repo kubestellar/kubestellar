@@ -96,8 +96,8 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	}
 	pmv1 := ProjectionModeVal{workloadPartDetails1.APIVersion}
 	pmv2 := ProjectionModeVal{workloadPartDetails2.APIVersion}
-	objRef1 := ExternalName{Cluster: sc1, Name: workloadPartID1.Third.String()}
-	objRef2 := ExternalName{Cluster: sc1, Name: workloadPartID2.Third.String()}
+	objRef1 := ExternalName{Cluster: sc1, Name: workloadPartID1.Third}
+	objRef2 := ExternalName{Cluster: sc1, Name: workloadPartID2.Third}
 	expectedNonNamespacedDistributions := NewMapSet(NewPair(pmk1, objRef1))
 	if !SetEqual[NonNamespacedDistributionTuple](expectedNonNamespacedDistributions, NonNamespacedDistributions) {
 		t.Fatalf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedDistributions, NonNamespacedDistributions)
