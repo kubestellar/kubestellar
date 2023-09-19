@@ -4,6 +4,11 @@ coverage.*
 tools
 build
 .vscode
+/metadata/scripts/venv
+/metadata/commits
+/metadata/branches
+/metadata/remotebranches
+/metadata/tags
 
 # JetBrains IDE files
 .idea/
