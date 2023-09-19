@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230918-a3bb3be7f.spaces.space.kubestellar.io
+  name: v230919-9899317ae.spaces.space.kubestellar.io
 spec:
   group: space.kubestellar.io
   names:

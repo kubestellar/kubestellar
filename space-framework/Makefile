@@ -105,7 +105,7 @@ LDFLAGS := \
 	-extldflags '-static'
 
 .PHONY: build
-build: WHAT ?= ./cmd/space-manager
+build: WHAT ?= ./cmd/space-manager ./cmd/space-client-test
 build: bin-dir
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package spaceclient
+package msclientlib
 
 import (
 	"context"
@@ -31,7 +31,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	mcclientset "github.com/kubestellar/kubestellar/pkg/spaceclient/clientset"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 )
 
@@ -40,26 +39,26 @@ const (
 )
 
 type controller struct {
-	context          context.Context
-	logger           logr.Logger
-	queue            workqueue.RateLimitingInterface
-	spaceInformer    cache.SharedIndexInformer
-	multiSpaceClient *multiSpaceClient
+	context       context.Context
+	logger        logr.Logger
+	msClient      *multiSpaceClient
+	queue         workqueue.RateLimitingInterface
+	spaceInformer cache.SharedIndexInformer
 }
 
 func newController(
 	context context.Context,
 	spaceInformer cache.SharedIndexInformer,
-	multiSpaceClient *multiSpaceClient,
+	msClient *multiSpaceClient,
 ) *controller {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 
 	c := &controller{
-		context:          context,
-		logger:           klog.FromContext(context),
-		queue:            workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
-		spaceInformer:    spaceInformer,
-		multiSpaceClient: multiSpaceClient,
+		context:       context,
+		logger:        klog.FromContext(context),
+		queue:         workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName),
+		spaceInformer: spaceInformer,
+		msClient:      msClient,
 	}
 
 	spaceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -158,25 +157,18 @@ func (c *controller) handleAdd(space interface{}, spaceKey string) {
 		runtime.HandleError(err)
 		return
 	}
-	cs, err := mcclientset.NewForConfig(config)
-	if err != nil {
-		runtime.HandleError(err)
-		return
-	}
 	c.logger.Info("New space detected", "space", spaceInfo.Name)
-	c.multiSpaceClient.lock.Lock()
-	defer c.multiSpaceClient.lock.Unlock()
-	c.multiSpaceClient.configs[spaceKey] = config
-	c.multiSpaceClient.clientsets[spaceKey] = cs
+	c.msClient.lock.Lock()
+	defer c.msClient.lock.Unlock()
+	c.msClient.configs[spaceKey] = config
 }
 
 // handleDelete deletes space from the cache maps
 func (c *controller) handleDelete(spaceKey string) {
-	c.multiSpaceClient.lock.Lock()
-	defer c.multiSpaceClient.lock.Unlock()
-	if _, ok := c.multiSpaceClient.configs[spaceKey]; !ok {
+	c.msClient.lock.Lock()
+	defer c.msClient.lock.Unlock()
+	if _, ok := c.msClient.configs[spaceKey]; !ok {
 		return
 	}
-	delete(c.multiSpaceClient.configs, spaceKey)
-	delete(c.multiSpaceClient.clientsets, spaceKey)
+	delete(c.msClient.configs, spaceKey)
 }
