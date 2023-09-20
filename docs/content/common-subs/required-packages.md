@@ -32,7 +32,17 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
-    === "Fedora/RHEL/CentOS"
+     === "Debian"
+        ``` title="jq - https://stedolan.github.io/jq/download/"
+        sudo apt-get install jq
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
+        sudo apt-get install yq
+        ```
+        ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+        ```
+   === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
@@ -183,6 +193,30 @@
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt update
         sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        ```
+        ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
+        ```
+
+    === "Debian"
+
+        ``` title="docker - https://docs.docker.com/engine/install/"
+        # Add Docker's official GPG key:
+        sudo apt-get update
+        sudo apt-get install ca-certificates curl gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        
+        # Add the repository to Apt sources:
+        echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        
+        # Install packages
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
