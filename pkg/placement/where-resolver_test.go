@@ -51,7 +51,7 @@ func TestWhereResolver(t *testing.T) {
 		},
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
-	ep1EN := ExternalName{wds1N, sps1.Name}
+	ep1EN := ExternalName{wds1N, ObjectName(sps1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(sps1)
 	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
 	spsClusterPreInformer := edgeClusterInformerFactory.Edge().V1alpha1().SinglePlacementSlices()

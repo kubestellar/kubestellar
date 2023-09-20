@@ -56,7 +56,7 @@ type queueItem struct {
 }
 
 func (qi queueItem) toExternalName() ExternalName {
-	return ExternalName{Cluster: qi.cluster, Name: qi.name}
+	return ExternalName{Cluster: qi.cluster, Name: ObjectName(qi.name)}
 }
 
 // NewWhereResolver returns a WhereResolver.

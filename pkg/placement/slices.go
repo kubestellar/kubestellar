@@ -162,7 +162,7 @@ type Slice[Elt any] []Elt
 
 var _ Visitable[float64] = Slice[float64]{}
 
-func NewSlice[Elt any]() Slice[Elt] { return Slice[Elt]{} }
+func NewSlice[Elt any](elts ...Elt) Slice[Elt] { return Slice[Elt](elts) }
 
 func (slice Slice[Elt]) IsEmpty() bool    { return len(slice) == 0 }
 func (slice Slice[Elt]) Len() int         { return len(slice) }

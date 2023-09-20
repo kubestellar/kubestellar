@@ -83,8 +83,9 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	wpc := MapGetAdd(awp.perCluster, clusterName, true, func(clusterName logicalcluster.Name) *apiWatchProviderPerCluster {
 		ctx := context.Background()
 		wpc := &apiWatchProviderPerCluster{
-			awp:               awp,
-			cluster:           clusterName,
+			awp:     awp,
+			cluster: clusterName,
+			// TODO: feed the groupReceivers
 			groupReceivers:    MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{},
 			resourceReceivers: MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{},
 		}

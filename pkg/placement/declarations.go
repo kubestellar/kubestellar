@@ -156,10 +156,8 @@ type ResolvedWhat struct {
 //
 // Every WorkloadParts that appears in the interfaces here is immutable.
 //
-// Namespace objects implied by the "what predicate" are included in
-// the results of "what resolution", with IncludeNamespaceObject=false.
-// The user may explicitly request a Namespace object, in which case
-// IncludeNamespaceObject=true.
+// Namespace objects appear here only if explicitly requested in the
+// "what predicate".
 //
 // A workload may include objects of kinds that are built into
 // the edge cluster.  By built-in we mean that these kinds are both
@@ -176,15 +174,18 @@ type WorkloadPartID = Triple[metav1.GroupResource, NamespaceName, ObjectName]
 
 type ObjectName string
 
-func (objName ObjectName) String() string { return string(objName) }
+func NewObjectName(name string) ObjectName { return ObjectName(name) }
+func (objName ObjectName) String() string  { return string(objName) }
 
 // WorkloadPartDetails provides additional details about how the WorkloadPart
 // is to be included.
 type WorkloadPartDetails struct {
 	// APIVersion is version (no group) that the source workspace prefers to serve.
-	// In the case of a namespace object: this field only applies to the namespace
-	// object itself, not the namespace contents, and is the empty string if
-	// IncludeNamespaceObject is false.
+	// This is denormalized in two ways.
+	// This information is duplicated for all objects of the same kind.
+	// Since each WorkloadParts is specific to one EdgePlacement object,
+	// this information is duplicated among EdgePlacement objects that
+	// refer to the same workload object (i.e., in the same WDS).
 	APIVersion string
 }
 

@@ -125,15 +125,21 @@ var SliceOfStringDomain = NewSliceHashDomain[string](HashDomainString{})
 
 var HashLogicalClusterName = NewTransformHashDomain[logicalcluster.Name, string](func(name logicalcluster.Name) string { return string(name) }, HashDomainString{})
 
+var HashObjectName = NewTransformHashDomain[ObjectName, string](func(name ObjectName) string { return string(name) }, HashDomainString{})
+
 var HashClusterString = PairHashDomain[logicalcluster.Name, string](HashLogicalClusterName, HashDomainString{})
 
+var HashClusterObjectName = PairHashDomain[logicalcluster.Name, ObjectName](HashLogicalClusterName, HashObjectName)
+
 var factorExternalName = NewFactorer(
-	func(whole ExternalName) Pair[logicalcluster.Name, string] { return NewPair(whole.Cluster, whole.Name) },
-	func(parts Pair[logicalcluster.Name, string]) ExternalName {
+	func(whole ExternalName) Pair[logicalcluster.Name, ObjectName] {
+		return NewPair(whole.Cluster, whole.Name)
+	},
+	func(parts Pair[logicalcluster.Name, ObjectName]) ExternalName {
 		return ExternalName{parts.First, parts.Second}
 	})
 
-var HashExternalName = NewTransformHashDomain(factorExternalName.First, HashClusterString)
+var HashExternalName = NewTransformHashDomain(factorExternalName.First, HashClusterObjectName)
 
 type HashUpsyncSet struct{}
 
