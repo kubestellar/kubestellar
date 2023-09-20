@@ -13,7 +13,7 @@ sleep 60
 ``` { .bash .no-copy }
 ...
 I0721 17:37:10.186848  189094 main.go:206] "Found APIExport view" exportName="e
-dge.kcp.io" serverURL="https://10.0.2.15:6443/services/apiexport/cseslli1ddit3s
+dge.kubestellar.io" serverURL="https://10.0.2.15:6443/services/apiexport/cseslli1ddit3s
 a5/edge.kubestellar.io"
 ...
 I0721 19:17:21.906984  189094 controller.go:300] "Created APIBinding" worker=1
@@ -38,6 +38,7 @@ normally it would run continuously.
 You can get a listing of those mailbox workspaces as follows.
 
 ```shell
+kubectl ws root
 kubectl get Workspaces
 ```
 ``` { .bash .no-copy }

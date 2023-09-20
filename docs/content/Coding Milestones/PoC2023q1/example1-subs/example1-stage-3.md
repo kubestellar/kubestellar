@@ -30,11 +30,18 @@ The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
 
 ```shell
+kubectl ws root
+```
+``` { .bash .no-copy }
+Current workspace is "root".
+```
+
+```shell
 kubectl ws $FLORIN_WS
 ```
 
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
+Current workspace is "root:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 ```
 
 ```shell
@@ -177,17 +184,17 @@ Examine guilder's `SyncerConfig` object and workloads as follows, using
 the name that you stored in Stage 1.
 
 ```shell
-kubectl ws root:espw
+kubectl ws root
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw".
+Current workspace is "root".
 ```
 
 ```shell
 kubectl ws $GUILDER_WS
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
+Current workspace is "root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
 ```
 
 ```shell

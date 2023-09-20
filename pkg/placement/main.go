@@ -78,7 +78,7 @@ func NewPlacementTranslator(
 	syncfgClusterPreInformer edgev1a1informers.SyncerConfigClusterInformer,
 
 	customizerClusterPreInformer edgev1a1informers.CustomizerClusterInformer,
-	// pre-informer on Workspaces objects in the ESPW
+	// pre-informer on Workspaces objects
 	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
 	// all-cluster clientset for kcp APIs,
 	// needed to manipulate TMC objects in mailbox workspaces
