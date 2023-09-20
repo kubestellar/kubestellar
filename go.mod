@@ -13,7 +13,6 @@ require (
 	github.com/kcp-dev/kcp v0.11.0
 	github.com/kcp-dev/kcp/pkg/apis v0.11.0
 	github.com/kcp-dev/logicalcluster/v3 v3.0.2
-	github.com/kubestellar/kubestellar/space-framework v0.0.0-00010101000000-000000000000
 	github.com/martinlindhe/base36 v1.1.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace

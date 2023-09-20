@@ -14,14 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package spaceclient
+package msclientlib
 
 // kubestellar space-aware client impl
 
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -30,9 +29,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 
-	mcclientset "github.com/kubestellar/kubestellar/pkg/spaceclient/clientset"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
-	ksclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	mgtclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
 	ksinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
 )
 
@@ -40,43 +38,57 @@ const defaultProviderNs = "spaceprovider-default"
 
 type KubestellarSpaceInterface interface {
 	// Space returns clientset for given space.
-	Space(name string, namespace ...string) (client mcclientset.Interface)
+
+	//Space(name string, namespace ...string) (client mcclientset.Interface)
+
 	// ConfigForSpace returns rest config for given space.
-	ConfigForSpace(name string, namespace ...string) (*rest.Config, error)
+	ConfigForSpace(name string, providerNS string) (*rest.Config, error)
 }
 
 type multiSpaceClient struct {
-	ctx              context.Context
+	ctx context.Context
+	// Currently configs holds the kubeconfig as a string for each Space.
+	// This is temporary as Space is bing changed to use secrets instead of holding the config as
+	// text string
+	// The key to the map is the spaceName+ProviderNS  (currently we use the provider NS and not directly the provider name)
 	configs          map[string]*rest.Config
-	clientsets       map[string]*mcclientset.Clientset
-	managerClientset *ksclientset.Clientset
+	managerClientset *mgtclientset.Clientset
 	lock             sync.Mutex
 }
 
-func (mcc *multiSpaceClient) Space(name string, namespace ...string) mcclientset.Interface {
-	key, ns := namespaceKey(name, namespace)
-	var err error
-	mcc.lock.Lock()
-	defer mcc.lock.Unlock()
-	clientset, ok := mcc.clientsets[key]
-	if !ok {
-		// Try to get Space from API server.
-		if _, clientset, err = mcc.getFromServer(name, ns); err != nil {
-			panic(fmt.Sprintf("invalid space name: %s. error: %v", name, err))
+/*
+	 func (mcc *multiSpaceClient) Space(name string, namespace ...string) mcclientset.Interface {
+		key, ns := namespaceKey(name, namespace)
+		var err error
+		mcc.lock.Lock()
+		defer mcc.lock.Unlock()
+		clientset, ok := mcc.clientsets[key]
+		if !ok {
+			// Try to get Space from API server.
+			if _, clientset, err = mcc.getFromServer(name, ns); err != nil {
+				panic(fmt.Sprintf("invalid space name: %s. error: %v", name, err))
+			}
 		}
+		return clientset
 	}
-	return clientset
-}
+*/
 
-func (mcc *multiSpaceClient) ConfigForSpace(name string, namespace ...string) (*rest.Config, error) {
-	key, ns := namespaceKey(name, namespace)
+// Use the default Provider
+// The folowing functions are temporary, once Space become a cluster-scope resurce
+// We will not use the providerNS anymore.
+func (mcc *multiSpaceClient) ConfigForSpace(name string, providerNS string) (*rest.Config, error) {
+	nameS := defaultProviderNs
+	if len(providerNS) > 0 {
+		nameS = providerNS
+	}
+	key, ns := namespaceKey(name, nameS)
 	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	config, ok := mcc.configs[key]
 	if !ok {
 		// Try to get Space from API server.
-		if config, _, err = mcc.getFromServer(name, ns); err != nil {
+		if config, err = mcc.getFromServer(name, ns); err != nil {
 			return nil, err
 		}
 	}
@@ -95,7 +107,7 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 		return client, nil
 	}
 
-	managerClientset, err := ksclientset.NewForConfig(managerConfig)
+	managerClientset, err := mgtclientset.NewForConfig(managerConfig)
 	if err != nil {
 		return client, err
 	}
@@ -103,7 +115,6 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 	client = &multiSpaceClient{
 		ctx:              ctx,
 		configs:          make(map[string]*rest.Config),
-		clientsets:       make(map[string]*mcclientset.Clientset),
 		managerClientset: managerClientset,
 		lock:             sync.Mutex{},
 	}
@@ -112,7 +123,7 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 	return client, nil
 }
 
-func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerClientset *ksclientset.Clientset) {
+func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerClientset *mgtclientset.Clientset) {
 	numThreads := 2
 	resyncPeriod := time.Duration(0)
 
@@ -128,34 +139,25 @@ func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerCl
 
 // getFromServer will query API server for specific Space and cache it if it exists and ready.
 // getFromServer caller function should acquire the mcc lock.
-func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest.Config, *mcclientset.Clientset, error) {
+func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest.Config, error) {
 	space, err := mcc.managerClientset.SpaceV1alpha1().Spaces(namespace).Get(mcc.ctx, name, metav1.GetOptions{})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
-		return nil, nil, errors.New("space is not ready")
+		return nil, errors.New("space is not ready")
 	}
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(space.Status.SpaceConfig))
 	if err != nil {
-		return nil, nil, err
-	}
-	cs, err := mcclientset.NewForConfig(config)
-	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	// Calling function should acquire the mcc lock
 	mcc.configs[space.Name] = config
-	mcc.clientsets[space.Name] = cs
 
-	return config, cs, nil
+	return config, nil
 }
 
-func namespaceKey(name string, namespaces []string) (key string, namespace string) {
-	ns := defaultProviderNs
-	if len(namespace) > 0 {
-		ns = namespaces[0]
-	}
+func namespaceKey(name string, ns string) (key string, namespace string) {
 	return ns + "/" + name, ns
 }

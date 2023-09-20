@@ -22,10 +22,11 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	klog "k8s.io/klog/v2"
 
-	spaceclient "github.com/kubestellar/kubestellar/pkg/spaceclient"
+	spaceclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 func main() {
@@ -53,7 +54,18 @@ func main() {
 
 	// Demonstrate a Watch() on a space
 	// Using the mcclient to get access to a space directly (clientset, informer, etc..)
-	watcher, err := spclient.Space(spaceName).Kube().CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
+	// Use the default provider
+	spaceConfig, err := spclient.ConfigForSpace(spaceName, "")
+	if err != nil {
+		logger.Error(err, "get space config failed")
+		panic(err)
+	}
+	spaceKubeClient, err := kubeclient.NewForConfig(spaceConfig)
+	if err != nil {
+		logger.Error(err, "create clientset failed")
+		panic(err)
+	}
+	watcher, err := spaceKubeClient.CoreV1().ConfigMaps(metav1.NamespaceDefault).Watch(ctx, metav1.ListOptions{})
 	if err == nil {
 		for {
 			select {
