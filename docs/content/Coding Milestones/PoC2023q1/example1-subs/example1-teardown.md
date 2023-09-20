@@ -1,11 +1,14 @@
-<!--teardown-the-environment-start-->
+<!--example1-teardown-start-->
 To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:
 
 ``` {.bash}
 rm florin-syncer.yaml guilder-syncer.yaml || true
 kubectl ws root
-kubectl delete workspace example-imw
-kubectl kubestellar remove wmw example-wmw
+kubectl delete workspace imw-1
+kubectl delete workspace $FLORIN_WS
+kubectl delete workspace $GUILDER_WS
+kubectl kubestellar remove wmw wmw-c
+kubectl kubestellar remove wmw wmw-s
 kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
@@ -34,4 +37,4 @@ With `kubectl` configured to manipulate the hosting cluster, the following comma
 helm delete kubestellar
 ```
 
-<!--teardown-the-environment-end-->
+<!--example1-teardown-end-->
