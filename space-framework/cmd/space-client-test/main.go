@@ -54,7 +54,8 @@ func main() {
 
 	// Demonstrate a Watch() on a space
 	// Using the mcclient to get access to a space directly (clientset, informer, etc..)
-	spaceConfig, err := spclient.ConfigForSpace(spaceName)
+	// Use the default provider
+	spaceConfig, err := spclient.ConfigForSpace(spaceName, "")
 	if err != nil {
 		logger.Error(err, "get space config failed")
 		panic(err)

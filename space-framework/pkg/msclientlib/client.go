@@ -42,7 +42,7 @@ type KubestellarSpaceInterface interface {
 	//Space(name string, namespace ...string) (client mcclientset.Interface)
 
 	// ConfigForSpace returns rest config for given space.
-	ConfigForSpace(name string, namespace ...string) (*rest.Config, error)
+	ConfigForSpace(name string, providerNS string) (*rest.Config, error)
 }
 
 type multiSpaceClient struct {
@@ -50,6 +50,7 @@ type multiSpaceClient struct {
 	// Currently configs holds the kubeconfig as a string for each Space.
 	// This is temporary as Space is bing changed to use secrets instead of holding the config as
 	// text string
+	// The key to the map is the spaceName+ProviderNS  (currently we use the provider NS and not directly the provider name)
 	configs          map[string]*rest.Config
 	managerClientset *mgtclientset.Clientset
 	lock             sync.Mutex
@@ -71,8 +72,16 @@ type multiSpaceClient struct {
 		return clientset
 	}
 */
-func (mcc *multiSpaceClient) ConfigForSpace(name string, namespace ...string) (*rest.Config, error) {
-	key, ns := namespaceKey(name, namespace)
+
+// Use the default Provider
+// The folowing functions are temporary, once Space become a cluster-scope resurce
+// We will not use the providerNS anymore.
+func (mcc *multiSpaceClient) ConfigForSpace(name string, providerNS string) (*rest.Config, error) {
+	nameS := defaultProviderNs
+	if len(providerNS) > 0 {
+		nameS = providerNS
+	}
+	key, ns := namespaceKey(name, nameS)
 	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
@@ -149,10 +158,6 @@ func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest
 	return config, nil
 }
 
-func namespaceKey(name string, namespaces []string) (key string, namespace string) {
-	ns := defaultProviderNs
-	if len(namespace) > 0 {
-		ns = namespaces[0]
-	}
+func namespaceKey(name string, ns string) (key string, namespace string) {
 	return ns + "/" + name, ns
 }
