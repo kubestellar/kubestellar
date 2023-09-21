@@ -44,7 +44,7 @@ Now let's deploy the edge syncer to the `florin` edge cluster:
 
   
 ```shell
-sudo kubectl --context kind-florin apply -f florin-syncer.yaml
+kubectl --context kind-florin apply -f florin-syncer.yaml
 ```
 
 which should yield something like:
@@ -62,7 +62,7 @@ deployment.apps/kubestellar-syncer-florin-1yi5q9c4 created
 Optionally, check that the edge syncer pod is running:
 
 ```shell
-sudo kubectl --context kind-florin get pods -A
+kubectl --context kind-florin get pods -A
 ```
 
 which should yield something like:
@@ -92,6 +92,6 @@ kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod ext
 Apply the created edge syncer manifest:
 
 ```shell
-sudo kubectl --context kind-guilder apply -f guilder-syncer.yaml
+kubectl --context kind-guilder apply -f guilder-syncer.yaml
 ```
 <!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end-->

@@ -9,8 +9,8 @@ kubectl ws root:my-org
 kubectl kubestellar remove wmw example-wmw
 kubectl ws root
 kubectl delete workspace my-org
-sudo kind delete cluster --name florin
-sudo kind delete cluster --name guilder
+kind delete cluster --name florin
+kind delete cluster --name guilder
 ```
 
 Teardown of KubeStellar depends on which style of deployment was used.

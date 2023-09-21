@@ -2,7 +2,7 @@
 Create the first edge cluster:
 
 ```shell
-sudo kind create cluster --name florin --config - <<EOF
+kind create cluster --name florin --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:

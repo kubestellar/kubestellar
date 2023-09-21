@@ -99,7 +99,7 @@ EOF
 Now, let's check that the deployment was created in the `florin` edge cluster - it may take a few 10s of seconds to appear:
 
 ```shell
-sudo kubectl --context kind-florin get deployments -A
+kubectl --context kind-florin get deployments -A
 ```
 
 which should yield something like:
@@ -115,7 +115,7 @@ local-path-storage                   local-path-provisioner               1/1   
 Also, let's check that the deployment was created in the `guilder` edge cluster:
 
 ```shell
-sudo kubectl --context kind-guilder get deployments -A
+kubectl --context kind-guilder get deployments -A
 ```
 
 which should yield something like:
@@ -133,7 +133,7 @@ Lastly, let's check that the workload is working in both clusters:
 For `florin`:
 
 ```shell
-while [[ $(sudo kubectl --context kind-florin get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8094
+while [[ $(kubectl --context kind-florin get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8094
 ```
 
 which should eventually yield:
@@ -150,7 +150,7 @@ which should eventually yield:
 For `guilder`:
 
 ```shell
-while [[ $(sudo kubectl --context kind-guilder get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8096
+while [[ $(kubectl --context kind-guilder get pod -l "app=common" -n commonstuff -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do sleep 5; done;curl http://localhost:8096
 ```
 which should eventually yield:
 
