@@ -32,7 +32,7 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
-     === "Debian"
+    === "Debian"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
         ```
@@ -42,7 +42,7 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
-   === "Fedora/RHEL/CentOS"
+    === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
         ```
