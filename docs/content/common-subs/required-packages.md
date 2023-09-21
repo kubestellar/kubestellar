@@ -22,6 +22,9 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         brew install kubectl
         ```
+        ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
+        brew install helm
+        ```
     === "Ubuntu"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
@@ -31,6 +34,13 @@
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+        ```
+        ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
+        curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+        sudo apt-get install apt-transport-https --yes
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+        sudo apt-get update
+        sudo apt-get install helm
         ```
     === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
@@ -45,6 +55,9 @@
         [ $(uname -m) = x86_64 ] && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
         # for ARM64 / aarch64
         [ $(uname -m) = aarch64 ] && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl" && chmod +x kubectl && mv ./kubectl /usr/local/bin/kubectl
+        ```
+        ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
+        dnf install helm
         ```
     === "Windows"
         ``` title="Chocolatey - https://chocolatey.org/install#individual"
@@ -62,6 +75,9 @@
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)"
         curl.exe -LO "https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe"    
         ```  
+        ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
+        choco install kubernetes-helm
+        ```
     === "WSL with Ubuntu"  
         ### How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
 
@@ -154,6 +170,12 @@
         curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
         echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        ```
+        ###### 3.8 install helm (required when deploying as workload)
+        ```
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
         ```
 
 !!! tip "Required Packages for the example usage:"
