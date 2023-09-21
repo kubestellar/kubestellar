@@ -194,6 +194,12 @@
         sudo apt update
         sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
+        ``` title="Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/"
+        sudo apt-get install -y dbus-user-session # *** Relogin after this
+        sudo apt-get install -y uidmap
+        dockerd-rootless-setuptool.sh install
+        systemctl --user restart docker.service
+        ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
@@ -218,6 +224,12 @@
         # Install packages
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         ```
+        ``` title="Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/"
+        sudo apt-get install -y dbus-user-session # *** Relogin after this
+        sudo apt-get install -y fuse-overlayfs
+        sudo apt-get install -y slirp4netns
+        dockerd-rootless-setuptool.sh install
+        ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
@@ -227,6 +239,7 @@
         ``` title="docker - https://docs.docker.com/engine/install/"
         yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
+        Enable rootless usage of Docker by following the instructions at [https://docs.docker.com/engine/security/rootless/](https://docs.docker.com/engine/security/rootless/)
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         # For AMD64 / x86_64
         [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
