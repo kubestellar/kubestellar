@@ -2506,8 +2506,6 @@ and have at least the given labels.</p>
 <li><code>--imw workspace_path</code>: specifies which workspace to use as the
   inventory management workspace.  The default value is the current
   workspace.</li>
-<li><code>-X</code>: turn on debug echoing of the commands inside the script that
-  implements this command.</li>
 </ul>
 <p>The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be your chosen
@@ -2611,14 +2609,11 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
   provider workspace.  The default is the standard location,
   <code>root:espw</code>.</li>
 <li><code>--syncer-image image_ref</code>: specifies the container image that runs
-  the syncer.  The default is <code>quay.io/kubestellar/syncer:latest</code>.</li>
+  the syncer.  The default is <code>quay.io/kubestellar/syncer:v0.7.0</code>.</li>
 <li><code>-o output_pathname</code>: specifies where to write the YAML definitions
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is <code>synctarget_name +
   "-syncer.yaml"</code>.</li>
-<li><code>-s</code>: exceptionally low info output.</li>
-<li><code>-X</code>: turn on debug echoing of commands inside the script that
-  implements this command.</li>
 </ul>
 <p>The current workspaces does not matter if the IMW is explicitly
 specified.  Upon completion, the current workspace will be what it was
@@ -2720,8 +2715,6 @@ will be <code>parent_pathname:wm_workspace_name</code>.</p>
 <li><code>--with-kube boolean</code>: specifies whether or not the WMW should
   include an APIBinding to the Kubernetes API for management of
   containerized workloads.</li>
-<li><code>-X</code>: turn on debug echoing of the commands inside the script that
-  implements this command.</li>
 </ul>
 <p>This script works in idempotent style, doing whatever work remains to
 be done.</p>
@@ -2783,7 +2776,7 @@ completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>parent<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>parent<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
 </code></pre></div>
@@ -2804,7 +2797,7 @@ the parent of the workload management workspace to delete.</p>
 <a href="../../../Getting-Started/quickstart/">the
 QuickStart</a>.</p>
 <p>The script can be read directly from
-https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh
+https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.7/bootstrap/bootstrap-kubestellar.sh
 and does the following things.</p>
 <ol>
 <li>Downloads and installs kcp executables if they are not already
