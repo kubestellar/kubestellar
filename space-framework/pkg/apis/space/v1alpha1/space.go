@@ -42,23 +42,30 @@ type Space struct {
 	Status SpaceStatus `json:"status"`
 }
 
+// SpaceType identifies the type of the space (managed, unmanaged, imported)
+// +kubebuilder:validation:Enum=managed;unmanaged;imported
+type SpaceType string
+
+const (
+	SpaceTypeManaged   SpaceType = "managed"
+	SpaceTypeUnmanaged SpaceType = "unmanaged"
+	SpaceTypeImported  SpaceType = "imported"
+)
+
 // SpaceSpec describes a cluster.
 type SpaceSpec struct {
 	// SpaceProviderDescName is a reference to a SpaceProviderDesc resource
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="SpaceProviderDescName is immutable"
+	// +optional
 	SpaceProviderDescName string `json:"SpaceProviderDescName"`
 
-	// Managed identifies whether a cluster is managed (true) or unmanaged (false).
-	// Currently this is immutable.
-	// A space can be created through the ClusterManager (managed) or
-	// discovered/imported (unmanaged).
-	// +kubebuilder:default=true
-	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Managed is immutable"
-	Managed bool `json:"Managed"`
+	// Type identifies the space type.
+	// A space can be created through the ClusterManager (managed), discovered (unmanaged), or imported.
+	// +kubebuilder:default=managed
+	Type SpaceType `json:"Type"`
 }
 
 // SpacePhaseType is the type of the current phase of the cluster.
-//
 // +kubebuilder:validation:Enum=Initializing;NotReady;Ready
 type SpacePhaseType string
 

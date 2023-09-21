@@ -25,6 +25,7 @@ import (
 	pclient "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
 )
 
+// finalizerName is the delete space finalizer
 const finalizerName = "SpaceFinalizer"
 
 // SpacePathAnnotationKey is the path under which space will reside(for providers that support hierarchy)
@@ -75,59 +76,85 @@ func (c *controller) reconcileSpace(key string) error {
 
 // processAddOrUpdateSpace: process an added or updated space object
 func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
-	if space.Status.Phase == spacev1alpha1.SpacePhaseNotReady && !space.Spec.Managed {
-		// Discovery noticed that a physical space has disappeared.
-		// If the space is managed, do nothing and let the user handle.
-		// If the psace is unmanaged, then delete the corresponding object.
-		return c.clientset.
-			SpaceV1alpha1().
-			Spaces(ProviderNS(space.Spec.SpaceProviderDescName)).
-			Delete(c.ctx, space.Name, v1.DeleteOptions{})
-	}
-	if space.Status.Phase == "" && space.Spec.Managed {
-		// The client created a new space object and we need to
-		// create the corresponding physical space.
-		providerInfo, err := c.clientset.SpaceV1alpha1().SpaceProviderDescs().Get(
-			c.ctx, space.Spec.SpaceProviderDescName, v1.GetOptions{})
-		if err != nil {
-			c.logger.Error(err, "failed to get the provider resource")
+	switch space.Spec.Type {
+	case spacev1alpha1.SpaceTypeUnmanaged:
+		if space.Spec.SpaceProviderDescName == "" {
+			err := errors.New("missing SpaceProviderDesc")
+			c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
 			return err
 		}
-		provider, ok := c.providers[providerInfo.Name]
-		if !ok {
-			c.logger.Error(err, "failed to get provider from controller")
+		if space.Status.Phase == spacev1alpha1.SpacePhaseNotReady {
+			// Discovery noticed that a physical space has disappeared.
+			// If the space is managed, do nothing and let the user handle.
+			// If the psace is unmanaged, then delete the corresponding object.
+			return c.clientset.
+				SpaceV1alpha1().
+				Spaces(ProviderNS(space.Spec.SpaceProviderDescName)).
+				Delete(c.ctx, space.Name, v1.DeleteOptions{})
+		}
+	case spacev1alpha1.SpaceTypeManaged:
+		if space.Spec.SpaceProviderDescName == "" {
+			err := errors.New("missing SpaceProviderDesc")
+			c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
 			return err
 		}
+		if space.Status.Phase == "" {
+			// The client created a new space object and we need to
+			// create the corresponding physical space.
+			providerInfo, err := c.clientset.SpaceV1alpha1().SpaceProviderDescs().Get(
+				c.ctx, space.Spec.SpaceProviderDescName, v1.GetOptions{})
+			if err != nil {
+				err = errors.New("failed to get provider object")
+				c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
+				return err
+			}
+			provider, ok := c.providers[providerInfo.Name]
+			if !ok {
+				err = errors.New("failed to get provider from controller")
+				c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
+				return err
+			}
 
-		providerClient := provider.providerClient
-		if providerClient == nil {
-			c.logger.Error(err, "failed to get provider client")
-			return err
-		}
+			providerClient := provider.providerClient
+			if providerClient == nil {
+				err = errors.New("failed to get provider client")
+				c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
+				return err
+			}
 
-		// Update status Initializing
-		if !containsFinalizer(space, finalizerName) {
-			space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, finalizerName)
+			// Update status Initializing
+			if !containsFinalizer(space, finalizerName) {
+				space.ObjectMeta.Finalizers = append(space.ObjectMeta.Finalizers, finalizerName)
+			}
+			space.Status.Phase = spacev1alpha1.SpacePhaseInitializing
+			_, err = c.clientset.
+				SpaceV1alpha1().
+				Spaces(ProviderNS(providerInfo.Name)).
+				Update(c.ctx, space, v1.UpdateOptions{})
+			if err != nil {
+				c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
+				return err
+			}
+
+			opts := pclient.Options{}
+			path, ok := space.Annotations[SpacePathAnnotationKey]
+			if ok {
+				opts.Parent = path
+			}
+			// Async call the provider to create the space. Once created, discovery
+			// will set the space in the Ready state.
+			go providerClient.Create(space.Name, opts)
 		}
-		space.Status.Phase = spacev1alpha1.SpacePhaseInitializing
-		_, err = c.clientset.
+	case spacev1alpha1.SpaceTypeImported:
+		space.Status.Phase = spacev1alpha1.SpacePhaseReady
+		_, err := c.clientset.
 			SpaceV1alpha1().
-			Spaces(ProviderNS(providerInfo.Name)).
+			Spaces(space.Namespace).
 			Update(c.ctx, space, v1.UpdateOptions{})
 		if err != nil {
-			c.logger.Error(err, "failed to update space status.")
+			c.logger.V(2).Error(err, "processAddOrUpdateSpace", "name", space.Name)
 			return err
 		}
-
-		opts := pclient.Options{}
-		path, ok := space.Annotations[SpacePathAnnotationKey]
-		if ok {
-			opts.Parent = path
-		}
-		// Async call the provider to create the space. Once created, discovery
-		// will set the space in the Ready state.
-		go providerClient.Create(space.Name, opts)
-		return nil
 	}
 	// case spacev1alpha1.SpacePhaseInitializing:
 	// A managed space is being created by the provider. Need to wait for
@@ -146,8 +173,9 @@ func (c *controller) processAddOrUpdateSpace(space *spacev1alpha1.Space) error {
 
 // processDeleteSpace: process a space object delete event.
 // If the space is managed, then async delete the physical space.
+// For imported or unmanaged spaces, we don't delete the pSpace.
 func (c *controller) processDeleteSpace(delSpace *spacev1alpha1.Space) error {
-	if delSpace.Spec.Managed {
+	if delSpace.Spec.Type == spacev1alpha1.SpaceTypeManaged {
 		provider, ok := c.providers[delSpace.Spec.SpaceProviderDescName]
 		if !ok {
 			return errors.New("failed to get provider client")

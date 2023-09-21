@@ -116,7 +116,7 @@ func (c *controller) handleDelete(providerName string) error {
 	for _, spaceObj := range spaces {
 		space := spaceObj.(*spacev1alpha1.Space)
 		if space.Namespace == ns {
-			if space.Spec.Managed {
+			if space.Spec.Type == spacev1alpha1.SpaceTypeManaged {
 				space.Status.Phase = spacev1alpha1.SpacePhaseNotReady
 				_, err := c.clientset.SpaceV1alpha1().Spaces(ns).Update(c.ctx, space, metav1.UpdateOptions{})
 				if err != nil {
