@@ -83,11 +83,31 @@ type EdgePlacementSpec struct {
 	// An object is selected if it matches at least one member of this list.
 	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
 
+	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
+	// to be 1 and (b) the reported state of each downsynced object should be returned back to
+	// the object in this space.
+	// When multiple EdgePlacement objects match the same workload object,
+	// the OR of these booleans rules.
+	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
+
 	// `upsync` identifies objects to upsync.
 	// An object matches `upsync` if and only if it matches at least one member of `upsync`.
 	// +optional
 	Upsync []UpsyncSet `json:"upsync,omitempty"`
 }
+
+// ExecutingCountKey is the name (AKA key) of an annotation on a workload object.
+// This annotation is written by the KubeStellar implementation to report on
+// the number of executing copies of that object.
+// This annotation is maintained while that number is intended to be 1
+// (see the `WantSingletonReportedState` field above).
+// The value of this annotation is a string representing the number of
+// executing copies.  While this annotation is present with the value "1",
+// the reported state is being returned into this workload object (the design
+// of an API object typically assumes that it is taking effect in just one cluster).
+// For reported state from a general number of executing copies, see the
+// mailboxwatch library and the aspiration for summarization.
+const ExecutingCountKey string = "kubestellar.io/executing-count"
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
