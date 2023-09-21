@@ -65,6 +65,8 @@ We ❤️ our contributors! If you're interested in helping us out, please head 
 
 There are several ways to communicate with us:
 
+Instantly get access to our documents and meeting invites http://kubestellar.io/joinus
+
 - The [`#kubestellar-dev` channel](https://kubernetes.slack.com/archives/C058SUSL5AA) in the [Kubernetes Slack workspace](https://slack.k8s.io)
 - Our mailing lists:
     - [kubestellar-dev](https://groups.google.com/g/kubestellar-dev) for development discussions
