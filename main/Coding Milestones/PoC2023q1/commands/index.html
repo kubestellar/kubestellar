@@ -2349,13 +2349,13 @@ Kubernetes cluster that will be referred to as "the hosting cluster".
 These are framed as "kubectl plugins" and thus need to be explicitly
 or implicitly given a kubeconfig file for the hosting cluster.</p>
 <h3 id="deploy-to-cluster">Deploy to cluster<a class="headerlink" href="#deploy-to-cluster" title="Permanent link">#</a></h3>
-<p>Deployment is done with a "kubectl plugin" that creates a <a href="https://helm.sh/docs/intro/using_helm/#three-big-concepts">Helm
+<p>Deployment is done with a "kubectl plugin" that is invoked as <code>kubectl
+kubestellar deploy</code> and creates a <a href="https://helm.sh/docs/intro/using_helm/#three-big-concepts">Helm
 "release"</a>
 in the hosting cluster. As such, it relies on explicit (on the command
-line) or implicit (in environment variables and/or <code>~/.kube/config</code>
-configuration needed to execute Helm commands). An invocation of this
-plugin starts with <code>kubectl kubestellar deploy</code> and continues with the
-following, in any order.</p>
+line) or implicit (in environment variables and/or <code>~/.kube/config</code>)
+configuration needed to execute Helm commands. The following flags can
+appear on the command line, in any order.</p>
 <ul>
 <li><code>--openshift $bool</code>, saying whether the hosting cluster is an
   OpenShift cluster.  If so then a Route will be created to the kcp

@@ -3279,10 +3279,11 @@ paying attention to <code>$KUBECONFIG</code> and, if that's empty,
 ways: as bare processes on whatever host you are using to run this
 example, or as workload in a Kubernetes cluster (an OpenShift cluster
 qualifies).  Do one or the other, not both.</p>
+<p>KubeStellar only works with release <code>v0.11.0</code> of kcp.</p>
 <h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
 <h4 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h4>
 <p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
-according to your preference.  See the start of <a href="https://docs.kcp.io/kcp/v0.11/#quickstart">the kcp quickstart</a> for instructions on that.</p>
+according to your preference.  See the start of <a href="https://docs.kcp.io/kcp/v0.11/#quickstart">the kcp quickstart</a> for instructions on that, but get <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">release v0.11.0</a> rather than the latest (the downloadable assets appear after the long list of changes/features/etc).</p>
 <p>In some shell that will be used only for this purpose, issue the <code>kcp
 start</code> command.  If you have junk from previous runs laying around,
 you should probably <code>rm -rf .kcp</code> first.</p>
@@ -3357,13 +3358,12 @@ are namespaced and are meaningful in KubeStellar.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>kubestellar<span class="w"> </span>init
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
+<p>(This style of deployment requires release v0.6 or later of KubeStellar.)</p>
 <p>First you will need the kcp <code>kubectl</code> plugins.  See <a href="./#start-kcp">the "Start kcp"
 section above</a> for instructions on how to get all of the
 kcp executables.</p>
 <p>Next you will need to get a build of KubeStellar.  See
-<a href="./#get-kubestellar">above</a> and <strong>NOTE WELL</strong>: as yet there is no
-release of KubeStellar that supports this style of deployment, you
-will have to get the latest code from github and <code>make build</code>.</p>
+<a href="./#get-kubestellar">above</a>.</p>
 <p>To do the deployment and prepare to use it you will be using <a href="../commands/#deployment-into-a-kubernetes-cluster">the
 commands defined for
 that</a>.  These
