@@ -294,6 +294,13 @@ spec:
                   - resources
                   type: object
                 type: array
+              wantSingletonReportedState:
+                description: WantSingletonReportedState indicates that (a) the number
+                  of selected locations is intended to be 1 and (b) the reported state
+                  of each downsynced object should be returned back to the object
+                  in this space. When multiple EdgePlacement objects match the same
+                  workload object, the OR of these booleans rules.
+                type: boolean
             type: object
           status:
             description: '`status` describes the status of the process of binding
