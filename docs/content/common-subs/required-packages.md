@@ -12,6 +12,8 @@
 
         + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.23-1.25)
 
+        + [__helm__](https://helm.sh/docs/intro/install/) (required when deploying as workload)
+
     === "Mac"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
