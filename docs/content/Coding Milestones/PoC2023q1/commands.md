@@ -262,13 +262,13 @@ or implicitly given a kubeconfig file for the hosting cluster.
 
 ### Deploy to cluster
 
-Deployment is done with a "kubectl plugin" that creates a [Helm
+Deployment is done with a "kubectl plugin" that is invoked as `kubectl
+kubestellar deploy` and creates a [Helm
 "release"](https://helm.sh/docs/intro/using_helm/#three-big-concepts)
 in the hosting cluster. As such, it relies on explicit (on the command
-line) or implicit (in environment variables and/or `~/.kube/config`
-configuration needed to execute Helm commands). An invocation of this
-plugin starts with `kubectl kubestellar deploy` and continues with the
-following, in any order.
+line) or implicit (in environment variables and/or `~/.kube/config`)
+configuration needed to execute Helm commands. The following flags can
+appear on the command line, in any order.
 
 - `--openshift $bool`, saying whether the hosting cluster is an
   OpenShift cluster.  If so then a Route will be created to the kcp
