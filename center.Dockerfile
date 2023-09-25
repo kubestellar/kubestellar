@@ -44,7 +44,7 @@ ADD hack/		hack/
 ADD monitoring/		monitoring/
 ADD pkg/		pkg/
 ADD scripts/		scripts/
-ADD space-provider/	space-provider/
+ADD space-framework/	space-framework/
 ADD test/		test/
 ADD .git/		.git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .

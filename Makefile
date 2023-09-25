@@ -15,8 +15,16 @@
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
 
+KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
+GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
+GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
+
 CENTER_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
-CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +b%y-%m-%d-%H-%M-%S)
+CENTER_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
+BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
+GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
 
 SYNCER_PLATFORMS ?= linux/amd64,linux/arm64,linux/s390x
 
@@ -80,11 +88,6 @@ export CODE_GENERATOR # so hack scripts can use it
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
 
-KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
-KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
-GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
-GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
-GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 LDFLAGS := \
 	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
@@ -128,11 +131,11 @@ build-all:
 .PHONY: kubestellar-image
 kubestellar-image:
 	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar; fi
-	docker buildx --builder kubestellar build --push --sbom=true --platform $(CENTER_PLATFORMS) --tag $(CENTER_IMAGE) -f center.Dockerfile .
+	docker buildx --builder kubestellar build --push --sbom=true --platform $(CENTER_PLATFORMS) --tag $(CENTER_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CENTER_IMAGE_REPO):$(GIT_TAG) -f center.Dockerfile .
 
 .PHONY: kubestellar-image-local
 kubestellar-image-local:
-	docker build --tag $(CENTER_IMAGE) -f center.Dockerfile .
+	docker build --tag $(CENTER_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CENTER_IMAGE_REPO):$(GIT_TAG) -f center.Dockerfile .
 
 # .PHONY: build-kind-images
 # build-kind-images-ko: require-ko
@@ -148,7 +151,7 @@ kubestellar-image-local:
 # This example builds ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
 .PHONY: build-kubestellar-syncer-image
 build-kubestellar-syncer-image: DOCKER_REPO ?= quay.io/kubestellar/syncer
-build-kubestellar-syncer-image: IMAGE_TAG ?= git-${GIT_COMMIT}-${GIT_DIRTY}
+build-kubestellar-syncer-image: IMAGE_TAG ?= $(GIT_TAG)
 build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= 
 build-kubestellar-syncer-image: require-ko
 	echo KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
