@@ -32,10 +32,20 @@
         sudo apt-get install jq
         ```
         ``` title="yq - https://github.com/mikefarah/yq#install"
+        sudo snap install yq
+        ```
+        ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+        ```
+    === "Debian"
+        ``` title="jq - https://stedolan.github.io/jq/download/"
+        sudo apt-get install jq
+        ```
+        ``` title="yq - https://github.com/mikefarah/yq#install"
         sudo apt-get install yq
         ```
         ``` title="kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)"
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl" && chmod +x kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
         ```
         ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
         curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
@@ -208,6 +218,42 @@
         sudo apt update
         sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
+        ``` title="Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/"
+        sudo apt-get install -y dbus-user-session # *** Relogin after this
+        sudo apt-get install -y uidmap
+        dockerd-rootless-setuptool.sh install
+        systemctl --user restart docker.service
+        ```
+        ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
+        ```
+
+    === "Debian"
+
+        ``` title="docker - https://docs.docker.com/engine/install/"
+        # Add Docker's official GPG key:
+        sudo apt-get update
+        sudo apt-get install ca-certificates curl gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        
+        # Add the repository to Apt sources:
+        echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        
+        # Install packages
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        ```
+        ``` title="Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/"
+        sudo apt-get install -y dbus-user-session # *** Relogin after this
+        sudo apt-get install -y fuse-overlayfs
+        sudo apt-get install -y slirp4netns
+        dockerd-rootless-setuptool.sh install
+        ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
@@ -217,6 +263,7 @@
         ``` title="docker - https://docs.docker.com/engine/install/"
         yum -y install epel-release && yum -y install docker && systemctl enable --now docker && systemctl status docker
         ```
+        Enable rootless usage of Docker by following the instructions at [https://docs.docker.com/engine/security/rootless/](https://docs.docker.com/engine/security/rootless/)
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
         # For AMD64 / x86_64
         [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
