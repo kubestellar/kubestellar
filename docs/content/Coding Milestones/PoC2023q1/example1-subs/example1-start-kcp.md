@@ -6,12 +6,14 @@ ways: as bare processes on whatever host you are using to run this
 example, or as workload in a Kubernetes cluster (an OpenShift cluster
 qualifies).  Do one or the other, not both.
 
+KubeStellar only works with release `v0.11.0` of kcp.
+
 ### Deploy kcp and KubeStellar as bare processes
 
 #### Start kcp
 
 Download and build or install [kcp](https://github.com/kcp-dev/kcp/releases/tag/v0.11.0),
-according to your preference.
+according to your preference.  See the start of [the kcp quickstart](https://docs.kcp.io/kcp/v0.11/#quickstart) for instructions on that, but get [release v0.11.0](https://github.com/kcp-dev/kcp/releases/tag/v0.11.0) rather than the latest (the downloadable assets appear after the long list of changes/features/etc).
 
 In some shell that will be used only for this purpose, issue the `kcp
 start` command.  If you have junk from previous runs laying around,
