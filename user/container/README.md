@@ -61,6 +61,7 @@ kubestellar   v0.3.0    76d714261c6e   14 minutes ago   617MB
 ## Build and push a multi-architecture image to a remote registry
 
 Note that `docker buildx` is required for this option.
+Furthermore, the multi-architecture build fails when the host os is arm64.
 
 Make sure to login into the remote registry with the desired user:
 
@@ -83,7 +84,7 @@ Several arguments can be used to customize the build:
 As an example, the **KubeStellar** container images available at https://quay.io/repository/kubestellar/kubestellar?tab=tags have been built with commands like:
 
 ```shell
-make buildx IMG=quay.io/kubestellar/kubestellar KUBESTELLAR_VERSION=v0.4.0
+make buildx IMG=quay.io/kubestellar/kubestellar KUBESTELLAR_VERSION=v0.7.0
 ```
 
 ## Run the container and access KubeStellar from the host OS for testing and debugging

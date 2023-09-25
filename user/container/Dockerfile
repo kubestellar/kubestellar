@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM redhat/ubi9
+FROM docker.io/redhat/ubi9
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -47,7 +47,7 @@ RUN groupadd kubestellar && \
     rm kubestellar.tar.gz
 
 ADD entry.sh            entry.sh
-ADD kubestellar-patch   kubestellar/bin
+# ADD kubestellar-patch   kubestellar/bin
 
 RUN chown -R kubestellar:0 /home/kubestellar && \
     chmod -R g=u /home/kubestellar

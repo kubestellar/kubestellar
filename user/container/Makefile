@@ -44,7 +44,7 @@ buildx:
 	$(info Arguments: TAG=${TAG})
 	$(info Arguments: PLATFORMS=${PLATFORMS})
 	- docker buildx rm kubestellar-builder
-	docker buildx create --name kubestellar-builder --use
+	docker buildx create --name kubestellar-builder --platform ${PLATFORMS} --use
 	docker buildx build --push --platform ${PLATFORMS} --build-arg="KUBESTELLAR_VERSION=${KUBESTELLAR_VERSION}" --tag ${IMG}:${TAG} .
 	- docker buildx rm kubestellar-builder
 
