@@ -153,6 +153,10 @@ git push origin --tags
 ./hack/make-release-full.sh v0.3.0
 ```
 
+### Update the kubestellar container image just build and uploaded to quay.io
+Head up to quay.io and look for the image of KubeStellar container just uploaded.  
+Make this image 'stable' so that helm and other install methods pickup this image.
+
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
 - Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
@@ -170,8 +174,6 @@ git push origin --tags
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
 [{{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
 [{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)
-
-
 
 
 <!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
