@@ -47,7 +47,6 @@ RUN groupadd kubestellar && \
     rm kubestellar.tar.gz
 
 ADD entry.sh            entry.sh
-# ADD kubestellar-patch   kubestellar/bin
 
 RUN chown -R kubestellar:0 /home/kubestellar && \
     chmod -R g=u /home/kubestellar
