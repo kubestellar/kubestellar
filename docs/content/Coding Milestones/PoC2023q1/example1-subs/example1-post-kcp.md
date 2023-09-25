@@ -65,10 +65,10 @@ kubestellar init
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
 
+(This style of deployment requires release v0.6 or later of KubeStellar.)
+
 First you will need to get a build of KubeStellar.  See
-[above](../#get-kubestellar) and **NOTE WELL**: as yet there is no
-release of KubeStellar that supports this style of deployment, you
-will have to get the latest code from github and `make build`.
+[above](../#get-kubestellar).
 
 To do the deployment and prepare to use it you will be using [the
 commands defined for
