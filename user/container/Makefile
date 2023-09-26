@@ -15,7 +15,7 @@
 # Global arguments
 IMG ?= kubestellar
 NAME ?= kubestellar
-PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+PLATFORMS ?= linux/amd64/v2,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
 KUBESTELLAR_STABLE := $(shell curl -sL https://raw.githubusercontent.com/kubestellar/kubestellar/main/VERSION | grep stable | sed -n -e 's/^.*=//p')
 KUBESTELLAR_LATEST := $(shell curl -sL https://raw.githubusercontent.com/kubestellar/kubestellar/main/VERSION | grep latest | sed -n -e 's/^.*=//p')
 KUBESTELLAR_VERSION ?= ${KUBESTELLAR_STABLE}
