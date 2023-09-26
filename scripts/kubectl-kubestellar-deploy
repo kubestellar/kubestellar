@@ -86,5 +86,5 @@ esac
 
 set -e
 
-helm upgrade -i "${helm_flags[@]}" kubestellar ${KSDIR}/user/helm-chart --set clusterType=$cluster_type --set-string "EXTERNAL_HOSTNAME=$external_hostname" --set "EXTERNAL_PORT=$external_port" --set image.tag=$image_tag
+helm upgrade -i "${helm_flags[@]}" kubestellar ${KSDIR}/core-helm-chart --set clusterType=$cluster_type --set-string "EXTERNAL_HOSTNAME=$external_hostname" --set "EXTERNAL_PORT=$external_port" --set image.tag=$image_tag
 
