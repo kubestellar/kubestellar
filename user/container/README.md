@@ -61,7 +61,6 @@ kubestellar   v0.3.0    76d714261c6e   14 minutes ago   617MB
 ## Build and push a multi-architecture image to a remote registry
 
 Note that `docker buildx` is required for this option.
-Furthermore, the multi-architecture build fails when the host os is arm64.
 
 Make sure to login into the remote registry with the desired user:
 
