@@ -67,17 +67,7 @@ kubestellar init
 
 (This style of deployment requires release v0.6 or later of KubeStellar.)
 
-You need a Kubernetes cluster with an Ingress controller deployed and
-configured in a way that does _not_ terminate TLS connections (this
-abstinence is often called "TLS passthrough"). An OpenShift cluster
-would be one qualifying thing. Another would be an ordinary Kubernetes
-cluster with the [nginx Ingress
-controller](https://docs.nginx.com/nginx-ingress-controller/) deployed
-and configured appropriately. Please note that [special
-considerations](https://kind.sigs.k8s.io/docs/user/ingress/) apply
-when deploying an ingress controller in `kind`. See [a fully worked example with kind and nginx](../../environments/dev-env/#hosting-kubestellar-in-a-kind-cluster). You will need to know
-the port number at which the Ingress controller is listening for HTTPS
-connections.
+You need a Kubernetes cluster; see [the documentation for `kubectl kubestellar deploy`](../../commands/#deployment-into-a-kubernetes-cluster) for more information.
 
 You will need a domain name that, on each of your clients, resolves to
 an IP address that gets to the Ingress controller's listening socket.
