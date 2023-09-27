@@ -1,12 +1,12 @@
 # User Guide
 
-The KubeStellar git repo is a "monorepo", and its most prominent component is concerned with multi-cluster configuration management (MCCM).
+The KubeStellar git repo contains a few things; its most prominent component is concerned with multi-cluster configuration management (MCCM).
 
 ## KubeStellar multi-cluster configuration management overview
 
 This is a work in progress.  See the Introduction sections of [the 2023q1 PoC](../../Coding%20Milestones/PoC2023q1/outline/) and [the 2023q4 PoC](../../Coding%20Milestones/PoC2023q4/outline/) for a summary of the goals and aspirations for further development.
 
-The following picture shows a consumer's view of the architecture of the current state of development.
+The following picture shows a consumer's view of the architecture of the current state of development of KubeStellar MCCM.
 
 ![Consumer's view of KubeStellar MCCM](KubeStellar-Usage.svg "Consumer's view of KubeStellar MCCM")
 
@@ -25,6 +25,8 @@ KubeStellar MCCM contemplates two classes of users: those who create/admin a dep
 ## Pre-requisites for using KS MCCM
 
 First see the pre-requisites section of [the quickstart](../quickstart/) or of [the extended example](../../Coding%20Milestones/PoC2023q1/example1/).
+
+When hosting the core of KS MCCM in a Kubernetes cluster (which is expected to be the normal case), that cluster itself is a pre-requisite. The cluster has to have an Ingress controller configured to _not_ terminate TLS (this is often called TLS or SSL "passthrough"). There has to be a domain name that all the clients of KS MCCM will resolve to an IP address that they can use to connect to that Ingress controller's ingress port for HTTPS. An OpenShift cluster qualifies. Also, see [a fully worked example with kind and nginx](../../Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster).
 
 kcp is also a pre-requisite but is not discussed in those pre-requisites sections; instead fetching and deploying kcp is discussed together with fetching and deploying KS MCCM. There are a few different ways you can do this.
 
