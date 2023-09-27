@@ -26,13 +26,15 @@ KubeStellar MCCM contemplates two classes of users: those who create/admin a dep
 
 First see the pre-requisites section of [the quickstart](../quickstart/) or of [the extended example](../../Coding%20Milestones/PoC2023q1/example1/).
 
-Next you will need kcp and KubeStellar MCCM. There are a few different ways you could do this.
+kcp is also a pre-requisite but is not discussed in those pre-requisites sections; instead fetching and deploying kcp is discussed together with fetching and deploying KS MCCM. There are a few different ways you can do this.
 
 For a user who will _not_ be creating the deployment, it suffices to get the needed executables and associated run-time files from a release archive and augment your shell's `PATH` envar. The quickstart describes [a way](../quickstart/#deploy-kcp-and-kubestellar-as-bare-processes) to use a curl-to-bash script to fetch _and deploy_ kcp and KubeStellar MCCM and print instructions for what you need to add to your shell's environment variables. Using the `--deploy false` option will skip creating the deployment. The extended example [points](../../Coding%20Milestones/PoC2023q1/example1/#start-kcp) to instructions for how to get kcp's executables and put them on your `$PATH` and [describes](../../Coding%20Milestones/PoC2023q1/example1/#get-kubestellar) how to get the KubeStellar MCCM executables and other runtime files and augment your `$PATH`.
 
 For a user who _will_ be creating the deployment, see the next section; the instructions for creating the deployment are bundled together with the instructions for getting kcp and KS MCCM.
 
-In any case, once the deployment has been made, a user of KS MCCM will need to have the kcp and KS MCCM executables on their shell's `$PATH`.
+**NOTE SHARP EDGE**: the archive of kcp's "kubectl plugins" includes some symbolic links, and some GUI archive tools do not handle symbolic links. Be sure to unpack that archive with a tool that handles the symbolic links.
+
+In any case, once the deployment has been made, a user of KS MCCM will need to have the kcp and KS MCCM executables on the `$PATH` of every relevant one of their shells. (A user who does not do the deploymet does not need all of those executables, but there is no designed way to deliver only the executables needed by such a user.) Both kcp and KS MCCM use [kubectl plugin technology](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/); deficiencies in `$PATH` will result in error messages like `error: unknown command "foo" for "kubectl"`.
 
 ## Deploying KubeStellar MCCM
 
