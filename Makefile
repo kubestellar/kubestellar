@@ -21,8 +21,8 @@ GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
 GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
 GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 
-CENTER_PLATFORMS ?= linux/amd64/v2,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
-CENTER_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
+CORE_PLATFORMS ?= linux/amd64/v2,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+CORE_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
 BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
 GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
 
@@ -130,12 +130,12 @@ build-all:
 
 .PHONY: kubestellar-image
 kubestellar-image:
-	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar --platform $(CENTER_PLATFORMS); fi
-	if [ -n "$(EXTRA_CENTER_TAG)" ]; then extra="--tag $(CENTER_IMAGE_REPO):$(EXTRA_CENTER_TAG)"; else extra=""; fi; eval docker buildx --builder kubestellar build --push --sbom=true --platform $(CENTER_PLATFORMS) --tag $(CENTER_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CENTER_IMAGE_REPO):$(GIT_TAG) $$extra -f center.Dockerfile .
+	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar --platform $(CORE_PLATFORMS); fi
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; eval docker buildx --builder kubestellar build --push --sbom=true --platform $(CORE_PLATFORMS) --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile .
 
 .PHONY: kubestellar-image-local
 kubestellar-image-local:
-	if [ -n "$(EXTRA_CENTER_TAG)" ]; then extra="--tag $(CENTER_IMAGE_REPO):$(EXTRA_CENTER_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CENTER_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CENTER_IMAGE_REPO):$(GIT_TAG) $$extra -f center.Dockerfile $$extoo .
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile $$extoo .
 
 # .PHONY: build-kind-images
 # build-kind-images-ko: require-ko

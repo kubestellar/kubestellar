@@ -99,18 +99,18 @@ timestamp and one based on git metadata.
 If you are not authorized to write to
 `quay.io/kubestellar/kubestellar` then you can specify an alternate
 image repository: put it in the make variable named
-`CENTER_IMAGE_REPO`.  For example, you might invoke `make
-kubestellar-image CENTER_IMAGE_REPO=docker.io/myacct/ksctr`.
+`CORE_IMAGE_REPO`.  For example, you might invoke `make
+kubestellar-image CORE_IMAGE_REPO=docker.io/myacct/ksctr`.
 
-Another variable that you might like to use is `EXTRA_CENTER_TAG`.
+Another variable that you might like to use is `EXTRA_CORE_TAG`.
 This causes the make command to push the image with a third tag that
 you supply in that variable.  For example, if you want to tag the
 image with a release tag you might invoke `make kubestellar-image
-EXTRA_CENTER_TAG=v0.42.7`.
+EXTRA_CORE_TAG=v0.42.7`.
 
 For a less pushy alternative you can build a single-platform image and
 not push it, using the following command. It also supports the
-`CENTER_IMAGE_REPO` and `EXTRA_CENTER_TAG` variables.  But it only
+`CORE_IMAGE_REPO` and `EXTRA_CORE_TAG` variables.  But it only
 builds for your local "platform"; you can use this if you have podman
 pretending to be docker.
 
