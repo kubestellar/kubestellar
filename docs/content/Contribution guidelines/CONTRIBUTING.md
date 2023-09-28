@@ -82,19 +82,37 @@ central components then you will need to build a new image; perhaps
 surprisingly, this is not included in `make build`.  The regular way
 to build this image is with the following command.  It builds a
 multi-platform image, for all the platforms that KubeStellar can run
-its central components on, and pushes it to quay.io.
+its central components on, and pushes it to quay.io.  Read the remarks
+below before trying this.
 
 ```bash
 make kubestellar-image
 ```
 
-However, that will only succeed if you have done `docker login` to
-quay.io with credentials authorized to write to the
-`kubestellar/kubestellar` repository.  Look on quay.io to find the
-image you just pushed, you will need its tag.
+The command shown above will only succeed if you have done `docker
+login` to quay.io with credentials authorized to write to the
+`kubestellar/kubestellar` repository. Look on quay.io to find the
+image you just pushed, you will soon need to use one of its tags.
+This make target pushes the image with two tags, one based on build
+timestamp and one based on git metadata.
+
+If you are not authorized to write to
+`quay.io/kubestellar/kubestellar` then you can specify an alternate
+image repository: put it in the make variable named
+`CORE_IMAGE_REPO`.  For example, you might invoke `make
+kubestellar-image CORE_IMAGE_REPO=docker.io/myacct/ksctr`.
+
+Another variable that you might like to use is `EXTRA_CORE_TAG`.
+This causes the make command to push the image with a third tag that
+you supply in that variable.  For example, if you want to tag the
+image with a release tag you might invoke `make kubestellar-image
+EXTRA_CORE_TAG=v0.42.7`.
 
 For a less pushy alternative you can build a single-platform image and
-not push it, using the following command.
+not push it, using the following command. It also supports the
+`CORE_IMAGE_REPO` and `EXTRA_CORE_TAG` variables.  But it only
+builds for your local "platform"; you can use this if you have podman
+pretending to be docker.
 
 ```bash
 make kubestellar-image-local
