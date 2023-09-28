@@ -257,8 +257,26 @@ the ESPW.
 These commands administer a deployment of the central components ---
 the kcp server, PKI, and the central KubeStellar components --- in a
 Kubernetes cluster that will be referred to as "the hosting cluster".
-These are framed as "kubectl plugins" and thus need to be explicitly
-or implicitly given a kubeconfig file for the hosting cluster.
+These commands are framed as "kubectl plugins" and thus need to be
+explicitly or implicitly given a kubeconfig file for the hosting
+cluster.
+
+You need a Kubernetes cluster with an Ingress controller deployed and
+configured in a way that does _not_ terminate TLS connections (this
+abstinence is often called "SSL passthrough"). An OpenShift cluster
+would be one qualifying thing. Another would be an ordinary Kubernetes
+cluster with the [nginx Ingress
+controller](https://docs.nginx.com/nginx-ingress-controller/) deployed
+and configured appropriately. Please note that [special
+considerations](https://kind.sigs.k8s.io/docs/user/ingress/) apply
+when deploying an ingress controller in `kind`. See [a fully worked
+example with kind and
+nginx](../environments/dev-env/#hosting-kubestellar-in-a-kind-cluster). You
+will need to know the port number at which the Ingress controller is
+listening for HTTPS connections.
+
+You will need a domain name that, on each of your clients, resolves to
+an IP address that gets to the Ingress controller's listening socket.
 
 ### Deploy to cluster
 

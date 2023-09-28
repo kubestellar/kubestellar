@@ -67,11 +67,16 @@ kubestellar init
 
 (This style of deployment requires release v0.6 or later of KubeStellar.)
 
-First you will need the kcp `kubectl` plugins.  See [the "Start kcp"
-section above](../#start-kcp) for instructions on how to get all of the
-kcp executables.
+You need a Kubernetes cluster; see [the documentation for `kubectl kubestellar deploy`](../../commands/#deployment-into-a-kubernetes-cluster) for more information.
 
-Next you will need to get a build of KubeStellar.  See
+You will need a domain name that, on each of your clients, resolves to
+an IP address that gets to the Ingress controller's listening socket.
+
+You will need the kcp `kubectl` plugins.  See [the "Start kcp" section
+above](../#start-kcp) for instructions on how to get all of the kcp
+executables.
+
+You will need to get a build of KubeStellar.  See
 [above](../#get-kubestellar).
 
 To do the deployment and prepare to use it you will be using [the
