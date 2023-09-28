@@ -1976,15 +1976,31 @@ central components then you will need to build a new image; perhaps
 surprisingly, this is not included in <code>make build</code>.  The regular way
 to build this image is with the following command.  It builds a
 multi-platform image, for all the platforms that KubeStellar can run
-its central components on, and pushes it to quay.io.</p>
+its central components on, and pushes it to quay.io.  Read the remarks
+below before trying this.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>kubestellar-image
 </code></pre></div>
-<p>However, that will only succeed if you have done <code>docker login</code> to
-quay.io with credentials authorized to write to the
-<code>kubestellar/kubestellar</code> repository.  Look on quay.io to find the
-image you just pushed, you will need its tag.</p>
+<p>The command shown above will only succeed if you have done <code>docker
+login</code> to quay.io with credentials authorized to write to the
+<code>kubestellar/kubestellar</code> repository. Look on quay.io to find the
+image you just pushed, you will soon need to use one of its tags.
+This make target pushes the image with two tags, one based on build
+timestamp and one based on git metadata.</p>
+<p>If you are not authorized to write to
+<code>quay.io/kubestellar/kubestellar</code> then you can specify an alternate
+image repository: put it in the make variable named
+<code>CORE_IMAGE_REPO</code>.  For example, you might invoke <code>make
+kubestellar-image CORE_IMAGE_REPO=docker.io/myacct/ksctr</code>.</p>
+<p>Another variable that you might like to use is <code>EXTRA_CORE_TAG</code>.
+This causes the make command to push the image with a third tag that
+you supply in that variable.  For example, if you want to tag the
+image with a release tag you might invoke <code>make kubestellar-image
+EXTRA_CORE_TAG=v0.42.7</code>.</p>
 <p>For a less pushy alternative you can build a single-platform image and
-not push it, using the following command.</p>
+not push it, using the following command. It also supports the
+<code>CORE_IMAGE_REPO</code> and <code>EXTRA_CORE_TAG</code> variables.  But it only
+builds for your local "platform"; you can use this if you have podman
+pretending to be docker.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>kubestellar-image-local
 </code></pre></div>
 <p>Follow that with <code>docker images</code> to find the tag of the image you just
