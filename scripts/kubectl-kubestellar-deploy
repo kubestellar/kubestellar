@@ -20,7 +20,10 @@
 
 KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
-image_tag=b23-09-15-04-52-13
+image_tag=$(kubestellar-release 2> /dev/null)
+if [ "$image_tag" == "" ]; then
+	image_tag=stable
+fi
 
 external_endpoint=""
 openshift=false
