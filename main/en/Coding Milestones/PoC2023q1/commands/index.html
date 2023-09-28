@@ -2346,8 +2346,24 @@ the ESPW.</p>
 <p>These commands administer a deployment of the central components ---
 the kcp server, PKI, and the central KubeStellar components --- in a
 Kubernetes cluster that will be referred to as "the hosting cluster".
-These are framed as "kubectl plugins" and thus need to be explicitly
-or implicitly given a kubeconfig file for the hosting cluster.</p>
+These commands are framed as "kubectl plugins" and thus need to be
+explicitly or implicitly given a kubeconfig file for the hosting
+cluster.</p>
+<p>You need a Kubernetes cluster with an Ingress controller deployed and
+configured in a way that does <em>not</em> terminate TLS connections (this
+abstinence is often called "SSL passthrough"). An OpenShift cluster
+would be one qualifying thing. Another would be an ordinary Kubernetes
+cluster with the <a href="https://docs.nginx.com/nginx-ingress-controller/">nginx Ingress
+controller</a> deployed
+and configured appropriately. Please note that <a href="https://kind.sigs.k8s.io/docs/user/ingress/">special
+considerations</a> apply
+when deploying an ingress controller in <code>kind</code>. See <a href="../environments/dev-env/#hosting-kubestellar-in-a-kind-cluster">a fully worked
+example with kind and
+nginx</a>. You
+will need to know the port number at which the Ingress controller is
+listening for HTTPS connections.</p>
+<p>You will need a domain name that, on each of your clients, resolves to
+an IP address that gets to the Ingress controller's listening socket.</p>
 <h3 id="deploy-to-cluster">Deploy to cluster<a class="headerlink" href="#deploy-to-cluster" title="Permanent link">#</a></h3>
 <p>Deployment is done with a "kubectl plugin" that is invoked as <code>kubectl
 kubestellar deploy</code> and creates a <a href="https://helm.sh/docs/intro/using_helm/#three-big-concepts">Helm
