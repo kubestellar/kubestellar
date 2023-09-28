@@ -12,11 +12,11 @@ mailbox workspace name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97
 
 Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-kubectl ws root:espw:$mbws
+kubectl ws root:$mbws
 ./bin/kubectl-kubestellar-syncer_gen florin --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o florin-syncer.yaml
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f".
+Current workspace is "root:vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f".
 Creating service account "kubestellar-syncer-florin-32uaph9l"
 Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service account "kubestellar-syncer-florin-32uaph9l"
 

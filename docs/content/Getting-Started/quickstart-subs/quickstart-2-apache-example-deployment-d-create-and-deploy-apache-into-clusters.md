@@ -4,7 +4,7 @@ Create the `EdgePlacement` object for your workload. Its “where predicate” (
 In the `example-wmw` workspace create the following `EdgePlacement` object: 
   
 ```shell linenums="1"
-kubectl ws root:my-org:example-wmw
+kubectl ws root:example-wmw
 
 kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v1alpha1

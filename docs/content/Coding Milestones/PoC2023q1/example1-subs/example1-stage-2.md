@@ -13,18 +13,11 @@ One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".
 
 In this example, each workload description goes in its own workload
-management workspace (WMW).  Start by creating a common parent for
-those two workspaces, with the following commands.
+management workspace (WMW).  Start by creating a WMW for the common
+workload, with the following commands.
 
 ```shell
 kubectl ws root
-kubectl ws create my-org --enter
-```
-
-Next, create the WMW for the common workload.  The following command
-will do that, if issued while "root:my-org" is the current workspace.
-
-```shell
 kubectl kubestellar ensure wmw wmw-c
 ```
 
@@ -185,7 +178,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-kubectl ws root:my-org
+kubectl ws root
 kubectl kubestellar ensure wmw wmw-s
 ```
 
@@ -350,10 +343,10 @@ continually.
 Check out the SinglePlacementSlice objects as follows.
 
 ```shell
-kubectl ws root:my-org:wmw-c
+kubectl ws root:wmw-c
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org:wmw-c".
+Current workspace is "root:wmw-c".
 ```
 
 ```shell
@@ -392,6 +385,6 @@ metadata:
 ```
 
 Also check out the SinglePlacementSlice objects in
-`root:my-org:wmw-s`.  It should go similarly, but the `destinations`
+`root:wmw-s`.  It should go similarly, but the `destinations`
 should include only the entry for guilder.
 <!--example1-stage-2-end-->

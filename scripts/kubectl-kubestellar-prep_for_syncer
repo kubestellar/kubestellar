@@ -31,6 +31,7 @@ if ! [ -x "$bindir/kubectl-kubestellar-syncer_gen" ]; then
 fi
 
 imw=.
+rootws="root"
 espw="root:espw"
 stname=""
 output=""
@@ -142,6 +143,12 @@ fi
 if ! kubectl "${kubectl_flags[@]}" get APIExport edge.kubestellar.io &> /dev/null ; then
     echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
     exit 2
+fi
+
+if [ "$silent" == "true" ]; then
+    kubectl ws "${kubectl_flags[@]}" "$rootws" > /dev/null
+else
+    kubectl ws "${kubectl_flags[@]}" "$rootws"
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then

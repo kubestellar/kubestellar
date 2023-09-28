@@ -120,6 +120,11 @@ command line parameters, then `$KUBECONFIG`, then `~/.kube/config`.
       --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace
       --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace
 
+      --root-cluster string              The name of the kubeconfig cluster to use for access to root workspace
+      --root-context string              The name of the kubeconfig context to use for access to root workspace (default "root")
+      --root-kubeconfig string           Path to the kubeconfig file to use for access to root workspace
+      --root-user string                 The name of the kubeconfig user to use for access to root workspace
+
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10204)
 ```
 
@@ -209,10 +214,10 @@ to run the placement translator, or any other that is pointed at the
 edge service provider workspace. The following with switch the focus
 to mailbox workspace(s).
 
-You can get a listing of mailbox workspaces, while in the edge service
-provider workspace, as follows.
+You can get a listing of mailbox workspaces, as follows.
 
 ```shell 
+kubectl ws root
 kubectl get workspace
 ```
 ``` { .bash .no-copy }
@@ -226,10 +231,10 @@ one for the guilder cluster) and examine the `SyncerConfig` object.
 That should look like the following.
 
 ```shell
-kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+kubectl ws $(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "guilder") | .name')
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+Current workspace is "root:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
 ```
 
 ```shell
@@ -323,7 +328,7 @@ tweaking things.  For example, try deleting an EdgePlacement as
 follows.
 
 ```shell
-kubectl ws root:my-org:wmw-c
+kubectl ws root:wmw-c
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:work-c"
@@ -346,17 +351,17 @@ After that, the SyncerConfig in the florin mailbox should be empty, as
 in the following (you mailbox workspace names may be different).
 
 ```shell
-kubectl ws root:espw
+kubectl ws root
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw".
+Current workspace is "root".
 ```
 
 ```shell
-kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+kubectl ws $(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "florin") | .name')
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
+Current workspace is "root:2lplrryirmv4xug3-mb-89c08764-01ae-4117-8fb0-6b752e76bc2f" (type root:universal).
 ```
 
 ```shell
@@ -383,11 +388,11 @@ only the special workload.  That would look something like the
 following.
 
 ```shell
-kubectl ws root:espw
-kubectl ws $(kubectl get workspace | sed -n '2p' | awk '{print $1}')
+kubectl ws root
+kubectl ws $(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "guilder") | .name')
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
+Current workspace is "root:1xpg93182scl85te-mb-5ee1c42e-a7d5-4363-ba10-2f13fe578e19" (type root:universal).
 ```
 
 ```shell

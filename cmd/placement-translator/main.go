@@ -104,6 +104,9 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	espwClientOpts := NewClientOpts("espw", "access to the edge service provider workspace")
 	espwClientOpts.AddFlags(fs)
+	rootClientOpts := NewClientOpts("root", "access to root workspace")
+	rootClientOpts.overrides.CurrentContext = "root"
+	rootClientOpts.AddFlags(fs)
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
@@ -132,6 +135,12 @@ func main() {
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
 		os.Exit(10)
+	}
+
+	rootRestConfig, err := rootClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "Failed to build config from flags", "which", rootClientOpts.which)
+		os.Exit(11)
 	}
 
 	baseRestConfig, err := baseClientOpts.ToRESTConfig()
@@ -175,14 +184,14 @@ func main() {
 	customizerClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Customizers()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
-	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
+	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for edge service provider workspace")
+		logger.Error(err, "Failed to create clientset for root workspace")
 		os.Exit(50)
 	}
 
-	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
-	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
+	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
+	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
 	locationClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Locations()
@@ -217,8 +226,9 @@ func main() {
 	pt := placement.NewPlacementTranslator(concurrency, ctx, locationClusterPreInformer, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer, customizerClusterPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+
 	edgeInformerFactory.Start(doneCh)
-	espwInformerFactory.Start(doneCh)
+	rootInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
 	kubeClusterInformerFactory.Start(doneCh)
 	pt.Run()

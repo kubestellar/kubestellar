@@ -12,11 +12,10 @@ kubectl ws root
 kubectl ws create example-imw
 ```
 
-WMWs are used by KubeStellar to store workload descriptions and `EdgePlacement` objects. Create an WMW named `example-wmw` in a `my-org` workspace with the following commands:
+WMWs are used by KubeStellar to store workload descriptions and `EdgePlacement` objects. Create an WMW named `example-wmw` with the following commands:
 
 ```shell
 kubectl ws root
-kubectl ws create my-org --enter
 kubectl kubestellar ensure wmw example-wmw
 ```
 
