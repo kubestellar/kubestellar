@@ -162,6 +162,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/example1-subs/example1-teardown/</loc>
+         <lastmod>2023-09-28</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-teardown/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin/</loc>
          <lastmod>2023-09-28</lastmod>
          <changefreq>daily</changefreq>

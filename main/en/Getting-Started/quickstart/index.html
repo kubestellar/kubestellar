@@ -2849,10 +2849,9 @@ workload and summarization aspirations removed.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
 </code></pre></div>
-<p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> in a <code>my-org</code> workspace with the following commands:</p>
+<p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> with the following commands:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
-<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
 <!-- END INCLUDE -->
@@ -2969,7 +2968,7 @@ workload and summarization aspirations removed.</p>
 <span class="normal"><a href="#__codelineno-81-31">31</a></span>
 <span class="normal"><a href="#__codelineno-81-32">32</a></span>
 <span class="normal"><a href="#__codelineno-81-33">33</a></span>
-<span class="normal"><a href="#__codelineno-81-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org:example-wmw
+<span class="normal"><a href="#__codelineno-81-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:example-wmw
 <a id="__codelineno-81-2" name="__codelineno-81-2"></a>
 <a id="__codelineno-81-3" name="__codelineno-81-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-81-4" name="__codelineno-81-4"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
@@ -3158,12 +3157,9 @@ which should eventually yield:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 <a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-91-4" name="__codelineno-91-4" href="#__codelineno-91-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
-<a id="__codelineno-91-5" name="__codelineno-91-5" href="#__codelineno-91-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-91-6" name="__codelineno-91-6" href="#__codelineno-91-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-91-7" name="__codelineno-91-7" href="#__codelineno-91-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
-<a id="__codelineno-91-8" name="__codelineno-91-8" href="#__codelineno-91-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-91-9" name="__codelineno-91-9" href="#__codelineno-91-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<a id="__codelineno-91-4" name="__codelineno-91-4" href="#__codelineno-91-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-91-5" name="__codelineno-91-5" href="#__codelineno-91-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-91-6" name="__codelineno-91-6" href="#__codelineno-91-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>

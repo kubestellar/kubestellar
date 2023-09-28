@@ -1651,10 +1651,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>example-imw
 </code></pre></div>
-<p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> in a <code>my-org</code> workspace with the following commands:</p>
+<p>WMWs are used by KubeStellar to store workload descriptions and <code>EdgePlacement</code> objects. Create an WMW named <code>example-wmw</code> with the following commands:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>my-org<span class="w"> </span>--enter
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
 <p>A WMW does not have to be created before the edge cluster is on-boarded; the WMW only needs to be created before content is put in it.</p>
 <!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end-->
