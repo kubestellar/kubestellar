@@ -89,6 +89,35 @@ below before trying this.
 make kubestellar-image
 ```
 
+The set of target platforms can be specified by setting the
+`CORE_PLATFORMS` variable. The following command is equivalent to the
+default behavior.
+
+```bash
+make kubestellar-image CORE_PLATFORMS=linux/amd64,linux/arm64,linux/ppc64le
+```
+
+**NOTE VERY SHARP AND BURIED EDGE**: IF the target platforms include
+  `linux/amd64` --- either because you explicitly set that or you let
+  the default setting apply --- then you MUST issue this command on a
+  machine (real or virtual) with the x86-64-v2
+  instructions. "x86-64-v2" is a shorthand for a bundle of instruction
+  set features that have been appearing in x86 chips for many years
+  now (any real machine that you are likely to use today has them) but
+  still do not all appear by default in some common emulators. See
+  [QEMU configuration
+  recommendations](https://www.qemu.org/docs/master/system/i386/cpu.html),
+  for example. If the machine lacks the v2 instructions then the build
+  will fail when it tries to use the glibc in the redhat/ubi9
+  image. Cross-platform building when the builder is NOT x86 and the
+  target IS x86 is beyond the ken of modern technology (see
+  [here](https://github.com/docker/buildx/issues/2028) and
+  [here](https://github.com/multiarch/qemu-user-static#supported-host-architectures)). If
+  you somehow succeed to build for the target platform
+  `linux/amd64/v2` and successfully test on real x86 hardware you
+  still are not done: when you try to use this image in OpenShift on
+  x86 you may get inexplicable failures to pull the image.
+
 The command shown above will only succeed if you have done `docker
 login` to quay.io with credentials authorized to write to the
 `kubestellar/kubestellar` repository. Look on quay.io to find the

@@ -21,7 +21,7 @@ GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
 GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
 GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 
-CORE_PLATFORMS ?= linux/amd64/v2,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+CORE_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
 CORE_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
 BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
 GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
