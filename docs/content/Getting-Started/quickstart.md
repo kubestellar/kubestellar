@@ -20,9 +20,8 @@ Table of contents:
 2. [Install and run kcp and **KubeStellar**](#2-install-and-run-kcp-and-kubestellar)
 3. [Example deployment of Apache HTTP Server workload into two local kind clusters](#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
       1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
-      2. [Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)](#b-create-a-kubestellar-inventory-management-workspace-imw-and-workload-management-workspace-wmw)
-      3. [Onboarding the clusters](#c-onboarding-the-clusters)
-      4. [Create and deploy the Apache Server workload into florin and guilder clusters](#d-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
+      2. [Onboarding the clusters](#b-onboarding-the-clusters)
+      3. [Create and deploy the Apache Server workload into florin and guilder clusters](#c-create-and-deploy-the-apache-server-workload-into-florin-and-guilder-clusters)
 4. [Teardown the environment](#4-teardown-the-environment)
 5. [Next Steps](#5-next-steps)
 
@@ -68,15 +67,8 @@ workload and summarization aspirations removed.
    start="<!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-start-->"
    end="<!--quickstart-2-apache-example-deployment-a-kind-clusters-guilder-end-->"
 %}
-### b. Create a KubeStellar Inventory Management Workspace (IMW) and Workload Management Workspace (WMW)
 
-{%
-   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw.md"
-   start="<!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-start-->"
-   end="<!--quickstart-2-apache-example-deployment-b-create-imw-and-wmw-end-->"
-%}
-
-### c. Onboarding the clusters
+### b. Onboarding the clusters
 
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-c-onboarding-clusters.md"
@@ -84,7 +76,7 @@ workload and summarization aspirations removed.
    end="<!--quickstart-2-apache-example-deployment-c-onboarding-clusters-end-->"
 %}
 
-### d. Create and deploy the Apache Server workload into florin and guilder clusters
+### c. Create and deploy the Apache Server workload into florin and guilder clusters
 
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md"

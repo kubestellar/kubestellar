@@ -1,12 +1,12 @@
 <!--kubestellar-syncer-0-deploy-florin-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
-kubectl ws root:imw-1
+kubectl ws root:imw1
 mbws=`kubectl get synctargets.edge.kubestellar.io florin -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
 echo "mailbox workspace name = $mbws"
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
+Current workspace is "root:imw1".
 mailbox workspace name = vosh9816n2xmpdwm-mb-bb47149d-52d3-4f14-84dd-7b64ac01c97f
 ```
 
