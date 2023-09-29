@@ -73,7 +73,7 @@ COPY --from=builder /home/kubestellar/bin	      	bin/
 COPY --from=builder /home/kubestellar/config	      	config/
 
 # add entry script
-ADD user/container/entry.sh entry.sh
+ADD core-container/entry.sh entry.sh
 
 RUN chown -R kubestellar:0 /home/kubestellar && \
     chmod -R g=u /home/kubestellar
