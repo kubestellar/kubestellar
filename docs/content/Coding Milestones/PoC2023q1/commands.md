@@ -275,6 +275,16 @@ nginx](../environments/dev-env/#hosting-kubestellar-in-a-kind-cluster). You
 will need to know the port number at which the Ingress controller is
 listening for HTTPS connections.
 
+**IF** your Kubernetes cluster has any worker nodes --- real or
+virtual --- with the x86_64 instruction set, they need to support the
+extended instruction set known as "x64-64-v2". If using hardware
+bought in the last 10 years, you can assume that is true. If using
+emulation, you need to make sure that your emulator is emulating that
+extended instruction set --- some emulators do not do this by
+default. See [QEMU configuration
+recommendations](https://www.qemu.org/docs/master/system/i386/cpu.html),
+for example.
+
 You will need a domain name that, on each of your clients, resolves to
 an IP address that gets to the Ingress controller's listening socket.
 
