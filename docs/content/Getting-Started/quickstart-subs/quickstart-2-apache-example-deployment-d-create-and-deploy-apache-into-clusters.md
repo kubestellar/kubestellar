@@ -1,10 +1,14 @@
 <!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->
+KubeStellar will have automatically created a Workload Management
+Workspace (WMW) for the user to store workload descriptions and MCCM
+control objects in. The automatically created WMW is at `root:wmw1`.
+
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
 
-In the `example-wmw` workspace create the following `EdgePlacement` object: 
+In the `root:wmw1` workspace create the following `EdgePlacement` object: 
   
 ```shell linenums="1"
-kubectl ws root:example-wmw
+kubectl ws root:wmw1
 
 kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v1alpha1

@@ -69,13 +69,13 @@ See [an example in the extended example](../../Coding%20Milestones/PoC2023q1/exa
 
 ### Maintaining inventory of WECs
 
-A client owns the ISes in which its inventory objects exist. The client creates and deletes ISes as desired. See [an example in the extended example](../../Coding%20Milestones/PoC2023q1/example1/#create-an-inventory-management-workspace).
+A client owns the ISes in which its inventory objects exist. When KubeStellar MCCM is deployed it creates an IS for clients to use, at workspace path `root:imw1`. The clients can create more and delete ISes as desired, using plain kcp workspace management commands.
 
 A client maintains inventory objects in the client's ISes. See [an example in the extended example](../../Coding%20Milestones/PoC2023q1/example1/#create-synctarget-and-location-objects-to-represent-the-florin-and-guilder-clusters), and documentation for the [postive](../../Coding%20Milestones/PoC2023q1/commands/#creating-synctargetlocation-pairs) and [negative](../../Coding%20Milestones/PoC2023q1/commands/#removing-synctargetlocation-pairs) commands.
 
 ### Maintaining workload descriptions in WDSes
 
-A client owns the WDSes that it uses. The client creates and deletes WDSes as desired. See the [positive](../../Coding%20Milestones/PoC2023q1/commands/#creating-a-workload-management-workspace) and [negative](../../Coding%20Milestones/PoC2023q1/commands/#removing-a-workload-management-workspace) commands.
+A client owns the WDSes that it uses. When KubeStellar MCCM is deployed it creates a WDS for clients to use, at workspace path `root:wmw1`. The clients can create more and delete WDSes as desired. See the [positive](../../Coding%20Milestones/PoC2023q1/commands/#creating-a-workload-management-workspace) and [negative](../../Coding%20Milestones/PoC2023q1/commands/#removing-a-workload-management-workspace) commands.
 
 A workload description is ordinary Kubernetes API objects. KubeStellar MCCM does not stipulate the use of any sort of "wrapper" objects. A client's workload objects may actually be some sort of wrapper, if the client has equipped its WECs with controllers that act on those wrappers. KS MCCM will transport the objects are they appear in the WDSes and WECs.
 

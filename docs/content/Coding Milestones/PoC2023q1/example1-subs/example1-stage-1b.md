@@ -7,10 +7,10 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw-1 guilder
+kubectl kubestellar prep-for-syncer --imw root:imw1 guilder
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
+Current workspace is "root:imw1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
 Creating service account "kubestellar-syncer-guilder-wfeig2lv"
@@ -68,10 +68,10 @@ local-path-storage                 local-path-provisioner             1/1     1 
 Do the analogous stuff for the florin cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw-1 florin
+kubectl kubestellar prep-for-syncer --imw root:imw1 florin
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
+Current workspace is "root:imw1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 Creating service account "kubestellar-syncer-florin-32uaph9l"

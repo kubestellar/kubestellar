@@ -232,12 +232,26 @@ only used in the `start` subcommand.
 #### Kubestellar init
 
 This subcommand is used after installation to finish setup and does
-two things.  One is to ensure that the edge service provider workspace
-(ESPW) exists and has the required contents.  The other is to ensure
-that the `root:compute` workspace has been extended with the RBAC
-objects that enable the syncer to propagate reported state for
+the following four things.
+
+1. Ensure that the edge service provider workspace (ESPW) exists and
+has the required contents.
+
+2. Ensure that the `root:compute` workspace has been extended with the
+RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
+
+3. Ensure the existence of an inventory management workspace at
+pathname "root:imw1".
+
+4. Ensure the existence of a workload management workspace at pathname
+"root:wmw1" and that it has APIBindings that import the namespaced
+Kubernetes resources (kinds of objects) for management of
+containerized workloads.
+
+At the completion of `kubestellar init` the current workspace will be
+"root:wmw1".
 
 #### KubeStellar start
 
@@ -328,6 +342,10 @@ issue the following command.
 ```shell
 kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:1234
 ```
+
+The Helm chart takes care of setting up the KubeStellar MCCM core,
+accomplishing the same thing as the [kubestellar
+start](#kubestellar-start) command above.
 
 ### Fetch kubeconfig for internal clients
 
