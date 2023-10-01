@@ -28,9 +28,9 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	kcpinformers "github.com/kcp-dev/apimachinery/v2/third_party/informers"
-	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpapiinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
+	kcpscopedclientset "github.com/kcp-dev/kcp/sdk/client/clientset/versioned"
+	kcpapiinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
+	tenancyv1a1informers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/tenancy/v1alpha1"
 )
 
 // NewSharedInformer constructs a shared index informer on objects of a given kind in mailbox workspaces.

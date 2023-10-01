@@ -19,7 +19,6 @@ package options
 import (
 	"github.com/spf13/pflag"
 
-	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
 
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
@@ -35,7 +34,7 @@ type Options struct {
 func NewOptions() *Options {
 	// Default to -v=2
 	logs := logs.NewOptions()
-	logs.Config.Verbosity = config.VerbosityLevel(2)
+	logs.Verbosity = 2
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),

@@ -33,8 +33,8 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
-	kcpscopedclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	kcpscopedclient "github.com/kcp-dev/kcp/sdk/client/clientset/versioned"
+	kcpinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"

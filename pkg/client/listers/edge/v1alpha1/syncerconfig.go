@@ -103,7 +103,7 @@ func (s *syncerConfigLister) Get(name string) (*edgev1alpha1.SyncerConfig, error
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SyncerConfig"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("syncerconfigs"), name)
 	}
 	return obj.(*edgev1alpha1.SyncerConfig), nil
 }
@@ -137,7 +137,7 @@ func (s *syncerConfigScopedLister) Get(name string) (*edgev1alpha1.SyncerConfig,
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SyncerConfig"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("syncerconfigs"), name)
 	}
 	return obj.(*edgev1alpha1.SyncerConfig), nil
 }

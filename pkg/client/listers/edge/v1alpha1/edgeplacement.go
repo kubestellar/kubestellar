@@ -103,7 +103,7 @@ func (s *edgePlacementLister) Get(name string) (*edgev1alpha1.EdgePlacement, err
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("EdgePlacement"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("edgeplacements"), name)
 	}
 	return obj.(*edgev1alpha1.EdgePlacement), nil
 }
@@ -137,7 +137,7 @@ func (s *edgePlacementScopedLister) Get(name string) (*edgev1alpha1.EdgePlacemen
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("EdgePlacement"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("edgeplacements"), name)
 	}
 	return obj.(*edgev1alpha1.EdgePlacement), nil
 }

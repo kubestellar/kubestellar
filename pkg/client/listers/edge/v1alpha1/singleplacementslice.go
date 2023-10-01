@@ -103,7 +103,7 @@ func (s *singlePlacementSliceLister) Get(name string) (*edgev1alpha1.SinglePlace
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SinglePlacementSlice"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("singleplacementslices"), name)
 	}
 	return obj.(*edgev1alpha1.SinglePlacementSlice), nil
 }
@@ -137,7 +137,7 @@ func (s *singlePlacementSliceScopedLister) Get(name string) (*edgev1alpha1.Singl
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SinglePlacementSlice"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("singleplacementslices"), name)
 	}
 	return obj.(*edgev1alpha1.SinglePlacementSlice), nil
 }

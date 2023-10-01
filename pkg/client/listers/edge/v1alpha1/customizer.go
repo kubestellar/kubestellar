@@ -136,7 +136,7 @@ func (s *customizerNamespaceLister) Get(name string) (*edgev1alpha1.Customizer, 
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("Customizer"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("customizers"), name)
 	}
 	return obj.(*edgev1alpha1.Customizer), nil
 }
@@ -190,7 +190,7 @@ func (s *customizerScopedNamespaceLister) Get(name string) (*edgev1alpha1.Custom
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("Customizer"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("customizers"), name)
 	}
 	return obj.(*edgev1alpha1.Customizer), nil
 }

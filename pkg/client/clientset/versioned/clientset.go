@@ -34,8 +34,7 @@ type Interface interface {
 	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface
 }
 
-// Clientset contains the clients for groups. Each group has exactly one
-// version included in a Clientset.
+// Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
 	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1Client

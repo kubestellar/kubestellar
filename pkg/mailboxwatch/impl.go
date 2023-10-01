@@ -32,9 +32,9 @@ import (
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	tenancyv1a1client "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
+	tenancyv1a1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
+	tenancyv1a1client "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/typed/tenancy/v1alpha1"
+	tenancyv1a1informers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	"github.com/kubestellar/kubestellar/pkg/placement"

@@ -103,7 +103,7 @@ func (s *syncTargetLister) Get(name string) (*edgev1alpha1.SyncTarget, error) {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SyncTarget"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("synctargets"), name)
 	}
 	return obj.(*edgev1alpha1.SyncTarget), nil
 }
@@ -137,7 +137,7 @@ func (s *syncTargetScopedLister) Get(name string) (*edgev1alpha1.SyncTarget, err
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(edgev1alpha1.Resource("SyncTarget"), name)
+		return nil, errors.NewNotFound(edgev1alpha1.Resource("synctargets"), name)
 	}
 	return obj.(*edgev1alpha1.SyncTarget), nil
 }

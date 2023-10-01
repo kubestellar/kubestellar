@@ -45,9 +45,9 @@ import (
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
-	kcpcorev1a1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
-	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
+	kcpcorev1a1 "github.com/kcp-dev/kcp/sdk/apis/core/v1alpha1"
+	tenancyv1a1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
+	tenancyv1a1listers "github.com/kcp-dev/kcp/sdk/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
@@ -1000,7 +1000,6 @@ func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Na
 	destObj.SetResourceVersion("")
 	destObj.SetSelfLink("")
 	destObj.SetUID("")
-	destObj.SetZZZ_DeprecatedClusterName("")
 	labels := destObj.GetLabels()
 	if labels == nil {
 		labels = map[string]string{}

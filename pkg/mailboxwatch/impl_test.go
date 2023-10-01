@@ -35,9 +35,9 @@ import (
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	kcpfake "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	tenancyv1a1 "github.com/kcp-dev/kcp/sdk/apis/tenancy/v1alpha1"
+	kcpfake "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster/fake"
+	kcpinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"

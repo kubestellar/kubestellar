@@ -26,13 +26,14 @@ import (
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
+	logsapi "k8s.io/component-base/logs/api/v1"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
-	kcpclientsetnoncluster "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
+	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1"
+	"github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/util/conditions"
+	kcpclientsetnoncluster "github.com/kcp-dev/kcp/sdk/client/clientset/versioned"
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
@@ -46,7 +47,7 @@ func NewResolverCommand() *cobra.Command {
 		Use:   "where-resolver",
 		Short: "Maintains SinglePlacementSlice API objects for EdgePlacements",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := options.Logs.ValidateAndApply(kcpfeatures.DefaultFeatureGate); err != nil {
+			if err := logsapi.ValidateAndApply(options.Logs, kcpfeatures.DefaultFeatureGate); err != nil {
 				return err
 			}
 			if err := options.Complete(); err != nil {

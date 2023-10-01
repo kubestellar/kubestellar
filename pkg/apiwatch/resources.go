@@ -47,7 +47,7 @@ type Invalidatable interface {
 
 // ObjectNotifier is something that notifies the client like an informer does
 type ObjectNotifier interface {
-	AddEventHandler(handler upstreamcache.ResourceEventHandler)
+	AddEventHandler(handler upstreamcache.ResourceEventHandler) (upstreamcache.ResourceEventHandlerRegistration, error)
 }
 
 // APIResourceLister helps list APIResources.

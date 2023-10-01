@@ -49,7 +49,7 @@ import (
 
 	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	"github.com/kcp-dev/kcp/test/e2e/framework"
+	"github.com/kcp-dev/contrib-tmc/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	workloadcliplugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"

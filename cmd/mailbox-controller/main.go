@@ -44,11 +44,11 @@ import (
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
-	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	apisv1alpha1 "github.com/kcp-dev/kcp/sdk/apis/apis/v1alpha1"
+	"github.com/kcp-dev/kcp/sdk/apis/third_party/conditions/util/conditions"
+	kcpscopedclientset "github.com/kcp-dev/kcp/sdk/client/clientset/versioned"
+	kcpclusterclientset "github.com/kcp-dev/kcp/sdk/client/clientset/versioned/cluster"
+	kcpinformers "github.com/kcp-dev/kcp/sdk/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"

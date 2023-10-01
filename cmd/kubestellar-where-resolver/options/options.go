@@ -19,8 +19,8 @@ package options
 import (
 	"github.com/spf13/pflag"
 
-	"k8s.io/component-base/config"
 	"k8s.io/component-base/logs"
+	logsapi "k8s.io/component-base/logs/api/v1"
 
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
 )
@@ -34,7 +34,7 @@ type Options struct {
 func NewOptions() *Options {
 	// Default to -v=2
 	logs := logs.NewOptions()
-	logs.Config.Verbosity = config.VerbosityLevel(2)
+	logs.Verbosity = 2
 
 	return &Options{
 		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
@@ -47,7 +47,7 @@ func (options *Options) AddFlags(fs *pflag.FlagSet) {
 	options.EspwClientOpts.AddFlags(fs)
 	options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
 	options.BaseClientOpts.AddFlags(fs)
-	options.Logs.AddFlags(fs)
+	logsapi.AddFlags(options.Logs, fs)
 }
 
 func (options *Options) Complete() error {
