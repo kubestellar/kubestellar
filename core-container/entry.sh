@@ -55,7 +55,7 @@ fi
 echo "logfile=./kubestellar-logs/kcp.log"
 
 echo "Waiting for kcp to be ready... it may take a while"
-until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]; do
+until [ "$(kubectl ws root 2> /dev/null)" != "" ]; do
     sleep 5
 done
 

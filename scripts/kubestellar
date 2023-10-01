@@ -100,10 +100,16 @@ function create_or_replace() { # usage: filename
     
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
-    if ! kubectl ws root:compute &> /dev/null ; then
+    kubectl ws root &> /dev/null
+    if ! kubectl get ws compute &> /dev/null; then
+	kubectl apply -f ${SCRIPT_DIR}/../config/tmc/rootcompute/clusterworkspace-compute.yaml
+	kubectl wait workspace.tenancy.kcp.io compute --for condition=WorkspaceInitialized=True --timeout 60s
+    fi
+    if ! kubectl ws compute &> /dev/null ; then
 	echo "$0: Something is very wrong, unable to set current kcp workspace to root:compute" >&2
 	exit 1
     fi
+    kubectl apply -f ${SCRIPT_DIR}/../config/tmc/rootcompute/kube-1.24
     ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do

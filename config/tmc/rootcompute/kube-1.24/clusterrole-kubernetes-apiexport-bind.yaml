@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: compute:apiexport:kubernetes:bind
+rules:
+- apiGroups: ["apis.kcp.io"]
+  resources:
+  - "apiexports"
+  resourceNames:
+  - "kubernetes"
+  verbs: ["bind"]
