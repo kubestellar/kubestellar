@@ -12,20 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prefix used for defining KubeStellar objects in the cluster
-prefix: kubestellar
-
-# Namespace where KubeStellar will be deployed
-namespace: kubestellar
-
 # KubeStellar image parameters
 image:
   repository: quay.io/kubestellar/kubestellar
   pullPolicy: IfNotPresent
-  tag: stable
+  tag: main-mc
 
 # Storage size
-storageSize: 1Gi
+storageSize: 8Gi
 
 # Select the cluster type
 clusterType: Kubernetes # OpenShift or Kubernetes
@@ -33,3 +27,15 @@ clusterType: Kubernetes # OpenShift or Kubernetes
 # Parameters for setting up the externally accessible kubeconfig
 EXTERNAL_HOSTNAME: "" # an empty string will let the container infer its ingress/route
 EXTERNAL_PORT: 443
+
+# Set KubeStellar controller verbosity (default: 2)
+CONTROLLER_VERBOSITY: 2
+
+# Set the ESPW name (default: espw)
+ESPW_NAME: "espw"
+
+# List comma separated inventories to be created (e.g., "root:inv-1,root:abc:inv-2")
+ENSURE_IMW: "root:inv1"
+
+# List comma separated WMWs to be created (e.g., "root:wmw-1,root:wmw-2")
+ENSURE_WMW: "root:wmw1"

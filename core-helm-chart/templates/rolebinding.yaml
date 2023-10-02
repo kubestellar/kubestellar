@@ -15,14 +15,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.prefix }}-role-binding
-  namespace: {{ .Values.namespace }}
+  name: kubestellar-role-binding
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.prefix }}-sa
-  namespace: {{ .Values.namespace }}
+  name: kubestellar-sa
   apiGroup: ""
 roleRef:
   kind: Role
-  name: {{ .Values.prefix }}-role
+  name: kubestellar-role
   apiGroup: ""

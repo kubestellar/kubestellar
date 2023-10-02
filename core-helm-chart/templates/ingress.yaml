@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if not (eq .Values.clusterType "OpenShift") }} # OpenShift
+{{ if not (eq .Values.clusterType "OpenShift") }} # Kubernetes
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -21,8 +22,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     kubernetes.io/ingress.class: nginx
-  name: {{ .Values.prefix }}-ingress
-  namespace: {{ .Values.namespace }}
+  name: kubestellar-ingress
 spec:
   rules:
   - host: {{ .Values.EXTERNAL_HOSTNAME }}
@@ -32,7 +32,8 @@ spec:
         path: /
         backend:
           service:
-            name: {{ .Values.prefix }}-service
+            name: kubestellar
             port:
               number: 6443
+
 {{ end }}
