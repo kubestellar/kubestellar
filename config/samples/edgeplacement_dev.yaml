@@ -6,9 +6,3 @@ spec:
   locationSelectors:
   - matchLabels:
       env: dev
-  nonNamespacedObjects:
-  - apiGroup: apis.kcp.io
-    resources:
-      - "apibindings"
-    resourceNames:
-      - "kubernetes"
