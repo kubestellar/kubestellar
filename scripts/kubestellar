@@ -100,8 +100,9 @@ function create_or_replace() { # usage: filename
     
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
-    kubectl ws root &> /dev/null
-    if ! kubectl get ws compute &> /dev/null; then
+    kubectl ws root
+    while ! kubectl get ws ; do sleep 10; done
+    if ! kubectl get ws compute; then
 	kubectl apply -f ${SCRIPT_DIR}/../config/tmc/rootcompute/clusterworkspace-compute.yaml
 	kubectl wait workspace.tenancy.kcp.io compute --for condition=WorkspaceInitialized=True --timeout 60s
     fi

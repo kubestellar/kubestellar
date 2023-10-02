@@ -55,13 +55,17 @@ fi
 echo "logfile=./kubestellar-logs/kcp.log"
 
 echo "Waiting for kcp to be ready... it may take a while"
-until [ "$(kubectl ws root 2> /dev/null)" != "" ]; do
+until ( kubectl ws root && [ "$(kubectl ws root)" != "" ] ) &> /dev/null; do
     sleep 5
 done
 
-echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+until ( kubectl version | grep 'Server Version:' ) &> /dev/null ; do
+    sleep 5
+done
 
-kubectl ws root
+sleep 10
+
+echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
 
 if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp-${EXTERNAL_HOSTNAME}" ]; then
     echo "Switching the admin.kubeconfig domain to ${EXTERNAL_HOSTNAME} and port ${EXTERNAL_PORT}..."
