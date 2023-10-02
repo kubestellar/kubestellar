@@ -159,7 +159,7 @@ ensure_folder() {
     fi
 }
 
-KCP_REQUIRED_VERSION="v0.11.0"
+KCP_REQUIRED_VERSION="v0.20.0"
 kcp_version=""
 kubestellar_version=""
 deploy="true"

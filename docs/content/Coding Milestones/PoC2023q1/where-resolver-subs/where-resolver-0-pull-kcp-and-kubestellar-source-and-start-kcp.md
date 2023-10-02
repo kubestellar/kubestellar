@@ -1,7 +1,7 @@
 <!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->
-Clone the v0.11.0 branch kcp source:
+Clone the v0.20.0 branch kcp source:
 ```shell
-git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
+git clone -b v0.20.0 https://github.com/kcp-dev/kcp kcp
 ```
 Build the kubectl-ws binary and include it in `$PATH`
 ```shell

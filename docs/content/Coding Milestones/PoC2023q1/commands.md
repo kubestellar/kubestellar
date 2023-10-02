@@ -166,7 +166,7 @@ There will be the following two differences.
 
 Following is an example of using this command and examining the
 results.  The context and port number chosen work for the kubeconfig
-file that `kcp start` (kcp release v0.11.0) creates by default.
+file that `kcp start` (kcp release v0.20.0) creates by default.
 
 ```console
 bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}

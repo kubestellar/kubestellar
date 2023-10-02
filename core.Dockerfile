@@ -25,11 +25,11 @@ RUN mkdir -p .kcp kubestellar-logs && \
     mkdir easy-rsa && \
     tar -C easy-rsa -zxf easy-rsa.tar.gz --wildcards --strip-components=1 EasyRSA*/* && \
     rm easy-rsa.tar.gz && \
-    curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kcp_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
+    curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.20.0/kcp_0.20.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kcp && \
     tar -C kcp -zxf kcp.tar.gz && \
     rm kcp.tar.gz && \
-    curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kubectl-kcp-plugin_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
+    curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.20.0/kubectl-kcp-plugin_0.20.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kcp-plugins && \
     tar -C kcp-plugins -zxf kcp-plugins.tar.gz && \
     rm kcp-plugins.tar.gz && \
