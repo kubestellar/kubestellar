@@ -20,7 +20,36 @@ Current workspace is "root:espw".
 ```
 ```shell
 placement-translator &
-sleep 120
+# wait until SyncerConfig, ReplicaSets and Deployments are ready
+sleep 10
+mbxws=($FLORIN_WS $GUILDER_WS)
+for ii in "${mbxws[@]}"; do
+  kubectl ws root:$ii
+  # wait for SyncerConfig resource
+  while ! kubectl get SyncerConfig the-one &> /dev/null; do
+    sleep 10
+  done
+  echo "* SyncerConfig resource exists"
+  # wait for ReplicaSet resource
+  while ! kubectl get rs &> /dev/null; do
+    sleep 10
+  done
+  echo "* ReplicaSet resource exists"
+  # wait until ReplicaSet running
+  while [ $(kubectl get replicaset -A | grep commonstuff | sed -e 's/ \+/ /g' | cut -d " " -f 5) -lt 1 ]; do
+    sleep 10
+  done
+  echo "* commonstuff ReplicaSet running"
+done
+# check for deployment in guilder
+while ! kubectl get deploy -A &> /dev/null; do
+  sleep 10
+done
+echo "* Deployment resource exists"
+while [ $(kubectl get deploy -A | grep specialstuff | sed -e 's/ \+/ /g' | cut -d " " -f 5) -lt 1 ]; do
+  sleep 10
+done
+echo "* specialstuff Deployment running"
 ```
 
 After it stops logging stuff, wait another minute and then you can

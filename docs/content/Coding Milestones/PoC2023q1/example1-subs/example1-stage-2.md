@@ -325,7 +325,12 @@ Current workspace is "root:espw".
 ```
 ```shell
 kubestellar-where-resolver &
-sleep 45
+# wait until where-resolver is ready by continuing once SinglePlacementSlice resource is available
+sleep 10
+kubectl ws root:wmw-c
+while ! kubectl get SinglePlacementSlice &> /dev/null; do
+  sleep 10
+done
 ```
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io"

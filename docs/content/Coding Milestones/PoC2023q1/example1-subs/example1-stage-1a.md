@@ -8,7 +8,12 @@ here.
 ```shell
 kubectl ws root:espw
 mailbox-controller -v=2 &
-sleep 60
+# wait until workspaces for both mailboxes show up
+sleep 10
+kubectl ws root
+while [ $(kubectl ws tree | grep "── .\+$" | wc -l) -ne 6 ]; do
+  sleep 10
+done
 ```
 ``` { .bash .no-copy }
 ...
