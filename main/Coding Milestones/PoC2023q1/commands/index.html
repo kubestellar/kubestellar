@@ -2328,12 +2328,31 @@ only used in the <code>start</code> subcommand.</p>
 </ul>
 <h4 id="kubestellar-init">Kubestellar init<a class="headerlink" href="#kubestellar-init" title="Permanent link">#</a></h4>
 <p>This subcommand is used after installation to finish setup and does
-two things.  One is to ensure that the edge service provider workspace
-(ESPW) exists and has the required contents.  The other is to ensure
-that the <code>root:compute</code> workspace has been extended with the RBAC
-objects that enable the syncer to propagate reported state for
+the following four things.</p>
+<ol>
+<li>
+<p>Ensure that the edge service provider workspace (ESPW) exists and
+has the required contents.</p>
+</li>
+<li>
+<p>Ensure that the <code>root:compute</code> workspace has been extended with the
+RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.</p>
+</li>
+<li>
+<p>Ensure the existence of an inventory management workspace at
+pathname "root:imw1".</p>
+</li>
+<li>
+<p>Ensure the existence of a workload management workspace at pathname
+"root:wmw1" and that it has APIBindings that import the namespaced
+Kubernetes resources (kinds of objects) for management of
+containerized workloads.</p>
+</li>
+</ol>
+<p>At the completion of <code>kubestellar init</code> the current workspace will be
+"root:wmw1".</p>
 <h4 id="kubestellar-start">KubeStellar start<a class="headerlink" href="#kubestellar-start" title="Permanent link">#</a></h4>
 <p>This subcommand is used after installation or process stops.</p>
 <p>This subcommand stops any running kubestellar controllers and then
@@ -2410,6 +2429,9 @@ controller can be reached at
 issue the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:1234
 </code></pre></div>
+<p>The Helm chart takes care of setting up the KubeStellar MCCM core,
+accomplishing the same thing as the <a href="#kubestellar-start">kubestellar
+start</a> command above.</p>
 <h3 id="fetch-kubeconfig-for-internal-clients">Fetch kubeconfig for internal clients<a class="headerlink" href="#fetch-kubeconfig-for-internal-clients" title="Permanent link">#</a></h3>
 <p>To fetch a kubeconfig for use by clients inside the hosting cluster,
 use the <code>kubectl kubestellar get-internal-kubeconfig</code> command.  It

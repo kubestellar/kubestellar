@@ -1767,7 +1767,7 @@ You can get a listing of those mailbox workspaces as follows.</p>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c<span class="w">   </span>universal<span class="w">              </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/1y7wll1dz806h3sb<span class="w">   </span>50s
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>compute<span class="w">                                                    </span>universal<span class="w">              </span>Ready<span class="w">   </span>https://172.20.144.39:6443/clusters/root:compute<span class="w">        </span>6m8s
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>espw<span class="w">                                                       </span>organization<span class="w">           </span>Ready<span class="w">   </span>https://172.20.144.39:6443/clusters/root:espw<span class="w">           </span>2m4s
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>imw-1<span class="w">                                                      </span>organization<span class="w">           </span>Ready<span class="w">   </span>https://172.20.144.39:6443/clusters/root:imw-1<span class="w">          </span>1m9s
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>imw1<span class="w">                                                       </span>organization<span class="w">           </span>Ready<span class="w">   </span>https://172.20.144.39:6443/clusters/root:imw1<span class="w">           </span>1m9s
 </code></pre></div></p>
 <p>More usefully, using custom columns you can get a listing that shows
 the <em>name</em> of the associated SyncTarget.</p>
@@ -1778,7 +1778,7 @@ the <em>name</em> of the associated SyncTarget.</p>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c<span class="w">   </span>guilder<span class="w">      </span>1y7wll1dz806h3sb
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>compute<span class="w">                                                    </span>&lt;none&gt;<span class="w">       </span>mqnl7r5f56hswewy
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>espw<span class="w">                                                       </span>&lt;none&gt;<span class="w">       </span>2n88ugkhysjbxqp5
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>imw-1<span class="w">                                                      </span>&lt;none&gt;<span class="w">       </span>4d2r9stcyy2qq5c1
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>imw1<span class="w">                                                       </span>&lt;none&gt;<span class="w">       </span>4d2r9stcyy2qq5c1
 </code></pre></div></p>
 <p>Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.</p>
@@ -1801,9 +1801,9 @@ SyncTarget name, you could do it as follows.</p>
 guilder, an identity and authorizations for the edge syncer and (b)
 write a file containing YAML for deploying the syncer in the guilder
 cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>guilder
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>guilder
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw1&quot;</span>.
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-guilder-wfeig2lv&quot;</span>
@@ -1849,9 +1849,9 @@ necessary to make kubectl manipulate <strong>your</strong> guilder cluster.</p>
 </code></pre></div></p>
 <h3 id="connect-florin-edge-cluster-with-its-mailbox-workspace">Connect florin edge cluster with its mailbox workspace<a class="headerlink" href="#connect-florin-edge-cluster-with-its-mailbox-workspace" title="Permanent link">#</a></h3>
 <p>Do the analogous stuff for the florin cluster.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>florin
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>florin
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw1&quot;</span>.
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-32uaph9l&quot;</span>
