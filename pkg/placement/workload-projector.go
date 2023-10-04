@@ -956,7 +956,7 @@ func (wp *workloadProjector) syncSourceToDestLocked(ctx context.Context, logger 
 			time.Sleep(wp.delay)
 			asUpdated, err := rscClient.Update(ctx, revisedDestObj, metav1.UpdateOptions{FieldManager: FieldManager})
 			if err != nil {
-				logger.Error(err, "Failed to update object in mailbox workspace", "resourceVersion", asUpdated.GetResourceVersion())
+				logger.V(2).Info("Failed to update object in mailbox workspace", "resourceVersion", revisedDestObj.GetResourceVersion(), "err", err)
 				return true
 			}
 			if logger.V(5).Enabled() {
