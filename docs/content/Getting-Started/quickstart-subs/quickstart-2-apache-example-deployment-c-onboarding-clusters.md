@@ -1,20 +1,31 @@
 <!--quickstart-2-apache-example-deployment-c-onboarding-clusters-start-->
+The above use of `kind` has knocked kcp's `kubectl ws` plugin off kilter, as the latter uses the local kubeconfig to store its state about the "current" and "previous" workspaces.  Get it back on track with the following command.
+
+```shell
+kubectl config use-context root
+```
+
+KubeStellar will have created an Inventory Management Workspace (IMW)
+for the user to put inventory objects in, describing the user's
+clusters. The IMW that is automatically created for the user is at
+`root:imw1`.
+
 Let's begin by onboarding the `florin` cluster:
 
 ```shell
 kubectl ws root
-kubectl kubestellar prep-for-cluster --imw root:example-imw florin env=prod
+kubectl kubestellar prep-for-cluster --imw root:imw1 florin env=prod
 ```
 
 which should yield something like:
 
 ``` { .sh .no-copy }
-Current workspace is "root:example-imw".
+Current workspace is "root:imw1".
 synctarget.workload.kcp.io/florin created
 location.scheduling.kcp.io/florin created
 synctarget.workload.kcp.io/florin labeled
 location.scheduling.kcp.io/florin labeled
-Current workspace is "root:example-imw".
+Current workspace is "root:imw1".
 Current workspace is "root:espw".
 Current workspace is "root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a" (type root:universal).
 Creating service account "kubestellar-syncer-florin-1yi5q9c4"
@@ -34,7 +45,7 @@ to apply it. Use
   KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-florin-1yi5q9c4" kubestellar-syncer-florin-1yi5q9c4
 
 to verify the syncer pod is running.
-Current workspace is "root:example-imw".
+Current workspace is "root:imw1".
 Current workspace is "root".
 ```
 
@@ -86,7 +97,7 @@ Now, let's onboard the `guilder` cluster:
 
 ```shell
 kubectl ws root
-kubectl kubestellar prep-for-cluster --imw root:example-imw guilder env=prod extended=si
+kubectl kubestellar prep-for-cluster --imw root:imw1 guilder env=prod extended=si
 ```
 
 Apply the created edge syncer manifest:

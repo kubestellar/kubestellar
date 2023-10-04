@@ -44,7 +44,9 @@ which should yield:
 .
 └── root
     ├── compute
-    └── espw
+    ├── espw
+    ├── imw1
+    └── wmw1
 ```
 
 ### Deploy kcp and KubeStellar as Kubernetes workload

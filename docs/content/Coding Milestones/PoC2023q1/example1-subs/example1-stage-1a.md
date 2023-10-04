@@ -48,7 +48,7 @@ NAME                                                       TYPE          REGION 
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c   universal              Ready   https://192.168.58.123:6443/clusters/1y7wll1dz806h3sb   50s
 compute                                                    universal              Ready   https://172.20.144.39:6443/clusters/root:compute        6m8s
 espw                                                       organization           Ready   https://172.20.144.39:6443/clusters/root:espw           2m4s
-imw-1                                                      organization           Ready   https://172.20.144.39:6443/clusters/root:imw-1          1m9s
+imw1                                                       organization           Ready   https://172.20.144.39:6443/clusters/root:imw1           1m9s
 ```
 
 More usefully, using custom columns you can get a listing that shows
@@ -63,7 +63,7 @@ NAME                                                       SYNCTARGET   CLUSTER
 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c   guilder      1y7wll1dz806h3sb
 compute                                                    <none>       mqnl7r5f56hswewy
 espw                                                       <none>       2n88ugkhysjbxqp5
-imw-1                                                      <none>       4d2r9stcyy2qq5c1
+imw1                                                       <none>       4d2r9stcyy2qq5c1
 ```
 
 Also: if you ever need to look up just one mailbox workspace by

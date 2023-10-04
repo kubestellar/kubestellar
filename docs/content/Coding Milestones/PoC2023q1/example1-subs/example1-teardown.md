@@ -4,7 +4,7 @@ To remove the example usage, delete the IMW and WMW and kind clusters run the fo
 ``` {.bash}
 rm florin-syncer.yaml guilder-syncer.yaml || true
 kubectl ws root
-kubectl delete workspace imw-1
+kubectl delete workspace imw1
 kubectl delete workspace $FLORIN_WS
 kubectl delete workspace $GUILDER_WS
 kubectl kubestellar remove wmw wmw-c
