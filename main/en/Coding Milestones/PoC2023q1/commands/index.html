@@ -2316,7 +2316,8 @@ and two for process control.</p>
 </code></pre></div>
 <p>This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The <code>--log-folder</code> flag is
-only used in the <code>start</code> subcommand.</p>
+only meaningful for the <code>start</code> subcommand. The <code>--local-kcp</code> flag is
+not meaningful for the <code>stop</code> subcommand.</p>
 <ul>
 <li><code>-V</code> or <code>--verbose</code>: calls for more verbose output.  This is a
   binary choice, not a matter of degree.</li>
@@ -2324,12 +2325,18 @@ only used in the <code>start</code> subcommand.</p>
 <li><code>--log-folder $pathname</code>: says where to put the logs from the
   controllers.  Will be <code>mkdir -p</code> if absent.  Defaults to
   <code>${PWD}/kubestellar-logs</code>.</li>
+<li><code>--local-kcp $bool</code>: says whether to expect to find a local process
+  named "kcp".  Defaults to "true".</li>
 <li><code>-h</code> or <code>--help</code>: print a brief usage message and terminate.</li>
 </ul>
 <h4 id="kubestellar-init">Kubestellar init<a class="headerlink" href="#kubestellar-init" title="Permanent link">#</a></h4>
 <p>This subcommand is used after installation to finish setup and does
-the following four things.</p>
+the following five things.</p>
 <ol>
+<li>
+<p>Waits for the kcp server to be in service and the <code>root:compute</code>
+   workspace to be usable.</p>
+</li>
 <li>
 <p>Ensure that the edge service provider workspace (ESPW) exists and
 has the required contents.</p>
