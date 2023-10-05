@@ -91,12 +91,10 @@ fi
 if ! kubectl get workspaces &> /dev/null ; then
     echo "ERROR: KUBECONFIG does not seem to refer to kcp admin.kubeconfig!"
     exit 1
-fi
-if ! kubectl ws . --short &> /dev/null ; then
+elif ! kubectl ws . --short &> /dev/null ; then
     echo "ERROR: Unable to use the ws plugin, please make sure that it is in the PATH!"
     exit 1
-fi
-if ! kubectl ws root:compute &> /dev/null ; then
+elif ! kubectl ws root:compute &> /dev/null ; then
     echo "ERROR: Unable to switch to the root:compute workspace, kcp may not have completed its initialization!"
     exit 1
 fi
