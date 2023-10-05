@@ -219,7 +219,8 @@ kubestellar [flags] subcommand [flags]
 
 This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The `--log-folder` flag is
-only used in the `start` subcommand.
+only meaningful for the `start` subcommand. The `--local-kcp` flag is
+not meaningful for the `stop` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -227,25 +228,30 @@ only used in the `start` subcommand.
 - `--log-folder $pathname`: says where to put the logs from the
   controllers.  Will be `mkdir -p` if absent.  Defaults to
   `${PWD}/kubestellar-logs`.
+- `--local-kcp $bool`: says whether to expect to find a local process
+  named "kcp".  Defaults to "true".
 - `-h` or `--help`: print a brief usage message and terminate.
 
 #### Kubestellar init
 
 This subcommand is used after installation to finish setup and does
-the following four things.
+the following five things.
 
-1. Ensure that the edge service provider workspace (ESPW) exists and
+1. Waits for the kcp server to be in service and the `root:compute`
+   workspace to be usable.
+
+2. Ensure that the edge service provider workspace (ESPW) exists and
 has the required contents.
 
-2. Ensure that the `root:compute` workspace has been extended with the
+3. Ensure that the `root:compute` workspace has been extended with the
 RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
 
-3. Ensure the existence of an inventory management workspace at
+4. Ensure the existence of an inventory management workspace at
 pathname "root:imw1".
 
-4. Ensure the existence of a workload management workspace at pathname
+5. Ensure the existence of a workload management workspace at pathname
 "root:wmw1" and that it has APIBindings that import the namespaced
 Kubernetes resources (kinds of objects) for management of
 containerized workloads.
