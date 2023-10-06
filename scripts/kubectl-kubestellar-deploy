@@ -20,7 +20,7 @@
 
 KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
-image_tag=git-8259fa7c7-clean
+image_tag=git-ce9cc894a-clean
 
 external_endpoint=""
 openshift=false
