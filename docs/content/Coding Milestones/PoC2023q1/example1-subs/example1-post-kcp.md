@@ -119,7 +119,7 @@ Those two script invocations are equivalent to creating the following
 four objects.
 
 ```yaml
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: florin
@@ -128,7 +128,7 @@ metadata:
     loc-name: florin
     env: prod
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
 metadata:
   name: florin
@@ -136,11 +136,11 @@ metadata:
     loc-name: florin
     env: prod
 spec:
-  resource: {group: edge.kubestellar.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kubestellar.io, version: v2alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {id: florin}
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: guilder
@@ -150,7 +150,7 @@ metadata:
     env: prod
     extended: si
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
 metadata:
   name: guilder
@@ -159,7 +159,7 @@ metadata:
     env: prod
     extended: si
 spec:
-  resource: {group: edge.kubestellar.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kubestellar.io, version: v2alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {id: guilder}
 ```

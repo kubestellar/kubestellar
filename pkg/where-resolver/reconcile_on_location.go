@@ -27,7 +27,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) error {
@@ -81,7 +81,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	epsSelectedLoc := store.epsBySelectedLoc[locKey]
 
 	// 2a)
-	stsFilteredByLoc := []*edgev1alpha1.SyncTarget{}
+	stsFilteredByLoc := []*edgev2alpha1.SyncTarget{}
 	if !locDeleted {
 		stsInLws, err := c.synctargetLister.Cluster(lws).List(labels.Everything())
 		if err != nil {
@@ -97,7 +97,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	stsSelecting := packStKeys(stsFilteredByLoc)
 
 	// 2b)
-	epsFilteredByLoc := []*edgev1alpha1.EdgePlacement{}
+	epsFilteredByLoc := []*edgev2alpha1.EdgePlacement{}
 	if !locDeleted {
 		epsAll, err := c.edgePlacementLister.List(labels.Everything())
 		if err != nil {
@@ -154,7 +154,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 				return err
 			}
 			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -182,7 +182,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
 			nextSPS = extendSPS(nextSPS, singles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -212,7 +212,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
 			nextSPS = extendSPS(nextSPS, singles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -226,8 +226,8 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 }
 
 // filterStsByLoc returns those SyncTargets that selected by the Location
-func filterStsByLoc(sts []*edgev1alpha1.SyncTarget, loc *edgev1alpha1.Location) ([]*edgev1alpha1.SyncTarget, error) {
-	filtered := []*edgev1alpha1.SyncTarget{}
+func filterStsByLoc(sts []*edgev2alpha1.SyncTarget, loc *edgev2alpha1.Location) ([]*edgev2alpha1.SyncTarget, error) {
+	filtered := []*edgev2alpha1.SyncTarget{}
 	for _, st := range sts {
 		s := loc.Spec.InstanceSelector
 		selector, err := metav1.LabelSelectorAsSelector(s)
@@ -242,8 +242,8 @@ func filterStsByLoc(sts []*edgev1alpha1.SyncTarget, loc *edgev1alpha1.Location) 
 }
 
 // filterEpsByLoc returns those EdgePlacements that select the Location
-func filterEpsByLoc(eps []*edgev1alpha1.EdgePlacement, loc *edgev1alpha1.Location) ([]*edgev1alpha1.EdgePlacement, error) {
-	filtered := []*edgev1alpha1.EdgePlacement{}
+func filterEpsByLoc(eps []*edgev2alpha1.EdgePlacement, loc *edgev2alpha1.Location) ([]*edgev2alpha1.EdgePlacement, error) {
+	filtered := []*edgev2alpha1.EdgePlacement{}
 	for _, ep := range eps {
 		for _, s := range ep.Spec.LocationSelectors {
 			selector, err := metav1.LabelSelectorAsSelector(&s)
@@ -260,7 +260,7 @@ func filterEpsByLoc(eps []*edgev1alpha1.EdgePlacement, loc *edgev1alpha1.Locatio
 }
 
 // packEpKeys extracts keys from given EdgePlacements and put the keys in a map
-func packEpKeys(eps []*edgev1alpha1.EdgePlacement) map[string]empty {
+func packEpKeys(eps []*edgev2alpha1.EdgePlacement) map[string]empty {
 	keys := map[string]empty{}
 	for _, ep := range eps {
 		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(ep)
@@ -270,7 +270,7 @@ func packEpKeys(eps []*edgev1alpha1.EdgePlacement) map[string]empty {
 }
 
 // packStKeys extracts keys from given SyncTargets and put the keys in a map
-func packStKeys(sts []*edgev1alpha1.SyncTarget) map[string]empty {
+func packStKeys(sts []*edgev2alpha1.SyncTarget) map[string]empty {
 	keys := map[string]empty{}
 	for _, st := range sts {
 		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(st)
@@ -280,8 +280,8 @@ func packStKeys(sts []*edgev1alpha1.SyncTarget) map[string]empty {
 }
 
 // cleanSPSByLoc removes all singleplacements that has the specified location, from a singleplacementslice
-func cleanSPSByLoc(sps *edgev1alpha1.SinglePlacementSlice, lws, lName string) *edgev1alpha1.SinglePlacementSlice {
-	nextDests := []edgev1alpha1.SinglePlacement{}
+func cleanSPSByLoc(sps *edgev2alpha1.SinglePlacementSlice, lws, lName string) *edgev2alpha1.SinglePlacementSlice {
+	nextDests := []edgev2alpha1.SinglePlacement{}
 	for _, sp := range sps.Destinations {
 		if sp.Cluster != lws || sp.LocationName != lName {
 			nextDests = append(nextDests, sp)
@@ -291,14 +291,14 @@ func cleanSPSByLoc(sps *edgev1alpha1.SinglePlacementSlice, lws, lName string) *e
 	return sps
 }
 
-func makeSinglePlacementsForLoc(locSelectingSts *edgev1alpha1.Location, sts []*edgev1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
-	made := []edgev1alpha1.SinglePlacement{}
+func makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Location, sts []*edgev2alpha1.SyncTarget) []edgev2alpha1.SinglePlacement {
+	made := []edgev2alpha1.SinglePlacement{}
 	if locSelectingSts == nil || len(sts) == 0 {
 		return made
 	}
 	ws := logicalcluster.From(locSelectingSts).String()
 	for _, st := range sts {
-		sp := edgev1alpha1.SinglePlacement{
+		sp := edgev2alpha1.SinglePlacement{
 			Cluster:        ws,
 			LocationName:   locSelectingSts.Name,
 			SyncTargetName: st.Name,

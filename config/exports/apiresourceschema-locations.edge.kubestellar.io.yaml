@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230915-8d536c3e3.locations.edge.kubestellar.io
+  name: v231005-c6f7728ef.locations.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -32,7 +32,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    name: v1alpha1
+    name: v2alpha1
     schema:
       description: "Location represents a set of instances of a scheduling resource
         type acting a target of scheduling. \n The location is chosen by the user
@@ -158,7 +158,7 @@ spec:
                 version:
                   description: version is the version of the API.
                   enum:
-                  - v1alpha1
+                  - v2alpha1
                   pattern: ^[a-z][-a-z0-9]*[a-z0-9]$
                   type: string
               required:

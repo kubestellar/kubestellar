@@ -11,7 +11,7 @@ In the `root:wmw1` workspace create the following `EdgePlacement` object:
 kubectl ws root:wmw1
 
 kubectl apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-c

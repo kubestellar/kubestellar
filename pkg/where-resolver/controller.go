@@ -30,10 +30,10 @@ import (
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 const (
@@ -59,26 +59,26 @@ type controller struct {
 
 	edgeClusterClient edgeclientset.ClusterInterface
 
-	singlePlacementSliceLister  edgev1alpha1listers.SinglePlacementSliceClusterLister
+	singlePlacementSliceLister  edgev2alpha1listers.SinglePlacementSliceClusterLister
 	singlePlacementSliceIndexer cache.Indexer
 
-	edgePlacementLister  edgev1alpha1listers.EdgePlacementClusterLister
+	edgePlacementLister  edgev2alpha1listers.EdgePlacementClusterLister
 	edgePlacementIndexer cache.Indexer
 
-	locationLister  edgev1alpha1listers.LocationClusterLister
+	locationLister  edgev2alpha1listers.LocationClusterLister
 	locationIndexer cache.Indexer
 
-	synctargetLister  edgev1alpha1listers.SyncTargetClusterLister
+	synctargetLister  edgev2alpha1listers.SyncTargetClusterLister
 	synctargetIndexer cache.Indexer
 }
 
 func NewController(
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
-	edgePlacementAccess edgev1alpha1informers.EdgePlacementClusterInformer,
-	singlePlacementSliceAccess edgev1alpha1informers.SinglePlacementSliceClusterInformer,
-	locationAccess edgev1alpha1informers.LocationClusterInformer,
-	syncTargetAccess edgev1alpha1informers.SyncTargetClusterInformer,
+	edgePlacementAccess edgev2alpha1informers.EdgePlacementClusterInformer,
+	singlePlacementSliceAccess edgev2alpha1informers.SinglePlacementSliceClusterInformer,
+	locationAccess edgev2alpha1informers.LocationClusterInformer,
+	syncTargetAccess edgev2alpha1informers.SyncTargetClusterInformer,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
@@ -111,8 +111,8 @@ func NewController(
 	locationAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueLocation,
 		UpdateFunc: func(old, obj interface{}) {
-			oldLoc := old.(*edgev1alpha1.Location)
-			newLoc := obj.(*edgev1alpha1.Location)
+			oldLoc := old.(*edgev2alpha1.Location)
+			newLoc := obj.(*edgev2alpha1.Location)
 			if !apiequality.Semantic.DeepEqual(oldLoc.Spec, newLoc.Spec) || !apiequality.Semantic.DeepEqual(oldLoc.Labels, newLoc.Labels) {
 				c.enqueueLocation(obj)
 			}
@@ -123,8 +123,8 @@ func NewController(
 	syncTargetAccess.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: c.enqueueSyncTarget,
 		UpdateFunc: func(old, obj interface{}) {
-			oldST := old.(*edgev1alpha1.SyncTarget)
-			newST := obj.(*edgev1alpha1.SyncTarget)
+			oldST := old.(*edgev2alpha1.SyncTarget)
+			newST := obj.(*edgev2alpha1.SyncTarget)
 			if !apiequality.Semantic.DeepEqual(oldST.Spec, newST.Spec) || !apiequality.Semantic.DeepEqual(oldST.Labels, newST.Labels) {
 				c.enqueueSyncTarget((obj))
 			}

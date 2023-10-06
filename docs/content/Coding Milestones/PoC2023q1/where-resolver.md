@@ -135,7 +135,7 @@ The Where Resolver maintains a SinglePlacementSlice for an EdgePlacement in the 
 kubectl get sps all2all -oyaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 destinations:
 - cluster: 1yotsgod0d2p3xa5
   locationName: prod
@@ -161,7 +161,7 @@ metadata:
   generation: 1
   name: all2all
   ownerReferences:
-  - apiVersion: edge.kubestellar.io/v1alpha1
+  - apiVersion: edge.kubestellar.io/v2alpha1
     kind: EdgePlacement
     name: all2all
     uid: 31915018-6a25-4f01-943e-b8a0a0ed35ba
@@ -181,7 +181,7 @@ The corresponding SinglePlacementSlice has a shorter list of `destinations`:
 kubectl get sps dev -oyaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 destinations:
 - cluster: 1yotsgod0d2p3xa5
   locationName: dev
@@ -195,7 +195,7 @@ metadata:
   generation: 1
   name: dev
   ownerReferences:
-  - apiVersion: edge.kubestellar.io/v1alpha1
+  - apiVersion: edge.kubestellar.io/v2alpha1
     kind: EdgePlacement
     name: dev
     uid: 1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b

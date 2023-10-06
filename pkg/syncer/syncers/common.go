@@ -26,22 +26,22 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	. "github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
 )
 
-func resourceToString(resource edgev1alpha1.EdgeSyncConfigResource) string {
+func resourceToString(resource edgev2alpha1.EdgeSyncConfigResource) string {
 	return fmt.Sprintf("%s.%s/%s in %s", resource.Kind, resource.Group, resource.Name, resource.Namespace)
 }
 
 func initializeClients(
 	logger klog.Logger,
-	syncResources []edgev1alpha1.EdgeSyncConfigResource,
+	syncResources []edgev2alpha1.EdgeSyncConfigResource,
 	upstreamClientFactory ClientFactory,
 	downstreamClientFactory ClientFactory,
 	upstreamClients map[schema.GroupKind]*Client,
 	downstreamClients map[schema.GroupKind]*Client,
-	conversions []edgev1alpha1.EdgeSynConversion,
+	conversions []edgev2alpha1.EdgeSynConversion,
 ) error {
 	logger.V(3).Info("initialize clients")
 	for _, syncResource := range syncResources {
@@ -98,7 +98,7 @@ func isDenaturingEnabled() bool {
 	return ok && env == "true"
 }
 
-func convertToUpstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+func convertToUpstream(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) edgev2alpha1.EdgeSyncConfigResource {
 	if !isDenaturingEnabled() {
 		return resource
 	}
@@ -113,7 +113,7 @@ func convertToUpstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions
 	return resource
 }
 
-func convertToDownstream(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) edgev1alpha1.EdgeSyncConfigResource {
+func convertToDownstream(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) edgev2alpha1.EdgeSyncConfigResource {
 	if !isDenaturingEnabled() {
 		return resource
 	}
@@ -128,7 +128,7 @@ func convertToDownstream(resource edgev1alpha1.EdgeSyncConfigResource, conversio
 	return resource
 }
 
-func applyConversion(source *unstructured.Unstructured, target edgev1alpha1.EdgeSyncConfigResource) {
+func applyConversion(source *unstructured.Unstructured, target edgev2alpha1.EdgeSyncConfigResource) {
 	if !isDenaturingEnabled() {
 		return
 	}
@@ -142,7 +142,7 @@ func applyConversion(source *unstructured.Unstructured, target edgev1alpha1.Edge
 	}
 }
 
-func getClients(resource edgev1alpha1.EdgeSyncConfigResource, upstreamClients map[schema.GroupKind]*Client, downstreamClients map[schema.GroupKind]*Client, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+func getClients(resource edgev2alpha1.EdgeSyncConfigResource, upstreamClients map[schema.GroupKind]*Client, downstreamClients map[schema.GroupKind]*Client, conversions []edgev2alpha1.EdgeSynConversion) (*Client, *Client, error) {
 	upstreamResource := convertToUpstream(resource, conversions)
 	upstreamGk := schema.GroupKind{
 		Group: upstreamResource.Group,

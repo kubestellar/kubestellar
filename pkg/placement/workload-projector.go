@@ -51,9 +51,9 @@ import (
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
@@ -87,11 +87,11 @@ func NewWorkloadProjector(
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
 	locationClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	locationClusterLister edgev1a1listers.LocationClusterLister,
+	locationClusterLister edgev2a1listers.LocationClusterLister,
 	syncfgClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	syncfgClusterLister edgev1a1listers.SyncerConfigClusterLister,
+	syncfgClusterLister edgev2a1listers.SyncerConfigClusterLister,
 	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	customizerClusterLister edgev1a1listers.CustomizerClusterLister,
+	customizerClusterLister edgev2a1listers.CustomizerClusterLister,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
@@ -315,11 +315,11 @@ type workloadProjector struct {
 	queue                     workqueue.RateLimitingInterface
 	mbwsLister                tenancyv1a1listers.WorkspaceLister
 	locationClusterInformer   kcpcache.ScopeableSharedIndexInformer
-	locationClusterLister     edgev1a1listers.LocationClusterLister
+	locationClusterLister     edgev2a1listers.LocationClusterLister
 	syncfgClusterInformer     kcpcache.ScopeableSharedIndexInformer
-	syncfgClusterLister       edgev1a1listers.SyncerConfigClusterLister
+	syncfgClusterLister       edgev2a1listers.SyncerConfigClusterLister
 	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer
-	customizerClusterLister   edgev1a1listers.CustomizerClusterLister
+	customizerClusterLister   edgev2a1listers.CustomizerClusterLister
 	edgeClusterClientset      edgeclusterclientset.ClusterInterface
 	dynamicClusterClient      clusterdynamic.ClusterInterface
 	nsClusterPreInformer      kcpkubecorev1informers.NamespaceClusterInformer
@@ -703,7 +703,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 					Name: string(scRef.Name),
 				},
 				Spec: wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)}
-			client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
+			client := wp.edgeClusterClientset.EdgeV2alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
 			syncfg2, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: FieldManager})
 			if logger.V(4).Enabled() {
 				logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
@@ -725,7 +725,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		return false
 	}
 	syncfg.Spec = wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)
-	client := wp.edgeClusterClientset.EdgeV1alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
+	client := wp.edgeClusterClientset.EdgeV2alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
 	syncfg2, err := client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: FieldManager})
 	if logger.V(4).Enabled() {
 		logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,

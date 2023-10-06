@@ -1,5 +1,5 @@
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
 metadata:
   name: dev
@@ -12,4 +12,4 @@ spec:
   resource:
     group: edge.kubestellar.io
     resource: synctargets
-    version: v1alpha1
+    version: v2alpha1

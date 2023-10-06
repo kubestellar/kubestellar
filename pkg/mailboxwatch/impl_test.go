@@ -40,10 +40,10 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgefakeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
-	edgeclusterclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v1alpha1"
-	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	edgeclusterclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v2alpha1"
+	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -215,7 +215,7 @@ func TestMailboxInformer(t *testing.T) {
 		// syncerConfigs[dummySCON] = dummySC
 		edgeClientset := edgefakeclient.NewSimpleClientset( /*dummySC*/ )
 		scInformer := NewSharedInformer[edgescopedclient.SyncerConfigInterface, *edgeapi.SyncerConfigList](ctx, sclGVK, wsPreInformer.Cluster(espwCluster),
-			edgeClientset.EdgeV1alpha1().SyncerConfigs(), &edgeapi.SyncerConfig{}, 0, upstreamcache.Indexers{})
+			edgeClientset.EdgeV2alpha1().SyncerConfigs(), &edgeapi.SyncerConfig{}, 0, upstreamcache.Indexers{})
 		scInformer.AddEventHandler(actual)
 		go func() {
 			doneCh := ctx.Done()
@@ -235,7 +235,7 @@ func TestMailboxInformer(t *testing.T) {
 				//mbwsName := gonerSC.Annotations["the-mbws-name"]
 				//wsObjName := objectName{cluster: espwCluster, name: mbwsName}
 				//delete(expectedWorkspaces, wsObjName)
-				err := edgeClientset.Cluster(cluster.Path()).EdgeV1alpha1().SyncerConfigs().Delete(ctx, gonerSC.Name, metav1.DeleteOptions{})
+				err := edgeClientset.Cluster(cluster.Path()).EdgeV2alpha1().SyncerConfigs().Delete(ctx, gonerSC.Name, metav1.DeleteOptions{})
 				if err != nil {
 					t.Fatalf("Failed to delete goner %+v: %v", gonerSC, err)
 				} else {
@@ -303,7 +303,7 @@ func TestMailboxInformer(t *testing.T) {
 					},
 				}
 				syncerConfigs[objName] = obj
-				_, err := edgeClientset.Cluster(mbwsClusterN.Path()).EdgeV1alpha1().SyncerConfigs().Create(ctx, obj, metav1.CreateOptions{FieldManager: "test"})
+				_, err := edgeClientset.Cluster(mbwsClusterN.Path()).EdgeV2alpha1().SyncerConfigs().Create(ctx, obj, metav1.CreateOptions{FieldManager: "test"})
 				if err != nil {
 					t.Fatalf("Failed to add %+v to testing tracker: %v", obj, err)
 				} else {

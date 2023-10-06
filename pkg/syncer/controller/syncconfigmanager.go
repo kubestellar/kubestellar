@@ -22,29 +22,29 @@ import (
 
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 type SyncConfigManager struct {
 	sync.Mutex
 	logger                       klog.Logger
-	syncConfigMap                map[string]edgev1alpha1.EdgeSyncConfig
+	syncConfigMap                map[string]edgev2alpha1.EdgeSyncConfig
 	indexedDownSyncedResources   _indexedSyncedResources
 	indexedUpSyncedResources     _indexedSyncedResources
 	indexedDownUnsyncedResources _indexedSyncedResources
 	indexedUpUnsyncedResources   _indexedSyncedResources
-	conversions                  []edgev1alpha1.EdgeSynConversion
+	conversions                  []edgev2alpha1.EdgeSynConversion
 }
 
 type _indexedSyncedResources struct {
-	syncedResources []edgev1alpha1.EdgeSyncConfigResource
-	index           map[edgev1alpha1.EdgeSyncConfigResource]bool
+	syncedResources []edgev2alpha1.EdgeSyncConfigResource
+	index           map[edgev2alpha1.EdgeSyncConfigResource]bool
 }
 
-func createIndexedSyncedResources(resources ...edgev1alpha1.EdgeSyncConfigResource) _indexedSyncedResources {
+func createIndexedSyncedResources(resources ...edgev2alpha1.EdgeSyncConfigResource) _indexedSyncedResources {
 	isr := _indexedSyncedResources{
-		syncedResources: []edgev1alpha1.EdgeSyncConfigResource{},
-		index:           map[edgev1alpha1.EdgeSyncConfigResource]bool{},
+		syncedResources: []edgev2alpha1.EdgeSyncConfigResource{},
+		index:           map[edgev2alpha1.EdgeSyncConfigResource]bool{},
 	}
 	for _, resource := range resources {
 		_, ok := isr.index[resource]
@@ -52,7 +52,7 @@ func createIndexedSyncedResources(resources ...edgev1alpha1.EdgeSyncConfigResour
 			isr.index[resource] = true
 		}
 	}
-	isr.syncedResources = []edgev1alpha1.EdgeSyncConfigResource{}
+	isr.syncedResources = []edgev2alpha1.EdgeSyncConfigResource{}
 	for key := range isr.index {
 		isr.syncedResources = append(isr.syncedResources, key)
 	}
@@ -62,14 +62,14 @@ func createIndexedSyncedResources(resources ...edgev1alpha1.EdgeSyncConfigResour
 func NewSyncConfigManager(logger klog.Logger) *SyncConfigManager {
 	return &SyncConfigManager{
 		logger:                     logger,
-		syncConfigMap:              map[string]edgev1alpha1.EdgeSyncConfig{},
+		syncConfigMap:              map[string]edgev2alpha1.EdgeSyncConfig{},
 		indexedDownSyncedResources: createIndexedSyncedResources(),
 		indexedUpSyncedResources:   createIndexedSyncedResources(),
-		conversions:                []edgev1alpha1.EdgeSynConversion{},
+		conversions:                []edgev2alpha1.EdgeSynConversion{},
 	}
 }
 
-func (s *SyncConfigManager) upsert(syncConfig edgev1alpha1.EdgeSyncConfig) {
+func (s *SyncConfigManager) upsert(syncConfig edgev2alpha1.EdgeSyncConfig) {
 	key := syncConfig.Name
 	s.logger.V(3).Info(fmt.Sprintf("upsert %s to synConfigMap", key))
 	s.Lock()
@@ -90,8 +90,8 @@ func (s *SyncConfigManager) delete(key string) {
 	s.syncConfigMap = newSyncConfig
 }
 
-func (s *SyncConfigManager) refresh(newSyncConfig map[string]edgev1alpha1.EdgeSyncConfig) {
-	conversions := []edgev1alpha1.EdgeSynConversion{}
+func (s *SyncConfigManager) refresh(newSyncConfig map[string]edgev2alpha1.EdgeSyncConfig) {
+	conversions := []edgev2alpha1.EdgeSynConversion{}
 	for _, _syncConfig := range s.syncConfigMap {
 		conversions = append(conversions, _syncConfig.Spec.Conversions...)
 	}
@@ -109,9 +109,9 @@ func (s *SyncConfigManager) refresh(newSyncConfig map[string]edgev1alpha1.EdgeSy
 	s.logger.V(3).Info("refreshed syncConfigManager")
 }
 
-func createIndexedDownAndUpSyncedResources(syncConfigMap map[string]edgev1alpha1.EdgeSyncConfig) (_indexedSyncedResources, _indexedSyncedResources) {
-	downSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
-	upSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
+func createIndexedDownAndUpSyncedResources(syncConfigMap map[string]edgev2alpha1.EdgeSyncConfig) (_indexedSyncedResources, _indexedSyncedResources) {
+	downSyncedResources := []edgev2alpha1.EdgeSyncConfigResource{}
+	upSyncedResources := []edgev2alpha1.EdgeSyncConfigResource{}
 	for _, _syncConfig := range syncConfigMap {
 		downSyncedResources = append(downSyncedResources, _syncConfig.Spec.DownSyncedResources...)
 		upSyncedResources = append(upSyncedResources, _syncConfig.Spec.UpSyncedResources...)
@@ -120,7 +120,7 @@ func createIndexedDownAndUpSyncedResources(syncConfigMap map[string]edgev1alpha1
 }
 
 func updateUnsyncedResources(currentIndexedUnsyncedResources _indexedSyncedResources, currentIndexedSyncedResources _indexedSyncedResources, newIndexedSyncedResources _indexedSyncedResources) _indexedSyncedResources {
-	unsyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
+	unsyncedResources := []edgev2alpha1.EdgeSyncConfigResource{}
 	// Current unsynced resources (exclude synced resources listed in new SyncConfig)
 	for key := range currentIndexedUnsyncedResources.index {
 		_, ok := newIndexedSyncedResources.index[key]
@@ -139,30 +139,30 @@ func updateUnsyncedResources(currentIndexedUnsyncedResources _indexedSyncedResou
 	return createIndexedSyncedResources(unsyncedResources...)
 }
 
-func copySyncConfigMap(syncConfigMap map[string]edgev1alpha1.EdgeSyncConfig) map[string]edgev1alpha1.EdgeSyncConfig {
-	_syncConfigMap := map[string]edgev1alpha1.EdgeSyncConfig{}
+func copySyncConfigMap(syncConfigMap map[string]edgev2alpha1.EdgeSyncConfig) map[string]edgev2alpha1.EdgeSyncConfig {
+	_syncConfigMap := map[string]edgev2alpha1.EdgeSyncConfig{}
 	for key, value := range syncConfigMap {
 		_syncConfigMap[key] = value
 	}
 	return _syncConfigMap
 }
 
-func (s *SyncConfigManager) GetDownSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetDownSyncedResources() []edgev2alpha1.EdgeSyncConfigResource {
 	return s.indexedDownSyncedResources.syncedResources
 }
 
-func (s *SyncConfigManager) GetUpSyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetUpSyncedResources() []edgev2alpha1.EdgeSyncConfigResource {
 	return s.indexedUpSyncedResources.syncedResources
 }
 
-func (s *SyncConfigManager) GetDownUnsyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetDownUnsyncedResources() []edgev2alpha1.EdgeSyncConfigResource {
 	return s.indexedDownUnsyncedResources.syncedResources
 }
 
-func (s *SyncConfigManager) GetUpUnsyncedResources() []edgev1alpha1.EdgeSyncConfigResource {
+func (s *SyncConfigManager) GetUpUnsyncedResources() []edgev2alpha1.EdgeSyncConfigResource {
 	return s.indexedUpUnsyncedResources.syncedResources
 }
 
-func (s *SyncConfigManager) GetConversions() []edgev1alpha1.EdgeSynConversion {
+func (s *SyncConfigManager) GetConversions() []edgev2alpha1.EdgeSynConversion {
 	return s.conversions
 }

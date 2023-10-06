@@ -35,7 +35,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    name: v1alpha1
+    name: v2alpha1
     schema:
       openAPIV3Schema:
         description: "Location represents a set of instances of a scheduling resource
@@ -163,7 +163,7 @@ spec:
                   version:
                     description: version is the version of the API.
                     enum:
-                    - v1alpha1
+                    - v2alpha1
                     pattern: ^[a-z][-a-z0-9]*[a-z0-9]$
                     type: string
                 required:

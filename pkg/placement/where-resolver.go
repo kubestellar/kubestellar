@@ -31,9 +31,9 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 type whereResolver struct {
@@ -43,7 +43,7 @@ type whereResolver struct {
 	queue      workqueue.RateLimitingInterface
 
 	spsInformer kcpcache.ScopeableSharedIndexInformer
-	spsLister   edgev1alpha1listers.SinglePlacementSliceClusterLister
+	spsLister   edgev2alpha1listers.SinglePlacementSliceClusterLister
 
 	// resolutions maps EdgePlacement name to its ResolvedWhere
 	resolutions RelayMap[ExternalName, ResolvedWhere]
@@ -62,7 +62,7 @@ func (qi queueItem) toExternalName() ExternalName {
 // NewWhereResolver returns a WhereResolver.
 func NewWhereResolver(
 	ctx context.Context,
-	spsPreInformer edgev1alpha1informers.SinglePlacementSliceClusterInformer,
+	spsPreInformer edgev2alpha1informers.SinglePlacementSliceClusterInformer,
 	numThreads int,
 ) WhereResolver {
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhere]) Runnable {

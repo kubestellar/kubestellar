@@ -625,14 +625,14 @@ func createEdgeSyncConfig(ctx context.Context, cfg *rest.Config, edgeSyncTargetN
 		return nil, fmt.Errorf("failed to get API group resources :%w", err)
 	}
 	restMapper := restmapper.NewDiscoveryRESTMapper(groupResources)
-	mapping, err := restMapper.RESTMapping(gk, "v1alpha1")
+	mapping, err := restMapper.RESTMapping(gk, "v2alpha1")
 	if err != nil || mapping == nil {
 		return nil, fmt.Errorf("failed to get resource mapping :%w", err)
 	}
 	cr, err := dynamicClient.Resource(mapping.Resource).Get(ctx, edgeSyncTargetName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		cr = &unstructured.Unstructured{Object: map[string]interface{}{
-			"apiVersion": gk.Group + "/v1alpha1",
+			"apiVersion": gk.Group + "/v2alpha1",
 			"kind":       gk.Kind,
 			"metadata": map[string]interface{}{
 				"name": edgeSyncTargetName,
