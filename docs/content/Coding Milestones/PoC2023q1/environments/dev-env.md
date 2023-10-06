@@ -41,7 +41,7 @@ EOF
 Create an `nginx-ingress` with SSL passthrough. Following [Kind NGINX ingress instructions](https://kind.sigs.k8s.io/docs/user/ingress/), we have modified the YAML at https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml to include the `--enable-ssl-passthrough=true` argument. [This](https://raw.githubusercontent.com/kubestellar/kubestellar/main/user/yaml/kind-nginx-ingress-with-SSL-passthrough.yaml) is the link to our raw modified nginx controller deployment YAML.
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/user/yaml/kind-nginx-ingress-with-SSL-passthrough.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.7/user/yaml/kind-nginx-ingress-with-SSL-passthrough.yaml
 ```
 
 Wait for the ingress to be ready:
