@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v2alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -100,7 +100,7 @@ type GroupVersionResource struct {
 	//
 	// +kubebuilder:validation:Pattern=`^[a-z][-a-z0-9]*[a-z0-9]$`
 	// +kubebuilder:validation:MinLength:1
-	// +kubebuilder:validation:Enum="v1alpha1"
+	// +kubebuilder:validation:Enum="v2alpha1"
 	// +required
 	// +kubebuilder:validation:Required
 	Version string `json:"version"`

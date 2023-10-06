@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v2alpha1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,7 +28,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // The other replaces every substring of the form "%(parameter_name)" with the destination's
 // value for the named parameter.  A parameter_name can be any label or annotation key.
 //
-// A destination is a [Location](https://github.com/kubestellar/kubestellar/blob/main/pkg/apis/edge/v1alpha1/types_location.go#L50)
+// A destination is a [Location](https://github.com/kubestellar/kubestellar/blob/main/pkg/apis/edge/v2alpha1/types_location.go#L50)
 // and its labels and annotations provide parameter values (with labels taking priority over annotations).
 //
 // Note that this sort of customization has limited applicability.  It can only be used where
