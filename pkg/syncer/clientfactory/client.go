@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/client-go/dynamic"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 type Client struct {
@@ -36,7 +36,7 @@ func (c *Client) IsNamespaced() bool {
 	return c.scope == meta.RESTScopeNamespace
 }
 
-func (c *Client) Create(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+func (c *Client) Create(resource edgev2alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 	var createdObj *unstructured.Unstructured
 	var err error
 	if c.IsNamespaced() {
@@ -47,7 +47,7 @@ func (c *Client) Create(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *u
 	return createdObj, err
 }
 
-func (c *Client) Get(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructured.Unstructured, error) {
+func (c *Client) Get(resource edgev2alpha1.EdgeSyncConfigResource) (*unstructured.Unstructured, error) {
 	var unstObj *unstructured.Unstructured
 	var err error
 	if c.IsNamespaced() {
@@ -58,7 +58,7 @@ func (c *Client) Get(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructure
 	return unstObj, err
 }
 
-func (c *Client) List(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructured.UnstructuredList, error) {
+func (c *Client) List(resource edgev2alpha1.EdgeSyncConfigResource) (*unstructured.UnstructuredList, error) {
 	var unstListObj *unstructured.UnstructuredList
 	var err error
 	if c.IsNamespaced() {
@@ -69,7 +69,7 @@ func (c *Client) List(resource edgev1alpha1.EdgeSyncConfigResource) (*unstructur
 	return unstListObj, err
 }
 
-func (c *Client) Update(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+func (c *Client) Update(resource edgev2alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 	var updatedObj *unstructured.Unstructured
 	var err error
 	if c.IsNamespaced() {
@@ -81,7 +81,7 @@ func (c *Client) Update(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *u
 	return updatedObj, err
 }
 
-func (c *Client) UpdateStatus(resource edgev1alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+func (c *Client) UpdateStatus(resource edgev2alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
 	var updatedObj *unstructured.Unstructured
 	var err error
 	if c.IsNamespaced() {
@@ -93,7 +93,7 @@ func (c *Client) UpdateStatus(resource edgev1alpha1.EdgeSyncConfigResource, unst
 	return updatedObj, err
 }
 
-func (c *Client) Delete(resource edgev1alpha1.EdgeSyncConfigResource, name string) error {
+func (c *Client) Delete(resource edgev2alpha1.EdgeSyncConfigResource, name string) error {
 	if c.IsNamespaced() {
 		return c.ResourceClient.Namespace(resource.Namespace).Delete(context.Background(), name, v1.DeleteOptions{})
 	} else {

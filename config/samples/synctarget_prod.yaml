@@ -1,4 +1,4 @@
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: prod

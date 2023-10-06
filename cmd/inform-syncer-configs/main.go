@@ -36,10 +36,10 @@ import (
 	kcpscopedclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	edgescopedclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/mailboxwatch"
 )
 
@@ -79,7 +79,7 @@ func main() {
 
 	clusterClientset := emcclusterclientset.NewForConfigOrDie(allClientConfig)
 
-	clusterEdge := clusterClientset.EdgeV1alpha1()
+	clusterEdge := clusterClientset.EdgeV2alpha1()
 	clusterEdgeSyncfgs := clusterEdge.SyncerConfigs()
 
 	scGV := edgeapi.SchemeGroupVersion

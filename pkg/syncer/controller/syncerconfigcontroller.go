@@ -25,15 +25,15 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1typed "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2alpha1typed "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v2alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 func NewSyncerConfigController(
 	logger klog.Logger,
-	syncerConfigClient edgev1alpha1typed.SyncerConfigInterface,
-	syncerConfigInformer edgev1alpha1informers.SyncerConfigInformer,
+	syncerConfigClient edgev2alpha1typed.SyncerConfigInterface,
+	syncerConfigInformer edgev2alpha1informers.SyncerConfigInformer,
 	syncerConfigManager *SyncerConfigManager,
 	reconcileInterval time.Duration,
 ) (*syncerConfigController, error) {
@@ -74,8 +74,8 @@ func NewSyncerConfigController(
 // controller is a control loop that watches EdgeSyncConfig.
 type syncerConfigController struct {
 	*controllerBase
-	syncerConfigLister  edgev1alpha1listers.SyncerConfigLister
-	syncerConfigClient  edgev1alpha1typed.SyncerConfigInterface
+	syncerConfigLister  edgev2alpha1listers.SyncerConfigLister
+	syncerConfigClient  edgev2alpha1typed.SyncerConfigInterface
 	syncerConfigManager *SyncerConfigManager
 }
 

@@ -41,11 +41,11 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 type whatResolver struct {
@@ -56,7 +56,7 @@ type whatResolver struct {
 	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
 	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
-	edgePlacementLister   edgev1alpha1listers.EdgePlacementClusterLister
+	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
 	crdClusterPreInformer     kcpinformers.GenericClusterInformer
@@ -111,7 +111,7 @@ type objectDetails struct {
 // invoke that function after the namespace informer has synced.
 func NewWhatResolver(
 	ctx context.Context,
-	edgePlacementPreInformer edgev1alpha1informers.EdgePlacementClusterInformer,
+	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	crdClusterPreInformer kcpinformers.GenericClusterInformer,
 	bindingClusterPreInformer kcpinformers.GenericClusterInformer,

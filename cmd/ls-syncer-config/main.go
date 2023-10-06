@@ -34,7 +34,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	clusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 )
@@ -66,7 +66,7 @@ func main() {
 
 	clusterClientset := clusterclientset.NewForConfigOrDie(clientConfig)
 
-	clusterEdge := clusterClientset.EdgeV1alpha1()
+	clusterEdge := clusterClientset.EdgeV2alpha1()
 	clusterEdgeSyncfgs := clusterEdge.SyncerConfigs()
 
 	var list *edgeapi.SyncerConfigList
@@ -77,24 +77,24 @@ func main() {
 		clusterEdgeSyncfgsScoped := clusterEdgeSyncfgs.Cluster(clusterName.Path())
 		list, err = clusterEdgeSyncfgsScoped.List(ctx, metav1.ListOptions{})
 		if err != nil {
-			logger.Error(err, "Failed to .EdgeV1alpha1().SyncerConfigs().Cluster().List()")
+			logger.Error(err, "Failed to .EdgeV2alpha1().SyncerConfigs().Cluster().List()")
 		} else {
 			logger.Info("api-then-cluster list succeeded", "list", list)
 		}
 
 		scopedClientset := clusterClientset.Cluster(clusterName.Path())
-		scopedEdge := scopedClientset.EdgeV1alpha1()
+		scopedEdge := scopedClientset.EdgeV2alpha1()
 		scopedEdgeSyncfgs := scopedEdge.SyncerConfigs()
 		list, err = scopedEdgeSyncfgs.List(ctx, metav1.ListOptions{})
 		if err != nil {
-			logger.Error(err, "Failed to .Cluster().EdgeV1alpha1().SyncerConfigs().List()")
+			logger.Error(err, "Failed to .Cluster().EdgeV2alpha1().SyncerConfigs().List()")
 		} else {
 			logger.Info("cluster-then-api list succeeded", "list", list)
 		}
 	}
 	list, err = clusterEdgeSyncfgs.List(ctx, metav1.ListOptions{})
 	if err != nil {
-		logger.Error(err, "Failed to .EdgeV1alpha1().SyncerConfigs().List()")
+		logger.Error(err, "Failed to .EdgeV2alpha1().SyncerConfigs().List()")
 	} else {
 		logger.Info("all-cluster list succeeded", "list", list)
 	}

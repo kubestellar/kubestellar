@@ -37,7 +37,7 @@ import (
 	kcpapisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
@@ -107,7 +107,7 @@ func TestWhatResolver(t *testing.T) {
 	ep1EN := ExternalName{wds1N, ObjectName(ep1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(ep1)
 	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
-	epClusterPreInformer := edgeClusterInformerFactory.Edge().V1alpha1().EdgePlacements()
+	epClusterPreInformer := edgeClusterInformerFactory.Edge().V2alpha1().EdgePlacements()
 	fakeKubeClusterClientset := fakekube.NewSimpleClientset(ns1, cm1)
 	k8sCoreGroupVersion := metav1.GroupVersion{Version: "v1"}
 	usualVerbs := []string{"get", "list", "watch"}

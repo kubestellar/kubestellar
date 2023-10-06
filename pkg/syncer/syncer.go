@@ -28,7 +28,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
@@ -64,10 +64,10 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	if err != nil {
 		return err
 	}
-	syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
+	syncConfigClient := syncConfigClientSet.EdgeV2alpha1().EdgeSyncConfigs()
 	// syncConfigInformerFactory to watch a certain syncConfig on upstream
 	syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, resyncPeriod)
-	syncConfigAccess := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
+	syncConfigAccess := syncConfigInformerFactory.Edge().V2alpha1().EdgeSyncConfigs()
 
 	syncConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
 
@@ -79,10 +79,10 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 	if err != nil {
 		return err
 	}
-	syncerConfigClient := syncerConfigClientSet.EdgeV1alpha1().SyncerConfigs()
+	syncerConfigClient := syncerConfigClientSet.EdgeV2alpha1().SyncerConfigs()
 	// syncerConfigInformerFactory to watch a certain syncConfig on upstream
 	syncerConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncerConfigClientSet, resyncPeriod)
-	syncerConfigAccess := syncerConfigInformerFactory.Edge().V1alpha1().SyncerConfigs()
+	syncerConfigAccess := syncerConfigInformerFactory.Edge().V2alpha1().SyncerConfigs()
 
 	syncerConfigAccess.Lister().List(labels.Everything()) // TODO: Remove (for now, need to invoke List at once)
 
@@ -113,11 +113,11 @@ func RunSyncer(ctx context.Context, cfg *SyncerConfig, numSyncerThreads int) err
 		return err
 	}
 
-	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
+	upSyncer, err := syncers.NewUpSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev2alpha1.EdgeSyncConfigResource{}, []edgev2alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
-	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev1alpha1.EdgeSyncConfigResource{}, []edgev1alpha1.EdgeSynConversion{})
+	downSyncer, err := syncers.NewDownSyncer(logger, upstreamClientFactory, downstreamClientFactory, []edgev2alpha1.EdgeSyncConfigResource{}, []edgev2alpha1.EdgeSynConversion{})
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func runSync(ctx context.Context, cfg *SyncerConfig, syncConfigManager *controll
 	}
 }
 
-func sync(logger klog.Logger, syncer syncers.SyncerInterface, resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) {
+func sync(logger klog.Logger, syncer syncers.SyncerInterface, resources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) {
 	for _, resource := range resources {
 		if resource.Name == "*" || resource.Namespace == "*" {
 			if err := syncer.SyncMany(resource, conversions); err != nil {
@@ -184,7 +184,7 @@ func sync(logger klog.Logger, syncer syncers.SyncerInterface, resources []edgev1
 	}
 }
 
-func syncStatus(logger klog.Logger, downSyncer *syncers.DownSyncer, resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) {
+func syncStatus(logger klog.Logger, downSyncer *syncers.DownSyncer, resources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) {
 	for _, resource := range resources {
 		if resource.Name == "*" || resource.Namespace == "*" {
 			if err := downSyncer.BackStatusMany(resource, conversions); err != nil {

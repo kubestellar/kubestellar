@@ -79,7 +79,7 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Customizer
 metadata:
   namespace: commonstuff
@@ -136,7 +136,7 @@ directing the common workload to both edge clusters.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-c
@@ -210,7 +210,7 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Customizer
 metadata:
   namespace: specialstuff
@@ -267,7 +267,7 @@ earlier, thus directing the special workload to just one edge cluster.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-s
@@ -357,7 +357,7 @@ kubectl get SinglePlacementSlice -o yaml
 ``` { .bash .no-copy }
 apiVersion: v1
 items:
-- apiVersion: edge.kubestellar.io/v1alpha1
+- apiVersion: edge.kubestellar.io/v2alpha1
   destinations:
   - cluster: apmziqj9p9fqlflm
     locationName: florin
@@ -375,7 +375,7 @@ items:
     generation: 4
     name: edge-placement-c
     ownerReferences:
-    - apiVersion: edge.kubestellar.io/v1alpha1
+    - apiVersion: edge.kubestellar.io/v2alpha1
       kind: EdgePlacement
       name: edge-placement-c
       uid: 199cfe1e-48d9-4351-af5c-e66c83bf50dd

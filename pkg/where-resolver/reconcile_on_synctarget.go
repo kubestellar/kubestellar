@@ -27,7 +27,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) error {
@@ -79,7 +79,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	epsUsedSt := store.findEpsUsedSt(stKey)
 
 	// 2a)
-	locsFilteredBySt := []*edgev1alpha1.Location{}
+	locsFilteredBySt := []*edgev2alpha1.Location{}
 	if !stDeleted {
 		locsInStws, err := c.locationLister.Cluster(stws).List(labels.Everything())
 		if err != nil {
@@ -132,7 +132,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				return err
 			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -172,7 +172,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -213,7 +213,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV1alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -227,8 +227,8 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 }
 
 // filterLocsBySt returns those Locations that select the SyncTarget
-func filterLocsBySt(locs []*edgev1alpha1.Location, st *edgev1alpha1.SyncTarget) ([]*edgev1alpha1.Location, error) {
-	filtered := []*edgev1alpha1.Location{}
+func filterLocsBySt(locs []*edgev2alpha1.Location, st *edgev2alpha1.SyncTarget) ([]*edgev2alpha1.Location, error) {
+	filtered := []*edgev2alpha1.Location{}
 	for _, l := range locs {
 		s := l.Spec.InstanceSelector
 		selector, err := metav1.LabelSelectorAsSelector(s)
@@ -243,8 +243,8 @@ func filterLocsBySt(locs []*edgev1alpha1.Location, st *edgev1alpha1.SyncTarget) 
 }
 
 // filterLocsByEp returns those Locations that are selected by the EdgePlacement
-func filterLocsByEp(locs []*edgev1alpha1.Location, ep *edgev1alpha1.EdgePlacement) ([]*edgev1alpha1.Location, error) {
-	filtered := []*edgev1alpha1.Location{}
+func filterLocsByEp(locs []*edgev2alpha1.Location, ep *edgev2alpha1.EdgePlacement) ([]*edgev2alpha1.Location, error) {
+	filtered := []*edgev2alpha1.Location{}
 	for _, l := range locs {
 		for _, s := range ep.Spec.LocationSelectors {
 			selector, err := metav1.LabelSelectorAsSelector(&s)
@@ -260,14 +260,14 @@ func filterLocsByEp(locs []*edgev1alpha1.Location, ep *edgev1alpha1.EdgePlacemen
 	return filtered, nil
 }
 
-func makeSinglePlacementsForSt(locsSelectingSt []*edgev1alpha1.Location, st *edgev1alpha1.SyncTarget) []edgev1alpha1.SinglePlacement {
-	made := []edgev1alpha1.SinglePlacement{}
+func makeSinglePlacementsForSt(locsSelectingSt []*edgev2alpha1.Location, st *edgev2alpha1.SyncTarget) []edgev2alpha1.SinglePlacement {
+	made := []edgev2alpha1.SinglePlacement{}
 	if len(locsSelectingSt) == 0 || st == nil {
 		return made
 	}
 	ws := logicalcluster.From(st).String()
 	for _, loc := range locsSelectingSt {
-		sp := edgev1alpha1.SinglePlacement{
+		sp := edgev2alpha1.SinglePlacement{
 			Cluster:        ws,
 			LocationName:   loc.Name,
 			SyncTargetName: st.Name,
@@ -279,7 +279,7 @@ func makeSinglePlacementsForSt(locsSelectingSt []*edgev1alpha1.Location, st *edg
 }
 
 // packLocKeys extracts keys from given Locations and put the keys in a map
-func packLocKeys(locs []*edgev1alpha1.Location) map[string]empty {
+func packLocKeys(locs []*edgev2alpha1.Location) map[string]empty {
 	keys := map[string]empty{}
 	for _, l := range locs {
 		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(l)
@@ -289,8 +289,8 @@ func packLocKeys(locs []*edgev1alpha1.Location) map[string]empty {
 }
 
 // cleanSPSBySt removes all singleplacements that has the specified synctarget, from a singleplacementslice
-func cleanSPSBySt(sps *edgev1alpha1.SinglePlacementSlice, stws, stName string) *edgev1alpha1.SinglePlacementSlice {
-	nextDests := []edgev1alpha1.SinglePlacement{}
+func cleanSPSBySt(sps *edgev2alpha1.SinglePlacementSlice, stws, stName string) *edgev2alpha1.SinglePlacementSlice {
+	nextDests := []edgev2alpha1.SinglePlacement{}
 	for _, sp := range sps.Destinations {
 		if sp.Cluster != stws || sp.SyncTargetName != stName {
 			nextDests = append(nextDests, sp)
@@ -300,7 +300,7 @@ func cleanSPSBySt(sps *edgev1alpha1.SinglePlacementSlice, stws, stName string) *
 	return sps
 }
 
-func extendSPS(sps *edgev1alpha1.SinglePlacementSlice, singles []edgev1alpha1.SinglePlacement) *edgev1alpha1.SinglePlacementSlice {
+func extendSPS(sps *edgev2alpha1.SinglePlacementSlice, singles []edgev2alpha1.SinglePlacement) *edgev2alpha1.SinglePlacementSlice {
 	sps.Destinations = append(sps.Destinations, singles...)
 	return sps
 }

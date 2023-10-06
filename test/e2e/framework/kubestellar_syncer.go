@@ -85,13 +85,13 @@ var apibindingGVR = schema.GroupVersionResource{
 
 var edgeSyncConfigGVR = schema.GroupVersionResource{
 	Group:    "edge.kubestellar.io",
-	Version:  "v1alpha1",
+	Version:  "v2alpha1",
 	Resource: "edgesyncconfigs",
 }
 
 var syncerConfigGVR = schema.GroupVersionResource{
 	Group:    "edge.kubestellar.io",
-	Version:  "v1alpha1",
+	Version:  "v2alpha1",
 	Resource: "syncerconfigs",
 }
 

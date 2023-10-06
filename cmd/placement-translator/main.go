@@ -60,7 +60,7 @@ import (
 
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -178,10 +178,10 @@ func main() {
 	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
 
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
-	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
-	syncfgClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SyncerConfigs()
-	customizerClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Customizers()
+	epClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
+	spsClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
+	syncfgClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
+	customizerClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
 	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
@@ -194,7 +194,7 @@ func main() {
 	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
-	locationClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Locations()
+	locationClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
 	var _ edgev1a1informers.LocationClusterInformer = locationClusterPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)

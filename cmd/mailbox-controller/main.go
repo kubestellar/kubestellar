@@ -118,7 +118,7 @@ func main() {
 		os.Exit(6)
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
+	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
 
 	rootRestConfig, err := rootClientOpts.ToRESTConfig()
 	if err != nil {

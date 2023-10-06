@@ -34,7 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgefakeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
@@ -51,10 +51,10 @@ type FakeSyncer struct {
 	t                           *testing.T
 	reInitializedCount          int
 	reInitializeClientsCallback func(FakeSyncer) error
-	passedSyncedResources       []edgev1alpha1.EdgeSyncConfigResource
+	passedSyncedResources       []edgev2alpha1.EdgeSyncConfigResource
 }
 
-func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (s *FakeSyncer) ReInitializeClients(resources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	s.passedSyncedResources = resources
 	s.reInitializedCount++
 	if s.reInitializeClientsCallback != nil {
@@ -64,15 +64,15 @@ func (s *FakeSyncer) ReInitializeClients(resources []edgev1alpha1.EdgeSyncConfig
 	}
 }
 
-func (s *FakeSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (s *FakeSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	return nil
 }
 
-func (s *FakeSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (s *FakeSyncer) BackStatusOne(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	return nil
 }
 
-func (s *FakeSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (s *FakeSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	return nil
 }
 
@@ -83,21 +83,21 @@ func reInitializeClientsCallback(s FakeSyncer) error {
 	return fmt.Errorf("")
 }
 
-var upSyncedResource = edgev1alpha1.EdgeSyncConfigResource{
+var upSyncedResource = edgev2alpha1.EdgeSyncConfigResource{
 	Kind:      "uk1",
 	Group:     "ug1",
 	Version:   "uv1",
 	Name:      "un1",
 	Namespace: "uns1",
 }
-var downSyncedResource = edgev1alpha1.EdgeSyncConfigResource{
+var downSyncedResource = edgev2alpha1.EdgeSyncConfigResource{
 	Kind:      "dk1",
 	Group:     "dg1",
 	Version:   "dv1",
 	Name:      "dn1",
 	Namespace: "dns1",
 }
-var downSyncedResource2 = edgev1alpha1.EdgeSyncConfigResource{
+var downSyncedResource2 = edgev2alpha1.EdgeSyncConfigResource{
 	Kind:      "dk2",
 	Group:     "dg2",
 	Version:   "dv2",
@@ -106,9 +106,9 @@ var downSyncedResource2 = edgev1alpha1.EdgeSyncConfigResource{
 }
 
 type Expected struct {
-	downSyncedResources []edgev1alpha1.EdgeSyncConfigResource
-	upSyncedResources   []edgev1alpha1.EdgeSyncConfigResource
-	conversions         []edgev1alpha1.EdgeSynConversion
+	downSyncedResources []edgev2alpha1.EdgeSyncConfigResource
+	upSyncedResources   []edgev2alpha1.EdgeSyncConfigResource
+	conversions         []edgev2alpha1.EdgeSynConversion
 }
 
 func TestSyncConfig(t *testing.T) {
@@ -116,9 +116,9 @@ func TestSyncConfig(t *testing.T) {
 	tests := []struct {
 		description        string
 		op                 string
-		syncConfig         *edgev1alpha1.EdgeSyncConfig
+		syncConfig         *edgev2alpha1.EdgeSyncConfig
 		reInitializedCount int
-		syncConfigSpec     edgev1alpha1.EdgeSyncConfigSpec
+		syncConfigSpec     edgev2alpha1.EdgeSyncConfigSpec
 		upSyncer           FakeSyncer
 		downSyncer         FakeSyncer
 		expected           Expected
@@ -126,10 +126,10 @@ func TestSyncConfig(t *testing.T) {
 		{
 			description: "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig",
 			syncConfig:  syncConfig("test-sync-config", types.UID("uid")),
-			syncConfigSpec: edgev1alpha1.EdgeSyncConfigSpec{
-				DownSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource},
-				UpSyncedResources:   []edgev1alpha1.EdgeSyncConfigResource{upSyncedResource},
-				Conversions: []edgev1alpha1.EdgeSynConversion{{
+			syncConfigSpec: edgev2alpha1.EdgeSyncConfigSpec{
+				DownSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource},
+				UpSyncedResources:   []edgev2alpha1.EdgeSyncConfigResource{upSyncedResource},
+				Conversions: []edgev2alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},
@@ -138,9 +138,9 @@ func TestSyncConfig(t *testing.T) {
 			upSyncer:           FakeSyncer{t: t},
 			downSyncer:         FakeSyncer{t: t},
 			expected: Expected{
-				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource},
-				upSyncedResources:   []edgev1alpha1.EdgeSyncConfigResource{upSyncedResource},
-				conversions: []edgev1alpha1.EdgeSynConversion{{
+				downSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource},
+				upSyncedResources:   []edgev2alpha1.EdgeSyncConfigResource{upSyncedResource},
+				conversions: []edgev2alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},
@@ -149,16 +149,16 @@ func TestSyncConfig(t *testing.T) {
 		{
 			description: "Syncer updates downsyncer/upsyncer and synced resources following to additional syncConfig",
 			syncConfig:  syncConfig("test-sync-config-2", types.UID("uid-2")),
-			syncConfigSpec: edgev1alpha1.EdgeSyncConfigSpec{
-				DownSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource2},
+			syncConfigSpec: edgev2alpha1.EdgeSyncConfigSpec{
+				DownSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource2},
 			},
 			reInitializedCount: 1,
 			upSyncer:           FakeSyncer{t: t},
 			downSyncer:         FakeSyncer{t: t},
 			expected: Expected{
-				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource, downSyncedResource2},
-				upSyncedResources:   []edgev1alpha1.EdgeSyncConfigResource{upSyncedResource},
-				conversions: []edgev1alpha1.EdgeSynConversion{{
+				downSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource, downSyncedResource2},
+				upSyncedResources:   []edgev2alpha1.EdgeSyncConfigResource{upSyncedResource},
+				conversions: []edgev2alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},
@@ -168,16 +168,16 @@ func TestSyncConfig(t *testing.T) {
 			description: "Syncer updates downsyncer/upsyncer and deletes synced resources of the deleted syncConfig",
 			op:          "delete",
 			syncConfig:  syncConfig("test-sync-config-2", types.UID("uid-2")),
-			syncConfigSpec: edgev1alpha1.EdgeSyncConfigSpec{
-				DownSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource2},
+			syncConfigSpec: edgev2alpha1.EdgeSyncConfigSpec{
+				DownSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource2},
 			},
 			reInitializedCount: 1,
 			upSyncer:           FakeSyncer{t: t},
 			downSyncer:         FakeSyncer{t: t},
 			expected: Expected{
-				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource},
-				upSyncedResources:   []edgev1alpha1.EdgeSyncConfigResource{upSyncedResource},
-				conversions: []edgev1alpha1.EdgeSynConversion{{
+				downSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource},
+				upSyncedResources:   []edgev2alpha1.EdgeSyncConfigResource{upSyncedResource},
+				conversions: []edgev2alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},
@@ -190,9 +190,9 @@ func TestSyncConfig(t *testing.T) {
 			upSyncer:           FakeSyncer{t: t, reInitializeClientsCallback: reInitializeClientsCallback},
 			downSyncer:         FakeSyncer{t: t, reInitializeClientsCallback: reInitializeClientsCallback},
 			expected: Expected{ // Nothing to change the down/up synced resources and converions since no SyncConfig is added
-				downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{downSyncedResource},
-				upSyncedResources:   []edgev1alpha1.EdgeSyncConfigResource{upSyncedResource},
-				conversions: []edgev1alpha1.EdgeSynConversion{{
+				downSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{downSyncedResource},
+				upSyncedResources:   []edgev2alpha1.EdgeSyncConfigResource{upSyncedResource},
+				conversions: []edgev2alpha1.EdgeSynConversion{{
 					Upstream:   upSyncedResource,
 					Downstream: downSyncedResource,
 				}},
@@ -207,9 +207,9 @@ func TestSyncConfig(t *testing.T) {
 
 			tc.syncConfig.Spec = tc.syncConfigSpec
 			syncConfigClientSet := edgefakeclient.NewSimpleClientset(tc.syncConfig)
-			syncConfigClient := syncConfigClientSet.EdgeV1alpha1().EdgeSyncConfigs()
+			syncConfigClient := syncConfigClientSet.EdgeV2alpha1().EdgeSyncConfigs()
 			syncConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncConfigClientSet, 0)
-			syncConfigInformer := syncConfigInformerFactory.Edge().V1alpha1().EdgeSyncConfigs()
+			syncConfigInformer := syncConfigInformerFactory.Edge().V2alpha1().EdgeSyncConfigs()
 
 			controller, err := NewEdgeSyncConfigController(logger, syncConfigClient, syncConfigInformer, syncConfigManager, &tc.upSyncer, &tc.downSyncer, 1*time.Second)
 			require.NoError(t, err)
@@ -256,8 +256,8 @@ func TestSyncConfig(t *testing.T) {
 	}
 }
 
-func syncConfig(name string, uid types.UID) *edgev1alpha1.EdgeSyncConfig {
-	return &edgev1alpha1.EdgeSyncConfig{
+func syncConfig(name string, uid types.UID) *edgev2alpha1.EdgeSyncConfig {
+	return &edgev2alpha1.EdgeSyncConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 			UID:  uid,

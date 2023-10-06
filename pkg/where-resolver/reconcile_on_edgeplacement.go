@@ -27,7 +27,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string) error {
@@ -82,7 +82,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	}
 	locsSelecting := packLocKeys(locsFilteredByEp)
 
-	singles := []edgev1alpha1.SinglePlacement{}
+	singles := []edgev2alpha1.SinglePlacement{}
 	for _, loc := range locsFilteredByEp {
 		// 2)
 		lws := logicalcluster.From(loc)
@@ -118,12 +118,12 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	if err != nil {
 		if errors.IsNotFound(err) { // create
 			logger.V(1).Info("creating SinglePlacementSlice")
-			sps := &edgev1alpha1.SinglePlacementSlice{
+			sps := &edgev2alpha1.SinglePlacementSlice{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: epName,
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							APIVersion: edgev1alpha1.SchemeGroupVersion.String(),
+							APIVersion: edgev2alpha1.SchemeGroupVersion.String(),
 							Kind:       "EdgePlacement",
 							Name:       epName,
 							UID:        ep.UID,
@@ -132,7 +132,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 				},
 				Destinations: singles,
 			}
-			_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV2alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
 			if err != nil {
 				if !errors.IsAlreadyExists(err) {
 					logger.Error(err, "failed creating SinglePlacementSlice")
@@ -147,7 +147,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 		}
 	} else { // update
 		currentSPS.Destinations = singles
-		_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV1alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
+		_, err = c.edgeClusterClient.Cluster(epws.Path()).EdgeV2alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
 		if err != nil {
 			logger.Error(err, "failed updating SinglePlacementSlice")
 			return err
