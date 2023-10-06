@@ -241,6 +241,7 @@ function run_init() {
     kubectl ws root
     ensure_invs $ENSURE_IMW
     ensure_wmws $ENSURE_WMW
+    touch ready
     echo "***READY***"
     sleep infinity
 }
