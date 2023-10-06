@@ -36,7 +36,7 @@ for ii in "${mbxws[@]}"; do
   done
   echo "* ReplicaSet resource exists"
   # wait until ReplicaSet running
-  while [ $(kubectl get replicaset -A | grep commonstuff | sed -e 's/ \+/ /g' | cut -d " " -f 5) -lt 1 ]; do
+  while [ $(kubectl get rs -n commonstuff --field-selector metadata.name=commond | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
     sleep 10
   done
   echo "* commonstuff ReplicaSet running"
@@ -46,7 +46,7 @@ while ! kubectl get deploy -A &> /dev/null; do
   sleep 10
 done
 echo "* Deployment resource exists"
-while [ $(kubectl get deploy -A | grep specialstuff | sed -e 's/ \+/ /g' | cut -d " " -f 5) -lt 1 ]; do
+while [ $(kubectl get deploy -n specialstuff --field-selector metadata.name=speciald | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
   sleep 10
 done
 echo "* specialstuff Deployment running"
