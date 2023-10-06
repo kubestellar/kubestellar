@@ -2736,7 +2736,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <p>The Where Resolver maintains a SinglePlacementSlice for an EdgePlacement in the same workspace.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>all2all<span class="w"> </span>-oyaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>destinations:
 <a id="__codelineno-74-3" name="__codelineno-74-3" href="#__codelineno-74-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
 <a id="__codelineno-74-4" name="__codelineno-74-4" href="#__codelineno-74-4"></a><span class="w">  </span>locationName:<span class="w"> </span>prod
@@ -2762,7 +2762,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <a id="__codelineno-74-24" name="__codelineno-74-24" href="#__codelineno-74-24"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
 <a id="__codelineno-74-25" name="__codelineno-74-25" href="#__codelineno-74-25"></a><span class="w">  </span>name:<span class="w"> </span>all2all
 <a id="__codelineno-74-26" name="__codelineno-74-26" href="#__codelineno-74-26"></a><span class="w">  </span>ownerReferences:
-<a id="__codelineno-74-27" name="__codelineno-74-27" href="#__codelineno-74-27"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-74-27" name="__codelineno-74-27" href="#__codelineno-74-27"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-74-28" name="__codelineno-74-28" href="#__codelineno-74-28"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
 <a id="__codelineno-74-29" name="__codelineno-74-29" href="#__codelineno-74-29"></a><span class="w">    </span>name:<span class="w"> </span>all2all
 <a id="__codelineno-74-30" name="__codelineno-74-30" href="#__codelineno-74-30"></a><span class="w">    </span>uid:<span class="w"> </span><span class="m">31915018</span>-6a25-4f01-943e-b8a0a0ed35ba
@@ -2777,7 +2777,7 @@ EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:com
 <p>The corresponding SinglePlacementSlice has a shorter list of <code>destinations</code>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>sps<span class="w"> </span>dev<span class="w"> </span>-oyaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>destinations:
 <a id="__codelineno-77-3" name="__codelineno-77-3" href="#__codelineno-77-3"></a>-<span class="w"> </span>cluster:<span class="w"> </span>1yotsgod0d2p3xa5
 <a id="__codelineno-77-4" name="__codelineno-77-4" href="#__codelineno-77-4"></a><span class="w">  </span>locationName:<span class="w"> </span>dev
@@ -2791,7 +2791,7 @@ EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:com
 <a id="__codelineno-77-12" name="__codelineno-77-12" href="#__codelineno-77-12"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">1</span>
 <a id="__codelineno-77-13" name="__codelineno-77-13" href="#__codelineno-77-13"></a><span class="w">  </span>name:<span class="w"> </span>dev
 <a id="__codelineno-77-14" name="__codelineno-77-14" href="#__codelineno-77-14"></a><span class="w">  </span>ownerReferences:
-<a id="__codelineno-77-15" name="__codelineno-77-15" href="#__codelineno-77-15"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-77-15" name="__codelineno-77-15" href="#__codelineno-77-15"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-77-16" name="__codelineno-77-16" href="#__codelineno-77-16"></a><span class="w">    </span>kind:<span class="w"> </span>EdgePlacement
 <a id="__codelineno-77-17" name="__codelineno-77-17" href="#__codelineno-77-17"></a><span class="w">    </span>name:<span class="w"> </span>dev
 <a id="__codelineno-77-18" name="__codelineno-77-18" href="#__codelineno-77-18"></a><span class="w">    </span>uid:<span class="w"> </span>1ac4b7f5-5521-4b5a-a0fa-cc2ec87b458b

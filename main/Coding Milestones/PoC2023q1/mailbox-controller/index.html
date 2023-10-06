@@ -2697,7 +2697,7 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 </code></pre></div>
 <p>Then in that workspace, run the following command to create a <code>SyncTarget</code> object.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
-<a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a><span class="s">kind: SyncTarget</span>
 <a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-67-5" name="__codelineno-67-5" href="#__codelineno-67-5"></a><span class="s">  name: stest1</span>

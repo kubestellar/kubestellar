@@ -1756,7 +1756,7 @@ ConfigMap that is mounted as a volume for the httpd pod.</p>
 <a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="s">      &lt;/body&gt;</span>
 <a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="s">    &lt;/html&gt;</span>
 <a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="s">---</span>
-<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="s">kind: Customizer</span>
 <a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="s">metadata:</span>
 <a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="s">  namespace: commonstuff</span>
@@ -1809,7 +1809,7 @@ Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="s">  name: edge-placement-c</span>
@@ -1875,7 +1875,7 @@ workload.</p>
 <a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="s">      &lt;/body&gt;</span>
 <a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="s">    &lt;/html&gt;</span>
 <a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="s">---</span>
-<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="s">kind: Customizer</span>
 <a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="s">metadata:</span>
 <a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="s">  namespace: specialstuff</span>
@@ -1928,7 +1928,7 @@ Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches only one of the Location objects created
 earlier, thus directing the special workload to just one edge cluster.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="s">  name: edge-placement-s</span>
@@ -2014,7 +2014,7 @@ continually.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>apiVersion:<span class="w"> </span>v1
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>items:
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>destinations:
 <a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
 <a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span>locationName:<span class="w"> </span>florin
@@ -2032,7 +2032,7 @@ continually.</p>
 <a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">    </span>generation:<span class="w"> </span><span class="m">4</span>
 <a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="w">    </span>name:<span class="w"> </span>edge-placement-c
 <a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">    </span>ownerReferences:
-<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a><span class="w">      </span>kind:<span class="w"> </span>EdgePlacement
 <a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a><span class="w">      </span>name:<span class="w"> </span>edge-placement-c
 <a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a><span class="w">      </span>uid:<span class="w"> </span>199cfe1e-48d9-4351-af5c-e66c83bf50dd

@@ -3524,7 +3524,7 @@ also label guilder with <code>extended=si</code>.</p>
 </code></pre></div>
 <p>Those two script invocations are equivalent to creating the following
 four objects.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v1alpha1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-69-4" name="__codelineno-69-4" href="#__codelineno-69-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>
@@ -3533,7 +3533,7 @@ four objects.</p>
 <a id="__codelineno-69-7" name="__codelineno-69-7" href="#__codelineno-69-7"></a><span class="w">    </span><span class="nt">loc-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>
 <a id="__codelineno-69-8" name="__codelineno-69-8" href="#__codelineno-69-8"></a><span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prod</span>
 <a id="__codelineno-69-9" name="__codelineno-69-9" href="#__codelineno-69-9"></a><span class="nn">---</span>
-<a id="__codelineno-69-10" name="__codelineno-69-10" href="#__codelineno-69-10"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-69-10" name="__codelineno-69-10" href="#__codelineno-69-10"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-69-11" name="__codelineno-69-11" href="#__codelineno-69-11"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Location</span>
 <a id="__codelineno-69-12" name="__codelineno-69-12" href="#__codelineno-69-12"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-69-13" name="__codelineno-69-13" href="#__codelineno-69-13"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>
@@ -3541,11 +3541,11 @@ four objects.</p>
 <a id="__codelineno-69-15" name="__codelineno-69-15" href="#__codelineno-69-15"></a><span class="w">    </span><span class="nt">loc-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">florin</span>
 <a id="__codelineno-69-16" name="__codelineno-69-16" href="#__codelineno-69-16"></a><span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prod</span>
 <a id="__codelineno-69-17" name="__codelineno-69-17" href="#__codelineno-69-17"></a><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-69-18" name="__codelineno-69-18" href="#__codelineno-69-18"></a><span class="w">  </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="nv">edge.kubestellar.io</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">v1alpha1</span><span class="p p-Indicator">,</span><span class="nt"> resource</span><span class="p">:</span><span class="w"> </span><span class="nv">synctargets</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-69-18" name="__codelineno-69-18" href="#__codelineno-69-18"></a><span class="w">  </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="nv">edge.kubestellar.io</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">v2alpha1</span><span class="p p-Indicator">,</span><span class="nt"> resource</span><span class="p">:</span><span class="w"> </span><span class="nv">synctargets</span><span class="p p-Indicator">}</span>
 <a id="__codelineno-69-19" name="__codelineno-69-19" href="#__codelineno-69-19"></a><span class="w">  </span><span class="nt">instanceSelector</span><span class="p">:</span>
 <a id="__codelineno-69-20" name="__codelineno-69-20" href="#__codelineno-69-20"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">florin</span><span class="p p-Indicator">}</span>
 <a id="__codelineno-69-21" name="__codelineno-69-21" href="#__codelineno-69-21"></a><span class="nn">---</span>
-<a id="__codelineno-69-22" name="__codelineno-69-22" href="#__codelineno-69-22"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-69-22" name="__codelineno-69-22" href="#__codelineno-69-22"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-69-23" name="__codelineno-69-23" href="#__codelineno-69-23"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SyncTarget</span>
 <a id="__codelineno-69-24" name="__codelineno-69-24" href="#__codelineno-69-24"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-69-25" name="__codelineno-69-25" href="#__codelineno-69-25"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guilder</span>
@@ -3555,7 +3555,7 @@ four objects.</p>
 <a id="__codelineno-69-29" name="__codelineno-69-29" href="#__codelineno-69-29"></a><span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prod</span>
 <a id="__codelineno-69-30" name="__codelineno-69-30" href="#__codelineno-69-30"></a><span class="w">    </span><span class="nt">extended</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">si</span>
 <a id="__codelineno-69-31" name="__codelineno-69-31" href="#__codelineno-69-31"></a><span class="nn">---</span>
-<a id="__codelineno-69-32" name="__codelineno-69-32" href="#__codelineno-69-32"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-69-32" name="__codelineno-69-32" href="#__codelineno-69-32"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-69-33" name="__codelineno-69-33" href="#__codelineno-69-33"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Location</span>
 <a id="__codelineno-69-34" name="__codelineno-69-34" href="#__codelineno-69-34"></a><span class="nt">metadata</span><span class="p">:</span>
 <a id="__codelineno-69-35" name="__codelineno-69-35" href="#__codelineno-69-35"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guilder</span>
@@ -3564,7 +3564,7 @@ four objects.</p>
 <a id="__codelineno-69-38" name="__codelineno-69-38" href="#__codelineno-69-38"></a><span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prod</span>
 <a id="__codelineno-69-39" name="__codelineno-69-39" href="#__codelineno-69-39"></a><span class="w">    </span><span class="nt">extended</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">si</span>
 <a id="__codelineno-69-40" name="__codelineno-69-40" href="#__codelineno-69-40"></a><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-69-41" name="__codelineno-69-41" href="#__codelineno-69-41"></a><span class="w">  </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="nv">edge.kubestellar.io</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">v1alpha1</span><span class="p p-Indicator">,</span><span class="nt"> resource</span><span class="p">:</span><span class="w"> </span><span class="nv">synctargets</span><span class="p p-Indicator">}</span>
+<a id="__codelineno-69-41" name="__codelineno-69-41" href="#__codelineno-69-41"></a><span class="w">  </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="nv">edge.kubestellar.io</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">v2alpha1</span><span class="p p-Indicator">,</span><span class="nt"> resource</span><span class="p">:</span><span class="w"> </span><span class="nv">synctargets</span><span class="p p-Indicator">}</span>
 <a id="__codelineno-69-42" name="__codelineno-69-42" href="#__codelineno-69-42"></a><span class="w">  </span><span class="nt">instanceSelector</span><span class="p">:</span>
 <a id="__codelineno-69-43" name="__codelineno-69-43" href="#__codelineno-69-43"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="nv">guilder</span><span class="p p-Indicator">}</span>
 </code></pre></div>
@@ -3801,7 +3801,7 @@ ConfigMap that is mounted as a volume for the httpd pod.</p>
 <a id="__codelineno-93-22" name="__codelineno-93-22" href="#__codelineno-93-22"></a><span class="s">      &lt;/body&gt;</span>
 <a id="__codelineno-93-23" name="__codelineno-93-23" href="#__codelineno-93-23"></a><span class="s">    &lt;/html&gt;</span>
 <a id="__codelineno-93-24" name="__codelineno-93-24" href="#__codelineno-93-24"></a><span class="s">---</span>
-<a id="__codelineno-93-25" name="__codelineno-93-25" href="#__codelineno-93-25"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-93-25" name="__codelineno-93-25" href="#__codelineno-93-25"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-93-26" name="__codelineno-93-26" href="#__codelineno-93-26"></a><span class="s">kind: Customizer</span>
 <a id="__codelineno-93-27" name="__codelineno-93-27" href="#__codelineno-93-27"></a><span class="s">metadata:</span>
 <a id="__codelineno-93-28" name="__codelineno-93-28" href="#__codelineno-93-28"></a><span class="s">  namespace: commonstuff</span>
@@ -3854,7 +3854,7 @@ Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-95-2" name="__codelineno-95-2" href="#__codelineno-95-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-95-2" name="__codelineno-95-2" href="#__codelineno-95-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-95-3" name="__codelineno-95-3" href="#__codelineno-95-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-95-4" name="__codelineno-95-4" href="#__codelineno-95-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-95-5" name="__codelineno-95-5" href="#__codelineno-95-5"></a><span class="s">  name: edge-placement-c</span>
@@ -3920,7 +3920,7 @@ workload.</p>
 <a id="__codelineno-98-22" name="__codelineno-98-22" href="#__codelineno-98-22"></a><span class="s">      &lt;/body&gt;</span>
 <a id="__codelineno-98-23" name="__codelineno-98-23" href="#__codelineno-98-23"></a><span class="s">    &lt;/html&gt;</span>
 <a id="__codelineno-98-24" name="__codelineno-98-24" href="#__codelineno-98-24"></a><span class="s">---</span>
-<a id="__codelineno-98-25" name="__codelineno-98-25" href="#__codelineno-98-25"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-98-25" name="__codelineno-98-25" href="#__codelineno-98-25"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-98-26" name="__codelineno-98-26" href="#__codelineno-98-26"></a><span class="s">kind: Customizer</span>
 <a id="__codelineno-98-27" name="__codelineno-98-27" href="#__codelineno-98-27"></a><span class="s">metadata:</span>
 <a id="__codelineno-98-28" name="__codelineno-98-28" href="#__codelineno-98-28"></a><span class="s">  namespace: specialstuff</span>
@@ -3973,7 +3973,7 @@ Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches only one of the Location objects created
 earlier, thus directing the special workload to just one edge cluster.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-100-3" name="__codelineno-100-3" href="#__codelineno-100-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-100-4" name="__codelineno-100-4" href="#__codelineno-100-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-100-5" name="__codelineno-100-5" href="#__codelineno-100-5"></a><span class="s">  name: edge-placement-s</span>
@@ -4059,7 +4059,7 @@ continually.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a>apiVersion:<span class="w"> </span>v1
 <a id="__codelineno-109-2" name="__codelineno-109-2" href="#__codelineno-109-2"></a>items:
-<a id="__codelineno-109-3" name="__codelineno-109-3" href="#__codelineno-109-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-109-3" name="__codelineno-109-3" href="#__codelineno-109-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-109-4" name="__codelineno-109-4" href="#__codelineno-109-4"></a><span class="w">  </span>destinations:
 <a id="__codelineno-109-5" name="__codelineno-109-5" href="#__codelineno-109-5"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
 <a id="__codelineno-109-6" name="__codelineno-109-6" href="#__codelineno-109-6"></a><span class="w">    </span>locationName:<span class="w"> </span>florin
@@ -4077,7 +4077,7 @@ continually.</p>
 <a id="__codelineno-109-18" name="__codelineno-109-18" href="#__codelineno-109-18"></a><span class="w">    </span>generation:<span class="w"> </span><span class="m">4</span>
 <a id="__codelineno-109-19" name="__codelineno-109-19" href="#__codelineno-109-19"></a><span class="w">    </span>name:<span class="w"> </span>edge-placement-c
 <a id="__codelineno-109-20" name="__codelineno-109-20" href="#__codelineno-109-20"></a><span class="w">    </span>ownerReferences:
-<a id="__codelineno-109-21" name="__codelineno-109-21" href="#__codelineno-109-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<a id="__codelineno-109-21" name="__codelineno-109-21" href="#__codelineno-109-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-109-22" name="__codelineno-109-22" href="#__codelineno-109-22"></a><span class="w">      </span>kind:<span class="w"> </span>EdgePlacement
 <a id="__codelineno-109-23" name="__codelineno-109-23" href="#__codelineno-109-23"></a><span class="w">      </span>name:<span class="w"> </span>edge-placement-c
 <a id="__codelineno-109-24" name="__codelineno-109-24" href="#__codelineno-109-24"></a><span class="w">      </span>uid:<span class="w"> </span>199cfe1e-48d9-4351-af5c-e66c83bf50dd
@@ -4123,7 +4123,7 @@ proceed.</p>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a>metadata:
 <a id="__codelineno-118-4" name="__codelineno-118-4" href="#__codelineno-118-4"></a><span class="w">  </span>annotations:
@@ -4258,7 +4258,7 @@ the name that you stored in Stage 1.</p>
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v1alpha1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
 <a id="__codelineno-128-2" name="__codelineno-128-2" href="#__codelineno-128-2"></a>kind:<span class="w"> </span>SyncerConfig
 <a id="__codelineno-128-3" name="__codelineno-128-3" href="#__codelineno-128-3"></a>metadata:
 <a id="__codelineno-128-4" name="__codelineno-128-4" href="#__codelineno-128-4"></a><span class="w">  </span>annotations:
