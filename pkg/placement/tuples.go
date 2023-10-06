@@ -35,6 +35,9 @@ func NewPair[First, Second any](first First, second Second) Pair[First, Second] 
 	return Pair[First, Second]{first, second}
 }
 
+func (tup Pair[First, Second]) GetFirst() First   { return tup.First }
+func (tup Pair[First, Second]) GetSecond() Second { return tup.Second }
+
 func (tup Pair[First, Second]) String() string {
 	var ans strings.Builder
 	ans.WriteRune('(')

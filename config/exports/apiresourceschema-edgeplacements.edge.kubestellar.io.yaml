@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230915-8d536c3e3.edgeplacements.edge.kubestellar.io
+  name: v230922-62bfba99a.edgeplacements.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -286,6 +286,13 @@ spec:
                 - resources
                 type: object
               type: array
+            wantSingletonReportedState:
+              description: WantSingletonReportedState indicates that (a) the number
+                of selected locations is intended to be 1 and (b) the reported state
+                of each downsynced object should be returned back to the object in
+                this space. When multiple EdgePlacement objects match the same workload
+                object, the OR of these booleans rules.
+              type: boolean
           type: object
         status:
           description: '`status` describes the status of the process of binding workload
