@@ -882,6 +882,26 @@
     Stage 5
   </a>
   
+    <nav class="md-nav" aria-label="Stage 5">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#singleton-reported-state-return" class="md-nav__link">
+    Singleton reported state return
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-summarization-aspirational" class="md-nav__link">
+    Status Summarization (aspirational)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1771,6 +1791,26 @@
   <a href="#stage-5" class="md-nav__link">
     Stage 5
   </a>
+  
+    <nav class="md-nav" aria-label="Stage 5">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#singleton-reported-state-return" class="md-nav__link">
+    Singleton reported state return
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-summarization-aspirational" class="md-nav__link">
+    Status Summarization (aspirational)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2901,6 +2941,26 @@
     Stage 5
   </a>
   
+    <nav class="md-nav" aria-label="Stage 5">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#singleton-reported-state-return" class="md-nav__link">
+    Singleton reported state return
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-summarization-aspirational" class="md-nav__link">
+    Status Summarization (aspirational)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3816,15 +3876,16 @@ directing the common workload to both edge clusters.</p>
 <a id="__codelineno-95-21" name="__codelineno-95-21" href="#__codelineno-95-21"></a><span class="s">    resources: [ apibindings ]</span>
 <a id="__codelineno-95-22" name="__codelineno-95-22" href="#__codelineno-95-22"></a><span class="s">    namespaceSelectors: []</span>
 <a id="__codelineno-95-23" name="__codelineno-95-23" href="#__codelineno-95-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-95-24" name="__codelineno-95-24" href="#__codelineno-95-24"></a><span class="s">  upsync:</span>
-<a id="__codelineno-95-25" name="__codelineno-95-25" href="#__codelineno-95-25"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-95-26" name="__codelineno-95-26" href="#__codelineno-95-26"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-95-27" name="__codelineno-95-27" href="#__codelineno-95-27"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-95-28" name="__codelineno-95-28" href="#__codelineno-95-28"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-95-29" name="__codelineno-95-29" href="#__codelineno-95-29"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-95-30" name="__codelineno-95-30" href="#__codelineno-95-30"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-95-31" name="__codelineno-95-31" href="#__codelineno-95-31"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-95-32" name="__codelineno-95-32" href="#__codelineno-95-32"></a><span class="s">EOF</span>
+<a id="__codelineno-95-24" name="__codelineno-95-24" href="#__codelineno-95-24"></a><span class="s">  wantSingletonReportedState: true</span>
+<a id="__codelineno-95-25" name="__codelineno-95-25" href="#__codelineno-95-25"></a><span class="s">  upsync:</span>
+<a id="__codelineno-95-26" name="__codelineno-95-26" href="#__codelineno-95-26"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-95-27" name="__codelineno-95-27" href="#__codelineno-95-27"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-95-28" name="__codelineno-95-28" href="#__codelineno-95-28"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-95-29" name="__codelineno-95-29" href="#__codelineno-95-29"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-95-30" name="__codelineno-95-30" href="#__codelineno-95-30"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-95-31" name="__codelineno-95-31" href="#__codelineno-95-31"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-95-32" name="__codelineno-95-32" href="#__codelineno-95-32"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-95-33" name="__codelineno-95-33" href="#__codelineno-95-33"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
@@ -3934,15 +3995,16 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 <a id="__codelineno-100-21" name="__codelineno-100-21" href="#__codelineno-100-21"></a><span class="s">    resources: [ apibindings ]</span>
 <a id="__codelineno-100-22" name="__codelineno-100-22" href="#__codelineno-100-22"></a><span class="s">    namespaceSelectors: []</span>
 <a id="__codelineno-100-23" name="__codelineno-100-23" href="#__codelineno-100-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-100-24" name="__codelineno-100-24" href="#__codelineno-100-24"></a><span class="s">  upsync:</span>
-<a id="__codelineno-100-25" name="__codelineno-100-25" href="#__codelineno-100-25"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-100-26" name="__codelineno-100-26" href="#__codelineno-100-26"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-100-27" name="__codelineno-100-27" href="#__codelineno-100-27"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-100-28" name="__codelineno-100-28" href="#__codelineno-100-28"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-100-29" name="__codelineno-100-29" href="#__codelineno-100-29"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
-<a id="__codelineno-100-30" name="__codelineno-100-30" href="#__codelineno-100-30"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
-<a id="__codelineno-100-31" name="__codelineno-100-31" href="#__codelineno-100-31"></a><span class="s">    names: [&quot;*&quot;]</span>
-<a id="__codelineno-100-32" name="__codelineno-100-32" href="#__codelineno-100-32"></a><span class="s">EOF</span>
+<a id="__codelineno-100-24" name="__codelineno-100-24" href="#__codelineno-100-24"></a><span class="s">  wantSingletonReportedState: true</span>
+<a id="__codelineno-100-25" name="__codelineno-100-25" href="#__codelineno-100-25"></a><span class="s">  upsync:</span>
+<a id="__codelineno-100-26" name="__codelineno-100-26" href="#__codelineno-100-26"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-100-27" name="__codelineno-100-27" href="#__codelineno-100-27"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-100-28" name="__codelineno-100-28" href="#__codelineno-100-28"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-100-29" name="__codelineno-100-29" href="#__codelineno-100-29"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-100-30" name="__codelineno-100-30" href="#__codelineno-100-30"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
+<a id="__codelineno-100-31" name="__codelineno-100-31" href="#__codelineno-100-31"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
+<a id="__codelineno-100-32" name="__codelineno-100-32" href="#__codelineno-100-32"></a><span class="s">    names: [&quot;*&quot;]</span>
+<a id="__codelineno-100-33" name="__codelineno-100-33" href="#__codelineno-100-33"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
@@ -4472,6 +4534,29 @@ will show that the replacement-style customization happened.</p>
 <!-- END INCLUDE -->
 
 <h2 id="stage-5">Stage 5<a class="headerlink" href="#stage-5" title="Permanent link">#</a></h2>
+<h3 id="singleton-reported-state-return">Singleton reported state return<a class="headerlink" href="#singleton-reported-state-return" title="Permanent link">#</a></h3>
+<p>The two <code>EdgePlacement</code> objects above assert that the expected number
+of executing copies of their matching workload objects is 1 and
+request return of reported state to the WDS when the number of
+executing copies is exactly 1.</p>
+<p>For the common workload, that assertion is not correct: the number of
+executing copies should be 2.  The assertion causes the actual number
+of executing copies to be reported.  Check that the reported number is
+2.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+<a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;2&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+</code></pre></div>
+<p>For the special workload, the number of executing copies should be 1.
+Check that the reported number agrees.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
+<a id="__codelineno-151-2" name="__codelineno-151-2" href="#__codelineno-151-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;1&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+</code></pre></div>
+<p>Look at the status section of the "speciald" <code>Deployment</code> and see that
+it has been filled in with the information from the guilder cluster.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
+<a id="__codelineno-152-2" name="__codelineno-152-2" href="#__codelineno-152-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span>
+</code></pre></div>
+<h3 id="status-summarization-aspirational">Status Summarization (aspirational)<a class="headerlink" href="#status-summarization-aspirational" title="Permanent link">#</a></h3>
 <p><img alt="Summarization for special" src="../Edge-PoC-2023q1-Scenario-1-stage-5s.svg" title="Status summarization for special" /></p>
 <p>The status summarizer, driven by the EdgePlacement and
 SinglePlacementSlice for the special workload, creates a status
@@ -4489,27 +4574,27 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-teardown.md '&lt;!--example1-teardown-start--&gt;' '&lt;!--example1-teardown-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-150-3" name="__codelineno-150-3" href="#__codelineno-150-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
-<a id="__codelineno-150-4" name="__codelineno-150-4" href="#__codelineno-150-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
-<a id="__codelineno-150-5" name="__codelineno-150-5" href="#__codelineno-150-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
-<a id="__codelineno-150-6" name="__codelineno-150-6" href="#__codelineno-150-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
-<a id="__codelineno-150-7" name="__codelineno-150-7" href="#__codelineno-150-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
-<a id="__codelineno-150-8" name="__codelineno-150-8" href="#__codelineno-150-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-150-9" name="__codelineno-150-9" href="#__codelineno-150-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-153-2" name="__codelineno-153-2" href="#__codelineno-153-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-153-3" name="__codelineno-153-3" href="#__codelineno-153-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
+<a id="__codelineno-153-4" name="__codelineno-153-4" href="#__codelineno-153-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
+<a id="__codelineno-153-5" name="__codelineno-153-5" href="#__codelineno-153-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
+<a id="__codelineno-153-6" name="__codelineno-153-6" href="#__codelineno-153-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
+<a id="__codelineno-153-7" name="__codelineno-153-7" href="#__codelineno-153-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
+<a id="__codelineno-153-8" name="__codelineno-153-8" href="#__codelineno-153-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-153-9" name="__codelineno-153-9" href="#__codelineno-153-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
