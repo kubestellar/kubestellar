@@ -26,24 +26,24 @@ import (
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v2alpha1"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface
+	EdgeV2alpha1() edgev2alpha1.EdgeV2alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	edgeV1alpha1 *edgev1alpha1.EdgeV1alpha1Client
+	edgeV2alpha1 *edgev2alpha1.EdgeV2alpha1Client
 }
 
-// EdgeV1alpha1 retrieves the EdgeV1alpha1Client
-func (c *Clientset) EdgeV1alpha1() edgev1alpha1.EdgeV1alpha1Interface {
-	return c.edgeV1alpha1
+// EdgeV2alpha1 retrieves the EdgeV2alpha1Client
+func (c *Clientset) EdgeV2alpha1() edgev2alpha1.EdgeV2alpha1Interface {
+	return c.edgeV2alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -90,7 +90,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 
 	var cs Clientset
 	var err error
-	cs.edgeV1alpha1, err = edgev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.edgeV2alpha1, err = edgev2alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.edgeV1alpha1 = edgev1alpha1.New(c)
+	cs.edgeV2alpha1 = edgev2alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

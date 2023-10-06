@@ -27,7 +27,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 
-	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
+	v1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	conditionsv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/apis/conditions/v1alpha1"
 )
 
@@ -846,7 +846,7 @@ func (in *SyncTargetSpec) DeepCopyInto(out *SyncTargetSpec) {
 	}
 	if in.SupportedAPIExports != nil {
 		in, out := &in.SupportedAPIExports, &out.SupportedAPIExports
-		*out = make([]tenancyv1alpha1.APIExportReference, len(*in))
+		*out = make([]v1alpha1.APIExportReference, len(*in))
 		copy(*out, *in)
 	}
 	if in.Cells != nil {

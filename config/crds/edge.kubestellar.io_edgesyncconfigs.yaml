@@ -17,7 +17,7 @@ spec:
     singular: edgesyncconfig
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - name: v2alpha1
     schema:
       openAPIV3Schema:
         properties:
