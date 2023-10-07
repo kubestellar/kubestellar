@@ -22,7 +22,7 @@ rules:
   # resourceNames: [ "{{ .Values.secret }}" ]
   verbs: [ "get" , "create" , "delete" ]
 - apiGroups: [ "" ]
-  resources: [ "pods" , "pods/log"]
+  resources: [ "pods" , "pods/log" ]
   verbs: [ "get" , "list" ]
 {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
 - apiGroups: [ "route.openshift.io" ]

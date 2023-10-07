@@ -335,7 +335,10 @@ appear on the command line, in any order.
   hostname will start with a string derived from the Route in the
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.
-- a command line flag for the `helm upgrade` command.
+- a command line flag for the `helm upgrade` command. This includes
+  the usual control over namespace: you can set it on the command
+  line, otherwise the namespace that is current in your kubeconfig
+  applies.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -351,7 +354,9 @@ kubectl kubestellar deploy --external-endpoint my-long-application-name.my-regio
 
 The Helm chart takes care of setting up the KubeStellar MCCM core,
 accomplishing the same thing as the [kubestellar
-start](#kubestellar-start) command above.
+start](#kubestellar-start) command above. Additionally, another
+inventory management workspace named `root:inv1` is created in
+addition to the one created by `kubestellar init` (`root:imw1`).
 
 ### Fetch kubeconfig for internal clients
 
@@ -361,7 +366,8 @@ takes the following on the command line.
 
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
-- a `kubectl` command line flag, for accessing the hosting cluster.
+- a `kubectl` command line flag, for accessing the hosting
+  cluster. This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -377,6 +383,7 @@ on the command line.
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -404,6 +411,7 @@ follows.
   not given then `tail` will be told `-n +0` to fetch the whole log.
 - `-f`: tells `tail` to "follow".
 - a `kubectl` command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.
 - `-X`: for debugging, `set -x` in the script that implements this command.
 
 ### Remove deployment to a Kubernetes cluster
