@@ -105,8 +105,8 @@ function wait_kcp_ready() {
     echo "Waiting for kcp to be ready... this may take a while."
     (
         KUBECONFIG=
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
-            sleep 5
+        while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp -- ls /home/kubestellar/ready &> /dev/null; do
+            sleep 10
         done
     )
     echo "Succes!"
@@ -124,8 +124,8 @@ function wait-kubestellar-ready() {
     echo "Waiting for KubeStellar to be ready... this may take a while."
     (
         KUBECONFIG=
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init | grep '***READY***')" != "" ]; do
-            sleep 5
+        while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- ls /home/kubestellar/ready &> /dev/null; do
+            sleep 10
         done
     )
     echo "Succes!"
@@ -168,7 +168,9 @@ function run_kcp() {
     echo Attempting to delete kubestellar secret...
     (
         KUBECONFIG=
-        ! kubectl delete secret kubestellar
+        if ! kubectl delete secret kubestellar ; then
+            echo "Nothing to delete."
+        fi
     )
     echo "EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
 
@@ -191,8 +193,13 @@ function run_kcp() {
 
     # Running kcp
     if [ -n "$EXTERNAL_HOSTNAME" ]; then
+         # required to fix the restart
         echo "Removing existing apiserver keys... "
-        ! rm /home/kubestellar/.kcp/apiserver.* &> /dev/null # required to fix the restart
+        if ! rm /home/kubestellar/.kcp/apiserver.* &> /dev/null ; then
+            echo "Nothing to remove... must be the first time."
+        else
+            echo "Existing keys removed... the container mast have restarted."
+        fi
         echo -n "Running kcp with TLS keys... "
         kcp start --tls-sni-cert-key ${pieces_external[1]},${pieces_external[2]} --tls-sni-cert-key ${pieces_cluster[1]},${pieces_cluster[2]} & # &> kcp.log &
     else
@@ -203,14 +210,18 @@ function run_kcp() {
 
     # Waiting to be ready
     echo "Waiting for ${KUBECONFIG}..."
-    while [ ! -f "${KUBECONFIG}" ]; do sleep 5; done
+    while [ ! -f "${KUBECONFIG}" ]; do
+        sleep 5;
+    done
     echo 'Waiting for "root:compute" workspace...'
-    until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]; do sleep 5;done
+    until [ "$(kubectl ws root:compute 2> /dev/null)" != "" ]; do
+        sleep 5;
+    done
     echo '"root:compute" workspace is ready'.
     echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
     kubectl ws root
 
-    # Generate the external.kubeconfig
+    # Generate the external.kubeconfig and cluster.kubeconfig
     if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp-${EXTERNAL_HOSTNAME}" ]; then
         echo Creating external.kubeconfig...
         switch-domain .kcp/admin.kubeconfig .kcp/external.kubeconfig root ${EXTERNAL_HOSTNAME} ${EXTERNAL_PORT} ${pieces_external[0]}
@@ -227,6 +238,8 @@ function run_kcp() {
             kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig"
         fi
     )
+
+    touch ready
     echo "***READY***"
     sleep infinity
 }
@@ -236,8 +249,6 @@ function run_init() {
     echo "--< Starting init >--"
     wait_kcp_ready
     kubestellar init --local-kcp false
-    # ensure_root_compute_configd
-    # ensure_espw
     kubectl ws root
     ensure_invs $ENSURE_IMW
     ensure_wmws $ENSURE_WMW
