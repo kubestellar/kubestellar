@@ -2280,7 +2280,7 @@ results.  The context and port number chosen work for the kubeconfig
 file that <code>kcp start</code> (kcp release v0.11.0) creates by default.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml </span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="go">bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="go">4,5c4,5</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="go">&lt;     certificate-authority-data: LS0...LQo=</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="go">&lt;     server: https://192.168.something.something:6443</span>
@@ -2425,7 +2425,10 @@ appear on the command line, in any order.</p>
   hostname will start with a string derived from the Route in the
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.</li>
-<li>a command line flag for the <code>helm upgrade</code> command.</li>
+<li>a command line flag for the <code>helm upgrade</code> command. This includes
+  the usual control over namespace: you can set it on the command
+  line, otherwise the namespace that is current in your kubeconfig
+  applies.</li>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
@@ -2446,7 +2449,8 @@ takes the following on the command line.</p>
 <ul>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
   must appear exactly once on the command line.</li>
-<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li>a <code>kubectl</code> command line flag, for accessing the hosting
+  cluster. This includes the usual control over namespace.</li>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
@@ -2460,7 +2464,8 @@ on the command line.</p>
 <ul>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
   must appear exactly once on the command line.</li>
-<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.</li>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
@@ -2486,7 +2491,8 @@ follows.</p>
   usual syntax and semantics of the <code>-n</code> flag for <code>tail</code> apply.  If
   not given then <code>tail</code> will be told <code>-n +0</code> to fetch the whole log.</li>
 <li><code>-f</code>: tells <code>tail</code> to "follow".</li>
-<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.</li>
+<li>a <code>kubectl</code> command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.</li>
 <li><code>-X</code>: for debugging, <code>set -x</code> in the script that implements this command.</li>
 </ul>
 <h3 id="remove-deployment-to-a-kubernetes-cluster">Remove deployment to a Kubernetes cluster<a class="headerlink" href="#remove-deployment-to-a-kubernetes-cluster" title="Permanent link">#</a></h3>
@@ -2530,7 +2536,7 @@ containing many.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>1747254b
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubestellar-version<span class="w">          </span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubestellar-version
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="o">{</span><span class="s2">&quot;major&quot;</span>:<span class="s2">&quot;1&quot;</span>,<span class="s2">&quot;minor&quot;</span>:<span class="s2">&quot;24&quot;</span>,<span class="s2">&quot;gitVersion&quot;</span>:<span class="s2">&quot;v1.24.3+kcp-v0.2.1-20-g1747254b880cb7&quot;</span>,<span class="s2">&quot;gitCommit&quot;</span>:<span class="s2">&quot;1747254b&quot;</span>,<span class="s2">&quot;gitTreeState&quot;</span>:<span class="s2">&quot;dirty&quot;</span>,<span class="s2">&quot;buildDate&quot;</span>:<span class="s2">&quot;2023-05-19T02:54:01Z&quot;</span>,<span class="s2">&quot;goVersion&quot;</span>:<span class="s2">&quot;go1.19.9&quot;</span>,<span class="s2">&quot;compiler&quot;</span>:<span class="s2">&quot;gc&quot;</span>,<span class="s2">&quot;platform&quot;</span>:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
 </code></pre></div></p>
@@ -2815,7 +2821,7 @@ is included.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 <a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
 <a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kube&quot;</span><span class="w"> </span>deleted<span class="w"> </span>
+<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kube&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace<a class="headerlink" href="#removing-a-workload-management-workspace" title="Permanent link">#</a></h2>
 <p>Deleting a WMW can be done by simply deleting its <code>Workspace</code> object from
@@ -2830,7 +2836,7 @@ the parent.</p>
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted<span class="w"> </span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <p>Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
