@@ -171,7 +171,7 @@ file that `kcp start` (kcp release v0.11.0) creates by default.
 ```console
 bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
-bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml 
+bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5
 <     certificate-authority-data: LS0...LQo=
 <     server: https://192.168.something.something:6443
@@ -354,9 +354,7 @@ kubectl kubestellar deploy --external-endpoint my-long-application-name.my-regio
 
 The Helm chart takes care of setting up the KubeStellar MCCM core,
 accomplishing the same thing as the [kubestellar
-start](#kubestellar-start) command above. Additionally, another
-inventory management workspace named `root:inv1` is created in
-addition to the one created by `kubestellar init` (`root:imw1`).
+start](#kubestellar-start) command above.
 
 ### Fetch kubeconfig for internal clients
 
@@ -480,7 +478,7 @@ kubestellar-version gitCommit
 ```
 
 ```shell
-kubestellar-version          
+kubestellar-version
 ```
 ``` { .bash .no-copy }
 {"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
@@ -851,7 +849,7 @@ kubectl kubestellar ensure wmw example-wmw --with-kube false
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
-apibinding.apis.kcp.io "bind-kube" deleted 
+apibinding.apis.kcp.io "bind-kube" deleted
 ```
 
 ## Removing a Workload Management Workspace
@@ -877,7 +875,7 @@ Current workspace is "root:my-org".
 kubectl delete Workspace example-wmw
 ```
 ``` { .bash .no-copy }
-workspace.tenancy.kcp.io "example-wmw" deleted 
+workspace.tenancy.kcp.io "example-wmw" deleted
 ```
 
 Alternatively, you can use the following command line whose design
