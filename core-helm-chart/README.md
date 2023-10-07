@@ -26,6 +26,10 @@ Use `--namespace` argument to specify an optional user-defined namespace for the
 
 ## Deploy **KubeStellar** in an **OpenShift** cluster
 
+Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
+
+As an alternative, one could also create a new project and install the Helm chart in that project, *e.g.* `oc new-project kubestellar`.
+
 Deploy **KubeStellar** in an **OpenShift** cluster, letting the cluster decide the route assigned to **KubeStellar** on the default port `443`:
 
 ```shell
@@ -33,14 +37,11 @@ helm install kubestellar . \
   --set clusterType=OpenShift
 ```
 
-Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
-As an alternative, one could also create a new project and install the Helm chart in that project, *e.g.* `oc new-project kubestellar`.
-
 ## Wait for **KubeStellar** to be ready
 
 ```shell
 echo -n 'Waiting for KubeStellar to be ready'
-until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init | grep '***READY***')" != "" ]; do
+while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- ls /home/kubestellar/ready &> /dev/null; do
     sleep 10
     echo -n "."
 done
@@ -69,7 +70,7 @@ After the deployment has completed, in order to access **KubeStellar** from the 
 kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' | base64 --decode > admin.kubeconfig
 ```
 
-**NOTE:** currently, the `external.kubeconfig` needs to be retrieved from the `kubestellar` secret after each restat/recreation of the **KubeStellar** pod.
+**NOTE:** currently, the `external.kubeconfig` needs to be retrieved from the `kubestellar` secret after each restart/recreation of the **KubeStellar** pod.
 
 ## Obtain **kcp** and/or **KubeStellar** plugins/executables
 
