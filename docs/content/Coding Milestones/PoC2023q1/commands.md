@@ -171,7 +171,7 @@ file that `kcp start` (kcp release v0.11.0) creates by default.
 ```console
 bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
-bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml 
+bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5
 <     certificate-authority-data: LS0...LQo=
 <     server: https://192.168.something.something:6443
@@ -335,7 +335,10 @@ appear on the command line, in any order.
   hostname will start with a string derived from the Route in the
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.
-- a command line flag for the `helm upgrade` command.
+- a command line flag for the `helm upgrade` command. This includes
+  the usual control over namespace: you can set it on the command
+  line, otherwise the namespace that is current in your kubeconfig
+  applies.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -361,7 +364,8 @@ takes the following on the command line.
 
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
-- a `kubectl` command line flag, for accessing the hosting cluster.
+- a `kubectl` command line flag, for accessing the hosting
+  cluster. This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -377,6 +381,7 @@ on the command line.
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -404,6 +409,7 @@ follows.
   not given then `tail` will be told `-n +0` to fetch the whole log.
 - `-f`: tells `tail` to "follow".
 - a `kubectl` command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.
 - `-X`: for debugging, `set -x` in the script that implements this command.
 
 ### Remove deployment to a Kubernetes cluster
@@ -472,7 +478,7 @@ kubestellar-version gitCommit
 ```
 
 ```shell
-kubestellar-version          
+kubestellar-version
 ```
 ``` { .bash .no-copy }
 {"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
@@ -843,7 +849,7 @@ kubectl kubestellar ensure wmw example-wmw --with-kube false
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
-apibinding.apis.kcp.io "bind-kube" deleted 
+apibinding.apis.kcp.io "bind-kube" deleted
 ```
 
 ## Removing a Workload Management Workspace
@@ -869,7 +875,7 @@ Current workspace is "root:my-org".
 kubectl delete Workspace example-wmw
 ```
 ``` { .bash .no-copy }
-workspace.tenancy.kcp.io "example-wmw" deleted 
+workspace.tenancy.kcp.io "example-wmw" deleted
 ```
 
 Alternatively, you can use the following command line whose design

@@ -17,8 +17,7 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.prefix }}-route
-  namespace: {{ .Values.namespace }}
+  name: kubestellar-route
 spec:
   host: {{ .Values.EXTERNAL_HOSTNAME }}
   port:
@@ -28,5 +27,6 @@ spec:
     insecureEdgeTerminationPolicy: None
   to:
     kind: Service
-    name: {{ .Values.prefix }}-service
+    name: kubestellar
+
 {{ end }}

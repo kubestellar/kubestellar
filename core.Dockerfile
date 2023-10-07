@@ -11,7 +11,7 @@ RUN groupadd kubestellar && useradd -g kubestellar kubestellar
 
 WORKDIR /home/kubestellar
 
-RUN mkdir -p .kcp kubestellar-logs && \
+RUN mkdir -p .kcp && \
     dnf install -y git golang jq procps && \
     go install github.com/mikefarah/yq/v4@v4.34.2 && \
     curl -SL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/v1.25.3/bin/${TARGETPLATFORM}/kubectl" && \
@@ -38,15 +38,15 @@ RUN mkdir -p .kcp kubestellar-logs && \
 
 ENV PATH=$PATH:/root/go/bin
 
-ADD cmd/		cmd/
-ADD config/		config/
-ADD hack/		hack/
-ADD monitoring/		monitoring/
-ADD pkg/		pkg/
-ADD scripts/		scripts/
-ADD space-framework/	space-framework/
-ADD test/		test/
-ADD .git/		.git/
+ADD cmd/             cmd/
+ADD config/          config/
+ADD hack/            hack/
+ADD monitoring/      monitoring/
+ADD pkg/             pkg/
+ADD scripts/         scripts/
+ADD space-framework/ space-framework/
+ADD test/            test/
+ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
 # Avoid self-reference
@@ -56,21 +56,22 @@ RUN make build
 
 FROM redhat/ubi9
 
+WORKDIR /home/kubestellar
+
 RUN dnf install -y jq procps && \
     dnf -y upgrade openssl && \
     groupadd kubestellar && \
-    adduser -g kubestellar kubestellar
-
-WORKDIR /home/kubestellar
+    adduser -g kubestellar kubestellar && \
+    mkdir -p .kcp
 
 # copy binaries from the builder image
-COPY --from=builder /home/kubestellar/easy-rsa		easy-rsa/
-COPY --from=builder /root/go/bin			/usr/local/bin/
-COPY --from=builder /usr/local/bin/kubectl		/usr/local/bin/kubectl
-COPY --from=builder /home/kubestellar/kcp/bin        	kcp/bin/
-COPY --from=builder /home/kubestellar/kcp-plugins/bin	kcp/bin/
-COPY --from=builder /home/kubestellar/bin	      	bin/
-COPY --from=builder /home/kubestellar/config	      	config/
+COPY --from=builder /home/kubestellar/easy-rsa        easy-rsa/
+COPY --from=builder /root/go/bin                      /usr/local/bin/
+COPY --from=builder /usr/local/bin/kubectl            /usr/local/bin/kubectl
+COPY --from=builder /home/kubestellar/kcp/bin         kcp/bin/
+COPY --from=builder /home/kubestellar/kcp-plugins/bin kcp/bin/
+COPY --from=builder /home/kubestellar/bin             bin/
+COPY --from=builder /home/kubestellar/config          config/
 
 # add entry script
 ADD core-container/entry.sh entry.sh
