@@ -6,6 +6,7 @@ FROM redhat/ubi9 AS builder
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETPLATFORM
+ARG GIT_DIRTY=dirty
 
 RUN groupadd kubestellar && useradd -g kubestellar kubestellar
 
@@ -52,7 +53,7 @@ ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 # Avoid self-reference
 RUN rm scripts/kubectl-kubestellar-deploy
 
-RUN make build
+RUN make build GIT_DIRTY=$GIT_DIRTY
 
 FROM redhat/ubi9
 
