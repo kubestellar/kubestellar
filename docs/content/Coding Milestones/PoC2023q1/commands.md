@@ -386,31 +386,13 @@ on the command line.
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
 
-### Fetch a log from a central process
+### Fetch a log from a KubeStellar runtime container
 
-The `kubectl kubestellar get-log` command will fetch the log from one
-of the central process of kcp or KubeStellar.  This command requires
-one positional argument, identifying the process.  The accepted
-identifiers are as follows.
-
-- `kcp`
-- `mailbox-controller`
-- `where-resolver`
-- `placement-translator`
-
-This command accepts some optional flags, which may appear before
-and/or after the positional argument.  The optional flags are as
-follows.
-
-- `-h`: print a brief usage message and exit successfully.
-- `-n $lines`: the log is extracted with the Linux `tail` command, and
-  this optional flag will be passed along to `tail` if given; the
-  usual syntax and semantics of the `-n` flag for `tail` apply.  If
-  not given then `tail` will be told `-n +0` to fetch the whole log.
-- `-f`: tells `tail` to "follow".
-- a `kubectl` command line flag, for accessing the hosting cluster.
-  This includes the usual control over namespace.
-- `-X`: for debugging, `set -x` in the script that implements this command.
+{%
+   include-markdown "../../../../core-helm-chart/README.md"
+   start="<!--check-log-start-->"
+   end="<!--check-log-end-->"
+%}
 
 ### Remove deployment to a Kubernetes cluster
 
