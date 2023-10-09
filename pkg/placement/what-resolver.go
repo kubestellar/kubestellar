@@ -693,6 +693,7 @@ func mkgr(group, resource string) schema.GroupResource {
 var GRsForciblyDenatured = NewMapSet(
 	mkgr("admissionregistration.k8s.io", "mutatingwebhookconfigurations"),
 	mkgr("admissionregistration.k8s.io", "validatingwebhookconfigurations"),
+	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("flowcontrol.apiserver.k8s.io", "flowschemas"),
 	mkgr("flowcontrol.apiserver.k8s.io", "prioritylevelconfigurations"),
 	mkgr("rbac.authorization.k8s.io", "clusterroles"),
@@ -714,7 +715,6 @@ var NaturedInCenterGoToMailbox = NewMapSet(
 )
 
 var GRsNotSupported = NewMapSet(
-	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
 	mkgr("apis.kcp.io", "apiconversions"),

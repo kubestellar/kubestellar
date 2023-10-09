@@ -232,6 +232,7 @@ the normal kcp behavior.
 | ---------- | ---- | ---------- |
 | admissionregistration.k8s.io/v1 | MutatingWebhookConfiguration | false |
 | admissionregistration.k8s.io/v1 | ValidatingWebhookConfiguration | false |
+| apiregistration.k8s.io/v1 | APIService | false |
 | flowcontrol.apiserver.k8s.io/v1beta2 | FlowSchema | false |
 | flowcontrol.apiserver.k8s.io/v1beta2 | PriorityLevelConfiguration | false |
 | rbac.authorization.k8s.io/v1 | ClusterRole | false |
@@ -241,6 +242,23 @@ the normal kcp behavior.
 | v1 | LimitRange | true |
 | v1 | ResourceQuota | true |
 | v1 | ServiceAccount | true |
+
+The APIService objects are of two sorts: (a) those that are built-in
+and describe object types built into the apiserver and (b) those that
+are added by admins to add API groups served by custom external
+servers.  Sort (b) is not supported because this PoC does not support
+custom external servers in the edge clusters.  Sort (a) is not
+programmable in this PoC, but it might be inspectable.
+
+**NOTE**: The denaturing described here is not implemented yet.  The
+kinds of objects listed above can be put into a workload management
+workspace and it will given them its usual interpretation. For ones
+that add authorizations, this will indeed _add_ authorizations but not
+otherwise break something. The kcp server does not implement
+`FlowSchema` nor `PriorityLevelConfiguration`; those will indeed be
+uninterpreted. For objects that configure calls to other servers,
+these will fail unless the user arranges for them to work when made in
+the center as well in the edge clusters.
 
 #### Needs to be natured in center and edge
 
@@ -283,17 +301,9 @@ computing platform.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
-| apiregistration.k8s.io/v1 | APIService | false |
 | apiresource.kcp.io/v1alpha1 | APIResourceImport | false |
 | apiresource.kcp.io/v1alpha1 | NegotiatedAPIResource | false |
 | apis.kcp.io/v1alpha1 | APIConversion | false |
-
-The APIService objects are of two sorts: (a) those that are built-in
-and describe object types built into the apiserver and (b) those that
-are added by admins to add API groups served by custom external
-servers.  Sort (b) is not supported because this PoC does not support
-custom external servers in the edge clusters.  Sort (a) is not
-programmable in this PoC, but it might be inspectable.
 
 #### Not destined for edge
 
@@ -318,7 +328,7 @@ their workload desired and reported state.
 | core.kcp.io/v1alpha1 | LogicalCluster | false |
 | core.kcp.io/v1alpha1 | Shard | false |
 | events.k8s.io/v1 | Event | true |
-|~~ scheduling.kcp.io/v1alpha1 | Location | false ~~|
+| ~~scheduling.kcp.io/v1alpha1~~ | ~~Location~~ | ~~false ~~ |
 | scheduling.kcp.io/v1alpha1 | Placement | false |
 | tenancy.kcp.io/v1alpha1 | ClusterWorkspace | false |
 | tenancy.kcp.io/v1alpha1 | Workspace | false |
@@ -329,7 +339,7 @@ their workload desired and reported state.
 | v1 | ComponentStatus | false |
 | v1 | Event | true |
 | v1 | Node | false |
-| ~~workload.kcp.io/v1alpha1 | SyncTarget | false~~ |
+| ~~workload.kcp.io/v1alpha1~~ | ~~SyncTarget~~ | ~~false~~ |
 
 #### Already denatured in center, want natured in edge
 

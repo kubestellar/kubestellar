@@ -1,0 +1,9 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: apiregistration.k8s.io
+spec:
+  latestResourceSchemas:
+  - v231009-f17ee17a4.apiservices.apiregistration.k8s.io
+status: {}

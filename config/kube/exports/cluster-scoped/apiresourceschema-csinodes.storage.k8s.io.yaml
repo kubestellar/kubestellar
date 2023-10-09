@@ -3,6 +3,8 @@ kind: APIResourceSchema
 metadata:
   creationTimestamp: null
   name: v230615-d48020c8.csinodes.storage.k8s.io
+  annotations:
+    api-approved.kubernetes.io: https://github.com/kubernetes/enhancements/pull/1111
 spec:
   group: storage.k8s.io
   names:

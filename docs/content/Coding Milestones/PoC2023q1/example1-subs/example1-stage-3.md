@@ -89,88 +89,22 @@ metadata:
   resourceVersion: "1323"
   uid: 8840fee6-37dc-407e-ad01-2ad59389d4ff
 spec:
-  namespaceScope:
-    namespaces:
-    - commonstuff
-    resources:
-    - apiVersion: v1
-      group: ""
-      resource: secrets
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: batch
-      resource: jobs
-    - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: apps
-      resource: daemonsets
-    - apiVersion: v1
-      group: storage.k8s.io
-      resource: csistoragecapacities
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: ""
-      resource: pods
-    - apiVersion: v1
-      group: ""
-      resource: resourcequotas
-    - apiVersion: v1
-      group: discovery.k8s.io
-      resource: endpointslices
-    - apiVersion: v1
-      group: ""
-      resource: replicationcontrollers
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: ""
-      resource: persistentvolumeclaims
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
-    - apiVersion: v1
-      group: policy
-      resource: poddisruptionbudgets
-    - apiVersion: v1
-      group: apps
-      resource: statefulsets
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: networkpolicies
-    - apiVersion: v1
-      group: batch
-      resource: cronjobs
-    - apiVersion: v1
-      group: ""
-      resource: endpoints
-    - apiVersion: v2
-      group: autoscaling
-      resource: horizontalpodautoscalers
-    - apiVersion: v1
-      group: apps
-      resource: replicasets
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: podtemplates
+  namespaceScope: {}
+  namespacedObjects:
+  - apiVersion: v1
+    group: ""
+    objectsByNamespace:
+    - names:
+      - httpd-htdocs
+      namespace: commonstuff
+    resource: configmaps
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - commond
+      namespace: commonstuff
+    resource: replicasets
   upsync:
   - apiGroup: group1.test
     names:
@@ -241,89 +175,39 @@ metadata:
   resourceVersion: "1325"
   uid: 3da056c7-0d5c-45a3-9d91-d04f04415f30
 spec:
-  namespaceScope:
-    namespaces:
-    - commonstuff
-    - specialstuff
-    resources:
-    - apiVersion: v1
-      group: apps
-      resource: replicasets
-    - apiVersion: v1
-      group: storage.k8s.io
-      resource: csistoragecapacities
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: networkpolicies
-    - apiVersion: v1
-      group: apps
-      resource: daemonsets
-    - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: ""
-      resource: replicationcontrollers
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v2
-      group: autoscaling
-      resource: horizontalpodautoscalers
-    - apiVersion: v1
-      group: policy
-      resource: poddisruptionbudgets
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
-    - apiVersion: v1
-      group: batch
-      resource: jobs
-    - apiVersion: v1
-      group: batch
-      resource: cronjobs
-    - apiVersion: v1
-      group: ""
-      resource: persistentvolumeclaims
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: apps
-      resource: statefulsets
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: podtemplates
-    - apiVersion: v1
-      group: ""
-      resource: resourcequotas
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
-    - apiVersion: v1
-      group: ""
-      resource: endpoints
-    - apiVersion: v1
-      group: discovery.k8s.io
-      resource: endpointslices
-    - apiVersion: v1
-      group: ""
-      resource: secrets
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: ""
-      resource: pods
+  clusterScope:
+  - apiVersion: v1
+    group: apiregistration.k8s.io
+    objects:
+    - v1090.example.my
+    resource: apiservices
+  namespaceScope: {}
+  namespacedObjects:
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - commond
+      namespace: commonstuff
+    resource: replicasets
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - speciald
+      namespace: specialstuff
+    resource: deployments
+  - apiVersion: v1
+    group: ""
+    objectsByNamespace:
+    - names:
+      - httpd-htdocs
+      namespace: commonstuff
+    - names:
+      - httpd-htdocs
+      - kube-root-ca.crt
+      namespace: specialstuff
+    resource: configmaps
   upsync:
   - apiGroup: group3.test
     names:

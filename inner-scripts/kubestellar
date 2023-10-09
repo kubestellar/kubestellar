@@ -178,6 +178,14 @@ function ensure_root_compute_configd() {
       for refn in apiexport-*.yaml; do
 	  eval kubectl apply -f "$refn" $verbdir
       done
+      cd ${SCRIPT_DIR}/../config/kube/exports/cluster-scoped
+      # Some are too big to `kubectl apply`
+      for rsfn in apiresourceschema-*.yaml; do
+	  create_or_replace $rsfn
+      done
+      for refn in apiexport-*.yaml; do
+	  eval kubectl apply -f "$refn" $verbdir
+      done
     )
     eval kubectl apply -f - $verbdir <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
