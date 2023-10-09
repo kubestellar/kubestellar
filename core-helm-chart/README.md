@@ -49,7 +49,7 @@ echo "Ready!"
 ```
 
 ## Check **KubeStellar** logs
-
+<!--check-log-start-->
 The logs of each runtime container in the **KubeStellar** application pods can be access this way:
 
 ```shell
@@ -59,7 +59,7 @@ kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0
 kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c where-resolver
 kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c placement-translator
 ```
-
+<!--check-log-end-->
 ## Access **KubeStellar** after deployment
 
 The `kubestellar` deployment, holds its access kubeconfigs in a `kubestellar` secret.
