@@ -35,7 +35,7 @@ rootws="root"
 espw="root:espw"
 stname=""
 output=""
-syncer_image="quay.io/kubestellar/syncer:git-3b0839f44-clean"
+syncer_image="quay.io/kubestellar/syncer:git-ae64d5722-clean"
 kubectl_flags=()
 silent="false"
 

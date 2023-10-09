@@ -123,7 +123,7 @@ func (ds *DownSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conv
 			if !isDeleted {
 				// update
 				ds.logger.V(3).Info(fmt.Sprintf("  update %q in downstream since it's found", resourceToString(resourceForDown)))
-				if hasDownsyncAnnotation(downstreamResource) {
+				if true || hasDownsyncAnnotation(downstreamResource) {
 					upstreamResource.SetResourceVersion(downstreamResource.GetResourceVersion())
 					upstreamResource.SetUID(downstreamResource.GetUID())
 					setDownsyncAnnotation(upstreamResource)
