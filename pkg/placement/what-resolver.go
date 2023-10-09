@@ -617,6 +617,9 @@ func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, s
 // The first returned bool indicates whether there is a match.
 // The second indicates whether an accurate answer was found.
 func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, whatResource string, whatObj mrObject) (bool, bool) {
+	if ObjectIsSystem(whatObj) {
+		return false, true
+	}
 	gvk := whatObj.GetObjectKind().GroupVersionKind()
 	objNS := whatObj.GetNamespace()
 	objName := whatObj.GetName()

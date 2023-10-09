@@ -1452,7 +1452,7 @@ func (wps *wpPerSource) enqueueSourceObject(gr metav1.GroupResource, namespaced 
 	if namespaced {
 		namespace = objm.GetNamespace()
 	}
-	if ObjectIsSystem(objm) {
+	if false /* filtering now done in what resolver */ && ObjectIsSystem(objm) {
 		wps.logger.V(4).Info("Ignoring system object", "groupResource", gr, "namespace", namespace, "name", objm.GetName(), "action", action)
 		return
 	}
@@ -1473,7 +1473,7 @@ func (wpd *wpPerDestination) enqueueDestinationObject(gr metav1.GroupResource, n
 	if namespaced {
 		namespace = objm.GetNamespace()
 	}
-	if ObjectIsSystem(objm) {
+	if false /* filtering now done in what resolver */ && ObjectIsSystem(objm) {
 		wpd.logger.V(4).Info("Ignoring system object", "groupResource", gr, "namespace", namespace, "name", objm.GetName(), "action", action)
 		return
 	}
