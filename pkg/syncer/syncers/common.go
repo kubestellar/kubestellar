@@ -186,12 +186,12 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 			// Actually, when Syncer donwsynces, Syncer doesn't call UpdateStatus() method. Status fields at downstream side aren't updated by downsyncing.
 			setStatusFieldToDestinationStatus(logger, &srcResource, destResource)
 
-			if hasAnnotation(destResource) {
-				setAnnotation(&srcResource)
-				updatedResources = append(updatedResources, srcResource)
-			} else {
-				logger.V(2).Info(fmt.Sprintf("  ignore adding %s to updatedResources since annotation is not set.", destResource.GetName()))
-			}
+			// if hasAnnotation(destResource) {
+			setAnnotation(&srcResource)
+			updatedResources = append(updatedResources, srcResource)
+			// } else {
+			// logger.V(2).Info(fmt.Sprintf("  ignore adding %s to updatedResources since annotation is not set.", destResource.GetName()))
+			// }
 		} else {
 			srcResource.SetResourceVersion("")
 			srcResource.SetUID("")
