@@ -249,7 +249,7 @@ func (ds *DownSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, con
 	logger.V(3).Info("  compute diff between upstream and downstream")
 	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList, setDownsyncAnnotation, hasDownsyncAnnotation)
 
-	logger.V(3).Info("  apply filter such as auto-downsync condition to updatedResources and deletedResources")
+	logger.V(3).Info("  apply filter such as downsync-overwrite condition to updatedResources and deletedResources")
 	updatedResources = ds.computeUpdatedResources(downstreamResourceList, updatedResources)
 	deletedResources = ds.computeDeletedResources(downstreamResourceList, deletedResources)
 
@@ -292,16 +292,16 @@ func (ds *DownSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, con
 //   - updatedResource is the computed resource object to be pushed
 //   - noDiff is true if the computed updatedResource is no difference from the downstream resource.
 func (ds *DownSyncer) computeUpdatedResource(upstreamResource *unstructured.Unstructured, downstreamResource *unstructured.Unstructured) (updatedResource *unstructured.Unstructured, noDiff bool) {
-	if !isAutoDownsync(upstreamResource) {
-		ds.logger.V(2).Info(fmt.Sprintf("  auto-downsync of %q is marked as false", upstreamResource.GetName()))
+	if !isDownsyncOverwrite(upstreamResource) {
+		ds.logger.V(2).Info(fmt.Sprintf("  downsync-overwrite of %q is marked as false", upstreamResource.GetName()))
 		annotations := downstreamResource.GetAnnotations()
-		value, ok := annotations[autoDownsyncKey]
+		value, ok := annotations[downsyncOverwriteKey]
 		if ok && value == "false" {
 			ds.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in downstream", upstreamResource.GetName()))
 			return downstreamResource, true
 		} else {
-			ds.logger.V(2).Info(fmt.Sprintf("  update only annnotation %q in downstream since auto-downsync in downstream is still marked as true", upstreamResource.GetName()))
-			annotations[autoDownsyncKey] = "false"
+			ds.logger.V(2).Info(fmt.Sprintf("  update only annnotation %q in downstream since downsync-overwrite in downstream is still marked as true", upstreamResource.GetName()))
+			annotations[downsyncOverwriteKey] = "false"
 			_updatedResource := *downstreamResource
 			_updatedResource.SetAnnotations(annotations)
 			return &_updatedResource, false
@@ -311,10 +311,10 @@ func (ds *DownSyncer) computeUpdatedResource(upstreamResource *unstructured.Unst
 }
 
 func (ds *DownSyncer) checkDeletable(downstreamResource *unstructured.Unstructured) bool {
-	if isAutoDownsync(downstreamResource) {
+	if isDownsyncOverwrite(downstreamResource) {
 		return true
 	} else {
-		ds.logger.V(2).Info(fmt.Sprintf("  auto-downsync of %q is marked as false", downstreamResource.GetName()))
+		ds.logger.V(2).Info(fmt.Sprintf("  downsync-overwrite of %q is marked as false", downstreamResource.GetName()))
 		ds.logger.V(2).Info(fmt.Sprintf("  ignore deleting %q from downstream", downstreamResource.GetName()))
 		return false
 	}
@@ -441,9 +441,9 @@ func makeOwnedValue(object *unstructured.Unstructured) string {
 
 // Control parameter in annotation whether Syncer downsyns once or constantly.
 // Default (not given or brank) is to keep downsync as we do today.
-const autoDownsyncKey = "edge.kubestellar.io/auto-downsync"
+const downsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
 
-func isAutoDownsync(resource *unstructured.Unstructured) bool {
-	value := getAnnotation(resource, autoDownsyncKey)
+func isDownsyncOverwrite(resource *unstructured.Unstructured) bool {
+	value := getAnnotation(resource, downsyncOverwriteKey)
 	return value == "" || value == "true"
 }

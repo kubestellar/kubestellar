@@ -11,7 +11,7 @@ spec:
     - namespace: test
       names:
       - cm
-      - cm-not-autodownsync
+      - cm-not-downsync-overwrite
     - namespace: test2
       names:
       - "*"

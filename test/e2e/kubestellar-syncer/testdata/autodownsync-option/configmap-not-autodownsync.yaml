@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cm-not-autodownsync
-  annotations:
-    edge.kubestellar.io/auto-downsync: "false"
-data:
-  field1: value1
