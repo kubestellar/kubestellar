@@ -12,7 +12,7 @@ Table of contents:
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
-[Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingress with SSL passthrough.](../yaml/README.md)
+[Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingress with SSL passthrough.](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster)
 
 Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port, matching **Kind** ingress port above:
 
