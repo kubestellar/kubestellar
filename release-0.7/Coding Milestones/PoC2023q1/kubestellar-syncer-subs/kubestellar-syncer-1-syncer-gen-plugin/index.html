@@ -1625,7 +1625,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.7/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1634,7 +1634,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.7/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -1716,23 +1716,26 @@ a. downstream_namespace where Syncer Pod runs
 </code></pre></div>
 b. Syncer image
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
+</code></pre></div>
+c. Logical cluster name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">cluster_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>logicalclusters.core.kcp.io<span class="w"> </span>cluster<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.annotations.kcp\.io\/cluster&quot;</span><span class="w"> </span>--no-headers<span class="sb">`</span>
 </code></pre></div></p>
 <p>Download manifest template.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span><span class="nv">cluster_name</span><span class="o">=</span><span class="nv">$cluster_name</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>---
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>apiVersion: v1
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>kind: Namespace
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>metadata:
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>---
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>apiVersion: v1
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>kind: ServiceAccount
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>metadata:
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>---
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>apiVersion: v1
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>kind: Namespace
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>metadata:
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>---
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>apiVersion: v1
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>kind: ServiceAccount
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>metadata:
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>...
 </code></pre></div></p>
 <!--kubestellar-syncer-1-syncer-gen-plugin-end-->
 

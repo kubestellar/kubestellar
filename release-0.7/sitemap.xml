@@ -162,13 +162,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/example1-subs/example1-teardown/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/example1-subs/example1-teardown/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin/</loc>
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
@@ -446,6 +439,13 @@
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-a-kind-clusters-guilder/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Getting-Started/quickstart-subs/quickstart-2-apache-example-deployment-b-create-imw-and-wmw/"/>
          
     </url>
     <url>

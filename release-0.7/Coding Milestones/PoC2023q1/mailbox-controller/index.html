@@ -86,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-skip">
+        <a href="#linking-synctarget-with-mailbox-workspace" class="md-skip">
           Skip to content
         </a>
       
@@ -1013,221 +1013,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-if-youre-using-a-vpn-turn-it-off" class="md-nav__link">
-    1. If you're using a VPN, turn it off
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-ubuntu-into-wsl" class="md-nav__link">
-    2. Install Ubuntu into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" class="md-nav__link">
-    2.0 If wsl is not yet installed, open a powershell administrator window and run the following
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-reboot-your-system" class="md-nav__link">
-    2.1 reboot your system
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" class="md-nav__link">
-    2.2 In a Windows command terminal run the following to list all the linux distributions that are available online
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-select-a-linux-distribution-and-install-it-into-wsl" class="md-nav__link">
-    2.3 Select a linux distribution and install it into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" class="md-nav__link">
-    2.4 Enter your new username and password at the prompts, and you will eventually see something like:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" class="md-nav__link">
-    2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-install-pre-requisites-into-your-new-vm" class="md-nav__link">
-    3. Install pre-requisites into your new VM
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-update-and-apply-apt-get-packages" class="md-nav__link">
-    3.1 update and apply apt-get packages
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#32-install-golang" class="md-nav__link">
-    3.2 Install golang
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#33-install-ko-but-dont-do-ko-set-action-step" class="md-nav__link">
-    3.3 Install ko (but don't do ko set action step)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#34-install-gcc" class="md-nav__link">
-    3.4 Install gcc
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" class="md-nav__link">
-    3.5 Install make (if you installed build-essential this may already be installed)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#36-install-jq" class="md-nav__link">
-    3.6 Install jq
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#37-install-kubectl" class="md-nav__link">
-    3.7 install kubectl
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#38-install-helm-required-when-deploying-as-workload" class="md-nav__link">
-    3.8 install helm (required when deploying as workload)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" class="md-nav__link">
-    1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-install-docker" class="md-nav__link">
-    2.0 Install docker
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" class="md-nav__link">
-    2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" class="md-nav__link">
-    2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" class="md-nav__link">
-    2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-add-your-user-to-the-docker-group" class="md-nav__link">
-    2.4 Add your user to the docker group
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" class="md-nav__link">
-    2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" class="md-nav__link">
-    2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" class="md-nav__link">
-    3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-in-your-new-terminal-install-kind" class="md-nav__link">
-    3.1 In your new terminal, install kind
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#linking-synctarget-with-mailbox-workspace" class="md-nav__link">
     Linking SyncTarget with Mailbox Workspace
   </a>
@@ -1949,221 +1734,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-if-youre-using-a-vpn-turn-it-off" class="md-nav__link">
-    1. If you're using a VPN, turn it off
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-ubuntu-into-wsl" class="md-nav__link">
-    2. Install Ubuntu into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" class="md-nav__link">
-    2.0 If wsl is not yet installed, open a powershell administrator window and run the following
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-reboot-your-system" class="md-nav__link">
-    2.1 reboot your system
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" class="md-nav__link">
-    2.2 In a Windows command terminal run the following to list all the linux distributions that are available online
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-select-a-linux-distribution-and-install-it-into-wsl" class="md-nav__link">
-    2.3 Select a linux distribution and install it into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" class="md-nav__link">
-    2.4 Enter your new username and password at the prompts, and you will eventually see something like:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" class="md-nav__link">
-    2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-install-pre-requisites-into-your-new-vm" class="md-nav__link">
-    3. Install pre-requisites into your new VM
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-update-and-apply-apt-get-packages" class="md-nav__link">
-    3.1 update and apply apt-get packages
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#32-install-golang" class="md-nav__link">
-    3.2 Install golang
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#33-install-ko-but-dont-do-ko-set-action-step" class="md-nav__link">
-    3.3 Install ko (but don't do ko set action step)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#34-install-gcc" class="md-nav__link">
-    3.4 Install gcc
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" class="md-nav__link">
-    3.5 Install make (if you installed build-essential this may already be installed)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#36-install-jq" class="md-nav__link">
-    3.6 Install jq
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#37-install-kubectl" class="md-nav__link">
-    3.7 install kubectl
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#38-install-helm-required-when-deploying-as-workload" class="md-nav__link">
-    3.8 install helm (required when deploying as workload)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" class="md-nav__link">
-    1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-install-docker" class="md-nav__link">
-    2.0 Install docker
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" class="md-nav__link">
-    2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" class="md-nav__link">
-    2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" class="md-nav__link">
-    2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-add-your-user-to-the-docker-group" class="md-nav__link">
-    2.4 Add your user to the docker group
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" class="md-nav__link">
-    2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" class="md-nav__link">
-    2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" class="md-nav__link">
-    3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-in-your-new-terminal-install-kind" class="md-nav__link">
-    3.1 In your new terminal, install kind
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#linking-synctarget-with-mailbox-workspace" class="md-nav__link">
     Linking SyncTarget with Mailbox Workspace
   </a>
@@ -2246,7 +1816,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.7/docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -2255,7 +1825,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.7/docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -2264,12 +1834,12 @@
 
   <h1>KubeStellar Mailbox Controller</h1>
 
-<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml"><img alt="docs-ecutable - mailbox-controller" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
+<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml"><img alt="docs-ecutable - mailbox-controller" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-mailbox.yml/badge.svg?branch=release-0.7" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
 
 <div class="admonition tip">
 <p class="admonition-title">Required Packages for running and using KubeStellar:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:7"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><input id="__tabbed_1_7" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">General</label><label for="__tabbed_1_2">Mac</label><label for="__tabbed_1_3">Ubuntu</label><label for="__tabbed_1_4">Debian</label><label for="__tabbed_1_5">Fedora/RHEL/CentOS</label><label for="__tabbed_1_6">Windows</label><label for="__tabbed_1_7">WSL with Ubuntu</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">General</label><label for="__tabbed_1_2">Mac</label><label for="__tabbed_1_3">Ubuntu</label><label for="__tabbed_1_4">Fedora/RHEL/CentOS</label><label for="__tabbed_1_5">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>You will need the following tools to deploy and use KubeStellar. 
@@ -2287,9 +1857,6 @@ Select the tab for your environment for suggested commands to install them</p>
 <li>
 <p><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> (version range expected: 1.23-1.25)</p>
 </li>
-<li>
-<p><a href="https://helm.sh/docs/intro/install/"><strong>helm</strong></a> (required when deploying as workload)</p>
-</li>
 </ul>
 </div>
 <div class="tabbed-block">
@@ -2298,144 +1865,46 @@ Select the tab for your environment for suggested commands to install them</p>
 <div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install yq
 </code></pre></div>
 <div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew install kubectl
-</code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew install helm
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo apt-get install jq
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo apt-get install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo snap install yq
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo apt-get install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
-</code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sudo apt-get install apt-transport-https --yes
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>sudo apt-get update
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>sudo apt-get install helm
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo apt-get install jq
+<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>yum -y install jq
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo apt-get install yq
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># easiest to install with snap
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>snap install yq
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
-</code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg &gt; /dev/null
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>sudo apt-get install apt-transport-https --yes
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>sudo apt-get update
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>sudo apt-get install helm
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># For AMD64 / x86_64
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a># for ARM64 / aarch64
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>yum -y install jq
+<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
 </code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a># easiest to install with snap
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>snap install yq
+<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>choco install curl -y
 </code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a># For AMD64 / x86_64
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a># for ARM64 / aarch64
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl&quot; &amp;&amp; chmod +x kubectl &amp;&amp; mv ./kubectl /usr/local/bin/kubectl
+<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>choco install jq -y
 </code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>dnf install helm
+<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>choco install yq -y
+</code></pre></div>
+<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;
 </code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<p><div class="highlight"><span class="filename">Chocolatey - https://chocolatey.org/install#individual</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://community.chocolatey.org/install.ps1&#39;))
-</code></pre></div>
-<div class="highlight"><span class="filename">curl</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>choco install curl -y
-</code></pre></div>
-<div class="highlight"><span class="filename">jq - https://stedolan.github.io/jq/download/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>choco install jq -y
-</code></pre></div>
-<div class="highlight"><span class="filename">yq - https://github.com/mikefarah/yq#install</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>choco install yq -y
-</code></pre></div>
-<div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>curl.exe -LO &quot;https://dl.k8s.io/release/v1.27.2/bin/windows/amd64/kubectl.exe&quot;    
-</code></pre></div>
-<div class="highlight"><span class="filename">helm (required when deploying as workload) - https://helm.sh/docs/intro/install/</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>choco install kubernetes-helm
-</code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<h3 id="how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution">How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution<a class="headerlink" href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" title="Permanent link">#</a></h3>
-<p>(Tested on a Intel(R) Core(TM) i7-9850H CPU @ 2.60GHz 2.59 GHz with 32GB RAM, a 64-bit operating system, x64-based processor
-Using Windows 11 Enterprise)</p>
-<h6 id="1-if-youre-using-a-vpn-turn-it-off">1. If you're using a VPN, turn it off<a class="headerlink" href="#1-if-youre-using-a-vpn-turn-it-off" title="Permanent link">#</a></h6>
-<h6 id="2-install-ubuntu-into-wsl">2. Install Ubuntu into WSL<a class="headerlink" href="#2-install-ubuntu-into-wsl" title="Permanent link">#</a></h6>
-<h6 id="20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following">2.0 If wsl is not yet installed, open a powershell administrator window and run the following<a class="headerlink" href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>wsl --install
-</code></pre></div>
-<h6 id="21-reboot-your-system">2.1 reboot your system<a class="headerlink" href="#21-reboot-your-system" title="Permanent link">#</a></h6>
-<h6 id="22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online">2.2 In a Windows command terminal run the following to list all the linux distributions that are available online<a class="headerlink" href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>wsl -l -o
-</code></pre></div>
-<h6 id="23-select-a-linux-distribution-and-install-it-into-wsl">2.3 Select a linux distribution and install it into WSL<a class="headerlink" href="#23-select-a-linux-distribution-and-install-it-into-wsl" title="Permanent link">#</a></h6>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>wsl --install -d Ubuntu 22.04.01
-</code></pre></div>
-You will see something like:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Installing, this may take a few minutes...
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>Please create a default UNIX user account. The username does not need to match your Windows username.
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>For more information visit: https://aka.ms/wslusers
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>Enter new UNIX username:
-</code></pre></div></p>
-<h6 id="24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like">2.4 Enter your new username and password at the prompts, and you will eventually see something like:<a class="headerlink" href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
-</code></pre></div>
-<h6 id="25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box">2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.<a class="headerlink" href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" title="Permanent link">#</a></h6>
-<p>Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.
-Start a VM using your distribution by clicking on the App.</p>
-<h6 id="3-install-pre-requisites-into-your-new-vm">3. Install pre-requisites into your new VM<a class="headerlink" href="#3-install-pre-requisites-into-your-new-vm" title="Permanent link">#</a></h6>
-<h6 id="31-update-and-apply-apt-get-packages">3.1 update and apply apt-get packages<a class="headerlink" href="#31-update-and-apply-apt-get-packages" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>sudo apt-get update
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>sudo apt-get upgrade
-</code></pre></div>
-<h6 id="32-install-golang">3.2 Install golang<a class="headerlink" href="#32-install-golang" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>echo export GOROOT=/usr/local/go | sudo tee -a /etc/profile
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>echo export PATH=&quot;$PATH:/usr/local/go/bin&quot; | sudo tee -a /etc/profile
-<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>source /etc/profile
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>go version
-</code></pre></div>
-<h6 id="33-install-ko-but-dont-do-ko-set-action-step">3.3 Install ko (but don't do ko set action step)<a class="headerlink" href="#33-install-ko-but-dont-do-ko-set-action-step" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>go install github.com/google/ko@latest
-</code></pre></div>
-<h6 id="34-install-gcc">3.4 Install gcc<a class="headerlink" href="#34-install-gcc" title="Permanent link">#</a></h6>
-<p>Either run this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sudo apt install build-essential
-</code></pre></div>
-or this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sudo apt-get update
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>apt install gcc
-<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>gcc --version
-</code></pre></div></p>
-<h6 id="35-install-make-if-you-installed-build-essential-this-may-already-be-installed">3.5 Install make (if you installed build-essential this may already be installed)<a class="headerlink" href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>apt install make
-</code></pre></div>
-<h6 id="36-install-jq">3.6 Install jq<a class="headerlink" href="#36-install-jq" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>jq --version
-</code></pre></div>
-<h6 id="37-install-kubectl">3.7 install kubectl<a class="headerlink" href="#37-install-kubectl" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
-<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
-<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>echo &quot;$(cat kubectl.sha256)  kubectl&quot; | sha256sum --check
-<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-</code></pre></div>
-<h6 id="38-install-helm-required-when-deploying-as-workload">3.8 install helm (required when deploying as workload)<a class="headerlink" href="#38-install-helm-required-when-deploying-as-workload" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>chmod 700 get_helm.sh
-<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>./get_helm.sh
-</code></pre></div>
 </div>
 </div>
 </div>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Required Packages for the example usage:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:7"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><input id="__tabbed_2_6" name="__tabbed_2" type="radio" /><input id="__tabbed_2_7" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">General</label><label for="__tabbed_2_2">Mac</label><label for="__tabbed_2_3">Ubuntu</label><label for="__tabbed_2_4">Debian</label><label for="__tabbed_2_5">Fedora/RHEL/CentOS</label><label for="__tabbed_2_6">Windows</label><label for="__tabbed_2_7">WSL with Ubuntu</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:5"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">General</label><label for="__tabbed_2_2">Mac</label><label for="__tabbed_2_3">Ubuntu</label><label for="__tabbed_2_4">Fedora/RHEL/CentOS</label><label for="__tabbed_2_5">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>You will need the following tools for the example usage of KubeStellar in this quickstart example.
@@ -2450,112 +1919,37 @@ Select the tab for your environment for suggested commands to install them</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>brew install docker
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>open -a Docker
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>brew install docker
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>open -a Docker
 </code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>brew install kind
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>brew install kind
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sudo mkdir -p /etc/apt/keyrings
-<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
-<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>sudo apt update
-<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo mkdir -p /etc/apt/keyrings
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>sudo apt update
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>sudo apt-get install -y uidmap
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>dockerd-rootless-setuptool.sh install
-<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>systemctl --user restart docker.service
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a># Add Docker&#39;s official GPG key:
-<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>sudo apt-get update
-<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>sudo apt-get install ca-certificates curl gnupg
-<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>sudo install -m 0755 -d /etc/apt/keyrings
-<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>sudo chmod a+r /etc/apt/keyrings/docker.gpg
-<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a>
-<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a># Add the repository to Apt sources:
-<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a>echo \
-<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a>  &quot;deb [arch=&quot;$(dpkg --print-architecture)&quot; signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a>  &quot;$(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;)&quot; stable&quot; | \
-<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a>  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
-<a id="__codelineno-41-13" name="__codelineno-41-13" href="#__codelineno-41-13"></a>sudo apt-get update
-<a id="__codelineno-41-14" name="__codelineno-41-14" href="#__codelineno-41-14"></a>
-<a id="__codelineno-41-15" name="__codelineno-41-15" href="#__codelineno-41-15"></a># Install packages
-<a id="__codelineno-41-16" name="__codelineno-41-16" href="#__codelineno-41-16"></a>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
 </code></pre></div>
-<div class="highlight"><span class="filename">Enable rootless usage of Docker (requires relogin) - https://docs.docker.com/engine/security/rootless/</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>sudo apt-get install -y dbus-user-session # *** Relogin after this
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>sudo apt-get install -y fuse-overlayfs
-<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>sudo apt-get install -y slirp4netns
-<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>dockerd-rootless-setuptool.sh install
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) &amp;&amp; chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a># For AMD64 / x86_64
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a># For ARM64
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin/kind
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>yum -y install epel-release &amp;&amp; yum -y install docker &amp;&amp; systemctl enable --now docker &amp;&amp; systemctl status docker
+<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>choco install docker -y
 </code></pre></div>
-Enable rootless usage of Docker by following the instructions at <a href="https://docs.docker.com/engine/security/rootless/">https://docs.docker.com/engine/security/rootless/</a>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a># For AMD64 / x86_64
-<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>[ $(uname -m) = x86_64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
-<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a># For ARM64
-<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>[ $(uname -m) = aarch64 ] &amp;&amp; curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-arm64 
-<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a>chmod +x ./kind &amp;&amp; sudo mv ./kind /usr/local/bin/kind
+<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
 </code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<p><div class="highlight"><span class="filename">docker - https://docs.docker.com/engine/install/</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>choco install docker -y
-</code></pre></div>
-<div class="highlight"><span class="filename">kind - https://kind.sigs.k8s.io/docs/user/quick-start/</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
-</code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<h2 id="how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution">How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution<a class="headerlink" href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" title="Permanent link">#</a></h2>
-<h6 id="10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above">1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.<a class="headerlink" href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" title="Permanent link">#</a></h6>
-<h6 id="20-install-docker">2.0 Install docker<a class="headerlink" href="#20-install-docker" title="Permanent link">#</a></h6>
-<p>The installation instructions from docker are not sufficient to get docker working with WSL</p>
-<h6 id="21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu">2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/<a class="headerlink" href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" title="Permanent link">#</a></h6>
-<p>Here some additonal steps you will need to take:</p>
-<h6 id="22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting">2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.<a class="headerlink" href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" title="Permanent link">#</a></h6>
-<p>If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>sudo vi /etc/wsl.conf
-</code></pre></div>
-Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>[boot]
-<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>systemd=true
-</code></pre></div></p>
-<h6 id="23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via">2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via<a class="headerlink" href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" title="Permanent link">#</a></h6>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>sudo vi /etc/sudoers.d/docker
-</code></pre></div>
-Insert
-<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a># Docker daemon specification
-<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>&lt;your user account&gt; ALL=(ALL) NOPASSWD: /usr/bin/dockerd
-</code></pre></div></p>
-<h6 id="24-add-your-user-to-the-docker-group">2.4 Add your user to the docker group<a class="headerlink" href="#24-add-your-user-to-the-docker-group" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>sudo usermod -aG docker $USER
-</code></pre></div>
-<h6 id="25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground">2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):<a class="headerlink" href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo systemctl stop docker
-<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>sudo dockerd &amp;
-</code></pre></div>
-<h6 id="251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655">2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655<a class="headerlink" href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" title="Permanent link">#</a></h6>
-<p>The following commands will fix the issue: 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-<a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>sudo dockerd &amp; 
-</code></pre></div></p>
-<h6 id="3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal">3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal<a class="headerlink" href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" title="Permanent link">#</a></h6>
-<h6 id="31-in-your-new-terminal-install-kind">3.1 In your new terminal, install kind<a class="headerlink" href="#31-in-your-new-terminal-install-kind" title="Permanent link">#</a></h6>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
-<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>sudo install -m 0755 kind /usr/local/bin/kind 
-<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>rm kind 
-<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>kind version
-</code></pre></div>
 </div>
 </div>
 </div>
@@ -2565,14 +1959,14 @@ Insert
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
-<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>cd kubestellar
-<a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md&#39;&quot; docs-ecutable
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>git clone -b release-0.7 https://github.com/kubestellar/kubestellar
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>cd kubestellar
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/mailbox-controller.md&#39;&quot; docs-ecutable
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a># done? remove everything
-<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>make MANIFEST=&quot;docs/content/common-subs/remove-all.md&quot; docs-ecutable
-<a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a>cd ..
-<a id="__codelineno-57-4" name="__codelineno-57-4" href="#__codelineno-57-4"></a>rm -rf kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a># done? remove everything
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>make MANIFEST=&quot;docs/content/common-subs/remove-all.md&quot; docs-ecutable
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>cd ..
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>rm -rf kubestellar
 </code></pre></div>
 </div>
 <!-- END INCLUDE -->
@@ -2602,23 +1996,28 @@ APIExport in those workspaces; this should be a client config that is
 able to read/write in all clusters.  For example, that is in the
 kubeconfig context named <code>base</code> in the kubeconfig created by <code>kcp
 start</code>.  Finally, the controller also needs a kube client config that
-is pointed at the root workspace and is authorized to consume the <code>Workspace</code>
-objects from there.</p>
+is pointed at the edge service provider workspace and is authorized to
+consume the <code>Workspace</code> objects from there.</p>
 <p>The command line flags, beyond the basics, are as follows.</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="w">      </span>--concurrency<span class="w"> </span>int<span class="w">                  </span>number<span class="w"> </span>of<span class="w"> </span>syncs<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span><span class="k">in</span><span class="w"> </span>parallel<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="m">4</span><span class="o">)</span>
-<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="w">      </span>--espw-path<span class="w"> </span>string<span class="w">                 </span>the<span class="w"> </span>pathname<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span><span class="o">)</span>
-<a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a>
-<a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="w">      </span>--mbws-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
-<a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="w">      </span>--mbws-context<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span><span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;base&quot;</span><span class="o">)</span>
-<a id="__codelineno-58-6" name="__codelineno-58-6" href="#__codelineno-58-6"></a><span class="w">      </span>--mbws-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
-<a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="w">      </span>--mbws-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
-<a id="__codelineno-58-8" name="__codelineno-58-8" href="#__codelineno-58-8"></a>
-<a id="__codelineno-58-9" name="__codelineno-58-9" href="#__codelineno-58-9"></a><span class="w">      </span>--server-bind-address<span class="w"> </span>ipport<span class="w">       </span>The<span class="w"> </span>IP<span class="w"> </span>address<span class="w"> </span>with<span class="w"> </span>port<span class="w"> </span>at<span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> </span>/metrics<span class="w"> </span>and<span class="w"> </span>/debug/pprof/<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>:10203<span class="o">)</span>
-<a id="__codelineno-58-10" name="__codelineno-58-10" href="#__codelineno-58-10"></a>
-<a id="__codelineno-58-11" name="__codelineno-58-11" href="#__codelineno-58-11"></a><span class="w">      </span>--root-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>root<span class="w"> </span>workspace
-<a id="__codelineno-58-12" name="__codelineno-58-12" href="#__codelineno-58-12"></a><span class="w">      </span>--root-context<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>root<span class="w"> </span>workspace<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
-<a id="__codelineno-58-13" name="__codelineno-58-13" href="#__codelineno-58-13"></a><span class="w">      </span>--root-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>root<span class="w"> </span>workspace
-<a id="__codelineno-58-14" name="__codelineno-58-14" href="#__codelineno-58-14"></a><span class="w">      </span>--root-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>root<span class="w"> </span>workspace
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="w">      </span>--concurrency<span class="w"> </span>int<span class="w">                  </span>number<span class="w"> </span>of<span class="w"> </span>syncs<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span><span class="k">in</span><span class="w"> </span>parallel<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="m">4</span><span class="o">)</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">      </span>--espw-path<span class="w"> </span>string<span class="w">                 </span>the<span class="w"> </span>pathname<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span><span class="o">)</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">      </span>--inventory-cluster<span class="w"> </span>string<span class="w">         </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">      </span>--inventory-context<span class="w"> </span>string<span class="w">         </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">      </span>--inventory-kubeconfig<span class="w"> </span>string<span class="w">      </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">      </span>--inventory-user<span class="w"> </span>string<span class="w">            </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>APIExport<span class="w"> </span>view<span class="w"> </span>of<span class="w"> </span>SyncTarget<span class="w"> </span>objects
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">      </span>--mbws-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">      </span>--mbws-context<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span><span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;base&quot;</span><span class="o">)</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">      </span>--mbws-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">      </span>--mbws-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>really<span class="w"> </span>all<span class="w"> </span>clusters<span class="o">)</span>
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a>
+<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="w">      </span>--server-bind-address<span class="w"> </span>ipport<span class="w">       </span>The<span class="w"> </span>IP<span class="w"> </span>address<span class="w"> </span>with<span class="w"> </span>port<span class="w"> </span>at<span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> </span>/metrics<span class="w"> </span>and<span class="w"> </span>/debug/pprof/<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>:10203<span class="o">)</span>
+<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a>
+<a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a><span class="w">      </span>--workload-cluster<span class="w"> </span>string<span class="w">          </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-24-17" name="__codelineno-24-17" href="#__codelineno-24-17"></a><span class="w">      </span>--workload-context<span class="w"> </span>string<span class="w">          </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a><span class="w">      </span>--workload-kubeconfig<span class="w"> </span>string<span class="w">       </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
+<a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a><span class="w">      </span>--workload-user<span class="w"> </span>string<span class="w">             </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>edge<span class="w"> </span>service<span class="w"> </span>provider<span class="w"> </span>workspace
 </code></pre></div>
 <h2 id="try-out-the-mailbox-controller">Try out the mailbox controller<a class="headerlink" href="#try-out-the-mailbox-controller" title="Permanent link">#</a></h2>
 <h3 id="pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp">Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp<a class="headerlink" href="#pull-the-kcp-and-kubestellar-source-code-build-the-kubectl-ws-binary-and-start-kcp" title="Permanent link">#</a></h3>
@@ -2626,19 +2025,19 @@ objects from there.</p>
 <!-- BEGIN INCLUDE where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp.md '&lt;!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start--&gt;' '&lt;!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end--&gt;' -->
 
 <p>Clone the v0.11.0 branch kcp source:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
 </code></pre></div>
 Build the kubectl-ws binary and include it in <code>$PATH</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
-<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>make<span class="w"> </span>build
-<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>make<span class="w"> </span>build
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div></p>
 <p>Run kcp (kcp will spit out tons of information and stay running in this terminal window).
 Set your <code>KUBECONFIG</code> environment variable to name the kubernetes client config file that <code>kcp</code> generates.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a><span class="nb">popd</span>
-<a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a>sleep<span class="w"> </span><span class="m">30</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="nb">popd</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>sleep<span class="w"> </span><span class="m">30</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -2646,82 +2045,82 @@ Set your <code>KUBECONFIG</code> environment variable to name the kubernetes cli
 <p>Open another terminal window(2) and point <code>$KUBECONFIG</code> to the admin kubeconfig for the kcp server and include the location of kubectl-ws in <code>$PATH</code>.</p>
 <!-- BEGIN INCLUDE where-resolver-subs/where-resolver-1-build-kubestellar.md '&lt;!--where-resolver-1-build-kubestellar-start--&gt;' '&lt;!--where-resolver-1-build-kubestellar-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>make<span class="w"> </span>build
-<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>make<span class="w"> </span>build
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
 <!-- END INCLUDE -->
 
 <!-- BEGIN INCLUDE where-resolver-subs/where-resolver-2-ws-root-and-ws-create-edge.md '&lt;!--where-resolver-2-ws-root-and-ws-create-edge-start--&gt;' '&lt;!--where-resolver-2-ws-root-and-ws-create-edge-end--&gt;' -->
 
 <p>Next, use the command that makes sure the Edge Service Provider Workspace (ESPW), which is <code>root:espw</code>, and the TMC provider workspace (<code>root:compute</code>) are properly set up.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>kubestellar<span class="w"> </span>init
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubestellar<span class="w"> </span>init
 </code></pre></div>
 <!-- END INCLUDE -->
 
 <p>After that, a run of the controller should look like the following.</p>
 <!-- BEGIN INCLUDE mailbox-controller-subs/mailbox-controller-process-start.md '&lt;!--mailbox-controller-process-start-start--&gt;' '&lt;!--mailbox-controller-process-start-end--&gt;' -->
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>sleep<span class="w"> </span><span class="m">45</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>sleep<span class="w"> </span><span class="m">45</span>
 </code></pre></div>
 <!-- END INCLUDE -->
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046741<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">add_dir_header</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
-<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046954<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">alsologtostderr</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
-<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046960<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">concurrency</span><span class="o">=</span><span class="s2">&quot;4&quot;</span>
-<a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046965<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-context<span class="o">=</span><span class="s2">&quot;root&quot;</span>
-<a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046971<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-6" name="__codelineno-65-6" href="#__codelineno-65-6"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046976<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_backtrace_at</span><span class="o">=</span><span class="s2">&quot;:0&quot;</span>
-<a id="__codelineno-65-7" name="__codelineno-65-7" href="#__codelineno-65-7"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046980<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-8" name="__codelineno-65-8" href="#__codelineno-65-8"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046985<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-9" name="__codelineno-65-9" href="#__codelineno-65-9"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046989<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file_max_size</span><span class="o">=</span><span class="s2">&quot;1800&quot;</span>
-<a id="__codelineno-65-10" name="__codelineno-65-10" href="#__codelineno-65-10"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046993<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">logtostderr</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
-<a id="__codelineno-65-11" name="__codelineno-65-11" href="#__codelineno-65-11"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046997<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">one_output</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
-<a id="__codelineno-65-12" name="__codelineno-65-12" href="#__codelineno-65-12"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047002<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>server-bind-address<span class="o">=</span><span class="s2">&quot;:10203&quot;</span>
-<a id="__codelineno-65-13" name="__codelineno-65-13" href="#__codelineno-65-13"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047006<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
-<a id="__codelineno-65-14" name="__codelineno-65-14" href="#__codelineno-65-14"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047011<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_log_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
-<a id="__codelineno-65-15" name="__codelineno-65-15" href="#__codelineno-65-15"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047015<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">stderrthreshold</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
-<a id="__codelineno-65-16" name="__codelineno-65-16" href="#__codelineno-65-16"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047019<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">v</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
-<a id="__codelineno-65-17" name="__codelineno-65-17" href="#__codelineno-65-17"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047023<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">vmodule</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-18" name="__codelineno-65-18" href="#__codelineno-65-18"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047027<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-context<span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-19" name="__codelineno-65-19" href="#__codelineno-65-19"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047031<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-65-20" name="__codelineno-65-20" href="#__codelineno-65-20"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.070071<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:247<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io&quot;</span>
-<a id="__codelineno-65-21" name="__codelineno-65-21" href="#__codelineno-65-21"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.072088<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
-<a id="__codelineno-65-22" name="__codelineno-65-22" href="#__codelineno-65-22"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172169<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
-<a id="__codelineno-65-23" name="__codelineno-65-23" href="#__codelineno-65-23"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172196<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:210<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Informers synced&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046741<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">add_dir_header</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046954<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">alsologtostderr</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046960<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">concurrency</span><span class="o">=</span><span class="s2">&quot;4&quot;</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046965<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-context<span class="o">=</span><span class="s2">&quot;root&quot;</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046971<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>inventory-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046976<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_backtrace_at</span><span class="o">=</span><span class="s2">&quot;:0&quot;</span>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046980<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046985<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046989<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">log_file_max_size</span><span class="o">=</span><span class="s2">&quot;1800&quot;</span>
+<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046993<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">logtostderr</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.046997<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">one_output</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047002<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>server-bind-address<span class="o">=</span><span class="s2">&quot;:10203&quot;</span>
+<a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047006<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047011<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">skip_log_headers</span><span class="o">=</span><span class="s2">&quot;false&quot;</span>
+<a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047015<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">stderrthreshold</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
+<a id="__codelineno-31-16" name="__codelineno-31-16" href="#__codelineno-31-16"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047019<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">v</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
+<a id="__codelineno-31-17" name="__codelineno-31-17" href="#__codelineno-31-17"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047023<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span><span class="nv">vmodule</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-18" name="__codelineno-31-18" href="#__codelineno-31-18"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047027<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-context<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-19" name="__codelineno-31-19" href="#__codelineno-31-19"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.047031<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:110<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Command line flag&quot;</span><span class="w"> </span>workload-kubeconfig<span class="o">=</span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-31-20" name="__codelineno-31-20" href="#__codelineno-31-20"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.070071<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:247<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;workload.kcp.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/root/workload.kcp.io&quot;</span>
+<a id="__codelineno-31-21" name="__codelineno-31-21" href="#__codelineno-31-21"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.072088<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:282<span class="o">]</span><span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>caches<span class="w"> </span>to<span class="w"> </span>sync<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
+<a id="__codelineno-31-22" name="__codelineno-31-22" href="#__codelineno-31-22"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172169<span class="w">   </span><span class="m">85556</span><span class="w"> </span>shared_informer.go:289<span class="o">]</span><span class="w"> </span>Caches<span class="w"> </span>are<span class="w"> </span>synced<span class="w"> </span><span class="k">for</span><span class="w"> </span>mailbox-controller
+<a id="__codelineno-31-23" name="__codelineno-31-23" href="#__codelineno-31-23"></a>I0305<span class="w"> </span><span class="m">18</span>:06:20.172196<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:210<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Informers synced&quot;</span>
 </code></pre></div>
 <p>In a separate terminal window(3), create an inventory management workspace as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
-<a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a>kubectl<span class="w"> </span>kcp<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>apiexport<span class="w"> </span>root:espw:edge.kubestellar.io
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>imw<span class="w"> </span>--enter
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>kubectl<span class="w"> </span>kcp<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>apiexport<span class="w"> </span>root:espw:edge.kubestellar.io
 </code></pre></div>
 <p>Then in that workspace, run the following command to create a <code>SyncTarget</code> object.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
-<a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
-<a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a><span class="s">kind: SyncTarget</span>
-<a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-67-5" name="__codelineno-67-5" href="#__codelineno-67-5"></a><span class="s">  name: stest1</span>
-<a id="__codelineno-67-6" name="__codelineno-67-6" href="#__codelineno-67-6"></a><span class="s">spec:</span>
-<a id="__codelineno-67-7" name="__codelineno-67-7" href="#__codelineno-67-7"></a><span class="s">  cells:</span>
-<a id="__codelineno-67-8" name="__codelineno-67-8" href="#__codelineno-67-8"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-67-9" name="__codelineno-67-9" href="#__codelineno-67-9"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt;EOF | kubectl apply -f -</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="s">apiVersion: edge.kubestellar.io/v1alpha1</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="s">kind: SyncTarget</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="s">  name: stest1</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="s">spec:</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="s">  cells:</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>That should provoke logging like the following from the mailbox controller.</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>I0305<span class="w"> </span><span class="m">18</span>:07:20.490417<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:369<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created missing workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>I0305<span class="w"> </span><span class="m">18</span>:07:20.490417<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:369<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Created missing workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
 <p>And you can verify that as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
 </code></pre></div>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span>
-<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>workspaces
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>workspaces
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>NAME<span class="w">                                                       </span>TYPE<span class="w">        </span>REGION<span class="w">   </span>PHASE<span class="w">   </span>URL<span class="w">                                                     </span>AGE
-<a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht<span class="w">   </span>22s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>NAME<span class="w">                                                       </span>TYPE<span class="w">        </span>REGION<span class="w">   </span>PHASE<span class="w">   </span>URL<span class="w">                                                     </span>AGE
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368<span class="w">   </span>universal<span class="w">            </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/0ay27fcwuo2sv6ht<span class="w">   </span>22s
 </code></pre></div></p>
 <p>FYI, if you look inside that workspace you will see an <code>APIBinding</code>
 named <code>bind-edge</code> that binds to the <code>APIExport</code> named <code>edge.kubestellar.io</code>
@@ -2730,41 +2129,44 @@ controller needs to know the pathname of that workspace), so that the
 edge API is available in the mailbox workspace.</p>
 <p>Next, <code>kubectl delete</code> that workspace, and watch the mailbox
 controller wait for it to be gone and then re-create it.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="go">I0305 18:08:15.428884   85556 main.go:369] &quot;Created missing workspace&quot; worker=2 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="go">I0305 18:08:15.428884   85556 main.go:369] &quot;Created missing workspace&quot; worker=2 mbwsName=&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
 <p>Finally, go back to your inventory workspace to delete the <code>SyncTarget</code>:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
-<a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>imw
-<a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-<a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
-<a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>synctargets.edge.kubestellar.io<span class="w"> </span>stest1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span><span class="se">\~</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>imw
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>synctargets.edge.kubestellar.io
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>synctargets.edge.kubestellar.io<span class="w"> </span>stest1
 </code></pre></div>
 and watch the mailbox controller react as follows.</p>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>I0305<span class="w"> </span><span class="m">18</span>:08:44.380421<span class="w">   </span><span class="m">85556</span><span class="w"> </span>main.go:352<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Deleted unwanted workspace&quot;</span><span class="w"> </span><span class="nv">worker</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">mbwsName</span><span class="o">=</span><span class="s2">&quot;niqdko2g2pwoadfb-mb-f99e773f-3db2-439e-8054-827c4ac55368&quot;</span>
 </code></pre></div>
 <h2 id="teardown-the-environment">Teardown the environment<a class="headerlink" href="#teardown-the-environment" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-77-3" name="__codelineno-77-3" href="#__codelineno-77-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-77-4" name="__codelineno-77-4" href="#__codelineno-77-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-77-5" name="__codelineno-77-5" href="#__codelineno-77-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-77-6" name="__codelineno-77-6" href="#__codelineno-77-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>my-org
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
