@@ -3027,7 +3027,10 @@ build the kubectl-ws binary and include it in <code>$PATH</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
 <a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>kcp<span class="w"> </span>start<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="nb">popd</span>
-<a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a>sleep<span class="w"> </span><span class="m">30</span><span class="w"> </span>
+<a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a><span class="c1"># wait until KCP is ready checking availability of ws resource</span>
+<a id="__codelineno-64-5" name="__codelineno-64-5" href="#__codelineno-64-5"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-64-6" name="__codelineno-64-6" href="#__codelineno-64-6"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-64-7" name="__codelineno-64-7" href="#__codelineno-64-7"></a><span class="k">done</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -3178,7 +3181,12 @@ Eventually.  In the meantime, you can use the KubeStellar command shown
 here.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
 <a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a>sleep<span class="w"> </span><span class="m">60</span>
+<a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a><span class="c1"># wait until workspaces for both mailboxes show up</span>
+<a id="__codelineno-71-4" name="__codelineno-71-4" href="#__codelineno-71-4"></a>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-71-5" name="__codelineno-71-5" href="#__codelineno-71-5"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-71-6" name="__codelineno-71-6" href="#__codelineno-71-6"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;\-mb\-&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-71-7" name="__codelineno-71-7" href="#__codelineno-71-7"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-71-8" name="__codelineno-71-8" href="#__codelineno-71-8"></a><span class="k">done</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>...
 <a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>I0721<span class="w"> </span><span class="m">17</span>:37:10.186848<span class="w">  </span><span class="m">189094</span><span class="w"> </span>main.go:206<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;e</span>
@@ -3634,7 +3642,16 @@ ESPW and invoke the KubeStellar command that runs the Where Resolver.</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>kubestellar-where-resolver<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a>sleep<span class="w"> </span><span class="m">45</span>
+<a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a><span class="c1"># wait until where-resolver is ready by continuing once SinglePlacementSlice resource is available</span>
+<a id="__codelineno-105-3" name="__codelineno-105-3" href="#__codelineno-105-3"></a>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-105-4" name="__codelineno-105-4" href="#__codelineno-105-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+<a id="__codelineno-105-5" name="__codelineno-105-5" href="#__codelineno-105-5"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-105-6" name="__codelineno-105-6" href="#__codelineno-105-6"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-105-7" name="__codelineno-105-7" href="#__codelineno-105-7"></a><span class="k">done</span>
+<a id="__codelineno-105-8" name="__codelineno-105-8" href="#__codelineno-105-8"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
+<a id="__codelineno-105-9" name="__codelineno-105-9" href="#__codelineno-105-9"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-105-10" name="__codelineno-105-10" href="#__codelineno-105-10"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-105-11" name="__codelineno-105-11" href="#__codelineno-105-11"></a><span class="k">done</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>main.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kubestellar.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io&quot;</span>
 <a id="__codelineno-106-2" name="__codelineno-106-2" href="#__codelineno-106-2"></a>...
