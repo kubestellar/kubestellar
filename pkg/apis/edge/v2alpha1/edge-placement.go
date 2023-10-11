@@ -21,10 +21,18 @@ import (
 )
 
 // EdgePlacement exists in the center and binds (a) a collection of
-// Locations with (b) both (b1) objects in the center to downsync
-// (propagate desired state from center to edge and return reported
-// state from edge toward center), and (b2) a way of identifying objects
+// Locations with (b) both (b1) objects in the center to downsync,
+// and (b2) a way of identifying objects
 // (in edge clusters) to upsync (propagate from edge toward center).
+// For an object subject to downsync, its state is divided into
+// the following four categories.
+//  1. Desired state, which flows from center to edge;
+//  2. Reported state, which flows from edge to center;
+//  3. System-managed state, determined by Kubernetes and beyond the
+//     control of KubeStellar;
+//  4. Immobile state, which also does not propagate but is not determined
+//     by Kubernetes.
+//
 // Both downsyncing and upsyncing are with all of the Locations.  This
 // is not entirely unrelated to a TMC Placement, which directs the
 // selected Namespaces to propagate to _one_ of the selected
@@ -79,9 +87,10 @@ type EdgePlacementSpec struct {
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
 	LocationSelectors []metav1.LabelSelector `json:"locationSelectors,omitempty"`
 
-	// `downsync` selects the objects to bind with the selected Locations for downsync.
+	// `downsync` selects the objects to bind with the selected Locations for downsync,
+	// and helps define which parts are immobile.
 	// An object is selected if it matches at least one member of this list.
-	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
+	Downsync []DownsyncObjectSelector `json:"downsync,omitempty"`
 
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
 	// to be 1 and (b) the reported state of each downsynced object should be returned back to
@@ -109,13 +118,14 @@ type EdgePlacementSpec struct {
 // mailboxwatch library and the aspiration for summarization.
 const ExecutingCountKey string = "kubestellar.io/executing-count"
 
-// DownsyncObjectTest is a set of criteria that characterize matching objects.
+// DownsyncObjectSelector is a set of criteria that characterize matching objects,
+// and information about which part(s) of the matching objects are immobile.
 // An object matches if:
 // - the `apiGroup` criterion is satisfied;
 // - the `resources` criterion is satisfied;
 // - the `namespaceSelectors` criterion is satisfied; and
 // - EITHER the `objectNames` criterion or the `labelSelectors` criterion matches.
-type DownsyncObjectTest struct {
+type DownsyncObjectSelector struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	APIGroup string `json:"apiGroup,omitempty"`
 
@@ -138,7 +148,21 @@ type DownsyncObjectTest struct {
 	// `labelSelectors` allows matching objects by a rule rather than listing individuals.
 	// An object maches if and only if its labels match at least one member of this list.
 	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
+
+	// `immobileParts` identifies parts of the matched objects that are immobile.
+	// That is, they do not propagate to or from WECs.
+	// A part of an object is immobile iff it is listed in any of the DownsyncObjectSelectors
+	// that match that object.
+	ImmobileParts []LiteralPath `json:"immobileParts,omitempty"`
 }
+
+// LiteralPath identifies a part of a JSON data structure, by nested indexing.
+// Indexing object `O` with path `[fieldname, index2, ... indexN]` means
+// indexing `O.fieldname` with path `[index2, ... indexN]`.
+// Indexing array `A` with path `[index1, index2, ... indexN]` means
+// indexing `A[index1]` with path `[index2, ... indexN]`.
+// Indexing value `V` with the empty path means `V`.
+type LiteralPath []string
 
 // UpsyncSet specifies a set of objects,
 // which may be namespaced or cluster-scoped,

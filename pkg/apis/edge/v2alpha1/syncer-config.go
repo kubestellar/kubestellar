@@ -115,6 +115,10 @@ type NamespaceScopeDownsyncObjects struct {
 	// Thus, no object matches the empty list.
 	// +optional
 	ObjectsByNamespace []NamespaceAndNames `json:"objectsByNamespace,omitempty"`
+
+	// `immobileParts` identifies parts of the matched objects that are immobile.
+	// That is, they do not propagate to or from WECs.
+	ImmobileParts []LiteralPath `json:"immobileParts,omitempty"`
 }
 
 // NamespaceAndNames identifies some objects of an implied resource that is namespaced.
