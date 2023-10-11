@@ -230,6 +230,8 @@ not meaningful for the `stop` subcommand.
   `${PWD}/kubestellar-logs`.
 - `--local-kcp $bool`: says whether to expect to find a local process
   named "kcp".  Defaults to "true".
+- `--ensure-imw`: provide a comma separated list of fully qualified inventory workspaces, _e.g._ "root:imw1,root:test:imw2". Defaults to "root:imw1". To prevet the creation of any inventory workspace, then pass "".
+- `--ensure-wmw`: provide a comma separated list of fully qualified workload management workspaces, _e.g._ "root:org:wmw1,root:org:imw2". Defaults to "root:wmw1". To prevet the creation of any workload management workspace, then pass "".
 - `-h` or `--help`: print a brief usage message and terminate.
 
 #### Kubestellar init
