@@ -50,25 +50,6 @@ function echoerr() {
 }
 
 
-function ensure_imw() {
-    while IFS=':' read -ra items; do
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                break
-            fi
-            if ! kubectl ws "$i" &> /dev/null ; then #
-                if ! kubectl ws create "$i" --enter &> /dev/null ; then
-                    echoerr 'unable to create "$i"!'
-                    break
-                fi
-            fi
-        done
-    done <<< "$1"
-    if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
-    	kubectl kcp bind apiexport root:espw:edge.kubestellar.io
-    fi
-}
-
 function ensure_imws() {
     initial_ws=$(kubectl ws . --short)
     while IFS=',' read -ra items; do
@@ -76,37 +57,21 @@ function ensure_imws() {
             if [ "$i" == "" ] ; then
                 continue
             fi
-            echo "Ensuring IMW: $i"
-            ensure_imw "$i"
-            kubectl ws use $initial_ws &> /dev/null # go back to the initial state
-        done
-    done <<< "$1"
-    kubectl ws use $initial_ws &> /dev/null
-}
-
-
-function ensure_wmw() {
-    while IFS=':' read -ra items; do
-        len=${#items[@]}
-        if [[ ${len} -eq 0 ]]; then
-            break # nothing to do
-        fi
-        # separate the last item
-        last_item=${items[$len-1]}
-        unset items[$len-1]
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                break
-            fi
-            if ! kubectl ws "$i" &> /dev/null ; then #
-                if ! kubectl ws create "$i" --enter &> /dev/null ; then
-                    echoerr 'unable to create "$i"!'
+            imw=${i#"root:"}
+            echo "Ensuring IMW: $imw"
+            kubectl ws root &> /dev/null
+            if ! kubectl ws "$imw" &> /dev/null ; then #
+                if ! kubectl ws create "$imw" --enter &> /dev/null ; then
+                    echoerr 'unable to create "$imw"!'
                     break
                 fi
             fi
+            if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
+                kubectl kcp bind apiexport root:espw:edge.kubestellar.io
+            fi
         done
-        ${bindir}/kubectl-kubestellar-ensure-wmw $last_item $xflag --with-kube true &> /dev/null
     done <<< "$1"
+    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
 }
 
 
@@ -117,12 +82,13 @@ function ensure_wmws() {
             if [ "$i" == "" ] ; then
                 continue
             fi
-            echo "Ensuring WMW: $i"
-            ensure_wmw "$i"
-            kubectl ws use $initial_ws &> /dev/null # go back to the initial state
+            wmw=${i#"root:"}
+            echo "Ensuring WMW: $wmw"
+            kubectl ws root &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true &> /dev/null
         done
     done <<< "$1"
-    kubectl ws use $initial_ws &> /dev/null
+    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
 }
 
 
@@ -403,10 +369,9 @@ done
 
 ensure_root_compute_configd
 ensure_espw
-# ensure_imw1
-kubectl ws root &> /dev/null
 ensure_imws $imws
 ensure_wmws $wmws
+kubectl ws root &> /dev/null
 
 if [ $subcommand == init ]; then
     exit 0
