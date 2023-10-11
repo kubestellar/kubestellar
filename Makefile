@@ -423,18 +423,23 @@ endif
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
 kcp/bin/kcp:
-	bash ./bootstrap/install-kcp-with-plugins.sh
+	bash ./bootstrap/bootstrap-kubestellar.sh --deploy false
 
 .PHONY: e2e-test-kubestellar-syncer
 e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 e2e-test-kubestellar-syncer: TEST_ARGS ?= 
-e2e-test-kubestellar-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
+e2e-test-kubestellar-syncer: PATH := $(PWD)/kcp/bin:$(PATH)
 e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
-	export PATH=$(PWD)/kcp/bin:$$PATH && \
+	mkdir -p $(WORK_DIR)/.kcp && \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; echo "kcp is not ready. wait for 1s...";done && \
-	echo 'Starting test(s)' && \
+	echo 'kcp is ready. Wait for Workspace API to be ready' && \
+	export KUBECONFIG=$(WORK_DIR)/.kcp/admin.kubeconfig && \
+	while ! kubectl get workspaces &> /dev/null; do sleep 1; echo "Workspace API is not ready. wait for 1s...";done && \
+	echo 'Workspace API is ready. Setup root:compute workspace by kubestellar init' && \
+	./scripts/kubestellar init && \
+	echo 'Starting test(s). To add TEST_ARGS=-v option to Make command if displaying the detail logs' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
 		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \
 		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites kubestellar-syncer \
