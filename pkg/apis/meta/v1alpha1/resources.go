@@ -57,6 +57,12 @@ type APIResourceSpec struct {
 	// verbs is a list of supported kube verbs (this includes get, list, watch, create,
 	// update, patch, delete, deletecollection, and proxy)
 	Verbs metav1.Verbs `json:"verbs" protobuf:"bytes,4,opt,name=verbs"`
+
+	// SubResources lists the subresources, if any.
+	// In this listing the subresource name does not include the superresource name/.
+	// +listType=map
+	// +listMapKey=Name
+	SubResources []*APIResourceSpec `json:"subResources,omitempty" protobuf:"bytes,10,opt,name=subResources"`
 }
 
 // APIResourceList is the API type for a list of APIResource

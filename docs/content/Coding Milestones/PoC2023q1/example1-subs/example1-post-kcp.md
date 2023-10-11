@@ -65,14 +65,19 @@ kubestellar init
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
 
-First you will need the kcp `kubectl` plugins.  See [the "Start kcp"
-section above](../#start-kcp) for instructions on how to get all of the
-kcp executables.
+(This style of deployment requires release v0.6 or later of KubeStellar.)
 
-Next you will need to get a build of KubeStellar.  See
-[above](../#get-kubestellar) and **NOTE WELL**: as yet there is no
-release of KubeStellar that supports this style of deployment, you
-will have to get the latest code from github and `make build`.
+You need a Kubernetes cluster; see [the documentation for `kubectl kubestellar deploy`](../../commands/#deployment-into-a-kubernetes-cluster) for more information.
+
+You will need a domain name that, on each of your clients, resolves to
+an IP address that gets to the Ingress controller's listening socket.
+
+You will need the kcp `kubectl` plugins.  See [the "Start kcp" section
+above](../#start-kcp) for instructions on how to get all of the kcp
+executables.
+
+You will need to get a build of KubeStellar.  See
+[above](../#get-kubestellar).
 
 To do the deployment and prepare to use it you will be using [the
 commands defined for
@@ -95,19 +100,15 @@ cluster.  But _do_ update your `KUBECONFIG` envar setting or remember
 to pass the new file with `--kubeconfig` on the command lines when
 using kcp or KubeStellar.
 
-
-### Create an inventory management workspace.
-```shell
-kubectl ws root
-kubectl ws create imw-1 
-```
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
-Use the following two commands. They label both florin and guilder
-with `env=prod`, and also label guilder with `extended=si`.
+Use the following two commands to put inventory objects in the IMW at
+`root:imw1` that was automatically created during deployment of
+KubeStellar. They label both florin and guilder with `env=prod`, and
+also label guilder with `extended=si`.
 
 ```shell
-kubectl ws root:imw-1
+kubectl ws root:imw1
 kubectl kubestellar ensure location florin  loc-name=florin  env=prod
 kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
 echo "decribe the florin location object"
@@ -118,7 +119,7 @@ Those two script invocations are equivalent to creating the following
 four objects.
 
 ```yaml
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: florin
@@ -127,7 +128,7 @@ metadata:
     loc-name: florin
     env: prod
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
 metadata:
   name: florin
@@ -135,11 +136,11 @@ metadata:
     loc-name: florin
     env: prod
 spec:
-  resource: {group: edge.kubestellar.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kubestellar.io, version: v2alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {id: florin}
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: guilder
@@ -149,7 +150,7 @@ metadata:
     env: prod
     extended: si
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
 metadata:
   name: guilder
@@ -158,7 +159,7 @@ metadata:
     env: prod
     extended: si
 spec:
-  resource: {group: edge.kubestellar.io, version: v1alpha1, resource: synctargets}
+  resource: {group: edge.kubestellar.io, version: v2alpha1, resource: synctargets}
   instanceSelector:
     matchLabels: {id: guilder}
 ```

@@ -26,17 +26,17 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1typed "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2alpha1typed "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/typed/edge/v2alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/syncer/syncers"
 )
 
 // NewEdgeSyncConfigController returns a edgeSyncConfigController watching a [edge.kubestellar.io.EdgeSyncConfig] and update down/up syncer,
 func NewEdgeSyncConfigController(
 	logger klog.Logger,
-	syncConfigClient edgev1alpha1typed.EdgeSyncConfigInterface,
-	syncConfigInformer edgev1alpha1informers.EdgeSyncConfigInformer,
+	syncConfigClient edgev2alpha1typed.EdgeSyncConfigInterface,
+	syncConfigInformer edgev2alpha1informers.EdgeSyncConfigInformer,
 	syncConfigManager *SyncConfigManager,
 	upSyncer syncers.SyncerInterface,
 	downSyncer syncers.SyncerInterface,
@@ -81,8 +81,8 @@ func NewEdgeSyncConfigController(
 // edgeSyncConfigController is a control loop that watches EdgeSyncConfig.
 type edgeSyncConfigController struct {
 	*controllerBase
-	syncConfigLister  edgev1alpha1listers.EdgeSyncConfigLister
-	syncConfigClient  edgev1alpha1typed.EdgeSyncConfigInterface
+	syncConfigLister  edgev2alpha1listers.EdgeSyncConfigLister
+	syncConfigClient  edgev2alpha1typed.EdgeSyncConfigInterface
 	syncConfigManager *SyncConfigManager
 	upSyncer          syncers.SyncerInterface
 	downSyncer        syncers.SyncerInterface

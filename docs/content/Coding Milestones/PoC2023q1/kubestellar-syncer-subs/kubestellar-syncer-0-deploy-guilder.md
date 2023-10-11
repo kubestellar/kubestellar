@@ -1,7 +1,7 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
-kubectl ws root:imw-1
+kubectl ws root:imw1
 kubectl get SyncTargets
 kubectl get synctargets.edge.kubestellar.io
 kubectl describe synctargets.edge.kubestellar.io guilder
@@ -10,17 +10,17 @@ mbws=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadat
 echo "mailbox workspace name = $mbws"
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
+Current workspace is "root:imw1".
 mailbox workspace name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
 ```
 
 Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-kubectl ws root:espw:$mbws
+kubectl ws root:$mbws
 ./bin/kubectl-kubestellar-syncer_gen guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e".
+Current workspace is "root:vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e".
 Creating service account "kubestellar-syncer-guilder-wfeig2lv"
 Creating cluster role "kubestellar-syncer-guilder-wfeig2lv" to give service account "kubestellar-syncer-guilder-wfeig2lv"
 

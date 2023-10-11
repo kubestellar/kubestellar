@@ -128,6 +128,17 @@ func VisitableGet[Elt any](seq Visitable[Elt], index int) (Elt, bool) {
 	return ans, res != nil
 }
 
+// VisitableMapReduce applies map-reduce to a Visitable
+func VisitableMapReduce[Elt, Intermediate, Accumulator any](input Visitable[Elt], mapFn func(Elt) Intermediate, reduce func(Accumulator, Intermediate) Accumulator) Accumulator {
+	var ans Accumulator
+	input.Visit(func(elt Elt) error {
+		intermediate := mapFn(elt)
+		ans = reduce(ans, intermediate)
+		return nil
+	})
+	return ans
+}
+
 func SetAddAll[Elt any](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allNew bool) {
 	someNew, allNew = false, true
 	adds.Visit(func(add Elt) error {
@@ -139,6 +150,14 @@ func SetAddAll[Elt any](set MutableSet[Elt], adds Visitable[Elt]) (someNew, allN
 		return nil
 	})
 	return
+}
+
+func MutableSetUnion1Elt[Elt any](set MutableSet[Elt], elt Elt) {
+	set.Add(elt)
+}
+
+func MutableSetUnion1Set[Elt any](set MutableSet[Elt], other Set[Elt]) {
+	SetAddAll[Elt](set, other)
 }
 
 func SetRemoveAll[Elt any](set MutableSet[Elt], goners Visitable[Elt]) (someNew, allNew bool) {

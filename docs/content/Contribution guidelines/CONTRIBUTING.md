@@ -82,19 +82,66 @@ central components then you will need to build a new image; perhaps
 surprisingly, this is not included in `make build`.  The regular way
 to build this image is with the following command.  It builds a
 multi-platform image, for all the platforms that KubeStellar can run
-its central components on, and pushes it to quay.io.
+its central components on, and pushes it to quay.io.  Read the remarks
+below before trying this.
 
 ```bash
 make kubestellar-image
 ```
 
-However, that will only succeed if you have done `docker login` to
-quay.io with credentials authorized to write to the
-`kubestellar/kubestellar` repository.  Look on quay.io to find the
-image you just pushed, you will need its tag.
+The set of target platforms can be specified by setting the
+`CORE_PLATFORMS` variable. The following command is equivalent to the
+default behavior.
+
+```bash
+make kubestellar-image CORE_PLATFORMS=linux/amd64,linux/arm64,linux/ppc64le
+```
+
+**NOTE VERY SHARP AND BURIED EDGE**: IF the target platforms include
+  `linux/amd64` --- either because you explicitly set that or you let
+  the default setting apply --- then you MUST issue this command on a
+  machine (real or virtual) with the x86-64-v2
+  instructions. "x86-64-v2" is a shorthand for a bundle of instruction
+  set features that have been appearing in x86 chips for many years
+  now (any real machine that you are likely to use today has them) but
+  still do not all appear by default in some common emulators. See
+  [QEMU configuration
+  recommendations](https://www.qemu.org/docs/master/system/i386/cpu.html),
+  for example. If the machine lacks the v2 instructions then the build
+  will fail when it tries to use the glibc in the redhat/ubi9
+  image. Cross-platform building when the builder is NOT x86 and the
+  target IS x86 is beyond the ken of modern technology (see
+  [here](https://github.com/docker/buildx/issues/2028) and
+  [here](https://github.com/multiarch/qemu-user-static#supported-host-architectures)). If
+  you somehow succeed to build for the target platform
+  `linux/amd64/v2` and successfully test on real x86 hardware you
+  still are not done: when you try to use this image in OpenShift on
+  x86 you may get inexplicable failures to pull the image.
+
+The command shown above will only succeed if you have done `docker
+login` to quay.io with credentials authorized to write to the
+`kubestellar/kubestellar` repository. Look on quay.io to find the
+image you just pushed, you will soon need to use one of its tags.
+This make target pushes the image with two tags, one based on build
+timestamp and one based on git metadata.
+
+If you are not authorized to write to
+`quay.io/kubestellar/kubestellar` then you can specify an alternate
+image repository: put it in the make variable named
+`CORE_IMAGE_REPO`.  For example, you might invoke `make
+kubestellar-image CORE_IMAGE_REPO=docker.io/myacct/ksctr`.
+
+Another variable that you might like to use is `EXTRA_CORE_TAG`.
+This causes the make command to push the image with a third tag that
+you supply in that variable.  For example, if you want to tag the
+image with a release tag you might invoke `make kubestellar-image
+EXTRA_CORE_TAG=v0.42.7`.
 
 For a less pushy alternative you can build a single-platform image and
-not push it, using the following command.
+not push it, using the following command. It also supports the
+`CORE_IMAGE_REPO` and `EXTRA_CORE_TAG` variables.  But it only
+builds for your local "platform"; you can use this if you have podman
+pretending to be docker.
 
 ```bash
 make kubestellar-image-local

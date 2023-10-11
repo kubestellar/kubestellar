@@ -31,6 +31,8 @@
 
 [Try our QuickStart]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
 
+Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
+
 <br/>
 <p align="center">
 <img alt="" width="500px" align="center" src="./KubeStellar-with-Logo.png" />

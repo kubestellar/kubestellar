@@ -85,13 +85,13 @@ var apibindingGVR = schema.GroupVersionResource{
 
 var edgeSyncConfigGVR = schema.GroupVersionResource{
 	Group:    "edge.kubestellar.io",
-	Version:  "v1alpha1",
+	Version:  "v2alpha1",
 	Resource: "edgesyncconfigs",
 }
 
 var syncerConfigGVR = schema.GroupVersionResource{
 	Group:    "edge.kubestellar.io",
-	Version:  "v1alpha1",
+	Version:  "v2alpha1",
 	Resource: "syncerconfigs",
 }
 
@@ -123,8 +123,6 @@ type kubeStellarSyncerFixture struct {
 func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedKubeStellarSyncerFixture {
 	t.Helper()
 
-	useDeployedSyncer := len(framework.TestConfig.PClusterKubeconfig()) > 0
-
 	// Write the upstream logical cluster config to disk for the workspace plugin
 	upstreamRawConfig, err := sf.upstreamServer.RawConfig()
 	require.NoError(t, err)
@@ -132,20 +130,14 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 
 	var downstreamConfig *rest.Config
 	var downstreamKubeconfigPath string
-	syncerImage := framework.TestConfig.SyncerImage()
 
-	if useDeployedSyncer {
-		// Test code is not implemented yet
-		require.NotZero(t, len(syncerImage), "--syncer-image must be specified if testing with a deployed syncer")
-	} else {
-		// The syncer will target a logical cluster that is a child of the current workspace. A
-		// logical server provides as a lightweight approximation of a pcluster for tests that
-		// don't need to validate running workloads or interaction with kube controllers.
-		downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
-		downstreamConfig = downstreamServer.BaseConfig(t)
-		downstreamKubeconfigPath = downstreamServer.KubeconfigPath()
-		syncerImage = "not-a-valid-image"
-	}
+	// The syncer will target a logical cluster that is a child of the current workspace. A
+	// logical server provides as a lightweight approximation of a pcluster for tests that
+	// don't need to validate running workloads or interaction with kube controllers.
+	downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
+	downstreamConfig = downstreamServer.BaseConfig(t)
+	downstreamKubeconfigPath = downstreamServer.KubeconfigPath()
+	syncerImage := "not-a-valid-image"
 
 	// Modify root:compute so that Syncer can update deployment.status
 	modifyRootCompute(t, upstreamRawConfig)
@@ -367,7 +359,6 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 	return &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfigWithToken,
-		SyncTargetPath:   logicalcluster.NewPath(""),
 		SyncTargetName:   "",
 		SyncTargetUID:    "",
 		Interval:         time.Second * 3,

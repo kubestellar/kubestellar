@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	. "github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
 )
 
@@ -39,7 +39,7 @@ type UpSyncer struct {
 	downstreamClients       map[schema.GroupKind]*Client
 }
 
-func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downstreamClientFactory ClientFactory, syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*UpSyncer, error) {
+func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downstreamClientFactory ClientFactory, syncedResources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) (*UpSyncer, error) {
 
 	upSyncer := UpSyncer{
 		logger:                  logger,
@@ -54,26 +54,26 @@ func NewUpSyncer(logger klog.Logger, upstreamClientFactory ClientFactory, downst
 	return &upSyncer, nil
 }
 
-func (us *UpSyncer) initializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) initializeClients(syncedResources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	us.upstreamClients = map[schema.GroupKind]*Client{}
 	us.downstreamClients = map[schema.GroupKind]*Client{}
 
 	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) ReInitializeClients(syncedResources []edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) ReInitializeClients(syncedResources []edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	us.Lock()
 	defer us.Unlock()
 	return initializeClients(us.logger, syncedResources, us.upstreamClientFactory, us.downstreamClientFactory, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) getClients(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) (*Client, *Client, error) {
+func (us *UpSyncer) getClients(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) (*Client, *Client, error) {
 	us.Lock()
 	defer us.Unlock()
 	return getClients(resource, us.upstreamClients, us.downstreamClients, conversions)
 }
 
-func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	us.logger.V(3).Info(fmt.Sprintf("upsync %q", resourceToString(resource)))
 	upstreamClient, downstreamClient, err := us.getClients(resource, conversions)
 	if err != nil {
@@ -155,12 +155,12 @@ func (us *UpSyncer) SyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conver
 	return nil
 }
 
-func (us *UpSyncer) UnsyncOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) UnsyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	// It's OK to use same logic as SyncOne unless we execute specific actions for unsynced resources
 	return us.SyncOne(resource, conversions)
 }
 
-func (us *UpSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	if resource.Name == "*" && resource.Namespace != "*" {
 		return us.syncMany(resource, conversions)
 	} else if resource.Name != "*" && resource.Namespace == "*" {
@@ -171,7 +171,7 @@ func (us *UpSyncer) SyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conve
 	return us.syncMany(resource, conversions)
 }
 
-func (us *UpSyncer) syncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) syncMany(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	logger := us.logger.WithName("SyncMany").WithValues("resource", resourceToString(resource))
 	logger.V(3).Info("upsync many")
 
@@ -234,15 +234,15 @@ func (us *UpSyncer) syncMany(resource edgev1alpha1.EdgeSyncConfigResource, conve
 	return nil
 }
 
-func (us *UpSyncer) UnsyncMany(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) UnsyncMany(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	// It's OK to use same logic as SyncMany unless we execute specific actions for unsynced resources
 	return us.SyncMany(resource, conversions)
 }
 
 func (us *UpSyncer) syncAllNamespaces(
-	resource edgev1alpha1.EdgeSyncConfigResource,
-	conversions []edgev1alpha1.EdgeSynConversion,
-	syncFunc func(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error,
+	resource edgev2alpha1.EdgeSyncConfigResource,
+	conversions []edgev2alpha1.EdgeSynConversion,
+	syncFunc func(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error,
 ) error {
 	namespaces, err := us.getNamespaces()
 	if err != nil {
@@ -263,10 +263,10 @@ func (us *UpSyncer) syncAllNamespaces(
 
 func (us *UpSyncer) getNamespaces() ([]string, error) {
 	namespaces := []string{}
-	nsResource := edgev1alpha1.EdgeSyncConfigResource{
+	nsResource := edgev2alpha1.EdgeSyncConfigResource{
 		Kind: "Namespace", Group: "", Version: "v1",
 	}
-	_, downstreamClient, err := us.getClients(nsResource, []edgev1alpha1.EdgeSynConversion{})
+	_, downstreamClient, err := us.getClients(nsResource, []edgev2alpha1.EdgeSynConversion{})
 	if err != nil {
 		us.logger.Error(err, "failed to get namespace client")
 		return nil, err
@@ -293,6 +293,6 @@ func hasUpsyncAnnotation(resource *unstructured.Unstructured) bool {
 	return getAnnotation(resource, upsyncKey) == ownedValue
 }
 
-func (us *UpSyncer) BackStatusOne(resource edgev1alpha1.EdgeSyncConfigResource, conversions []edgev1alpha1.EdgeSynConversion) error {
+func (us *UpSyncer) BackStatusOne(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
 	return nil
 }

@@ -76,6 +76,7 @@ vi docs/mkdocs.yml
 <b>before:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3"
 ...
+edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
 ...
@@ -84,6 +85,7 @@ ks_tag: 'latest'
 <b>after:</b>
 ```shell title="mkdocs.yml" hl_lines="2 3" 
 ...
+edit_uri: edit/release-0.3/docs/content
 ks_branch: 'release-0.3'
 ks_tag: 'v0.3.0'
 ...
@@ -151,6 +153,11 @@ git push origin --tags
 ```shell
 ./hack/make-release-full.sh v0.3.0
 ```
+
+### Update the kubestellar container image just build and uploaded to quay.io
+
+Head up to quay.io and look for the image of KubeStellar container just uploaded.
+Make this image 'stable' so that helm and other install methods pickup this image.
 
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases

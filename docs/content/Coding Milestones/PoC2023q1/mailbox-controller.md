@@ -44,19 +44,14 @@ APIExport in those workspaces; this should be a client config that is
 able to read/write in all clusters.  For example, that is in the
 kubeconfig context named `base` in the kubeconfig created by `kcp
 start`.  Finally, the controller also needs a kube client config that
-is pointed at the edge service provider workspace and is authorized to
-consume the `Workspace` objects from there.
+is pointed at the root workspace and is authorized to consume the `Workspace`
+objects from there.
 
 The command line flags, beyond the basics, are as follows.
 
 ``` { .bash .no-copy }
       --concurrency int                  number of syncs to run in parallel (default 4)
       --espw-path string                 the pathname of the edge service provider workspace (default "root:espw")
-
-      --inventory-cluster string         The name of the kubeconfig cluster to use for access to APIExport view of SyncTarget objects
-      --inventory-context string         The name of the kubeconfig context to use for access to APIExport view of SyncTarget objects (default "root")
-      --inventory-kubeconfig string      Path to the kubeconfig file to use for access to APIExport view of SyncTarget objects
-      --inventory-user string            The name of the kubeconfig user to use for access to APIExport view of SyncTarget objects
 
       --mbws-cluster string              The name of the kubeconfig cluster to use for access to mailbox workspaces (really all clusters)
       --mbws-context string              The name of the kubeconfig context to use for access to mailbox workspaces (really all clusters) (default "base")
@@ -65,10 +60,10 @@ The command line flags, beyond the basics, are as follows.
 
       --server-bind-address ipport       The IP address with port at which to serve /metrics and /debug/pprof/ (default :10203)
 
-      --workload-cluster string          The name of the kubeconfig cluster to use for access to edge service provider workspace
-      --workload-context string          The name of the kubeconfig context to use for access to edge service provider workspace
-      --workload-kubeconfig string       Path to the kubeconfig file to use for access to edge service provider workspace
-      --workload-user string             The name of the kubeconfig user to use for access to edge service provider workspace
+      --root-cluster string              The name of the kubeconfig cluster to use for access to the root workspace
+      --root-context string              The name of the kubeconfig context to use for access to the root workspace (default "root")
+      --root-kubeconfig string           Path to the kubeconfig file to use for access to the root workspace
+      --root-user string                 The name of the kubeconfig user to use for access to the root workspace
 ```
 
 ## Try out the mailbox controller
@@ -142,7 +137,7 @@ Then in that workspace, run the following command to create a `SyncTarget` objec
 
 ```shell
 cat <<EOF | kubectl apply -f -
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncTarget
 metadata:
   name: stest1
@@ -166,10 +161,10 @@ kubectl get synctargets.edge.kubestellar.io
 ```
 
 ```shell
-kubectl ws root:espw
+kubectl ws root
 ```
 ``` {.bash .no-copy }
-Current workspace is "root:espw".
+Current workspace is "root".
 ```
 
 ```shell

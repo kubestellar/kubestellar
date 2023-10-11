@@ -70,15 +70,13 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	fs.StringVar(&espwPath, "espw-path", espwPath, "the pathname of the edge service provider workspace")
 
-	inventoryClientOpts := clientopts.NewClientOpts("inventory", "access to APIExport view of SyncTarget objects")
-	inventoryClientOpts.SetDefaultCurrentContext("root")
+	rootClientOpts := clientopts.NewClientOpts("root", "access to the root workspace")
+	rootClientOpts.SetDefaultCurrentContext("root")
 
-	workloadClientOpts := clientopts.NewClientOpts("workload", "access to edge service provider workspace")
 	mbwsClientOpts := clientopts.NewClientOpts("mbws", "access to mailbox workspaces (really all clusters)")
 	mbwsClientOpts.SetDefaultCurrentContext("base")
 
-	inventoryClientOpts.AddFlags(fs)
-	workloadClientOpts.AddFlags(fs)
+	rootClientOpts.AddFlags(fs)
 	mbwsClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
@@ -102,15 +100,6 @@ func main() {
 		}
 	}()
 
-	// create config for accessing TMC service provider workspace
-	inventoryClientConfig, err := inventoryClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "failed to make inventory config")
-		os.Exit(2)
-	}
-
-	inventoryClientConfig.UserAgent = "mailbox-controller"
-
 	// create edgeSharedInformerFactory
 	options := resolveroptions.NewOptions()
 	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
@@ -129,19 +118,16 @@ func main() {
 		os.Exit(6)
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V1alpha1().SyncTargets()
+	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
 
-	// create config for accessing edge service provider workspace
-
-	workspaceClientConfig, err := workloadClientOpts.ToRESTConfig()
+	rootRestConfig, err := rootClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to make workspaces config")
+		logger.Error(err, "failed to make root config")
 		os.Exit(8)
 	}
+	rootRestConfig.UserAgent = "mailbox-controller"
 
-	workspaceClientConfig.UserAgent = "mailbox-controller"
-
-	workspaceScopedClientset, err := kcpscopedclientset.NewForConfig(workspaceClientConfig)
+	workspaceScopedClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create clientset for workspaces")
 	}

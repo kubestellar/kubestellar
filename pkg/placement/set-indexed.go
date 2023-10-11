@@ -16,7 +16,7 @@ limitations under the License.
 
 package placement
 
-// GenericIndexedSet is a readonly set of Tuple whose representation is based on
+// GenericIndexedSet is a set of Tuple whose representation is based on
 // factoring each Tuple into Key and Val parts and using a map from
 // Key to set of Val.
 // Making the Val set type a type parameter allows the use of this in

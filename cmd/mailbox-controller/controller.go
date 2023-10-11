@@ -38,9 +38,9 @@ import (
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
-	edgev1alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
-	edgev1alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 const wsNameSep = "-mb-"
@@ -56,7 +56,7 @@ type mbCtl struct {
 	context                    context.Context
 	espwPath                   string
 	syncTargetClusterInformer  kcpcache.ScopeableSharedIndexInformer
-	syncTargetClusterLister    edgev1alpha1listers.SyncTargetClusterLister
+	syncTargetClusterLister    edgev2alpha1listers.SyncTargetClusterLister
 	syncTargetIndexer          cache.Indexer
 	workspaceScopedInformer    cache.SharedIndexInformer
 	workspaceScopedLister      tenancylisters.WorkspaceLister
@@ -70,7 +70,7 @@ type mbCtl struct {
 // SyncTarget objects (not limited to one cluster).
 func newMailboxController(ctx context.Context,
 	espwPath string,
-	syncTargetClusterPreInformer edgev1alpha1informers.SyncTargetClusterInformer,
+	syncTargetClusterPreInformer edgev2alpha1informers.SyncTargetClusterInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
 	workspaceScopedClient tenancyclient.WorkspaceInterface,
 	apiBindingClusterInterface apisclient.APIBindingClusterInterface,
@@ -142,7 +142,7 @@ func (ctl *mbCtl) enqueue(obj any) {
 	case *tenancyv1alpha1.Workspace:
 		logger.V(4).Info("Enqueuing reference due to workspace", "wsName", typed.Name)
 		ctl.queue.Add(typed.Name)
-	case *edgev1alpha1.SyncTarget:
+	case *edgev2alpha1.SyncTarget:
 		mbwsName := mbwsNameOfSynctarget(typed)
 		logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
 		ctl.queue.Add(mbwsName)
@@ -202,10 +202,10 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 		logger.Error(err, "Failed to lookup SyncTargets by mailbox workspace name", "mbwsName", mbwsName)
 		return false
 	}
-	var syncTarget *edgev1alpha1.SyncTarget
+	var syncTarget *edgev2alpha1.SyncTarget
 	if len(byIndex) == 0 {
 	} else {
-		syncTarget = byIndex[0].(*edgev1alpha1.SyncTarget)
+		syncTarget = byIndex[0].(*edgev2alpha1.SyncTarget)
 		if len(byIndex) > 1 {
 			logger.Error(nil, "Impossible: more than one SyncTarget fetched from index; using the first", "mbwsName", mbwsName, "fetched", byIndex)
 		}
@@ -301,13 +301,13 @@ func (ctl *mbCtl) ensureEdgeBinding(ctx context.Context, workspace *tenancyv1alp
 	return false
 }
 
-func mbwsNameOfSynctarget(st *edgev1alpha1.SyncTarget) string {
+func mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
 	cluster := logicalcluster.From(st)
 	return cluster.String() + wsNameSep + string(st.UID)
 }
 
 func mbwsNameOfObj(obj any) ([]string, error) {
-	st, ok := obj.(*edgev1alpha1.SyncTarget)
+	st, ok := obj.(*edgev2alpha1.SyncTarget)
 	if !ok {
 		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
 	}

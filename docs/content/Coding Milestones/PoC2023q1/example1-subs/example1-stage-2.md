@@ -13,18 +13,11 @@ One of the workloads is called "common", because it will go to both
 edge clusters.  The other one is called "special".
 
 In this example, each workload description goes in its own workload
-management workspace (WMW).  Start by creating a common parent for
-those two workspaces, with the following commands.
+management workspace (WMW).  Start by creating a WMW for the common
+workload, with the following commands.
 
 ```shell
 kubectl ws root
-kubectl ws create my-org --enter
-```
-
-Next, create the WMW for the common workload.  The following command
-will do that, if issued while "root:my-org" is the current workspace.
-
-```shell
 kubectl kubestellar ensure wmw wmw-c
 ```
 
@@ -86,7 +79,7 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Customizer
 metadata:
   namespace: commonstuff
@@ -143,19 +136,29 @@ directing the common workload to both edge clusters.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-c
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod"}
-  namespaceSelector:
-    matchLabels: {"common":"si"}
-  nonNamespacedObjects:
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ httpd-htdocs ]
+  - apiGroup: apps
+    resources: [ replicasets ]
+    namespaceSelectors:
+    - matchLabels: {"common":"si"}
+    objectNames: [ "*" ]
   - apiGroup: apis.kcp.io
-    resources: [ "apibindings" ]
-    resourceNames: [ "bind-kubernetes", "bind-apps" ]
+    resources: [ apibindings ]
+    namespaceSelectors: []
+    objectNames: [ "bind-kubernetes", "bind-apps" ]
+  wantSingletonReportedState: true
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
@@ -176,7 +179,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-kubectl ws root:my-org
+kubectl ws root
 kubectl kubestellar ensure wmw wmw-s
 ```
 
@@ -207,7 +210,7 @@ data:
       </body>
     </html>
 ---
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: Customizer
 metadata:
   namespace: specialstuff
@@ -264,19 +267,29 @@ earlier, thus directing the special workload to just one edge cluster.
    
 ```shell
 kubectl apply -f - <<EOF
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: edge-placement-s
 spec:
   locationSelectors:
   - matchLabels: {"env":"prod","extended":"si"}
-  namespaceSelector: 
-    matchLabels: {"special":"si"}
-  nonNamespacedObjects:
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaceSelectors:
+    - matchLabels: {"special":"si"}
+    objectNames: [ "*" ]
+  - apiGroup: apps
+    resources: [ deployments ]
+    namespaceSelectors:
+    - matchLabels: {"special":"si"}
+    objectNames: [ speciald ]
   - apiGroup: apis.kcp.io
-    resources: [ "apibindings" ]
-    resourceNames: [ "bind-kubernetes" ]
+    resources: [ apibindings ]
+    namespaceSelectors: []
+    objectNames: [ "bind-kubernetes", "bind-apps" ]
+  wantSingletonReportedState: true
   upsync:
   - apiGroup: "group1.test"
     resources: ["sprockets", "flanges"]
@@ -314,7 +327,16 @@ Current workspace is "root:espw".
 ```
 ```shell
 kubestellar-where-resolver &
-sleep 45
+# wait until where-resolver is ready by continuing once SinglePlacementSlice resource is available
+sleep 10
+kubectl ws root:wmw-c
+while ! kubectl get SinglePlacementSlice &> /dev/null; do
+  sleep 10
+done
+kubectl ws root:wmw-s
+while ! kubectl get SinglePlacementSlice &> /dev/null; do
+  sleep 10
+done
 ```
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io"
@@ -332,10 +354,10 @@ continually.
 Check out the SinglePlacementSlice objects as follows.
 
 ```shell
-kubectl ws root:my-org:wmw-c
+kubectl ws root:wmw-c
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org:wmw-c".
+Current workspace is "root:wmw-c".
 ```
 
 ```shell
@@ -344,7 +366,7 @@ kubectl get SinglePlacementSlice -o yaml
 ``` { .bash .no-copy }
 apiVersion: v1
 items:
-- apiVersion: edge.kubestellar.io/v1alpha1
+- apiVersion: edge.kubestellar.io/v2alpha1
   destinations:
   - cluster: apmziqj9p9fqlflm
     locationName: florin
@@ -362,7 +384,7 @@ items:
     generation: 4
     name: edge-placement-c
     ownerReferences:
-    - apiVersion: edge.kubestellar.io/v1alpha1
+    - apiVersion: edge.kubestellar.io/v2alpha1
       kind: EdgePlacement
       name: edge-placement-c
       uid: 199cfe1e-48d9-4351-af5c-e66c83bf50dd
@@ -374,6 +396,6 @@ metadata:
 ```
 
 Also check out the SinglePlacementSlice objects in
-`root:my-org:wmw-s`.  It should go similarly, but the `destinations`
+`root:wmw-s`.  It should go similarly, but the `destinations`
 should include only the entry for guilder.
 <!--example1-stage-2-end-->

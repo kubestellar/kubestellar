@@ -60,7 +60,7 @@ import (
 
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -104,6 +104,9 @@ func main() {
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
 	espwClientOpts := NewClientOpts("espw", "access to the edge service provider workspace")
 	espwClientOpts.AddFlags(fs)
+	rootClientOpts := NewClientOpts("root", "access to root workspace")
+	rootClientOpts.overrides.CurrentContext = "root"
+	rootClientOpts.AddFlags(fs)
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
@@ -132,6 +135,12 @@ func main() {
 	if err != nil {
 		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
 		os.Exit(10)
+	}
+
+	rootRestConfig, err := rootClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "Failed to build config from flags", "which", rootClientOpts.which)
+		os.Exit(11)
 	}
 
 	baseRestConfig, err := baseClientOpts.ToRESTConfig()
@@ -169,23 +178,23 @@ func main() {
 	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
 
 	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	epClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().EdgePlacements()
-	spsClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SinglePlacementSlices()
-	syncfgClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().SyncerConfigs()
-	customizerClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Customizers()
+	epClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
+	spsClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
+	syncfgClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
+	customizerClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
 	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
 
-	espwClientset, err := kcpscopedclientset.NewForConfig(espwRestConfig)
+	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create clientset for edge service provider workspace")
+		logger.Error(err, "Failed to create clientset for root workspace")
 		os.Exit(50)
 	}
 
-	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
-	mbwsPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
+	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
+	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
 	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
-	locationClusterPreInformer := edgeInformerFactory.Edge().V1alpha1().Locations()
+	locationClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
 	var _ edgev1a1informers.LocationClusterInformer = locationClusterPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
@@ -217,8 +226,9 @@ func main() {
 	pt := placement.NewPlacementTranslator(concurrency, ctx, locationClusterPreInformer, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer, customizerClusterPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+
 	edgeInformerFactory.Start(doneCh)
-	espwInformerFactory.Start(doneCh)
+	rootInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
 	kubeClusterInformerFactory.Start(doneCh)
 	pt.Run()

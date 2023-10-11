@@ -36,7 +36,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/klog/v2"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgefakeclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/syncer/clientfactory"
@@ -75,32 +75,32 @@ var testAPIResourceList = []*metav1.APIResourceList{
 
 type typeSyncerConfigTest struct {
 	description      string
-	syncerConfig     *edgev1alpha1.SyncerConfig
-	syncerConfigSpec edgev1alpha1.SyncerConfigSpec
+	syncerConfig     *edgev2alpha1.SyncerConfig
+	syncerConfigSpec edgev2alpha1.SyncerConfigSpec
 	expected         Expected
 }
 
 var test1 typeSyncerConfigTest = typeSyncerConfigTest{
 	description:  "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig",
 	syncerConfig: syncerConfig("test-sync-config", types.UID("uid")),
-	syncerConfigSpec: edgev1alpha1.SyncerConfigSpec{
-		NamespaceScope: edgev1alpha1.NamespaceScopeDownsyncs{
+	syncerConfigSpec: edgev2alpha1.SyncerConfigSpec{
+		NamespaceScope: edgev2alpha1.NamespaceScopeDownsyncs{
 			Namespaces: []string{"default"},
-			Resources: []edgev1alpha1.NamespaceScopeDownsyncResource{
+			Resources: []edgev2alpha1.NamespaceScopeDownsyncResource{
 				{
 					GroupResource: metav1.GroupResource{Group: "", Resource: "configmaps"},
 					APIVersion:    "v1",
 				},
 			},
 		},
-		ClusterScope: []edgev1alpha1.ClusterScopeDownsyncResource{
+		ClusterScope: []edgev2alpha1.ClusterScopeDownsyncResource{
 			{
 				GroupResource: metav1.GroupResource{Group: "cheese.testing.k8s.io", Resource: "cheddars"},
 				APIVersion:    "v1",
 				Objects:       nil,
 			},
 		},
-		Upsync: []edgev1alpha1.UpsyncSet{
+		Upsync: []edgev2alpha1.UpsyncSet{
 			{
 				APIGroup:   "cheese.testing.k8s.io",
 				Resources:  []string{"*"},
@@ -110,19 +110,19 @@ var test1 typeSyncerConfigTest = typeSyncerConfigTest{
 		},
 	},
 	expected: Expected{
-		downSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
+		downSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{
 			{Group: "", Version: "v1", Kind: "ConfigMap", Namespace: "default", Name: "*"},
 			{Group: "", Version: "v1", Kind: "Namespace", Name: "default"},
 			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Name: "*"},
 		},
-		upSyncedResources: []edgev1alpha1.EdgeSyncConfigResource{
+		upSyncedResources: []edgev2alpha1.EdgeSyncConfigResource{
 			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Cheddar", Namespace: "*", Name: "*"},
 			{Group: "cheese.testing.k8s.io", Version: "v1", Kind: "Gouda", Name: "*"},
 			{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Cheddar", Namespace: "*", Name: "*"},
 			{Group: "cheese.testing.k8s.io", Version: "v27alpha15", Kind: "Gouda", Name: "*"},
 			{Group: "", Version: "v1", Kind: "Namespace", Name: "*"},
 		},
-		conversions: []edgev1alpha1.EdgeSynConversion{{
+		conversions: []edgev2alpha1.EdgeSynConversion{{
 			Upstream:   upSyncedResource,
 			Downstream: downSyncedResource,
 		}},
@@ -132,11 +132,11 @@ var test1 typeSyncerConfigTest = typeSyncerConfigTest{
 var test2 typeSyncerConfigTest = typeSyncerConfigTest{
 	description:  "Syncer updates downsyncer/upsyncer and synced resources following to syncConfig (New SyncerConfig format)",
 	syncerConfig: syncerConfig("test-sync-config2", types.UID("uid")),
-	syncerConfigSpec: edgev1alpha1.SyncerConfigSpec{
-		NamespacedObjects: []edgev1alpha1.NamespaceScopeDownsyncObjects{{
+	syncerConfigSpec: edgev2alpha1.SyncerConfigSpec{
+		NamespacedObjects: []edgev2alpha1.NamespaceScopeDownsyncObjects{{
 			GroupResource: metav1.GroupResource{Group: "", Resource: "configmaps"},
 			APIVersion:    "v1",
-			ObjectsByNamespace: []edgev1alpha1.NamespaceAndNames{{
+			ObjectsByNamespace: []edgev2alpha1.NamespaceAndNames{{
 				Namespace: "default",
 				Names:     []string{"*"},
 			}},
@@ -157,9 +157,9 @@ func TestSyncerConfig(t *testing.T) {
 
 			tc.syncerConfig.Spec = tc.syncerConfigSpec
 			syncerConfigClientSet := edgefakeclient.NewSimpleClientset(tc.syncerConfig)
-			syncerConfigClient := syncerConfigClientSet.EdgeV1alpha1().SyncerConfigs()
+			syncerConfigClient := syncerConfigClientSet.EdgeV2alpha1().SyncerConfigs()
 			syncerConfigInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(syncerConfigClientSet, 0)
-			syncerConfigInformer := syncerConfigInformerFactory.Edge().V1alpha1().SyncerConfigs()
+			syncerConfigInformer := syncerConfigInformerFactory.Edge().V2alpha1().SyncerConfigs()
 
 			upstreamDynamicClient := dynamic.NewSimpleDynamicClient(scheme)
 			upstreamClientSet := clientset.NewSimpleClientset()
@@ -223,10 +223,10 @@ func TestSyncerConfig(t *testing.T) {
 			assertEqualArrayWithouOrder(t, tc.expected.upSyncedResources, upsyncedResources)
 
 			newSyncerConfig := *tc.syncerConfig.DeepCopy()
-			emptySyncerConfigSpec := edgev1alpha1.SyncerConfigSpec{
-				NamespaceScope: edgev1alpha1.NamespaceScopeDownsyncs{},
-				ClusterScope:   []edgev1alpha1.ClusterScopeDownsyncResource{},
-				Upsync:         []edgev1alpha1.UpsyncSet{},
+			emptySyncerConfigSpec := edgev2alpha1.SyncerConfigSpec{
+				NamespaceScope: edgev2alpha1.NamespaceScopeDownsyncs{},
+				ClusterScope:   []edgev2alpha1.ClusterScopeDownsyncResource{},
+				Upsync:         []edgev2alpha1.UpsyncSet{},
 			}
 			newSyncerConfig.Spec = emptySyncerConfigSpec
 			_, err = syncerConfigClient.Update(ctx, &newSyncerConfig, metav1.UpdateOptions{})
@@ -246,8 +246,8 @@ func TestSyncerConfig(t *testing.T) {
 	}
 }
 
-func syncerConfig(name string, uid types.UID) *edgev1alpha1.SyncerConfig {
-	return &edgev1alpha1.SyncerConfig{
+func syncerConfig(name string, uid types.UID) *edgev2alpha1.SyncerConfig {
+	return &edgev2alpha1.SyncerConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 			UID:  uid,

@@ -53,10 +53,8 @@ import (
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog/v2"
 
-	kcpclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	"github.com/kcp-dev/kcp/pkg/cliplugins/base"
 	"github.com/kcp-dev/kcp/pkg/cliplugins/helpers"
-	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 //go:embed *.yaml
@@ -235,9 +233,8 @@ func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 		KCPNamespace: o.KCPNamespace,
 		Namespace:    o.DownstreamNamespace,
 
-		SyncTargetPath: logicalcluster.From(edgeSyncTarget).Path().String(),
-		SyncTarget:     o.SyncTargetName,
-		SyncTargetUID:  string(edgeSyncTarget.UID),
+		SyncTarget:    o.SyncTargetName,
+		SyncTargetUID: string(edgeSyncTarget.UID),
 
 		Image:    o.SyncerImage,
 		Replicas: o.Replicas,
@@ -267,28 +264,18 @@ func getKubeStellarSyncerID(edgeSyncTarget *typeEdgeSyncTarget) string {
 }
 
 type typeEdgeSyncTarget struct {
-	UID         types.UID
-	Name        string
-	Annotations map[string]string
+	UID  types.UID
+	Name string
 }
 
-func (o *typeEdgeSyncTarget) GetAnnotations() map[string]string {
-	return o.Annotations
-}
-
-func (o *EdgeSyncOptions) applyEdgeSyncTarget(ctx context.Context, kcpClient kcpclient.Interface, edgeSyncTargetName string, labels map[string]string) (*typeEdgeSyncTarget, error) {
-	logicalCluster, err := kcpClient.CoreV1alpha1().LogicalClusters().Get(ctx, "cluster", metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get default logical cluster %q: %w", edgeSyncTargetName, err)
-	}
+func (o *EdgeSyncOptions) applyEdgeSyncTarget(ctx context.Context, edgeSyncTargetName string, labels map[string]string) (*typeEdgeSyncTarget, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate UUID %q: %w", edgeSyncTargetName, err)
 	}
 	edgeSyncTarget := typeEdgeSyncTarget{
-		UID:         types.UID(uuid.String()),
-		Name:        edgeSyncTargetName,
-		Annotations: logicalCluster.Annotations,
+		UID:  types.UID(uuid.String()),
+		Name: edgeSyncTargetName,
 	}
 	return &edgeSyncTarget, nil
 }
@@ -297,12 +284,7 @@ func (o *EdgeSyncOptions) applyEdgeSyncTarget(ctx context.Context, kcpClient kcp
 // account for the syncer in the given namespace. The expectation is that the provided config is
 // for a logical cluster (workspace). Returns the token the syncer will use to connect to kcp.
 func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *rest.Config, edgeSyncTargetName, namespace string, labels map[string]string) (saToken string, syncerID string, edgeSyncTarget *typeEdgeSyncTarget, err error) {
-	kcpClient, err := kcpclient.NewForConfig(config)
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to create kcp client: %w", err)
-	}
-
-	edgeSyncTarget, err = o.applyEdgeSyncTarget(ctx, kcpClient, edgeSyncTargetName, labels)
+	edgeSyncTarget, err = o.applyEdgeSyncTarget(ctx, edgeSyncTargetName, labels)
 	if err != nil {
 		return "", "", nil, fmt.Errorf("failed to apply synctarget %q: %w", edgeSyncTargetName, err)
 	}
@@ -542,8 +524,6 @@ type templateInputForEdge struct {
 	KCPNamespace string
 	// Namespace is the name of the syncer namespace on the pcluster
 	Namespace string
-	// SyncTargetPath is the qualified kcp logical cluster name the syncer will sync from
-	SyncTargetPath string
 	// SyncTarget is the name of the sync target the syncer will use to
 	// communicate its status and read configuration from
 	SyncTarget string
@@ -645,14 +625,14 @@ func createEdgeSyncConfig(ctx context.Context, cfg *rest.Config, edgeSyncTargetN
 		return nil, fmt.Errorf("failed to get API group resources :%w", err)
 	}
 	restMapper := restmapper.NewDiscoveryRESTMapper(groupResources)
-	mapping, err := restMapper.RESTMapping(gk, "v1alpha1")
+	mapping, err := restMapper.RESTMapping(gk, "v2alpha1")
 	if err != nil || mapping == nil {
 		return nil, fmt.Errorf("failed to get resource mapping :%w", err)
 	}
 	cr, err := dynamicClient.Resource(mapping.Resource).Get(ctx, edgeSyncTargetName, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		cr = &unstructured.Unstructured{Object: map[string]interface{}{
-			"apiVersion": gk.Group + "/v1alpha1",
+			"apiVersion": gk.Group + "/v2alpha1",
 			"kind":       gk.Kind,
 			"metadata": map[string]interface{}{
 				"name": edgeSyncTargetName,

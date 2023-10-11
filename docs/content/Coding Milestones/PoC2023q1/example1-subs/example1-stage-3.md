@@ -20,25 +20,57 @@ Current workspace is "root:espw".
 ```
 ```shell
 placement-translator &
-sleep 120
-```
-``` { .bash .no-copy }
-I0423 01:39:56.362722   11644 shared_informer.go:282] Waiting for caches to sync for placement-translator
-...
+# wait until SyncerConfig, ReplicaSets and Deployments are ready
+sleep 10
+mbxws=($FLORIN_WS $GUILDER_WS)
+for ii in "${mbxws[@]}"; do
+  kubectl ws root:$ii
+  # wait for SyncerConfig resource
+  while ! kubectl get SyncerConfig the-one &> /dev/null; do
+    sleep 10
+  done
+  echo "* SyncerConfig resource exists"
+  # wait for ReplicaSet resource
+  while ! kubectl get rs &> /dev/null; do
+    sleep 10
+  done
+  echo "* ReplicaSet resource exists"
+  # wait until ReplicaSet running
+  while [ $(kubectl get rs -n commonstuff --field-selector metadata.name=commond | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+    sleep 10
+  done
+  echo "* commonstuff ReplicaSet running"
+done
+# check for deployment in guilder
+while ! kubectl get deploy -A &> /dev/null; do
+  sleep 10
+done
+echo "* Deployment resource exists"
+while [ $(kubectl get deploy -n specialstuff --field-selector metadata.name=speciald | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+  sleep 10
+done
+echo "* specialstuff Deployment running"
 ```
 
-After it stops logging stuff, wait another minute and then you can ^C
-it or use another shell to continue exploring.
+After it stops logging stuff, wait another minute and then you can
+proceed.
 
 The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
+
+```shell
+kubectl ws root
+```
+``` { .bash .no-copy }
+Current workspace is "root".
+```
 
 ```shell
 kubectl ws $FLORIN_WS
 ```
 
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
+Current workspace is "root:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
 ```
 
 ```shell
@@ -46,7 +78,7 @@ kubectl get SyncerConfig the-one -o yaml
 ```
 
 ``` { .bash .no-copy }
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncerConfig
 metadata:
   annotations:
@@ -181,24 +213,24 @@ Examine guilder's `SyncerConfig` object and workloads as follows, using
 the name that you stored in Stage 1.
 
 ```shell
-kubectl ws root:espw
+kubectl ws root
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw".
+Current workspace is "root".
 ```
 
 ```shell
 kubectl ws $GUILDER_WS
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:espw:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
+Current workspace is "root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
 ```
 
 ```shell
 kubectl get SyncerConfig the-one -o yaml
 ```
 ``` { .bash .no-copy }
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: SyncerConfig
 metadata:
   annotations:

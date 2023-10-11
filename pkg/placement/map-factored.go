@@ -16,16 +16,22 @@ limitations under the License.
 
 package placement
 
-// FactoredMap is a map implemented by two levels of mapping.
+// FactoredMap is a mutable map implemented by two levels of mapping.
 // It has a general key decomposition/composition rotator.
-type FactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any] interface {
+type FactoredMap[WholeKey, KeyPartA, KeyPartB, Val any] GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, Map[KeyPartB, Val]]
+
+// GenericFactoredMap is a mutable map implemented by two levels of mapping.
+// It has a general key decomposition/composition rotator
+// and a general representation for the nested maps.
+type GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, InnerMap any] interface {
 	MutableMap[WholeKey, Val]
-	GetIndex() FactoredMapIndex[KeyPartA, KeyPartB, Val]
+	GetIndex() GenericFactoredMapIndex[KeyPartA, KeyPartB, Val, InnerMap]
 }
 
-// FactoredMapIndex is an index into a factored map.
-type FactoredMapIndex[KeyPartA, KeyPartB comparable, Val any] interface {
-	Map[KeyPartA, Map[KeyPartB, Val]]
+// GenericFactoredMapIndex is an index into a factored map where the inner maps
+// (from KeyPartB to Val) have a general representation.
+type GenericFactoredMapIndex[KeyPartA, KeyPartB, Val, InnerMap any] interface {
+	Map[KeyPartA, InnerMap]
 	Visit1to2(KeyPartA, func(Pair[KeyPartB, Val]) error) error
 }
 
@@ -36,16 +42,18 @@ func NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
 	outerKeysetObserver SetChangeReceiver[KeyPartA],
 	outerObserver2 MappingReceiver[KeyPartA, Map[KeyPartB, Val]],
 ) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
-	return NewFactoredMap[WholeKey, KeyPartA, KeyPartB, Val](
+	return NewGenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MapMap[KeyPartB, Val], Map[KeyPartB, Val]](
 		keyDecomposer,
-		NewMapMapFactory[KeyPartB, Val](nil),
-		NewMapMap[KeyPartA, MutableMap[KeyPartB, Val]](MapChangeReceiverFuncs[KeyPartA, MutableMap[KeyPartB, Val]]{
-			OnCreate: func(keyPartA KeyPartA, rest MutableMap[KeyPartB, Val]) {
+		func(KeyPartA) MapMap[KeyPartB, Val] { return NewMapMap[KeyPartB, Val](nil) },
+		func(inner MapMap[KeyPartB, Val]) MutableMap[KeyPartB, Val] { return inner },
+		func(inner MapMap[KeyPartB, Val]) Map[KeyPartB, Val] { return inner },
+		NewMapMap[KeyPartA, MapMap[KeyPartB, Val]](MapChangeReceiverFuncs[KeyPartA, MapMap[KeyPartB, Val]]{
+			OnCreate: func(keyPartA KeyPartA, rest MapMap[KeyPartB, Val]) {
 				if outerKeysetObserver != nil {
 					outerKeysetObserver(true, keyPartA)
 				}
 			},
-			OnDelete: func(keyPartA KeyPartA, rest MutableMap[KeyPartB, Val]) {
+			OnDelete: func(keyPartA KeyPartA, rest MapMap[KeyPartB, Val]) {
 				if outerKeysetObserver != nil {
 					outerKeysetObserver(false, keyPartA)
 				}
@@ -57,47 +65,55 @@ func NewFactoredMapMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
 
 // NewFactoredMap creates a factored map implemented by the given outer map
 // and constructor of inner maps.
-func NewFactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any](
+func NewGenericFactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val, MutableInnerMap, InnerMap any](
 	keyDecomposer Factorer[WholeKey, KeyPartA, KeyPartB],
-	innerMapConstructor func() MutableMap[KeyPartB, Val],
-	outerMap MutableMap[KeyPartA, MutableMap[KeyPartB, Val]],
+	innerMapConstructor func(KeyPartA) MutableInnerMap,
+	innerMapAsMap func(MutableInnerMap) MutableMap[KeyPartB, Val],
+	insulateInner func(MutableInnerMap) InnerMap,
+	outerMap MutableMap[KeyPartA, MutableInnerMap],
 	unifiedObserver MapChangeReceiver[WholeKey, Val],
 	outerObserver MappingReceiver[KeyPartA, Map[KeyPartB, Val]],
-) FactoredMap[WholeKey, KeyPartA, KeyPartB, Val] {
-	return &factoredMap[WholeKey, KeyPartA, KeyPartB, Val]{
+) GenericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, InnerMap] {
+	return &genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]{
 		keyDecomposer:       keyDecomposer,
 		innerMapConstructor: innerMapConstructor,
+		innerMapAsMap:       innerMapAsMap,
+		insulateInner:       insulateInner,
 		outerMap:            outerMap,
 		unifiedObserver:     unifiedObserver,
 		outerObserver:       outerObserver,
 	}
 }
 
-type factoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val any] struct {
+type genericFactoredMap[WholeKey, KeyPartA, KeyPartB comparable, Val, MutableInnerMap, InnerMap any] struct {
 	keyDecomposer       Factorer[WholeKey, KeyPartA, KeyPartB]
-	innerMapConstructor func() MutableMap[KeyPartB, Val]
-	outerMap            MutableMap[KeyPartA, MutableMap[KeyPartB, Val]]
+	innerMapConstructor func(KeyPartA) MutableInnerMap
+	innerMapAsMap       func(MutableInnerMap) MutableMap[KeyPartB, Val]
+	insulateInner       func(MutableInnerMap) InnerMap
+	outerMap            MutableMap[KeyPartA, MutableInnerMap]
 	unifiedObserver     MapChangeReceiver[WholeKey, Val]
 	outerObserver       MappingReceiver[KeyPartA, Map[KeyPartB, Val]]
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) IsEmpty() bool {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) IsEmpty() bool {
 	return fm.outerMap.IsEmpty()
 }
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) LenIsCheap() bool { return false }
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) LenIsCheap() bool {
+	return false
+}
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Len() int {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Len() int {
 	var ans int
-	fm.outerMap.Visit(func(outerMapping Pair[KeyPartA, MutableMap[KeyPartB, Val]]) error {
-		ans += outerMapping.Second.Len()
+	fm.outerMap.Visit(func(outerMapping Pair[KeyPartA, MutableInnerMap]) error {
+		ans += fm.innerMapAsMap(outerMapping.Second).Len()
 		return nil
 	})
 	return ans
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Visit(wholeVisitor func(Pair[WholeKey, Val]) error) error {
-	return fm.outerMap.Visit(func(outerMapping Pair[KeyPartA, MutableMap[KeyPartB, Val]]) error {
-		return outerMapping.Second.Visit(func(innerMapping Pair[KeyPartB, Val]) error {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Visit(wholeVisitor func(Pair[WholeKey, Val]) error) error {
+	return fm.outerMap.Visit(func(outerMapping Pair[KeyPartA, MutableInnerMap]) error {
+		return fm.innerMapAsMap(outerMapping.Second).Visit(func(innerMapping Pair[KeyPartB, Val]) error {
 			decomposedKey := Pair[KeyPartA, KeyPartB]{outerMapping.First, innerMapping.First}
 			wholeKey := fm.keyDecomposer.Second(decomposedKey)
 			return wholeVisitor(Pair[WholeKey, Val]{wholeKey, innerMapping.Second})
@@ -105,112 +121,164 @@ func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Visit(wholeVisitor fun
 	})
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Get(wholeKey WholeKey) (Val, bool) {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Get(wholeKey WholeKey) (Val, bool) {
 	decomposedKey := fm.keyDecomposer.First(wholeKey)
 	innerMap, ok := fm.outerMap.Get(decomposedKey.First)
 	if !ok {
 		var zeroVal Val
 		return zeroVal, false
 	}
-	return innerMap.Get(decomposedKey.Second)
+	return fm.innerMapAsMap(innerMap).Get(decomposedKey.Second)
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Put(wholeKey WholeKey, val Val) {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Put(wholeKey WholeKey, val Val) {
 	decomposedKey := fm.keyDecomposer.First(wholeKey)
 	innerMap, ok := fm.outerMap.Get(decomposedKey.First)
 	if !ok {
-		innerMap = fm.innerMapConstructor()
-		innerMap.Put(decomposedKey.Second, val)
+		innerMap = fm.innerMapConstructor(decomposedKey.First)
+		innerMapAsMap := fm.innerMapAsMap(innerMap)
+		innerMapAsMap.Put(decomposedKey.Second, val)
 		fm.outerMap.Put(decomposedKey.First, innerMap)
 		if fm.unifiedObserver != nil {
 			fm.unifiedObserver.Create(wholeKey, val)
 		}
 		if fm.outerObserver != nil {
-			fm.outerObserver.Put(decomposedKey.First, innerMap)
+			fm.outerObserver.Put(decomposedKey.First, innerMapAsMap)
 		}
 		return
 	}
+	innerMapAsMap := fm.innerMapAsMap(innerMap)
 	if fm.unifiedObserver != nil || fm.outerObserver != nil {
-		oldVal, had := innerMap.Get(decomposedKey.Second)
-		innerMap.Put(decomposedKey.Second, val)
+		oldVal, had := innerMapAsMap.Get(decomposedKey.Second)
+		innerMapAsMap.Put(decomposedKey.Second, val)
 		if had {
 			if fm.unifiedObserver != nil {
 				fm.unifiedObserver.Update(wholeKey, oldVal, val)
 			}
 			if fm.outerObserver != nil {
-				fm.outerObserver.Put(decomposedKey.First, innerMap)
+				fm.outerObserver.Put(decomposedKey.First, innerMapAsMap)
 			}
 		} else {
 			if fm.unifiedObserver != nil {
 				fm.unifiedObserver.Create(wholeKey, val)
 			}
 			if fm.outerObserver != nil {
-				fm.outerObserver.Put(decomposedKey.First, innerMap)
+				fm.outerObserver.Put(decomposedKey.First, innerMapAsMap)
 			}
 		}
 		return
 	}
-	innerMap.Put(decomposedKey.Second, val)
+	innerMapAsMap.Put(decomposedKey.Second, val)
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) Delete(wholeKey WholeKey) {
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Delete(wholeKey WholeKey) {
 	decomposedKey := fm.keyDecomposer.First(wholeKey)
 	innerMap, ok := fm.outerMap.Get(decomposedKey.First)
 	if !ok {
 		return
 	}
-	oldVal, had := innerMap.Get(decomposedKey.Second)
+	innerMapAsMap := fm.innerMapAsMap(innerMap)
+	oldVal, had := innerMapAsMap.Get(decomposedKey.Second)
 	if !had {
 		return
 	}
-	innerMap.Delete(decomposedKey.Second)
-	if innerMap.IsEmpty() {
+	innerMapAsMap.Delete(decomposedKey.Second)
+	if innerMapAsMap.IsEmpty() {
 		fm.outerMap.Delete(decomposedKey.First)
 		if fm.outerObserver != nil {
 			fm.outerObserver.Delete(decomposedKey.First)
 		}
 	} else if fm.outerObserver != nil {
-		fm.outerObserver.Put(decomposedKey.First, innerMap)
+		fm.outerObserver.Put(decomposedKey.First, innerMapAsMap)
 	}
 	if fm.unifiedObserver != nil {
 		fm.unifiedObserver.DeleteWithFinal(wholeKey, oldVal)
 	}
 }
 
-func (fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]) GetIndex() FactoredMapIndex[KeyPartA, KeyPartB, Val] {
-	return factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]{fm}
+func (fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) GetIndex() GenericFactoredMapIndex[KeyPartA, KeyPartB, Val, InnerMap] {
+	return genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]{fm}
 }
 
-type factoredMapIndex[WholeKey, KeyPartA, KeyPartB comparable, Val any] struct {
-	fm *factoredMap[WholeKey, KeyPartA, KeyPartB, Val]
+type genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB comparable, Val, MutableInnerMap, InnerMap any] struct {
+	fm *genericFactoredMap[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]
 }
 
-func (fmi factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]) IsEmpty() bool {
+func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) IsEmpty() bool {
 	return fmi.fm.IsEmpty()
 }
 
-func (fmi factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]) LenIsCheap() bool {
+func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) LenIsCheap() bool {
 	return fmi.fm.outerMap.LenIsCheap()
 }
 
-func (fmi factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]) Len() int {
+func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Len() int {
 	return fmi.fm.outerMap.Len()
 }
 
-func (fmi factoredMapIndex[KWholeKey, KeyPartA, KeyPartB, Val]) Get(keyPartA KeyPartA) (Map[KeyPartB, Val], bool) {
-	return fmi.fm.outerMap.Get(keyPartA)
+func (fmi genericFactoredMapIndex[KWholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Get(keyPartA KeyPartA) (InnerMap, bool) {
+	innerMap, have := fmi.fm.outerMap.Get(keyPartA)
+	if !have {
+		var zero InnerMap
+		return zero, false
+	}
+	return fmi.fm.insulateInner(innerMap), true
 }
 
-func (fmi factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]) Visit(visitor func(Pair[KeyPartA, Map[KeyPartB, Val]]) error) error {
-	return fmi.fm.outerMap.Visit(func(outerTup Pair[KeyPartA, MutableMap[KeyPartB, Val]]) error {
-		return visitor(Pair[KeyPartA, Map[KeyPartB, Val]]{outerTup.First, MapReadonly[KeyPartB, Val](outerTup.Second)})
+func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Visit(visitor func(Pair[KeyPartA, InnerMap]) error) error {
+	return fmi.fm.outerMap.Visit(func(outerTup Pair[KeyPartA, MutableInnerMap]) error {
+		innerMap := fmi.fm.insulateInner(outerTup.Second)
+		return visitor(NewPair(outerTup.First, innerMap))
 	})
 }
 
-func (fmi factoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val]) Visit1to2(keyPartA KeyPartA, visitor func(Pair[KeyPartB, Val]) error) error {
+func (fmi genericFactoredMapIndex[WholeKey, KeyPartA, KeyPartB, Val, MutableInnerMap, InnerMap]) Visit1to2(keyPartA KeyPartA, visitor func(Pair[KeyPartB, Val]) error) error {
 	innerMap, has := fmi.fm.outerMap.Get(keyPartA)
 	if !has {
 		return nil
 	}
-	return innerMap.Visit(visitor)
+	innerMapAsMap := fmi.fm.innerMapAsMap(innerMap)
+	return innerMapAsMap.Visit(visitor)
+}
+
+type SingleIndexedMap2[First, Second, Val any] GenericFactoredMap[Pair[First, Second], First, Second, Val, Map[Second, Val]]
+
+func NewSingleIndexedMapMap2[First, Second comparable, Val any]() SingleIndexedMap2[First, Second, Val] {
+	gfm := NewGenericFactoredMap[Pair[First, Second], First, Second, Val, MutableMap[Second, Val], Map[Second, Val]](
+		PairFactorer[First, Second](),
+		func(First) MutableMap[Second, Val] { return NewMapMap[Second, Val](nil) },
+		Identity1[MutableMap[Second, Val]],
+		MutableMapToReadonly[Second, Val],
+		NewMapMap[First, MutableMap[Second, Val]](nil),
+		nil, nil)
+	return gfm
+}
+
+type SingleIndexedMap3[First, Second, Third, Val any] GenericFactoredMap[Triple[First, Second, Third],
+	First, Pair[Second, Third], Val,
+	GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+]
+
+func NewSingleIndexedMapMap3[First, Second, Third comparable, Val any]() SingleIndexedMap3[First, Second, Third, Val] {
+	gfm := NewGenericFactoredMap[Triple[First, Second, Third], First, Pair[Second, Third], Val,
+		GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+		GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]],
+	](
+		TripleFactorerTo1and23[First, Second, Third](),
+		func(First) GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]] {
+			return NewGenericFactoredMap[Pair[Second, Third], Second, Third, Val, MutableMap[Third, Val], Map[Third, Val]](
+				PairFactorer[Second, Third](),
+				func(Second) MutableMap[Third, Val] { return NewMapMap[Third, Val](nil) },
+				Identity1[MutableMap[Third, Val]],
+				MutableMapToReadonly[Third, Val],
+				NewMapMap[Second, MutableMap[Third, Val]](nil),
+				nil, nil)
+		},
+		func(inner GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]) MutableMap[Pair[Second, Third], Val] {
+			return inner
+		},
+		Identity1[GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]],
+		NewMapMap[First, GenericFactoredMap[Pair[Second, Third], Second, Third, Val, Map[Third, Val]]](nil),
+		nil, nil)
+	return gfm
 }

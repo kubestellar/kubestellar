@@ -1,0 +1,27 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: space2
+spec:
+  Type: imported
+status:
+  ClusterConfig: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: your-data-goes-here
+        server: https://127.0.0.1:33625
+      name: kind-import1
+    contexts:
+    - context:
+        cluster: kind-import1
+        user: kind-import1
+      name: kind-import1
+    current-context: kind-import1
+    kind: Config
+    preferences: {}
+    users:
+    - name: kind-import1
+      user:
+        client-certificate-data: your-data-goes-here
+        client-key-data: your-data-goes-here

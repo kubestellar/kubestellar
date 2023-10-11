@@ -41,11 +41,12 @@ kubectl ws tree
 which should yield:
 
 ``` { .sh .no-copy }
-kubectl ws tree
 .
 └── root
     ├── compute
-    └── espw
+    ├── espw
+    ├── imw1
+    └── wmw1
 ```
 
 ### Deploy kcp and KubeStellar as Kubernetes workload
@@ -111,7 +112,6 @@ kubectl ws tree
 which should yield:
 
 ``` { .sh .no-copy }
-kubectl ws tree
 .
 └── root
     ├── compute

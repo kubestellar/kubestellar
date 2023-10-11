@@ -23,7 +23,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 // A setBinder works as follows.
@@ -52,7 +52,7 @@ type setBinder struct {
 type setBindingForCluster struct {
 	*setBinder
 	cluster      logicalcluster.Name
-	perPlacement map[string]*setBindingForPlacement
+	perPlacement map[ObjectName]*setBindingForPlacement
 }
 
 type setBindingForPlacement struct {
@@ -92,11 +92,11 @@ func NewSetBinder(
 		sb.downsyncJoinLeftInput, downsyncJoinRightInput = NewDynamicFullJoin12VWith13(sb.logger,
 			NewMappingReceiverFuncs(
 				func(tup Triple[ExternalName, WorkloadPartID, SinglePlacement], workloadPartDetails WorkloadPartDetails) {
-					sb.logger.V(4).Info("Adding singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third, "details", workloadPartDetails)
+					sb.logger.V(4).Info("Putting singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third, "details", workloadPartDetails)
 					sb.singleBindingOps.Put(tup, workloadPartDetails)
 				},
 				func(tup Triple[ExternalName, WorkloadPartID, SinglePlacement]) {
-					sb.logger.V(4).Info("Removing singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third)
+					sb.logger.V(4).Info("Deleting singleBinding mapping", "epRef", tup.First, "partID", tup.Second, "where", tup.Third)
 					sb.singleBindingOps.Delete(tup)
 				},
 			))
@@ -199,14 +199,14 @@ func (sb *setBinder) getCluster(cluster logicalcluster.Name, want bool) *setBind
 		sbc = &setBindingForCluster{
 			setBinder:    sb,
 			cluster:      cluster,
-			perPlacement: map[string]*setBindingForPlacement{},
+			perPlacement: map[ObjectName]*setBindingForPlacement{},
 		}
 		sb.perCluster[cluster] = sbc
 	}
 	return sbc
 }
 
-func (sbc *setBindingForCluster) ensurePlacement(epName string) *setBindingForPlacement {
+func (sbc *setBindingForCluster) ensurePlacement(epName ObjectName) *setBindingForPlacement {
 	sbp := sbc.perPlacement[epName]
 	if sbp == nil {
 		epID := ExternalName{sbc.cluster, epName}

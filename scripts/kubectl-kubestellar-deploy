@@ -20,7 +20,7 @@
 
 KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
-image_tag=b23-08-18-21-58-09
+image_tag=git-dd86b310c-clean
 
 external_endpoint=""
 openshift=false
@@ -86,5 +86,5 @@ esac
 
 set -e
 
-helm upgrade -i "${helm_flags[@]}" kubestellar ${KSDIR}/user/helm-chart --set clusterType=$cluster_type --set-string "EXTERNAL_HOSTNAME=$external_hostname" --set "EXTERNAL_PORT=$external_port" --set image.tag=$image_tag
+helm upgrade -i "${helm_flags[@]}" kubestellar ${KSDIR}/core-helm-chart --set clusterType=$cluster_type --set-string "EXTERNAL_HOSTNAME=$external_hostname" --set "EXTERNAL_PORT=$external_port" --set image.tag=$image_tag
 

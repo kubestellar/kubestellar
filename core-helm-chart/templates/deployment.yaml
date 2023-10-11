@@ -1,0 +1,158 @@
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubestellar
+spec:
+  selector:
+    matchLabels:
+      app: kubestellar
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubestellar
+    spec:
+      serviceAccountName: kubestellar-sa
+      containers:
+
+      - name: kcp
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/kubestellar/entry.sh" , "kcp" ]
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+        volumeMounts:
+        - name: kubestellar-pv
+          mountPath: "/home/kubestellar/.kcp"
+          readOnly: false
+        ports:
+        - name: ks-port
+          protocol: TCP
+          containerPort: 6443
+
+      - name: init
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/kubestellar/entry.sh" , "init" ]
+        env:
+        - name: ESPW_NAME
+          value: "{{ .Values.ESPW_NAME }}"
+        - name: ENSURE_IMW
+          value: "{{ .Values.ENSURE_IMW }}"
+        - name: ENSURE_WMW
+          value: "{{ .Values.ENSURE_WMW }}"
+          # volumeMounts:
+          # - name: kubestellar-secret
+          #   mountPath: "/home/kubestellar/.kcp"
+          #   readOnly: true
+
+      - name: mailbox-controller
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [ "/home/kubestellar/entry.sh" , "mailbox-controller" ]
+        env:
+        - name: VERBOSITY
+          value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        # volumeMounts:
+        # - name: kubestellar-secret
+        #   mountPath: "/home/kubestellar/.kcp"
+        #   readOnly: true
+
+      - name: where-resolver
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [ "/home/kubestellar/entry.sh" , "where-resolver" ]
+        env:
+        - name: VERBOSITY
+          value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        # volumeMounts:
+        # - name: kubestellar-secret
+        #   mountPath: "/home/kubestellar/.kcp"
+        #   readOnly: true
+
+      - name: placement-translator
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [ "/home/kubestellar/entry.sh" , "placement-translator" ]
+        env:
+        - name: VERBOSITY
+          value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        # volumeMounts:
+        # - name: kubestellar-secret
+        #   mountPath: "/home/kubestellar/.kcp"
+        #   readOnly: true
+
+      volumes:
+      - name: kubestellar-pv
+        persistentVolumeClaim:
+          claimName: kubestellar-pvc
+      # - name: kubestellar-secret
+      #   secret:
+      #     secretName: kubestellar
+      #     items:
+      #     - key: admin.kubeconfig
+      #       path: admin.kubeconfig

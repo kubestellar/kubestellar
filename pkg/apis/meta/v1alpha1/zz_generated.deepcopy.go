@@ -94,6 +94,17 @@ func (in *APIResourceSpec) DeepCopyInto(out *APIResourceSpec) {
 		*out = make(v1.Verbs, len(*in))
 		copy(*out, *in)
 	}
+	if in.SubResources != nil {
+		in, out := &in.SubResources, &out.SubResources
+		*out = make([]*APIResourceSpec, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(APIResourceSpec)
+				(*in).DeepCopyInto(*out)
+			}
+		}
+	}
 	return
 }
 

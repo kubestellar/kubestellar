@@ -27,7 +27,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 // This file contains declarations of the interfaces between the main parts
@@ -85,27 +85,24 @@ type WorkloadProjector interface {
 }
 
 // WorkloadProjectionSections is given, incrementally, instructions
-// for what goes where how, organized for consumption by syncers.
-// The FooDistributions are proper sets, while the
-// FooModes add dependent information for set members.
+// for what goes where how.
+// The "Modes" are organized according to the design for how version agreement
+// is done, not optimized for the initial hack at that.
+// The FooDistributions are denormalized: the `returnSingletonReport bool` is duplicated for all destinations.
 // The booleans returned from the SetWriters may not be meaningful.
 type WorkloadProjectionSections struct {
-	NamespaceDistributions          SetWriter[NamespaceDistributionTuple]
-	NamespacedResourceDistributions SetWriter[NamespacedResourceDistributionTuple]
-	NamespacedModes                 MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedDistributions      SetWriter[NonNamespacedDistributionTuple]
-	NonNamespacedModes              MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	Upsyncs                         SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
+	NamespacedObjectDistributions    MappingReceiver[NamespacedDistributionTuple, bool]
+	NamespacedModes                  MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	NonNamespacedObjectDistributions MappingReceiver[NonNamespacedDistributionTuple, bool]
+	NonNamespacedModes               MappingReceiver[ProjectionModeKey, ProjectionModeVal]
+	Upsyncs                          SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
 }
 
 type SinglePlacement = edgeapi.SinglePlacement
 
-type NamespaceDistributionTuple = Triple[logicalcluster.Name /*source*/, NamespaceName, SinglePlacement]
+type ExternalNamespacedName = Triple[logicalcluster.Name, NamespaceName, ObjectName]
 
-type NamespacedResourceDistributionTuple struct {
-	SourceCluster logicalcluster.Name
-	ProjectionModeKey
-}
+type NamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/]
 
 type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of downsynced object*/]
 
@@ -160,8 +157,8 @@ type ResolvedWhat struct {
 //
 // Every WorkloadParts that appears in the interfaces here is immutable.
 //
-// In the case of a Namespace object, this implies that
-// all the objects in that namespace are included.
+// Namespace objects appear here only if explicitly requested in the
+// "what predicate".
 //
 // A workload may include objects of kinds that are built into
 // the edge cluster.  By built-in we mean that these kinds are both
@@ -174,34 +171,29 @@ type ResolvedWhat struct {
 type WorkloadParts map[WorkloadPartID]WorkloadPartDetails
 
 // WorkloadPartID identifies part of a workload.
-type WorkloadPartID struct {
-	APIGroup string
+type WorkloadPartID = Triple[metav1.GroupResource, NamespaceName, ObjectName]
 
-	// Resource is the lowercase plural way of identifying the kind of object
-	Resource string
+type ObjectName string
 
-	Name string
-}
+func NewObjectName(name string) ObjectName { return ObjectName(name) }
+func (objName ObjectName) String() string  { return string(objName) }
 
 // WorkloadPartDetails provides additional details about how the WorkloadPart
 // is to be included.
 type WorkloadPartDetails struct {
-	// APIVersion is version (no group) that the source workspace prefers to serve.
-	// In the case of a namespace object: this field only applies to the namespace
-	// object itself, not the namespace contents, and is the empty string if
-	// IncludeNamespaceObject is false.
+	// APIVersion is version (no group) that the WDS prefers to serve.
+	// This is denormalized in two ways.
+	// This information is duplicated for all objects of the same kind.
+	// Since each WorkloadParts is specific to one EdgePlacement object,
+	// this information is duplicated among EdgePlacement objects that
+	// refer to the same workload object (i.e., in the same WDS).
 	APIVersion string
 
-	// IncludeNamespaceObject is only interesting for a Namespace part, and
-	// indicates whether to include the details of the Namespace object;
-	// the objects in the namespace are certainly included.
-	// For other parts, this field holds `false`.
-	IncludeNamespaceObject bool
-}
-
-type WorkloadPartX struct {
-	WorkloadPartID
-	WorkloadPartDetails
+	// ReturnSingletonState indicates whether the number of executing copies is expected to
+	// be 1 and the reported state should be returned to the WDS.
+	// This is denormalized: this is duplicated among all the downsynced objects selected
+	// by a given EdgePlacement.
+	ReturnSingletonState bool
 }
 
 // ProjectionKey identifies the topmost level of organization,
@@ -423,3 +415,11 @@ func (where ResolvedWhere) String() string {
 	builder.WriteRune(']')
 	return builder.String()
 }
+
+type NamespaceName string
+
+type NamespaceAndDestination = Pair[NamespaceName, SinglePlacement]
+
+type SourceAndDestination = Pair[logicalcluster.Name, SinglePlacement]
+
+type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]

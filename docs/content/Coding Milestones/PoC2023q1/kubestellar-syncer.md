@@ -91,7 +91,7 @@ KubeStellar-Syncer is deployed on an Edge cluster easily by the following steps.
     kubectl plugin that includes the implementation of the functionality needed
     here.  This variant, under the special name shown here, is a normal part of
     the `bin` of KubeStellar.
-    For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:v0.2.2`. You can also create a syncer image from the source following [Build KubeStellar-Syncer Image](#build-kubestellar-syncer-image).
+    For the KubeStellar-Syncer image, please select an official image from https://quay.io/repository/kubestellar/syncer?tab=tags. For example, `--syncer-image quay.io/kubestellar/syncer:git-08289ea05-clean`. You can also create a syncer image from the source following [Build KubeStellar-Syncer Image](#build-kubestellar-syncer-image).
 4. Deploy KubeStellar-Syncer on an Edge cluster
 5. Syncer starts to run on the Edge cluster
     - KubeStellar-Syncer starts watching and consuming SyncerConfig
@@ -161,7 +161,7 @@ After this, KubeStellar will put the following in the mailbox workspace.
   - This behavior may be changed to only watching the default CR once Placement Translator is to be the component that generates the CR from EdgePlacement: [related issue]({{ config.repo_url }}/pull/284#pullrequestreview-1375667129)
 
 ### SyncerConfig
-- The spec is defined in {{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/apis/edge/v1alpha1/syncer-config.go
+- The spec is defined in {{ config.repo_url }}/blob/{{ config.ks_branch }}/pkg/apis/edge/v2alpha1/syncer-config.go
   - `namespaceScope` field is for namespace scoped objects.
     - `namespaces` is field for which namespaces to be downsynced.
     - `resources` is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.
@@ -253,11 +253,26 @@ image=`make build-kubestellar-syncer-image-local`
 ```
 
 ### How to build the image with multiple architectures and push it to Docker registry
-1. `make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64`
+
+1. `make build-kubestellar-syncer-image`
+
+The behavior can be modified with some make variables; their default values are what get used in a normal build.  The variables are as follows.
+
+- `DOCKER_REPO`, `IMAGE_TAG`: the built multi-platform manifest will
+  be pushed to `$DOCKER_REPO:$IMAGE_TAG`.  The default for
+  `DOCKER_REPO` is `quay.io/kubestellar/syncer`.  The default for
+  `IMAGE_TAG` is the concatenation of: "git-", a short ID of the
+  current git commit, "-", and either "clean" or "dirty" depending on
+  what `git status` has to say about it.
+- `SYNCER_PLATFORMS`: a
+  comma-separated list of `docker build` "platforms".  The default is
+  "linux/amd64,linux/arm64,linux/s390x".
+- `ADDITIONAL_ARGS`: a word that will be added into the `ko build` command line.
+  The default is the empty string.
 
 For example
 ```
-$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
 2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/{{ config.repo_short_name }}/cmd/syncer
 2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/arm64
 2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/amd64

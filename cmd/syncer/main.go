@@ -28,8 +28,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	synceroptions "github.com/kubestellar/kubestellar/cmd/syncer/options"
 	"github.com/kubestellar/kubestellar/pkg/syncer"
 )
@@ -76,7 +74,6 @@ func main() {
 	syncerConfig := &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfig,
-		SyncTargetPath:   logicalcluster.NewPath(options.FromClusterPath),
 		SyncTargetName:   options.SyncTargetName,
 		SyncTargetUID:    options.SyncTargetUID,
 	}

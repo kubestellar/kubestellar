@@ -53,6 +53,41 @@ they appear in this example.
 
 ## Stage 5
 
+### Singleton reported state return
+
+The two `EdgePlacement` objects above assert that the expected number
+of executing copies of their matching workload objects is 1 and
+request return of reported state to the WDS when the number of
+executing copies is exactly 1.
+
+For the common workload, that assertion is not correct: the number of
+executing copies should be 2.  The assertion causes the actual number
+of executing copies to be reported.  Check that the reported number is
+2.
+
+```shell
+kubectl ws root:wmw-c
+kubectl get rs -n commonstuff commond -o yaml | grep 'kubestellar.io/executing-count: "2"' || { kubectl get rs -n commonstuff commond -o yaml; false; }
+```
+
+For the special workload, the number of executing copies should be 1.
+Check that the reported number agrees.
+
+```shell
+kubectl ws root:wmw-s
+kubectl get deploy -n specialstuff speciald -o yaml | grep 'kubestellar.io/executing-count: "1"' || { kubectl get deploy -n specialstuff speciald -o yaml; false; }
+```
+
+Look at the status section of the "speciald" `Deployment` and see that
+it has been filled in with the information from the guilder cluster.
+
+```shell
+kubectl get deploy -n specialstuff speciald -o yaml
+kubectl get deploy -n specialstuff speciald -o yaml | grep 'readyReplicas: 1'
+```
+
+### Status Summarization (aspirational)
+
 ![Summarization for special](Edge-PoC-2023q1-Scenario-1-stage-5s.svg "Status summarization for special")
 
 The status summarizer, driven by the EdgePlacement and
@@ -73,7 +108,7 @@ the `commond` Deployment objects in the two mailbox workspaces.
 ## Teardown the environment
 
 {%
-   include-markdown "../../common-subs/teardown-the-environment.md"
-   start="<!--teardown-the-environment-start-->"
-   end="<!--teardown-the-environment-end-->"
+   include-markdown "example1-subs/example1-teardown.md"
+   start="<!--example1-teardown-start-->"
+   end="<!--example1-teardown-end-->"
 %}

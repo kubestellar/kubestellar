@@ -22,13 +22,13 @@ limitations under the License.
 package edge
 
 import (
-	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v1alpha1"
+	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 type ClusterInterface interface {
-	// V1alpha1 provides access to the shared informers in V1alpha1.
-	V1alpha1() v1alpha1.ClusterInterface
+	// V2alpha1 provides access to the shared informers in V2alpha1.
+	V2alpha1() v2alpha1.ClusterInterface
 }
 
 type group struct {
@@ -41,14 +41,14 @@ func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalin
 	return &group{factory: f, tweakListOptions: tweakListOptions}
 }
 
-// V1alpha1 returns a new v1alpha1.ClusterInterface.
-func (g *group) V1alpha1() v1alpha1.ClusterInterface {
-	return v1alpha1.New(g.factory, g.tweakListOptions)
+// V2alpha1 returns a new v2alpha1.ClusterInterface.
+func (g *group) V2alpha1() v2alpha1.ClusterInterface {
+	return v2alpha1.New(g.factory, g.tweakListOptions)
 }
 
 type Interface interface {
-	// V1alpha1 provides access to the shared informers in V1alpha1.
-	V1alpha1() v1alpha1.Interface
+	// V2alpha1 provides access to the shared informers in V2alpha1.
+	V2alpha1() v2alpha1.Interface
 }
 
 type scopedGroup struct {
@@ -62,7 +62,7 @@ func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace strin
 	return &scopedGroup{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// V1alpha1 returns a new v1alpha1.ClusterInterface.
-func (g *scopedGroup) V1alpha1() v1alpha1.Interface {
-	return v1alpha1.NewScoped(g.factory, g.namespace, g.tweakListOptions)
+// V2alpha1 returns a new v2alpha1.ClusterInterface.
+func (g *scopedGroup) V2alpha1() v2alpha1.Interface {
+	return v2alpha1.NewScoped(g.factory, g.namespace, g.tweakListOptions)
 }

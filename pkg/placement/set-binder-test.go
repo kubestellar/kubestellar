@@ -25,7 +25,7 @@ import (
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 // exerciseSetBinder tests a given SetBinder.
@@ -37,15 +37,11 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	gr1 := metav1.GroupResource{
 		Group:    "apiextensions.k8s.io",
 		Resource: "customresourcedefinitions"}
-	workloadPartDetails1 := WorkloadPartDetails{APIVersion: "v1"}
-	gvr1 := metav1.GroupVersionResource{
-		Group:    gr1.Group,
-		Version:  workloadPartDetails1.APIVersion,
-		Resource: gr1.Resource}
+	workloadPartDetails1 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true}
 	workloadPartID1 := WorkloadPartID{
-		APIGroup: gvr1.Group,
-		Resource: gvr1.Resource,
-		Name:     "crd1",
+		First:  gr1,
+		Second: metav1.NamespaceNone,
+		Third:  ObjectName("crd1"),
 	}
 	parts1 := WorkloadParts{workloadPartID1: workloadPartDetails1}
 	ups1 := []edgeapi.UpsyncSet{
@@ -54,15 +50,11 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	gr2 := metav1.GroupResource{
 		Group:    "",
 		Resource: "namespaces"}
-	workloadPartDetails2 := WorkloadPartDetails{APIVersion: "v1"}
-	gvr2 := metav1.GroupVersionResource{
-		Group:    gr2.Group,
-		Version:  workloadPartDetails2.APIVersion,
-		Resource: gr2.Resource}
+	workloadPartDetails2 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: false}
 	workloadPartID2 := WorkloadPartID{
-		APIGroup: gvr2.Group,
-		Resource: gvr2.Resource,
-		Name:     "ns-a",
+		First:  gr2,
+		Second: metav1.NamespaceNone,
+		Third:  ObjectName("ns-a"),
 	}
 	parts2 := WorkloadParts{workloadPartID2: workloadPartDetails2}
 	ups2 := []edgeapi.UpsyncSet{
@@ -70,29 +62,27 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 		{APIGroup: "group3.test", Resources: []string{"widgets"}, Names: []string{"*"}}}
 	sc1 := logicalcluster.Name("wm1")
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
-	sp1 := SinglePlacement{
+	spA := SinglePlacement{
 		Cluster:        "inv1",
 		LocationName:   "loc1",
 		SyncTargetName: "st1",
 		SyncTargetUID:  apimachtypes.UID("uid1"),
 	}
-	sps1 := &edgeapi.SinglePlacementSlice{
-		Destinations: []SinglePlacement{sp1},
+	spsA := &edgeapi.SinglePlacementSlice{
+		Destinations: []SinglePlacement{spA},
 	}
-	where1 := ResolvedWhere{sps1}
-	NamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
-	NamespacedResourceDistributions := NewMapSet[NamespacedResourceDistributionTuple]()
+	where1 := ResolvedWhere{spsA}
+	NamespacedObjectDistributions := NewMapMap[NamespacedDistributionTuple, bool](nil)
 	NamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
-	NonNamespacedDistributions := NewMapSet[NonNamespacedDistributionTuple]()
+	NonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, bool](nil)
 	NonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	Upsyncs := NewHashSet(PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
 	projectionTracker := WorkloadProjectionSections{
-		NamespaceDistributions:          NamespaceDistributions,
-		NamespacedResourceDistributions: NamespacedResourceDistributions,
-		NamespacedModes:                 NamespacedModes,
-		NonNamespacedDistributions:      NonNamespacedDistributions,
-		NonNamespacedModes:              NonNamespacedModes,
-		Upsyncs:                         Upsyncs,
+		NamespacedObjectDistributions:    NamespacedObjectDistributions,
+		NamespacedModes:                  NamespacedModes,
+		NonNamespacedObjectDistributions: NonNamespacedObjectDistributions,
+		NonNamespacedModes:               NonNamespacedModes,
+		Upsyncs:                          Upsyncs,
 	}
 	whatReceiver, whereReceiver := binder(TrivialTransactor[WorkloadProjectionSections]{projectionTracker})
 	rw1 := ResolvedWhat{parts1, ups1}
@@ -102,13 +92,16 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	whereReceiver.Put(ep1Ref, where1)
 	pmk1 := ProjectionModeKey{
 		GroupResource: gr1,
-		Destination:   sp1,
+		Destination:   spA,
 	}
 	pmv1 := ProjectionModeVal{workloadPartDetails1.APIVersion}
-	objRef1 := ExternalName{Cluster: sc1, Name: workloadPartID1.Name}
-	expectedNonNamespacedDistributions := NewMapSet(NewPair(pmk1, objRef1))
-	if !SetEqual[NonNamespacedDistributionTuple](expectedNonNamespacedDistributions, NonNamespacedDistributions) {
-		t.Fatalf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedDistributions, NonNamespacedDistributions)
+	pmv2 := ProjectionModeVal{workloadPartDetails2.APIVersion}
+	objRef1 := ExternalName{Cluster: sc1, Name: workloadPartID1.Third}
+	objRef2 := ExternalName{Cluster: sc1, Name: workloadPartID2.Third}
+	expectedNonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, bool](nil)
+	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk1, objRef1), true)
+	if !MapEqual[NonNamespacedDistributionTuple, bool](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
+		t.Fatalf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions)
 	}
 	expectedNonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	expectedNonNamespacedModes.Put(pmk1, pmv1)
@@ -127,15 +120,14 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 
 	expectedUpsyncs := NewHashSet(
 		PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}),
-		NewPair(sp1, ups1[0]),
-		NewPair(sp1, ups1[1]))
+		NewPair(spA, ups1[0]),
+		NewPair(spA, ups1[1]))
 	if !SetEqual[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
 		t.Fatalf("Wrong Upsyncs: expected %v, got %v",
 			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
 			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
 	}
-	expectedNamespaceDistributions := NewMapSet[NamespaceDistributionTuple]()
-	expectedNamespacedResourceDistributions := NewMapSet[NamespacedResourceDistributionTuple]()
+	expectedNamespacedDistributions := NewMapMap[NamespacedDistributionTuple, bool](nil)
 	expectedNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 
 	rd2 := ResourceDetails{Namespaced: true, SupportsInformers: true, PreferredVersion: workloadPartDetails2.APIVersion}
@@ -146,27 +138,26 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	t.Logf("Adding resource discovery key=%v, val=%v", NewPair(sc1, gr2), rd2)
 	logger.Info("Adding resource discovery mapping", "key", NewPair(sc1, gr2), "val", rd2)
 	resourceDiscoveryReceiver.Put(NewPair(sc1, gr2), rd2)
-	expectedNonNamespacedDistributions.Remove(NewPair(pmk1, objRef1))
-	expectedNonNamespacedModes.Delete(pmk1)
-	expectedUpsyncs.Add(NewPair(sp1, ups2[1]))
-	expectedUpsyncs.Remove(NewPair(sp1, ups1[1]))
-	ndt2 := NamespaceDistributionTuple{sc1, NamespaceName(workloadPartID2.Name), sp1}
 	pmk2 := ProjectionModeKey{
 		GroupResource: gr2,
-		Destination:   sp1,
+		Destination:   spA,
 	}
-	pmv2 := ProjectionModeVal{workloadPartDetails2.APIVersion}
-	expectedNamespaceDistributions.Add(ndt2)
-	expectedNamespacedResourceDistributions.Add(NamespacedResourceDistributionTuple{sc1, pmk2})
-	expectedNamespacedModes.Put(pmk2, pmv2)
-	if !SetEqual[NonNamespacedDistributionTuple](expectedNonNamespacedDistributions, NonNamespacedDistributions) {
-		t.Errorf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedDistributions, NonNamespacedDistributions)
+	expectedNonNamespacedObjectDistributions.Delete(NewPair(pmk1, objRef1))
+	expectedNonNamespacedModes.Delete(pmk1)
+	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk2, objRef2), false)
+	expectedNonNamespacedModes.Put(pmk2, pmv2)
+
+	expectedUpsyncs.Add(NewPair(spA, ups2[1]))
+	expectedUpsyncs.Remove(NewPair(spA, ups1[1]))
+	//ndt2 := NamespacedDistributionTuple{sc1, NamespaceName(workloadPartID2.Name), spA}
+	//ndt2 := NamespacedDistributionTuple{pmk2, NewTriple(sc1, workloadPartID2.Second, workloadPartID2.Third)}
+	//expectedNamespacedDistributions.Add(ndt2)
+	//expectedNamespacedModes.Put(pmk2, pmv2)
+	if !MapEqual[NonNamespacedDistributionTuple, bool](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
+		t.Errorf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions)
 	}
-	if !SetEqual[NamespacedResourceDistributionTuple](expectedNamespacedResourceDistributions, NamespacedResourceDistributions) {
-		t.Errorf("Wrong NamespacedResourceDistributions; expected=%v, got=%v", expectedNamespacedResourceDistributions, NamespacedResourceDistributions)
-	}
-	if !SetEqual[NamespaceDistributionTuple](expectedNamespaceDistributions, NamespaceDistributions) {
-		t.Errorf("Wrong NamespaceDistributions; expected=%v, got=%v", expectedNamespaceDistributions, NamespaceDistributions)
+	if !MapEqual[NamespacedDistributionTuple, bool](expectedNamespacedDistributions, NamespacedObjectDistributions) {
+		t.Errorf("Wrong NamespacedDistributions; expected=%v, got=%v", expectedNamespacedDistributions, NamespacedObjectDistributions)
 	}
 	MapEnumerateDifferences[ProjectionModeKey, ProjectionModeVal](expectedNamespacedModes, NamespacedModes,
 		MapChangeReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
@@ -180,7 +171,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 				t.Errorf("Missing entry in NamespacedModes; key=%v, val=%v", key, val)
 			},
 		})
-	expectedUpsyncs.Add(NewPair(sp1, ups2[1]))
+	expectedUpsyncs.Add(NewPair(spA, ups2[1]))
 	if !SetEqual[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs, Upsyncs) {
 		t.Errorf("Wrong Upsyncs: expected %v, got %v",
 			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),

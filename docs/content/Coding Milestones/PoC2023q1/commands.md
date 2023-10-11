@@ -171,7 +171,7 @@ file that `kcp start` (kcp release v0.11.0) creates by default.
 ```console
 bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
-bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml 
+bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5
 <     certificate-authority-data: LS0...LQo=
 <     server: https://192.168.something.something:6443
@@ -219,7 +219,8 @@ kubestellar [flags] subcommand [flags]
 
 This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The `--log-folder` flag is
-only used in the `start` subcommand.
+only meaningful for the `start` subcommand. The `--local-kcp` flag is
+not meaningful for the `stop` subcommand.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -227,17 +228,36 @@ only used in the `start` subcommand.
 - `--log-folder $pathname`: says where to put the logs from the
   controllers.  Will be `mkdir -p` if absent.  Defaults to
   `${PWD}/kubestellar-logs`.
+- `--local-kcp $bool`: says whether to expect to find a local process
+  named "kcp".  Defaults to "true".
 - `-h` or `--help`: print a brief usage message and terminate.
 
 #### Kubestellar init
 
 This subcommand is used after installation to finish setup and does
-two things.  One is to ensure that the edge service provider workspace
-(ESPW) exists and has the required contents.  The other is to ensure
-that the `root:compute` workspace has been extended with the RBAC
-objects that enable the syncer to propagate reported state for
+the following five things.
+
+1. Waits for the kcp server to be in service and the `root:compute`
+   workspace to be usable.
+
+2. Ensure that the edge service provider workspace (ESPW) exists and
+has the required contents.
+
+3. Ensure that the `root:compute` workspace has been extended with the
+RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
+
+4. Ensure the existence of an inventory management workspace at
+pathname "root:imw1".
+
+5. Ensure the existence of a workload management workspace at pathname
+"root:wmw1" and that it has APIBindings that import the namespaced
+Kubernetes resources (kinds of objects) for management of
+containerized workloads.
+
+At the completion of `kubestellar init` the current workspace will be
+"root:wmw1".
 
 #### KubeStellar start
 
@@ -257,18 +277,46 @@ the ESPW.
 These commands administer a deployment of the central components ---
 the kcp server, PKI, and the central KubeStellar components --- in a
 Kubernetes cluster that will be referred to as "the hosting cluster".
-These are framed as "kubectl plugins" and thus need to be explicitly
-or implicitly given a kubeconfig file for the hosting cluster.
+These commands are framed as "kubectl plugins" and thus need to be
+explicitly or implicitly given a kubeconfig file for the hosting
+cluster.
+
+You need a Kubernetes cluster with an Ingress controller deployed and
+configured in a way that does _not_ terminate TLS connections (this
+abstinence is often called "SSL passthrough"). An OpenShift cluster
+would be one qualifying thing. Another would be an ordinary Kubernetes
+cluster with the [nginx Ingress
+controller](https://docs.nginx.com/nginx-ingress-controller/) deployed
+and configured appropriately. Please note that [special
+considerations](https://kind.sigs.k8s.io/docs/user/ingress/) apply
+when deploying an ingress controller in `kind`. See [a fully worked
+example with kind and
+nginx](../environments/dev-env/#hosting-kubestellar-in-a-kind-cluster). You
+will need to know the port number at which the Ingress controller is
+listening for HTTPS connections.
+
+**IF** your Kubernetes cluster has any worker nodes --- real or
+virtual --- with the x86_64 instruction set, they need to support the
+extended instruction set known as "x64-64-v2". If using hardware
+bought in the last 10 years, you can assume that is true. If using
+emulation, you need to make sure that your emulator is emulating that
+extended instruction set --- some emulators do not do this by
+default. See [QEMU configuration
+recommendations](https://www.qemu.org/docs/master/system/i386/cpu.html),
+for example.
+
+You will need a domain name that, on each of your clients, resolves to
+an IP address that gets to the Ingress controller's listening socket.
 
 ### Deploy to cluster
 
-Deployment is done with a "kubectl plugin" that creates a [Helm
+Deployment is done with a "kubectl plugin" that is invoked as `kubectl
+kubestellar deploy` and creates a [Helm
 "release"](https://helm.sh/docs/intro/using_helm/#three-big-concepts)
 in the hosting cluster. As such, it relies on explicit (on the command
-line) or implicit (in environment variables and/or `~/.kube/config`
-configuration needed to execute Helm commands). An invocation of this
-plugin starts with `kubectl kubestellar deploy` and continues with the
-following, in any order.
+line) or implicit (in environment variables and/or `~/.kube/config`)
+configuration needed to execute Helm commands. The following flags can
+appear on the command line, in any order.
 
 - `--openshift $bool`, saying whether the hosting cluster is an
   OpenShift cluster.  If so then a Route will be created to the kcp
@@ -287,7 +335,10 @@ following, in any order.
   hostname will start with a string derived from the Route in the
   chart (currently "kubestellar-route-kubestellar") and continue with
   "." and then the ingress domain name for the cluster.
-- a command line flag for the `helm upgrade` command.
+- a command line flag for the `helm upgrade` command. This includes
+  the usual control over namespace: you can set it on the command
+  line, otherwise the namespace that is current in your kubeconfig
+  applies.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -301,6 +352,10 @@ issue the following command.
 kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:1234
 ```
 
+The Helm chart takes care of setting up the KubeStellar MCCM core,
+accomplishing the same thing as the [kubestellar
+start](#kubestellar-start) command above.
+
 ### Fetch kubeconfig for internal clients
 
 To fetch a kubeconfig for use by clients inside the hosting cluster,
@@ -309,7 +364,8 @@ takes the following on the command line.
 
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
-- a `kubectl` command line flag, for accessing the hosting cluster.
+- a `kubectl` command line flag, for accessing the hosting
+  cluster. This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
@@ -325,34 +381,18 @@ on the command line.
 - `-o $output_pathname`, saying where to write the kubeconfig. This
   must appear exactly once on the command line.
 - a `kubectl` command line flag, for accessing the hosting cluster.
+  This includes the usual control over namespace.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
 
-### Fetch a log from a central process
+### Fetch a log from a KubeStellar runtime container
 
-The `kubectl kubestellar get-log` command will fetch the log from one
-of the central process of kcp or KubeStellar.  This command requires
-one positional argument, identifying the process.  The accepted
-identifiers are as follows.
-
-- `kcp`
-- `mailbox-controller`
-- `where-resolver`
-- `placement-translator`
-
-This command accepts some optional flags, which may appear before
-and/or after the positional argument.  The optional flags are as
-follows.
-
-- `-h`: print a brief usage message and exit successfully.
-- `-n $lines`: the log is extracted with the Linux `tail` command, and
-  this optional flag will be passed along to `tail` if given; the
-  usual syntax and semantics of the `-n` flag for `tail` apply.  If
-  not given then `tail` will be told `-n +0` to fetch the whole log.
-- `-f`: tells `tail` to "follow".
-- a `kubectl` command line flag, for accessing the hosting cluster.
-- `-X`: for debugging, `set -x` in the script that implements this command.
+{%
+   include-markdown "../../../../core-helm-chart/README.md"
+   start="<!--check-log-start-->"
+   end="<!--check-log-end-->"
+%}
 
 ### Remove deployment to a Kubernetes cluster
 
@@ -420,7 +460,7 @@ kubestellar-version gitCommit
 ```
 
 ```shell
-kubestellar-version          
+kubestellar-version
 ```
 ``` { .bash .no-copy }
 {"major":"1","minor":"24","gitVersion":"v1.24.3+kcp-v0.2.1-20-g1747254b880cb7","gitCommit":"1747254b","gitTreeState":"dirty","buildDate":"2023-05-19T02:54:01Z","goVersion":"go1.19.9","compiler":"gc","platform":"darwin/amd64"}
@@ -791,7 +831,7 @@ kubectl kubestellar ensure wmw example-wmw --with-kube false
 Current workspace is "root".
 Current workspace is "root:my-org".
 Current workspace is "root:my-org:example-wmw" (type root:universal).
-apibinding.apis.kcp.io "bind-kube" deleted 
+apibinding.apis.kcp.io "bind-kube" deleted
 ```
 
 ## Removing a Workload Management Workspace
@@ -817,7 +857,7 @@ Current workspace is "root:my-org".
 kubectl delete Workspace example-wmw
 ```
 ``` { .bash .no-copy }
-workspace.tenancy.kcp.io "example-wmw" deleted 
+workspace.tenancy.kcp.io "example-wmw" deleted
 ```
 
 Alternatively, you can use the following command line whose design

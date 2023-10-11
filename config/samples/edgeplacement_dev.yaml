@@ -1,13 +1,10 @@
-apiVersion: edge.kubestellar.io/v1alpha1
+apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
   name: dev
 spec:
   locationSelectors:
   - matchLabels:
-      env: dev
-  namespaceSelector:
-    matchLabels:
       env: dev
   nonNamespacedObjects:
   - apiGroup: apis.kcp.io

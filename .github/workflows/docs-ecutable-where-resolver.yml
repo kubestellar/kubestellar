@@ -46,7 +46,7 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v4.0.0
+      - uses: actions/checkout@v4.1.0
       
       - uses: actions/setup-go@v4
         with:

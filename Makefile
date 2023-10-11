@@ -15,8 +15,18 @@
 # We need bash for some conditional logic below.
 SHELL := /usr/bin/env bash -e
 
-CENTER_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
-CENTER_IMAGE ?= quay.io/kubestellar/kubestellar:$(shell date -u +b%y-%m-%d-%H-%M-%S)
+KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
+GIT_DIRTY ?= $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
+GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
+
+CORE_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # kcp does not support linux/s390x
+CORE_IMAGE_REPO ?= quay.io/kubestellar/kubestellar
+BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
+GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
+
+SYNCER_PLATFORMS ?= linux/amd64,linux/arm64,linux/s390x
 
 GO_INSTALL = ./hack/go-install.sh
 
@@ -78,11 +88,6 @@ export CODE_GENERATOR # so hack scripts can use it
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
 
-KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
-KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
-GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
-GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
-GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 LDFLAGS := \
 	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
@@ -109,7 +114,7 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/space-manager ./cmd/syncer
+build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator  ./cmd/syncer
 #./tmc/cmd/...
 build: require-jq require-go require-git verify-go-versions ## Build the project
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
@@ -125,12 +130,12 @@ build-all:
 
 .PHONY: kubestellar-image
 kubestellar-image:
-	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar; fi
-	docker buildx --builder kubestellar build --push --sbom=true --platform $(CENTER_PLATFORMS) --tag $(CENTER_IMAGE) -f center.Dockerfile .
+	if ! docker buildx inspect kubestellar &> /dev/null; then docker buildx create --name kubestellar --platform $(CORE_PLATFORMS); fi
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; eval docker buildx --builder kubestellar build --push --sbom=true --platform $(CORE_PLATFORMS) --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile --build-arg "GIT_DIRTY=$(GIT_DIRTY)" .
 
 .PHONY: kubestellar-image-local
 kubestellar-image-local:
-	docker build --tag $(CENTER_IMAGE) -f center.Dockerfile .
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile $$extoo --build-arg "GIT_DIRTY=$(GIT_DIRTY)" .
 
 # .PHONY: build-kind-images
 # build-kind-images-ko: require-ko
@@ -142,16 +147,15 @@ kubestellar-image-local:
 
 # build and push kubestellar-syncer image by ko
 # e.g. usage:
-#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x ARCHS=linux/amd64,linux/arm64
+#      make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
 # This example builds ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x image with linux/amd64 and linux/arm64 and push it to ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
 .PHONY: build-kubestellar-syncer-image
-build-kubestellar-syncer-image: DOCKER_REPO ?= 
-build-kubestellar-syncer-image: IMAGE_TAG ?= latest
-build-kubestellar-syncer-image: ARCHS ?= linux/$(ARCH)
+build-kubestellar-syncer-image: DOCKER_REPO ?= quay.io/kubestellar/syncer
+build-kubestellar-syncer-image: IMAGE_TAG ?= $(GIT_TAG)
 build-kubestellar-syncer-image: ADDITIONAL_ARGS ?= 
 build-kubestellar-syncer-image: require-ko
-	echo KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
-	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) ko build --image-label GIT_COMMIT=${GIT_COMMIT},GIT_DIRTY=${GIT_DIRTY} --platform=$(ARCHS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
+	echo KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer
+	$(eval SYNCER_IMAGE=$(shell KO_DOCKER_REPO=$(DOCKER_REPO) GOFLAGS=-buildvcs=false ko build --platform=$(SYNCER_PLATFORMS) --bare --tags $(IMAGE_TAG) $(ADDITIONAL_ARGS) ./cmd/syncer))
 	@echo "$(SYNCER_IMAGE)"
 
 .PHONY: build-kubestellar-syncer-image-local
@@ -419,18 +423,23 @@ endif
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
 kcp/bin/kcp:
-	bash ./bootstrap/install-kcp-with-plugins.sh
+	bash ./bootstrap/bootstrap-kubestellar.sh --deploy false
 
 .PHONY: e2e-test-kubestellar-syncer
 e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 e2e-test-kubestellar-syncer: TEST_ARGS ?= 
-e2e-test-kubestellar-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
+e2e-test-kubestellar-syncer: PATH := $(PWD)/kcp/bin:$(PATH)
 e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
-	export PATH=$(PWD)/kcp/bin:$$PATH && \
+	mkdir -p $(WORK_DIR)/.kcp && \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; echo "kcp is not ready. wait for 1s...";done && \
-	echo 'Starting test(s)' && \
+	echo 'kcp is ready. Wait for Workspace API to be ready' && \
+	export KUBECONFIG=$(WORK_DIR)/.kcp/admin.kubeconfig && \
+	while ! kubectl get workspaces &> /dev/null; do sleep 1; echo "Workspace API is not ready. wait for 1s...";done && \
+	echo 'Workspace API is ready. Setup root:compute workspace by kubestellar init' && \
+	./scripts/kubestellar init && \
+	echo 'Starting test(s). To add TEST_ARGS=-v option to Make command if displaying the detail logs' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
 		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \
 		--kcp-kubeconfig $(WORK_DIR)/.kcp/admin.kubeconfig --suites kubestellar-syncer \

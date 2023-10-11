@@ -27,10 +27,10 @@ BOILERPLATE_HEADER="$( pwd )/hack/boilerplate/boilerplate.go.txt"
 popd
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
 
-# "core:v1alpha1 workload:v1alpha1 apiresource:v1alpha1 tenancy:v1alpha1 tenancy:v1beta1 apis:v1alpha1 scheduling:v1alpha1 topology:v1alpha1" \
+# "core:v2alpha1 workload:v2alpha1 apiresource:v2alpha1 tenancy:v2alpha1 tenancy:v1beta1 apis:v2alpha1 scheduling:v2alpha1 topology:v2alpha1" \
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
   github.com/kubestellar/kubestellar/pkg/client github.com/kubestellar/kubestellar/pkg/apis \
-  "edge:v1alpha1 meta:v1alpha1 space:v1alpha1" \
+  "edge:v2alpha1" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar
@@ -40,20 +40,20 @@ ${CODE_GENERATOR} \
   "client:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
   "lister:apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,headerFile=${BOILERPLATE_HEADER}" \
   "informer:outputPackagePath=github.com/kubestellar/kubestellar/pkg/client,apiPackagePath=github.com/kubestellar/kubestellar/pkg/apis,singleClusterClientPackagePath=github.com/kubestellar/kubestellar/pkg/client/clientset/versioned,headerFile=${BOILERPLATE_HEADER}" \
-  "paths=./..." \
+  "paths={./edge/...}" \
   "output:dir=./../client"
 popd
 
 # bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy" \
 #   github.com/kubestellar/kubestellar/third_party/conditions/client github.com/kubestellar/kubestellar/third_party/conditions/apis \
-#   "conditions:v1alpha1" \
+#   "conditions:v2alpha1" \
 #   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
 #   --output-base "${SCRIPT_ROOT}" \
 #   --trim-path-prefix github.com/kubestellar/kubestellar
 
 # bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client" \
 #   github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/client github.com/kubestellar/kubestellar/test/e2e/fixtures/wildwest/apis \
-#   "wildwest:v1alpha1" \
+#   "wildwest:v2alpha1" \
 #   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
 #   --output-base "${SCRIPT_ROOT}" \
 #   --trim-path-prefix github.com/kubestellar/kubestellar
@@ -70,15 +70,15 @@ popd
 go install "${CODEGEN_PKG}"/cmd/openapi-gen
 
 # "$GOPATH"/bin/openapi-gen  \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/workload/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/core/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apiresource/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/tenancy/v1alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/workload/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/core/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apiresource/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/tenancy/v2alpha1 \
 # # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/tenancy/v1beta1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apis/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/scheduling/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/topology/v1alpha1 \
-# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/third_party/conditions/apis/conditions/v1alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/apis/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/scheduling/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/topology/v2alpha1 \
+# # --input-dirs github.com/kubestellar/kubestellar/pkg/apis/third_party/conditions/apis/conditions/v2alpha1 \
 # --input-dirs k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version \
 # --output-package github.com/kubestellar/kubestellar/pkg/openapi -O zz_generated.openapi \
 # --go-header-file ./hack/../hack/boilerplate/boilerplate.generatego.txt \

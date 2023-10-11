@@ -34,7 +34,7 @@ import (
 	"k8s.io/klog/v2"
 	sigyaml "sigs.k8s.io/yaml"
 
-	edgev1alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v1alpha1"
+	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
 func main() {
@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	downSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
+	downSyncedResources := []edgev2alpha1.EdgeSyncConfigResource{}
 	requiredNamespaces := map[string]bool{}
 	for _, unstObj := range unstObjs {
 		gvk := unstObj.GroupVersionKind()
@@ -72,7 +72,7 @@ func main() {
 		kind := gvk.Kind
 		name := unstObj.GetName()
 		namespace := unstObj.GetNamespace()
-		downSyncedResource := edgev1alpha1.EdgeSyncConfigResource{
+		downSyncedResource := edgev2alpha1.EdgeSyncConfigResource{
 			Namespace: namespace,
 			Name:      name,
 			Group:     group,
@@ -128,10 +128,10 @@ func main() {
 	// 	}
 	// }
 
-	prependDownSyncedResources := []edgev1alpha1.EdgeSyncConfigResource{}
+	prependDownSyncedResources := []edgev2alpha1.EdgeSyncConfigResource{}
 	for namespace, value := range requiredNamespaces {
 		_ = value
-		downSyncedResource := edgev1alpha1.EdgeSyncConfigResource{
+		downSyncedResource := edgev2alpha1.EdgeSyncConfigResource{
 			Name:    namespace,
 			Kind:    "Namespace",
 			Version: "v1",
@@ -140,11 +140,11 @@ func main() {
 	}
 	downSyncedResources = append(prependDownSyncedResources, downSyncedResources...)
 
-	edgeSyncConfig := edgev1alpha1.EdgeSyncConfig{
+	edgeSyncConfig := edgev2alpha1.EdgeSyncConfig{
 		ObjectMeta: v1.ObjectMeta{
 			Name: "sync-config",
 		},
-		Spec: edgev1alpha1.EdgeSyncConfigSpec{
+		Spec: edgev2alpha1.EdgeSyncConfigSpec{
 			DownSyncedResources: downSyncedResources,
 		},
 	}

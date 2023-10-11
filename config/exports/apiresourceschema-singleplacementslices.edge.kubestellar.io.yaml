@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v230810-2d48e9f7.singleplacementslices.edge.kubestellar.io
+  name: v231005-c6f7728ef.singleplacementslices.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -14,7 +14,7 @@ spec:
     singular: singleplacementslice
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - name: v2alpha1
     schema:
       description: SinglePlacementSlice holds results of resolving a "where predicate".
         For a given EdgePlacement object, the Where Resolver figures out which Locations
