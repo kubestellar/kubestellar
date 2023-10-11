@@ -1128,7 +1128,7 @@
   
     <li class="md-nav__item">
       <a href="../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Use Cases Affecting the Roadmap for PoC2023q1
+        Roadmap
       </a>
     </li>
   
@@ -1298,14 +1298,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q4
+          PoC2023q3
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q4
+          PoC2023q3
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1315,7 +1315,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
+      <a href="../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1842,7 +1842,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.5/docs/content/Getting-Started/quickstart.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.4/docs/content/Getting-Started/quickstart.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1851,7 +1851,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.5/docs/content/Getting-Started/quickstart.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.4/docs/content/Getting-Started/quickstart.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -1860,7 +1860,7 @@
 
   <h1>QuickStart</h1>
 
-<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml"><img alt="QuickStart test" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml/badge.svg?branch=release-0.5" /></a>&nbsp;&nbsp;&nbsp;</p>
+<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml"><img alt="QuickStart test" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml/badge.svg?branch=release-0.4" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- <img width="500px" src="../../KubeStellar-with-Logo.png" title="KubeStellar"> -->
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-0-demo.md '&lt;!--quickstart-0-demo-start--&gt;' '&lt;!--quickstart-0-demo-end--&gt;' -->
 
@@ -1974,23 +1974,14 @@ Select the tab for your environment for suggested commands to install them</p>
 </code></pre></div>
 <div class="highlight"><span class="filename">kubectl - https://kubernetes.io/docs/tasks/tools/ (version range expected: 1.23-1.25)</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(dpkg --print-architecture)/kubectl &amp;&amp; chmod +x kubectl &amp;&amp; sudo mv ./kubectl /usr/local/bin/kubectl
 </code></pre></div>
-``` title="slsa-verifier - https://github.com/slsa-framework (verify ko signer)
-SLSA_VERIFIER=slsa-verifier-linux-$(dpkg --print-architecture)
-curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}
-chmod +x ${SLSA_VERIFIER}
-curl -sSfLO https://github.com/slsa-framework/slsa-verifier/releases/latest/download/${SLSA_VERIFIER}.intoto.jsonl
-./${SLSA_VERIFIER} verify-artifact ./${SLSA_VERIFIER} --provenance-path ${SLSA_VERIFIER}.intoto.jsonl --source-uri github.com/slsa-framework/slsa-verifier
-sudo install ./${SLSA_VERIFIER} /usr/local/bin/slsa-verifier
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>``` title=&quot;ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)&quot;
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>KO_VERSION=$(curl -sSf https://api.github.com/repos/ko-build/ko/releases/latest | jq -r &#39;.tag_name&#39;) # latest version (with v prefix)
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>OS=$(uname -s)     # Linux, Darwin
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>ARCH=$(uname -m)  # x86_64, arm64, i386, s390x
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/${KO_VERSION}/ko_${KO_VERSION#v}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/${KO_VERSION}/multiple.intoto.jsonl &gt; multiple.intoto.jsonl
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>slsa-verifier verify-artifact ko.tar.gz --provenance-path multiple.intoto.jsonl --source-uri github.com/ko-build/ko --source-tag &quot;${KO_VERSION}&quot;
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>tar xzf ko.tar.gz ko
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>chmod +x ./ko
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>./ko version
+<div class="highlight"><span class="filename">ko - https://github.com/ko-build/ko (required for compiling KubeStellar Syncer)</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>VERSION=TODO # choose the latest version (without v prefix)
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>OS=Linux     # or Darwin
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>ARCH=x86_64  # or arm64, i386, s390x
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>curl -sSfL &quot;https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz&quot; &gt; ko.tar.gz
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>curl -sSfL https://github.com/ko-build/ko/releases/download/v${VERSION}/attestation.intoto.jsonl &gt; provenance.intoto.jsonl
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>slsa-verifier -artifact-path ko.tar.gz -provenance provenance.intoto.jsonl -source github.com/google/ko -tag &quot;v${VERSION}&quot;
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>tar xzf ko.tar.gz ko
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>chmod +x ./ko
 </code></pre></div>
 <div class="highlight"><span class="filename">GO - You will need GO to compile and run kcp and the KubeStellar components.  Currently kcp requires go version 1.19</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl -L &quot;https://go.dev/dl/go1.19.5.linux-$(dpkg --print-architecture).tar.gz&quot; -o go.tar.gz
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>tar -C /usr/local -xzf go.tar.gz
@@ -2070,8 +2061,8 @@ sudo install ./${SLSA_VERIFIER} /usr/local/bin/slsa-verifier
 <h2 id="2-install-and-run-kubestellar">2. Install and run <strong>KubeStellar</strong><a class="headerlink" href="#2-install-and-run-kubestellar" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-1-install-and-run-kubestellar.md '&lt;!--quickstart-1-install-and-run-kubestellar-start--&gt;' '&lt;!--quickstart-1-install-and-run-kubestellar-end--&gt;' -->
 
-<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. The following commands will download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fecthed, see <a href="../../Coding Milestones/PoC2023q1/commands/#kcp-control">kcp control</a> and <a href="../../Coding Milestones/PoC2023q1/commands/#kubestellar-platform-control">KubeStellar platform control</a>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.5/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.5.0
+<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.4/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.4.0
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/.kcp/admin.kubeconfig&quot;</span>
 </code></pre></div>
@@ -2180,17 +2171,17 @@ workload and summarization aspirations removed.</p>
 <a id="__codelineno-37-16" name="__codelineno-37-16" href="#__codelineno-37-16"></a>
 <a id="__codelineno-37-17" name="__codelineno-37-17" href="#__codelineno-37-17"></a>Wrote<span class="w"> </span>physical<span class="w"> </span>cluster<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>florin-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span>.<span class="w"> </span>Use
 <a id="__codelineno-37-18" name="__codelineno-37-18" href="#__codelineno-37-18"></a>
-<a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;florin-syncer.yaml&quot;</span>
+<a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;florin-syncer.yaml&quot;</span>
 <a id="__codelineno-37-20" name="__codelineno-37-20" href="#__codelineno-37-20"></a>
 <a id="__codelineno-37-21" name="__codelineno-37-21" href="#__codelineno-37-21"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
 <a id="__codelineno-37-22" name="__codelineno-37-22" href="#__codelineno-37-22"></a>
-<a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>kubestellar-syncer-florin-1yi5q9c4
+<a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;pcluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-florin-1yi5q9c4&quot;</span><span class="w"> </span>kubestellar-syncer-florin-1yi5q9c4
 <a id="__codelineno-37-24" name="__codelineno-37-24" href="#__codelineno-37-24"></a>
 <a id="__codelineno-37-25" name="__codelineno-37-25" href="#__codelineno-37-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 <a id="__codelineno-37-26" name="__codelineno-37-26" href="#__codelineno-37-26"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-imw&quot;</span>.
 <a id="__codelineno-37-27" name="__codelineno-37-27" href="#__codelineno-37-27"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div>
-<p>An edge syncer manifest yaml file was created in your current directory: <code>florin-syncer.yaml</code>. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.</p>
+<p>An edge syncer manifest yaml file was created in your current director: <code>florin-syncer.yaml</code>. The default for the output file is the name of the SyncTarget object with “-syncer.yaml” appended.</p>
 <p>Now let's deploy the edge syncer to the <code>florin</code> edge cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>florin-syncer.yaml
 </code></pre></div>
