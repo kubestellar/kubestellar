@@ -36,6 +36,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-syncer/</loc>
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
@@ -68,13 +75,6 @@
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/roadmap-uses/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver/"/>
          
     </url>
     <url>
@@ -162,6 +162,55 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-0-pull-kcp-and-kubestellar-source-and-start-kcp/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-1-export-kubeconfig-and-path-for-kcp/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-2-ws-root-and-ws-create-edge/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-exports/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-exports/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-imports/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-imports/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start-without-cd-kubestellar/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start-without-cd-kubestellar/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start/</loc>
+         <lastmod>2023-10-11</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/kubestellar-scheduler-subs/kubestellar-scheduler-process-start/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/kubestellar-syncer-subs/kubestellar-syncer-0-deploy-florin/</loc>
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
@@ -208,55 +257,6 @@
          <lastmod>2023-10-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/placement-translator-subs/placement-translator-process-start/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-1-build-kubestellar/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-1-build-kubestellar/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-2-ws-root-and-ws-create-edge/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-2-ws-root-and-ws-create-edge/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-exports/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-exports/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-imports/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-imports/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-process-start-without-cd-kubestellar/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-process-start-without-cd-kubestellar/"/>
-         
-    </url>
-    <url>
-         <loc>https://docs.kubestellar.io/release-0.7/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-process-start/</loc>
-         <lastmod>2023-10-11</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.7/en/Coding%20Milestones/PoC2023q1/where-resolver-subs/where-resolver-process-start/"/>
          
     </url>
     <url>
