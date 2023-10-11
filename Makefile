@@ -428,9 +428,9 @@ kcp/bin/kcp:
 .PHONY: e2e-test-kubestellar-syncer
 e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 e2e-test-kubestellar-syncer: TEST_ARGS ?= 
-e2e-test-kubestellar-syncer: KIND_CLUSTER_NAME ?= e2e-kubestellar
-e2e-test-kubestellar-syncer: export PATH := $(PWD)/kcp/bin:$(PATH)
-e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup bin/kubestellar kcp/bin/kcp
+e2e-test-kubestellar-syncer: PATH := $(PWD)/kcp/bin:$(PATH)
+e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
+	mkdir -p $(WORK_DIR)/.kcp && \
 	kcp start --root-directory=$(WORK_DIR)/.kcp > $(WORK_DIR)/.kcp/kcp.log 2>&1 & PID=$$! && echo "PID $$PID" && \
 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; echo "kcp is not ready. wait for 1s...";done && \
