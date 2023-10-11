@@ -11,7 +11,7 @@ mailbox-controller -v=2 &
 # wait until workspaces for both mailboxes show up
 sleep 10
 kubectl ws root
-while [ $(kubectl ws tree | grep "-mb-" | wc -l) -ne 2 ]; do
+while [ $(kubectl ws tree | grep "\-mb\-" | wc -l) -ne 2 ]; do
   sleep 10
 done
 ```
