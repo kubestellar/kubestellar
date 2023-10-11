@@ -103,7 +103,7 @@ Following is an example of invoking this command and examining its
 results.
 
 ```console
-bash-5.2$ eval pieces=($(scripts/kubestellar-ensure-kcp-server-creds yep.yep))
+bash-5.2$ eval pieces=($(kubestellar-ensure-kcp-server-creds yep.yep))
 Re-using PKI at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki
 Re-using CA at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/ca.key
 Accepting existing credentials
@@ -169,7 +169,7 @@ results.  The context and port number chosen work for the kubeconfig
 file that `kcp start` (kcp release v0.11.0) creates by default.
 
 ```console
-bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
+bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
 bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5

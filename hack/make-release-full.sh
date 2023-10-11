@@ -34,6 +34,7 @@ length=${#os_names[@]}
 for (( i=0; i<length; i++ ));
 do
 	echo "${os_names[$i]} ${arch_names[$i]}"
-    $srcdir/make-release-platform-archive.sh $kcpe_version ${os_names[$i]} ${arch_names[$i]}
+    $srcdir/make-release-platform-archive.sh $kcpe_version user ${os_names[$i]} ${arch_names[$i]}
+    $srcdir/make-release-platform-archive.sh $kcpe_version full ${os_names[$i]} ${arch_names[$i]}
 done
 

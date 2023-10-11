@@ -22,7 +22,7 @@ git checkout main
 
 ### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
 ```shell
-vi scripts/kubectl-kubestellar-prep_for_syncer
+vi outer-scripts/kubectl-kubestellar-prep_for_syncer
 ```
 
 change the version in the following line:
