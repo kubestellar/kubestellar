@@ -43,7 +43,10 @@ Run the kcp server in a forked shell.  Even though the subcommand is "start", it
 export KUBECONFIG=$(pwd)/.kcp/admin.kubeconfig
 kcp start &> /tmp/kcp.log &
 popd
-sleep 30 
+# wait until KCP is ready checking availability of ws resource
+while ! kubectl ws tree &> /dev/null; do
+  sleep 10
+done
 ```
 <!--example1-start-kcp-end-->
 <!-- > /dev/null & -->
