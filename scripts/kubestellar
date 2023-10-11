@@ -76,7 +76,7 @@ function ensure_imws() {
             if [ "$i" == "" ] ; then
                 continue
             fi
-            echo "Ensuring INV: $i"
+            echo "Ensuring IMW: $i"
             ensure_imw "$i"
             kubectl ws use $initial_ws &> /dev/null # go back to the initial state
         done
