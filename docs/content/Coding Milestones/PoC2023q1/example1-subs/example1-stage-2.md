@@ -60,7 +60,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: commonstuff
-  labels: {common: "si"}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -146,13 +145,11 @@ spec:
   downsync:
   - apiGroup: ""
     resources: [ configmaps ]
-    namespaceSelectors:
-    - matchLabels: {"common":"si"}
+    namespaces: [ commonstuff ]
     objectNames: [ httpd-htdocs ]
   - apiGroup: apps
     resources: [ replicasets ]
-    namespaceSelectors:
-    - matchLabels: {"common":"si"}
+    namespaces: [ commonstuff ]
     objectNames: [ "*" ]
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
