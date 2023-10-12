@@ -205,7 +205,6 @@ spec:
       namespace: commonstuff
     - names:
       - httpd-htdocs
-      - kube-root-ca.crt
       namespace: specialstuff
     resource: configmaps
   upsync:

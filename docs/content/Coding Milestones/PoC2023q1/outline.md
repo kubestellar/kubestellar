@@ -243,16 +243,9 @@ the normal kcp behavior.
 | v1 | ResourceQuota | true |
 | v1 | ServiceAccount | true |
 
-The APIService objects are of two sorts: (a) those that are built-in
-and describe object types built into the apiserver and (b) those that
-are added by admins to add API groups served by custom external
-servers.  Sort (b) is not supported because this PoC does not support
-custom external servers in the edge clusters.  Sort (a) is not
-programmable in this PoC, but it might be inspectable.
-
 **NOTE**: The denaturing described here is not implemented yet.  The
 kinds of objects listed above can be put into a workload management
-workspace and it will given them its usual interpretation. For ones
+workspace and it will give them its usual interpretation. For ones
 that add authorizations, this will indeed _add_ authorizations but not
 otherwise break something. The kcp server does not implement
 `FlowSchema` nor `PriorityLevelConfiguration`; those will indeed be
