@@ -2509,6 +2509,11 @@ the normal kcp behavior.</p>
 <td>false</td>
 </tr>
 <tr>
+<td>apiregistration.k8s.io/v1</td>
+<td>APIService</td>
+<td>false</td>
+</tr>
+<tr>
 <td>flowcontrol.apiserver.k8s.io/v1beta2</td>
 <td>FlowSchema</td>
 <td>false</td>
@@ -2555,6 +2560,15 @@ the normal kcp behavior.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>NOTE</strong>: The denaturing described here is not implemented yet.  The
+kinds of objects listed above can be put into a workload management
+workspace and it will give them its usual interpretation. For ones
+that add authorizations, this will indeed <em>add</em> authorizations but not
+otherwise break something. The kcp server does not implement
+<code>FlowSchema</code> nor <code>PriorityLevelConfiguration</code>; those will indeed be
+uninterpreted. For objects that configure calls to other servers,
+these will fail unless the user arranges for them to work when made in
+the center as well in the edge clusters.</p>
 <h4 id="needs-to-be-natured-in-center-and-edge">Needs to be natured in center and edge<a class="headerlink" href="#needs-to-be-natured-in-center-and-edge" title="Permanent link">#</a></h4>
 <p>These should have their usual effect in both center and edge; they
 need no distinct treatment.</p>
@@ -2624,11 +2638,6 @@ computing platform.</p>
 </thead>
 <tbody>
 <tr>
-<td>apiregistration.k8s.io/v1</td>
-<td>APIService</td>
-<td>false</td>
-</tr>
-<tr>
 <td>apiresource.kcp.io/v1alpha1</td>
 <td>APIResourceImport</td>
 <td>false</td>
@@ -2645,12 +2654,6 @@ computing platform.</p>
 </tr>
 </tbody>
 </table>
-<p>The APIService objects are of two sorts: (a) those that are built-in
-and describe object types built into the apiserver and (b) those that
-are added by admins to add API groups served by custom external
-servers.  Sort (b) is not supported because this PoC does not support
-custom external servers in the edge clusters.  Sort (a) is not
-programmable in this PoC, but it might be inspectable.</p>
 <h4 id="not-destined-for-edge">Not destined for edge<a class="headerlink" href="#not-destined-for-edge" title="Permanent link">#</a></h4>
 <p>These kinds of objects are concerned with either (a) TMC control or
 (b) workload data that should only exist in the edge clusters.  These
@@ -2736,9 +2739,9 @@ their workload desired and reported state.</p>
 <td>true</td>
 </tr>
 <tr>
-<td>~~ scheduling.kcp.io/v1alpha1</td>
-<td>Location</td>
-<td>false ~~</td>
+<td>~~scheduling.kcp.io/v1alpha1~~</td>
+<td>~~Location~~</td>
+<td>~~false ~~</td>
 </tr>
 <tr>
 <td>scheduling.kcp.io/v1alpha1</td>
@@ -2791,9 +2794,9 @@ their workload desired and reported state.</p>
 <td>false</td>
 </tr>
 <tr>
-<td>~~workload.kcp.io/v1alpha1</td>
-<td>SyncTarget</td>
-<td>false~~</td>
+<td>~~workload.kcp.io/v1alpha1~~</td>
+<td>~~SyncTarget~~</td>
+<td>~~false~~</td>
 </tr>
 </tbody>
 </table>
