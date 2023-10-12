@@ -39,8 +39,58 @@ cleanup=0
 espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
 local_kcp=true
+imws="root:imw1"
+wmws="root:wmw1"
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+
+function echoerr() {
+   echo "ERROR: $1" >&2
+}
+
+
+function ensure_imws() {
+    initial_ws=$(kubectl ws . --short)
+    while IFS=',' read -ra items; do
+        for i in "${items[@]}"; do
+            if [ "$i" == "" ] ; then
+                continue
+            fi
+            imw=${i#"root:"}
+            echo "Ensuring IMW: $imw"
+            kubectl ws root &> /dev/null
+            if ! kubectl ws "$imw" &> /dev/null ; then #
+                if ! kubectl ws create "$imw" --enter &> /dev/null ; then
+                    echoerr 'unable to create "$imw"!'
+                    break
+                fi
+            fi
+            if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
+                kubectl kcp bind apiexport root:espw:edge.kubestellar.io
+            fi
+        done
+    done <<< "$1"
+    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
+}
+
+
+function ensure_wmws() {
+    initial_ws=$(kubectl ws . --short)
+    while IFS=',' read -ra items; do
+        for i in "${items[@]}"; do
+            if [ "$i" == "" ] ; then
+                continue
+            fi
+            wmw=${i#"root:"}
+            echo "Ensuring WMW: $wmw"
+            kubectl ws root &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true &> /dev/null
+        done
+    done <<< "$1"
+    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
+}
+
 
 while (( $# > 0 )); do
     case "$1" in
@@ -59,11 +109,21 @@ while (( $# > 0 )); do
     (--verbose|-V)
         verbosity=1
 	verbdir="";;
+    (--ensure-imw)
+        if (( $# > 1 ));
+        then { imws="$2"; shift; }
+        else { echo "$0: missing comma separated list of IMWs" >&2; exit 1; }
+        fi;;
+    (--ensure-wmw)
+        if (( $# > 1 ));
+        then { wmws="$2"; shift; }
+        else { echo "$0: missing comma separated list of WMWs" >&2; exit 1; }
+        fi;;
     (-X)
-	xflag="-X"
-	set -x;;
+        xflag="-X"
+        set -x;;
     (-h|--help)
-        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--local-kcp bool] [-V|--verbose] [-X]"
+        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--local-kcp bool] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -94,7 +154,7 @@ process_running() {
   then
       echo "running"
   else
-      echo "stopped" 
+      echo "stopped"
   fi
 }
 
@@ -107,7 +167,7 @@ function create_or_replace() { # usage: filename
     else eval kubectl create -f "$filename" $verbdir
     fi
 }
-    
+
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
     ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
@@ -255,52 +315,39 @@ function ensure_espw() {
     if kubectl get Workspace "$espw_name" &> /dev/null; then
 	echo "espw workspace already exists -- using it:"
 	kubectl ws "$espw_name"
-    else 
+    else
         kubectl ws create "$espw_name" --enter
     fi
     eval kubectl apply -f "$SCRIPT_DIR/../config/exports" $verbdir
-    echo "Finished populating the espw with kubestellar apiexports"   
-}
-
-# current ws at start does not matter, is imw1 on return
-function ensure_imw1() {
-    kubectl ws root &> /dev/null
-    if kubectl get ws imw1 &> /dev/null
-    then kubectl ws imw1 &> /dev/null
-    else kubectl ws create imw1 --enter &> /dev/null
-    fi
-    
-    if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
-	kubectl kcp bind apiexport root:espw:edge.kubestellar.io
-    fi
+    echo "Finished populating the espw with kubestellar apiexports"
 }
 
 if [ "$subcommand" != init ]; then
-    
+
     # Check mailbox-controller is already running
     if [ $(process_running mailbox-controller) == "running" ]
     then
 	echo "An older deployment of mailbox-controller is already running - terminating it ...."
 	pkill -f mailbox-controller
     fi
-    
+
     # Check kubestellar-where-resolver is already running
     if [ $(process_running "kubestellar-where-resolver") == "running" ]
     then
 	echo "An older deployment of kubestellar-where-resolver is already running - terminating it ...."
 	pkill -f "kubestellar-where-resolver"
     fi
-    
+
     # Check placement-translator is already running
     if [ $(process_running placement-translator) == "running" ]
     then
 	echo "An older deployment of placement-translator is already running - terminating it ...."
 	pkill -f placement-translator
     fi
-    
+
 fi
 
-if [ $subcommand == stop ]; then    
+if [ $subcommand == stop ]; then
    echo "kubestellar stopped ....."
    exit 0
 fi
@@ -322,9 +369,9 @@ done
 
 ensure_root_compute_configd
 ensure_espw
-ensure_imw1
+ensure_imws $imws
+ensure_wmws $wmws
 kubectl ws root &> /dev/null
-${bindir}/kubectl-kubestellar-ensure-wmw wmw1 $xflag --with-kube true
 
 if [ $subcommand == init ]; then
     exit 0
@@ -385,7 +432,7 @@ else
     echo " where-resolver failed to start ..... exiting"
     exit 1
 fi
- 
+
 # Start the Placement Translator
 sleep 3
 placement-translator --allclusters-context  "system:admin" -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
