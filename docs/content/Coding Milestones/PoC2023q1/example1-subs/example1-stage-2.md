@@ -183,7 +183,10 @@ kubectl ws root
 kubectl kubestellar ensure wmw wmw-s
 ```
 
-Next, use `kubectl` to create the following workload objects in that workspace.
+Next, use `kubectl` to create the following workload objects in that
+workspace. The `APIService` object included here does not contribute
+to the httpd workload but is here to demonstrate that `APIService`
+objects can be downsynced.
 
 ```shell
 kubectl apply -f - <<EOF
@@ -254,6 +257,19 @@ spec:
         configMap:
           name: httpd-htdocs
           optional: false
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1090.example.my
+spec:
+  group: example.my
+  groupPriorityMinimum: 360
+  service:
+    name: my-service
+    namespace: my-example
+  version: v1090
+  versionPriority: 42
 EOF
 ```
 ``` {.bash .hide-me}
@@ -288,7 +304,11 @@ spec:
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
     namespaceSelectors: []
-    objectNames: [ "bind-kubernetes", "bind-apps" ]
+    objectNames: [ "bind-kubernetes", "bind-apps", "bind-apiregistration.k8s.io" ]
+  - apiGroup: apiregistration.k8s.io
+    resources: [ apiservices ]
+    namespaceSelectors: []
+    objectNames: [ "v1090.example.my" ]
   wantSingletonReportedState: true
   upsync:
   - apiGroup: "group1.test"
