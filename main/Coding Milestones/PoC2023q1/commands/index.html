@@ -2317,7 +2317,8 @@ and two for process control.</p>
 <p>This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The <code>--log-folder</code> flag is
 only meaningful for the <code>start</code> subcommand. The <code>--local-kcp</code> flag is
-not meaningful for the <code>stop</code> subcommand.</p>
+not meaningful for the <code>stop</code> subcommand. The <code>--ensure-imw</code> and 
+<code>--ensure-wmw</code> flags are only meaningful for the <code>start</code> or <code>init</code> subcommands.</p>
 <ul>
 <li><code>-V</code> or <code>--verbose</code>: calls for more verbose output.  This is a
   binary choice, not a matter of degree.</li>
@@ -2327,6 +2328,8 @@ not meaningful for the <code>stop</code> subcommand.</p>
   <code>${PWD}/kubestellar-logs</code>.</li>
 <li><code>--local-kcp $bool</code>: says whether to expect to find a local process
   named "kcp".  Defaults to "true".</li>
+<li><code>--ensure-imw</code>: provide a comma separated list of pathnames for inventory workspaces, <em>e.g.</em> "root:imw1,root:imw2". Defaults to "root:imw1". To prevent the creation of any inventory workspace, then pass "".</li>
+<li><code>--ensure-wmw</code>: provide a comma separated list of pathnames for workload management workspaces, <em>e.g.</em> "root:wmw1,root:imw2". Defaults to "root:wmw1". To prevent the creation of any workload management workspace, then pass "".</li>
 <li><code>-h</code> or <code>--help</code>: print a brief usage message and terminate.</li>
 </ul>
 <h4 id="kubestellar-init">Kubestellar init<a class="headerlink" href="#kubestellar-init" title="Permanent link">#</a></h4>
@@ -2348,18 +2351,19 @@ downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.</p>
 </li>
 <li>
-<p>Ensure the existence of an inventory management workspace at
-pathname "root:imw1".</p>
+<p>Ensure the existence of zero, one, or more inventory management workspaces
+depending on the value of <code>--ensure-imw</code> flag. Default is one inventory management
+workspaces at pathname "root:imw1".</p>
 </li>
 <li>
-<p>Ensure the existence of a workload management workspace at pathname
-"root:wmw1" and that it has APIBindings that import the namespaced
-Kubernetes resources (kinds of objects) for management of
-containerized workloads.</p>
+<p>Ensure the existence of zero, one, or more workload management workspaces 
+depending on the value of <code>--ensure-wmw</code> flag. Default is one workload management
+workspaces at pathname "root:wmw1". The workload management workspaceshace APIBindings
+that import the namespaced Kubernetes resources (kinds of objects) for management of
+containerized workloads. At the completion of <code>kubestellar init</code> the current workspace will be
+"root".</p>
 </li>
 </ol>
-<p>At the completion of <code>kubestellar init</code> the current workspace will be
-"root:wmw1".</p>
 <h4 id="kubestellar-start">KubeStellar start<a class="headerlink" href="#kubestellar-start" title="Permanent link">#</a></h4>
 <p>This subcommand is used after installation or process stops.</p>
 <p>This subcommand stops any running kubestellar controllers and then
