@@ -40,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	kubernetesclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -146,6 +147,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
+	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
 
 	logicalConfig, upstreamKubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 	upstreamKubeConfig, err := logicalConfig.ClientConfig()
@@ -210,6 +212,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
 	require.NoError(t, err)
+	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
 
 	// Run the plugin command to enable the kubestellar syncer and collect the resulting yaml
 	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
@@ -253,9 +256,11 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 		DownstreamKubeClient:        downstreamKubeClient,
 		DownstreamDynamicKubeClient: downstreamDynamicKubeClient,
 		DownstreamKubeconfigPath:    downstreamKubeconfigPath,
+		DownstreamDiscoveryClient:   downstreamDiscoveryClient,
 		UpstreamConfig:              upstreamConfig,
 		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
 		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
+		UpstreamDiscoveryClient:     upstreamDiscoveryClient,
 		UpstreamKubeconfigPath:      upstreamKubeconfigPath,
 	}
 }
@@ -296,11 +301,13 @@ type appliedKubeStellarSyncerFixture struct {
 	DownstreamConfig            *rest.Config
 	DownstreamKubeClient        kubernetesclient.Interface
 	DownstreamDynamicKubeClient dynamic.Interface
+	DownstreamDiscoveryClient   *discovery.DiscoveryClient
 	DownstreamKubeconfigPath    string
 
 	UpstreamConfig            *rest.Config
 	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
 	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
+	UpstreamDiscoveryClient   *discovery.DiscoveryClient
 	UpstreamKubeconfigPath    string
 }
 

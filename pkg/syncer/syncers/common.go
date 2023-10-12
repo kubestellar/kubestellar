@@ -167,14 +167,16 @@ func getClients(resource edgev2alpha1.EdgeSyncConfigResource, upstreamClients ma
 	return upstreamClient, downstreamClient, nil
 }
 
+// Compute diff between srcResourceList and destResourceList
+//
+//   - newResources: list of srcResource that exists in srcResourceList but not destResourceList
+//   - updatedResources: list of srcResource that exists in both srcResourceList and destResourceList
+//   - deletedResources: list of destResource that exists in not srcResourceList but destResourceList
 func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, destResourceList *unstructured.UnstructuredList, setAnnotation func(resource *unstructured.Unstructured), hasAnnotation func(resource *unstructured.Unstructured) bool) (
-	[]unstructured.Unstructured,
-	[]unstructured.Unstructured,
-	[]unstructured.Unstructured,
+	newResources []unstructured.Unstructured,
+	updatedResources []unstructured.Unstructured,
+	deletedResources []unstructured.Unstructured,
 ) {
-	newResources := []unstructured.Unstructured{}
-	updatedResources := []unstructured.Unstructured{}
-	deletedResources := []unstructured.Unstructured{}
 	for _, srcResource := range srcResourceList.Items {
 		destResource, ok := findWithObject(srcResource, destResourceList)
 		if ok {
@@ -211,21 +213,9 @@ func diff(logger klog.Logger, srcResourceList *unstructured.UnstructuredList, de
 		}
 	}
 
-	newResourceNames := []string{}
-	for _, resource := range newResources {
-		newResourceNames = append(newResourceNames, resource.GetName())
-	}
-	updatedResourceNames := []string{}
-	for _, resource := range updatedResources {
-		updatedResourceNames = append(updatedResourceNames, resource.GetName())
-	}
-	deletedResourceNames := []string{}
-	for _, resource := range deletedResources {
-		deletedResourceNames = append(deletedResourceNames, resource.GetName())
-	}
-	logger.V(3).Info(fmt.Sprintf("  new resource names: %v", newResourceNames))
-	logger.V(3).Info(fmt.Sprintf("  updated resource names: %v", updatedResourceNames))
-	logger.V(3).Info(fmt.Sprintf("  deleted resource names: %v", deletedResourceNames))
+	logger.V(3).Info(fmt.Sprintf("  new resource names: %v", mapToNames(newResources)))
+	logger.V(3).Info(fmt.Sprintf("  updated resource names: %v", mapToNames(updatedResources)))
+	logger.V(3).Info(fmt.Sprintf("  deleted resource names: %v", mapToNames(deletedResources)))
 
 	return newResources, updatedResources, deletedResources
 }
@@ -255,4 +245,12 @@ func setStatusFieldToDestinationStatus(logger klog.Logger, srcResource *unstruct
 		}
 		logger.V(2).Info(fmt.Sprintf("  failed to extract status from destination object %q. Nothing to do with status field", destResource.GetName()))
 	}
+}
+
+func mapToNames(resources []unstructured.Unstructured) []string {
+	names := []string{}
+	for _, resource := range resources {
+		names = append(names, resource.GetName())
+	}
+	return names
 }
