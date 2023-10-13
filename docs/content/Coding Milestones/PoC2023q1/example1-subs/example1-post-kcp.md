@@ -24,7 +24,7 @@ export PATH=$PWD/bin:$PATH
 
 You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add `-b
-$branch` to get a different one.
+$branch` to the `git` command in order to get a different branch.
 
 ```{.base}
 git clone {{ config.repo_url }}
@@ -52,12 +52,12 @@ The kubectl plugin lines use fully specific executables (e.g.,
 In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API, and also
 augments the `root:compute` workspace from kcp TMC as needed here.
-Those augmentation consists of adding authorization to update the
+That augmentation consists of adding authorization to update the
 relevant `/status` and `/scale` subresources (missing in kcp TMC) and
 extending the supported subset of the Kubernetes API for managing
 containerized workloads from the four resources built into kcp TMC
 (`Deployment`, `Pod`, `Service`, and `Ingress`) to the other ones that
-are namespaced and are meaningful in KubeStellar.
+are meaningful in KubeStellar.
 
 ```shell
 kubestellar init
@@ -70,7 +70,8 @@ kubestellar init
 You need a Kubernetes cluster; see [the documentation for `kubectl kubestellar deploy`](../../commands/#deployment-into-a-kubernetes-cluster) for more information.
 
 You will need a domain name that, on each of your clients, resolves to
-an IP address that gets to the Ingress controller's listening socket.
+an IP address that the client can use to open a TCP connection to the
+Ingress controller's listening socket.
 
 You will need the kcp `kubectl` plugins.  See [the "Start kcp" section
 above](../#start-kcp) for instructions on how to get all of the kcp
@@ -98,25 +99,40 @@ into a file the kubeconfig that you will use as a user of kcp and
 KubeStellar.  Do not overwrite the kubeconfig file for your hosting
 cluster.  But _do_ update your `KUBECONFIG` envar setting or remember
 to pass the new file with `--kubeconfig` on the command lines when
-using kcp or KubeStellar.
+using kcp or KubeStellar. For example, you might use the following
+commands to fetch and start using that kubeconfig file; the first
+assumes that you deployed the core into a Kubernetes namespace named
+"kubestellar".
+
+```{.base}
+kubectl kubestellar get-external-kubeconfig -n kubestellar -o kcs.kubeconfig
+export KUBECONFIG=$(pwd)/kcs.kubeconfig
+```
+
+Note that you now care about two different kubeconfig files: the one
+that you were using earlier, which holds the contexts for your `kind`
+clusters, and the one that you just fetched and started using for
+working with the KubeStellar interface. The remainder of this document
+assumes that your `kind` cluster contexts are in `~/.kube/config`.
 
 ### Create SyncTarget and Location objects to represent the florin and guilder clusters
 
 Use the following two commands to put inventory objects in the IMW at
 `root:imw1` that was automatically created during deployment of
 KubeStellar. They label both florin and guilder with `env=prod`, and
-also label guilder with `extended=si`.
+also label guilder with `extended=yes`.
 
 ```shell
 kubectl ws root:imw1
 kubectl kubestellar ensure location florin  loc-name=florin  env=prod
-kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=si
+kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
 echo "decribe the florin location object"
 kubectl describe location.edge.kubestellar.io florin
 ```
 
 Those two script invocations are equivalent to creating the following
-four objects.
+four objects plus the kcp `APIBinding` objects that import the
+definition of the KubeStellar API.
 
 ```yaml
 apiVersion: edge.kubestellar.io/v2alpha1
@@ -148,7 +164,7 @@ metadata:
     id: guilder
     loc-name: guilder
     env: prod
-    extended: si
+    extended: yes
 ---
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: Location
@@ -157,7 +173,7 @@ metadata:
   labels:
     loc-name: guilder
     env: prod
-    extended: si
+    extended: yes
 spec:
   resource: {group: edge.kubestellar.io, version: v2alpha1, resource: synctargets}
   instanceSelector:

@@ -1,20 +1,34 @@
 <!--example1-stage-1a-start-->
 ### The mailbox controller
 
-Running the mailbox controller will be conveniently automated.
-Eventually.  In the meantime, you can use the KubeStellar command shown
-here.
+The mailbox controller is one of the central controllers of
+KubeStellar.  If you have deployed the KubeStellar core as Kubernetes
+workload then this controller is already running in a pod in your
+hosting cluster. If instead you are running these controllers as bare
+processes then launch this controller as follows.
 
 ```shell
 kubectl ws root:espw
 mailbox-controller -v=2 &
-# wait until workspaces for both mailboxes show up
 sleep 10
+```
+
+This controller is in charge of maintaining the collection of mailbox
+workspaces, which are an implementation detail not intended for user
+consumption. You can use the following command to wait for the
+appearance of the mailbox workspaces implied by the florin and guilder
+`SyncTarget` objects that you made earlier.
+
+```shell
 kubectl ws root
 while [ $(kubectl ws tree | grep "\-mb\-" | wc -l) -ne 2 ]; do
   sleep 10
 done
 ```
+
+If it is working correctly, lines like the following will appear in
+the controller's log (which is being written into your shell if you ran the controller as a bare process above, otherwise you can fetch [as directed](../../commands/#fetch-a-log-from-a-kubestellar-runtime-container)).
+
 ``` { .bash .no-copy }
 ...
 I0721 17:37:10.186848  189094 main.go:206] "Found APIExport view" exportName="e
@@ -33,12 +47,6 @@ mbwsName="1d55jhazpo3d3va6-mb-732cf72a-1ca9-4def-a5e7-78fd0e36e61c" mbwsCluster
 
 You need a `-v` setting of 2 or numerically higher to get log messages
 about individual mailbox workspaces.
-
-This controller creates a mailbox workspace for each SyncTarget and
-puts an APIBinding to the edge API in each of those mailbox
-workspaces.  For this simple scenario, you do not need to keep this
-controller running after it does those things (hence the `^C` above);
-normally it would run continuously.
 
 A mailbox workspace name is distinguished by `-mb-` separator.
 You can get a listing of those mailbox workspaces as follows.

@@ -8,20 +8,23 @@ In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
 into the mailbox workspaces and create `SyncerConfig` objects there.
 
-Eventually there will be convenient automation running the placement
-translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the KubeStellar command that runs the placement translator.
+If you have deployed the KubeStellar core as workload in a Kubernetes
+cluster then the placement translator is running in a Pod there. If
+instead you are running the core controllers as bare processes then
+use the following commands to launch the placement translator; it
+requires the ESPW to be current at start time.
 
 ```shell
 kubectl ws root:espw
-```
-``` { .bash .no-copy }
-Current workspace is "root:espw".
-```
-```shell
 placement-translator &
-# wait until SyncerConfig, ReplicaSets and Deployments are ready
 sleep 10
+```
+
+The following commands wait for the placement translator to get its
+job done for this example.
+
+```shell
+# wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_WS $GUILDER_WS)
 for ii in "${mbxws[@]}"; do
   kubectl ws root:$ii
@@ -36,7 +39,7 @@ for ii in "${mbxws[@]}"; do
   done
   echo "* ReplicaSet resource exists"
   # wait until ReplicaSet running
-  while [ $(kubectl get rs -n commonstuff --field-selector metadata.name=commond | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+  while [ "$(kubectl get rs -n commonstuff commond -o 'jsonpath={.status.readyReplicas}')" != 1 ]; do
     sleep 10
   done
   echo "* commonstuff ReplicaSet running"
@@ -46,27 +49,18 @@ while ! kubectl get deploy -A &> /dev/null; do
   sleep 10
 done
 echo "* Deployment resource exists"
-while [ $(kubectl get deploy -n specialstuff --field-selector metadata.name=speciald | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+while [ "$(kubectl get deploy -n specialstuff speciald -o 'jsonpath={.status.availableReplicas}')" != 1 ]; do
   sleep 10
 done
 echo "* specialstuff Deployment running"
 ```
 
-After it stops logging stuff, wait another minute and then you can
-proceed.
-
 The florin cluster gets only the common workload.  Examine florin's
-`SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
+`SyncerConfig` as follows.  Utilize the name of the mailbox workspace
+for florin (which you stored in Stage 1) here.
 
 ```shell
-kubectl ws root
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-kubectl ws $FLORIN_WS
+kubectl ws root:$FLORIN_WS
 ```
 
 ``` { .bash .no-copy }
@@ -143,18 +137,11 @@ commonstuff   commond   0         1         1       10m
 ```
 
 The guilder cluster gets both the common and special workloads.
-Examine guilder's `SyncerConfig` object and workloads as follows, using
-the name that you stored in Stage 1.
+Examine guilder's `SyncerConfig` object and workloads as follows,
+using the mailbox workspace name that you stored in Stage 1.
 
 ```shell
-kubectl ws root
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-kubectl ws $GUILDER_WS
+kubectl ws root:$GUILDER_WS
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).

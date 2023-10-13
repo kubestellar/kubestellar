@@ -191,7 +191,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: specialstuff
-  labels: {special: "si"}
+  labels: {special: "yes"}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -286,17 +286,17 @@ metadata:
   name: edge-placement-s
 spec:
   locationSelectors:
-  - matchLabels: {"env":"prod","extended":"si"}
+  - matchLabels: {"env":"prod","extended":"yes"}
   downsync:
   - apiGroup: ""
     resources: [ configmaps ]
     namespaceSelectors:
-    - matchLabels: {"special":"si"}
+    - matchLabels: {"special":"yes"}
     objectNames: [ "*" ]
   - apiGroup: apps
     resources: [ deployments ]
     namespaceSelectors:
-    - matchLabels: {"special":"si"}
+    - matchLabels: {"special":"yes"}
     objectNames: [ speciald ]
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
@@ -332,20 +332,22 @@ following resolutions of the "where" predicates.
 | edge-placement-c | florin, guilder |
 | edge-placement-s | guilder |
 
-Eventually there will be automation that conveniently runs the
-Where Resolver.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the KubeStellar command that runs the Where Resolver.
+If you have deployed the KubeStellar core in a Kubernetes cluster then
+the where resolver is running in a pod there. If instead you are
+running the core controllers are bare processes then you can use the
+following commands to launch the where-resolver; it requires the ESPW
+to be the current kcp workspace at start time.
 
 ```shell
 kubectl ws root:espw
-```
-``` { .bash .no-copy }
-Current workspace is "root:espw".
-```
-```shell
 kubestellar-where-resolver &
-# wait until where-resolver is ready by continuing once SinglePlacementSlice resource is available
 sleep 10
+```
+
+The following commands wait until the where-resolver has done its job
+for the common and special `EdgePlacement` objects.
+
+```shell
 kubectl ws root:wmw-c
 while ! kubectl get SinglePlacementSlice &> /dev/null; do
   sleep 10
@@ -355,20 +357,19 @@ while ! kubectl get SinglePlacementSlice &> /dev/null; do
   sleep 10
 done
 ```
+
+If things are working properly then you will see log lines like the
+following (among many others) in the where-resolver's log.
+
 ``` { .bash .no-copy }
 I0423 01:33:37.036752   11305 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io"
 ...
 I0423 01:33:37.320859   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|florin" locationWorkspace="apmziqj9p9fqlflm" location="florin" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
 ...
 I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlacementSlice" controller="kubestellar-where-resolver" triggeringKind=Location key="apmziqj9p9fqlflm|guilder" locationWorkspace="apmziqj9p9fqlflm" location="guilder" workloadWorkspace="10l175x6ejfjag3e" singlePlacementSlice="edge-placement-c"
-^C
 ```
 
-In this simple scenario you do not need to keep the Where Resolver running
-after it gets its initial work done; normally it would run
-continually.
-
-Check out the SinglePlacementSlice objects as follows.
+Check out a SinglePlacementSlice object as follows.
 
 ```shell
 kubectl ws root:wmw-c
