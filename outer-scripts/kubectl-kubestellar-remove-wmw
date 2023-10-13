@@ -23,21 +23,20 @@ wmw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name"
+	    exit 0;;
 	(-X) set -o xtrace;;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
-	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name"
-	    exit 0;;
 	(--*|-?)
-	    if (( $# > 1 ))
-	    then kubectl_flags[${#kubectl_flags[*]}]="$1"
+	    kubectl_flags[${#kubectl_flags[*]}]="$1"
+	    if (( $# > 1 )); then 
 		 kubectl_flags[${#kubectl_flags[*]}]="$2"
 		 shift
-	    else echo "$0: missing value for long flag $1" >&2; exit 1
 	    fi;;
 	(-*)
 	    echo "$0: flag syntax error" >&2
