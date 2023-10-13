@@ -63,6 +63,17 @@ type APIResourceSpec struct {
 	// +listType=map
 	// +listMapKey=Name
 	SubResources []*APIResourceSpec `json:"subResources,omitempty" protobuf:"bytes,10,opt,name=subResources"`
+
+	// definers is the objects that appear to be defining this resource.
+	// Typically 0 or 1 of these.
+	// +optional
+	Definers []Definer `json:"definers,omitempty" protobuf:"bytes,11,opt,name=definers"`
+}
+
+// Definer is a reference to an object that defines a resource.
+type Definer struct {
+	Kind string `json:"kind"`
+	Name string `json:"name"`
 }
 
 // APIResourceList is the API type for a list of APIResource

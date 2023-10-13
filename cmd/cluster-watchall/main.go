@@ -28,7 +28,9 @@ import (
 
 	"github.com/spf13/pflag"
 
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned"
+	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
+	apiextinfactoryv1 "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -45,11 +47,10 @@ import (
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
-	kcpapis "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	coreapi "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
 	clusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	extkcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
+	apisinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
@@ -65,8 +66,12 @@ func main() {
 	fs := pflag.NewFlagSet("watchall", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
+	var qps float32
+	var burst int
 	cliFlags := genericclioptions.NewConfigFlags(false)
 	cliFlags.AddFlags(fs)
+	fs.Float32Var(&qps, "qps", qps, "request rate limit")
+	fs.IntVar(&burst, "burst", burst, "request burst limit")
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	includeSubresources := false
 	fs.BoolVar(&includeSubresources, "include-subresources", includeSubresources, "list subresources too")
@@ -96,6 +101,23 @@ func main() {
 		logger.Error(err, "Failed to build config from flags")
 		os.Exit(10)
 	}
+	if qps > 0 {
+		config.QPS = qps
+		if burst > 0 {
+			config.Burst = burst
+		} else {
+			config.Burst = int(qps) + 1
+		}
+	}
+
+	apiextClusterClient, err := apiextclient.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "Failed to create cluster clientset for CustomResourceDefinitions")
+		os.Exit(12)
+	}
+
+	apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClusterClient, 0)
+	crdClusterPreInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions()
 
 	clusterClient, err := clusterclientset.NewForConfig(config)
 	if err != nil {
@@ -105,6 +127,7 @@ func main() {
 
 	kcpClusterInformerFactory := extkcpinformers.NewSharedInformerFactory(clusterClient, 0)
 	lcClusterInformer := kcpClusterInformerFactory.Core().V1alpha1().LogicalClusters().Informer()
+	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
 
 	out := csv.NewWriter(os.Stdout)
 	watcher := &watcherBase{ctx: ctx, logger: logger, out: out}
@@ -123,10 +146,14 @@ func main() {
 
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
 
-	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapis.SchemeGroupVersion.WithResource("apibindings"))
+	// crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	// bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapis.SchemeGroupVersion.WithResource("apibindings"))
 	dynamicClusterInformerFactory.Start(ctx.Done())
-	if !upstreamcache.WaitForCacheSync(ctx.Done(), crdClusterPreInformer.Informer().HasSynced, bindingClusterPreInformer.Informer().HasSynced) {
+	crdClusterInformer := crdClusterPreInformer.Informer()
+	bindingClusterInformer := bindingClusterPreInformer.Informer()
+	apiextFactory.Start(ctx.Done())
+	kcpClusterInformerFactory.Start(ctx.Done())
+	if !upstreamcache.WaitForCacheSync(ctx.Done(), crdClusterInformer.HasSynced, bindingClusterInformer.HasSynced) {
 		logger.Error(nil, "Failed to sync all-cluster dynamic informers on CRDs, APIBindings")
 		os.Exit(40)
 	}
@@ -134,7 +161,6 @@ func main() {
 		crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient,
 		map[logicalcluster.Name]*clusterWatcher{}}
 	lcClusterInformer.AddEventHandler(acw)
-	kcpClusterInformerFactory.Start(ctx.Done())
 	for {
 		select {
 		case <-ctx.Done():
@@ -164,10 +190,12 @@ type allClustersWatcher struct {
 	*watcherBase
 	includeSubresources    bool
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface
-	crdClusterInformer     kcpinformers.GenericClusterInformer
-	bindingClusterInformer kcpinformers.GenericClusterInformer
-	dynamicClusterClient   clusterdynamic.ClusterInterface
-	clusterWatchers        map[logicalcluster.Name]*clusterWatcher
+	// crdClusterInformer     kcpinformers.GenericClusterInformer
+	crdClusterInformer     apiextinfactoryv1.CustomResourceDefinitionClusterInformer
+	bindingClusterInformer apisinformers.APIBindingClusterInformer
+	// bindingClusterInformer kcpinformers.GenericClusterInformer
+	dynamicClusterClient clusterdynamic.ClusterInterface
+	clusterWatchers      map[logicalcluster.Name]*clusterWatcher
 }
 
 func (acw *allClustersWatcher) OnAdd(obj any) {
@@ -197,7 +225,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 	crdInformer := acw.crdClusterInformer.Cluster(clusterName).Informer()
 	bindingInformer := acw.bindingClusterInformer.Cluster(clusterName).Informer()
 	resourceInformer, _, _ := apiwatch.NewAPIResourceInformer(context.Background(), clusterName.String(), discoveryScopedClient,
-		acw.includeSubresources, crdInformer, bindingInformer)
+		acw.includeSubresources, apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
 	cw := &clusterWatcher{
 		watcherBase:      acw.watcherBase,
 		resourceWatchers: map[schema.GroupVersionResource]*resourceWatcher{},
@@ -214,7 +242,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 			if _, ok := cw.resourceWatchers[gvr]; ok {
 				return
 			}
-			acw.WriteCSV([]string{"RESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, rsc.Spec.Name, fmt.Sprintf("%v", informable)})
+			acw.WriteCSV([]string{"RESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, rsc.Spec.Name, fmt.Sprintf("%v", informable), fmt.Sprintf("%v", rsc.Spec.Definers)})
 			acw.writeSubresources(clusterName, gvr.GroupVersion(), rsc.Spec.SubResources, rsc.Spec.Name+"/")
 			rw := &resourceWatcher{cw}
 			cw.resourceWatchers[gvr] = rw
@@ -223,6 +251,31 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 				go gi.Run(acw.ctx.Done())
 				gi.AddEventHandler(rw)
 			}
+		},
+		UpdateFunc: func(oldObj, newObj any) {
+			rsc := newObj.(*ksmetav1a1.APIResource)
+			gvr := schema.GroupVersionResource{
+				Group:    rsc.Spec.Group,
+				Version:  rsc.Spec.Version,
+				Resource: rsc.Spec.Name,
+			}
+			informable := verbsSupportInformers(rsc.Spec.Verbs)
+			acw.WriteCSV([]string{"RERESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, rsc.Spec.Name, fmt.Sprintf("%v", informable), fmt.Sprintf("%v", rsc.Spec.Definers)})
+			acw.writeSubresources(clusterName, gvr.GroupVersion(), rsc.Spec.SubResources, rsc.Spec.Name+"/")
+		},
+		DeleteFunc: func(obj any) {
+			if del, ok := obj.(upstreamcache.DeletedFinalStateUnknown); ok {
+				obj = del.Obj
+			}
+			rsc := obj.(*ksmetav1a1.APIResource)
+			gvr := schema.GroupVersionResource{
+				Group:    rsc.Spec.Group,
+				Version:  rsc.Spec.Version,
+				Resource: rsc.Spec.Name,
+			}
+			informable := verbsSupportInformers(rsc.Spec.Verbs)
+			acw.WriteCSV([]string{"DERESOURCE", clusterName.String(), gvr.Group, gvr.Version, rsc.Spec.Kind, rsc.Spec.Name, fmt.Sprintf("%v", informable), fmt.Sprintf("%v", rsc.Spec.Definers)})
+			acw.writeSubresources(clusterName, gvr.GroupVersion(), rsc.Spec.SubResources, rsc.Spec.Name+"/")
 		},
 	})
 	informerFactory.Start(acw.ctx.Done())

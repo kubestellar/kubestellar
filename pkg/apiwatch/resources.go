@@ -27,7 +27,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
+	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 	upstreamdiscovery "k8s.io/client-go/discovery"
@@ -49,6 +49,13 @@ type Invalidatable interface {
 type ObjectNotifier interface {
 	AddEventHandler(handler upstreamcache.ResourceEventHandler)
 }
+
+type ResourceDefinitionSupplier interface {
+	ObjectNotifier
+	EnumerateDefinedResources(definer any) ResourceDefinitionEnumerator
+}
+
+type ResourceDefinitionEnumerator func(func(metav1.GroupVersionResource))
 
 // APIResourceLister helps list APIResources.
 // All objects returned here must be treated as read-only.
@@ -83,6 +90,8 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 		clusterName:         clusterName,
 		cache:               cachediscovery.NewMemCacheClient(client),
 		resourceVersionI:    1,
+		rscToDefiners:       map[metav1.GroupVersionResource]map[objectID]Empty{},
+		definerToRscs:       map[objectID]map[metav1.GroupVersionResource]Empty{},
 	}
 	rlw.cond = sync.NewCond(&rlw.mutex)
 	go func() {
@@ -118,10 +127,22 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 		}
 	}()
 	for _, invalidator := range invalidationNotifiers {
+		supplier, isSupplier := invalidator.(ResourceDefinitionSupplier)
 		invalidator.AddEventHandler(upstreamcache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj any) {
-				logger.V(3).Info("Notified of invalidator", "obj", obj)
-				rlw.Invalidate()
+				logger.V(3).Info("Notified of invalidator", "obj", obj, "isSupplier", isSupplier)
+				rlw.InvalidateWithDefiner(obj, supplier, true)
+			},
+			UpdateFunc: func(oldObj, newObj any) {
+				logger.V(3).Info("Notified of invalidator change", "newObj", newObj, "isSupplier", isSupplier)
+				rlw.InvalidateWithDefiner(newObj, supplier, true)
+			},
+			DeleteFunc: func(obj any) {
+				if del, ok := obj.(upstreamcache.DeletedFinalStateUnknown); ok {
+					obj = del.Obj
+				}
+				logger.V(3).Info("Notified of invalidator deletion", "obj", obj, "isSupplier", isSupplier)
+				rlw.InvalidateWithDefiner(obj, supplier, false)
 			},
 		})
 	}
@@ -142,17 +163,59 @@ type resourcesListWatcher struct {
 	needRelist       bool
 	relistAfter      time.Time
 	cancels          []context.CancelFunc
+	rscToDefiners    map[metav1.GroupVersionResource]map[objectID]Empty
+	definerToRscs    map[objectID]map[metav1.GroupVersionResource]Empty
+}
+
+// objectID identifies an object that defines resources
+type objectID struct {
+	apiVersion string // including group
+	kind       string
+	name       string
+}
+
+type Empty struct{}
+
+func (rlw *resourcesListWatcher) InvalidateWithDefiner(obj any, supplier ResourceDefinitionSupplier, set bool) {
+	rlw.mutex.Lock()
+	defer rlw.mutex.Unlock()
+	rlw.invalidateWithDefinerLocked(obj, supplier, set)
 }
 
 func (rlw *resourcesListWatcher) Invalidate() {
 	rlw.mutex.Lock()
 	defer rlw.mutex.Unlock()
+	rlw.invalidateWithDefinerLocked(nil, nil, false)
+}
+
+func (rlw *resourcesListWatcher) invalidateWithDefinerLocked(obj any, supplier ResourceDefinitionSupplier, set bool) {
 	rlw.resourceVersionI += 1
 	rlw.relistAfter = time.Now().Add(time.Second * 20)
 	rlw.needRelist = true
 	rlw.cache.Invalidate()
 	rlw.cond.Broadcast()
+	if obj == nil || supplier == nil {
+		return
+	}
+	objM := obj.(metav1.Object)
+	objR := obj.(k8sruntime.Object)
+	gvk := objR.GetObjectKind().GroupVersionKind()
+	apiVersion, kind := gvk.ToAPIVersionAndKind()
+	oid := objectID{apiVersion, kind, objM.GetName()}
+	if oid.apiVersion == "" {
+		panic(obj)
+	}
+	if oid.kind == "" {
+		panic(obj)
+	}
+	var enumr ResourceDefinitionEnumerator = enumerateNothing
+	if set {
+		enumr = supplier.EnumerateDefinedResources(obj)
+	}
+	rlw.setDefinerLocked(oid, enumr)
 }
+
+func enumerateNothing(func(metav1.GroupVersionResource)) {}
 
 type resourceWatch struct {
 	*resourcesListWatcher
@@ -191,7 +254,7 @@ func (rlw *resourcesListWatcher) Watch(opts metav1.ListOptions) (watch.Interface
 	return rw, nil
 }
 
-func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, error) {
+func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (k8sruntime.Object, error) {
 	resourceVersionI := func() int64 {
 		rlw.mutex.Lock()
 		defer rlw.mutex.Unlock()
@@ -218,8 +281,10 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 	return &ans, err
 }
 
+// arMap maps from resource or subresource name (single step in pathname) to data for that name
 type arMap map[string]*arTuple
 
+// arTuple holds the data for an APIResource
 type arTuple struct {
 	spec         *ksmetav1a1.APIResourceSpec
 	subresources arMap
@@ -263,6 +328,8 @@ func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resour
 		groupToVersion[ag.Name] = ag.PreferredVersion.Version
 	}
 	ans := []ksmetav1a1.APIResource{}
+	rlw.mutex.Lock()
+	defer rlw.mutex.Unlock()
 	for _, group := range resourceList {
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
 		if err != nil {
@@ -274,7 +341,7 @@ func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resour
 			continue
 		}
 		am := arMap{}
-		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(ar ksmetav1a1.APIResourceSpec) {
+		rlw.enumAPIResourcesLocked(resourceVersionS, gv, group.APIResources, func(ar ksmetav1a1.APIResourceSpec) {
 			rscName := ar.Name
 			nameParts := strings.Split(rscName, "/")
 			am.insert(nameParts, &ar)
@@ -301,12 +368,15 @@ func specComplete(spec ksmetav1a1.APIResourceSpec, resourceVersionS string, gv s
 		Spec: spec}
 }
 
-func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv schema.GroupVersion, mrs []metav1.APIResource, consumer func(ksmetav1a1.APIResourceSpec)) {
+func (rlw *resourcesListWatcher) enumAPIResourcesLocked(resourceVersionS string, gv schema.GroupVersion, mrs []metav1.APIResource, consumer func(ksmetav1a1.APIResourceSpec)) {
 	for _, rsc := range mrs {
 		rscVersion := rsc.Version
 		if rscVersion == "" {
 			rscVersion = gv.Version
 		}
+		gvr := metav1.GroupVersionResource{Group: gv.Group, Version: rscVersion, Resource: rsc.Name}
+		definers := definersToSlice(rlw.rscToDefiners[gvr])
+		rlw.logger.V(4).Info("Enumerating", "gvr", gvr, "definers", definers)
 		arSpec := ksmetav1a1.APIResourceSpec{
 			Name:         rsc.Name,
 			SingularName: rsc.SingularName,
@@ -315,10 +385,19 @@ func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv sc
 			Version:      rscVersion,
 			Kind:         rsc.Kind,
 			Verbs:        rsc.Verbs,
+			Definers:     definers,
 		}
 		// rlw.logger.V(4).Info("Producing an APIResource", "ar", ar)
 		consumer(arSpec)
 	}
+}
+
+func definersToSlice(asSet map[objectID]Empty) []ksmetav1a1.Definer {
+	ans := make([]ksmetav1a1.Definer, 0, len(asSet))
+	for definer := range asSet {
+		ans = append(ans, ksmetav1a1.Definer{Kind: definer.kind, Name: definer.name})
+	}
+	return ans
 }
 
 func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) ([]ksmetav1a1.APIResource, error) {
@@ -327,13 +406,15 @@ func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) (
 		return nil, err
 	}
 	ans := []ksmetav1a1.APIResource{}
+	rlw.mutex.Lock()
+	defer rlw.mutex.Unlock()
 	for _, group := range groupList {
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
 		if err != nil {
 			rlw.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
 			continue
 		}
-		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(arSpec ksmetav1a1.APIResourceSpec) {
+		rlw.enumAPIResourcesLocked(resourceVersionS, gv, group.APIResources, func(arSpec ksmetav1a1.APIResourceSpec) {
 			ar := specComplete(arSpec, resourceVersionS, gv)
 			ans = append(ans, ar)
 		})

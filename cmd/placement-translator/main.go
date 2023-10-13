@@ -33,7 +33,8 @@ import (
 
 	"github.com/spf13/pflag"
 
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned"
+	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/server/mux"
@@ -168,6 +169,15 @@ func main() {
 		os.Exit(40)
 	}
 
+	apiextClusterClient, err := apiextclient.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create cluster clientset for CustomResourceDefinitions")
+		os.Exit(43)
+	}
+
+	apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClusterClient, 0)
+	crdClusterPreInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions()
+
 	kubeClusterClient, err := kcpkubeclient.NewForConfig(baseRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create kcp-kube all-cluster client")
@@ -217,9 +227,8 @@ func main() {
 
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
 
-	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	// crdClusterPreInformer.Informer().Cluster()
-	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(apisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+	kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClusterClientset, 0)
+	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
 
 	doneCh := ctx.Done()
 	// TODO: more
@@ -227,10 +236,12 @@ func main() {
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
 
+	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)
 	rootInformerFactory.Start(doneCh)
 	dynamicClusterInformerFactory.Start(doneCh)
 	kubeClusterInformerFactory.Start(doneCh)
+	kcpClusterInformerFactory.Start(doneCh)
 	pt.Run()
 	logger.Info("Time to stop")
 }

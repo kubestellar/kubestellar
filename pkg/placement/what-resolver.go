@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/informers/externalversions/apiextensions/v1"
+	apiextkcpinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,7 +40,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
+	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
@@ -59,8 +61,8 @@ type whatResolver struct {
 	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
-	crdClusterPreInformer     kcpinformers.GenericClusterInformer
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer
+	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
 
 	// Hold this while accessing data listed below
@@ -113,8 +115,8 @@ func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	crdClusterPreInformer kcpinformers.GenericClusterInformer,
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
+	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	numThreads int,
 ) WhatResolver {
@@ -479,9 +481,11 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		}
 		wsCtx, stopWS := context.WithCancel(wr.ctx)
 		discoveryScopedClient := wr.discoveryClusterClient.Cluster(cluster.Path())
-		crdInformer := wr.crdClusterPreInformer.Cluster(cluster).Informer()
-		bindingInformer := wr.bindingClusterPreInformer.Cluster(cluster).Informer()
-		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false, crdInformer, bindingInformer)
+		var crdPreInformer apiextinformers.CustomResourceDefinitionInformer
+		var bindingPreInformer bindinginformers.APIBindingInformer
+		crdPreInformer = wr.crdClusterPreInformer.Cluster(cluster)
+		bindingPreInformer = wr.bindingClusterPreInformer.Cluster(cluster)
+		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false, crdPreInformer.Informer(), bindingPreInformer.Informer())
 		scopedDynamic := wr.dynamicClusterClient.Cluster(cluster.Path())
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
