@@ -97,7 +97,7 @@ func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
 // Get: obtains the kubeconfig for the given lcName cluster.
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
-	cmd := "kubectl --context kind-kubeflex get secrets -n lc3-system admin-kubeconfig -o jsonpath='{.data.*}' | base64 -d"
+	cmd := "kubectl --context kind-kubeflex get secrets -n " + lcName + " admin-kubeconfig -o jsonpath='{.data.*}' | base64 -d"
 	cfg, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
@@ -180,6 +180,8 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					for _, name := range newSetClusters.Difference(setClusters).UnsortedList() {
 						logger.V(2).Info("Processing KubeFlex cluster", "name", name)
 						spaceInfo, err := k.provider.Get(name)
+						logger.Error(err, "kflex Added")
+						logger.Error(err, name)
 						if err != nil {
 							logger.V(2).Info("KubeFlex cluster is not ready. Retrying", "cluster", name)
 							// Can't get the cluster info, so let's discover it again

@@ -1,0 +1,8 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: kflex2
+  namespace: "spaceprovider-default"
+spec:
+  SpaceProviderDescName: "default"
+  Type: "managed"
