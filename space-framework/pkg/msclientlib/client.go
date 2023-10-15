@@ -127,7 +127,7 @@ func (mcc *multiSpaceClient) startSpaceCollection(ctx context.Context, managerCl
 	numThreads := 2
 	resyncPeriod := time.Duration(0)
 
-	spaceInformerFactory := ksinformers.NewSharedScopedInformerFactory(managerClientset, resyncPeriod, metav1.NamespaceAll)
+	spaceInformerFactory := ksinformers.NewSharedInformerFactory(managerClientset, resyncPeriod)
 	spaceInformer := spaceInformerFactory.Space().V1alpha1().Spaces().Informer()
 
 	spaceInformerFactory.Start(ctx.Done())

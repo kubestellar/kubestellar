@@ -22,7 +22,6 @@ import (
 	"os"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
@@ -66,7 +65,7 @@ func main() {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	informerFactory := ksinformers.NewSharedScopedInformerFactory(clientset, resyncPeriod, metav1.NamespaceAll)
+	informerFactory := ksinformers.NewSharedInformerFactory(clientset, resyncPeriod)
 	informerSpace := informerFactory.Space().V1alpha1().Spaces().Informer()
 	informerProvider := informerFactory.Space().V1alpha1().SpaceProviderDescs().Informer()
 
