@@ -1856,7 +1856,7 @@ objects can be downsynced.</p>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="s">  name: specialstuff</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="s">  labels: {special: &quot;si&quot;}</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="s">  labels: {special: &quot;yes&quot;}</span>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="s">---</span>
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="s">kind: ConfigMap</span>
@@ -1947,17 +1947,17 @@ earlier, thus directing the special workload to just one edge cluster.</p>
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="s">  name: edge-placement-s</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="s">spec:</span>
 <a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="s">  locationSelectors:</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;,&quot;extended&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;,&quot;extended&quot;:&quot;yes&quot;}</span>
 <a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="s">  downsync:</span>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="s">  - apiGroup: &quot;&quot;</span>
 <a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="s">    resources: [ configmaps ]</span>
 <a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;yes&quot;}</span>
 <a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
 <a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="s">  - apiGroup: apps</span>
 <a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="s">    resources: [ deployments ]</span>
 <a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;yes&quot;}</span>
 <a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="s">    objectNames: [ speciald ]</span>
 <a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="s">  - apiGroup: apis.kcp.io</span>
 <a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="s">    resources: [ apibindings ]</span>
@@ -2002,71 +2002,70 @@ following resolutions of the "where" predicates.</p>
 </tr>
 </tbody>
 </table>
-<p>Eventually there will be automation that conveniently runs the
-Where Resolver.  In the meantime, you can run it by hand: switch to the
-ESPW and invoke the KubeStellar command that runs the Where Resolver.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<p>If you have deployed the KubeStellar core in a Kubernetes cluster then
+the where resolver is running in a pod there. If instead you are
+running the core controllers are bare processes then you can use the
+following commands to launch the where-resolver; it requires the ESPW
+to be the current kcp workspace at start time.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>kubestellar-where-resolver<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<p>The following commands wait until the where-resolver has done its job
+for the common and special <code>EdgePlacement</code> objects.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">done</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="k">done</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubestellar-where-resolver<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1"># wait until where-resolver is ready by continuing once SinglePlacementSlice resource is available</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="k">done</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="k">done</span>
+<p>If things are working properly then you will see log lines like the
+following (among many others) in the where-resolver's log.</p>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>main.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kubestellar.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io&quot;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>...
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.320859<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|florin&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;florin&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>...
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.391772<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|guilder&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;guilder&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.036752<span class="w">   </span><span class="m">11305</span><span class="w"> </span>main.go:212<span class="o">]</span><span class="w"> </span><span class="s2">&quot;Found APIExport view&quot;</span><span class="w"> </span><span class="nv">exportName</span><span class="o">=</span><span class="s2">&quot;edge.kubestellar.io&quot;</span><span class="w"> </span><span class="nv">serverURL</span><span class="o">=</span><span class="s2">&quot;https://192.168.58.123:6443/services/apiexport/7qkse309upzrv0fy/edge.kubestellar.io&quot;</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>...
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.320859<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|florin&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;florin&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>...
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.391772<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|guilder&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;guilder&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>^C
+<p>Check out a SinglePlacementSlice object as follows.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:wmw-c&quot;</span>.
 </code></pre></div></p>
-<p>In this simple scenario you do not need to keep the Where Resolver running
-after it gets its initial work done; normally it would run
-continually.</p>
-<p>Check out the SinglePlacementSlice objects as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:wmw-c&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>items:
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>destinations:
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span>locationName:<span class="w"> </span>florin
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span>syncTargetName:<span class="w"> </span>florin
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span>syncTargetUID:<span class="w"> </span>b8c64c64-070c-435b-b3bd-9c0f0c040a54
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
-<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span>locationName:<span class="w"> </span>guilder
-<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">    </span>syncTargetName:<span class="w"> </span>guilder
-<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">    </span>syncTargetUID:<span class="w"> </span>bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">  </span>kind:<span class="w"> </span>SinglePlacementSlice
-<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">  </span>metadata:
-<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">    </span>annotations:
-<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">      </span>kcp.io/cluster:<span class="w"> </span>10l175x6ejfjag3e
-<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="w">    </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:33:37Z&quot;</span>
-<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">    </span>generation:<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="w">    </span>name:<span class="w"> </span>edge-placement-c
-<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">    </span>ownerReferences:
-<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
-<a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a><span class="w">      </span>kind:<span class="w"> </span>EdgePlacement
-<a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a><span class="w">      </span>name:<span class="w"> </span>edge-placement-c
-<a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a><span class="w">      </span>uid:<span class="w"> </span>199cfe1e-48d9-4351-af5c-e66c83bf50dd
-<a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a><span class="w">    </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1316&quot;</span>
-<a id="__codelineno-19-26" name="__codelineno-19-26" href="#__codelineno-19-26"></a><span class="w">    </span>uid:<span class="w"> </span>b5db1f9d-1aed-4a25-91da-26dfbb5d8879
-<a id="__codelineno-19-27" name="__codelineno-19-27" href="#__codelineno-19-27"></a>kind:<span class="w"> </span>List
-<a id="__codelineno-19-28" name="__codelineno-19-28" href="#__codelineno-19-28"></a>metadata:
-<a id="__codelineno-19-29" name="__codelineno-19-29" href="#__codelineno-19-29"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>items:
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span>destinations:
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span>locationName:<span class="w"> </span>florin
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span>syncTargetName:<span class="w"> </span>florin
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span>syncTargetUID:<span class="w"> </span>b8c64c64-070c-435b-b3bd-9c0f0c040a54
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span>-<span class="w"> </span>cluster:<span class="w"> </span>apmziqj9p9fqlflm
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">    </span>locationName:<span class="w"> </span>guilder
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span>syncTargetName:<span class="w"> </span>guilder
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">    </span>syncTargetUID:<span class="w"> </span>bf452e1f-45a0-4d5d-b35c-ef1ece2879ba
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span>kind:<span class="w"> </span>SinglePlacementSlice
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">  </span>metadata:
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span>annotations:
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">      </span>kcp.io/cluster:<span class="w"> </span>10l175x6ejfjag3e
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">    </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:33:37Z&quot;</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span>generation:<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">    </span>name:<span class="w"> </span>edge-placement-c
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">    </span>ownerReferences:
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">    </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">      </span>kind:<span class="w"> </span>EdgePlacement
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">      </span>name:<span class="w"> </span>edge-placement-c
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">      </span>uid:<span class="w"> </span>199cfe1e-48d9-4351-af5c-e66c83bf50dd
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">    </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1316&quot;</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">    </span>uid:<span class="w"> </span>b5db1f9d-1aed-4a25-91da-26dfbb5d8879
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a>kind:<span class="w"> </span>List
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a>metadata:
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;&quot;</span>
 </code></pre></div></p>
 <p>Also check out the SinglePlacementSlice objects in
 <code>root:wmw-s</code>.  It should go similarly, but the <code>destinations</code>
