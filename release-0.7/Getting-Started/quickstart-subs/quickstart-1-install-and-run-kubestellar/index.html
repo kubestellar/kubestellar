@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#1-install-and-run-kubestellar" class="md-skip">
+        <a href="#deploy-kcp-and-kubestellar-as-bare-processes" class="md-skip">
           Skip to content
         </a>
       
@@ -881,7 +881,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/coding-milestone-invite-q1/" class="md-nav__link">
-        Inivitation to Contribute
+        Invitation to Contribute
       </a>
     </li>
   
@@ -957,8 +957,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Coding%20Milestones/PoC2023q1/kubestellar-scheduler/" class="md-nav__link">
-        KubeStellar Scheduler
+      <a href="../../../Coding%20Milestones/PoC2023q1/where-resolver/" class="md-nav__link">
+        KubeStellar Where Resolver
       </a>
     </li>
   
@@ -1007,7 +1007,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Coding%20Milestones/PoC2023q1/roadmap-uses/" class="md-nav__link">
-        Roadmap
+        Use Cases Affecting the Roadmap for PoC2023q1
       </a>
     </li>
   
@@ -1177,14 +1177,14 @@
       
       
         <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-          PoC2023q3
+          PoC2023q4
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
-          PoC2023q3
+          PoC2023q4
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1194,7 +1194,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Coding%20Milestones/PoC2023q3/outline/" class="md-nav__link">
+      <a href="../../../Coding%20Milestones/PoC2023q4/outline/" class="md-nav__link">
         Details
       </a>
     </li>
@@ -1624,8 +1624,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-install-and-run-kubestellar" class="md-nav__link">
-    1. Install and run KubeStellar
+  <a href="#deploy-kcp-and-kubestellar-as-bare-processes" class="md-nav__link">
+    Deploy kcp and KubeStellar as bare processes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploy-kcp-and-kubestellar-as-kubernetes-workload" class="md-nav__link">
+    Deploy kcp and KubeStellar as Kubernetes workload
   </a>
   
 </li>
@@ -1645,7 +1652,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.3/docs/content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.7/docs/content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1654,7 +1661,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.3/docs/content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.7/docs/content/Getting-Started/quickstart-subs/quickstart-1-install-and-run-kubestellar.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -1664,22 +1671,25 @@
   <h1>Quickstart 1 install and run kubestellar</h1>
 
 <!--quickstart-1-install-and-run-kubestellar-start-->
-<h2 id="1-install-and-run-kubestellar">1. Install and run <strong>KubeStellar</strong><a class="headerlink" href="#1-install-and-run-kubestellar" title="Permanent link">#</a></h2>
-<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp. Download the kcp and <strong>KubeStellar</strong> binaries and scripts into a <code>kubestellar</code> subfolder in your current working directory using the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.3/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.3.1
+
+<p>KubeStellar works in the context of kcp, so to use KubeStellar you also need kcp.</p>
+<p>We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.</p>
+<h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
+<p>The following commands will download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar as bare processes, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about <a href="../../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment">the commands for bare process deployment</a>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.7/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.7.0
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/.kcp/admin.kubeconfig&quot;</span>
 </code></pre></div>
-<p>Check that <code>KubeStellar</code> is running:</p>
+<p>Check that <code>KubeStellar</code> is running.</p>
 <p>First, check that controllers are running with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span>mailbox-controller<span class="w"> </span>-e<span class="w"> </span>placement-translator<span class="w"> </span>-e<span class="w"> </span>kubestellar-scheduler
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span>mailbox-controller<span class="w"> </span>-e<span class="w"> </span>placement-translator<span class="w"> </span>-e<span class="w"> </span>kubestellar-where-resolver
 </code></pre></div>
 <p>which should yield something like:</p>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>user<span class="w">     </span><span class="m">1892</span><span class="w">  </span><span class="m">0</span>.0<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">747644</span><span class="w"> </span><span class="m">29628</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:00<span class="w"> </span>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>user<span class="w">     </span><span class="m">1902</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">743652</span><span class="w"> </span><span class="m">27504</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>kubestellar-scheduler<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>user<span class="w">     </span><span class="m">1902</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.3<span class="w"> </span><span class="m">743652</span><span class="w"> </span><span class="m">27504</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>-v<span class="w"> </span><span class="m">2</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>user<span class="w">     </span><span class="m">1912</span><span class="w">  </span><span class="m">0</span>.3<span class="w">  </span><span class="m">0</span>.5<span class="w"> </span><span class="m">760428</span><span class="w"> </span><span class="m">41660</span><span class="w"> </span>pts/1<span class="w">    </span>Sl<span class="w">   </span><span class="m">10</span>:51<span class="w">   </span><span class="m">0</span>:02<span class="w"> </span>placement-translator<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span>
 </code></pre></div>
-<p>Second, check that the Edge Service Provider Workspace (<code>espw</code>) is created with the following command:</p>
+<p>Second, check that TMC compute service provider workspace and the KubeStellar Edge Service Provider Workspace (<code>espw</code>) have been created with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
 </code></pre></div>
 <p>which should yield:</p>
@@ -1688,6 +1698,49 @@
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>└──<span class="w"> </span>root
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>├──<span class="w"> </span>compute
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>└──<span class="w"> </span>espw
+</code></pre></div>
+<h3 id="deploy-kcp-and-kubestellar-as-kubernetes-workload">Deploy kcp and KubeStellar as Kubernetes workload<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-kubernetes-workload" title="Permanent link">#</a></h3>
+<p>This requires a KubeStellar release GREATER THAN v0.5.0.</p>
+<p>This example uses a total of three <code>kind</code> clusters, which tends to run
+into <a href="https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files">a known issue with a known
+work-around</a>,
+so take care of that.</p>
+<p>Before you can deploy kcp and KubeStellar as workload in a Kubernetes
+cluster, you need a Kubernetes cluster and it needs to have an Ingress
+controller installed.  We use the term "hosting cluster" for the
+cluster that plays this role.  In this quickstart, we make such a
+cluster with <a href="https://kind.sigs.k8s.io/">kind</a>.  Follow the <a href="../../../Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster">developer
+directions for making a hosting cluster with kind</a>;
+you need not worry about loading a locally built container image into
+that cluster.</p>
+<p>This example uses the domain name "hostname.favorite.my" for the machine where you invoked <code>kind create cluster</code>. If you have not already done so then issue the following command, replacing <code>a_good_IP_address_for_this_machine</code> with an IPv4 address for your machine that can be reached from inside a container or VM (i.e., not 127.0.0.1).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;echo a_good_IP_address_for_this_machine hostname.favorite.my &gt;&gt; /etc/hosts&quot;</span>
+</code></pre></div>
+<p>The next command relies on <code>kubectl</code> already being configured to manipulate the hosting cluster, which is indeed the state that <code>kind create cluster</code> leaves it in.</p>
+<p>The following commands will (a) download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) kcp and KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for <a href="../../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster">the commands about deployment into a Kubernetes cluster</a>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.7/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.7.0<span class="w"> </span>--external-endpoint<span class="w"> </span>hostname.favorite.my:6443
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
+</code></pre></div>
+<p>Using your original <code>kubectl</code> configuration that manipulates the hosting cluster, check that the KubeStellar Deployment has its intended one running Pod.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-n<span class="w"> </span>kubestellar
+</code></pre></div>
+<p>which should yield something like:</p>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>NAME<span class="w">                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>kubestellar-server<span class="w">   </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>2m42s
+</code></pre></div>
+<p>It may take some time for that Pod to reach Running state.</p>
+<p>The bootstrap command above will print out instructions to set your KUBECONFIG environment variable to the pathname of a kubeconfig file that you can use as a user of kcp and KubeStellar.  Do that now, for the benefit of the remaining commands in this example.  It will look something like the following command.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar.kubeconfig&quot;</span>
+</code></pre></div>
+<p>Check that the TMC compute service provider workspace and the KubeStellar Edge Service Provider Workspace (<code>espw</code>) have been created with the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
+</code></pre></div>
+<p>which should yield:</p>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>tree
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>.
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>└──<span class="w"> </span>root
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span>├──<span class="w"> </span>compute
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span>└──<span class="w"> </span>espw
 </code></pre></div>
 <!--quickstart-1-install-and-run-kubestellar-end-->
 
