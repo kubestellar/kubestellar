@@ -128,9 +128,12 @@ func (ds *DownSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conv
 					upstreamResource.SetUID(downstreamResource.GetUID())
 					setDownsyncAnnotation(upstreamResource)
 					applyConversion(upstreamResource, resourceForDown)
-					if _, err := downstreamClient.Update(resourceForDown, upstreamResource); err != nil {
-						ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
-						return err
+					_updatedResource, noDiff := ds.computeUpdatedResource(upstreamResource, downstreamResource)
+					if !noDiff {
+						if _, err := downstreamClient.Update(resourceForDown, _updatedResource); err != nil {
+							ds.logger.Error(err, fmt.Sprintf("failed to update resource on downstream %q", resourceToString(resourceForDown)))
+							return err
+						}
 					}
 				} else {
 					ds.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in downstream since downsync annotation is not set", resourceToString(resourceForDown)))
@@ -138,9 +141,11 @@ func (ds *DownSyncer) SyncOne(resource edgev2alpha1.EdgeSyncConfigResource, conv
 			} else {
 				ds.logger.V(3).Info(fmt.Sprintf("  delete %q from downstream since it's found", resourceToString(resourceForDown)))
 				if hasDownsyncAnnotation(downstreamResource) {
-					if err := downstreamClient.Delete(resourceForDown, resourceForDown.Name); err != nil {
-						ds.logger.Error(err, fmt.Sprintf("failed to delete resource from downstream %q", resourceToString(resourceForDown)))
-						return err
+					if ds.checkDeletable(downstreamResource) {
+						if err := downstreamClient.Delete(resourceForDown, resourceForDown.Name); err != nil {
+							ds.logger.Error(err, fmt.Sprintf("failed to delete resource from downstream %q", resourceToString(resourceForDown)))
+							return err
+						}
 					}
 				} else {
 					ds.logger.V(2).Info(fmt.Sprintf("  ignore deleting %q from downstream since downsync annotation is not setn", resourceToString(resourceForDown)))
@@ -244,6 +249,15 @@ func (ds *DownSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, con
 	logger.V(3).Info("  compute diff between upstream and downstream")
 	newResources, updatedResources, deletedResources := diff(logger, upstreamResourceList, downstreamResourceList, setDownsyncAnnotation, hasDownsyncAnnotation)
 
+	logger.V(3).Info("  apply filter such as downsync-overwrite condition to updatedResources and deletedResources")
+	updatedResources = ds.computeUpdatedResources(downstreamResourceList, updatedResources)
+	deletedResources = ds.computeDeletedResources(downstreamResourceList, deletedResources)
+
+	logger.V(3).Info("  final new/updated/deleted resource list")
+	logger.V(3).Info(fmt.Sprintf("    new resource names: %v", mapToNames(newResources)))
+	logger.V(3).Info(fmt.Sprintf("    updated resource names: %v", mapToNames(updatedResources)))
+	logger.V(3).Info(fmt.Sprintf("    deleted resource names: %v", mapToNames(deletedResources)))
+
 	logger.V(3).Info("  create resources in downstream")
 	for _, resource := range newResources {
 		applyConversion(&resource, resourceForDown)
@@ -258,7 +272,7 @@ func (ds *DownSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, con
 		applyConversion(&resource, resourceForDown)
 		logger.V(3).Info("  update " + resource.GetName())
 		if _, err := downstreamClient.Update(resourceForDown, &resource); err != nil {
-			logger.Error(err, "failed to create resource to downstream")
+			logger.Error(err, "failed to update resource on downstream")
 			return err
 		}
 	}
@@ -272,6 +286,60 @@ func (ds *DownSyncer) SyncMany(resource edgev2alpha1.EdgeSyncConfigResource, con
 		}
 	}
 	return nil
+}
+
+// Compute resource object to be pushed from upstreamResource and downstreamResource
+//   - updatedResource is the computed resource object to be pushed
+//   - noDiff is true if the computed updatedResource is no difference from the downstream resource.
+func (ds *DownSyncer) computeUpdatedResource(upstreamResource *unstructured.Unstructured, downstreamResource *unstructured.Unstructured) (updatedResource *unstructured.Unstructured, noDiff bool) {
+	if !isDownsyncOverwrite(upstreamResource) {
+		ds.logger.V(2).Info(fmt.Sprintf("  downsync-overwrite of %q is marked as false", upstreamResource.GetName()))
+		annotations := downstreamResource.GetAnnotations()
+		value, ok := annotations[downsyncOverwriteKey]
+		if ok && value == "false" {
+			ds.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in downstream", upstreamResource.GetName()))
+			return downstreamResource, true
+		} else {
+			ds.logger.V(2).Info(fmt.Sprintf("  update only annnotation %q in downstream since downsync-overwrite in downstream is still marked as true", upstreamResource.GetName()))
+			annotations[downsyncOverwriteKey] = "false"
+			_updatedResource := *downstreamResource
+			_updatedResource.SetAnnotations(annotations)
+			return &_updatedResource, false
+		}
+	}
+	return upstreamResource, false
+}
+
+func (ds *DownSyncer) checkDeletable(downstreamResource *unstructured.Unstructured) bool {
+	if isDownsyncOverwrite(downstreamResource) {
+		return true
+	} else {
+		ds.logger.V(2).Info(fmt.Sprintf("  downsync-overwrite of %q is marked as false", downstreamResource.GetName()))
+		ds.logger.V(2).Info(fmt.Sprintf("  ignore deleting %q from downstream", downstreamResource.GetName()))
+		return false
+	}
+}
+
+func (ds *DownSyncer) computeUpdatedResources(downstreamResourceList *unstructured.UnstructuredList, updatedResources []unstructured.Unstructured) []unstructured.Unstructured {
+	filteredUpdatedResources := []unstructured.Unstructured{}
+	for _, updatedResource := range updatedResources {
+		downstreamResource, _ := findWithObject(updatedResource, downstreamResourceList)
+		_updatedResource, noDiff := ds.computeUpdatedResource(&updatedResource, downstreamResource)
+		if !noDiff {
+			filteredUpdatedResources = append(filteredUpdatedResources, *_updatedResource)
+		}
+	}
+	return filteredUpdatedResources
+}
+
+func (ds *DownSyncer) computeDeletedResources(downstreamResourceList *unstructured.UnstructuredList, deletedResources []unstructured.Unstructured) []unstructured.Unstructured {
+	filteredDeletedResources := []unstructured.Unstructured{}
+	for _, resource := range deletedResources {
+		if ds.checkDeletable(&resource) {
+			filteredDeletedResources = append(filteredDeletedResources, resource)
+		}
+	}
+	return filteredDeletedResources
 }
 
 func (ds *DownSyncer) UnsyncMany(resource edgev2alpha1.EdgeSyncConfigResource, conversions []edgev2alpha1.EdgeSynConversion) error {
@@ -369,4 +437,13 @@ func hasDownsyncAnnotation(resource *unstructured.Unstructured) bool {
 func makeOwnedValue(object *unstructured.Unstructured) string {
 	gvk := object.GroupVersionKind()
 	return gvk.Kind + "/" + object.GetNamespace() + "/" + object.GetName()
+}
+
+// Control parameter in annotation whether Syncer downsyns once or constantly.
+// Default (not given or brank) is to keep downsync as we do today.
+const downsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
+
+func isDownsyncOverwrite(resource *unstructured.Unstructured) bool {
+	value := getAnnotation(resource, downsyncOverwriteKey)
+	return value == "" || value == "true"
 }

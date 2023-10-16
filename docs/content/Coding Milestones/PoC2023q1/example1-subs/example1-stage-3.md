@@ -8,20 +8,23 @@ In Stage 3, in response to the EdgePlacement and SinglePlacementSlice
 objects, the placement translator will copy the workload prescriptions
 into the mailbox workspaces and create `SyncerConfig` objects there.
 
-Eventually there will be convenient automation running the placement
-translator.  In the meantime, you can run it manually: switch to the
-ESPW and use the KubeStellar command that runs the placement translator.
+If you have deployed the KubeStellar core as workload in a Kubernetes
+cluster then the placement translator is running in a Pod there. If
+instead you are running the core controllers as bare processes then
+use the following commands to launch the placement translator; it
+requires the ESPW to be current at start time.
 
 ```shell
 kubectl ws root:espw
-```
-``` { .bash .no-copy }
-Current workspace is "root:espw".
-```
-```shell
 placement-translator &
-# wait until SyncerConfig, ReplicaSets and Deployments are ready
 sleep 10
+```
+
+The following commands wait for the placement translator to get its
+job done for this example.
+
+```shell
+# wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_WS $GUILDER_WS)
 for ii in "${mbxws[@]}"; do
   kubectl ws root:$ii
@@ -36,7 +39,7 @@ for ii in "${mbxws[@]}"; do
   done
   echo "* ReplicaSet resource exists"
   # wait until ReplicaSet running
-  while [ $(kubectl get rs -n commonstuff --field-selector metadata.name=commond | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+  while [ "$(kubectl get rs -n commonstuff commond -o 'jsonpath={.status.readyReplicas}')" != 1 ]; do
     sleep 10
   done
   echo "* commonstuff ReplicaSet running"
@@ -46,27 +49,18 @@ while ! kubectl get deploy -A &> /dev/null; do
   sleep 10
 done
 echo "* Deployment resource exists"
-while [ $(kubectl get deploy -n specialstuff --field-selector metadata.name=speciald | tail -1 | sed -e 's/ \+/ /g' | cut -d " " -f 4) -lt 1 ]; do
+while [ "$(kubectl get deploy -n specialstuff speciald -o 'jsonpath={.status.availableReplicas}')" != 1 ]; do
   sleep 10
 done
 echo "* specialstuff Deployment running"
 ```
 
-After it stops logging stuff, wait another minute and then you can
-proceed.
-
 The florin cluster gets only the common workload.  Examine florin's
-`SyncerConfig` as follows.  Utilize florin's name (which you stored in Stage 1) here.
+`SyncerConfig` as follows.  Utilize the name of the mailbox workspace
+for florin (which you stored in Stage 1) here.
 
 ```shell
-kubectl ws root
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-kubectl ws $FLORIN_WS
+kubectl ws root:$FLORIN_WS
 ```
 
 ``` { .bash .no-copy }
@@ -89,88 +83,22 @@ metadata:
   resourceVersion: "1323"
   uid: 8840fee6-37dc-407e-ad01-2ad59389d4ff
 spec:
-  namespaceScope:
-    namespaces:
-    - commonstuff
-    resources:
-    - apiVersion: v1
-      group: ""
-      resource: secrets
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: batch
-      resource: jobs
-    - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: apps
-      resource: daemonsets
-    - apiVersion: v1
-      group: storage.k8s.io
-      resource: csistoragecapacities
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: ""
-      resource: pods
-    - apiVersion: v1
-      group: ""
-      resource: resourcequotas
-    - apiVersion: v1
-      group: discovery.k8s.io
-      resource: endpointslices
-    - apiVersion: v1
-      group: ""
-      resource: replicationcontrollers
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: ""
-      resource: persistentvolumeclaims
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
-    - apiVersion: v1
-      group: policy
-      resource: poddisruptionbudgets
-    - apiVersion: v1
-      group: apps
-      resource: statefulsets
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: networkpolicies
-    - apiVersion: v1
-      group: batch
-      resource: cronjobs
-    - apiVersion: v1
-      group: ""
-      resource: endpoints
-    - apiVersion: v2
-      group: autoscaling
-      resource: horizontalpodautoscalers
-    - apiVersion: v1
-      group: apps
-      resource: replicasets
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: podtemplates
+  namespaceScope: {}
+  namespacedObjects:
+  - apiVersion: v1
+    group: ""
+    objectsByNamespace:
+    - names:
+      - httpd-htdocs
+      namespace: commonstuff
+    resource: configmaps
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - commond
+      namespace: commonstuff
+    resource: replicasets
   upsync:
   - apiGroup: group1.test
     names:
@@ -209,18 +137,11 @@ commonstuff   commond   0         1         1       10m
 ```
 
 The guilder cluster gets both the common and special workloads.
-Examine guilder's `SyncerConfig` object and workloads as follows, using
-the name that you stored in Stage 1.
+Examine guilder's `SyncerConfig` object and workloads as follows,
+using the mailbox workspace name that you stored in Stage 1.
 
 ```shell
-kubectl ws root
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-kubectl ws $GUILDER_WS
+kubectl ws root:$GUILDER_WS
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
@@ -241,89 +162,38 @@ metadata:
   resourceVersion: "1325"
   uid: 3da056c7-0d5c-45a3-9d91-d04f04415f30
 spec:
-  namespaceScope:
-    namespaces:
-    - commonstuff
-    - specialstuff
-    resources:
-    - apiVersion: v1
-      group: apps
-      resource: replicasets
-    - apiVersion: v1
-      group: storage.k8s.io
-      resource: csistoragecapacities
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: networkpolicies
-    - apiVersion: v1
-      group: apps
-      resource: daemonsets
-    - apiVersion: v1
-      group: ""
-      resource: services
-    - apiVersion: v1
-      group: ""
-      resource: replicationcontrollers
-    - apiVersion: v1
-      group: networking.k8s.io
-      resource: ingresses
-    - apiVersion: v2
-      group: autoscaling
-      resource: horizontalpodautoscalers
-    - apiVersion: v1
-      group: policy
-      resource: poddisruptionbudgets
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: roles
-    - apiVersion: v1
-      group: ""
-      resource: serviceaccounts
-    - apiVersion: v1
-      group: batch
-      resource: jobs
-    - apiVersion: v1
-      group: batch
-      resource: cronjobs
-    - apiVersion: v1
-      group: ""
-      resource: persistentvolumeclaims
-    - apiVersion: v1
-      group: apps
-      resource: deployments
-    - apiVersion: v1
-      group: rbac.authorization.k8s.io
-      resource: rolebindings
-    - apiVersion: v1
-      group: apps
-      resource: statefulsets
-    - apiVersion: v1
-      group: ""
-      resource: configmaps
-    - apiVersion: v1
-      group: ""
-      resource: podtemplates
-    - apiVersion: v1
-      group: ""
-      resource: resourcequotas
-    - apiVersion: v1
-      group: coordination.k8s.io
-      resource: leases
-    - apiVersion: v1
-      group: ""
-      resource: endpoints
-    - apiVersion: v1
-      group: discovery.k8s.io
-      resource: endpointslices
-    - apiVersion: v1
-      group: ""
-      resource: secrets
-    - apiVersion: v1
-      group: ""
-      resource: limitranges
-    - apiVersion: v1
-      group: ""
-      resource: pods
+  clusterScope:
+  - apiVersion: v1
+    group: apiregistration.k8s.io
+    objects:
+    - v1090.example.my
+    resource: apiservices
+  namespaceScope: {}
+  namespacedObjects:
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - commond
+      namespace: commonstuff
+    resource: replicasets
+  - apiVersion: v1
+    group: apps
+    objectsByNamespace:
+    - names:
+      - speciald
+      namespace: specialstuff
+    resource: deployments
+  - apiVersion: v1
+    group: ""
+    objectsByNamespace:
+    - names:
+      - httpd-htdocs
+      namespace: commonstuff
+    - names:
+      - httpd-htdocs
+      namespace: specialstuff
+    resource: configmaps
   upsync:
   - apiGroup: group3.test
     names:

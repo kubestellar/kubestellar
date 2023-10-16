@@ -103,7 +103,7 @@ Following is an example of invoking this command and examining its
 results.
 
 ```console
-bash-5.2$ eval pieces=($(scripts/kubestellar-ensure-kcp-server-creds yep.yep))
+bash-5.2$ eval pieces=($(kubestellar-ensure-kcp-server-creds yep.yep))
 Re-using PKI at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki
 Re-using CA at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/ca.key
 Accepting existing credentials
@@ -169,7 +169,7 @@ results.  The context and port number chosen work for the kubeconfig
 file that `kcp start` (kcp release v0.11.0) creates by default.
 
 ```console
-bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
+bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
 bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5
@@ -220,7 +220,8 @@ kubestellar [flags] subcommand [flags]
 This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The `--log-folder` flag is
 only meaningful for the `start` subcommand. The `--local-kcp` flag is
-not meaningful for the `stop` subcommand.
+not meaningful for the `stop` subcommand. The `--ensure-imw` and 
+`--ensure-wmw` flags are only meaningful for the `start` or `init` subcommands.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -230,6 +231,8 @@ not meaningful for the `stop` subcommand.
   `${PWD}/kubestellar-logs`.
 - `--local-kcp $bool`: says whether to expect to find a local process
   named "kcp".  Defaults to "true".
+- `--ensure-imw`: provide a comma separated list of pathnames for inventory workspaces, _e.g._ "root:imw1,root:imw2". Defaults to "root:imw1". To prevent the creation of any inventory workspace, then pass "".
+- `--ensure-wmw`: provide a comma separated list of pathnames for workload management workspaces, _e.g._ "root:wmw1,root:imw2". Defaults to "root:wmw1". To prevent the creation of any workload management workspace, then pass "".
 - `-h` or `--help`: print a brief usage message and terminate.
 
 #### Kubestellar init
@@ -248,16 +251,16 @@ RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
 
-4. Ensure the existence of an inventory management workspace at
-pathname "root:imw1".
+4. Ensure the existence of zero, one, or more inventory management workspaces
+depending on the value of `--ensure-imw` flag. Default is one inventory management
+workspaces at pathname "root:imw1".
 
-5. Ensure the existence of a workload management workspace at pathname
-"root:wmw1" and that it has APIBindings that import the namespaced
-Kubernetes resources (kinds of objects) for management of
-containerized workloads.
-
-At the completion of `kubestellar init` the current workspace will be
-"root:wmw1".
+5. Ensure the existence of zero, one, or more workload management workspaces 
+depending on the value of `--ensure-wmw` flag. Default is one workload management
+workspaces at pathname "root:wmw1". The workload management workspaceshace APIBindings
+that import the namespaced Kubernetes resources (kinds of objects) for management of
+containerized workloads. At the completion of `kubestellar init` the current workspace will be
+"root".
 
 #### KubeStellar start
 

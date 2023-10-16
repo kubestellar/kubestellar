@@ -632,32 +632,16 @@ func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePl
 			continue
 		}
 		if objNS == "" {
-			if len(objTest.NamespaceSelectors) > 0 {
+			if len(objTest.NamespaceSelectors) > 0 || len(objTest.Namespaces) > 0 {
 				continue
 			}
 		} else {
-			nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
-			nsRR := wsd.resources[nsARName]
-			var objNSR k8sruntime.Object
-			if nsRR != nil {
-				var err error
-				objNSR, err = nsRR.lister.Get(objNS)
-				if err != nil && !k8sapierrors.IsNotFound(err) {
-					logger.Error(err, "Impossible: failed to fetch namespace from Lister", "objNS", objNS)
-					return true, true
-				}
-				if objNSR == nil || err != nil && k8sapierrors.IsNotFound(err) {
-					logger.V(2).Info("Going around again because namespace is not known yet", "objNSR", objNSR)
-					return false, false
-				}
-				objNSM := objNSR.(metav1.Object)
-				nsLabels := objNSM.GetLabels()
-				if !labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors) {
-					continue
-				}
-			} else {
-				logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
-				return false, false
+			nsMatch, ok, retry := wsd.namespaceMatch(logger, objTest, objNS)
+			if !ok {
+				return retry, retry
+			}
+			if !nsMatch {
+				continue
 			}
 		}
 		if len(objTest.ObjectNames) == 1 && objTest.ObjectNames[0] == "*" || SliceContains(objTest.ObjectNames, objName) {
@@ -666,6 +650,36 @@ func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePl
 		return labelsMatchAny(logger, objLabels, objTest.LabelSelectors), true
 	}
 	return false, true
+}
+
+// Returns match, ok, retry.
+func (wsd *workspaceDetails) namespaceMatch(logger klog.Logger, objTest edgeapi.DownsyncObjectTest, objNS string) (bool, bool, bool) {
+	if len(objTest.Namespaces) == 1 && objTest.Namespaces[0] == "*" || SliceContains(objTest.Namespaces, objNS) {
+		return true, true, false
+	}
+	if len(objTest.NamespaceSelectors) == 0 {
+		return false, true, false
+	}
+	nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
+	nsRR := wsd.resources[nsARName]
+	var objNSR k8sruntime.Object
+	if nsRR != nil {
+		var err error
+		objNSR, err = nsRR.lister.Get(objNS)
+		if err != nil && !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Impossible: failed to fetch namespace from Lister", "objNS", objNS)
+			return false, true, true
+		}
+		if objNSR == nil || err != nil && k8sapierrors.IsNotFound(err) {
+			logger.V(2).Info("Going around again because namespace is not known yet", "objNSR", objNSR)
+			return false, false, false
+		}
+		objNSM := objNSR.(metav1.Object)
+		nsLabels := objNSM.GetLabels()
+		return labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors), true, false
+	}
+	logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
+	return false, false, false
 }
 
 func labelsMatchAny(logger klog.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {
@@ -693,6 +707,7 @@ func mkgr(group, resource string) schema.GroupResource {
 var GRsForciblyDenatured = NewMapSet(
 	mkgr("admissionregistration.k8s.io", "mutatingwebhookconfigurations"),
 	mkgr("admissionregistration.k8s.io", "validatingwebhookconfigurations"),
+	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("flowcontrol.apiserver.k8s.io", "flowschemas"),
 	mkgr("flowcontrol.apiserver.k8s.io", "prioritylevelconfigurations"),
 	mkgr("rbac.authorization.k8s.io", "clusterroles"),
@@ -714,7 +729,6 @@ var NaturedInCenterGoToMailbox = NewMapSet(
 )
 
 var GRsNotSupported = NewMapSet(
-	mkgr("apiregistration.k8s.io", "apiservices"),
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
 	mkgr("apis.kcp.io", "apiconversions"),

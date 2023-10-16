@@ -44,16 +44,14 @@ ADD config/          config/
 ADD hack/            hack/
 ADD monitoring/      monitoring/
 ADD pkg/             pkg/
-ADD scripts/         scripts/
+ADD inner-scripts/   inner-scripts/
+ADD overlap-scripts/ overlap-scripts/
 ADD space-framework/ space-framework/
 ADD test/            test/
 ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
-# Avoid self-reference
-RUN rm scripts/kubectl-kubestellar-deploy
-
-RUN make build GIT_DIRTY=$GIT_DIRTY
+RUN make innerbuild GIT_DIRTY=$GIT_DIRTY
 
 FROM redhat/ubi9
 

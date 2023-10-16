@@ -86,6 +86,17 @@ commonstuff                           replicaset.apps/commond                   
 specialstuff                          replicaset.apps/speciald-76cdbb69b5                             1         1         1       14s
 ```
 
+Examine the `APIService` objects in the guilder cluster, find the one
+named `v1090.example.my`. It is broken because it refers to a Service
+object that we have not bothered to create.
+
+```shell
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get apiservices | grep 1090
+```
+``` {.bash .no-copy }
+v1090.example.my                       my-example/my-service   False (ServiceNotFound)   2m39s
+```
+
 Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.
 

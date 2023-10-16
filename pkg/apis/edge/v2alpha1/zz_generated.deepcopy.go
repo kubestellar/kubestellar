@@ -146,6 +146,11 @@ func (in *DownsyncObjectTest) DeepCopyInto(out *DownsyncObjectTest) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.Namespaces != nil {
+		in, out := &in.Namespaces, &out.Namespaces
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.NamespaceSelectors != nil {
 		in, out := &in.NamespaceSelectors, &out.NamespaceSelectors
 		*out = make([]v1.LabelSelector, len(*in))

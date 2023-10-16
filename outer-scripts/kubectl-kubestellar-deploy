@@ -20,7 +20,7 @@
 
 KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
 
-image_tag=git-dd86b310c-clean
+image_tag=v0.8.0-alpha.13.git180d07e-clean
 
 external_endpoint=""
 openshift=false
@@ -28,6 +28,9 @@ helm_flags=()
 
 while (( $# > 0 )); do
     case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar deploy (\$kubectl_flag | --external_endpoint \$domain_name:$port | --openshift \$boolean)*"
+	    exit 0;;
 	(--external-endpoint)
 	    if (( $# >1 ))
 	    then external_endpoint="$2"; shift
@@ -41,21 +44,17 @@ while (( $# > 0 )); do
 	(--*=*|-?=*)
 	    helm_flags[${#helm_flags[*]}]="$1";;
 	(-X) set -x;;
-	(-h)
-	    echo "Usage: kubectl kubestellar deploy (\$kubectl_flag | --external_endpoint \$domain_name:$port | --openshift \$boolean)*"
-	    exit 0;;
 	(--*|-?)
-	    if (( $# > 1 ))
-	    then helm_flags[${#helm_flags[*]}]="$1"
+	    helm_flags[${#helm_flags[*]}]="$1"
+	    if (( $# > 1 )); then 
 		 helm_flags[${#helm_flags[*]}]="$2"
 		 shift
-	    else echo "$0: missing value for long flag $1" >&2; exit 1
 	    fi;;
 	(-*)
 	    echo "$0: flag syntax error" >&2
 	    exit 1;;
 	(*)
-	    echo "$0: no positional arguments accepted" >&2
+	    echo "$0: no positional arguments are allowed" >&2
 	    exit 1
     esac
     shift

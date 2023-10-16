@@ -25,9 +25,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
+	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
 	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
@@ -136,4 +138,16 @@ func pathToTestdataDir() string {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "./testdata")
 	return dir
+}
+
+func createNamespace(t *testing.T, ctx context.Context, upstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset, wsPath logicalcluster.Path, namespaceName string) *corev1.Namespace {
+	namespaceObj := &corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: namespaceName,
+		},
+	}
+	t.Logf("Create namespace %q in workspace %q.", namespaceObj.Name, wsPath.String())
+	_, err := upstreamKubeClusterClient.Cluster(wsPath).CoreV1().Namespaces().Create(ctx, namespaceObj, v1.CreateOptions{})
+	require.NoError(t, err)
+	return namespaceObj
 }

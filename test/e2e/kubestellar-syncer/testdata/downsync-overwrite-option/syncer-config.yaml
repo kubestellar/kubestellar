@@ -1,0 +1,17 @@
+apiVersion: edge.kubestellar.io/v2alpha1
+kind: SyncerConfig
+metadata:
+  name: syncer-config
+spec:
+  namespacedObjects:
+  - apiVersion: v1
+    group: ""
+    resource: configmaps
+    objectsByNamespace:
+    - namespace: test
+      names:
+      - cm
+      - cm-not-downsync-overwrite
+    - namespace: test2
+      names:
+      - "*"

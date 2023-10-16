@@ -14,6 +14,27 @@
 
 # We need bash for some conditional logic below.
 
+GIT_COMMIT=
+GIT_DIRTY=
+GIT_VERSION=
+
+
+
+SHELL := /usr/bin/env bash -e
+
+KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+CORE_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # todo linux/s390x  ?
+CORE_IMAGE_REPO ?= quay.io/kubestellar/space-framework
+
+GIT_INFO_FILE := git-info.txt
+#GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
+#IT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
+#GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
+
+BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
+GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
+
 GO_INSTALL = ./hack/go-install.sh
 
 TOOLS_DIR=hack/tools
@@ -21,14 +42,6 @@ TOOLS_GOBIN_DIR := $(abspath $(TOOLS_DIR))
 GOBIN_DIR=$(abspath ./bin )
 PATH := $(GOBIN_DIR):$(TOOLS_GOBIN_DIR):$(PATH)
 TMPDIR := $(shell mktemp -d)
-
-
-.PHONY: all
-all: build
-
-.PHONY: bin-dir
-bin-dir:
-	mkdir -p bin
 
 # Detect the path used for the install target
 ifeq (,$(shell go env GOBIN))
@@ -81,13 +94,16 @@ export CODE_GENERATOR # so hack scripts can use it
 
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
-
-KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
-KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
-GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
-GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
-GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+ifeq ($(IMPORT_TAGS),yes)
+	include ${GIT_INFO_FILE}
+else
+	GIT_COMMIT=$(shell git rev-parse --short HEAD || echo 'local')
+	GIT_DIRTY=$(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty') 
+	GIT_VERSION=$(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT)) 
+endif
+
 LDFLAGS := \
 	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
 	-X k8s.io/client-go/pkg/version.gitTreeState=${GIT_DIRTY} \
@@ -104,9 +120,16 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
 
+.PHONY: all
+all: build
+
+.PHONY: bin-dir
+bin-dir:
+	mkdir -p bin
+
 .PHONY: build
 build: WHAT ?= ./cmd/space-manager ./cmd/space-client-test
-build: bin-dir
+build: bin-dir 
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 
 ldflags:
@@ -157,7 +180,6 @@ $(TOOLS_DIR)/verify_boilerplate.py:
 verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
 	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
 
-
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) 
 	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
@@ -165,3 +187,20 @@ imports: $(OPENSHIFT_GOIMPORTS)
 .PHONY: modules
 modules: ## Run go mod tidy to ensure modules are up to date
 	go mod tidy
+
+.PHONY: spacecore-image
+spacecore-image: export-git-info
+	if ! docker buildx inspect space-framework &> /dev/null; then docker buildx create --name space-framework --platform $(CORE_PLATFORMS); fi
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; eval docker buildx --builder space-framework build --push --platform $(CORE_PLATFORMS) --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile .
+
+.PHONY: spacecore-image-local
+spacecore-image-local: export-git-info
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile $$extoo .
+
+.PHONY: export-git-info
+export-git-info:
+	echo  "GIT_COMMIT := " "$(GIT_COMMIT)" > ${GIT_INFO_FILE}
+	echo  "GIT_DIRTY := " ${GIT_DIRTY} >> ${GIT_INFO_FILE}
+	echo  "GIT_VERSION := " ${GIT_VERSION} >> ${GIT_INFO_FILE}
+
+

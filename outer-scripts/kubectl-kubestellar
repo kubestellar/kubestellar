@@ -14,27 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 KCPE_VERSION
+cat <<EOF
+Usage:
+  kubectl kubestellar [command]
 
-if [ $# != 1 ]; then
-    echo "$0 usage: KCPE_VERSION" >&2
-    exit 1
-fi
-
-kcpe_version="$1"
-
-set -e
-
-srcdir=$(dirname "$0")
-$srcdir/make-release-container.sh $kcpe_version
-
-os_names=( darwin darwin linux linux linux linux )
-arch_names=( arm64 amd64 arm64 amd64 ppc64le s390x)
-length=${#os_names[@]}
-for (( i=0; i<length; i++ ));
-do
-	echo "${os_names[$i]} ${arch_names[$i]}"
-    $srcdir/make-release-platform-archive.sh $kcpe_version user ${os_names[$i]} ${arch_names[$i]}
-    $srcdir/make-release-platform-archive.sh $kcpe_version full ${os_names[$i]} ${arch_names[$i]}
-done
-
+Available commands:
+  deploy                  Deploy KubeStellar core in a Kubernetes cluster
+  ensure                  Make sure a given thing exists and is setup
+  get-internal-kubeconfig Fetch kubeconfig for using core from same namespace
+  get-external-kubeconfig Fetch kubeconfig for using core from outside cluster
+  prep-for-cluster        Ensure location and prep-for-syncer
+  prep-for-syncer         First step in bootstrapping a WEC
+  remove                  Make sure a given thing does not exist
+EOF

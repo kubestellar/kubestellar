@@ -24,6 +24,9 @@ wmw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    exit 0;;
 	(-X) set -o xtrace;;
 	(--with-kube)
 	    if (( $# >1 ))
@@ -35,15 +38,11 @@ while (( $# > 0 )); do
 	    echo "$0: --context flag not supported" >&2; exit 1;;
 	(--*=*|-?=*)
 	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
-	(-h)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
-	    exit 0;;
 	(--*|-?)
-	    if (( $# > 1 ))
-	    then kubectl_flags[${#kubectl_flags[*]}]="$1"
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";
+	    if (( $# > 1 )); then 
 		 kubectl_flags[${#kubectl_flags[*]}]="$2"
 		 shift
-	    else echo "$0: missing value for long flag $1" >&2; exit 1
 	    fi;;
 	(-*)
 	    echo "$0: flag syntax error" >&2
@@ -122,11 +121,15 @@ fi
 }
 
 bind_iff_wanted kubernetes
+bind_iff_wanted apiregistration.k8s.io
 bind_iff_wanted apps
 bind_iff_wanted autoscaling
 bind_iff_wanted batch
 bind_iff_wanted core.k8s.io
 bind_iff_wanted discovery.k8s.io
+bind_iff_wanted flowcontrol.apiserver.k8s.io
 bind_iff_wanted networking.k8s.io
+bind_iff_wanted node.k8s.io
 bind_iff_wanted policy
+bind_iff_wanted scheduling.k8s.io
 bind_iff_wanted storage.k8s.io
