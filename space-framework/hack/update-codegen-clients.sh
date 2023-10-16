@@ -24,7 +24,6 @@ export GOPATH=$(go env GOPATH)
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; go list -f '{{.Dir}}' -m k8s.io/code-generator)}
-CODEGEN_PKG=/home/ezra/go/pkg/mod/k8s.io/code-generator@v0.24.3
 
 bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client,informer,lister" \
   github.com/kubestellar/kubestellar/space-framework/pkg/client github.com/kubestellar/kubestellar/space-framework/pkg/apis \
@@ -32,5 +31,3 @@ bash "${CODEGEN_PKG}"/generate-groups.sh "deepcopy,client,informer,lister" \
   --go-header-file "${SCRIPT_ROOT}"/hack/boilerplate/boilerplate.generatego.txt \
   --output-base "${SCRIPT_ROOT}" \
   --trim-path-prefix github.com/kubestellar/kubestellar/space-framework
-
-go install "${CODEGEN_PKG}"/cmd/openapi-gen
