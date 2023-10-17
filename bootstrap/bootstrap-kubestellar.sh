@@ -443,6 +443,7 @@ elif [ "$deploy_style" == bare ]; then
     fi
 else
     echo "< Deploy kcp and KubeStellar into Kubernetes, namespace=$host_ns >---------------"
+    kubectl get ns $host_ns || kubectl create ns $host_ns
     kubectl kubestellar deploy "${deploy_flags[@]}" -n $host_ns
     echo "< Waiting for startup and fetching $folder/kubestellar.kubeconfig >---------------"
     kubectl kubestellar get-external-kubeconfig -n $host_ns -o "$folder"/kubestellar.kubeconfig
