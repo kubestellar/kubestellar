@@ -2898,6 +2898,9 @@ and does the following things.</p>
   working directory.  The download of kcp, if any, will go in
   <code>$install_parent_dir/kcp</code>.  The download of KubeStellar will go in
   <code>$install_parent_dir/kubestellar</code>.</li>
+<li><code>--host-ns $namespace_in_hosting_cluster</code>: specifies the namespace
+  in the hosting cluster where the core will be deployed. Defaults to
+  "kubestellar".</li>
 <li><code>-V</code> or <code>--verbose</code>: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.</li>
 <li><code>-X</code>: makes the script <code>set -x</code> internally, for debugging.</li>
