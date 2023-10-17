@@ -31,6 +31,7 @@
 # [--bind-address address] bind kcp to a specific ip address
 # [--ensure-imw name] create a Inventory Management Workspace (IMW)
 # [--ensure-wmw name] create a Workload Management Workspace (WMW)
+# [--host-ns namespace] specify namespace in hosting cluster that gets chart
 # [-V|--verbose] verbose output
 # [-X] `set -x`
 
@@ -174,6 +175,7 @@ flagx=""
 user_exports=""
 external_endpoint=""
 openshift=false
+host_ns="kubestellar"
 
 echo "< KubeStellar bootstrap started >----------------"
 
@@ -234,13 +236,18 @@ while (( $# > 0 )); do
         then { openshift="$2"; shift; }
         else { echo "$0: missing openshift setting" >&2; exit 1; }
         fi;;
+    (--host-ns)
+        if (( $# > 1 ));
+        then { host_ns="$2"; shift; }
+        else { echo "$0: missing host-ns setting" >&2; exit 1; }
+        fi;;
     (--verbose|-V)
         verbose="true";;
     (-X)
 	set -x
 	flagx="-X";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--deploy bool] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--deploy bool] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--host-ns namespace-in-hosting-cluster] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
@@ -284,6 +291,11 @@ case "$openshift" in
     (*) echo "$0: --openshift value must be 'true' or 'false'" >&2
 	exit 1;;
 esac
+
+if [ $(wc -w <<<"$host_ns") != 1 ]; then
+    echo "$0: --host-ns value must be one word, not '$host_ns'" >&2
+    exit 1
+fi
 
 deploy_style=bare
 deploy_flags=()
@@ -430,10 +442,10 @@ elif [ "$deploy_style" == bare ]; then
 	fi
     fi
 else
-    echo "< Deploy kcp and KubeStellar into Kubernetes >---------------"
-    kubectl kubestellar deploy "${deploy_flags[@]}"
+    echo "< Deploy kcp and KubeStellar into Kubernetes, namespace=$host_ns >---------------"
+    kubectl kubestellar deploy "${deploy_flags[@]}" -n $host_ns
     echo "< Waiting for startup and fetching $folder/kubestellar.kubeconfig >---------------"
-    kubectl kubestellar get-external-kubeconfig -o "$folder"/kubestellar.kubeconfig
+    kubectl kubestellar get-external-kubeconfig -n $host_ns -o "$folder"/kubestellar.kubeconfig
     export KUBECONFIG="$folder/kubestellar.kubeconfig"
     echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
     user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
