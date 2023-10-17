@@ -949,6 +949,9 @@ This script accepts the following command line flags; all are optional.  The `--
   working directory.  The download of kcp, if any, will go in
   `$install_parent_dir/kcp`.  The download of KubeStellar will go in
   `$install_parent_dir/kubestellar`.
+- `--host-ns $namespace_in_hosting_cluster`: specifies the namespace
+  in the hosting cluster where the core will be deployed. Defaults to
+  "kubestellar".
 - `-V` or `--verbose`: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.
 - `-X`: makes the script `set -x` internally, for debugging.
