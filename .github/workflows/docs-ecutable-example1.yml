@@ -43,7 +43,10 @@ jobs:
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
+        with:
+         version: '1.28.2'
         id: install
+        
   
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
