@@ -232,7 +232,7 @@
         systemctl --user restart docker.service
         ```
         ``` title="kind - https://kind.sigs.k8s.io/docs/user/quick-start/"
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-$(dpkg --print-architecture) && chmod +x ./kind && sudo mv ./kind /usr/local/bin
         ```
 
     === "Debian"
