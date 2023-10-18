@@ -18,7 +18,7 @@
 
 # Usage: $0 (--external-endpoint $domain_name:$port | --openshift $bool | -X | kubectl_flag)*
 
-KSDIR=$(cd $(dirname ${BASH_SOURCE[0]}); cd ..; pwd)
+KSDIR=$(cd -- $(dirname $(realpath ${BASH_SOURCE[0]})); cd ..; pwd)
 
 image_tag=v0.8.0-alpha.13.git180d07e-clean
 
