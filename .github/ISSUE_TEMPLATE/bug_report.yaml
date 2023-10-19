@@ -8,6 +8,36 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+        
+        Here is how you can help us serve you better:
+
+        Lets gather your kubectl and kubeconfig information first:
+	        - save kubectl output to a file
+	        - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
+
+        Lets get KubeStellar specific context now:
+	        collection of KubeStellar Core user-facing effects:
+		        - ‘kubectl get synctarget,location -o yaml ’ objects from the inventory space(s)
+		        - ‘kubectl get edgeplacement,customizer -o yaml’ to show all your  (if any) objects from the workload description space(s)
+		        - ‘kubectl config get-contexts’ , for each relevant kubeconfig , to show a summary of its contents
+		        - ‘kubectl version’ for each relevant kubeconfig.
+		        - ‘kubestellar-version’
+		        - ‘kubestellar-release’
+
+	        collection of KubeStellar Core internal items:
+		        - kubectl get singleplacementslice -o yaml’ in all your workload description space(s)
+		        - (future) kubectl get resolvedworkloadslice -o yaml’ in all your workload description space(s)
+
+	        collection of KubeStellar Core implementation details:
+		        - The log from each of the KubeStellar controllers and from the kcp server.
+		        - Assuming the KubeStellar core was deployed as a Kubernetes workload: (a) helm list -A , (b) kubectl describe the Deployment object involved, (c) kubectl describe the Pod of that Deployment, (d) the log from the init container in that Pod, and (e) kubectl or docker or whatever exec kubestellar-version in any of the containers in that Pod besides the kcp server.
+		        - Use kubectl ws root; kubectl ws tree to show all the kcp workspaces.
+		        - For each mailbox workspace in there: kubectl get -o yaml SyncerConfig the-one and also kubectl get -o yaml all the workload objects that should be downsynced or upsynced.
+		        - Regarding logs: if any of the containers has restarted, also get the log from the container's previous run.
+
+        	collection of KubeStellar Syncer items
+		        - Find the syncer Pod in your WEC and do kubectl describe on that Pod.
+
   - type: textarea
     id: description
     attributes:
