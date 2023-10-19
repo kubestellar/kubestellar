@@ -17,7 +17,7 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: kubectl ws parent; $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
+# Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
 
 want_kube=true
 wmw_name=""
@@ -25,7 +25,7 @@ wmw_name=""
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--with-kube)
@@ -70,16 +70,7 @@ esac
 
 set -e
 
-original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
-
-if [ "$original_ws" != root ]; then
-    kubectl ws "${kubectl_flags[@]}" ..
-    if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null; then
-	echo "Warning: parent has a child with the given WMW name; are you sure the right workspace is current?" >&2
-	sleep 15 # give a chance for ^C
-    fi
-    kubectl ws "${kubectl_flags[@]}" -
-fi
+kubectl ws "${kubectl_flags[@]}" root
 
 if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null
 then kubectl ws "${kubectl_flags[@]}" "$wmw_name"

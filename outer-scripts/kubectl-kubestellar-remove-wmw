@@ -17,14 +17,14 @@
 # Purpose: ensure that a workload management workspace exists and has
 # the needed APIBindings.
 
-# Usage: kubectl ws parent; $0 [-X] kubectl_flag... wmw_name
+# Usage: $0 [-X] kubectl_flag... wmw_name
 
 wmw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name"
+	    echo "Usage: kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--context*)
@@ -58,6 +58,7 @@ fi
 
 set -e
 
+kubectl ws "${kubectl_flags[@]}" root
 if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &>/dev/null
 then kubectl "${kubectl_flags[@]}" delete workspaces.tenancy.kcp.io "$wmw_name"
 fi
