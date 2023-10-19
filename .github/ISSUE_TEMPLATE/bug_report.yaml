@@ -17,26 +17,26 @@ body:
           
         2. Lets get KubeStellar specific context now:
         &nbsp;&nbsp;a) collection of KubeStellar Core user-facing effects:
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl get synctarget,location -o yaml ’ objects from the inventory space(s)
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl get edgeplacement,customizer -o yaml’ to show all your  (if any) objects from the workload description space(s)
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl config get-contexts’ , for each relevant kubeconfig , to show a summary of its contents
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl version’ for each relevant kubeconfig.
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubestellar-version’
-        &nbsp;&nbsp;&nbsp;&nbsp;- ‘kubestellar-release’
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl get synctarget,location -o yaml ’ objects from the inventory space(s)
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl get edgeplacement,customizer -o yaml’ to show all your  (if any) objects from the workload description space(s)
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl config get-contexts’ , for each relevant kubeconfig , to show a summary of its contents
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubectl version’ for each relevant kubeconfig.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubestellar-version’
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ‘kubestellar-release’
           
         &nbsp;&nbsp;b) collection of KubeStellar Core internal items:
-        &nbsp;&nbsp;&nbsp;&nbsp;- kubectl get singleplacementslice -o yaml’ in all your workload description space(s)
-        &nbsp;&nbsp;&nbsp;&nbsp;- (future) kubectl get resolvedworkloadslice -o yaml’ in all your workload description space(s)
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- kubectl get singleplacementslice -o yaml’ in all your workload description space(s)
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- (future) kubectl get resolvedworkloadslice -o yaml’ in all your workload description space(s)
           
         &nbsp;&nbsp;c) collection of KubeStellar Core implementation details:
-        &nbsp;&nbsp;&nbsp;&nbsp;- The log from each of the KubeStellar controllers and from the kcp server.
-        &nbsp;&nbsp;&nbsp;&nbsp;- Assuming the KubeStellar core was deployed as a Kubernetes workload: (a) helm list -A , (b) kubectl describe the Deployment object involved, (c) kubectl describe the Pod of that Deployment, (d) the log from the init container in that Pod, and (e) kubectl or docker or whatever exec kubestellar-version in any of the containers in that Pod besides the kcp server.
-        &nbsp;&nbsp;&nbsp;&nbsp;- Use kubectl ws root; kubectl ws tree to show all the kcp workspaces.
-        &nbsp;&nbsp;&nbsp;&nbsp;- For each mailbox workspace in there: kubectl get -o yaml SyncerConfig the-one and also kubectl get -o yaml all the workload objects that should be downsynced or upsynced.
-        &nbsp;&nbsp;&nbsp;&nbsp;- Regarding logs: if any of the containers has restarted, also get the log from the container's previous run.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- The log from each of the KubeStellar controllers and from the kcp server.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Assuming the KubeStellar core was deployed as a Kubernetes workload: (a) helm list -A , (b) kubectl describe the Deployment object involved, (c) kubectl describe the Pod of that Deployment, (d) the log from the init container in that Pod, and (e) kubectl or docker or whatever exec kubestellar-version in any of the containers in that Pod besides the kcp server.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Use kubectl ws root; kubectl ws tree to show all the kcp workspaces.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- For each mailbox workspace in there: kubectl get -o yaml SyncerConfig the-one and also kubectl get -o yaml all the workload objects that should be downsynced or upsynced.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Regarding logs: if any of the containers has restarted, also get the log from the container's previous run.
           
         &nbsp;&nbsp;d) collection of KubeStellar Syncer items
-        &nbsp;&nbsp;&nbsp;&nbsp;- Find the syncer Pod in your WEC and do kubectl describe on that Pod.
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find the syncer Pod in your WEC and do kubectl describe on that Pod.
 
   - type: textarea
     id: description
