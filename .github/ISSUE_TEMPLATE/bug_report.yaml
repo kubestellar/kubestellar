@@ -10,9 +10,10 @@ body:
         Thanks for taking the time to fill out this bug report!
         
         Here is how you can help us serve you better:
-          Lets gather your kubectl and kubeconfig information first:
-            - save kubectl output to a file
-            - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
+        
+        Lets gather your kubectl and kubeconfig information first:
+          - save kubectl output to a file
+          - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
   - type: textarea
     id: description
     attributes:
