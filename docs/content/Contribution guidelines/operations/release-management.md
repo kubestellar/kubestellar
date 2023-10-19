@@ -74,7 +74,7 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3"
+```shell title="mkdocs.yml" hl_lines="2 4"
 ...
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
@@ -83,7 +83,7 @@ ks_tag: 'latest'
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3" 
+```shell title="mkdocs.yml" hl_lines="2 4" 
 ...
 edit_uri: edit/release-0.3/docs/content
 ks_branch: 'release-0.3'
