@@ -26,7 +26,7 @@
 #    KubeStellar controller binaries are on $PATH.
 #    kubectl is configured to talk to kcp server with high privilege
 
-bindir="$(dirname "$0")"
+bindir=$(dirname $(realpath "${BASH_SOURCE[0]}"))
 
 set -e
 
@@ -41,9 +41,6 @@ log_folder=$(pwd)/kubestellar-logs
 local_kcp=true
 imws="root:imw1"
 wmws="root:wmw1"
-
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
 
 function echoerr() {
    echo "ERROR: $1" >&2
@@ -170,7 +167,7 @@ function create_or_replace() { # usage: filename
 
 # current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
-    ( cd ${SCRIPT_DIR}/../config/kube/exports/namespaced
+    ( cd ${bindir}/../config/kube/exports/namespaced
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do
 	  create_or_replace $rsfn
@@ -178,7 +175,7 @@ function ensure_root_compute_configd() {
       for refn in apiexport-*.yaml; do
 	  eval kubectl apply -f "$refn" $verbdir
       done
-      cd ${SCRIPT_DIR}/../config/kube/exports/cluster-scoped
+      cd ${bindir}/../config/kube/exports/cluster-scoped
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do
 	  create_or_replace $rsfn
@@ -326,7 +323,7 @@ function ensure_espw() {
     else
         kubectl ws create "$espw_name" --enter
     fi
-    eval kubectl apply -f "$SCRIPT_DIR/../config/exports" $verbdir
+    eval kubectl apply -f "$bindir/../config/exports" $verbdir
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
