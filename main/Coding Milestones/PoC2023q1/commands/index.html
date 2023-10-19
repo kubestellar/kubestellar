@@ -1368,6 +1368,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#syncer-removal" class="md-nav__link">
+    Syncer removal
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#edge-cluster-on-boarding" class="md-nav__link">
     Edge cluster on-boarding
   </a>
@@ -2076,6 +2083,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#syncer-removal" class="md-nav__link">
+    Syncer removal
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#edge-cluster-on-boarding" class="md-nav__link">
     Edge cluster on-boarding
   </a>
@@ -2711,6 +2725,31 @@ needed to configure <code>kubectl</code> to modify the edge cluster and read you
 chosen output file.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$demo1_kubeconfig</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>demo1-syncer.yaml
 </code></pre></div>
+<p>You can preserve this file for future use if you want to remove the
+syncer later.</p>
+<h2 id="syncer-removal">Syncer removal<a class="headerlink" href="#syncer-removal" title="Permanent link">#</a></h2>
+<p>The previous section shows the two steps involved in establishing a
+syncer: one modifies the core and one adds stuff into the WEC. If for
+any reason your core gets deleted (e.g., deliberate replacement) and
+you want to undo the addition of the syncer into the WEC, you can use
+the YAML file generated above with <code>kubectl delete</code> instead of
+<code>kubectl apply</code> (of course using the right kubeconfig and context
+therein).</p>
+<p>A syncer that is configured to work with an extinct core is harmless
+except that its pod will be doing some futile work (failing to make
+requests on the core and logging error messages).</p>
+<p>If you need to manually remove the syncer from your WEC, following is
+the list of things that went into the WEC.</p>
+<ul>
+<li>A namespace named
+  <code>kubestellar-syncer-${SyncTarget_Name}-${UID}</code>. The UID is a random
+  ID that is uniquely generated each time you run prep-for-syncer.</li>
+<li>A ServiceAccount (with associated token Secret) in that namespace.</li>
+<li>Another Secret in that namespace.</li>
+<li>A Deployment in that namespace</li>
+<li>A ClusterRole with the same name as the namespace.</li>
+<li>A ClusterRoleBinding with the same name as the namespace.</li>
+</ul>
 <h2 id="edge-cluster-on-boarding">Edge cluster on-boarding<a class="headerlink" href="#edge-cluster-on-boarding" title="Permanent link">#</a></h2>
 <p>The following command is a combination of <code>kubectl kubestellar
 ensure-location</code> and <code>kubectl kubestellar prep-for-syncer</code>, and takes
