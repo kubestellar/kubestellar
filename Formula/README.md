@@ -14,6 +14,6 @@ to remove:
 
 after PR is accepted:
 
-brew tap kubestellar/kubestellar https://github.com/kubestellar/kubestellar/brew
+brew tap kubestellar/kubestellar
 brew install kcp_cli
 brew install kubestellar_cli
