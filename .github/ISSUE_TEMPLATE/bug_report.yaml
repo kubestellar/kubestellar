@@ -7,13 +7,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+	Thanks for taking the time to fill out this bug report!
         
-        Here is how you can help us serve you better:
+	Here is how you can help us serve you better:
 
-        Lets gather your kubectl and kubeconfig information first:
-	        - save kubectl output to a file
-	        - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
+	Lets gather your kubectl and kubeconfig information first:
+		- save kubectl output to a file
+		- include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
 
         Lets get KubeStellar specific context now:
 	        collection of KubeStellar Core user-facing effects:
