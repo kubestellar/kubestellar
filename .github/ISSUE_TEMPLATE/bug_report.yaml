@@ -14,6 +14,15 @@ body:
         Lets gather your kubectl and kubeconfig information first:
           - save kubectl output to a file
           - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
+        Lets get KubeStellar specific context now:
+          collection of KubeStellar Core user-facing effects:
+            - ‘kubectl get synctarget,location -o yaml ’ objects from the inventory space(s)
+            - ‘kubectl get edgeplacement,customizer -o yaml’ to show all your  (if any) objects from the workload description space(s)
+            - ‘kubectl config get-contexts’ , for each relevant kubeconfig , to show a summary of its contents
+            - ‘kubectl version’ for each relevant kubeconfig.
+            - ‘kubestellar-version’
+            - ‘kubestellar-release’
+
   - type: textarea
     id: description
     attributes:
