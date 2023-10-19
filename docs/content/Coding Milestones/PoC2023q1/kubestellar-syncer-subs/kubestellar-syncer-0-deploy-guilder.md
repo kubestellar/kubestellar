@@ -29,7 +29,7 @@ Creating cluster role "kubestellar-syncer-guilder-wfeig2lv" to give service acco
 
 Creating or updating cluster role binding "kubestellar-syncer-guilder-wfeig2lv" to bind service account "kubestellar-syncer-guilder-wfeig2lv" to cluster role "kubestellar-syncer-guilder-wfeig2lv".
 
-Wrote physical cluster manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
+Wrote WEC manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "guilder-syncer.yaml"
 

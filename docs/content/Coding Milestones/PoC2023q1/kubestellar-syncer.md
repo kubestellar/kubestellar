@@ -102,11 +102,11 @@ The overall diagram is as follows:
 
 ### What KubeStellar syncer-gen plugin does
 
-In order for Syncer to sync resources between upstream (workspace) and downstream (physical cluster), access information for both is required. 
+In order for Syncer to sync resources between upstream (workspace) and downstream (workload execution cluster), access information for both is required. 
 
 For the upstream access, Syncer's registration command (`kubectl kubestellar syncer-gen`) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to `/kcp/` in Syncer pod. The command generates such deployment manifest as Syncer reads `/kcp/` for the upstream Kubeconfig. 
 
-On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the physical cluster. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to `serviceAccountName` in the deployment manifest.
+On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the WEC. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to `serviceAccountName` in the deployment manifest.
 
 Note: In addition to that, the command creates an EdgeSyncConfig CRD if it does not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (`kubectl kubestellar syncer-gen <name>`). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of the EdgeSyncConfig CRD will also no longer be needed since we will switch to using SyncerConfig rather than EdgeSyncConfig in near future.
 
