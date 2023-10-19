@@ -6,8 +6,8 @@ repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
 docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
-edit_uri: edit/main/docs/content
-ks_branch: 'main'
+edit_uri: edit/release-0.9/docs/content
+ks_branch: 'release-0.9'
 ks_tag: 'latest'
 
 # Site content
@@ -58,7 +58,7 @@ nav:
           - Details: Coding Milestones/PoC2023q4/outline.md
   - Community: 
     - Get Involved: Community/_index.md
-    - Contributor Guidelines: https://docs.kubestellar.io/main/Contribution%20guidelines/CONTRIBUTING/
+    - Contributor Guidelines: https://docs.kubestellar.io/release-0.9/Contribution%20guidelines/CONTRIBUTING/
     - Contact Us:
         - Mailing List: https://kubestellar.io/join_us
         - Community Meeting Agenda (join mailing list first): https://kubestellar.io/agenda
