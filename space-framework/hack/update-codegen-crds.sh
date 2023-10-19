@@ -19,14 +19,20 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+if [[ -z "${MAKELEVEL:-}" ]]; then
+    echo 'You must invoke this script via make'
+    exit 1
+fi
+
 if [[ -z "${CONTROLLER_GEN:-}" ]]; then
     echo "$CONTROLLER_GEN must be defined to refer to the right binary, e.g. as is done in the Makefile"
     exit 1
 fi
-if [[ -z "${API_GEN:-}" ]]; then
-    echo "$API_GEN must be defined to refer to the right binary, e.g. as is done in the Makefile"
-    exit 1
-fi
+
+#if [[ -z "${API_GEN:-}" ]]; then
+#    echo "$API_GEN must be defined to refer to the right binary, e.g. as is done in the Makefile"
+#    exit 1
+#fi
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
@@ -47,4 +53,4 @@ for CRD in "${REPO_ROOT}"/config/crds/*.yaml; do
     fi
 done
 
-"${REPO_ROOT}/${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
+#"${REPO_ROOT}/${API_GEN}" --input-dir "${REPO_ROOT}"/config/crds --output-dir "${REPO_ROOT}"/config/exports
