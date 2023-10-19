@@ -699,6 +699,35 @@ chosen output file.
 KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 ```
 
+You can preserve this file for future use if you want to remove the
+syncer later.
+
+## Syncer removal
+
+The previous section shows the two steps involved in establishing a
+syncer: one modifies the core and one adds stuff into the WEC. If for
+any reason your core gets deleted (e.g., deliberate replacement) and
+you want to undo the addition of the syncer into the WEC, you can use
+the YAML file generated above with `kubectl delete` instead of
+`kubectl apply` (of course using the right kubeconfig and context
+therein).
+
+A syncer that is configured to work with an extinct core is harmless
+except that its pod will be doing some futile work (failing to make
+requests on the core and logging error messages).
+
+If you need to manually remove the syncer from your WEC, following is
+the list of things that went into the WEC.
+
+- A namespace named
+  `kubestellar-syncer-${SyncTarget_Name}-${UID}`. The UID is a random
+  ID that is uniquely generated each time you run prep-for-syncer.
+- A ServiceAccount (with associated token Secret) in that namespace.
+- Another Secret in that namespace.
+- A Deployment in that namespace
+- A ClusterRole with the same name as the namespace.
+- A ClusterRoleBinding with the same name as the namespace.
+
 ## Edge cluster on-boarding
 
 The following command is a combination of `kubectl kubestellar
