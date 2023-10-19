@@ -2786,30 +2786,25 @@ the kcp current workspace will be what it was at the start.</p>
 </code></pre></div></p>
 <h2 id="creating-a-workload-management-workspace">Creating a Workload Management Workspace<a class="headerlink" href="#creating-a-workload-management-workspace" title="Permanent link">#</a></h2>
 <p>Such a workspace needs not only to be created but also populated with
-an <code>APIBinding</code> to the edge API and, if desired, an <code>APIBinding</code> to
+an <code>APIBinding</code> to the edge API and, if desired, some <code>APIBindings</code> to
 the Kubernetes API for management of containerized workloads.</p>
-<p><strong>NOTE</strong>: currently, only a subset of the Kubernetes containerized
-workload management API is supported.  In particular, only the
-following object kinds are supported: <code>Deployment</code>, <code>Pod</code>, <code>Service</code>,
-<code>Ingress</code>.  To be clear: this is in addition to the generic object
-kinds that are supported; illustrative examples include RBAC objects,
-<code>CustomResourceDefinition</code>, and <code>ConfigMap</code>.  For a full description,
-see <a href="../outline/#data-objects">the categorization in the design</a>.</p>
+<p>Every workload management workspace is a child of the <code>root</code>
+workspace.</p>
 <p>The usage synopsis for this command is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>parent_pathname<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div>
-<p>Here <code>parent_pathname</code> is the workspace pathname of the parent of the
-WMW, and <code>wm_workspace_name</code> is the name (not pathname, just a bare
+<p>Here <code>wm_workspace_name</code> is the name (not pathname, just a bare
 one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
-will be <code>parent_pathname:wm_workspace_name</code>.</p>
+will be <code>root:wm_workspace_name</code>.</p>
 <p>Upon completion, the WMW will be the current workspace.</p>
 <p>The flags can also appear anywhere later on the command line.</p>
 <p>The acceptable flags include all those of <code>kubectl</code> except for
 <code>--context</code>.  This command also accepts the following flags.</p>
 <ul>
 <li><code>--with-kube boolean</code>: specifies whether or not the WMW should
-  include an APIBinding to the Kubernetes API for management of
-  containerized workloads.</li>
+  include an APIBindings to the supported subset of the Kubernetes API
+  for management of containerized workloads. See <a href="../outline/#data-objects">the categorization
+  in the design</a> for details.</li>
 <li><code>-X</code>: turn on debug echoing of the commands inside the script that
   implements this command.</li>
 </ul>
@@ -2818,77 +2813,89 @@ be done.</p>
 <p>The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube APIBinding
 is included.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>created.<span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>it<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span>ready...
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>ready<span class="w"> </span>to<span class="w"> </span>use.
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>apibinding.apis.kcp.io/bind-espw<span class="w"> </span>created
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>apibinding.apis.kcp.io/bind-kubernetes<span class="w"> </span>created
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>apibinding.apis.kcp.io/bind-apiregistration.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>apibinding.apis.kcp.io/bind-apps<span class="w"> </span>created
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a>apibinding.apis.kcp.io/bind-autoscaling<span class="w"> </span>created
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a>apibinding.apis.kcp.io/bind-batch<span class="w"> </span>created
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a>apibinding.apis.kcp.io/bind-core.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a>apibinding.apis.kcp.io/bind-discovery.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a>apibinding.apis.kcp.io/bind-flowcontrol.apiserver.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a>apibinding.apis.kcp.io/bind-networking.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a>apibinding.apis.kcp.io/bind-node.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a>apibinding.apis.kcp.io/bind-policy<span class="w"> </span>created
+<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a>apibinding.apis.kcp.io/bind-scheduling.k8s.io<span class="w"> </span>created
+<a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a>apibinding.apis.kcp.io/bind-storage.k8s.io<span class="w"> </span>created
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
-<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>created.<span class="w"> </span>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>it<span class="w"> </span>to<span class="w"> </span>be<span class="w"> </span>ready...
-<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>Workspace<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>ready<span class="w"> </span>to<span class="w"> </span>use.
-<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>apibinding.apis.kcp.io/bind-espw<span class="w"> </span>created
-<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>apibinding.apis.kcp.io/bind-kube<span class="w"> </span>created
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
-<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
-<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kube&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-kubernetes&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-apiregistration.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-apps&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-autoscaling&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-batch&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-core.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-discovery.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-flowcontrol.apiserver.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-11" name="__codelineno-44-11" href="#__codelineno-44-11"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-networking.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-12" name="__codelineno-44-12" href="#__codelineno-44-12"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-node.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-13" name="__codelineno-44-13" href="#__codelineno-44-13"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-policy&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-14" name="__codelineno-44-14" href="#__codelineno-44-14"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-scheduling.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-44-15" name="__codelineno-44-15" href="#__codelineno-44-15"></a>apibinding.apis.kcp.io<span class="w"> </span><span class="s2">&quot;bind-storage.k8s.io&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace<a class="headerlink" href="#removing-a-workload-management-workspace" title="Permanent link">#</a></h2>
 <p>Deleting a WMW can be done by simply deleting its <code>Workspace</code> object from
 the parent.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org:example-wmw&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>..
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <p>Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>parent<span class="p">;</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:my-org
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:my-org&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
-</code></pre></div>
 <h2 id="bootstrap">Bootstrap<a class="headerlink" href="#bootstrap" title="Permanent link">#</a></h2>
 <p>This is a combination of some installation and setup steps, for use in
 <a href="../../../Getting-Started/quickstart/">the
