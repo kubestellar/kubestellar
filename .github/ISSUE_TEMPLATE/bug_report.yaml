@@ -10,7 +10,8 @@ body:
         Thanks for taking the time to fill out this bug report!
         
         Here is how you can help us serve you better:
-        
+
+        0. Did you look at issue #920 re: potentially misusing the ‘kubectl ws’ command?
         1. First, lets gather your kubectl and kubeconfig information first:
         &nbsp;&nbsp;&nbsp;&nbsp;- save kubectl output to a file
         &nbsp;&nbsp;&nbsp;&nbsp;- include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
