@@ -42,7 +42,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
@@ -83,7 +83,7 @@ type workspaceDetails struct {
 	// and formerly only contains entries for non-namespaced resources
 	resources map[string]*resourceResolver
 
-	// maps GroupKind to Name of urmetav1a1.APIResource
+	// maps GroupKind to Name of ksmetav1a1.APIResource
 	gkToARName map[schema.GroupKind]string
 }
 
@@ -308,7 +308,7 @@ func (wr *whatResolver) processNextWorkItem() bool {
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
 	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
 		return wr.processEdgePlacement(ctx, item.cluster, item.nn.Second)
-	} else if item.gk.Group == urmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
+	} else if item.gk.Group == ksmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
 		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
 	} else {
 		return wr.processCenterObject(ctx, item.cluster, item.gk, item.nn)
@@ -495,7 +495,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 			gkToARName:             map[schema.GroupKind]string{},
 		}
 		wr.workspaceDetails[cluster] = wsDetails
-		apiInformer.AddEventHandler(WhatResolverScopedHandler{wr, mkgk(urmetav1a1.SchemeGroupVersion.Group, "APIResource"), cluster})
+		apiInformer.AddEventHandler(WhatResolverScopedHandler{wr, mkgk(ksmetav1a1.SchemeGroupVersion.Group, "APIResource"), cluster})
 		logger.V(2).Info("Started watching logical cluster")
 		go apiInformer.Run(wsCtx.Done())
 		dynamicInformerFactory.Start(wsCtx.Done())
