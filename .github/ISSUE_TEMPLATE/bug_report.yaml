@@ -8,6 +8,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+        
         Here is how you can help us serve you better:
   - type: textarea
     id: description
