@@ -11,9 +11,9 @@ body:
         
         Here is how you can help us serve you better:
         
-        Lets gather your kubectl and kubeconfig information first:
-          - save kubectl output to a file
-          - include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
+        First, lets gather your kubectl and kubeconfig information first:
+        &nbsp;- save kubectl output to a file
+        &nbsp;- include a reference to what $KUBECONFIG was set to at the time of your kubectl usage
           
         Lets get KubeStellar specific context now:
           collection of KubeStellar Core user-facing effects:
