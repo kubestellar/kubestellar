@@ -36,7 +36,7 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
-	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 )
 
 // Invalidatable is a cache that has to be explicitly invalidated
@@ -55,15 +55,15 @@ type ObjectNotifier interface {
 type APIResourceLister interface {
 	// List lists all APIResources in the informer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*urmetav1a1.APIResource, err error)
+	List(selector labels.Selector) (ret []*ksmetav1a1.APIResource, err error)
 	// Get retrieves the APIResource having the given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*urmetav1a1.APIResource, error)
+	Get(name string) (*ksmetav1a1.APIResource, error)
 }
 
 // NewAPIResourceInformer creates an informer on the API resources
 // revealed by the given client.  The objects delivered by the
-// informer are of type `*urmetav1a1.APIResource`.
+// informer are of type `*ksmetav1a1.APIResource`.
 //
 // The results from the given client are cached in memory and that
 // cache has to be explicitly invalidated.  Invalidation can be done
@@ -125,7 +125,7 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 			},
 		})
 	}
-	inf := upstreamcache.NewSharedInformer(rlw, &urmetav1a1.APIResource{}, 0)
+	inf := upstreamcache.NewSharedInformer(rlw, &ksmetav1a1.APIResource{}, 0)
 	return inf, resourceLister{inf.GetStore()}, rlw
 }
 
@@ -202,10 +202,10 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 		return rlw.resourceVersionI
 	}()
 	resourceVersionS := strconv.FormatInt(resourceVersionI, 10)
-	ans := urmetav1a1.APIResourceList{
+	ans := ksmetav1a1.APIResourceList{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "APIResourceList",
-			APIVersion: urmetav1a1.SchemeGroupVersion.String(),
+			APIVersion: ksmetav1a1.SchemeGroupVersion.String(),
 		},
 		ListMeta: metav1.ListMeta{ResourceVersion: resourceVersionS},
 	}
@@ -221,11 +221,11 @@ func (rlw *resourcesListWatcher) List(opts metav1.ListOptions) (runtime.Object, 
 type arMap map[string]*arTuple
 
 type arTuple struct {
-	spec         *urmetav1a1.APIResourceSpec
+	spec         *ksmetav1a1.APIResourceSpec
 	subresources arMap
 }
 
-func (am arMap) insert(name []string, spec *urmetav1a1.APIResourceSpec) {
+func (am arMap) insert(name []string, spec *ksmetav1a1.APIResourceSpec) {
 	art := am[name[0]]
 	if art == nil {
 		art = &arTuple{subresources: arMap{}}
@@ -238,7 +238,7 @@ func (am arMap) insert(name []string, spec *urmetav1a1.APIResourceSpec) {
 	}
 }
 
-func (am arMap) toList(logger klog.Logger, prefix []string, consume func(urmetav1a1.APIResourceSpec)) {
+func (am arMap) toList(logger klog.Logger, prefix []string, consume func(ksmetav1a1.APIResourceSpec)) {
 	for name, art := range am {
 		if art.spec == nil {
 			logger.Error(nil, "Gap in subresource structure", "prefix", prefix, "name", name, "subresources", art.subresources)
@@ -246,14 +246,14 @@ func (am arMap) toList(logger klog.Logger, prefix []string, consume func(urmetav
 		}
 		spec := *art.spec
 		spec.Name = name
-		art.subresources.toList(logger, append(prefix, name), func(subSpec urmetav1a1.APIResourceSpec) {
+		art.subresources.toList(logger, append(prefix, name), func(subSpec ksmetav1a1.APIResourceSpec) {
 			spec.SubResources = append(spec.SubResources, &subSpec)
 		})
 		consume(spec)
 	}
 }
 
-func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resourceVersionS string) ([]urmetav1a1.APIResource, error) {
+func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resourceVersionS string) ([]ksmetav1a1.APIResource, error) {
 	groupList, resourceList, err := rlw.cache.ServerGroupsAndResources()
 	if err != nil {
 		return nil, err
@@ -262,7 +262,7 @@ func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resour
 	for _, ag := range groupList {
 		groupToVersion[ag.Name] = ag.PreferredVersion.Version
 	}
-	ans := []urmetav1a1.APIResource{}
+	ans := []ksmetav1a1.APIResource{}
 	for _, group := range resourceList {
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
 		if err != nil {
@@ -274,12 +274,12 @@ func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resour
 			continue
 		}
 		am := arMap{}
-		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(ar urmetav1a1.APIResourceSpec) {
+		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(ar ksmetav1a1.APIResourceSpec) {
 			rscName := ar.Name
 			nameParts := strings.Split(rscName, "/")
 			am.insert(nameParts, &ar)
 		})
-		am.toList(logger, []string{}, func(spec urmetav1a1.APIResourceSpec) {
+		am.toList(logger, []string{}, func(spec ksmetav1a1.APIResourceSpec) {
 			complete := specComplete(spec, resourceVersionS, gv)
 			ans = append(ans, complete)
 		})
@@ -287,11 +287,11 @@ func (rlw *resourcesListWatcher) listWithSubresources(logger klog.Logger, resour
 	return ans, nil
 }
 
-func specComplete(spec urmetav1a1.APIResourceSpec, resourceVersionS string, gv schema.GroupVersion) urmetav1a1.APIResource {
-	return urmetav1a1.APIResource{
+func specComplete(spec ksmetav1a1.APIResourceSpec, resourceVersionS string, gv schema.GroupVersion) ksmetav1a1.APIResource {
+	return ksmetav1a1.APIResource{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "APIResource",
-			APIVersion: urmetav1a1.SchemeGroupVersion.String(),
+			APIVersion: ksmetav1a1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			// The normal syntax has a slash, which confuses the usual Store
@@ -301,13 +301,13 @@ func specComplete(spec urmetav1a1.APIResourceSpec, resourceVersionS string, gv s
 		Spec: spec}
 }
 
-func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv schema.GroupVersion, mrs []metav1.APIResource, consumer func(urmetav1a1.APIResourceSpec)) {
+func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv schema.GroupVersion, mrs []metav1.APIResource, consumer func(ksmetav1a1.APIResourceSpec)) {
 	for _, rsc := range mrs {
 		rscVersion := rsc.Version
 		if rscVersion == "" {
 			rscVersion = gv.Version
 		}
-		arSpec := urmetav1a1.APIResourceSpec{
+		arSpec := ksmetav1a1.APIResourceSpec{
 			Name:         rsc.Name,
 			SingularName: rsc.SingularName,
 			Namespaced:   rsc.Namespaced,
@@ -321,19 +321,19 @@ func (rlw *resourcesListWatcher) enumAPIResources(resourceVersionS string, gv sc
 	}
 }
 
-func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) ([]urmetav1a1.APIResource, error) {
+func (rlw *resourcesListWatcher) listSansSubresources(resourceVersionS string) ([]ksmetav1a1.APIResource, error) {
 	groupList, err := rlw.cache.ServerPreferredResources()
 	if err != nil {
 		return nil, err
 	}
-	ans := []urmetav1a1.APIResource{}
+	ans := []ksmetav1a1.APIResource{}
 	for _, group := range groupList {
 		gv, err := schema.ParseGroupVersion(group.GroupVersion)
 		if err != nil {
 			rlw.logger.Error(err, "Failed to parse a GroupVersion", "groupVersion", group.GroupVersion)
 			continue
 		}
-		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(arSpec urmetav1a1.APIResourceSpec) {
+		rlw.enumAPIResources(resourceVersionS, gv, group.APIResources, func(arSpec ksmetav1a1.APIResourceSpec) {
 			ar := specComplete(arSpec, resourceVersionS, gv)
 			ans = append(ans, ar)
 		})
@@ -345,10 +345,10 @@ type resourceLister struct {
 	store upstreamcache.Store
 }
 
-func (rl resourceLister) List(selector labels.Selector) (ret []*urmetav1a1.APIResource, err error) {
+func (rl resourceLister) List(selector labels.Selector) (ret []*ksmetav1a1.APIResource, err error) {
 	allObjs := rl.store.List()
 	for _, obj := range allObjs {
-		ar := obj.(*urmetav1a1.APIResource)
+		ar := obj.(*ksmetav1a1.APIResource)
 		if selector.Matches(labels.Set(ar.Labels)) {
 			ret = append(ret, ar)
 		}
@@ -356,14 +356,14 @@ func (rl resourceLister) List(selector labels.Selector) (ret []*urmetav1a1.APIRe
 	return
 }
 
-func (rl resourceLister) Get(name string) (*urmetav1a1.APIResource, error) {
+func (rl resourceLister) Get(name string) (*ksmetav1a1.APIResource, error) {
 	obj, exists, err := rl.store.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		gr := schema.GroupResource{Group: urmetav1a1.SchemeGroupVersion.Group, Resource: "apiresources"}
+		gr := schema.GroupResource{Group: ksmetav1a1.SchemeGroupVersion.Group, Resource: "apiresources"}
 		return nil, apierrors.NewNotFound(gr, name)
 	}
-	return obj.(*urmetav1a1.APIResource), nil
+	return obj.(*ksmetav1a1.APIResource), nil
 }

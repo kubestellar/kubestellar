@@ -32,7 +32,7 @@ import (
 	kcpinformers "github.com/kcp-dev/client-go/informers"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	apiwatch "github.com/kubestellar/kubestellar/pkg/apiwatch"
 )
 
@@ -150,7 +150,7 @@ func (wpc *apiWatchProviderPerCluster) OnDelete(obj any) {
 }
 
 func (wpc *apiWatchProviderPerCluster) enqueueResourceRef(obj any, action string) {
-	rsc := obj.(*urmetav1a1.APIResource)
+	rsc := obj.(*ksmetav1a1.APIResource)
 	rr := resourceRef{cluster: wpc.cluster, metaname: rsc.Name}
 	logger := klog.FromContext(wpc.awp.context)
 	logger.V(4).Info("Enqueuing", "ref", rr)
@@ -229,7 +229,7 @@ func (awp *apiWatchProvider) sync(ctx context.Context, refany any) bool {
 
 func (awp *apiWatchProvider) syncResourceRef(ctx context.Context, rr resourceRef) bool {
 	logger := klog.FromContext(ctx)
-	metarsc, receivers := func() (*urmetav1a1.APIResource, MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]) {
+	metarsc, receivers := func() (*ksmetav1a1.APIResource, MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]) {
 		awp.Lock()
 		defer awp.Unlock()
 		wpc, has := awp.perCluster.Get(rr.cluster)
@@ -249,8 +249,8 @@ func (awp *apiWatchProvider) syncResourceRef(ctx context.Context, rr resourceRef
 
 // externalizeReceiver converts a receiver in terms internal to this package
 // into a receiver of the external representation from apiwatch.
-func externalizeReceiver(receiver MappingReceiver[metav1.GroupResource, ResourceDetails]) func(metarsc *urmetav1a1.APIResource) {
-	return func(metarsc *urmetav1a1.APIResource) {
+func externalizeReceiver(receiver MappingReceiver[metav1.GroupResource, ResourceDetails]) func(metarsc *ksmetav1a1.APIResource) {
+	return func(metarsc *ksmetav1a1.APIResource) {
 		key := metav1.GroupResource{Group: metarsc.Spec.Group, Resource: metarsc.Spec.Name}
 		val := ResourceDetails{
 			Namespaced:        metarsc.Spec.Namespaced,
@@ -288,6 +288,6 @@ func (awp *apiWatchProvider) syncResourceReceiver(ctx context.Context, cluster l
 	return false
 }
 
-func ResourceSupportsInformers(metarsc *urmetav1a1.APIResource) bool {
+func ResourceSupportsInformers(metarsc *ksmetav1a1.APIResource) bool {
 	return SliceContains(metarsc.Spec.Verbs, "list") && SliceContains(metarsc.Spec.Verbs, "watch")
 }

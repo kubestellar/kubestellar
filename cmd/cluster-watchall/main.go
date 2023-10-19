@@ -52,7 +52,7 @@ import (
 	extkcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	urmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
+	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 )
 
@@ -204,7 +204,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 	}
 	resourceInformer.AddEventHandler(upstreamcache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
-			rsc := obj.(*urmetav1a1.APIResource)
+			rsc := obj.(*ksmetav1a1.APIResource)
 			gvr := schema.GroupVersionResource{
 				Group:    rsc.Spec.Group,
 				Version:  rsc.Spec.Version,
@@ -233,7 +233,7 @@ func (acw *allClustersWatcher) NewClusterWatcher(clusterName logicalcluster.Name
 	return cw
 }
 
-func (acw *allClustersWatcher) writeSubresources(clusterName logicalcluster.Name, gv schema.GroupVersion, subs []*urmetav1a1.APIResourceSpec, prefix string) {
+func (acw *allClustersWatcher) writeSubresources(clusterName logicalcluster.Name, gv schema.GroupVersion, subs []*ksmetav1a1.APIResourceSpec, prefix string) {
 	for _, sub := range subs {
 		informable := verbsSupportInformers(sub.Verbs)
 		acw.WriteCSV([]string{"SUBRESOURCE", clusterName.String(), gv.Group, gv.Version, sub.Kind, prefix + sub.Name, fmt.Sprintf("%v", informable)})
