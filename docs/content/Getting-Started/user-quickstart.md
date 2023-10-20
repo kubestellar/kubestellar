@@ -16,7 +16,7 @@ This guide will show how to:
 5. deploy an example kubernetes workload to both edge clusters from KubeStellar Core,
 6. view the status of your deployment across both edge clusters from KubeStellar Core
 
-For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
+NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
 !!! tip "Pre-reqs"
     === "General"
@@ -91,40 +91,53 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
         EOF
         ```
    
-#### 1. Install KubeStellar environment
+#### 1. Deploy your KubeStellar Core component
 
-```
-# deploy KubeStellar core components on the 'ks-core' kind cluster you created in the pre-req section above
-KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
-kubectl create namespace kubestellar
-helm repo add kubestellar https://helm.kubestellar.io
-helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set EXTERNAL_PORT=1024 --namespace kubestellar --generate-name
-```
+!!! tip ""
+    === "deploy"
+         ```
+         # deploy KubeStellar core components on the 'ks-core' kind cluster you created in the pre-req section above
+         KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
+         kubectl create namespace kubestellar
+         helm repo add kubestellar https://helm.kubestellar.io
+         helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set EXTERNAL_PORT=1024 --namespace kubestellar --generate-name
+         ```
+    === "wait"
+         run the following to wait for KubeStellar to be ready to take requests:
+         ```
+         echo -n 'Waiting for KubeStellar to be ready'
+         while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -c init -- ls /home/kubestellar/ready &> /dev/null; do
+            sleep 10
+            echo -n "."
+         done
+         echo "KubeStellar is now ready to take requests"
+         ```
+    === "debug"
+         you can also check logs:
 
-run the following to wait for KubeStellar to be ready to take requests:
-```
-echo -n 'Waiting for KubeStellar to be ready'
-while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -c init -- ls /home/kubestellar/ready &> /dev/null; do
-    sleep 10
-    echo -n "."
-done
-echo "KubeStellar is now ready to take requests"
-```
-
-you can also check logs:
-```
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
-```
+         Checking the initialization log to see if there are errors:
+         ```
+         kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
+         ```
 
 #### 2. Install KubeStellar's user commands and kubectl plugins
 
-```
-brew tap kubestellar/kubestellar
-brew install kcp_cli
-brew install kubestellar_cli@{{config.ks_tag}}
-```
+!!! tip ""
+    === "install"
+         ```
+         brew tap kubestellar/kubestellar
+         brew install kcp_cli
+         brew install kubestellar_cli@{{config.ks_tag}}
+         ```
+    === "remove"
+         ```
+         brew remove kubestellar_cli@{{config.ks_tag}}
+         brew remove kcp_cli
+         brew untap kubestellar/kubestellar
+         ```
 
-#### 3. View KubeStellar Space environment
+
+#### 3. View your KubeStellar Core Space environment
 
 ```
 kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
@@ -172,7 +185,7 @@ brew install kcp_cli
 brew install kubestellar_cli@{{config.ks_tag}}
 ```
 
-## 2. View KubeStellar Space environment
+## 2. View your KubeStellar Core Space environment
 
 ```
 kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
