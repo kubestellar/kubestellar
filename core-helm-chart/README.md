@@ -45,7 +45,7 @@ helm install kubestellar . \
 
 ```shell
 echo -n 'Waiting for KubeStellar to be ready'
-while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- ls /home/kubestellar/ready &> /dev/null; do
+while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -c init -- ls /home/kubestellar/ready &> /dev/null; do
     sleep 10
     echo -n "."
 done
