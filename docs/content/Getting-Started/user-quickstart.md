@@ -140,7 +140,7 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
 #### 3. View your KubeStellar Core Space environment
 
 ```
-kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
+kubectl get secrets kubestellar -o jsonpath='{.data.external\.kubeconfig}' -n kubestellar | base64 -d > ks-core.kubeconfig
 KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
 ```
 
@@ -179,18 +179,25 @@ KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get deploy,rs -A 
 
 ## 1. Install KubeStellar's user commands and kubectl plugins
 
-```
-brew tap kubestellar/kubestellar
-brew install kcp_cli
-brew install kubestellar_cli@{{config.ks_tag}}
-```
+!!! tip ""
+    === "install"
+         ```
+         brew tap kubestellar/kubestellar
+         brew install kcp_cli
+         brew install kubestellar_cli@{{config.ks_tag}}
+         ```
+    === "remove"
+         ```
+         brew remove kubestellar_cli@{{config.ks_tag}}
+         brew remove kcp_cli
+         brew untap kubestellar/kubestellar
+         ```
 
 ## 2. View your KubeStellar Core Space environment
 
 ```
-kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
-KUBECONFIG=ks-core.kubeconfig kubectl config use-context root
-kubectl ws tree
+kubectl get secrets kubestellar -o jsonpath='{.data.external\.kubeconfig}' -n kubestellar | base64 -d > ks-core.kubeconfig
+KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
 ```
 
 ## 3. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
