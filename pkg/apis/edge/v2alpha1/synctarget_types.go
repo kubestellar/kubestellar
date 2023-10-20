@@ -78,7 +78,7 @@ type SyncTargetSpec struct {
 	SupportedAPIExports []tenancyv1alpha1.APIExportReference `json:"supportedAPIExports,omitempty"`
 
 	// Cells is a set of labels to identify the cells the SyncTarget belongs to. SyncTargets with the same cells run as
-	// they are in the same physical cluster. Each key/value pair in the cells should be added and updated by service providers
+	// they are in the same WEC. Each key/value pair in the cells should be added and updated by service providers
 	// (i.e. a network provider updates one key/value, while the storage provider updates another.)
 	Cells map[string]string `json:"cells,omitempty"`
 }

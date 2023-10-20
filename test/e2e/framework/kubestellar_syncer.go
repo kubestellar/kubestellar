@@ -120,7 +120,7 @@ type kubeStellarSyncerFixture struct {
 }
 
 // CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kubestellar syncer-gen` CLI command,
-// applies the kubestellar-syncer-related resources in the physical cluster.
+// applies the kubestellar-syncer-related resources in the WEC.
 func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedKubeStellarSyncerFixture {
 	t.Helper()
 
@@ -133,7 +133,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	var downstreamKubeconfigPath string
 
 	// The syncer will target a logical cluster that is a child of the current workspace. A
-	// logical server provides as a lightweight approximation of a pcluster for tests that
+	// logical server provides as a lightweight approximation of a WEC for tests that
 	// don't need to validate running workloads or interaction with kube controllers.
 	downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
 	downstreamConfig = downstreamServer.BaseConfig(t)
@@ -266,8 +266,8 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 }
 
 // RunSyncer runs a new Syncer against the upstream kcp workspaces
-// Whether the syncer runs in-process or deployed on a pcluster will depend
-// whether --pcluster-kubeconfig and --syncer-image are supplied to the test invocation.
+// Whether the syncer runs in-process or deployed on a WEC will depend
+// whether --wec-kubeconfig and --syncer-image are supplied to the test invocation.
 func (sf *appliedKubeStellarSyncerFixture) RunSyncer(t *testing.T) *StartedKubeStellarSyncerFixture {
 	t.Helper()
 

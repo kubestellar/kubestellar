@@ -674,7 +674,7 @@ Creating cluster role "kubestellar-syncer-demo1-28at01r3" to give service accoun
 
 Creating or updating cluster role binding "kubestellar-syncer-demo1-28at01r3" to bind service account "kubestellar-syncer-demo1-28at01r3" to cluster role "kubestellar-syncer-demo1-28at01r3".
 
-Wrote physical cluster manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
+Wrote WEC manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo1-syncer.yaml"
 
@@ -757,7 +757,7 @@ Creating cluster role "kubestellar-syncer-demo2-15nq4e94" to give service accoun
 
 Creating or updating cluster role binding "kubestellar-syncer-demo2-15nq4e94" to bind service account "kubestellar-syncer-demo2-15nq4e94" to cluster role "kubestellar-syncer-demo2-15nq4e94".
 
-Wrote physical cluster manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
+Wrote WEC manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo2-syncer.yaml"
 
