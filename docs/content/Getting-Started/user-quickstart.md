@@ -49,17 +49,15 @@ kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kub
 ## 4. Install KubeStellar Syncers on your Edge Clusters
 
 ```
-KUBECONFIG=admin-core.config kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1
-KUBECONFIG=admin-core.config kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2
+KUBECONFIG=~/.kube/config kubectl --context kind-core kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1
+KUBECONFIG=~/.kube/config kubectl --context kind-core kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2
 ```
 
 change your kubeconfig to point at edge-cluster1 and edge-cluster2 and apply the files that prep-for-cluster prepared for you
 
 ```
-kubectl cluster-info --context kind-edge-cluster1
-kubectl apply -f edge-cluster1-syncer.yaml
-kubectl cluster-info --context kind-edge-cluster2
-kubectl apply -f edge-cluster2-syncer.yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 apply -f edge-cluster1-syncer.yaml
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster2 apply -f edge-cluster2-syncer.yaml
 ```
 
 ## 5. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
@@ -73,8 +71,7 @@ kubectl apply -f edge-cluster2-syncer.yaml
 ## 6. Check the status of your Apache Server on edge-cluster1 and edge-cluster2
 
 ```
-kubectl cluster-info --context kind-edge-cluster1
-kubectl get ...
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get ...
 ```
 
 ### How to use an existing KubeStellar environment
@@ -104,6 +101,5 @@ kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kub
 ## 4. Check the status of your Apache Server on edge-cluster1 and edge-cluster2
 
 ```
-kubectl cluster-info --context kind-edge-cluster1
-kubectl get ...
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get ...
 ```
