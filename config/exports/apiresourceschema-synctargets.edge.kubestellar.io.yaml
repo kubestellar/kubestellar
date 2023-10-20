@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v231005-c6f7728ef.synctargets.edge.kubestellar.io
+  name: v231020-4e62eaf7.synctargets.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -56,9 +56,9 @@ spec:
                 type: string
               description: Cells is a set of labels to identify the cells the SyncTarget
                 belongs to. SyncTargets with the same cells run as they are in the
-                same physical cluster. Each key/value pair in the cells should be
-                added and updated by service providers (i.e. a network provider updates
-                one key/value, while the storage provider updates another.)
+                same WEC. Each key/value pair in the cells should be added and updated
+                by service providers (i.e. a network provider updates one key/value,
+                while the storage provider updates another.) 
               type: object
             evictAfter:
               description: EvictAfter controls cluster schedulability of new and existing
