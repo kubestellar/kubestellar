@@ -55,7 +55,7 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
         ```
         kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
         ```
-        Wait for ingress to be ready:
+        **Wait about 10 seconds** and then check for ingress to be ready:
         ```
         kubectl wait --namespace ingress-nginx \
           --for=condition=ready pod \
@@ -101,6 +101,15 @@ helm repo add kubestellar https://helm.kubestellar.io
 helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set EXTERNAL_PORT=1024 --namespace kubestellar --generate-name
 ```
 
+run the following to wait for KubeStellar to be ready to take requests:
+```
+echo -n 'Waiting for KubeStellar to be ready'
+while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -c init -- ls /home/kubestellar/ready &> /dev/null; do
+    sleep 10
+    echo -n "."
+done
+echo "KubeStellar is now ready to take requests"
+```
 
 #### 2. Install KubeStellar's user commands and kubectl plugins
 
