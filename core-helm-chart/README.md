@@ -85,13 +85,13 @@ If the host OS and cluster share the same OS type and architecture, then the plu
 Obtaining the **kcp** plugins (this copy preserves links):
 
 ```shell
-kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- tar cf - /home/kubestellar/kcp/bin | tar xf - --strip-components=2
+kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init -- tar cf - /home/kubestellar/kcp/bin | tar xf - --strip-components=2
 ```
 
 Obtaining the **KubeStellar** plugins/executables:
 
 ```shell
-kubectl cp $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}'):/home/kubestellar/bin kubestellar/bin -c init
+kubectl cp $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar):/home/kubestellar/bin kubestellar/bin -n kubestellar -c init
 ```
 
 Add the plugins and executables to the PATH:
