@@ -17,6 +17,39 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
 - kind clusters (3) 
    - 1 KubeStellar core cluster (kind-core)
    - 2 KubeStellar edge clusters (kind-edge-cluster1, kind-edge-cluster2)
+
+
+```
+   kind create cluster --name core --config - <<EOF
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+      - role: control-plane
+      extraPortMappings:
+      - containerPort: 8081
+         hostPort: 8094
+      EOF
+
+   kind create cluster --name edge-cluster1 --config - <<EOF
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+      - role: control-plane
+      extraPortMappings:
+      - containerPort: 8081
+         hostPort: 8094
+      EOF
+
+   kind create cluster --name edge-cluster2 --config - <<EOF
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+      - role: control-plane
+      extraPortMappings:
+      - containerPort: 8081
+         hostPort: 8094
+      EOF
+```
    
 ## 1. Install KubeStellar
 
