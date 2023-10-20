@@ -34,7 +34,8 @@ Deploy **KubeStellar** in an **OpenShift** cluster, letting the cluster decide t
 
 ```shell
 helm install kubestellar . \
-  --set clusterType=OpenShift
+  --set clusterType=OpenShift \
+  --namespace kubestellar
 ```
 
 ## Wait for **KubeStellar** to be ready
