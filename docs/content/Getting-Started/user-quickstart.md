@@ -28,12 +28,12 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
         
         + [__kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
 
-        + 3 kind clusters (see tabs for 'ks-host', 'edge-cluster1', and 'edge-cluster2' above)
+        + 3 kind clusters (see tabs for 'ks-core', 'edge-cluster1', and 'edge-cluster2' above)
         
-    === "ks-host cluster"
+    === "ks-core cluster"
         <!-- [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster) -->
         ```
-        kind create cluster --name ks-host --config=- <<EOF
+        kind create cluster --name ks-core --config=- <<EOF
         kind: Cluster
         apiVersion: kind.x-k8s.io/v1alpha4
         nodes:
@@ -51,7 +51,7 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
         EOF
         ```
 
-        Apply an ingress control with SSL passthrough to 'ks-host'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-host'.
+        Apply an ingress control with SSL passthrough to 'ks-core'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-core'.
         ```
         kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
         ```
@@ -88,7 +88,7 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
 
 ```
 # deploy KubeStellar core components on the 'ks-core' kind cluster you created in the pre-req section above
-KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-host
+KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
 helm repo add kubestellar https://helm.kubestellar.io
 kubectl create namespace kubestellar
 helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set EXTERNAL_PORT=1024 --namespace kubestellar --generate-name
@@ -106,8 +106,8 @@ brew install kubestellar_cli@{{config.ks_tag}}
 #### 3. View KubeStellar Space environment
 
 ```
-kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-host.kubeconfig
-KUBECONFIG=ks-host.kubeconfig kubectl config use-context root
+kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
+KUBECONFIG=ks-core.kubeconfig kubectl config use-context root
 kubectl ws tree
 ```
 
@@ -115,7 +115,7 @@ kubectl ws tree
 change your kubeconfig context to point at edge-cluster1 and edge-cluster2 and apply the files that prep-for-cluster prepared for you
 
 ```
-KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-host
+KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
 kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1
 kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2
 ```
@@ -154,8 +154,8 @@ brew install kubestellar_cli@{{config.ks_tag}}
 ## 2. View KubeStellar Space environment
 
 ```
-kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-host.kubeconfig
-KUBECONFIG=ks-host.kubeconfig kubectl config use-context root
+kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
+KUBECONFIG=ks-core.kubeconfig kubectl config use-context root
 kubectl ws tree
 ```
 
