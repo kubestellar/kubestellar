@@ -18,8 +18,8 @@ This guide will show how to:
 
 NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
-!!! tip "Pre-reqs"
-    === "General"
+!!! tip ""
+    === "Pre-reqs"
         + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.24-1.26)
 
         + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the kubestellar-core helm chart
@@ -30,8 +30,8 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
 
         + 3 kind clusters (see tabs for 'ks-core', 'edge-cluster1', and 'edge-cluster2' above)
         
-    === "ks-core cluster"
-        <!-- [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster) -->
+   
+        create the ks-core kind cluster
         ```
         kind create cluster --name ks-core --config=- <<EOF
         kind: Cluster
@@ -46,7 +46,7 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
                 node-labels: "ingress-ready=true"
           extraPortMappings:
           - containerPort: 443
-            hostPort: 1023
+            hostPort: {{ config.ks_port_num }}
             protocol: TCP
         EOF
         ```
@@ -63,7 +63,8 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
           --timeout=90s
         ```
 
-    === "edge-cluster1"
+    <!-- === "edge-cluster1" -->
+        create the edge-cluster1 kind cluster
         ```
         kind create cluster --name edge-cluster1 --config=- <<EOF
         kind: Cluster
@@ -76,7 +77,8 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
         EOF
         ```
 
-    === "edge-cluster2"
+    <!-- === "edge-cluster2" -->
+        create the edge-cluster2 kind cluster
         ```
         kind create cluster --name edge-cluster2 --config=- <<EOF
         kind: Cluster
@@ -92,7 +94,6 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
         ```
    
 #### 1. Deploy your KubeStellar Core component
-         <!-- helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set  -->
 !!! tip ""
     === "deploy"
          ```
@@ -100,7 +101,7 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
          KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
          kubectl create namespace kubestellar
          helm repo add kubestellar https://helm.kubestellar.io
-         helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="localhost" --set EXTERNAL_PORT=1023 --namespace kubestellar --generate-name
+         helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="localhost" --set EXTERNAL_PORT={{ config.ks_port_num }} --namespace kubestellar --generate-name
          ```
     === "when is KubeStellar ready?"
          run the following to wait for KubeStellar to be ready to take requests:
@@ -112,13 +113,15 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
          done
          echo "KubeStellar is now ready to take requests"
          ```
-    === "debug"
-         you can also check logs:
-
+    === "uh oh, error?"
          Checking the initialization log to see if there are errors:
          ```
          kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
          ```
+         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+    
+    === "open a bug report"
+        Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
 
 #### 2. Install KubeStellar's user commands and kubectl plugins
 
@@ -146,7 +149,7 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
          ```
     === "uh oh, error"
          Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:1023/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
+         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
 
          A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:
          
@@ -164,29 +167,42 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
 
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the 'ks-core' kind cluster
 
-         
+         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+
+    === "open a bug report"
+        Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+
 
 #### 4. Install KubeStellar Syncers on your Edge Clusters
-change your kubeconfig context to point at edge-cluster1 and edge-cluster2 and apply the files that prep-for-cluster prepared for you
+prepare (kubestellar prep-for-cluster) a syncer for edge-cluster1 and edge-cluster2 and then apply the files that prep-for-cluster prepared for you
 
-```
-KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
-kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1
-kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2
-```
+make sure you created kind clusters for edge-cluster1 and edge-cluster2 from the pre-req step above before proceeding
 
-```
-KUBECONFIG=~/.kube/config kubectl config use-context kind-edge-cluster1
-kubectl apply -f edge-cluster1-syncer.yaml
+!!! tip ""
+    === "Prep and apply"
+        ```
+        export KUBECONFIG=ks-core.kubeconfig
+        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1 location_group=edge
+        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2 location_group=edge
+        ```
 
-KUBECONFIG=~/.kube/config kubectl config use-context kind-edge-cluster2
-kubectl apply -f edge-cluster2-syncer.yaml
-```
+        ```
+        export KUBECONFIG=~/.kube/config
+        kubectl config use-context kind-edge-cluster1
+        kubectl apply -f edge-cluster1-syncer.yaml
+
+        kubectl config use-context kind-edge-cluster2
+        kubectl apply -f edge-cluster2-syncer.yaml
+        ```
 
 #### 5. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
 
+```
+export KUBECONFIG=ks-core.kubeconfig
+```
+
 {%
-   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md"
+   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-user-qs.md"
    start="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->"
    end="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end-->"
 %}
@@ -225,7 +241,7 @@ KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
 ## 3. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
 
 {%
-   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters.md"
+   include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-user-qs.md"
    start="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->"
    end="<!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-end-->"
 %}
