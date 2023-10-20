@@ -114,14 +114,27 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator  ./cmd/syncer
-#./tmc/cmd/...
-build: require-jq require-go require-git verify-go-versions ## Build the project
+build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
+build: require-jq require-go require-git verify-go-versions ## Build all executables
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-#	ln -sf kubectl-workspace bin/kubectl-workspaces
-#	ln -sf kubectl-workspace bin/kubectl-ws
-	cp scripts/* bin/
+	cp outer-scripts/* bin/
+	cp overlap-scripts/* bin/
+	cp inner-scripts/* bin/
 .PHONY: build
+
+userbuild: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version
+userbuild: require-jq require-go require-git verify-go-versions ## Build executables needed by users outside the core image
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
+	cp outer-scripts/* bin/
+	cp overlap-scripts/* bin/
+.PHONY: userbuild
+
+innerbuild: WHAT ?= ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
+innerbuild: require-jq require-go require-git verify-go-versions ## Build all executables
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
+	cp overlap-scripts/* bin/
+	cp inner-scripts/* bin/
+.PHONY: innerbuild
 
 .PHONY: build-all
 build-all:
@@ -351,7 +364,7 @@ endif
 # 	trap 'kill -TERM $$PID' TERM INT EXIT && \
 # 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
 # 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
-# 		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
+# 		-args --use-default-kcp-server --syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --wec-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" $(SUITES_ARG) \
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
 # .PHONY: test-e2e-shared-minimal
@@ -397,7 +410,7 @@ endif
 # 	while [ ! -f "$(WORK_DIR)/.kcp/admin.kubeconfig" ]; do sleep 1; done && \
 # 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) $(GO_TEST) -race $(COUNT_ARG) $(PARALLELISM_ARG) $(WHAT) $(TEST_ARGS) \
 # 		-args --use-default-kcp-server --root-shard-kubeconfig=$(PWD)/.kcp-0/admin.kubeconfig $(SUITES_ARG) \
-# 		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --pcluster-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
+# 		--syncer-image="$(SYNCER_IMAGE)" --kcp-test-image="$(TEST_IMAGE)" --wec-kubeconfig="$(abspath $(WORK_DIR)/.kcp/kind.kubeconfig)" \
 # 	$(if $(value WAIT),|| { echo "Terminated with $$?"; wait "$$PID"; },)
 
 # .PHONY: test-e2e-sharded-minimal
@@ -427,7 +440,8 @@ kcp/bin/kcp:
 
 .PHONY: e2e-test-kubestellar-syncer
 e2e-test-kubestellar-syncer: WORK_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-e2e-test-kubestellar-syncer: TEST_ARGS ?= 
+e2e-test-kubestellar-syncer: TEST_ARGS ?=
+e2e-test-kubestellar-syncer: build # so that we can use `kubestellar init` below
 e2e-test-kubestellar-syncer: PATH := $(PWD)/kcp/bin:$(PATH)
 e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
 	mkdir -p $(WORK_DIR)/.kcp && \
@@ -438,7 +452,7 @@ e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
 	export KUBECONFIG=$(WORK_DIR)/.kcp/admin.kubeconfig && \
 	while ! kubectl get workspaces &> /dev/null; do sleep 1; echo "Workspace API is not ready. wait for 1s...";done && \
 	echo 'Workspace API is ready. Setup root:compute workspace by kubestellar init' && \
-	./scripts/kubestellar init && \
+	bin/kubestellar init && \
 	echo 'Starting test(s). To add TEST_ARGS=-v option to Make command if displaying the detail logs' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \
 		$(GO_TEST) -race $(COUNT_ARG) ./test/e2e/kubestellar-syncer/... $(TEST_ARGS) \

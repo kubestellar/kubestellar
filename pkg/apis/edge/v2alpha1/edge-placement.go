@@ -81,6 +81,7 @@ type EdgePlacementSpec struct {
 
 	// `downsync` selects the objects to bind with the selected Locations for downsync.
 	// An object is selected if it matches at least one member of this list.
+	// +optional
 	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
 
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
@@ -88,6 +89,7 @@ type EdgePlacementSpec struct {
 	// the object in this space.
 	// When multiple EdgePlacement objects match the same workload object,
 	// the OR of these booleans rules.
+	// +optional
 	WantSingletonReportedState bool `json:"wantSingletonReportedState,omitempty"`
 
 	// `upsync` identifies objects to upsync.
@@ -113,7 +115,7 @@ const ExecutingCountKey string = "kubestellar.io/executing-count"
 // An object matches if:
 // - the `apiGroup` criterion is satisfied;
 // - the `resources` criterion is satisfied;
-// - the `namespaceSelectors` criterion is satisfied; and
+// - EITHER the `namespaces` criterion or the `namespaceSelectors` criterion is satisfied; and
 // - EITHER the `objectNames` criterion or the `labelSelectors` criterion matches.
 type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
@@ -121,22 +123,40 @@ type DownsyncObjectTest struct {
 
 	// `resources` is a list of lowercase plural names for the sorts of objects to match.
 	// An entry of `"*"` means that all match.
+	// If this list contains `"*"` then it should contain nothing else.
 	// Empty list means nothing matches.
 	Resources []string `json:"resources"`
 
-	// `namespaceSelectors` tests the labels on the object's namespace.
-	// A non-namespaced object matches if and only if this list is empty.
+	// `namespaces` is a simple way to test the namespace of the potentially
+	// matching object.
+	// If this list contains `"*"` then it should contain nothing else.
+	// The object satisfies this criterion if any of the following is true.
+	// 1. The object is cluster-scoped and this list and `namespaceSelectors` are empty.
+	// 2. The object is namespaced and its namespace is in this list.
+	// 3. The object is namespaced and `"*"` (the 1-character string containing an asterisk) appears in this list.
+	// +optional
+	Namespaces []string `json:"namespaces,omitempty"`
+
+	// `namespaceSelectors` is another way to identify matching namespaces,
+	// alternative to the simple list in `namespaces`.
+	// This field tests the labels on the Namespace object (the one whose name
+	// equals the workload object's namespace).
+	// A non-namespaced object matches if and only if this list and `namespaces` are empty.
 	// A namespaced object matches if and only if the namespace's labels match
 	// at least one member of this list.
-	NamespaceSelectors []metav1.LabelSelector `json:"namespaceSelectors"`
+	// +optional
+	NamespaceSelectors []metav1.LabelSelector `json:"namespaceSelectors,omitempty"`
 
 	// `objectNames` is a list of object names that match.
 	// An entry of `"*"` means that all match.
+	// If this list contains `"*"` then it should contain nothing else.
 	// Empty list means nothing matches.
+	// +optional
 	ObjectNames []string `json:"objectNames,omitempty"`
 
 	// `labelSelectors` allows matching objects by a rule rather than listing individuals.
 	// An object maches if and only if its labels match at least one member of this list.
+	// +optional
 	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
 }
 
@@ -161,6 +181,7 @@ type UpsyncSet struct {
 	// An entry of `"*"` means that all match.
 	// Empty list means nothing matches (you probably do not want this
 	// for namespaced resources).
+	// +optional
 	Namespaces []string `json:"namespaces,omitempty"`
 
 	// `Names` is a list of objects that match by name.

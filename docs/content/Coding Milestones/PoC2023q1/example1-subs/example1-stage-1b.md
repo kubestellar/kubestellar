@@ -21,7 +21,7 @@ Creating cluster role "kubestellar-syncer-guilder-wfeig2lv" to give service acco
 
 Creating or updating cluster role binding "kubestellar-syncer-guilder-wfeig2lv" to bind service account "kubestellar-syncer-guilder-wfeig2lv" to cluster role "kubestellar-syncer-guilder-wfeig2lv".
 
-Wrote physical cluster manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
+Wrote WEC manifest to guilder-syncer.yaml for namespace "kubestellar-syncer-guilder-wfeig2lv". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "guilder-syncer.yaml"
 
@@ -82,7 +82,7 @@ Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service accou
 
 Creating or updating cluster role binding "kubestellar-syncer-florin-32uaph9l" to bind service account "kubestellar-syncer-florin-32uaph9l" to cluster role "kubestellar-syncer-florin-32uaph9l".
 
-Wrote physical cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
+Wrote WEC manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
 

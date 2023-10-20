@@ -74,7 +74,7 @@ type EdgeSyncOptions struct {
 	Replicas int
 	// OutputFile is the path to a file where the YAML for the syncer should be written.
 	OutputFile string
-	// DownstreamNamespace is the name of the namespace in the physical cluster where the syncer deployment is created.
+	// DownstreamNamespace is the name of the namespace in the WEC where the syncer deployment is created.
 	DownstreamNamespace string
 	// KCPNamespace is the name of the namespace in the kcp workspace where the service account is created for the
 	// syncer.
@@ -108,8 +108,8 @@ func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&o.SyncerImage, "syncer-image", o.SyncerImage, "The kubestellar-syncer image to use in the syncer's deployment YAML. Images are published at https://quay.io/repository/kcpedge/syncer")
 	cmd.Flags().IntVar(&o.Replicas, "replicas", o.Replicas, "Number of replicas of the syncer deployment.")
 	cmd.Flags().StringVar(&o.KCPNamespace, "kcp-namespace", o.KCPNamespace, "The name of the kcp namespace to create a service account in.")
-	cmd.Flags().StringVarP(&o.OutputFile, "output-file", "o", o.OutputFile, "The manifest file to be created and applied to the physical cluster. Use - for stdout.")
-	cmd.Flags().StringVarP(&o.DownstreamNamespace, "namespace", "n", o.DownstreamNamespace, "The namespace to create the syncer in the physical cluster. By default this is \"kubestellar-syncer-<synctarget-name>-<uid>\".")
+	cmd.Flags().StringVarP(&o.OutputFile, "output-file", "o", o.OutputFile, "The manifest file to be created and applied to the WEC. Use - for stdout.")
+	cmd.Flags().StringVarP(&o.DownstreamNamespace, "namespace", "n", o.DownstreamNamespace, "The namespace to create the syncer in the WEC. By default this is \"kubestellar-syncer-<synctarget-name>-<uid>\".")
 	cmd.Flags().Float32Var(&o.QPS, "qps", o.QPS, "QPS to use when talking to API servers.")
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
@@ -164,7 +164,7 @@ func (o *EdgeSyncOptions) Validate() error {
 }
 
 // Run prepares a kcp workspace for use with a syncer and outputs the
-// configuration required to deploy a syncer to the pcluster to stdout.
+// configuration required to deploy a syncer to the WEC to stdout.
 func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 	config, err := o.ClientConfig.ClientConfig()
 	if err != nil {
@@ -249,8 +249,8 @@ func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 
 	_, err = outputFile.Write(resources)
 	if o.OutputFile != "-" {
-		fmt.Fprintf(o.ErrOut, "\nWrote physical cluster manifest to %s for namespace %q. Use\n\n  KUBECONFIG=<pcluster-config> kubectl apply -f %q\n\nto apply it. "+
-			"Use\n\n  KUBECONFIG=<pcluster-config> kubectl get deployment -n %q %s\n\nto verify the syncer pod is running.\n", o.OutputFile, o.DownstreamNamespace, o.OutputFile, o.DownstreamNamespace, syncerID)
+		fmt.Fprintf(o.ErrOut, "\nWrote workload execution cluster manifest to %s for namespace %q. Use\n\n  KUBECONFIG=<wec-config> kubectl apply -f %q\n\nto apply it. "+
+			"Use\n\n  KUBECONFIG=<wec-config> kubectl get deployment -n %q %s\n\nto verify the syncer pod is running.\n", o.OutputFile, o.DownstreamNamespace, o.OutputFile, o.DownstreamNamespace, syncerID)
 	}
 	return err
 }
@@ -511,7 +511,7 @@ func mergeOwnerReferenceForEdge(ownerReferences, newOwnerReferences []metav1.Own
 }
 
 // templateInputForEdge represents the external input required to render the resources to
-// deploy the syncer to a pcluster.
+// deploy the syncer to a WEC.
 type templateInputForEdge struct {
 	// ServerURL is the logical cluster url the syncer configuration will use
 	ServerURL string
@@ -522,7 +522,7 @@ type templateInputForEdge struct {
 	Token string
 	// KCPNamespace is the name of the kcp namespace of the syncer's service account
 	KCPNamespace string
-	// Namespace is the name of the syncer namespace on the pcluster
+	// Namespace is the name of the syncer namespace on the WEC
 	Namespace string
 	// SyncTarget is the name of the sync target the syncer will use to
 	// communicate its status and read configuration from
@@ -547,16 +547,16 @@ type templateInputForEdge struct {
 type templateArgsForEdge struct {
 	templateInputForEdge
 	// ServiceAccount is the name of the service account to create in the syncer
-	// namespace on the pcluster.
+	// namespace on the WEC.
 	ServiceAccount string
 	// ClusterRole is the name of the cluster role to create for the syncer on the
-	// pcluster.
+	// WEC.
 	ClusterRole string
 	// ClusterRoleBinding is the name of the cluster role binding to create for the
-	// syncer on the pcluster.
+	// syncer on the WEC.
 	ClusterRoleBinding string
 	// GroupMappings is the mapping of api group to resources that will be used to
-	// define the cluster role rules for the syncer in the pcluster. The syncer will be
+	// define the cluster role rules for the syncer in the WEC. The syncer will be
 	// granted full permissions for the resources it will synchronize.
 	GroupMappings []groupMappingForEdge
 	// Secret is the name of the secret that will contain the kubeconfig the syncer
@@ -566,14 +566,14 @@ type templateArgsForEdge struct {
 	// Key in the syncer secret for the kcp logical cluster kubconfig.
 	SecretConfigKey string
 	// Deployment is the name of the deployment that will run the syncer in the
-	// pcluster.
+	// WEC.
 	Deployment string
 	// DeploymentApp is the label value that the syncer's deployment will select its
 	// pods with.
 	DeploymentApp string
 }
 
-// renderKubeStellarSyncerResources renders the resources required to deploy a syncer to a pcluster.
+// renderKubeStellarSyncerResources renders the resources required to deploy a syncer to a WEC.
 func renderKubeStellarSyncerResources(input templateInputForEdge, syncerID string) ([]byte, error) {
 
 	tmplArgs := templateArgsForEdge{

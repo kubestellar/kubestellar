@@ -34,7 +34,7 @@ jobs:
 
       - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
 
-      - uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v4.1.1
       
       - uses: actions/setup-go@v4
         with:
@@ -43,7 +43,10 @@ jobs:
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
+        # with:
+        #  version: 'v1.28.3'
         id: install
+        
   
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \

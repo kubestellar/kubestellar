@@ -14,17 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 KCPE_VERSION target_os target_arch
+# Usage: $0 KCPE_VERSION scope target_os target_arch
 
-if [ $# != 3 ]; then
-    echo "$0 usage: KCPE_VERSION target_os target_arch" >&2
+if [ $# != 4 ]; then
+    echo "$0 usage: KCPE_VERSION scope target_os target_arch" >&2
     exit 1
 fi
 
 kcpe_version="$1"
-target_os="$2"
-target_arch="$3"
-archname="kubestellar_${kcpe_version}_${target_os}_${target_arch}.tar.gz"
+shift
+scope="$1"
+shift
+target_os="$1"
+shift
+target_arch="$1"
+shift
+
+case "$scope" in
+    (full) scope_part="";;
+    (user) scope_part=user;;
+    (*) echo "$0: scope must be 'full' or 'user', not '$scope'" >& 2;
+	exit 1;;
+esac
+
+archname="kubestellar${scope_part}_${kcpe_version}_${target_os}_${target_arch}.tar.gz"
 
 if shasum -a 256 "$0" &> /dev/null
 then sumcmd="shasum -a 256"
@@ -37,7 +50,8 @@ srcdir=$(dirname "$0")
 cd "$srcdir/.."
 
 rm -rf bin/*
-make build OS="$target_os" ARCH="$target_arch" WHAT="./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator"
+make ${scope_part}build OS="$target_os" ARCH="$target_arch"
+
 echo $'#!/usr/bin/env bash\necho' ${kcpe_version} > bin/kubestellar-release
 chmod a+x bin/kubestellar-release
 mkdir -p build/release

@@ -22,12 +22,12 @@ git checkout main
 
 ### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
 ```shell
-vi scripts/kubectl-kubestellar-prep_for_syncer
+vi outer-scripts/kubectl-kubestellar-prep_for_syncer
 ```
 
 change the version in the following line:
 ```shell
-syncer_image="quay.io/kubestellar/syncer:v0.3.0"
+syncer_image="quay.io/kubestellar/syncer:{{ config.ks_next_tag }}"
 ```
 
 ### Update the VERSION file
@@ -40,16 +40,16 @@ vi VERSION
 <b>before:</b>
 ```shell title="VERSION" hl_lines="2 3"
 ...
-stable=v0.2.0
-latest=v0.2.0
+stable={{ config.ks_tag }}
+latest={{ config.ks_tag }}
 ...
 ```
 
 <b>after:</b>
 ```shell title="VERSION" hl_lines="2 3" 
 ...
-stable=v0.2.0
-latest=v0.3.0
+stable={{ config.ks_tag }}
+latest={{ config.ks_next_tag }}
 ...
 ```
 
@@ -61,9 +61,9 @@ git push -u origin main
 ```
 
 ### Create a release-major.minor branch
-To create a release branch, identify the current 'release' branches' name (e.g. release-0.3).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'release-0.2', you might name the new release branch 'release-0.3'.
+To create a release branch, identify the current 'release' branches' name (e.g. {{ config.ks_next_branch }}).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is '{{ config.ks_branch }}', you might name the new release branch '{{ config.ks_next_branch }}'.
 ```shell
-git checkout -b release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
+git checkout -b {{ config.ks_next_branch }}
 ```
 
 ### Update the mkdocs.yml file
@@ -74,40 +74,32 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3"
+```shell title="mkdocs.yml" hl_lines="2 3 4 5 6"
 ...
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
-ks_tag: 'latest'
+ks_tag: '{{ config.ks_tag }}'
+ks_next_branch: '{{ config.ks_next_branch }}'
+ks_next_tag: '{{ config.ks_next_tag }}'
 ...
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3" 
+```shell title="mkdocs.yml" hl_lines="2 3 4 5 6" 
 ...
-edit_uri: edit/release-0.3/docs/content
-ks_branch: 'release-0.3'
-ks_tag: 'v0.3.0'
+edit_uri: edit/{{ config.ks_next_branch }}/docs/content
+ks_branch: '{{ config.ks_next_branch }}'
+ks_tag: '{{ config.ks_next_tag }}'
+ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
+ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
 ...
-```
-
-### Update the branch name in kubestellar/docs/content/readme.md
-There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
-<b>before:</b>
-```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
-```
-
-<b>after:</b>
-```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
 ```
 
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
 cd docs
-mike delete stable # remove the 'stable' alias from the current 'release-<major>.<minor>' branches' doc set
+mike delete stable # remove the 'stable' alias from the current '{{ config.ks_branch }}' branches' doc set
 mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
 cd ..
 ```
@@ -116,8 +108,8 @@ cd ..
 ### Push the new release branch
 ```shell
 git add .
-git commit -m "new release version <major>.<minor>"
-git push -u origin release-<major>.<minor> # replace <major>.<minor> with your incremented <major>.<minor> pair
+git commit -m "new release version {{ config.ks_next_branch }}"
+git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'stable' alias using 'mike'
@@ -125,7 +117,7 @@ git push -u origin release-<major>.<minor> # replace <major>.<minor> with your i
 cd docs
 mike delete stable # remove the 'stable' alias from the 'main' branches' doc set
 git pull
-mike deploy --push --rebase --update-aliases release-0.3 stable  # this generates the new 'release-<major>.<minor>' branches' doc set and points 'stable' at it
+mike deploy --push --rebase --update-aliases {{ config.ks_next_branch }} stable  # this generates the new '{{ config.ks_next_branch }}' branches' doc set and points 'stable' at it
 cd ..
 ```
 
@@ -140,18 +132,18 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.2.0' to 'v0.3.0'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag '{{ config.ks_tag }}' to '{{ config.ks_next_tag }}'
 
 ```shell
-TAG=v0.3.0
-REF=release-0.3
+TAG={{ config.ks_next_tag }}
+REF={{ config.ks_next_branch }}
 git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
 
 ### Create a build
 ```shell
-./hack/make-release-full.sh v0.3.0
+./hack/make-release-full.sh {{ config.ks_next_tag }}
 ```
 
 ### Update the kubestellar container image just build and uploaded to quay.io
@@ -161,9 +153,9 @@ Make this image 'stable' so that helm and other install methods pickup this imag
 
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
-- Click 'Draft a new release' and create a new tag ('v0.3.0' in our example)
-    - Select the release branch you created above (release-0.3)
-    - Add a release title (v.0.3.0)
+- Click 'Draft a new release' and select the tag ('{{ config.ks_next_tag }}')
+    - Select the release branch you created above ({{ config.ks_next_branch }})
+    - Add a release title ({{ config.ks_next_tag }})
     - Add some release notes ('generate release notes' if you like)
     - select 'pre-release' as a the first step.  Once validated the release is working properly, come back and mark as 'release'
     - Attach the binaries that were created in the 'make-release-full' process above
@@ -187,7 +179,7 @@ Check to make sure the GitHub workflows for doc generation, doc push, and broken
     - Create a new branch
     - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
     - Edit the new file
-    - Change main to the name of the release branch, such as release-0.8
+    - Change main to the name of the release branch, such as {{ config.ks_next_branch }}
 
 ```
 zz_generated_metadata:
@@ -238,11 +230,40 @@ Publish the release
 Notify -->
 
 
-### Create an email addressed to [kubestellar-dev@googlegroups.com](https://kubestellar.io/joinus) and [kubestellar-users@googlegroups.com](https://groups.google.com/g/kubestellar-users)
+### Create an email addressed to [kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com](mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com) 
 
 ```
-Subject: [release] <major><minor>
+Subject: KubeStellar release {{ config.ks_next_tag }}
+
+Body:
+
+Dear KubeStellar Community,
+	Release {{ config.ks_next_tag }} is now available at https://github.com/kubestellar/kubestellar/releases/tag/{{ config.ks_next_tag }}
+ 
+What's Changed
+
+🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+✨ Switch to use k8s code generators by @ezrasilvera in #1139
+✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+📖Update dev-env.md by @francostellari in #1157
+📖Update Chart.yaml appVersion by @francostellari in #1158
+🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+📖 Document syncer removal by @MikeSpreitzer in #1164
+🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+New Contributors
+
+@fab7 made their first contribution in #1155
+Full Changelog: v0.8.0…v0.9.0
+
+Thank you for your continued support,
+
+Andy
 ```
-    - In the body, include noteworthy changes
-    - Provide a link to the release in GitHub for the full release notes
-    - Post a message in the [#kubestellar](https://kubestellar.io/slack) Slack channel
+
+### Post the same message in the [#kubestellar](https://kubestellar.io/slack) Slack channel

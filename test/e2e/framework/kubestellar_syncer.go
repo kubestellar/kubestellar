@@ -40,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	kubernetesclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -119,7 +120,7 @@ type kubeStellarSyncerFixture struct {
 }
 
 // CreateEdgeSyncTargetAndApplyToDownstream creates a default EdgeSyncConfig resource through the `kubestellar syncer-gen` CLI command,
-// applies the kubestellar-syncer-related resources in the physical cluster.
+// applies the kubestellar-syncer-related resources in the WEC.
 func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *testing.T) *appliedKubeStellarSyncerFixture {
 	t.Helper()
 
@@ -132,7 +133,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	var downstreamKubeconfigPath string
 
 	// The syncer will target a logical cluster that is a child of the current workspace. A
-	// logical server provides as a lightweight approximation of a pcluster for tests that
+	// logical server provides as a lightweight approximation of a WEC for tests that
 	// don't need to validate running workloads or interaction with kube controllers.
 	downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
 	downstreamConfig = downstreamServer.BaseConfig(t)
@@ -146,6 +147,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
+	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
 
 	logicalConfig, upstreamKubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 	upstreamKubeConfig, err := logicalConfig.ClientConfig()
@@ -210,6 +212,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
 	require.NoError(t, err)
+	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
 
 	// Run the plugin command to enable the kubestellar syncer and collect the resulting yaml
 	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
@@ -253,16 +256,18 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 		DownstreamKubeClient:        downstreamKubeClient,
 		DownstreamDynamicKubeClient: downstreamDynamicKubeClient,
 		DownstreamKubeconfigPath:    downstreamKubeconfigPath,
+		DownstreamDiscoveryClient:   downstreamDiscoveryClient,
 		UpstreamConfig:              upstreamConfig,
 		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
 		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
+		UpstreamDiscoveryClient:     upstreamDiscoveryClient,
 		UpstreamKubeconfigPath:      upstreamKubeconfigPath,
 	}
 }
 
 // RunSyncer runs a new Syncer against the upstream kcp workspaces
-// Whether the syncer runs in-process or deployed on a pcluster will depend
-// whether --pcluster-kubeconfig and --syncer-image are supplied to the test invocation.
+// Whether the syncer runs in-process or deployed on a WEC will depend
+// whether --wec-kubeconfig and --syncer-image are supplied to the test invocation.
 func (sf *appliedKubeStellarSyncerFixture) RunSyncer(t *testing.T) *StartedKubeStellarSyncerFixture {
 	t.Helper()
 
@@ -296,11 +301,13 @@ type appliedKubeStellarSyncerFixture struct {
 	DownstreamConfig            *rest.Config
 	DownstreamKubeClient        kubernetesclient.Interface
 	DownstreamDynamicKubeClient dynamic.Interface
+	DownstreamDiscoveryClient   *discovery.DiscoveryClient
 	DownstreamKubeconfigPath    string
 
 	UpstreamConfig            *rest.Config
 	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
 	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
+	UpstreamDiscoveryClient   *discovery.DiscoveryClient
 	UpstreamKubeconfigPath    string
 }
 

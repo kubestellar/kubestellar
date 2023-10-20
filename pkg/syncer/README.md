@@ -10,19 +10,19 @@
     ```
 1. The new plugin to generate bootstrap manifests for kubestellar-syncer is available by adding the `./bin` directory
     ```
-    Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a physical cluster.
+    Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a WEC.
 
     Usage:
       syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o <output-file> [flags]
 
     Examples:
 
-            # Setup workspace for syncer to interact and then install syncer on a physical cluster
+            # Setup workspace for syncer to interact and then install syncer on a WEC
             kubectl kubestellar syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o kubestellar-syncer.yaml
-            KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
+            KUBECONFIG=<a-wec-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
 
             # Directly apply the manifest
-            kubectl kubestellar syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
+            kubectl kubestellar syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-wec-kubeconfig> kubectl apply -f -
 
 
     Flags:
@@ -54,7 +54,7 @@
 
     Creating or updating cluster role binding "kubestellar-syncer-wec1-1na3tqcd" to bind service account "kubestellar-syncer-wec1-1na3tqcd" to cluster role "kubestellar-syncer-wec1-1na3tqcd".
 
-    Wrote physical cluster manifest to /tmp/kubestellar-syncer.yaml for namespace "kubestellar-syncer-wec1-1na3tqcd". Use
+    Wrote WEC manifest to /tmp/kubestellar-syncer.yaml for namespace "kubestellar-syncer-wec1-1na3tqcd". Use
 
       KUBECONFIG=<wec1-config> kubectl apply -f "/tmp/kubestellar-syncer.yaml"
 

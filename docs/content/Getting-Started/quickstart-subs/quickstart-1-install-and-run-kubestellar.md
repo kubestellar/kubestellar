@@ -115,7 +115,9 @@ which should yield:
 .
 └── root
     ├── compute
-    └── espw
+    ├── espw
+    ├── imw1
+    └── wmw1
 ```
 
 <!--quickstart-1-install-and-run-kubestellar-end-->

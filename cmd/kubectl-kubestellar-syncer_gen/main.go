@@ -32,12 +32,12 @@ import (
 
 var (
 	syncerGenExample = `
-	# Setup workspace for syncer to interact and then install syncer on a physical cluster
+	# Setup workspace for syncer to interact and then install syncer on a WEC
 	%[1]s syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o kubestellar-syncer.yaml
-	KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
+	KUBECONFIG=<a-wec-kubeconfig> kubectl apply -f kubestellar-syncer.yaml
 
 	# Directly apply the manifest
-	%[1]s syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-physical-cluster-kubeconfig> kubectl apply -f -
+	%[1]s syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o - | KUBECONFIG=<a-wec-kubeconfig> kubectl apply -f -
 `
 )
 
@@ -48,7 +48,7 @@ func syncerGenCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:          "syncer-gen <name> --syncer-image <kubestellar-syncer-image> -o <output-file>",
-		Short:        "Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a physical cluster.",
+		Short:        "Create service account and RBAC permissions in the workspace in kcp for Edge MC. Output a manifest to deploy a syncer in a WEC.",
 		Example:      fmt.Sprintf(syncerGenExample, "kubectl kubestellar"),
 		SilenceUsage: true,
 		RunE: func(c *cobra.Command, args []string) error {

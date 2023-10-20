@@ -103,7 +103,7 @@ Following is an example of invoking this command and examining its
 results.
 
 ```console
-bash-5.2$ eval pieces=($(scripts/kubestellar-ensure-kcp-server-creds yep.yep))
+bash-5.2$ eval pieces=($(kubestellar-ensure-kcp-server-creds yep.yep))
 Re-using PKI at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki
 Re-using CA at /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/ca.key
 Accepting existing credentials
@@ -169,7 +169,7 @@ results.  The context and port number chosen work for the kubeconfig
 file that `kcp start` (kcp release v0.11.0) creates by default.
 
 ```console
-bash-5.2$ scripts/wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
+bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
 
 bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 4,5c4,5
@@ -220,7 +220,8 @@ kubestellar [flags] subcommand [flags]
 This command accepts the following command line flags, which can
 appear before and/or after the subcommand.  The `--log-folder` flag is
 only meaningful for the `start` subcommand. The `--local-kcp` flag is
-not meaningful for the `stop` subcommand.
+not meaningful for the `stop` subcommand. The `--ensure-imw` and 
+`--ensure-wmw` flags are only meaningful for the `start` or `init` subcommands.
 
 - `-V` or `--verbose`: calls for more verbose output.  This is a
   binary choice, not a matter of degree.
@@ -230,6 +231,8 @@ not meaningful for the `stop` subcommand.
   `${PWD}/kubestellar-logs`.
 - `--local-kcp $bool`: says whether to expect to find a local process
   named "kcp".  Defaults to "true".
+- `--ensure-imw`: provide a comma separated list of pathnames for inventory workspaces, _e.g._ "root:imw1,root:imw2". Defaults to "root:imw1". To prevent the creation of any inventory workspace, then pass "".
+- `--ensure-wmw`: provide a comma separated list of pathnames for workload management workspaces, _e.g._ "root:wmw1,root:imw2". Defaults to "root:wmw1". To prevent the creation of any workload management workspace, then pass "".
 - `-h` or `--help`: print a brief usage message and terminate.
 
 #### Kubestellar init
@@ -248,16 +251,16 @@ RBAC objects that enable the syncer to propagate reported state for
 downsynced objects defined by the APIExport from that workspace of a
 subset of the Kubernetes API for managing containerized workloads.
 
-4. Ensure the existence of an inventory management workspace at
-pathname "root:imw1".
+4. Ensure the existence of zero, one, or more inventory management workspaces
+depending on the value of `--ensure-imw` flag. Default is one inventory management
+workspaces at pathname "root:imw1".
 
-5. Ensure the existence of a workload management workspace at pathname
-"root:wmw1" and that it has APIBindings that import the namespaced
-Kubernetes resources (kinds of objects) for management of
-containerized workloads.
-
-At the completion of `kubestellar init` the current workspace will be
-"root:wmw1".
+5. Ensure the existence of zero, one, or more workload management workspaces 
+depending on the value of `--ensure-wmw` flag. Default is one workload management
+workspaces at pathname "root:wmw1". The workload management workspaceshace APIBindings
+that import the namespaced Kubernetes resources (kinds of objects) for management of
+containerized workloads. At the completion of `kubestellar init` the current workspace will be
+"root".
 
 #### KubeStellar start
 
@@ -671,7 +674,7 @@ Creating cluster role "kubestellar-syncer-demo1-28at01r3" to give service accoun
 
 Creating or updating cluster role binding "kubestellar-syncer-demo1-28at01r3" to bind service account "kubestellar-syncer-demo1-28at01r3" to cluster role "kubestellar-syncer-demo1-28at01r3".
 
-Wrote physical cluster manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
+Wrote WEC manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo1-syncer.yaml"
 
@@ -695,6 +698,35 @@ chosen output file.
 ```shell
 KUBECONFIG=$demo1_kubeconfig kubectl apply -f demo1-syncer.yaml
 ```
+
+You can preserve this file for future use if you want to remove the
+syncer later.
+
+## Syncer removal
+
+The previous section shows the two steps involved in establishing a
+syncer: one modifies the core and one adds stuff into the WEC. If for
+any reason your core gets deleted (e.g., deliberate replacement) and
+you want to undo the addition of the syncer into the WEC, you can use
+the YAML file generated above with `kubectl delete` instead of
+`kubectl apply` (of course using the right kubeconfig and context
+therein).
+
+A syncer that is configured to work with an extinct core is harmless
+except that its pod will be doing some futile work (failing to make
+requests on the core and logging error messages).
+
+If you need to manually remove the syncer from your WEC, following is
+the list of things that went into the WEC.
+
+- A namespace named
+  `kubestellar-syncer-${SyncTarget_Name}-${UID}`. The UID is a random
+  ID that is uniquely generated each time you run prep-for-syncer.
+- A ServiceAccount (with associated token Secret) in that namespace.
+- Another Secret in that namespace.
+- A Deployment in that namespace
+- A ClusterRole with the same name as the namespace.
+- A ClusterRoleBinding with the same name as the namespace.
 
 ## Edge cluster on-boarding
 
@@ -725,7 +757,7 @@ Creating cluster role "kubestellar-syncer-demo2-15nq4e94" to give service accoun
 
 Creating or updating cluster role binding "kubestellar-syncer-demo2-15nq4e94" to bind service account "kubestellar-syncer-demo2-15nq4e94" to cluster role "kubestellar-syncer-demo2-15nq4e94".
 
-Wrote physical cluster manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
+Wrote WEC manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo2-syncer.yaml"
 
@@ -739,27 +771,21 @@ to verify the syncer pod is running.
 ## Creating a Workload Management Workspace
 
 Such a workspace needs not only to be created but also populated with
-an `APIBinding` to the edge API and, if desired, an `APIBinding` to
+an `APIBinding` to the edge API and, if desired, some `APIBindings` to
 the Kubernetes API for management of containerized workloads.
 
-**NOTE**: currently, only a subset of the Kubernetes containerized
-workload management API is supported.  In particular, only the
-following object kinds are supported: `Deployment`, `Pod`, `Service`,
-`Ingress`.  To be clear: this is in addition to the generic object
-kinds that are supported; illustrative examples include RBAC objects,
-`CustomResourceDefinition`, and `ConfigMap`.  For a full description,
-see [the categorization in the design](../outline/#data-objects).
+Every workload management workspace is a child of the `root`
+workspace.
 
 The usage synopsis for this command is as follows.
 
 ```shell
-kubectl ws parent_pathname; kubectl kubestellar ensure wmw flag... wm_workspace_name
+kubectl kubestellar ensure wmw flag... wm_workspace_name
 ```
 
-Here `parent_pathname` is the workspace pathname of the parent of the
-WMW, and `wm_workspace_name` is the name (not pathname, just a bare
+Here `wm_workspace_name` is the name (not pathname, just a bare
 one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
-will be `parent_pathname:wm_workspace_name`.
+will be `root:wm_workspace_name`.
 
 Upon completion, the WMW will be the current workspace.
 
@@ -769,8 +795,9 @@ The acceptable flags include all those of `kubectl` except for
 `--context`.  This command also accepts the following flags.
 
 - `--with-kube boolean`: specifies whether or not the WMW should
-  include an APIBinding to the Kubernetes API for management of
-  containerized workloads.
+  include an APIBindings to the supported subset of the Kubernetes API
+  for management of containerized workloads. See [the categorization
+  in the design](../outline/#data-objects) for details.
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
 
@@ -782,30 +809,34 @@ demonstration of idempotency and changing whether the kube APIBinding
 is included.
 
 ```shell
-kubectl ws .
-```
-``` { .bash .no-copy }
-Current workspace is "root:my-org".
-```
-
-```shell
 kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
 Current workspace is "root".
-Current workspace is "root:my-org".
 Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
 Workspace "example-wmw" (type root:universal) is ready to use.
-Current workspace is "root:my-org:example-wmw" (type root:universal).
+Current workspace is "root:example-wmw" (type root:universal).
 apibinding.apis.kcp.io/bind-espw created
-apibinding.apis.kcp.io/bind-kube created
+apibinding.apis.kcp.io/bind-kubernetes created
+apibinding.apis.kcp.io/bind-apiregistration.k8s.io created
+apibinding.apis.kcp.io/bind-apps created
+apibinding.apis.kcp.io/bind-autoscaling created
+apibinding.apis.kcp.io/bind-batch created
+apibinding.apis.kcp.io/bind-core.k8s.io created
+apibinding.apis.kcp.io/bind-discovery.k8s.io created
+apibinding.apis.kcp.io/bind-flowcontrol.apiserver.k8s.io created
+apibinding.apis.kcp.io/bind-networking.k8s.io created
+apibinding.apis.kcp.io/bind-node.k8s.io created
+apibinding.apis.kcp.io/bind-policy created
+apibinding.apis.kcp.io/bind-scheduling.k8s.io created
+apibinding.apis.kcp.io/bind-storage.k8s.io created
 ```
 
 ```shell
 kubectl ws ..
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org".
+Current workspace is "root".
 ```
 
 ```shell
@@ -813,15 +844,14 @@ kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
 Current workspace is "root".
-Current workspace is "root:my-org".
-Current workspace is "root:my-org:example-wmw" (type root:universal).
+Current workspace is "root:example-wmw" (type root:universal).
 ```
 
 ```shell
 kubectl ws ..
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org".
+Current workspace is "root".
 ```
 
 ```shell
@@ -829,9 +859,20 @@ kubectl kubestellar ensure wmw example-wmw --with-kube false
 ```
 ``` { .bash .no-copy }
 Current workspace is "root".
-Current workspace is "root:my-org".
-Current workspace is "root:my-org:example-wmw" (type root:universal).
-apibinding.apis.kcp.io "bind-kube" deleted
+Current workspace is "root:example-wmw" (type root:universal).
+apibinding.apis.kcp.io "bind-kubernetes" deleted
+apibinding.apis.kcp.io "bind-apiregistration.k8s.io" deleted
+apibinding.apis.kcp.io "bind-apps" deleted
+apibinding.apis.kcp.io "bind-autoscaling" deleted
+apibinding.apis.kcp.io "bind-batch" deleted
+apibinding.apis.kcp.io "bind-core.k8s.io" deleted
+apibinding.apis.kcp.io "bind-discovery.k8s.io" deleted
+apibinding.apis.kcp.io "bind-flowcontrol.apiserver.k8s.io" deleted
+apibinding.apis.kcp.io "bind-networking.k8s.io" deleted
+apibinding.apis.kcp.io "bind-node.k8s.io" deleted
+apibinding.apis.kcp.io "bind-policy" deleted
+apibinding.apis.kcp.io "bind-scheduling.k8s.io" deleted
+apibinding.apis.kcp.io "bind-storage.k8s.io" deleted
 ```
 
 ## Removing a Workload Management Workspace
@@ -840,17 +881,10 @@ Deleting a WMW can be done by simply deleting its `Workspace` object from
 the parent.
 
 ```shell
-kubectl ws .
+kubectl ws root
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org:example-wmw".
-```
-
-```shell
-kubectl ws ..
-```
-``` { .bash .no-copy }
-Current workspace is "root:my-org".
+Current workspace is "root".
 ```
 
 ```shell
@@ -868,20 +902,14 @@ the parent of the workload management workspace to delete.
 kubectl kubestellar remove wmw -h
 ```
 ``` { .bash .no-copy }
-Usage: kubectl ws parent; kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name
-```
-
-```shell
-kubectl ws root:my-org
-```
-``` { .bash .no-copy }
-Current workspace is "root:my-org".
+Usage: kubectl kubestellar remove wmw [-X] kubectl_flag... wm_workspace_name
 ```
 
 ```shell
 kubectl kubestellar remove wmw demo1
 ```
 ``` { .bash .no-copy }
+Current workspace is "root".
 workspace.tenancy.kcp.io "demo1" deleted
 ```
 
@@ -889,11 +917,14 @@ workspace.tenancy.kcp.io "demo1" deleted
 kubectl ws .
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:my-org".
+Current workspace is "root".
 ```
 
 ```shell
 kubectl kubestellar remove wmw demo1
+```
+``` { .bash .no-copy }
+Current workspace is "root".
 ```
 
 ## Bootstrap
@@ -946,6 +977,9 @@ This script accepts the following command line flags; all are optional.  The `--
   working directory.  The download of kcp, if any, will go in
   `$install_parent_dir/kcp`.  The download of KubeStellar will go in
   `$install_parent_dir/kubestellar`.
+- `--host-ns $namespace_in_hosting_cluster`: specifies the namespace
+  in the hosting cluster where the core will be deployed. Defaults to
+  "kubestellar".
 - `-V` or `--verbose`: increases the verbosity of output.  This is a
   binary thing, not a matter of degree.
 - `-X`: makes the script `set -x` internally, for debugging.

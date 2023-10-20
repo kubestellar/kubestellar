@@ -14,6 +14,22 @@
 
 # We need bash for some conditional logic below.
 
+SHELL := /usr/bin/env bash -e
+
+GIT_COMMIT=
+GIT_DIRTY=
+GIT_VERSION=
+
+KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
+KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
+CORE_PLATFORMS ?= linux/amd64,linux/arm64,linux/ppc64le # todo linux/s390x  ?
+CORE_IMAGE_REPO ?= quay.io/kubestellar/space-framework
+
+GIT_INFO_FILE := git-info.txt
+
+BUILD_TIME_TAG := $(shell date -u +b%y-%m-%d-%H-%M-%S)
+GIT_TAG = git-${GIT_COMMIT}-${GIT_DIRTY}
+
 GO_INSTALL = ./hack/go-install.sh
 
 TOOLS_DIR=hack/tools
@@ -21,14 +37,6 @@ TOOLS_GOBIN_DIR := $(abspath $(TOOLS_DIR))
 GOBIN_DIR=$(abspath ./bin )
 PATH := $(GOBIN_DIR):$(TOOLS_GOBIN_DIR):$(PATH)
 TMPDIR := $(shell mktemp -d)
-
-
-.PHONY: all
-all: build
-
-.PHONY: bin-dir
-bin-dir:
-	mkdir -p bin
 
 # Detect the path used for the install target
 ifeq (,$(shell go env GOBIN))
@@ -41,11 +49,6 @@ CONTROLLER_GEN_VER := v0.10.0
 CONTROLLER_GEN_BIN := controller-gen
 CONTROLLER_GEN := $(TOOLS_DIR)/$(CONTROLLER_GEN_BIN)-$(CONTROLLER_GEN_VER)
 export CONTROLLER_GEN # so hack scripts can use it
-
-API_GEN_VER := v0.0.0-20230124223207-cb8dd3c46470
-API_GEN_BIN := apigen
-API_GEN := $(TOOLS_DIR)/$(API_GEN_BIN)-$(API_GEN_VER)
-export API_GEN # so hack scripts can use it
 
 YAML_PATCH_VER ?= v0.0.11
 YAML_PATCH_BIN := yaml-patch
@@ -74,20 +77,18 @@ LOGCHECK_BIN := logcheck
 LOGCHECK := $(TOOLS_GOBIN_DIR)/$(LOGCHECK_BIN)-$(LOGCHECK_VER)
 export LOGCHECK # so hack scripts can use it
 
-CODE_GENERATOR_VER := v2.0.0-alpha.1
-CODE_GENERATOR_BIN := code-generator
-CODE_GENERATOR := $(TOOLS_GOBIN_DIR)/$(CODE_GENERATOR_BIN)-$(CODE_GENERATOR_VER)
-export CODE_GENERATOR # so hack scripts can use it
-
 ARCH := $(shell go env GOARCH)
 OS := $(shell go env GOOS)
-
-KUBE_MAJOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed 's/v\([0-9]*\).*/\1/')
-KUBE_MINOR_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output | sed "s/v[0-9]*\.\([0-9]*\).*/\1/")
-GIT_COMMIT := $(shell git rev-parse --short HEAD || echo 'local')
-GIT_DIRTY := $(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty')
-GIT_VERSION := $(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT))
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+ifeq ($(IMPORT_TAGS),yes)
+	include ${GIT_INFO_FILE}
+else
+	GIT_COMMIT=$(shell git rev-parse --short HEAD || echo 'local')
+	GIT_DIRTY=$(shell [ $$(git status --porcelain=v2 | wc -l) == 0 ] && echo 'clean' || echo 'dirty') 
+	GIT_VERSION=$(shell go mod edit -json | jq '.Require[] | select(.Path == "k8s.io/kubernetes") | .Version' --raw-output)+kcp-$(shell git describe --tags --match='v*' --abbrev=14 "$(GIT_COMMIT)^{commit}" 2>/dev/null || echo v0.0.0-$(GIT_COMMIT)) 
+endif
+
 LDFLAGS := \
 	-X k8s.io/client-go/pkg/version.gitCommit=${GIT_COMMIT} \
 	-X k8s.io/client-go/pkg/version.gitTreeState=${GIT_DIRTY} \
@@ -104,9 +105,16 @@ LDFLAGS := \
 	-X k8s.io/component-base/version.buildDate=${BUILD_DATE} \
 	-extldflags '-static'
 
+.PHONY: all
+all: build
+
+.PHONY: bin-dir
+bin-dir:
+	mkdir -p bin
+
 .PHONY: build
 build: WHAT ?= ./cmd/space-manager ./cmd/space-client-test
-build: bin-dir
+build: bin-dir 
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 
 ldflags:
@@ -116,17 +124,14 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-$(CODE_GENERATOR):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/code-generator/v2 $(CODE_GENERATOR_BIN) $(CODE_GENERATOR_VER)
+#$(CODE_GENERATOR):
+#	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/code-generator/v2 $(CODE_GENERATOR_BIN) $(CODE_GENERATOR_VER)
 
-tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) $(CODE_GENERATOR)
+tools: $(GOLANGCI_LINT) $(CONTROLLER_GEN) $(YAML_PATCH) $(GOTESTSUM) $(OPENSHIFT_GOIMPORTS) 
 .PHONY: tools
 
 $(CONTROLLER_GEN):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) sigs.k8s.io/controller-tools/cmd/controller-gen $(CONTROLLER_GEN_BIN) $(CONTROLLER_GEN_VER)
-
-$(API_GEN):
-	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/kcp-dev/kcp/cmd/apigen $(API_GEN_BIN) $(API_GEN_VER)
 
 $(YAML_PATCH):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) github.com/pivotal-cf/yaml-patch/cmd/yaml-patch $(YAML_PATCH_BIN) $(YAML_PATCH_VER)
@@ -134,15 +139,21 @@ $(YAML_PATCH):
 $(GOTESTSUM):
 	GOBIN=$(TOOLS_GOBIN_DIR) $(GO_INSTALL) gotest.tools/gotestsum $(GOTESTSUM_BIN) $(GOTESTSUM_VER)
 
-crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
+crds: $(CONTROLLER_GEN) $(YAML_PATCH)
 	./hack/update-codegen-crds.sh
 .PHONY: crds
 
-codegen: crds $(CODE_GENERATOR)
+codegen: crds 
 	go mod download
 	./hack/update-codegen-clients.sh
 	$(MAKE) imports
 .PHONY: codegen
+
+codegenclients:  $(CONTROLLER_GEN)
+	go mod download
+	./hack/update-codegen-clients.sh
+	$(MAKE) imports
+.PHONY: codegenclients
 
 
 $(OPENSHIFT_GOIMPORTS):
@@ -157,11 +168,27 @@ $(TOOLS_DIR)/verify_boilerplate.py:
 verify-boilerplate: $(TOOLS_DIR)/verify_boilerplate.py
 	$(TOOLS_DIR)/verify_boilerplate.py --boilerplate-dir=hack/boilerplate --skip docs
 
-
 .PHONY: imports
 imports: $(OPENSHIFT_GOIMPORTS) 
-	$(OPENSHIFT_GOIMPORTS) -i github.com/kcp-dev -m github.com/kubestellar/kubestellar
+	$(OPENSHIFT_GOIMPORTS) -m github.com/kubestellar/kubestellar
 
 .PHONY: modules
 modules: ## Run go mod tidy to ensure modules are up to date
 	go mod tidy
+
+.PHONY: spacecore-image
+spacecore-image: export-git-info
+	if ! docker buildx inspect space-framework &> /dev/null; then docker buildx create --name space-framework --platform $(CORE_PLATFORMS); fi
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; eval docker buildx --builder space-framework build --push --platform $(CORE_PLATFORMS) --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile .
+
+.PHONY: spacecore-image-local
+spacecore-image-local: export-git-info
+	if [ -n "$(EXTRA_CORE_TAG)" ]; then extra="--tag $(CORE_IMAGE_REPO):$(EXTRA_CORE_TAG)"; else extra=""; fi; case "$$HOSTTYPE" in (aarch64*|arm64*) extoo="--platform linux/arm64";; esac; eval docker build --tag $(CORE_IMAGE_REPO):$(BUILD_TIME_TAG) --tag $(CORE_IMAGE_REPO):$(GIT_TAG) $$extra -f core.Dockerfile $$extoo .
+
+.PHONY: export-git-info
+export-git-info:
+	echo  "GIT_COMMIT := " "$(GIT_COMMIT)" > ${GIT_INFO_FILE}
+	echo  "GIT_DIRTY := " ${GIT_DIRTY} >> ${GIT_INFO_FILE}
+	echo  "GIT_VERSION := " ${GIT_VERSION} >> ${GIT_INFO_FILE}
+
+

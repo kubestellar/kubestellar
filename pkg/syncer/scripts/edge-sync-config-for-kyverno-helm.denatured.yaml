@@ -1,7 +1,7 @@
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgeSyncConfig
 metadata:
-  name: pcluster1
+  name: wec1
 spec:
   downSyncedResources:
   - kind: Namespace

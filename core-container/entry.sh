@@ -24,83 +24,6 @@ function echoerr() {
 }
 
 
-function ensure_inv() {
-    while IFS=':' read -ra items; do
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                break
-            fi
-            if ! kubectl ws "$i" &> /dev/null ; then #
-                if ! kubectl ws create "$i" --enter &> /dev/null ; then
-                    echoerr 'unable to create "$i"!'
-                    break
-                fi
-            fi
-        done
-    done <<< "$1"
-}
-
-function ensure_invs() {
-    initial_ws=$(kubectl ws . --short)
-
-    while IFS=',' read -ra items; do
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                continue
-            fi
-            echo "Ensuring INV: $i"
-            ensure_inv "$i"
-            kubectl ws use $initial_ws &> /dev/null # go back to the initial state
-        done
-    done <<< "$1"
-
-    kubectl ws use $initial_ws &> /dev/null
-}
-
-
-function ensure_wmw() {
-    while IFS=':' read -ra items; do
-        len=${#items[@]}
-        if [[ ${len} -eq 0 ]]; then
-            break # nothing to do
-        fi
-        # separate the last item
-        last_item=${items[$len-1]}
-        unset items[$len-1]
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                break
-            fi
-            if ! kubectl ws "$i" &> /dev/null ; then #
-                if ! kubectl ws create "$i" --enter &> /dev/null ; then
-                    echoerr 'unable to create "$i"!'
-                    break
-                fi
-            fi
-        done
-        kubectl kubestellar ensure wmw $last_item --with-kube true &> /dev/null
-    done <<< "$1"
-}
-
-
-function ensure_wmws() {
-    initial_ws=$(kubectl ws . --short)
-
-    while IFS=',' read -ra items; do
-        for i in "${items[@]}"; do
-            if [ "$i" == "" ] ; then
-                continue
-            fi
-            echo "Ensuring WMW: $i"
-            ensure_wmw "$i"
-            kubectl ws use $initial_ws &> /dev/null # go back to the initial state
-        done
-    done <<< "$1"
-
-    kubectl ws use $initial_ws &> /dev/null
-}
-
-
 function wait_kcp_ready() {
     echo "Waiting for kcp to be ready... this may take a while."
     (
@@ -254,10 +177,8 @@ function run_kcp() {
 function run_init() {
     echo "--< Starting init >--"
     wait_kcp_ready
-    kubestellar init --local-kcp false
+    kubestellar init --local-kcp false --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW
     kubectl ws root
-    ensure_invs $ENSURE_IMW
-    ensure_wmws $ENSURE_WMW
     touch ready
     echo "***READY***"
     sleep infinity

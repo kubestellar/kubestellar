@@ -16,7 +16,7 @@
 image:
   repository: quay.io/kubestellar/kubestellar
   pullPolicy: IfNotPresent
-  tag: main-mc
+  tag: release-0.9
 
 # Storage size
 storageSize: 8Gi

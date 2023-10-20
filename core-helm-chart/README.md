@@ -17,9 +17,12 @@ Table of contents:
 Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port, matching **Kind** ingress port above:
 
 ```shell
+kubectl create namespace kubestellar
 helm install kubestellar . \
   --set EXTERNAL_HOSTNAME="my-long-app-name.aregion.some.cloud.com" \
-  --set EXTERNAL_PORT=1024
+  --set EXTERNAL_PORT=1024 \
+  --namespace kubestellar \
+  --generate-name
 ```
 
 Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
@@ -34,18 +37,19 @@ Deploy **KubeStellar** in an **OpenShift** cluster, letting the cluster decide t
 
 ```shell
 helm install kubestellar . \
-  --set clusterType=OpenShift
+  --set clusterType=OpenShift \
+  --namespace kubestellar
 ```
 
 ## Wait for **KubeStellar** to be ready
 
 ```shell
 echo -n 'Waiting for KubeStellar to be ready'
-while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- ls /home/kubestellar/ready &> /dev/null; do
+while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -c init -- ls /home/kubestellar/ready &> /dev/null; do
     sleep 10
     echo -n "."
 done
-echo "Ready!"
+echo "KubeStellar is now ready to take requests"
 ```
 
 ## Check **KubeStellar** logs
@@ -53,21 +57,21 @@ echo "Ready!"
 The logs of each runtime container in the **KubeStellar** application pods can be access this way:
 
 ```shell
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c mailbox-controller
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c where-resolver
-kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c placement-translator
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c kcp
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c mailbox-controller
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c where-resolver
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c placement-translator
 ```
 <!--check-log-end-->
 ## Access **KubeStellar** after deployment
 
-The `kubestellar` deployment, holds its access kubeconfigs in a `kubestellar` secret.
+The `kubestellar` deployment, secures it's access kubeconfigs in a `kubestellar` secret.
 
-After the deployment has completed, in order to access **KubeStellar** from the host OS, the `external.kubeconfig` must be extracted from the `kubestellar` secret:
+After the deployment has completed, for you to access **KubeStellar** from the host OS, the `external.kubeconfig` must be extracted from the `kubestellar` secret:
 
 ```shell
-kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' | base64 --decode > admin.kubeconfig
+kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' -n kubestellar | base64 --decode > admin.kubeconfig
 ```
 
 **NOTE:** currently, the `external.kubeconfig` needs to be retrieved from the `kubestellar` secret after each restart/recreation of the **KubeStellar** pod.
@@ -76,24 +80,8 @@ kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconf
 
 If matching plugins/executables are already available locally, then this step is unnecessary.
 
-If the host OS and cluster share the same OS type and architecture, then the plugins/executables can be extracted from the container image.
-
-Obtaining the **kcp** plugins (this copy preserves links):
-
-```shell
-kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init -- tar cf - /home/kubestellar/kcp/bin | tar xf - --strip-components=2
 ```
-
-Obtaining the **KubeStellar** plugins/executables:
-
-```shell
-kubectl cp $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}'):/home/kubestellar/bin kubestellar/bin -c init
+brew tap kubestellar/kubestellar
+brew install kcp_cli
+brew install kubestellar_cli
 ```
-
-Add the plugins and executables to the PATH:
-
-```shell
-export PATH=$PATH:$PWD/kcp/bin:$PWD/kubestellar/bin
-```
-
-If the host OS and cluster do not share the same OS type and architecture, then compatible plugins must be obtained from a corresponding **kcp** release at https://github.com/kcp-dev/kcp/releases and **KubeStellar** release at https://github.com/kubestellar/kubestellar/releases.
