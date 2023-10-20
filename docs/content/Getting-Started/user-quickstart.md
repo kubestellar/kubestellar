@@ -15,20 +15,10 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
 - brew
 - kubectl
 - kind clusters (3) 
-   - 1 KubeStellar core cluster (kind-core)
+   - 1 KubeStellar core cluster (kind-core) [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster)
    - 2 KubeStellar edge clusters (kind-edge-cluster1, kind-edge-cluster2)
 
-
 ```
-   kind create cluster --name core --config - <<EOF
-      kind: Cluster
-      apiVersion: kind.x-k8s.io/v1alpha4
-      nodes:
-      - role: control-plane
-      extraPortMappings:
-      - containerPort: 6443
-         hostPort: 1024
-      EOF
 
    kind create cluster --name edge-cluster1 --config - <<EOF
       kind: Cluster
