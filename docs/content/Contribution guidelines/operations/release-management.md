@@ -230,11 +230,12 @@ Publish the release
 Notify -->
 
 
-### Create an email addressed to [kubestellar-dev@googlegroups.com](https://kubestellar.io/joinus) and [kubestellar-users@googlegroups.com](https://groups.google.com/g/kubestellar-users)
+### Create an email addressed to [kubestellar-dev@googlegroups.com](mailto:kubestellar-dev@googlegroups.com) and [kubestellar-users@googlegroups.com](mailto:kubestellar-users@googlegroups.com)
 
 ```
 Subject: [release] {{ config.ks_next_tag }}
 ```
     - In the body, include noteworthy changes
     - Provide a link to the release in GitHub for the full release notes
-    - Post a message in the [#kubestellar](https://kubestellar.io/slack) Slack channel
+
+### Post the same message in the [#kubestellar](https://kubestellar.io/slack) Slack channel
