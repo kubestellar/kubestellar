@@ -38,22 +38,29 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
         apiVersion: kind.x-k8s.io/v1alpha4
         nodes:
         - role: control-plane
-        kubeadmConfigPatches:
-        - |
-           kind: InitConfiguration
-           nodeRegistration:
+          kubeadmConfigPatches:
+          - |
+            kind: InitConfiguration
+            nodeRegistration:
               kubeletExtraArgs:
-              node-labels: "ingress-ready=true"
-        extraPortMappings:
-        - containerPort: 443
-           hostPort: 1024
-           protocol: TCP
+                node-labels: "ingress-ready=true"
+          extraPortMappings:
+          - containerPort: 443
+            hostPort: 1024
+            protocol: TCP
         EOF
         ```
 
-        Apply an ingress control with SSL passthrough to 'ks-core'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-core'.
+        Be sure to apply an ingress control with SSL passthrough to 'ks-core'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-core'.
         ```
         kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+        ```
+        Wait for ingress to be ready:
+        ```
+        kubectl wait --namespace ingress-nginx \
+          --for=condition=ready pod \
+          --selector=app.kubernetes.io/component=controller \
+          --timeout=90s
         ```
 
     === "edge-cluster1"
@@ -89,8 +96,8 @@ For this quickstart you will need to know how to use kubernetes' kubeconfig *con
 ```
 # deploy KubeStellar core components on the 'ks-core' kind cluster you created in the pre-req section above
 KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
-helm repo add kubestellar https://helm.kubestellar.io
 kubectl create namespace kubestellar
+helm repo add kubestellar https://helm.kubestellar.io
 helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="$(hostname -f | tr '[:upper:]' '[:lower:]')" --set EXTERNAL_PORT=1024 --namespace kubestellar --generate-name
 ```
 
@@ -107,8 +114,7 @@ brew install kubestellar_cli@{{config.ks_tag}}
 
 ```
 kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > ks-core.kubeconfig
-KUBECONFIG=ks-core.kubeconfig kubectl config use-context root
-kubectl ws tree
+KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
 ```
 
 #### 4. Install KubeStellar Syncers on your Edge Clusters
@@ -123,6 +129,7 @@ kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-clus
 ```
 KUBECONFIG=~/.kube/config kubectl config use-context kind-edge-cluster1
 kubectl apply -f edge-cluster1-syncer.yaml
+
 KUBECONFIG=~/.kube/config kubectl config use-context kind-edge-cluster2
 kubectl apply -f edge-cluster2-syncer.yaml
 ```
