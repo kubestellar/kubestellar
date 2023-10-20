@@ -79,6 +79,8 @@ vi docs/mkdocs.yml
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: '{{ config.ks_tag }}'
+ks_next_branch: '{{ config.ks_next_branch }}'
+ks_next_tag: '{{ config.ks_next_tag }}'
 ...
 ```
 
