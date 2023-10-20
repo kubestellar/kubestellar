@@ -26,8 +26,8 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
       nodes:
       - role: control-plane
       extraPortMappings:
-      - containerPort: 8081
-         hostPort: 8094
+      - containerPort: 6443
+         hostPort: 1024
       EOF
 
    kind create cluster --name edge-cluster1 --config - <<EOF
