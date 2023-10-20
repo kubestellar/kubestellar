@@ -35,8 +35,9 @@ helm install kubestellar --set clusterType=OpenShift
 ## 2. Install KubeStellar's Kubectl plugins
 
 ```
-brew tap kubestellar/kubestellar {{config.repo_url}}/brew
-brew install kubestellar-kubectl {{config.ks_tag}}
+brew tap kubestellar/kubestellar
+brew install kcp_cli
+brew install kubestellar_cli {{config.ks_tag}}
 ```
 
 ## 3. Access KubeStellar
@@ -81,7 +82,9 @@ kubectl get ...
 ## 1. Install KubeStellar's Kubectl plugins
 
 ```
-brew install kubestellar-kubectl v0.X.0
+brew tap kubestellar/kubestellar
+brew install kcp_cli
+brew install kubestellar_cli {{config.ks_tag}}
 ```
 
 ## 2. Access KubeStellar
