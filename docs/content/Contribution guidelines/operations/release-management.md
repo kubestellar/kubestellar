@@ -234,7 +234,9 @@ Notify -->
 
 ```
 Subject: KubeStellar release {{ config.ks_next_tag }}
-```
+
+Body:
+
 Dear KubeStellar Community,
 	Release {{ config.ks_next_tag }} is now available at https://github.com/kubestellar/kubestellar/releases/tag/{{ config.ks_next_tag }}
  
@@ -262,6 +264,6 @@ Full Changelog: v0.8.0…v0.9.0
 Thank you for your continued support,
 
 Andy
-
+```
 
 ### Post the same message in the [#kubestellar](https://kubestellar.io/slack) Slack channel
