@@ -66,9 +66,9 @@ kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0
 <!--check-log-end-->
 ## Access **KubeStellar** after deployment
 
-The `kubestellar` deployment, holds its access kubeconfigs in a `kubestellar` secret.
+The `kubestellar` deployment, secures it's access kubeconfigs in a `kubestellar` secret.
 
-After the deployment has completed, in order to access **KubeStellar** from the host OS, the `external.kubeconfig` must be extracted from the `kubestellar` secret:
+After the deployment has completed, for you to access **KubeStellar** from the host OS, the `external.kubeconfig` must be extracted from the `kubestellar` secret:
 
 ```shell
 kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' -n kubestellar | base64 --decode > admin.kubeconfig
