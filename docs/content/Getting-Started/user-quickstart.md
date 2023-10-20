@@ -54,6 +54,7 @@ helm install kubestellar --set EXTERNAL_HOSTNAME="$(hostname -f)" --set EXTERNAL
 -or-
 
 ```
+oc login
 oc new-project kubestellar
 helm install kubestellar --set clusterType=OpenShift
 ```
@@ -97,7 +98,7 @@ KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster2 apply -f edge-clu
 ## 6. Check the status of your Apache Server on edge-cluster1 and edge-cluster2
 
 ```
-KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get ...
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get deploy,rs -A | egrep 'NAME|stuff'
 ```
 
 ### How to use an existing KubeStellar environment
@@ -113,7 +114,7 @@ brew install kubestellar_cli {{config.ks_tag}}
 ## 2. Access KubeStellar
 
 ```
-kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > > admin-core.kubeconfig
+KUBECONFIG=~/.kube/config kubectl --context kind-core get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 -d > > admin-core.kubeconfig
 ```
 
 ## 3. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
@@ -127,5 +128,5 @@ kubectl get secrets kubestellar -n kubestellar -o jsonpath='{.data.external\.kub
 ## 4. Check the status of your Apache Server on edge-cluster1 and edge-cluster2
 
 ```
-KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get ...
+KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get deploy,rs -A | egrep 'NAME|stuff'
 ```
