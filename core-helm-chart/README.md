@@ -80,24 +80,8 @@ kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconf
 
 If matching plugins/executables are already available locally, then this step is unnecessary.
 
-If the host OS and cluster share the same OS type and architecture, then the plugins/executables can be extracted from the container image.
-
-Obtaining the **kcp** plugins (this copy preserves links):
-
-```shell
-kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init -- tar cf - /home/kubestellar/kcp/bin | tar xf - --strip-components=2
 ```
-
-Obtaining the **KubeStellar** plugins/executables:
-
-```shell
-kubectl cp $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar):/home/kubestellar/bin kubestellar/bin -n kubestellar -c init
+brew tap kubestellar/kubestellar
+brew install kcp_cli
+brew install kubestellar_cli
 ```
-
-Add the plugins and executables to the PATH:
-
-```shell
-export PATH=$PATH:$PWD/kcp/bin:$PWD/kubestellar/bin
-```
-
-If the host OS and cluster do not share the same OS type and architecture, then compatible plugins must be obtained from a corresponding **kcp** release at https://github.com/kcp-dev/kcp/releases and **KubeStellar** release at https://github.com/kubestellar/kubestellar/releases.
