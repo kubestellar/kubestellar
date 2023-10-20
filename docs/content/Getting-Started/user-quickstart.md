@@ -21,14 +21,15 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
 ## 1. Install KubeStellar
 
 ```
-kubectl cluster-info --context kind-core
-helm install kubestellar --set EXTERNAL_HOSTNAME="localhost" --set EXTERNAL_PORT=1024
+KUBECONFIG=~/.kube/config kubectl use-context kind-core
+kubectl create namespace kubestellar
+helm install kubestellar --set EXTERNAL_HOSTNAME="$(hostname -f)" --set EXTERNAL_PORT=1024 --namespace kubestellar
 ```
-   (NOTE: you can use an FQDN for your EXTERNAL_HOSTNAME if you are using DNS in your environment)
 
 -or-
 
 ```
+oc new-project kubestellar
 helm install kubestellar --set clusterType=OpenShift
 ```
 
