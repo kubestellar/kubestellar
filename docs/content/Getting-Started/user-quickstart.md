@@ -17,7 +17,8 @@ For this quickstart you will need to know how to use kubernetes kubeconfig conte
 - brew
 - kubectl
 - Kind clusters (3) 
-   - 1 KubeStellar core cluster (kind-ks-host) [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster)
+   - 1 KubeStellar core cluster (kind-ks-host) 
+   <!-- [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster) -->
    - 2 KubeStellar edge clusters (kind-edge-cluster1, kind-edge-cluster2)
 
 create kind cluster 'ks-host'
