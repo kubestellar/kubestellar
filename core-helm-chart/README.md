@@ -17,9 +17,12 @@ Table of contents:
 Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port, matching **Kind** ingress port above:
 
 ```shell
+kubectl create namespace kubestellar
 helm install kubestellar . \
   --set EXTERNAL_HOSTNAME="my-long-app-name.aregion.some.cloud.com" \
-  --set EXTERNAL_PORT=1024
+  --set EXTERNAL_PORT=1024 \
+  --namespace kubestellar \
+  --generate-name
 ```
 
 Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
