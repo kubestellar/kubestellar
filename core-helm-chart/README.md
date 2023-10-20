@@ -49,7 +49,7 @@ while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{
     sleep 10
     echo -n "."
 done
-echo "Ready!"
+echo "KubeStellar is now ready to take requests"
 ```
 
 ## Check **KubeStellar** logs
