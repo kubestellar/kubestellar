@@ -47,7 +47,9 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
       - role: control-plane
       extraPortMappings:
       - containerPort: 8081
-         hostPort: 8094
+        hostPort: 8096
+      - containerPort: 8082
+        hostPort: 8097
       EOF
 ```
    
