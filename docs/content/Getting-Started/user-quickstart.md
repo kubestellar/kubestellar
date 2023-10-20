@@ -12,68 +12,64 @@ This guide is intended to show how to (1) quickly bring up a **KubeStellar** env
 For this quickstart you will need to know how to use kubernetes kubeconfig context to access multiple clusters.  You can learn about it [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
 ## 0. Pre-reqs
-
 - helm
 - brew
 - kubectl
 - Kind clusters (3) 
-   - 1 KubeStellar core cluster (kind-ks-host) 
-   <!-- [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster) -->
-   - 2 KubeStellar edge clusters (kind-edge-cluster1, kind-edge-cluster2)
+!!! tip "How to spin up Kind clusters for use with this guide"
+    === "KubeStellar core cluster (kind-ks-host)"
+        <!-- [instructions](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster) -->
+        ```
+        kind create cluster --name ks-host --config=- <<EOF
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        nodes:
+        - role: control-plane
+        kubeadmConfigPatches:
+        - |
+           kind: InitConfiguration
+           nodeRegistration:
+              kubeletExtraArgs:
+              node-labels: "ingress-ready=true"
+        extraPortMappings:
+        - containerPort: 443
+           hostPort: 1024
+           protocol: TCP
+        EOF
+        ```
 
-create kind cluster 'ks-host'
-```
-kind create cluster --name ks-host --config=- <<EOF
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "ingress-ready=true"
-  extraPortMappings:
-  - containerPort: 443
-    hostPort: 1024
-    protocol: TCP
-EOF
-```
+        Apply an ingress control with SSL passthrough to 'ks-host'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-host'.
+        ```
+        kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
+        ```
 
-Apply an ingress control with SSL passthrough to 'ks-host'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-host'.
-```
-kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
-```
+    === "KubeStellar edge cluster 1 (kind-edge-cluster1)
+        ```
+        kind create cluster --name edge-cluster1 --config=- <<EOF
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        nodes:
+        - role: control-plane
+          extraPortMappings:
+          - containerPort: 8081
+            hostPort: 8094
+        EOF
+        ```
 
-create kind cluster 'edge-cluster1'
-```
-kind create cluster --name edge-cluster1 --config=- <<EOF
-   kind: Cluster
-   apiVersion: kind.x-k8s.io/v1alpha4
-   nodes:
-   - role: control-plane
-     extraPortMappings:
-     - containerPort: 8081
-       hostPort: 8094
-EOF
-```
-
-create kind cluster 'edge-cluster2'
-
-```
-kind create cluster --name edge-cluster2 --config=- <<EOF
-   kind: Cluster
-   apiVersion: kind.x-k8s.io/v1alpha4
-   nodes:
-   - role: control-plane
-     extraPortMappings:
-     - containerPort: 8081
-       hostPort: 8096
-     - containerPort: 8082
-       hostPort: 8097
-EOF
-```
+    === "KubeStellar edge cluster 2 (kind-edge-cluster2)
+        ```
+        kind create cluster --name edge-cluster2 --config=- <<EOF
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        nodes:
+        - role: control-plane
+          extraPortMappings:
+          - containerPort: 8081
+            hostPort: 8096
+          - containerPort: 8082
+            hostPort: 8097
+        EOF
+        ```
    
 ## 1. Install KubeStellar
 
