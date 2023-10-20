@@ -111,6 +111,11 @@ done
 echo "KubeStellar is now ready to take requests"
 ```
 
+you can also check logs:
+```
+kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
+```
+
 #### 2. Install KubeStellar's user commands and kubectl plugins
 
 ```
