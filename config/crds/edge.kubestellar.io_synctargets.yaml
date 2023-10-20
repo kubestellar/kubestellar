@@ -62,7 +62,7 @@ spec:
                   belongs to. SyncTargets with the same cells run as they are in the
                   same WEC. Each key/value pair in the cells should be added and updated
                   by service providers (i.e. a network provider updates one key/value,
-                  while the storage provider updates another.) 
+                  while the storage provider updates another.)
                 type: object
               evictAfter:
                 description: EvictAfter controls cluster schedulability of new and
