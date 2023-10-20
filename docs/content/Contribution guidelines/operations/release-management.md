@@ -230,12 +230,38 @@ Publish the release
 Notify -->
 
 
-### Create an email addressed to [kubestellar-dev@googlegroups.com](mailto:kubestellar-dev@googlegroups.com) and [kubestellar-users@googlegroups.com](mailto:kubestellar-users@googlegroups.com)
+### Create an email addressed to [kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com](mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com) 
 
 ```
-Subject: [release] {{ config.ks_next_tag }}
+Subject: KubeStellar release {{ config.ks_next_tag }}
 ```
-    - In the body, include noteworthy changes
-    - Provide a link to the release in GitHub for the full release notes
+Dear KubeStellar Community,
+	Release {{ config.ks_next_tag }} is now available at https://github.com/kubestellar/kubestellar/releases/tag/{{ config.ks_next_tag }}
+ 
+What's Changed
+
+🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+✨ Switch to use k8s code generators by @ezrasilvera in #1139
+✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+📖Update dev-env.md by @francostellari in #1157
+📖Update Chart.yaml appVersion by @francostellari in #1158
+🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+📖 Document syncer removal by @MikeSpreitzer in #1164
+🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+New Contributors
+
+@fab7 made their first contribution in #1155
+Full Changelog: v0.8.0…v0.9.0
+
+Thank you for your continued support,
+
+Andy
+
 
 ### Post the same message in the [#kubestellar](https://kubestellar.io/slack) Slack channel
