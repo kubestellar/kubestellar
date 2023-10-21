@@ -16,7 +16,7 @@ This guide will show how to:
 5. deploy an example kubernetes workload to both edge clusters from KubeStellar Core,
 6. view the status of your deployment across both edge clusters from KubeStellar Core
 
-NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
+**important:** For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
 !!! tip ""
     === "Pre-reqs"
@@ -28,136 +28,63 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
         
         + [__kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
 
-        + 3 kind clusters (see tabs for 'ks-core', 'edge-cluster1', and 'edge-cluster2' above)
+        + 3 kind clusters
         
-   
-        create the ks-core kind cluster
-        ```
-        kind create cluster --name ks-core --config=- <<EOF
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        nodes:
-        - role: control-plane
-          kubeadmConfigPatches:
-          - |
-            kind: InitConfiguration
-            nodeRegistration:
-              kubeletExtraArgs:
-                node-labels: "ingress-ready=true"
-          extraPortMappings:
-          - containerPort: 443
-            hostPort: {{ config.ks_port_num }}
-            protocol: TCP
-        EOF
-        ```
+        {%
+          include-markdown "../common-subs/create-ks-core-kind-cluster.md"
+          start="<!--create-ks-core-kind-cluster-start-->"
+          end="<!--create-ks-core-kind-cluster-end-->"
+        %}
 
-        Be sure to apply an ingress control with SSL passthrough to 'ks-core'. This is a special requirement for Kind that allows access to the KubeStellar core running on 'ks-core'.
-        ```
-        kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
-        ```
-        **Wait about 10 seconds** and then check for ingress to be ready:
-        ```
-        kubectl wait --namespace ingress-nginx \
-          --for=condition=ready pod \
-          --selector=app.kubernetes.io/component=controller \
-          --timeout=90s
-        ```
+        {%
+          include-markdown "../common-subs/create-ks-edge-cluster1-kind-cluster.md"
+          start="<!--create-ks-edge-cluster1-kind-cluster-start-->"
+          end="<!--create-ks-edge-cluster1-kind-cluster-end-->"
+        %}
 
-    <!-- === "edge-cluster1" -->
-        create the edge-cluster1 kind cluster
-        ```
-        kind create cluster --name edge-cluster1 --config=- <<EOF
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        nodes:
-        - role: control-plane
-          extraPortMappings:
-          - containerPort: 8081
-            hostPort: 8094
-        EOF
-        ```
-
-    <!-- === "edge-cluster2" -->
-        create the edge-cluster2 kind cluster
-        ```
-        kind create cluster --name edge-cluster2 --config=- <<EOF
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        nodes:
-        - role: control-plane
-          extraPortMappings:
-          - containerPort: 8081
-            hostPort: 8096
-          - containerPort: 8082
-            hostPort: 8097
-        EOF
-        ```
+        {%
+          include-markdown "../common-subs/create-ks-edge-cluster2-kind-cluster.md"
+          start="<!--create-ks-edge-cluster2-kind-cluster-start-->"
+          end="<!--create-ks-edge-cluster2-kind-cluster-end-->"
+        %}
    
 #### 1. Deploy your KubeStellar Core component
-!!! tip ""
-    === "deploy"
-         ```
-         # deploy KubeStellar core components on the 'ks-core' kind cluster you created in the pre-req section above
-         KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core
-         kubectl create namespace kubestellar
-         helm repo add kubestellar https://helm.kubestellar.io
-         helm install kubestellar/kubestellar-core --set EXTERNAL_HOSTNAME="localhost" --set EXTERNAL_PORT={{ config.ks_port_num }} --namespace kubestellar --generate-name
-         ```
-    === "when is KubeStellar ready?"
-         run the following to wait for KubeStellar to be ready to take requests:
-         ```
-         echo -n 'Waiting for KubeStellar to be ready'
-         while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init -- ls /home/kubestellar/ready &> /dev/null; do
-            sleep 10
-            echo -n "."
-         done
-         echo "KubeStellar is now ready to take requests"
-         ```
-    === "uh oh, error?"
-         Checking the initialization log to see if there are errors:
-         ```
-         kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}' -n kubestellar) -n kubestellar -c init
-         ```
-         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
-    
-    === "open a bug report"
-        Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+deploy the KubeStellar Core components on the **ks-core** kind cluster you created in the pre-req section above  
+{%
+  include-markdown "../common-subs/deploy-your-kubestellar-core-component.md"
+  start="<!--deploy-your-kubestellar-core-component-start-->"
+  end="<!--deploy-your-kubestellar-core-component-end-->"
+%}
 
 #### 2. Install KubeStellar's user commands and kubectl plugins
 
-!!! tip ""
-    === "install"
-         ```
-         brew tap kubestellar/kubestellar
-         brew install kcp_cli
-         brew install kubestellar_cli
-         ```
-    === "remove"
-         ```
-         brew remove kubestellar_cli
-         brew remove kcp_cli
-         brew untap kubestellar/kubestellar
-         ```
-
+{%
+   include-markdown "../common-subs/install-brew.md"
+   start="<!--install-brew-start-->"
+   end="<!--install-brew-end-->"
+%}
 
 #### 3. View your KubeStellar Core Space environment
 !!! tip ""
-    === "show all available spaces"
+    === "show all available KubeStellar Core Spaces"
          ```
-         kubectl get secrets kubestellar -o jsonpath='{.data.external\.kubeconfig}' -n kubestellar | base64 -d > ks-core.kubeconfig
+         KUBECONFIG=~/.kube/config kubectl config use-context kind-ks-core  
+         kubectl get secrets kubestellar \
+           -o jsonpath='{.data.external\.kubeconfig}' \
+           -n kubestellar | base64 -d > ks-core.kubeconfig
          KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
          ```
     === "uh oh, error"
          Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
+         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
 
          A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:
          
-         Check if the port specified in the ks-core kind cluster configuration and the EXTERNAL_PORT helm value are unoccupied by another application:
+         Check if the port specified in the **ks-core** kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
 
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another proecess?  If so, delete the 'ks-core' kind cluster and create it again using an available port for your 'hostPort' value
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another process?  If so, delete the **ks-core** kind cluster and create it again using an available port for your 'hostPort' value
 
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your ks-core 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your **ks-core** 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
 
          Check that your EXTERNAL_HOSTNAME helm value is reachable via DNS:
 
@@ -165,7 +92,7 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
 
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. make sure your EXTERNAL_HOSTNAME and associated ip address are listed in your /etc/hosts file.
 
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the 'ks-core' kind cluster
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the **ks-core** kind cluster
 
          if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
 
@@ -174,32 +101,38 @@ NOTE: For this quickstart you will need to know how to use kubernetes' kubeconfi
 
 
 #### 4. Install KubeStellar Syncers on your Edge Clusters
-prepare (kubestellar prep-for-cluster) a syncer for edge-cluster1 and edge-cluster2 and then apply the files that prep-for-cluster prepared for you
+prepare KubeStellar Syncers, with `kubestellar prep-for-cluster`, for **edge-cluster1** and **edge-cluster2** and then apply the files that `kubestellar prep-for-cluster prepared` for you
 
-make sure you created kind clusters for edge-cluster1 and edge-cluster2 from the pre-req step above before proceeding
+**important:** make sure you created kind clusters for **edge-cluster1** and **edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
 
 !!! tip ""
     === "Prep and apply"
-        ```
+        ``` hl_lines="4 8"
         export KUBECONFIG=ks-core.kubeconfig
-        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 env=edge-cluster1 location_group=edge
-        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 env=edge-cluster2 location_group=edge
+        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster1 \
+          env=edge-cluster1 \
+          location-group=edge     #add edge-cluster1 and edge-cluster2 to the same group
+
+        kubectl kubestellar prep-for-cluster --imw root:imw1 edge-cluster2 \
+          env=edge-cluster2 \
+          location-group=edge     #add edge-cluster1 and edge-cluster2 to the same group
         ```
 
         ```
         export KUBECONFIG=~/.kube/config
+
+        #apply edge-cluster1 syncer
         kubectl config use-context kind-edge-cluster1
         kubectl apply -f edge-cluster1-syncer.yaml
+        kubectl get pods -A | grep kubestellar  #check if syncer deployed to edge-cluster1 correctly
 
+        #apply edge-cluster2 syncer
         kubectl config use-context kind-edge-cluster2
         kubectl apply -f edge-cluster2-syncer.yaml
+        kubectl get pods -A | grep kubestellar  #check if syncer deployed to edge-cluster2 correctly
         ```
 
 #### 5. Create and deploy an Apache Server to edge-cluster1 and edge-cluster2
-
-```
-export KUBECONFIG=ks-core.kubeconfig
-```
 
 {%
    include-markdown "quickstart-subs/quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-user-qs.md"
@@ -213,23 +146,27 @@ export KUBECONFIG=ks-core.kubeconfig
 KUBECONFIG=~/.kube/config kubectl --context kind-edge-cluster1 get deploy,rs -A | egrep 'NAME|stuff'
 ```
 
+what's next...
+how to upsync a resource
+how to create, but not overrite/update a synchronized resource
+<br>
+
+---
+
+---
+
+<br>
+
 ## How to use an existing KubeStellar environment
 
 ## 1. Install KubeStellar's user commands and kubectl plugins
 
-!!! tip ""
-    === "install"
-         ```
-         brew tap kubestellar/kubestellar
-         brew install kcp_cli
-         brew install kubestellar_cli
-         ```
-    === "remove"
-         ```
-         brew remove kubestellar_cli
-         brew remove kcp_cli
-         brew untap kubestellar/kubestellar
-         ```
+{%
+   include-markdown "../common-subs/install-brew.md"
+   start="<!--install-brew-start-->"
+   end="<!--install-brew-end-->"
+%}
+
 
 ## 2. View your KubeStellar Core Space environment
 
