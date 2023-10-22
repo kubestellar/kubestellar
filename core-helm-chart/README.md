@@ -71,7 +71,7 @@ The `kubestellar` deployment, secures it's access kubeconfigs in a `kubestellar`
 After the deployment has completed, for you to access **KubeStellar** from the host OS, the `external.kubeconfig` must be extracted from the `kubestellar` secret:
 
 ```shell
-kubectl get secrets kubestellar -o 'go-template={{index .data "external.kubeconfig"}}' -n kubestellar | base64 --decode > admin.kubeconfig
+kubectl get secrets kubestellar -o jsonpath='{.data.external\.kubeconfig}' -n kubestellar | base64 -d > ks-core.kubeconfig
 ```
 
 **NOTE:** currently, the `external.kubeconfig` needs to be retrieved from the `kubestellar` secret after each restart/recreation of the **KubeStellar** pod.

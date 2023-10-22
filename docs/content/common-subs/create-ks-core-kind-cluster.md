@@ -2,7 +2,7 @@
 create the ks-core kind cluster
 ```shell
 export KUBECONFIG=~/.kube/config
-kind create cluster --name ks-core --config=- <<EOF
+kind create cluster --name ks-core --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -24,9 +24,9 @@ Be sure to apply an ingress control with SSL passthrough to **ks-core**. This is
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 ```
-**Wait about 10 seconds** and then check if the ingress control is ready on **ks-core**:
+**Wait about 20 seconds** and then check if the ingress control is ready on **ks-core**:
 ```shell
-sleep 10
+sleep 20
 
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
