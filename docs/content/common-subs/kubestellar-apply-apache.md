@@ -1,7 +1,6 @@
 <!--kubestellar-apply-apache-start-->
-KubeStellar's helm chart automatically creates a Workload Management
-Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar
-control objects in. The automatically created WMW is at `root:wmw1`.
+<span class="Space-Bd-BT">KUBESTELLAR</span>'s helm chart automatically creates a Workload Management
+Workspace (WMW) for you to store kubernetes workload descriptions and <span class="Space-Bd-BT">KUBESTELLAR</span> control objects in. The automatically created WMW is at `root:wmw1`.
 
 Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.
 

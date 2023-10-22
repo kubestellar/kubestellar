@@ -20,7 +20,7 @@ nodes:
 EOF
 ```
 
-Be sure to apply an ingress control with SSL passthrough to **ks-core**. This is a special requirement for Kind that allows access to the KubeStellar core running on **ks-core**.
+Be sure to apply an ingress control with SSL passthrough to **ks-core**. This is a special requirement for Kind that allows access to the <span class="Space-Bd-BT">KUBESTELLAR</span> core running on **ks-core**.
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 ```

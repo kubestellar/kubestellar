@@ -4,12 +4,12 @@
 } */
 
 @font-face {
-    font-family: 'YourSpecialFont';
-    src: url('../fonts/space_bd_bt/tt1254m_.ttf') format('woff2');
+    font-family: 'Space Bd BT';
+    src: url('../fonts/space_bd_bt/tt1254m_.ttf');
 }
   
 .Space-Bd-BT {
-    font-family: 'YourSpecialFont', sans-serif;
+    font-family: 'Space Bd BT', sans-serif;
 }
 
 :root {

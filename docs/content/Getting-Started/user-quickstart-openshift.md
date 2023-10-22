@@ -8,19 +8,19 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 !!! tip "Estimated time to complete this example:" 
     ~4 minutes (after installing prerequisites) -->
 
-## How to deploy and use KubeStellar on Red Hat OpenShift Kubernetes Clusters
+## How to deploy and use <span class="Space-Bd-BT">KUBESTELLAR</span> on Red Hat OpenShift Kubernetes Clusters
 
 !!! tip ""
     === "Goals"
         This guide will show how to:
 
-        1. quickly deploy the KubeStellar Core component on an OpenShift cluster using helm (ks-core), 
-        2. install the KubeStellar user commands and kubectl plugins on your computer with brew,
-        3. retrieve the KubeStellar Core component kubeconfig, 
-        4. install the KubeStellar Syncer component on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2), 
-        5. deploy an example kubernetes workload to both edge OpenShift clusters from KubeStellar Core (ks-core),
+        1. quickly deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component on an OpenShift cluster using helm (ks-core), 
+        2. install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins on your computer with brew,
+        3. retrieve the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component kubeconfig, 
+        4. install the <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer component on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2), 
+        5. deploy an example kubernetes workload to both edge OpenShift clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core),
         6. view the example kubernetes workload running on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2)
-        7. view the status of your deployment across both edge OpenShift clusters from KubeStellar Core (ks-core)
+        7. view the status of your deployment across both edge OpenShift clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core)
 
         **important:** For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
@@ -28,9 +28,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
     === "Pre-reqs"
         + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.24-1.26)
 
-        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the kubestellar-core helm chart
+        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart
         
-        + [__brew__](https://helm.sh/docs/intro/install/) - to install the kubestellar user commands and kubectl plugins
+        + [__brew__](https://helm.sh/docs/intro/install/) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
         
         + [__kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
 
@@ -42,8 +42,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
           end="<!--create-files-and-contexts-for-openshift-clusters-end-->"
         %}
    
-#### 1. Deploy the KubeStellar Core component
-deploy the KubeStellar Core components on the **ks-core** OpenShift cluster
+#### 1. Deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component
 {%
   include-markdown "../common-subs/deploy-your-kubestellar-core-component-openshift.md"
   start="<!--deploy-your-kubestellar-core-component-openshift-start-->"
@@ -65,9 +64,9 @@ deploy the KubeStellar Core components on the **ks-core** OpenShift cluster
            end="<!--brew-remove-end-->"
          %}
 
-#### 3. View your KubeStellar Core Space environment
+#### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
-    === "show all available KubeStellar Core Spaces"
+    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
          {%
            include-markdown "../common-subs/kubestellar-show-available-spaces.md"
            start="<!--kubestellar-show-available-spaces-start-->"
@@ -78,7 +77,7 @@ deploy the KubeStellar Core components on the **ks-core** OpenShift cluster
          Did you received the following error:
          ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
 
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:
+         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
          
          Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
 
@@ -100,13 +99,13 @@ deploy the KubeStellar Core components on the **ks-core** OpenShift cluster
         Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
 
 
-#### 4. Install KubeStellar Syncers on your Edge Clusters
-prepare KubeStellar Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster`` prepared for you
-
-**important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
-
+#### 4. Install <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers on your Edge Clusters
 !!! tip ""
     === "Prep and apply"
+        prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster`` prepared for you
+
+        **important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
+
          {%
            include-markdown "../common-subs/kubestellar-prep-syncer.md"
            start="<!--kubestellar-prep-syncer-start-->"
@@ -159,7 +158,7 @@ how to create, but not overrite/update a synchronized resource
 ---
 <br>
 
-## How to use an existing KubeStellar environment
+## How to use an existing <span class="Space-Bd-BT">KUBESTELLAR</span> environment
 
 #### 1. Install KubeStellar's user commands and kubectl plugins
 !!! tip ""
@@ -176,10 +175,10 @@ how to create, but not overrite/update a synchronized resource
            end="<!--brew-remove-end-->"
          %}
 
-#### 2. View your KubeStellar Core Space environment
+#### 2. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 
 !!! tip ""
-    === "show all available KubeStellar Core Spaces"
+    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
          ```
          KUBECONFIG=~/.kube/config kubectl --context kind-ks-core get secrets kubestellar \
            -o jsonpath='{.data.external\.kubeconfig}' \
@@ -191,7 +190,7 @@ how to create, but not overrite/update a synchronized resource
          Did you received the following error:
          ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
 
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:
+         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
          
          Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
 

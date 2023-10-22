@@ -8,6 +8,7 @@ helm repo update
 helm install kubestellar/kubestellar-core \
   --set EXTERNAL_HOSTNAME="kubestellar.core" \
   --set EXTERNAL_PORT={{ config.ks_kind_port_num }} \
-  --namespace kubestellar --generate-name
+  --namespace kubestellar \
+  --generate-name
 ```
 <!--install-helm-kind-end-->
