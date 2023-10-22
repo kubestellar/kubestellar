@@ -17,12 +17,14 @@ Table of contents:
 Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port, matching **Kind** ingress port above:
 
 ```shell
-kubectl create namespace kubestellar
-helm install kubestellar/kubestellar-core . \
+kubectl create namespace kubestellar  
+
+helm repo add kubestellar https://helm.kubestellar.io
+helm repo update
+helm install kubestellar/kubestellar-core \
   --set EXTERNAL_HOSTNAME="kubestellar.core" \
   --set EXTERNAL_PORT=1024 \
-  --namespace kubestellar \
-  --generate-name
+  --namespace kubestellar --generate-name
 ```
 
 Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
@@ -38,9 +40,14 @@ As an alternative, one could also create a new project and install the Helm char
 Deploy **KubeStellar** in an **OpenShift** cluster, letting the cluster decide the route assigned to **KubeStellar** on the default port `443`:
 
 ```shell
-helm install kubestellar/kubestellar-core . \
+kubectl create namespace kubestellar  
+
+helm repo add kubestellar https://helm.kubestellar.io
+helm repo update
+helm install kubestellar/kubestellar-core \
   --set clusterType=OpenShift \
-  --namespace kubestellar
+  --namespace kubestellar \
+  --generate-name
 ```
 
 ## Wait for **KubeStellar** to be ready
