@@ -26,6 +26,8 @@ kubectl apply -f https://raw.githubusercontent.com/kubestellar/kubestellar/main/
 ```
 **Wait about 10 seconds** and then check if the ingress control is ready on **ks-core**:
 ```shell
+sleep 10
+
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \

@@ -10,6 +10,8 @@
            end="<!--install-helm-end-->"
          %}
 
+        **important:** Add 'kubestellar.core' to your /etc/hosts file with the local network IP address (e.g., 192.168.x.y) where your **ks-core** Kind cluster is running. **DO NOT** use `127.0.0.1` because the edge-cluster1 and edge-cluster2 kind clusters map `127.0.0.1` to their local kubernetes cluster, **not** the ks-core kind cluster.
+
         run the following to wait for KubeStellar to be ready to take requests:
          ```shell
          echo -n 'Waiting for KubeStellar to be ready'

@@ -3,6 +3,14 @@
     src:url(https://fonts.cdnfonts.com/css/space-mono) ;
 } */
 
+@font-face {
+    font-family: 'YourSpecialFont';
+    src: url('../fonts/space_bd_bt/tt1254m_.ttf') format('woff2');
+}
+  
+.Space-Bd-BT {
+    font-family: 'YourSpecialFont', sans-serif;
+}
 
 :root {
     --md-primary-fg-color: #06c;
