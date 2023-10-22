@@ -98,13 +98,18 @@ func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
 	cmd := "kubectl --context kind-kubeflex get secrets -n " + lcName + " admin-kubeconfig -o jsonpath='{.data.*}' | base64 -d"
+	//TODO get the external kubeconfig
 	cfg, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
 	lcInfo := clusterprovider.SpaceInfo{
-		Name:   lcName,
-		Config: string(cfg),
+		Name: lcName,
+		Config: map[string]string{
+			clusterprovider.EXTERNAL: string(cfg),
+			//TODO  get the incluster config
+			clusterprovider.INCLUSTER: "",
+		},
 	}
 	return lcInfo, nil
 }
@@ -124,8 +129,12 @@ func (k KflexClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) 
 		}
 
 		lcInfoList = append(lcInfoList, clusterprovider.SpaceInfo{
-			Name:   lcName,
-			Config: string(cfg),
+			Name: lcName,
+			Config: map[string]string{
+				clusterprovider.EXTERNAL: string(cfg),
+				//TODO  get the incluster config
+				clusterprovider.INCLUSTER: "",
+			},
 		})
 	}
 

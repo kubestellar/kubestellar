@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -81,9 +82,9 @@ type SpaceStatus struct {
 	// +kubebuilder
 	Phase SpacePhaseType `json:"Phase,omitempty"`
 
-	// Cluster config from the kube config file in string format.
-	// +kubebuilder
-	SpaceConfig string `json:"ClusterConfig,omitempty"`
+	InClusterSecretRef *corev1.SecretReference `json:"inClusterSecretRef,omitempty"`
+
+	ExternalSecretRef *corev1.SecretReference `json:"externalSecretRef,omitempty"`
 }
 
 // SpaceList is the API type for a list of Space
