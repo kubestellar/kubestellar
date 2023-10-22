@@ -18,14 +18,16 @@ Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.
 
 ```shell
 kubectl create namespace kubestellar
-helm install kubestellar . \
-  --set EXTERNAL_HOSTNAME="my-long-app-name.aregion.some.cloud.com" \
+helm install kubestellar/kubestellar-core . \
+  --set EXTERNAL_HOSTNAME="kubestellar.core" \
   --set EXTERNAL_PORT=1024 \
   --namespace kubestellar \
   --generate-name
 ```
 
 Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
+
+**important:** Add 'kubestellar.core' to your /etc/hosts file with the local network IP address (e.g., 192.168.x.y) where your ks-core Kind cluster is running. DO NOT use 127.0.0.1 because the edge-cluster1 and edge-cluster2 kind clusters map 127.0.0.1 to their local kubernetes cluster, not the ks-core kind cluster.
 
 ## Deploy **KubeStellar** in an **OpenShift** cluster
 
@@ -36,7 +38,7 @@ As an alternative, one could also create a new project and install the Helm char
 Deploy **KubeStellar** in an **OpenShift** cluster, letting the cluster decide the route assigned to **KubeStellar** on the default port `443`:
 
 ```shell
-helm install kubestellar . \
+helm install kubestellar/kubestellar-core . \
   --set clusterType=OpenShift \
   --namespace kubestellar
 ```
