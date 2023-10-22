@@ -1,5 +1,5 @@
-name: docs-ecutable - User QS
-run-name: docs-ecutable - User QS - ${{ github.ref_name }}
+name: docs-ecutable - User Quickstart Kind
+run-name: docs-ecutable - User Quickstart Kind - ${{ github.ref_name }}
 
 on:
   workflow_call:
@@ -10,31 +10,31 @@ on:
     branches:
       - "release-*"
     paths:
-      - "docs/content/Getting-Started/user-quickstart.md"
+      - "docs/content/Getting-Started/user-quickstart-kind.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/docs-ecutable-user-qs.yml"
+      - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
       - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
       - "release-*"
     paths:
-      - "docs/content/Getting-Started/user-quickstart.md"
+      - "docs/content/Getting-Started/user-quickstart-kind.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
       - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-      - ".github/workflows/docs-ecutable-user-qs.yml"
+      - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
       - "docs/scripts/docs-ecutable.sh"
     tags:
       - 'v*'
       
 env:
-  docs-ecutable-filename: user-qs
-  docs-ecutable-md-filename: "'docs/content/Getting-Started/user-quickstart.md'"
+  docs-ecutable-filename: user-quickstart-kind
+  docs-ecutable-md-filename: "'docs/content/Getting-Started/user-quickstart-kind.md'"
 
 jobs:
   docs-ecutable:
     #if: github.repository_owner == 'kubestellar'
-    name: docs-ecutable - for user-quickstart e2e
+    name: docs-ecutable - for user-quickstart-kind e2e
     runs-on: ubuntu-latest
     outputs:
       docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
@@ -58,6 +58,18 @@ jobs:
         # with:
           # version: 'v1.27.4'
       - run: kubectl version || true
+
+      # - run: sudo apt install coreutils
+
+      - name: 🔎 Check IP
+        run: curl https://api.ipify.org
+
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo echo $(tail -n 1 /etc/hosts | awk '{print $1}') kubestellar.core | sudo tee -a /etc/hosts
+        # sudo echo $(curl https://api.ipify.org) kubestellar.core | sudo tee -a /etc/hosts
+
+      - run: more /etc/hosts
       
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
