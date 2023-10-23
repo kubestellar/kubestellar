@@ -55,34 +55,6 @@ spec:
           #   mountPath: "/home/kubestellar/.kcp"
           #   readOnly: true
 
-      - name: kcp
-        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
-        securityContext:
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
-        {{ end }}
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # command: [ "sleep" , "infinity" ]
-        command: [ "/home/kubestellar/entry.sh" , "kcp" ]
-        env:
-        - name: EXTERNAL_HOSTNAME
-          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
-        - name: EXTERNAL_PORT
-          value: "{{ .Values.EXTERNAL_PORT }}"
-        volumeMounts:
-        - name: kubestellar-pv
-          mountPath: "/home/kubestellar/.kcp"
-          readOnly: false
-        ports:
-        - name: ks-port
-          protocol: TCP
-          containerPort: 6443
-
       - name: mailbox-controller
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
@@ -145,6 +117,34 @@ spec:
         # - name: kubestellar-secret
         #   mountPath: "/home/kubestellar/.kcp"
         #   readOnly: true
+
+      - name: kcp
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/kubestellar/entry.sh" , "kcp" ]
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+        volumeMounts:
+        - name: kubestellar-pv
+          mountPath: "/home/kubestellar/.kcp"
+          readOnly: false
+        ports:
+        - name: ks-port
+          protocol: TCP
+          containerPort: 6443
 
       volumes:
       - name: kubestellar-pv
