@@ -2918,175 +2918,93 @@ Workspace (WMW) for the user to store workload descriptions and MCCM
 control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: </p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-79-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-79-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-79-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-79-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-79-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-79-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-79-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-79-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-79-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-79-10">10</a></span>
-<span class="normal"><a href="#__codelineno-79-11">11</a></span>
-<span class="normal"><a href="#__codelineno-79-12">12</a></span>
-<span class="normal"><a href="#__codelineno-79-13">13</a></span>
-<span class="normal"><a href="#__codelineno-79-14">14</a></span>
-<span class="normal"><a href="#__codelineno-79-15">15</a></span>
-<span class="normal"><a href="#__codelineno-79-16">16</a></span>
-<span class="normal"><a href="#__codelineno-79-17">17</a></span>
-<span class="normal"><a href="#__codelineno-79-18">18</a></span>
-<span class="normal"><a href="#__codelineno-79-19">19</a></span>
-<span class="normal"><a href="#__codelineno-79-20">20</a></span>
-<span class="normal"><a href="#__codelineno-79-21">21</a></span>
-<span class="normal"><a href="#__codelineno-79-22">22</a></span>
-<span class="normal"><a href="#__codelineno-79-23">23</a></span>
-<span class="normal"><a href="#__codelineno-79-24">24</a></span>
-<span class="normal"><a href="#__codelineno-79-25">25</a></span>
-<span class="normal"><a href="#__codelineno-79-26">26</a></span>
-<span class="normal"><a href="#__codelineno-79-27">27</a></span>
-<span class="normal"><a href="#__codelineno-79-28">28</a></span>
-<span class="normal"><a href="#__codelineno-79-29">29</a></span>
-<span class="normal"><a href="#__codelineno-79-30">30</a></span>
-<span class="normal"><a href="#__codelineno-79-31">31</a></span>
-<span class="normal"><a href="#__codelineno-79-32">32</a></span>
-<span class="normal"><a href="#__codelineno-79-33">33</a></span>
-<span class="normal"><a href="#__codelineno-79-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
-<a id="__codelineno-79-2" name="__codelineno-79-2"></a>
-<a id="__codelineno-79-3" name="__codelineno-79-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-79-4" name="__codelineno-79-4"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
-<a id="__codelineno-79-5" name="__codelineno-79-5"></a><span class="s">kind: EdgePlacement</span>
-<a id="__codelineno-79-6" name="__codelineno-79-6"></a><span class="s">metadata:</span>
-<a id="__codelineno-79-7" name="__codelineno-79-7"></a><span class="s">  name: edge-placement-c</span>
-<a id="__codelineno-79-8" name="__codelineno-79-8"></a><span class="s">spec:</span>
-<a id="__codelineno-79-9" name="__codelineno-79-9"></a><span class="s">  locationSelectors:</span>
-<a id="__codelineno-79-10" name="__codelineno-79-10"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;}</span>
-<a id="__codelineno-79-11" name="__codelineno-79-11"></a><span class="s">  downsync:</span>
-<a id="__codelineno-79-12" name="__codelineno-79-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
-<a id="__codelineno-79-13" name="__codelineno-79-13"></a><span class="s">    resources: [ configmaps ]</span>
-<a id="__codelineno-79-14" name="__codelineno-79-14"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-79-15" name="__codelineno-79-15"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-79-16" name="__codelineno-79-16"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-<a id="__codelineno-79-17" name="__codelineno-79-17"></a><span class="s">  - apiGroup: apps</span>
-<a id="__codelineno-79-18" name="__codelineno-79-18"></a><span class="s">    resources: [ deployments ]</span>
-<a id="__codelineno-79-19" name="__codelineno-79-19"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-79-20" name="__codelineno-79-20"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-79-21" name="__codelineno-79-21"></a><span class="s">    objectNames: [ commond ]</span>
-<a id="__codelineno-79-22" name="__codelineno-79-22"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-79-23" name="__codelineno-79-23"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-79-24" name="__codelineno-79-24"></a><span class="s">    namespaceSelectors: []</span>
-<a id="__codelineno-79-25" name="__codelineno-79-25"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-79-26" name="__codelineno-79-26"></a><span class="s">  upsync:</span>
-<a id="__codelineno-79-27" name="__codelineno-79-27"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-79-28" name="__codelineno-79-28"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-79-29" name="__codelineno-79-29"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-79-30" name="__codelineno-79-30"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-79-31" name="__codelineno-79-31"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-79-32" name="__codelineno-79-32"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-79-33" name="__codelineno-79-33"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-79-34" name="__codelineno-79-34"></a><span class="s">EOF</span>
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
+<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>
+<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
+<a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a><span class="s">kind: EdgePlacement</span>
+<a id="__codelineno-79-6" name="__codelineno-79-6" href="#__codelineno-79-6"></a><span class="s">metadata:</span>
+<a id="__codelineno-79-7" name="__codelineno-79-7" href="#__codelineno-79-7"></a><span class="s">  name: edge-placement-c</span>
+<a id="__codelineno-79-8" name="__codelineno-79-8" href="#__codelineno-79-8"></a><span class="s">spec:</span>
+<a id="__codelineno-79-9" name="__codelineno-79-9" href="#__codelineno-79-9"></a><span class="s">  locationSelectors:</span>
+<a id="__codelineno-79-10" name="__codelineno-79-10" href="#__codelineno-79-10"></a><span class="s">  - matchLabels: {&quot;env&quot;:&quot;prod&quot;}</span>
+<a id="__codelineno-79-11" name="__codelineno-79-11" href="#__codelineno-79-11"></a><span class="s">  downsync:</span>
+<a id="__codelineno-79-12" name="__codelineno-79-12" href="#__codelineno-79-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+<a id="__codelineno-79-13" name="__codelineno-79-13" href="#__codelineno-79-13"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-79-14" name="__codelineno-79-14" href="#__codelineno-79-14"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-79-15" name="__codelineno-79-15" href="#__codelineno-79-15"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-79-16" name="__codelineno-79-16" href="#__codelineno-79-16"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-79-17" name="__codelineno-79-17" href="#__codelineno-79-17"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-79-18" name="__codelineno-79-18" href="#__codelineno-79-18"></a><span class="s">    resources: [ deployments ]</span>
+<a id="__codelineno-79-19" name="__codelineno-79-19" href="#__codelineno-79-19"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-79-20" name="__codelineno-79-20" href="#__codelineno-79-20"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
+<a id="__codelineno-79-21" name="__codelineno-79-21" href="#__codelineno-79-21"></a><span class="s">    objectNames: [ commond ]</span>
+<a id="__codelineno-79-22" name="__codelineno-79-22" href="#__codelineno-79-22"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-79-23" name="__codelineno-79-23" href="#__codelineno-79-23"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-79-24" name="__codelineno-79-24" href="#__codelineno-79-24"></a><span class="s">    namespaceSelectors: []</span>
+<a id="__codelineno-79-25" name="__codelineno-79-25" href="#__codelineno-79-25"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-79-26" name="__codelineno-79-26" href="#__codelineno-79-26"></a><span class="s">  upsync:</span>
+<a id="__codelineno-79-27" name="__codelineno-79-27" href="#__codelineno-79-27"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-79-28" name="__codelineno-79-28" href="#__codelineno-79-28"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-79-29" name="__codelineno-79-29" href="#__codelineno-79-29"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-79-30" name="__codelineno-79-30" href="#__codelineno-79-30"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-79-31" name="__codelineno-79-31" href="#__codelineno-79-31"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-79-32" name="__codelineno-79-32" href="#__codelineno-79-32"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-79-33" name="__codelineno-79-33" href="#__codelineno-79-33"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-79-34" name="__codelineno-79-34" href="#__codelineno-79-34"></a><span class="s">EOF</span>
+</code></pre></div>
 <p>Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (<code>edge-placement-c</code>) object created above. </p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-80-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-80-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-80-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-80-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-80-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-80-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-80-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-80-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-80-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-80-10">10</a></span>
-<span class="normal"><a href="#__codelineno-80-11">11</a></span>
-<span class="normal"><a href="#__codelineno-80-12">12</a></span>
-<span class="normal"><a href="#__codelineno-80-13">13</a></span>
-<span class="normal"><a href="#__codelineno-80-14">14</a></span>
-<span class="normal"><a href="#__codelineno-80-15">15</a></span>
-<span class="normal"><a href="#__codelineno-80-16">16</a></span>
-<span class="normal"><a href="#__codelineno-80-17">17</a></span>
-<span class="normal"><a href="#__codelineno-80-18">18</a></span>
-<span class="normal"><a href="#__codelineno-80-19">19</a></span>
-<span class="normal"><a href="#__codelineno-80-20">20</a></span>
-<span class="normal"><a href="#__codelineno-80-21">21</a></span>
-<span class="normal"><a href="#__codelineno-80-22">22</a></span>
-<span class="normal"><a href="#__codelineno-80-23">23</a></span>
-<span class="normal"><a href="#__codelineno-80-24">24</a></span>
-<span class="normal"><a href="#__codelineno-80-25">25</a></span>
-<span class="normal"><a href="#__codelineno-80-26">26</a></span>
-<span class="normal"><a href="#__codelineno-80-27">27</a></span>
-<span class="normal"><a href="#__codelineno-80-28">28</a></span>
-<span class="normal"><a href="#__codelineno-80-29">29</a></span>
-<span class="normal"><a href="#__codelineno-80-30">30</a></span>
-<span class="normal"><a href="#__codelineno-80-31">31</a></span>
-<span class="normal"><a href="#__codelineno-80-32">32</a></span>
-<span class="normal"><a href="#__codelineno-80-33">33</a></span>
-<span class="normal"><a href="#__codelineno-80-34">34</a></span>
-<span class="normal"><a href="#__codelineno-80-35">35</a></span>
-<span class="normal"><a href="#__codelineno-80-36">36</a></span>
-<span class="normal"><a href="#__codelineno-80-37">37</a></span>
-<span class="normal"><a href="#__codelineno-80-38">38</a></span>
-<span class="normal"><a href="#__codelineno-80-39">39</a></span>
-<span class="normal"><a href="#__codelineno-80-40">40</a></span>
-<span class="normal"><a href="#__codelineno-80-41">41</a></span>
-<span class="normal"><a href="#__codelineno-80-42">42</a></span>
-<span class="normal"><a href="#__codelineno-80-43">43</a></span>
-<span class="normal"><a href="#__codelineno-80-44">44</a></span>
-<span class="normal"><a href="#__codelineno-80-45">45</a></span>
-<span class="normal"><a href="#__codelineno-80-46">46</a></span>
-<span class="normal"><a href="#__codelineno-80-47">47</a></span>
-<span class="normal"><a href="#__codelineno-80-48">48</a></span>
-<span class="normal"><a href="#__codelineno-80-49">49</a></span>
-<span class="normal"><a href="#__codelineno-80-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-80-2" name="__codelineno-80-2"></a><span class="s">apiVersion: v1</span>
-<a id="__codelineno-80-3" name="__codelineno-80-3"></a><span class="s">kind: Namespace</span>
-<a id="__codelineno-80-4" name="__codelineno-80-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-80-5" name="__codelineno-80-5"></a><span class="s">  name: commonstuff</span>
-<a id="__codelineno-80-6" name="__codelineno-80-6"></a><span class="s">  labels: {common: &quot;si&quot;}</span>
-<a id="__codelineno-80-7" name="__codelineno-80-7"></a><span class="s">---</span>
-<a id="__codelineno-80-8" name="__codelineno-80-8"></a><span class="s">apiVersion: v1</span>
-<a id="__codelineno-80-9" name="__codelineno-80-9"></a><span class="s">kind: ConfigMap</span>
-<a id="__codelineno-80-10" name="__codelineno-80-10"></a><span class="s">metadata:</span>
-<a id="__codelineno-80-11" name="__codelineno-80-11"></a><span class="s">  namespace: commonstuff</span>
-<a id="__codelineno-80-12" name="__codelineno-80-12"></a><span class="s">  name: httpd-htdocs</span>
-<a id="__codelineno-80-13" name="__codelineno-80-13"></a><span class="s">data:</span>
-<a id="__codelineno-80-14" name="__codelineno-80-14"></a><span class="s">  index.html: |</span>
-<a id="__codelineno-80-15" name="__codelineno-80-15"></a><span class="s">    &lt;!DOCTYPE html&gt;</span>
-<a id="__codelineno-80-16" name="__codelineno-80-16"></a><span class="s">    &lt;html&gt;</span>
-<a id="__codelineno-80-17" name="__codelineno-80-17"></a><span class="s">      &lt;body&gt;</span>
-<a id="__codelineno-80-18" name="__codelineno-80-18"></a><span class="s">        This is a common web site.</span>
-<a id="__codelineno-80-19" name="__codelineno-80-19"></a><span class="s">      &lt;/body&gt;</span>
-<a id="__codelineno-80-20" name="__codelineno-80-20"></a><span class="s">    &lt;/html&gt;</span>
-<a id="__codelineno-80-21" name="__codelineno-80-21"></a><span class="s">---</span>
-<a id="__codelineno-80-22" name="__codelineno-80-22"></a><span class="s">apiVersion: apps/v1</span>
-<a id="__codelineno-80-23" name="__codelineno-80-23"></a><span class="s">kind: Deployment</span>
-<a id="__codelineno-80-24" name="__codelineno-80-24"></a><span class="s">metadata:</span>
-<a id="__codelineno-80-25" name="__codelineno-80-25"></a><span class="s">  namespace: commonstuff</span>
-<a id="__codelineno-80-26" name="__codelineno-80-26"></a><span class="s">  name: commond</span>
-<a id="__codelineno-80-27" name="__codelineno-80-27"></a><span class="s">spec:</span>
-<a id="__codelineno-80-28" name="__codelineno-80-28"></a><span class="s">  selector: {matchLabels: {app: common} }</span>
-<a id="__codelineno-80-29" name="__codelineno-80-29"></a><span class="s">  template:</span>
-<a id="__codelineno-80-30" name="__codelineno-80-30"></a><span class="s">    metadata:</span>
-<a id="__codelineno-80-31" name="__codelineno-80-31"></a><span class="s">      labels: {app: common}</span>
-<a id="__codelineno-80-32" name="__codelineno-80-32"></a><span class="s">    spec:</span>
-<a id="__codelineno-80-33" name="__codelineno-80-33"></a><span class="s">      containers:</span>
-<a id="__codelineno-80-34" name="__codelineno-80-34"></a><span class="s">      - name: httpd</span>
-<a id="__codelineno-80-35" name="__codelineno-80-35"></a><span class="s">        image: library/httpd:2.4</span>
-<a id="__codelineno-80-36" name="__codelineno-80-36"></a><span class="s">        ports:</span>
-<a id="__codelineno-80-37" name="__codelineno-80-37"></a><span class="s">        - name: http</span>
-<a id="__codelineno-80-38" name="__codelineno-80-38"></a><span class="s">          containerPort: 80</span>
-<a id="__codelineno-80-39" name="__codelineno-80-39"></a><span class="s">          hostPort: 8081</span>
-<a id="__codelineno-80-40" name="__codelineno-80-40"></a><span class="s">          protocol: TCP</span>
-<a id="__codelineno-80-41" name="__codelineno-80-41"></a><span class="s">        volumeMounts:</span>
-<a id="__codelineno-80-42" name="__codelineno-80-42"></a><span class="s">        - name: htdocs</span>
-<a id="__codelineno-80-43" name="__codelineno-80-43"></a><span class="s">          readOnly: true</span>
-<a id="__codelineno-80-44" name="__codelineno-80-44"></a><span class="s">          mountPath: /usr/local/apache2/htdocs</span>
-<a id="__codelineno-80-45" name="__codelineno-80-45"></a><span class="s">      volumes:</span>
-<a id="__codelineno-80-46" name="__codelineno-80-46"></a><span class="s">      - name: htdocs</span>
-<a id="__codelineno-80-47" name="__codelineno-80-47"></a><span class="s">        configMap:</span>
-<a id="__codelineno-80-48" name="__codelineno-80-48"></a><span class="s">          name: httpd-htdocs</span>
-<a id="__codelineno-80-49" name="__codelineno-80-49"></a><span class="s">          optional: false</span>
-<a id="__codelineno-80-50" name="__codelineno-80-50"></a><span class="s">EOF</span>
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-80-2" name="__codelineno-80-2" href="#__codelineno-80-2"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-80-3" name="__codelineno-80-3" href="#__codelineno-80-3"></a><span class="s">kind: Namespace</span>
+<a id="__codelineno-80-4" name="__codelineno-80-4" href="#__codelineno-80-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-80-5" name="__codelineno-80-5" href="#__codelineno-80-5"></a><span class="s">  name: commonstuff</span>
+<a id="__codelineno-80-6" name="__codelineno-80-6" href="#__codelineno-80-6"></a><span class="s">  labels: {common: &quot;si&quot;}</span>
+<a id="__codelineno-80-7" name="__codelineno-80-7" href="#__codelineno-80-7"></a><span class="s">---</span>
+<a id="__codelineno-80-8" name="__codelineno-80-8" href="#__codelineno-80-8"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-80-9" name="__codelineno-80-9" href="#__codelineno-80-9"></a><span class="s">kind: ConfigMap</span>
+<a id="__codelineno-80-10" name="__codelineno-80-10" href="#__codelineno-80-10"></a><span class="s">metadata:</span>
+<a id="__codelineno-80-11" name="__codelineno-80-11" href="#__codelineno-80-11"></a><span class="s">  namespace: commonstuff</span>
+<a id="__codelineno-80-12" name="__codelineno-80-12" href="#__codelineno-80-12"></a><span class="s">  name: httpd-htdocs</span>
+<a id="__codelineno-80-13" name="__codelineno-80-13" href="#__codelineno-80-13"></a><span class="s">data:</span>
+<a id="__codelineno-80-14" name="__codelineno-80-14" href="#__codelineno-80-14"></a><span class="s">  index.html: |</span>
+<a id="__codelineno-80-15" name="__codelineno-80-15" href="#__codelineno-80-15"></a><span class="s">    &lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-80-16" name="__codelineno-80-16" href="#__codelineno-80-16"></a><span class="s">    &lt;html&gt;</span>
+<a id="__codelineno-80-17" name="__codelineno-80-17" href="#__codelineno-80-17"></a><span class="s">      &lt;body&gt;</span>
+<a id="__codelineno-80-18" name="__codelineno-80-18" href="#__codelineno-80-18"></a><span class="s">        This is a common web site.</span>
+<a id="__codelineno-80-19" name="__codelineno-80-19" href="#__codelineno-80-19"></a><span class="s">      &lt;/body&gt;</span>
+<a id="__codelineno-80-20" name="__codelineno-80-20" href="#__codelineno-80-20"></a><span class="s">    &lt;/html&gt;</span>
+<a id="__codelineno-80-21" name="__codelineno-80-21" href="#__codelineno-80-21"></a><span class="s">---</span>
+<a id="__codelineno-80-22" name="__codelineno-80-22" href="#__codelineno-80-22"></a><span class="s">apiVersion: apps/v1</span>
+<a id="__codelineno-80-23" name="__codelineno-80-23" href="#__codelineno-80-23"></a><span class="s">kind: Deployment</span>
+<a id="__codelineno-80-24" name="__codelineno-80-24" href="#__codelineno-80-24"></a><span class="s">metadata:</span>
+<a id="__codelineno-80-25" name="__codelineno-80-25" href="#__codelineno-80-25"></a><span class="s">  namespace: commonstuff</span>
+<a id="__codelineno-80-26" name="__codelineno-80-26" href="#__codelineno-80-26"></a><span class="s">  name: commond</span>
+<a id="__codelineno-80-27" name="__codelineno-80-27" href="#__codelineno-80-27"></a><span class="s">spec:</span>
+<a id="__codelineno-80-28" name="__codelineno-80-28" href="#__codelineno-80-28"></a><span class="s">  selector: {matchLabels: {app: common} }</span>
+<a id="__codelineno-80-29" name="__codelineno-80-29" href="#__codelineno-80-29"></a><span class="s">  template:</span>
+<a id="__codelineno-80-30" name="__codelineno-80-30" href="#__codelineno-80-30"></a><span class="s">    metadata:</span>
+<a id="__codelineno-80-31" name="__codelineno-80-31" href="#__codelineno-80-31"></a><span class="s">      labels: {app: common}</span>
+<a id="__codelineno-80-32" name="__codelineno-80-32" href="#__codelineno-80-32"></a><span class="s">    spec:</span>
+<a id="__codelineno-80-33" name="__codelineno-80-33" href="#__codelineno-80-33"></a><span class="s">      containers:</span>
+<a id="__codelineno-80-34" name="__codelineno-80-34" href="#__codelineno-80-34"></a><span class="s">      - name: httpd</span>
+<a id="__codelineno-80-35" name="__codelineno-80-35" href="#__codelineno-80-35"></a><span class="s">        image: library/httpd:2.4</span>
+<a id="__codelineno-80-36" name="__codelineno-80-36" href="#__codelineno-80-36"></a><span class="s">        ports:</span>
+<a id="__codelineno-80-37" name="__codelineno-80-37" href="#__codelineno-80-37"></a><span class="s">        - name: http</span>
+<a id="__codelineno-80-38" name="__codelineno-80-38" href="#__codelineno-80-38"></a><span class="s">          containerPort: 80</span>
+<a id="__codelineno-80-39" name="__codelineno-80-39" href="#__codelineno-80-39"></a><span class="s">          hostPort: 8081</span>
+<a id="__codelineno-80-40" name="__codelineno-80-40" href="#__codelineno-80-40"></a><span class="s">          protocol: TCP</span>
+<a id="__codelineno-80-41" name="__codelineno-80-41" href="#__codelineno-80-41"></a><span class="s">        volumeMounts:</span>
+<a id="__codelineno-80-42" name="__codelineno-80-42" href="#__codelineno-80-42"></a><span class="s">        - name: htdocs</span>
+<a id="__codelineno-80-43" name="__codelineno-80-43" href="#__codelineno-80-43"></a><span class="s">          readOnly: true</span>
+<a id="__codelineno-80-44" name="__codelineno-80-44" href="#__codelineno-80-44"></a><span class="s">          mountPath: /usr/local/apache2/htdocs</span>
+<a id="__codelineno-80-45" name="__codelineno-80-45" href="#__codelineno-80-45"></a><span class="s">      volumes:</span>
+<a id="__codelineno-80-46" name="__codelineno-80-46" href="#__codelineno-80-46"></a><span class="s">      - name: htdocs</span>
+<a id="__codelineno-80-47" name="__codelineno-80-47" href="#__codelineno-80-47"></a><span class="s">        configMap:</span>
+<a id="__codelineno-80-48" name="__codelineno-80-48" href="#__codelineno-80-48"></a><span class="s">          name: httpd-htdocs</span>
+<a id="__codelineno-80-49" name="__codelineno-80-49" href="#__codelineno-80-49"></a><span class="s">          optional: false</span>
+<a id="__codelineno-80-50" name="__codelineno-80-50" href="#__codelineno-80-50"></a><span class="s">EOF</span>
+</code></pre></div>
 <p>Now, let's check that the deployment was created in the <code>florin</code> edge cluster - it may take a few 10s of seconds to appear:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deployments<span class="w"> </span>-A
 </code></pre></div>
