@@ -8,6 +8,6 @@ while ! KUBECONFIG=~/.kube/config kubectl exec $(KUBECONFIG=~/.kube/config kubec
    echo -n "."
 done
 
-echo "echo;echo;KubeStellar is now ready to take requests"
+echo; echo; echo "KubeStellar is now ready to take requests"
 ```
 <!--check-kubestellar-helm-deployment-running-end-->

@@ -29,7 +29,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 
         + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart
         
-        + [__brew__](https://helm.sh/docs/intro/install/) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
+        + [__brew__](https://brew.sh) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
         
         + [__Kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
 

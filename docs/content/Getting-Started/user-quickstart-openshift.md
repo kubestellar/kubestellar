@@ -30,7 +30,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 
         + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart
         
-        + [__brew__](https://helm.sh/docs/intro/install/) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
+        + [__brew__](https://brew.sh) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
         
         + 3 Red Hat OpenShift clusters - we will refer to them as **ks-core**, **ks-edge-cluster1**, and **ks-edge-cluster2** in this document
 

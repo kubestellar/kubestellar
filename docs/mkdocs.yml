@@ -42,6 +42,7 @@ nav:
           - Code Management: Contribution guidelines/operations/code-management.md
           - Release Management: Contribution guidelines/operations/release-management.md
           - Document Management: Contribution guidelines/operations/document-management.md
+          - Testing Documentation PRs: Contribution guidelines/operations/testing-doc-prs.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
