@@ -29,6 +29,32 @@ spec:
       serviceAccountName: kubestellar-sa
       containers:
 
+      - name: init
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/kubestellar/entry.sh" , "init" ]
+        env:
+        - name: ESPW_NAME
+          value: "{{ .Values.ESPW_NAME }}"
+        - name: ENSURE_IMW
+          value: "{{ .Values.ENSURE_IMW }}"
+        - name: ENSURE_WMW
+          value: "{{ .Values.ENSURE_WMW }}"
+          # volumeMounts:
+          # - name: kubestellar-secret
+          #   mountPath: "/home/kubestellar/.kcp"
+          #   readOnly: true
+
       - name: kcp
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
@@ -56,32 +82,6 @@ spec:
         - name: ks-port
           protocol: TCP
           containerPort: 6443
-
-      - name: init
-        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
-        securityContext:
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
-        {{ end }}
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # command: [ "sleep" , "infinity" ]
-        command: [ "/home/kubestellar/entry.sh" , "init" ]
-        env:
-        - name: ESPW_NAME
-          value: "{{ .Values.ESPW_NAME }}"
-        - name: ENSURE_IMW
-          value: "{{ .Values.ENSURE_IMW }}"
-        - name: ENSURE_WMW
-          value: "{{ .Values.ENSURE_WMW }}"
-          # volumeMounts:
-          # - name: kubestellar-secret
-          #   mountPath: "/home/kubestellar/.kcp"
-          #   readOnly: true
 
       - name: mailbox-controller
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
