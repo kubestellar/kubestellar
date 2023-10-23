@@ -31,7 +31,7 @@ nodes:
         node-labels: "ingress-ready=true"
   extraPortMappings:
   - containerPort: 443
-    hostPort: 1024
+    hostPort: {{ config.ks_kind_port_num }}
     protocol: TCP
 EOF
 ```
