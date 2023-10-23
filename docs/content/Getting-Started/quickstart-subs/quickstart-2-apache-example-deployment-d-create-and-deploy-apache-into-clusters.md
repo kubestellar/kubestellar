@@ -7,7 +7,7 @@ Create the `EdgePlacement` object for your workload. Its “where predicate” (
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
   
-```shell linenums="1"
+```shell
 kubectl ws root:wmw1
 
 kubectl apply -f - <<EOF
@@ -47,7 +47,7 @@ EOF
 Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`edge-placement-c`) object created above. 
 
 
-```shell linenums="1"
+```shell
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
