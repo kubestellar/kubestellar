@@ -109,7 +109,7 @@ func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, err
 		return clusterprovider.SpaceInfo{}, err
 	}
 
-	cmd := "kubectl --kubeconfig" + kubeconfigFile + " --context kind-kubeflex get secrets admin-kubeconfig -n " + lcName
+	cmd := "kubectl --kubeconfig " + kubeconfigFile + " --context kind-kubeflex get secrets admin-kubeconfig -n " + lcName
 
 	cfg, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
