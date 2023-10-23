@@ -14,17 +14,17 @@ Usage of inform-syncer-configs:
       --all-kubeconfig string            Path to the kubeconfig file to use for access to the SyncerConfig objects in all clusters
       --all-user string                  The name of the kubeconfig user to use for access to the SyncerConfig objects in all clusters
 ...
-      --espw-cluster string              The name of the kubeconfig cluster to use for access to the edge service provider workspace
-      --espw-context string              The name of the kubeconfig context to use for access to the edge service provider workspace
-      --espw-kubeconfig string           Path to the kubeconfig file to use for access to the edge service provider workspace
-      --espw-user string                 The name of the kubeconfig user to use for access to the edge service provider workspace
+      --parent-cluster string              The name of the kubeconfig cluster to use for access to the parent of mailbox workspaces
+      --parent-context string              The name of the kubeconfig context to use for access to the parent of mailbox workspaces
+      --parent-kubeconfig string           Path to the kubeconfig file to use for access to the parent of mailbox workspaces
+      --parent-user string                 The name of the kubeconfig user to use for access to the parent of mailbox workspaces
 ...
 pflag: help requested
 exit status 2
 ```
 
 This command requires two kube client configurations.  One points at
-the edge service provider workspace (ESPW) with authorization to list
+the workspace that is the parent of the mailbox workspaces, with authorization to list
 and watch Workspace objects (the mailbox Workspaces) in that
 workspace.  The other client config points at the server base with
 authorization to list and watch `SyncerConfig` objects from all
@@ -35,8 +35,8 @@ Currently the output is very simple logging.
 Following is an example of its usage.
 
 ```console
-$ kubectl ws root:espw
-Current workspace is "root:espw".
+$ kubectl ws root
+Current workspace is "root".
 
 $ go run ./cmd/inform-syncer-configs 
 I0419 00:32:51.695348   94959 main.go:103] "Running"
