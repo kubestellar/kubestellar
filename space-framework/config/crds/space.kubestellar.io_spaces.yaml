@@ -54,6 +54,15 @@ spec:
                 - unmanaged
                 - imported
                 type: string
+              accessscopetype:
+                default: Both
+                description: Access indicate whether the space is going to be accessed
+                  from within the cluster the space resides on or externally
+                enum:
+                - InCluster
+                - External
+                - Both
+                type: string
             required:
             - Type
             type: object

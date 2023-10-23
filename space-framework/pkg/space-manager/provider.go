@@ -68,7 +68,7 @@ func newProviderClient(providerDesc *spacev1alpha1apis.SpaceProviderDesc) spacep
 	case spacev1alpha1apis.KindProviderType:
 		pClient = kindprovider.New(providerDesc.Name)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(providerDesc.Name)
+		pClient = kflexprovider.New(providerDesc.Name, providerDesc.Spec.Config)
 	case spacev1alpha1apis.KcpProviderType:
 		pClient, err := providerkcp.New(providerDesc.Spec.Config)
 		if err != nil {
@@ -198,6 +198,7 @@ func (p *provider) processProviderWatchEvents() {
 				err := p.createSpaceSecrets(refspace, event.SpaceInfo)
 				if err != nil {
 					logger.Error(err, "Failed to create secrests for space "+p.name)
+					continue
 				}
 				if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged && !containsFinalizer(refspace, finalizerName) {
 					// When a physical space is removed we remove its finalizer
@@ -216,6 +217,7 @@ func (p *provider) processProviderWatchEvents() {
 				continue
 			}
 			if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged {
+				_ = p.deleteSpaceSecrets(refspace)
 				// If managed then we need to remove the finalizer.
 				f := refspace.ObjectMeta.Finalizers
 				for i := 0; i < len(refspace.ObjectMeta.Finalizers); i++ {
@@ -241,34 +243,55 @@ const (
 	SECRET_DATA_KEY = "kubeconfig"
 )
 
+func (p *provider) deleteSpaceSecrets(space *spacev1alpha1apis.Space) error {
+	if space.Status.InClusterSecretRef != nil {
+		p.c.k8sClientset.CoreV1().Secrets(space.Status.InClusterSecretRef.Namespace).Delete(p.c.ctx, space.Status.InClusterSecretRef.Name, metav1.DeleteOptions{})
+	}
+
+	if space.Status.ExternalSecretRef != nil {
+		p.c.k8sClientset.CoreV1().Secrets(space.Status.ExternalSecretRef.Namespace).Delete(p.c.ctx, space.Status.ExternalSecretRef.Name, metav1.DeleteOptions{})
+
+	}
+	return nil
+}
+
 func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spaceprovider.SpaceInfo) error {
 
 	var secret *v1.Secret
 	var secretName string
 
-	if spInfo.Config[spaceprovider.INCLUSTER] != "" {
-		secretName = "incluster-" + space.Name
-		secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-		_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		space.Status.InClusterSecretRef = &v1.SecretReference{
-			Name:      secretName,
-			Namespace: SECRET_NS,
+	needInClustr := space.Spec.AccessScope == spacev1alpha1apis.AccessScopeBoth ||
+		space.Spec.AccessScope == spacev1alpha1apis.AccessScopeInCluster
+
+	needExternal := space.Spec.AccessScope == spacev1alpha1apis.AccessScopeBoth ||
+		space.Spec.AccessScope == spacev1alpha1apis.AccessScopeExternal
+
+	if needInClustr {
+		if spInfo.Config[spaceprovider.INCLUSTER] != "" {
+			secretName = "incluster-" + space.Name
+			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
+			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			if err != nil {
+				return err
+			}
+			space.Status.InClusterSecretRef = &v1.SecretReference{
+				Name:      secretName,
+				Namespace: SECRET_NS,
+			}
 		}
 	}
-
-	if spInfo.Config[spaceprovider.EXTERNAL] != "" {
-		secretName = "external-" + space.Name
-		secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-		_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		space.Status.ExternalSecretRef = &v1.SecretReference{
-			Name:      secretName,
-			Namespace: SECRET_NS,
+	if needExternal {
+		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
+			secretName = "external-" + space.Name
+			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
+			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			if err != nil {
+				return err
+			}
+			space.Status.ExternalSecretRef = &v1.SecretReference{
+				Name:      secretName,
+				Namespace: SECRET_NS,
+			}
 		}
 	}
 	return nil
