@@ -26,7 +26,7 @@ Find just the `commonstuff` namespace and the `commond` Deployment.
   let tries=1
   while ! kubectl --context kind-florin get ns commonstuff &> /dev/null; do
     if (( tries >= 30)); then
-      echo "The commonstuff namespace failed to appear in florin!" >&2
+      echo 'The commonstuff namespace failed to appear in florin!' >&2
       exit 10
     fi
     let tries=tries+1
@@ -125,7 +125,7 @@ Check that the common workload on the florin cluster is working.
 let tries=1
 while ! curl http://localhost:8094 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The common workload failed to come up on florin!" >&2
+    echo 'The common workload failed to come up on florin!' >&2
     exit 10
   fi
   let tries=tries+1
@@ -148,7 +148,7 @@ Check that the special workload on the guilder cluster is working.
 let tries=1
 while ! curl http://localhost:8097 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The special workload failed to come up on guilder!" >&2
+    echo 'The special workload failed to come up on guilder!' >&2
     exit 10
   fi
   let tries=tries+1
@@ -172,7 +172,7 @@ Check that the common workload on the guilder cluster is working.
 let tries=1
 while ! curl http://localhost:8096 &> /dev/null; do
   if (( tries >= 30 )); then
-    echo "The common workload failed to come up on guilder!" >&2
+    echo 'The common workload failed to come up on guilder!' >&2
     exit 10
   fi
   let tries=tries+1
