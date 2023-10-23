@@ -12,14 +12,14 @@ Table of contents:
 
 ## Deploy **KubeStellar** in a **Kubernetes** cluster (**Kind** cluster)
 
-[Create a **Kind** cluster with the `extraPortMappings` for port `1024` and an **nginx** ingress with SSL passthrough.](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster)
+[Create a **Kind** cluster with the `extraPortMappings` for port `{{ config.ks_kind_port_num }}` and an **nginx** ingress with SSL passthrough.](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/environments/dev-env/#hosting-kubestellar-in-a-kind-cluster)
 
-Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `1024` port, matching **Kind** ingress port above:
+Deploy **KubeStellar** with a specific host name `my-long-app-name.aregion.some.cloud.com` and a `{{ config.ks_kind_port_num }}` port, matching **Kind** ingress port above:
 
 ```shell
 helm install kubestellar . \
   --set EXTERNAL_HOSTNAME="my-long-app-name.aregion.some.cloud.com" \
-  --set EXTERNAL_PORT=1024
+  --set EXTERNAL_PORT={{ config.ks_kind_port_num }}
 ```
 
 Use `--namespace` argument to specify an optional user-defined namespace for the deployment of **KubeStellar**, *e.g.* `--namespace kubestellar`.
