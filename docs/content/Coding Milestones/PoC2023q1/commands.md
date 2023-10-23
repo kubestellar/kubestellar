@@ -927,6 +927,83 @@ kubectl kubestellar remove wmw demo1
 Current workspace is "root".
 ```
 
+## kubestellar-list-syncing-objects
+
+The `kubestellar-list-syncing-objects` command will list or watch one
+kind of objects in the mailbox spaces. These are full (not summarized)
+workload objects in the intermediate place between WDSes and WECs,
+participating in downsync or upsync. The user of this command is not
+very exposed to the mailbox spaces themselves; the command is directed
+at the whole of this intermediate place and lists all of the requested
+kind of objects there. The kind of objects to list/watch is given by
+command line flags. In general the user has to also give the
+"resource" that is roughly equivalent to the "kind", but that can be
+defaulted in the easy case.
+
+The output is suitable for piping to `jq` or `yq`. In the JSON case,
+the output is one object per line (not pretty-printed). The default is
+to output YAML.
+
+This command will either do a one-shot listing or an ongoing
+list+watch. In the latter case each object is extended with a field
+named `Action` having a value of either `add`, `update`, or `delete`.
+
+This command is given two Kubernetes client configurations.  One,
+called "all", is for reading the chosen objects from all workspaces.
+The other, called "parent", is for reading the mailbox Workspace
+objects from their parent Workspace.
+
+Following are the command line flags beyond the baseline golang flags.
+
+```shell
+      --api-group string                 API group of objects to watch (default is Kubernetes core group)
+      --api-kind string                  kind of objects to watch
+      --api-resource string              API resource (lowercase plural) of objects to watch (defaults to lowercase(kind)+'s')
+      --api-version string               API version (just version, no group) of objects to watch (default "v1")
+      --json                             indicates whether to output as lines of JSON rather than YAML
+      --watch                            indicates whether to inform rather than just list
+...
+      --all-cluster string               The name of the kubeconfig cluster to use for access to the chosen objects in all clusters
+      --all-context string               The name of the kubeconfig context to use for access to the chosen objects in all clusters (default "system:admin")
+      --all-kubeconfig string            Path to the kubeconfig file to use for access to the chosen objects in all clusters
+      --all-user string                  The name of the kubeconfig user to use for access to the chosen objects in all clusters
+...
+      --parent-cluster string              The name of the kubeconfig cluster to use for access to the parent of mailbox workspaces
+      --parent-context string            The name of the kubeconfig context to use for access to the parent of mailbox workspaces (default "root")
+      --parent-kubeconfig string           Path to the kubeconfig file to use for access to the parent of mailbox workspaces
+      --parent-user string                 The name of the kubeconfig user to use for access to the parent of mailbox workspaces
+```
+
+Following is an example of its usage; the elipses show where this
+document omits many lines for brevity.
+
+```console
+$ kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+...
+status:
+  availableReplicas: 1
+  fullyLabeledReplicas: 1
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+...
+status:
+  availableReplicas: 1
+  fullyLabeledReplicas: 1
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+```
+
 ## Bootstrap
 
 This is a combination of some installation and setup steps, for use in

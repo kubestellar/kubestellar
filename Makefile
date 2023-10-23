@@ -114,7 +114,7 @@ ldflags:
 require-%:
 	@if ! command -v $* 1> /dev/null 2>&1; then echo "$* not found in \$$PATH"; exit 1; fi
 
-build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
+build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubestellar-list-syncing-objects
 build: require-jq require-go require-git verify-go-versions ## Build all executables
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 	cp outer-scripts/* bin/
@@ -122,7 +122,7 @@ build: require-jq require-go require-git verify-go-versions ## Build all executa
 	cp inner-scripts/* bin/
 .PHONY: build
 
-userbuild: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version
+userbuild: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-list-syncing-objects
 userbuild: require-jq require-go require-git verify-go-versions ## Build executables needed by users outside the core image
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 	cp outer-scripts/* bin/
