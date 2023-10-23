@@ -24,11 +24,11 @@ my-namespace        my-first-kubestellar-deployment    1/1        1            1
 Finally, let's check that the workload is working in both clusters:
 For **ks-edge-cluster1**:
 ```shell
-export KUBECONFIG=~/.kube/config
-while [[ $(kubectl --context ks-edge-cluster1 get pod \
-  -l "app=common" -n my-namespace \
-  -o jsonpath='{.items[0].status.phase}') != "Running" ]]; \
-  do sleep 5; done;curl http://localhost:8094
+while [[ $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 get pod \
+  -l "app=common" -n my-namespace -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do 
+    sleep 5; 
+  done;
+curl http://localhost:8094
 ```
 
 you should see the output:
@@ -43,11 +43,11 @@ you should see the output:
 
 For **ks-edge-cluster2**:
 ```shell
-export KUBECONFIG=~/.kube/config
-while [[ $(kubectl --context ks-edge-cluster2 get pod \
-  -l "app=common" -n my-namespace \
-  -o jsonpath='{.items[0].status.phase}') != "Running" ]]; \
-  do sleep 5; done;curl http://localhost:8096
+while [[ $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster2 get pod \
+  -l "app=common" -n my-namespace -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do 
+    sleep 5; 
+  done;
+curl http://localhost:8096
 ```
 
 you should see the output:

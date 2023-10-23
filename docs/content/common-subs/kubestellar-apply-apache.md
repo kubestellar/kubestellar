@@ -5,11 +5,10 @@ Workspace (WMW) for you to store kubernetes workload descriptions and <span clas
 Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
-```shell linenums="1" hl_lines="10 11 16 21"
-export KUBECONFIG=ks-core.kubeconfig
-kubectl ws root:wmw1
+```shell hl_lines="9 10 14 18 19"
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 
-kubectl apply -f - <<EOF
+KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -20,13 +19,11 @@ spec:
   downsync:
   - apiGroup: ""
     resources: [ configmaps ]
-    namespaceSelectors:
-    - matchLabels: {"common":"sure-is"}
+    namespaces: [ my-namespace ]
     objectNames: [ "*" ]
   - apiGroup: apps
     resources: [ deployments ]
-    namespaceSelectors:
-    - matchLabels: {"common":"sure-is"}
+    namespaces: [ my-namespace ]
     objectNames: [ my-first-kubestellar-deployment ]
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
@@ -37,28 +34,23 @@ EOF
 
 check if your edgeplacement was applied to the **ks-core** `kubestellar` namespace correctly
 ```shell
-export KUBECONFIG=ks-core.kubeconfig
-kubectl ws root:wmw1
-kubectl get edgeplacements -n kubestellar -o yaml
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
+KUBECONFIG=ks-core.kubeconfig kubectl get edgeplacements -n kubestellar -o yaml
 ```
 
 Now, apply the HTTP server workload definition into the WMW on **ks-core**. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`my-first-edge-placement`) object created above. 
-```shell linenums="1" hl_lines="7 14 29"
-export KUBECONFIG=ks-core.kubeconfig
-kubectl apply -f - <<EOF
-
+```shell hl_lines="5 10 24 25"
+KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
   name: my-namespace
-  labels: {common: "sure-is"}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: my-namespace
   name: httpd-htdocs
-  labels: {common: "sure-is"}
 data:
   index.html: |
     <!DOCTYPE html>
@@ -73,7 +65,6 @@ kind: Deployment
 metadata:
   namespace: my-namespace
   name: my-first-kubestellar-deployment
-  labels: {common: "sure-is"}
 spec:
   selector: {matchLabels: {app: common} }
   template:
@@ -102,10 +93,10 @@ EOF
 
 check if your configmap and deployment was applied to the **ks-core** `my-namespace` namespace correctly
 ```shell
-export KUBECONFIG=ks-core.kubeconfig
-kubectl ws root:wmw1
-kubectl get deployments/my-first-kubestellar-deployment -n my-namespace -o yaml
-kubectl get deployments,cm -n my-namespace
+
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
+KUBECONFIG=ks-core.kubeconfig kubectl get deployments/my-first-kubestellar-deployment -n my-namespace -o yaml
+KUBECONFIG=ks-core.kubeconfig kubectl get deployments,cm -n my-namespace
 ```
 
 <!--kubestellar-apply-apache-end-->

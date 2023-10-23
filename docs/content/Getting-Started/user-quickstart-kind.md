@@ -6,7 +6,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 
 <!-- 
 !!! tip "Estimated time to complete this example:" 
-    ~4 minutes (after installing prerequisites) -->
+    ~20 minutes (after installing prerequisites) -->
 
 ## How to deploy and use <span class="Space-Bd-BT">KUBESTELLAR</span> on Kind Kubernetes Clusters
 !!! tip ""
@@ -89,6 +89,8 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
     === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
+         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+
          {%
            include-markdown "../common-subs/kubestellar-show-available-spaces.md"
            start="<!--kubestellar-show-available-spaces-start-->"
@@ -96,26 +98,11 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
          %}
     
     === "uh oh, error?"
-         Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
-
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
-         
-         Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another process?  If so, delete the **ks-core** Kind cluster and create it again using an available port for your 'hostPort' value
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your **ks-core** 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
-
-         Check that your EXTERNAL_HOSTNAME helm value is reachable via DNS:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. use 'nslookup <value of EXTERNAL_HOSTNAME>' to make sure there is a valid IP address associated with the hostname you have specified
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. make sure your EXTERNAL_HOSTNAME and associated ip address are listed in your /etc/hosts file.
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the **ks-core** Kind cluster
-
-         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+         {%
+           include-markdown "../common-subs/kubestellar-kind-ip-error.md"
+           start="<!--kubestellar-kind-ip-error-start-->"
+           end="<!--kubestellar-kind-ip-error-end-->"
+         %}
 
     === "open a bug report"
         Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
@@ -168,7 +155,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 
           `E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused`
 
-          it means that your `/etc/hosts` does not have a proper ip address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
+          it means that your `/etc/hosts` does not have a proper IP address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
 
 #### 7. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 
@@ -207,34 +194,21 @@ how to create, but not overrite/update a synchronized resource
 
 !!! tip ""
     === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
+         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+
          ```
          KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
            -o jsonpath='{.data.external\.kubeconfig}' \
            -n kubestellar | base64 -d > ks-core.kubeconfig
 
-         KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
+         KUBECONFIG=ks-core.kubeconfig kubectl ws tree
          ```
     === "uh oh, error?"
-         Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
-
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
-         
-         Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another process?  If so, delete the **ks-core** Kind cluster and create it again using an available port for your 'hostPort' value
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your **ks-core** 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
-
-         Check that your EXTERNAL_HOSTNAME helm value is reachable via DNS:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. use 'nslookup <value of EXTERNAL_HOSTNAME>' to make sure there is a valid IP address associated with the hostname you have specified
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. make sure your EXTERNAL_HOSTNAME and associated ip address are listed in your /etc/hosts file.
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the **ks-core** Kind cluster
-
-         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
+         {%
+           include-markdown "../common-subs/kubestellar-kind-ip-error.md"
+           start="<!--kubestellar-kind-ip-error-start-->"
+           end="<!--kubestellar-kind-ip-error-end-->"
+         %}
 
     === "open a bug report"
         Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
@@ -267,7 +241,7 @@ how to create, but not overrite/update a synchronized resource
 
           `E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused`
 
-          it means that your `/etc/hosts` does not have a proper ip address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
+          it means that your `/etc/hosts` does not have a proper IP address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
 
 ## 5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 

@@ -6,7 +6,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 
 <!-- 
 !!! tip "Estimated time to complete this example:" 
-    ~4 minutes (after installing prerequisites) -->
+    ~20 minutes (after installing prerequisites) -->
 
 ## How to deploy and use <span class="Space-Bd-BT">KUBESTELLAR</span> on Red Hat OpenShift Kubernetes Clusters
 
@@ -32,8 +32,6 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
         
         + [__brew__](https://helm.sh/docs/intro/install/) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
         
-        + [__kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
-
         + 3 Red Hat OpenShift clusters - we will refer to them as **ks-core**, **ks-edge-cluster1**, and **ks-edge-cluster2** in this document
 
         {%
@@ -67,6 +65,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
     === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
+         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
          {%
            include-markdown "../common-subs/kubestellar-show-available-spaces.md"
            start="<!--kubestellar-show-available-spaces-start-->"
@@ -74,26 +73,6 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
          %}
     
     === "uh oh, error?"
-         Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
-
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
-         
-         Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another process?  If so, delete the **ks-core** Kind cluster and create it again using an available port for your 'hostPort' value
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your **ks-core** 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
-
-         Check that your EXTERNAL_HOSTNAME helm value is reachable via DNS:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. use 'nslookup <value of EXTERNAL_HOSTNAME>' to make sure there is a valid IP address associated with the hostname you have specified
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. make sure your EXTERNAL_HOSTNAME and associated ip address are listed in your /etc/hosts file.
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the **ks-core** Kind cluster
-
-         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
 
     === "open a bug report"
         Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
@@ -102,9 +81,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 #### 4. Install <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers on your Edge Clusters
 !!! tip ""
     === "Prep and apply"
-        prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster`` prepared for you
-
-        **important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
+        prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster` prepared for you
 
          {%
            include-markdown "../common-subs/kubestellar-prep-syncer.md"
@@ -179,34 +156,15 @@ how to create, but not overrite/update a synchronized resource
 
 !!! tip ""
     === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
+         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+
          ```
-         KUBECONFIG=~/.kube/config kubectl --context kind-ks-core get secrets kubestellar \
+         KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
            -o jsonpath='{.data.external\.kubeconfig}' \
            -n kubestellar | base64 -d > ks-core.kubeconfig
 
-         KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
+         KUBECONFIG=ks-core.kubeconfig kubectl ws tree
          ```
-    === "uh oh, error?"
-         Did you received the following error:
-         ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
-
-         A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
-         
-         Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the port specified in this example occupied by another process?  If so, delete the **ks-core** Kind cluster and create it again using an available port for your 'hostPort' value
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your **ks-core** 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value
-
-         Check that your EXTERNAL_HOSTNAME helm value is reachable via DNS:
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. use 'nslookup <value of EXTERNAL_HOSTNAME>' to make sure there is a valid IP address associated with the hostname you have specified
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. make sure your EXTERNAL_HOSTNAME and associated ip address are listed in your /etc/hosts file.
-
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. make sure the IP address is associated with the system where you have deployed the **ks-core** Kind cluster
-
-         if there is nothing obvious, [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)
 
     === "open a bug report"
         Stuck? [open a bug report and we can help you out](https://github.com/kubestellar/kubestellar/issues/new?assignees=&labels=kind%2Fbug&projects=&template=bug_report.yaml&title=bug%3A+)

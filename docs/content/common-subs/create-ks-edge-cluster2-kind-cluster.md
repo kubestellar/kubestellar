@@ -1,8 +1,7 @@
 <!--create-ks-edge-cluster2-kind-cluster-start-->
 create the **ks-edge-cluster2** kind cluster
 ```shell
-export KUBECONFIG=~/.kube/config
-kind create cluster --name ks-edge-cluster2 --config - <<EOF
+KUBECONFIG=~/.kube/config kind create cluster --name ks-edge-cluster2 --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
