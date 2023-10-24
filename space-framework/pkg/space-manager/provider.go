@@ -29,6 +29,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
@@ -39,7 +40,10 @@ import (
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName
-const prefixNamespace = "spaceprovider-"
+const (
+	prefixNamespace     = "spaceprovider-"
+	PROVIDER_CONFIG_KEY = "kubeconfig"
+)
 
 func ProviderNS(name string) string {
 	return prefixNamespace + name
@@ -62,15 +66,15 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(providerDesc *spacev1alpha1apis.SpaceProviderDesc) spaceprovider.ProviderClient {
+func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string) spaceprovider.ProviderClient {
 	var pClient spaceprovider.ProviderClient = nil
-	switch providerDesc.Spec.ProviderType {
+	switch pType {
 	case spacev1alpha1apis.KindProviderType:
-		pClient = kindprovider.New(providerDesc.Name)
+		pClient = kindprovider.New(config)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(providerDesc.Name, providerDesc.Spec.Config)
+		pClient = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err := providerkcp.New(providerDesc.Spec.Config)
+		pClient, err := providerkcp.New(config)
 		if err != nil {
 			runtime.HandleError(err)
 			return nil
@@ -93,7 +97,12 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
-	newProviderClient := newProviderClient(providerDesc)
+	configStr, err := getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
+	if err != nil {
+		return nil, err
+	}
+
+	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStr)
 	if newProviderClient == nil {
 		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
 	}
@@ -113,6 +122,29 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 
 	c.providers[providerName] = p
 	return p, nil
+}
+
+func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (string, error) {
+
+	ctx := context.Background()
+
+	secret, err := cs.CoreV1().Secrets(sRef.Namespace).Get(ctx, sRef.Name, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	// Retrieve the kubeconfig data from the Secret
+	kubeconfigData, found := secret.Data[PROVIDER_CONFIG_KEY]
+	if !found {
+		return "", errors.New("secret doesn't have kubeconfig data")
+	}
+
+	//	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
+	//	if err != nil {
+	//		return "", err
+	//	}
+
+	return string(kubeconfigData), nil
 }
 
 func (p *provider) filterOut(spaceName string) bool {

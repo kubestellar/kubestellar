@@ -37,10 +37,6 @@ spec:
           spec:
             description: '`spec` describes a provider.'
             properties:
-              Config:
-                description: 'TODO: this should be stored as a secret! Config is the
-                  provider config'
-                type: string
               ProviderType:
                 description: ProviderType is the type of the provider of the space.
                 type: string
@@ -51,6 +47,21 @@ spec:
                 description: SpacePrefixForDiscovery contains the prefix used during
                   space discovery.
                 type: string
+              secretRef:
+                description: SecretRef is the provider config. Only the Space Manager
+                  access the provider so the config should be such that allows te
+                  SM to access the provider
+                properties:
+                  name:
+                    description: name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
             required:
             - ProviderType
             type: object

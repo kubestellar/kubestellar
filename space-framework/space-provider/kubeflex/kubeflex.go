@@ -37,16 +37,14 @@ import (
 
 // KflexClusterProvider is a kubeflex cluster provider
 type KflexClusterProvider struct {
-	providerName string
-	pConfig      string
-	watch        clusterprovider.Watcher
+	pConfig string
+	watch   clusterprovider.Watcher
 }
 
 // New creates a new KflexClusterProvider
-func New(providerName string, pConfig string) KflexClusterProvider {
+func New(pConfig string) KflexClusterProvider {
 	return KflexClusterProvider{
-		providerName: providerName,
-		pConfig:      pConfig,
+		pConfig: pConfig,
 	}
 }
 

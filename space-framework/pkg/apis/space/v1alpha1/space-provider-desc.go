@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -59,10 +60,10 @@ type SpaceProviderDescSpec struct {
 	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="space provider type is immutable"
 	ProviderType SpaceProviderType `json:"ProviderType"`
 
-	// TODO: this should be stored as a secret!
-	// Config is the provider config
+	// SecretRef is the provider config. Only the Space Manager access the provider so the config should be such
+	// that allows te SM to access the provider
 	// +kubebuilder
-	Config string `json:"Config,omitempty"`
+	SecretRef *corev1.SecretReference `json:"secretRef,omitempty"`
 
 	// SpacePrefixForDiscovery contains the prefix used during space discovery.
 	// +kubebuilder

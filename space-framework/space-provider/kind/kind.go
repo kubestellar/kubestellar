@@ -32,16 +32,16 @@ import (
 // KindClusterProvider is a cluster provider that works with a local Kind instance.
 type KindClusterProvider struct {
 	kindProvider *kind.Provider
-	providerName string
+	pConfig      string
 	watch        clusterprovider.Watcher
 }
 
 // New creates a new KindClusterProvider
-func New(providerName string) KindClusterProvider {
+func New(pConfig string) KindClusterProvider {
 	kindProvider := kind.NewProvider()
 	return KindClusterProvider{
 		kindProvider: kindProvider,
-		providerName: providerName,
+		pConfig:      pConfig,
 	}
 }
 
@@ -83,9 +83,9 @@ func (k KindClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, e
 	spaceInfo := clusterprovider.SpaceInfo{
 		Name: spaceName,
 		Config: map[string]string{
+			//TODO  get the incluster config - for now use the same.
 			clusterprovider.INCLUSTER: cfg,
-			//TODO  get the incluster config
-			clusterprovider.EXTERNAL: "",
+			clusterprovider.EXTERNAL:  cfg,
 		},
 	}
 	return spaceInfo, err
@@ -101,19 +101,12 @@ func (k KindClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) {
 	spaceInfoList := make([]clusterprovider.SpaceInfo, 0, len(spaceNames))
 
 	for _, spaceName := range spaceNames {
-		cfg, err := k.kindProvider.KubeConfig(spaceName, false)
+		spInfo, err := k.Get(spaceName)
 		if err != nil {
 			logger.Error(err, "Failed to fetch config for cluster", "name", spaceName)
 		}
 
-		spaceInfoList = append(spaceInfoList, clusterprovider.SpaceInfo{
-			Name: spaceName,
-			Config: map[string]string{
-				clusterprovider.INCLUSTER: cfg,
-				//TODO  get the incluster config
-				clusterprovider.EXTERNAL: "",
-			},
-		})
+		spaceInfoList = append(spaceInfoList, spInfo)
 	}
 
 	return spaceInfoList, err
