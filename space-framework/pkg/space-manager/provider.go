@@ -139,12 +139,12 @@ func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (str
 		return "", errors.New("secret doesn't have kubeconfig data")
 	}
 
-	//	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
-	//	if err != nil {
-	//		return "", err
-	//	}
+	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
+		if err != nil {
+			return "", err
+	}
 
-	return string(kubeconfigData), nil
+	return string(kubeconfigBytes), nil
 }
 
 func (p *provider) filterOut(spaceName string) bool {
