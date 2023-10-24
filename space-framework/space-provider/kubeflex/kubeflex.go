@@ -19,11 +19,15 @@ package kflexprovider
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
@@ -34,13 +38,15 @@ import (
 // KflexClusterProvider is a kubeflex cluster provider
 type KflexClusterProvider struct {
 	providerName string
+	pConfig      string
 	watch        clusterprovider.Watcher
 }
 
 // New creates a new KflexClusterProvider
-func New(providerName string) KflexClusterProvider {
+func New(providerName string, pConfig string) KflexClusterProvider {
 	return KflexClusterProvider{
 		providerName: providerName,
+		pConfig:      pConfig,
 	}
 }
 
@@ -97,14 +103,39 @@ func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
 // Get: obtains the kubeconfig for the given lcName cluster.
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
-	cmd := "kubectl --context kind-kubeflex get secrets -n " + lcName + " admin-kubeconfig -o jsonpath='{.data.*}' | base64 -d"
+
+	kubeconfigFile, err := generateKubeConfig(k.pConfig)
+	if err != nil {
+		return clusterprovider.SpaceInfo{}, err
+	}
+
+	cmd := "kubectl --kubeconfig " + kubeconfigFile + " --context kind-kubeflex get secrets admin-kubeconfig -n " + lcName
+
 	cfg, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
+
+	var secret corev1.Secret
+
+	err = json.Unmarshal(cfg, &secret)
+	if err != nil {
+		return clusterprovider.SpaceInfo{}, err
+	}
+
+	externalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig"])
+	internalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig-incluster"])
+
+	//TODO get the external kubeconfig
+	if err != nil {
+		return clusterprovider.SpaceInfo{}, err
+	}
 	lcInfo := clusterprovider.SpaceInfo{
-		Name:   lcName,
-		Config: string(cfg),
+		Name: lcName,
+		Config: map[string]string{
+			clusterprovider.EXTERNAL:  externalConf,
+			clusterprovider.INCLUSTER: internalConf,
+		},
 	}
 	return lcInfo, nil
 }
@@ -116,17 +147,13 @@ func (k KflexClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) 
 	lcInfoList := make([]clusterprovider.SpaceInfo, 0, len(lcNames))
 
 	for _, lcName := range lcNames {
-		// TODO: switch from cli to kube directives
-		cmd := "kubectl --context kind-kubeflex get secrets -n lc3-system admin-kubeconfig -o jsonpath='{.data.*}' | base64 -d"
-		cfg, err := exec.Command("bash", "-c", cmd).Output()
-		if err != nil {
-			logger.Error(err, "Failed to fetch config for cluster", "name", lcName)
-		}
 
-		lcInfoList = append(lcInfoList, clusterprovider.SpaceInfo{
-			Name:   lcName,
-			Config: string(cfg),
-		})
+		spInfo, err := k.Get(lcName)
+		if err != nil {
+			logger.Error(err, "couldn't get space", "space", lcName)
+			continue
+		}
+		lcInfoList = append(lcInfoList, spInfo)
 	}
 
 	return lcInfoList, nil
@@ -211,4 +238,27 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 	})
 
 	return k.ch
+}
+
+func generateKubeConfig(config string) (string, error) {
+	cmdMktemp := exec.Command("mktemp", "-p", "/tmp/")
+	randomName, err := cmdMktemp.Output()
+	if err != nil {
+		return "", err
+	}
+
+	// Remove trailing newline character from randomName.
+	randomNameStr := string(randomName[:len(randomName)-1])
+
+	file, err := os.Create(randomNameStr)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(randomNameStr)
+	if err != nil {
+		return "", err
+	}
+	return randomNameStr, nil
 }

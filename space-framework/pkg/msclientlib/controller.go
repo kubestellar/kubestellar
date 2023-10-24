@@ -27,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
@@ -140,24 +139,26 @@ func (c *controller) process(key string) error {
 }
 
 func (c *controller) handleAdd(space interface{}, spaceKey string) {
-	spaceInfo, ok := space.(*spacev1alpha1.Space)
+	nSpace, ok := space.(*spacev1alpha1.Space)
 	if !ok {
 		runtime.HandleError(errors.New("unexpected object type. expected Space"))
 		return
 	}
 	// Only spaces in ready state are cached.
 	// We will get another event when the space is Ready and then we cache it.
-	if spaceInfo.Status.Phase != spacev1alpha1.SpacePhaseReady {
+	if nSpace.Status.Phase != spacev1alpha1.SpacePhaseReady {
 		c.handleDelete(spaceKey)
 		return
 	}
 
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(spaceInfo.Status.SpaceConfig))
+	// TODO We assume the space is in a pod in the same cluster where the controllers are deployed
+	// Need to add flags to indicate it
+	config, err := c.msClient.getRestConfigFromSecret(true, nSpace)
 	if err != nil {
 		runtime.HandleError(err)
 		return
 	}
-	c.logger.Info("New space detected", "space", spaceInfo.Name)
+	c.logger.Info("New space detected", "space", nSpace.Name)
 	c.msClient.lock.Lock()
 	defer c.msClient.lock.Unlock()
 	c.msClient.configs[spaceKey] = config

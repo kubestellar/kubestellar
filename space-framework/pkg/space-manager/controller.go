@@ -32,7 +32,7 @@ import (
 	"k8s.io/klog/v2"
 
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
-	edgeclient "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	spaceclient "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
 )
 
 const ()
@@ -52,7 +52,7 @@ type queueItem struct {
 
 type controller struct {
 	ctx                   context.Context
-	clientset             edgeclient.Interface
+	clientset             spaceclient.Interface
 	k8sClientset          *kubeclient.Clientset
 	logger                logr.Logger
 	queue                 workqueue.RateLimitingInterface
@@ -65,7 +65,7 @@ type controller struct {
 // NewController returns space-manager controller
 func NewController(
 	ctx context.Context,
-	clientset edgeclient.Interface,
+	clientset spaceclient.Interface,
 	k8sClientset *kubeclient.Clientset,
 	spaceInformer cache.SharedIndexInformer,
 	providerInformer cache.SharedIndexInformer,

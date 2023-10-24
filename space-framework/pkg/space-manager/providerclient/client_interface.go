@@ -20,13 +20,19 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
+const (
+	INCLUSTER = "incluster"
+	EXTERNAL  = "external"
+)
+
 // SpaceInfo is a minimal space information.
 type SpaceInfo struct {
 	// Name is the name of the space.
 	Name string
 
-	// Config is a space raw access config.
-	Config string
+	// When accessing the space from within the cluster hosting the space
+	// This relevant for space that is hosted in Pods and accessed from ther Pods in the same cluster
+	Config map[string]string
 }
 
 // Options are the possible options for provider create/delete operations.

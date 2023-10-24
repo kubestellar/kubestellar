@@ -20,11 +20,16 @@ package msclientlib
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
+	"fmt"
+	"os"
 	"sync"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
@@ -53,6 +58,7 @@ type multiSpaceClient struct {
 	// The key to the map is the spaceName+ProviderNS  (currently we use the provider NS and not directly the provider name)
 	configs          map[string]*rest.Config
 	managerClientset *mgtclientset.Clientset
+	kubeClientset    *kubernetes.Clientset
 	lock             sync.Mutex
 }
 
@@ -148,16 +154,51 @@ func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest
 	if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
 		return nil, errors.New("space is not ready")
 	}
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(space.Status.SpaceConfig))
+
+	restConfig, err := mcc.getRestConfigFromSecret(true, space)
 	if err != nil {
 		return nil, err
 	}
 	// Calling function should acquire the mcc lock
-	mcc.configs[space.Name] = config
+	mcc.configs[space.Name] = restConfig
 
-	return config, nil
+	return restConfig, nil
 }
 
 func namespaceKey(name string, ns string) (key string, namespace string) {
 	return ns + "/" + name, ns
+}
+
+const CUBEKONFIG_KEY = "kubeconfig"
+
+func (mcc *multiSpaceClient) getRestConfigFromSecret(internalAccess bool, space *spacev1alpha1.Space) (*rest.Config, error) {
+	var secretRef *corev1.SecretReference
+	if internalAccess {
+		secretRef = space.Status.InClusterSecretRef
+	} else {
+		secretRef = space.Status.ExternalSecretRef
+	}
+	secret, err := mcc.kubeClientset.CoreV1().Secrets(secretRef.Namespace).Get(mcc.ctx, secretRef.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the kubeconfig data from the Secret
+	kubeconfigData, found := secret.Data[CUBEKONFIG_KEY]
+	if !found {
+		return nil, errors.New("Secret doesn't have kubeconfig data")
+	}
+
+	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
+	if err != nil {
+		return nil, err
+	}
+
+	// Restore the *rest.Config from the decoded kubeconfig data
+	restConfig, err := clientcmd.RESTConfigFromKubeConfig(kubeconfigBytes)
+	if err != nil {
+		fmt.Printf("Error restoring RESTConfig: %v\n", err)
+		os.Exit(1)
+	}
+	return restConfig, nil
 }
