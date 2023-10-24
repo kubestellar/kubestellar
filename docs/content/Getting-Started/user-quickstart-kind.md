@@ -157,6 +157,8 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 
           it means that your `/etc/hosts` does not have a proper IP address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
 
+          Mac OS users may also experience issues when ```stealth mode``` (system settings/firewall).  If you decide to disable this mode temporarily, please be sure to re-enable it once you are finished with this guide.
+
 #### 7. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 
 ```
@@ -242,6 +244,8 @@ how to create, but not overrite/update a synchronized resource
           `E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused`
 
           it means that your `/etc/hosts` does not have a proper IP address (NOT `127.0.0.1`) listed for the `kubestellar.core` hostname. Once there is a valid address in `/etc/hosts` for `kubestellar.core`, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. 
+
+          Mac OS users may also experience issues when ```stealth mode``` (system settings/firewall).  If you decide to disable this mode temporarily, please be sure to re-enable it once you are finished with this guide.
 
 ## 5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 
