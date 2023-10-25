@@ -97,7 +97,7 @@ Now, let's onboard the `guilder` cluster:
 
 ```shell
 kubectl ws root
-kubectl kubestellar prep-for-cluster --imw root:imw1 guilder env=prod extended=si
+kubectl kubestellar prep-for-cluster --imw root:imw1 guilder env=prod extended=yes
 ```
 
 Apply the created edge syncer manifest:
