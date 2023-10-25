@@ -10,17 +10,17 @@ kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
 
-Teardown of KubeStellar depends on which style of deployment was used.
+Teardown of <span class="Space-Bd-BT">KUBESTELLAR</span> depends on which style of deployment was used.
 
 ### Teardown bare processes
 
-The following command will stop whatever KubeStellar controllers are running.
+The following command will stop whatever <span class="Space-Bd-BT">KUBESTELLAR</span> controllers are running.
 
 ``` {.bash}
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following command:
+Stop and uninstall <span class="Space-Bd-BT">KUBESTELLAR</span> and kcp with the following command:
 
 ``` {.bash}
 remove-kubestellar

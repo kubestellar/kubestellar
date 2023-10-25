@@ -11,7 +11,7 @@ ks_branch: 'main'
 ks_tag: 'v0.9.0'
 ks_next_branch: 'release-0.10'
 ks_next_tag: 'v0.10.0'
-ks_port_num: '1119'
+ks_kind_port_num: '1119'
 
 # Site content
 docs_dir: 'content'
@@ -22,8 +22,11 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
+      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
   - Getting Started:
-      - QuickStart: Getting-Started/quickstart.md
+      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
+      - Quickstart with OpenShift: Getting-Started/user-quickstart-openshift.md 
+      - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
       - KubeStellar - The Infomercial: Getting-Started/infomercial.md
@@ -41,6 +44,7 @@ nav:
           - Packaing and Versioning: Contribution guidelines/operations/packaging-and-versioning.md
           - Release Management: Contribution guidelines/operations/release-management.md
           - Document Management: Contribution guidelines/operations/document-management.md
+          - Testing Documentation PRs: Contribution guidelines/operations/testing-doc-prs.md
   - Coding Milestones:
       - PoC2023q1:
           - Details: Coding Milestones/PoC2023q1/outline.md
