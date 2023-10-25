@@ -26,6 +26,7 @@ import (
 	"github.com/go-logr/logr"
 
 	v1 "k8s.io/api/core/v1"
+	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -34,9 +35,9 @@ import (
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
-	providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kind"
 	kflexprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kubeflex"
+	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName
@@ -74,7 +75,8 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 	case spacev1alpha1apis.KubeflexProviderType:
 		pClient = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err := providerkcp.New(config)
+		//		pClient, err := providerkcp.New(config)
+		err := errors.New("not implemented")
 		if err != nil {
 			runtime.HandleError(err)
 			return nil
@@ -127,7 +129,9 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (string, error) {
 
 	ctx := context.Background()
+	logger := klog.FromContext(ctx)
 
+	var kubeconfigBytes []byte
 	secret, err := cs.CoreV1().Secrets(sRef.Namespace).Get(ctx, sRef.Name, metav1.GetOptions{})
 	if err != nil {
 		return "", err
@@ -139,9 +143,11 @@ func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (str
 		return "", errors.New("secret doesn't have kubeconfig data")
 	}
 
-	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
+	kubeconfigBytes, err = base64.StdEncoding.DecodeString(string(kubeconfigData))
 	if err != nil {
-		return "", err
+		//We assume this happen because the data was not encoded pring message and get the string
+		kubeconfigBytes = kubeconfigData
+		logger.Info("Provider secret was not encoded", "Secret", sRef.Name)
 	}
 
 	return string(kubeconfigBytes), nil
@@ -305,28 +311,49 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
+				if k8sapierrors.IsAlreadyExists(err) {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				return err
 			}
+
 			space.Status.InClusterSecretRef = &v1.SecretReference{
 				Name:      secretName,
 				Namespace: SECRET_NS,
 			}
+		} else {
+			return errors.New("missing needed in-cluster secret for space")
 		}
 	}
+
 	if needExternal {
 		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
 			secretName = "external-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
+				if k8sapierrors.IsAlreadyExists(err) {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				return err
 			}
 			space.Status.ExternalSecretRef = &v1.SecretReference{
 				Name:      secretName,
 				Namespace: SECRET_NS,
 			}
+		} else {
+			return errors.New("missing needed external secret for space")
 		}
 	}
+
 	return nil
 }
 
