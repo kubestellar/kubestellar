@@ -33,22 +33,22 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
   namespace: kubestellar-syncer-sync-target-name-34b23c4k
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k-token
+  name: kubestellar-syncer-sync-target-name-34b23c4k-token
   namespace: kubestellar-syncer-sync-target-name-34b23c4k
   annotations:
-    kubernetes.io/service-account.name: kcp-syncer-sync-target-name-34b23c4k
+    kubernetes.io/service-account.name: kubestellar-syncer-sync-target-name-34b23c4k
 type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
 rules:
 - apiGroups:
   - "rbac.authorization.k8s.io"
@@ -67,20 +67,20 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
 subjects:
 - kind: ServiceAccount
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
   namespace: kubestellar-syncer-sync-target-name-34b23c4k
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
   namespace: kubestellar-syncer-sync-target-name-34b23c4k
 stringData:
   kubeconfig: |
@@ -95,7 +95,7 @@ stringData:
     - name: default-context
       context:
         cluster: default-cluster
-        namespace: kcp-namespace
+        namespace: kubestellar-namespace
         user: default-user
     current-context: default-context
     users:
@@ -106,7 +106,7 @@ stringData:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kcp-syncer-sync-target-name-34b23c4k
+  name: kubestellar-syncer-sync-target-name-34b23c4k
   namespace: kubestellar-syncer-sync-target-name-34b23c4k
 spec:
   replicas: 1
@@ -114,18 +114,18 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: kcp-syncer-sync-target-name-34b23c4k
+      app: kubestellar-syncer-sync-target-name-34b23c4k
   template:
     metadata:
       labels:
-        app: kcp-syncer-sync-target-name-34b23c4k
+        app: kubestellar-syncer-sync-target-name-34b23c4k
     spec:
       containers:
-      - name: kcp-syncer
+      - name: kubestellar-syncer
         command:
         - /ko-app/syncer
         args:
-        - --from-kubeconfig=/kcp/kubeconfig
+        - --from-kubeconfig=/kubestellar/kubeconfig
         - --sync-target-name=sync-target-name
         - --sync-target-uid=sync-target-uid
         - --qps=123.4
@@ -140,14 +140,14 @@ spec:
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
-        - name: kcp-config
-          mountPath: /kcp/
+        - name: kubestellar-config
+          mountPath: /kubestellar/
           readOnly: true
-      serviceAccountName: kcp-syncer-sync-target-name-34b23c4k
+      serviceAccountName: kubestellar-syncer-sync-target-name-34b23c4k
       volumes:
-        - name: kcp-config
+        - name: kubestellar-config
           secret:
-            secretName: kcp-syncer-sync-target-name-34b23c4k
+            secretName: kubestellar-syncer-sync-target-name-34b23c4k
             optional: false
 `
 
@@ -155,7 +155,7 @@ spec:
 		ServerURL:     "server-url",
 		Token:         "token",
 		CAData:        "ca-data",
-		KCPNamespace:  "kcp-namespace",
+		KCPNamespace:  "kubestellar-namespace",
 		Namespace:     "kubestellar-syncer-sync-target-name-34b23c4k",
 		SyncTarget:    "sync-target-name",
 		SyncTargetUID: "sync-target-uid",
@@ -163,7 +163,7 @@ spec:
 		Replicas:      1,
 		QPS:           123.4,
 		Burst:         456,
-	}, "kcp-syncer-sync-target-name-34b23c4k")
+	}, "kubestellar-syncer-sync-target-name-34b23c4k")
 	require.NoError(t, err)
 	require.Empty(t, cmp.Diff(expectedYAML, string(actualYAML)))
 }
