@@ -22,6 +22,7 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
+      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
   - Getting Started:
       - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
       - Quickstart with OpenShift: Getting-Started/user-quickstart-openshift.md 
