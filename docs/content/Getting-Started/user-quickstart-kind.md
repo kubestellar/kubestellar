@@ -277,3 +277,18 @@ how to create, but not overrite/update a synchronized resource
 ```
 TODO
 ```
+
+<br>
+---
+
+---
+<br>
+
+## Tear it all down
+!!! tip ""
+    === "uninstall brew, delete kind clusters, delete kubernetes contexts"
+        {%
+          include-markdown "../common-subs/tear-down-kind.md"
+          start="<!--tear-down-kind-start-->"
+          end="<!--tear-down-kind-end-->"
+        %}
