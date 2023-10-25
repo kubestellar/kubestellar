@@ -379,6 +379,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/operations/packaging-and-versioning/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/operations/packaging-and-versioning/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/operations/release-management/</loc>
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
