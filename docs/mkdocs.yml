@@ -23,8 +23,8 @@ nav:
       - Overview: index.md 
       - Readme: readme.md
   - Getting Started:
-      - Quickstart: Getting-Started/user-quickstart-kind.md 
-      - Quickstart - OpenShift: Getting-Started/user-quickstart-openshift.md 
+      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
+      - Quickstart with OpenShift: Getting-Started/user-quickstart-openshift.md 
       - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
