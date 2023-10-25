@@ -105,11 +105,11 @@ spec:
         app: {{.DeploymentApp}}
     spec:
       containers:
-      - name: kcp-syncer
+      - name: kubestellar-syncer
         command:
         - /ko-app/syncer
         args:
-        - --from-kubeconfig=/kcp/{{.SecretConfigKey}}
+        - --from-kubeconfig=/kubestellar/{{.SecretConfigKey}}
         - --sync-target-name={{.SyncTarget}}
         - --sync-target-uid={{.SyncTargetUID}}
         - --qps={{.QPS}}
@@ -124,12 +124,12 @@ spec:
         imagePullPolicy: IfNotPresent
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
-        - name: kcp-config
-          mountPath: /kcp/
+        - name: kubestellar-config
+          mountPath: /kubestellar/
           readOnly: true
       serviceAccountName: {{.ServiceAccount}}
       volumes:
-        - name: kcp-config
+        - name: kubestellar-config
           secret:
             secretName: {{.Secret}}
             optional: false
