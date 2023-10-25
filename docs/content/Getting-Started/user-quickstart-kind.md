@@ -93,6 +93,12 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
            start="<!--brew-remove-start-->"
            end="<!--brew-remove-end-->"
          %}
+    === "uh oh, no brew?"
+         {%
+           include-markdown "../common-subs/brew-no.md"
+           start="<!--brew-no-start-->"
+           end="<!--brew-no-end-->"
+         %}
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
