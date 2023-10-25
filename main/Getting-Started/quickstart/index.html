@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://docs.kubestellar.io/main/Getting-Started/quickstart/">
       
       
-        <link rel="prev" href="../../readme/">
+        <link rel="prev" href="../user-quickstart-openshift/">
       
       
         <link rel="next" href="../../Coding%20Milestones/PoC2023q1/example1/">
@@ -21,7 +21,7 @@
     
     
       
-        <title>QuickStart - KubeStellar</title>
+        <title>Detailed QuickStart - KubeStellar</title>
       
     
     
@@ -134,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              QuickStart
+              Detailed QuickStart
             
           </span>
         </div>
@@ -230,7 +230,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="./" class="md-tabs__link md-tabs__link--active">
+      <a href="../user-quickstart-kind/" class="md-tabs__link md-tabs__link--active">
         Getting Started
       </a>
     </li>
@@ -370,6 +370,8 @@
         
           
         
+          
+        
       
       
         
@@ -400,6 +402,20 @@
     <li class="md-nav__item">
       <a href="../../readme/" class="md-nav__link">
         Readme
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-quickstart-kind/" class="md-nav__link">
+        Quickstart with Kind
       </a>
     </li>
   
@@ -439,6 +455,10 @@
         
           
         
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -457,6 +477,34 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../user-quickstart-kind/" class="md-nav__link">
+        Quickstart with Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-quickstart-openshift/" class="md-nav__link">
+        Quickstart with OpenShift
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -467,12 +515,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          QuickStart
+          Detailed QuickStart
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        QuickStart
+        Detailed QuickStart
       </a>
       
         
@@ -732,10 +780,10 @@
       
         <li class="md-nav__item">
   <a href="#2-install-and-run-kcp-and-kubestellar" class="md-nav__link">
-    2. Install and run kcp and KubeStellar
+    2. Install and run kcp and KUBESTELLAR
   </a>
   
-    <nav class="md-nav" aria-label="2. Install and run kcp and KubeStellar">
+    <nav class="md-nav" aria-label="2. Install and run kcp and KUBESTELLAR">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1088,6 +1136,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
@@ -1152,6 +1202,20 @@
     <li class="md-nav__item">
       <a href="../../Contribution%20guidelines/operations/document-management/" class="md-nav__link">
         Document Management
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Contribution%20guidelines/operations/testing-doc-prs/" class="md-nav__link">
+        Testing Documentation PRs
       </a>
     </li>
   
@@ -2258,10 +2322,10 @@
       
         <li class="md-nav__item">
   <a href="#2-install-and-run-kcp-and-kubestellar" class="md-nav__link">
-    2. Install and run kcp and KubeStellar
+    2. Install and run kcp and KUBESTELLAR
   </a>
   
-    <nav class="md-nav" aria-label="2. Install and run kcp and KubeStellar">
+    <nav class="md-nav" aria-label="2. Install and run kcp and KUBESTELLAR">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2382,7 +2446,7 @@
   
 
 
-  <h1>QuickStart</h1>
+  <h1>Detailed QuickStart</h1>
 
 <p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml"><img alt="QuickStart test" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-qs.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- <img width="500px" src="../../KubeStellar-with-Logo.png" title="KubeStellar"> -->
@@ -2415,7 +2479,7 @@
 <p>Table of contents:</p>
 <ol>
 <li><a href="#1-check-required-packages">Check Required Packages</a></li>
-<li><a href="#2-install-and-run-kcp-and-kubestellar">Install and run kcp and <strong>KubeStellar</strong></a></li>
+<li><a href="#2-install-and-run-kcp-and-kubestellar">Install and run kcp and <span class="Space-Bd-BT">KUBESTELLAR</span></a></li>
 <li><a href="#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters">Example deployment of Apache HTTP Server workload into two local kind clusters</a><ol>
 <li><a href="#a-stand-up-two-kind-clusters-florin-and-guilder">Stand up two kind clusters: florin and guilder</a></li>
 <li><a href="#b-onboarding-the-clusters">Onboarding the clusters</a></li>
@@ -2425,7 +2489,7 @@
 <li><a href="#4-teardown-the-environment">Teardown the environment</a></li>
 <li><a href="#5-next-steps">Next Steps</a></li>
 </ol>
-<p>This guide is intended to show how to (1) quickly bring up a <strong>KubeStellar</strong> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
+<p>This guide is intended to show how to (1) quickly bring up a <span class="Space-Bd-BT">KUBESTELLAR</span> environment with its dependencies from a binary release and then (2) run through a simple example usage.</p>
 <h2 id="1-check-required-packages">1. Check Required Packages<a class="headerlink" href="#1-check-required-packages" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
 
@@ -2600,7 +2664,7 @@ or this:
 <div class="tabbed-set tabbed-alternate" data-tabs="2:7"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><input id="__tabbed_2_6" name="__tabbed_2" type="radio" /><input id="__tabbed_2_7" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">General</label><label for="__tabbed_2_2">Mac</label><label for="__tabbed_2_3">Ubuntu</label><label for="__tabbed_2_4">Debian</label><label for="__tabbed_2_5">Fedora/RHEL/CentOS</label><label for="__tabbed_2_6">Windows</label><label for="__tabbed_2_7">WSL with Ubuntu</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>You will need the following tools for the example usage of KubeStellar in this quickstart example.
+<p>You will need the following tools for the example usage of <span class="Space-Bd-BT">KUBESTELLAR</span> in this quickstart example.
 Select the tab for your environment for suggested commands to install them</p>
 <ul>
 <li>
@@ -2724,7 +2788,7 @@ Insert
 </div>
 <!-- END INCLUDE -->
 
-<h2 id="2-install-and-run-kcp-and-kubestellar">2. Install and run kcp and <strong>KubeStellar</strong><a class="headerlink" href="#2-install-and-run-kcp-and-kubestellar" title="Permanent link">#</a></h2>
+<h2 id="2-install-and-run-kcp-and-kubestellar">2. Install and run kcp and <span class="Space-Bd-BT">KUBESTELLAR</span><a class="headerlink" href="#2-install-and-run-kcp-and-kubestellar" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE quickstart-subs/quickstart-1-install-and-run-kubestellar.md '&lt;!--quickstart-1-install-and-run-kubestellar-start--&gt;' '&lt;!--quickstart-1-install-and-run-kubestellar-end--&gt;' -->
 
 <p>KubeStellar works in the context of <a href="https://www.kcp.io/">kcp</a>, so to use KubeStellar you also need kcp.</p>
@@ -2775,7 +2839,7 @@ that cluster.</p>
 </code></pre></div>
 <p>The next command relies on <code>kubectl</code> already being configured to manipulate the hosting cluster, which is indeed the state that <code>kind create cluster</code> leaves it in.</p>
 <p>The following commands will (a) download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) kcp and KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for <a href="../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster">the commands about deployment into a Kubernetes cluster</a>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.9.0<span class="w"> </span>--external-endpoint<span class="w"> </span>hostname.favorite.my:<span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;ks_kind_port_num&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.9.0<span class="w"> </span>--external-endpoint<span class="w"> </span>hostname.favorite.my:1119
 <a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
 </code></pre></div>
 <p>Using your original <code>kubectl</code> configuration that manipulates the hosting cluster, check that the KubeStellar Deployment has its intended one running Pod.</p>
@@ -3078,12 +3142,12 @@ which should eventually yield:</p>
 <a id="__codelineno-89-5" name="__codelineno-89-5" href="#__codelineno-89-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-89-6" name="__codelineno-89-6" href="#__codelineno-89-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Teardown of KubeStellar depends on which style of deployment was used.</p>
+<p>Teardown of <span class="Space-Bd-BT">KUBESTELLAR</span> depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
-<p>The following command will stop whatever KubeStellar controllers are running.</p>
+<p>The following command will stop whatever <span class="Space-Bd-BT">KUBESTELLAR</span> controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
-<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
+<p>Stop and uninstall <span class="Space-Bd-BT">KUBESTELLAR</span> and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
@@ -3162,7 +3226,7 @@ and adding on some more steps for the special workload.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../readme/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Readme" rel="prev">
+          <a href="../user-quickstart-openshift/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quickstart with OpenShift" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -3171,7 +3235,7 @@ and adding on some more steps for the special workload.</p>
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                Readme
+                Quickstart with OpenShift
               </div>
             </div>
           </a>

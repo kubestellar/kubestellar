@@ -393,6 +393,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/operations/testing-doc-prs/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Contribution%20guidelines/operations/testing-doc-prs/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/Contribution%20guidelines/security/security/</loc>
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
@@ -425,6 +432,20 @@
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/user-guide/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/user-quickstart-kind/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/user-quickstart-kind/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/Getting-Started/user-quickstart-openshift/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/Getting-Started/user-quickstart-openshift/"/>
          
     </url>
     <url>
@@ -470,6 +491,27 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/brew-install/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/brew-install/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/brew-no/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/brew-no/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/brew-remove/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/brew-remove/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/check-command-syncerconfig-the-one/</loc>
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
@@ -477,10 +519,143 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/check-kubestellar-helm-deployment-running/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/check-kubestellar-helm-deployment-running/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/coming-soon/</loc>
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/coming-soon/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/create-files-and-contexts-for-kind-clusters/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/create-files-and-contexts-for-kind-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/create-files-and-contexts-for-openshift-clusters/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/create-files-and-contexts-for-openshift-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/create-ks-core-kind-cluster/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/create-ks-core-kind-cluster/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/create-ks-edge-cluster1-kind-cluster/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/create-ks-edge-cluster1-kind-cluster/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/create-ks-edge-cluster2-kind-cluster/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/create-ks-edge-cluster2-kind-cluster/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/debian-kind-docker/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/debian-kind-docker/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/delete-contexts-for-kind-and-openshift-clusters/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/delete-contexts-for-kind-and-openshift-clusters/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/deploy-your-kubestellar-core-component-kind/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/deploy-your-kubestellar-core-component-kind/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/deploy-your-kubestellar-core-component-openshift/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/deploy-your-kubestellar-core-component-openshift/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/install-helm-kind/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/install-helm-kind/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/install-helm-openshift/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/install-helm-openshift/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-apply-apache/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-apply-apache/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-apply-syncer/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-apply-syncer/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-check-syncers/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-check-syncers/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-kind-ip-error/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-kind-ip-error/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-prep-syncer/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-prep-syncer/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-show-available-spaces/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-show-available-spaces/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-test-apache/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-test-apache/"/>
          
     </url>
     <url>
@@ -509,6 +684,13 @@
          <lastmod>2023-10-25</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/save-some-time/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/tear-down-kind/</loc>
+         <lastmod>2023-10-25</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/tear-down-kind/"/>
          
     </url>
     <url>
