@@ -54,6 +54,11 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
         %}
 
         {%
+          include-markdown "../common-subs/delete-contexts-for-kind-and-openshift-clusters.md"
+          start="<!--delete-contexts-for-kind-and-openshift-clusters-start-->"
+          end="<!--delete-contexts-for-kind-and-openshift-clusters-end-->"
+        %}
+        {%
           include-markdown "../common-subs/create-files-and-contexts-for-kind-clusters.md"
           start="<!--create-files-and-contexts-for-kind-clusters-start-->"
           end="<!--create-files-and-contexts-for-kind-clusters-end-->"
@@ -204,6 +209,12 @@ how to create, but not overrite/update a synchronized resource
            include-markdown "../common-subs/brew-remove.md"
            start="<!--brew-remove-start-->"
            end="<!--brew-remove-end-->"
+         %}
+    === "uh oh, no brew?"
+         {%
+           include-markdown "../common-subs/brew-no.md"
+           start="<!--brew-no-start-->"
+           end="<!--brew-no-end-->"
          %}
 
 #### 2. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
