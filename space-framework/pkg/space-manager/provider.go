@@ -140,8 +140,8 @@ func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (str
 	}
 
 	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
-		if err != nil {
-			return "", err
+	if err != nil {
+		return "", err
 	}
 
 	return string(kubeconfigBytes), nil
