@@ -1,5 +1,11 @@
 <!--debian-kind-docker-start-->
-on Debian, the syncers on ks-edge-cluster1 and ks-edge-cluster2 will not resolve the kubestellar.core hostname until the following extra steps are followed (before step 6 in the KubeStellar User Quickstart for Kind). These steps follow from "The Cluster-wise solution" at https://stackoverflow.com/questions/37166822/is-there-a-way-to-add-arbitrary-records-to-kube-dns  
+on Debian, the syncers on ks-edge-cluster1 and ks-edge-cluster2 will not resolve the kubestellar.core hostname 
+
+You have 2 choices:  
+
+1. Use the value of `hostname -f` instead of kubestellar.core as your "EXTERNAL_HOSTNAME" in "Step 1:  Deploy the KubeStellar Core Component", or
+
+2. Just before step 6 in the KubeStellar User Quickstart for Kind do the following
 
 Add IP/domain to /etc/hosts of cluster1/cluster2 containers (replace with appropriate IP address):
  
@@ -82,4 +88,7 @@ KUBECONFIG=~/.kube/config kubectl rollout restart \
 KUBECONFIG=~/.kube/config kubectl rollout restart \
     -n kube-system deployment/coredns --context=ks-edge-cluster2
 ```
+
+__(adapted from "The Cluster-wise solution" at [https://stackoverflow.com/questions/37166822/is-there-a-way-to-add-arbitrary-records-to-kube-dns](https://stackoverflow.com/questions/37166822/is-there-a-way-to-add-arbitrary-records-to-kube-dns))__
+
 <!--debian-kind-docker-end-->
