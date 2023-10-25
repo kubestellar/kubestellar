@@ -219,13 +219,13 @@ func (p *provider) processProviderWatchEvents() {
 				err := p.createSpaceSecrets(&space, event.SpaceInfo)
 				if err != nil {
 					logger.Error(err, "Failed to create secrests for space "+p.name)
+					continue
 				}
 				space.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, metav1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't create the corresponding Space", "space name", spaceName)
 			} else {
 				logger.V(2).Info("Updating Space object", "space", event.Name)
-				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 
 				err := p.createSpaceSecrets(refspace, event.SpaceInfo)
 				if err != nil {
@@ -238,6 +238,7 @@ func (p *provider) processProviderWatchEvents() {
 					// need to restore the finalizer.
 					refspace.ObjectMeta.Finalizers = append(refspace.ObjectMeta.Finalizers, finalizerName)
 				}
+				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't update the corresponding Space status", "space name", spaceName)
 			}
