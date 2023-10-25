@@ -63,6 +63,14 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
           `error: no matching resources found`
 
         this might mean that you did not wait long enough before issuing the check command. Simply try the check command again.
+    === "Special notes for Debian users"
+        {%
+          include-markdown "../common-subs/debian-kind-docker.md"
+          start="<!--debian-kind-docker-start-->"
+          end="<!--debian-kind-docker-end-->"
+        %}
+    
+
    
 #### 1. Deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component  
 {%
