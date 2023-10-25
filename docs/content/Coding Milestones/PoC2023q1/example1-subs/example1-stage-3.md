@@ -38,11 +38,11 @@ for ii in "${mbxws[@]}"; do
     sleep 10
   done
   echo "* ReplicaSet resource exists"
-  # wait until ReplicaSet running
+  # wait until ReplicaSet in mailbox
   while [ "$(kubectl get rs -n commonstuff commond -o 'jsonpath={.status.readyReplicas}')" != 1 ]; do
     sleep 10
   done
-  echo "* commonstuff ReplicaSet running"
+  echo "* commonstuff ReplicaSet in mailbox $ii"
 done
 # check for deployment in guilder
 while ! kubectl get deploy -A &> /dev/null; do
@@ -52,7 +52,14 @@ echo "* Deployment resource exists"
 while [ "$(kubectl get deploy -n specialstuff speciald -o 'jsonpath={.status.availableReplicas}')" != 1 ]; do
   sleep 10
 done
-echo "* specialstuff Deployment running"
+echo "* specialstuff Deployment in its mailbox"
+# wait for crontab CRD to be established
+while ! kubectl get crd crontabs.stable.example.com; do sleep 10; done
+kubectl wait --for condition=Established crd crontabs.stable.example.com
+echo "* CronTab CRD is established in its mailbox"
+# wait for my-new-cron-object to be in its mailbox
+while ! kubectl get ct -n specialstuff my-new-cron-object; do sleep 10; done
+echo "* CronTab my-new-cron-object is in its mailbox"
 ```
 
 The florin cluster gets only the common workload.  Examine florin's
