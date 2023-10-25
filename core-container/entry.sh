@@ -112,11 +112,15 @@ function run_kcp() {
 
     # Create the certificates
     if [ -n "$EXTERNAL_HOSTNAME" ]; then
-        echo "Creating the TLS certificates"
+	if egrep '^([0-9]{1,3}\.){3}[0-9]{1,3}$' <<<$EXTERNAL_HOSTNAME &> /dev/null
+	then EXTERNAL_SAN="IP:$EXTERNAL_HOSTNAME"
+	else EXTERNAL_SAN="DNS:$EXTERNAL_HOSTNAME"
+	fi
+        echo "Creating the TLS certificates for SubjectAlternativeNames $EXTERNAL_SAN and DNS:${KUBESTELLAR_SERVICE}"
         # mkdir -p .kcp
         cd .kcp
-        eval pieces_external=($(kubestellar-ensure-kcp-server-creds ${EXTERNAL_HOSTNAME}))
-        eval pieces_cluster=($(kubestellar-ensure-kcp-server-creds ${KUBESTELLAR_SERVICE})) #############
+        eval pieces_external=($(kubestellar-ensure-kcp-server-creds ${EXTERNAL_SAN}))
+        eval pieces_cluster=($(kubestellar-ensure-kcp-server-creds DNS:${KUBESTELLAR_SERVICE})) #############
         cd ..
     fi
 
@@ -150,7 +154,8 @@ function run_kcp() {
     echo "kcp version: $(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
     kubectl ws root
 
-    # Generate the external.kubeconfig and cluster.kubeconfig
+    # Generate the external.kubeconfig and cluster.kubeconfig.
+    # The test for pre-existing file is broken, but fails safe.
     if [ -n "$EXTERNAL_HOSTNAME" ] && [ ! -d "${PWD}/.kcp-${EXTERNAL_HOSTNAME}" ]; then
         echo Creating external.kubeconfig...
         switch-domain .kcp/admin.kubeconfig .kcp/external.kubeconfig root ${EXTERNAL_HOSTNAME} ${EXTERNAL_PORT} ${pieces_external[0]}

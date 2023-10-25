@@ -3,9 +3,11 @@
 # Usage: $0 dns-name
 
 # This makes a TLS server certificate and private key.
-# The uses, creating if necessary, a PKI and CA at $PWD/pki.
-# The cert has one SubjectAlternativeName: a DNS form one
-# using the given domain name.
+# This uses, creating if necessary, a PKI and CA at $PWD/pki.
+# The cert has one SubjectAlternativeName, taken from the command line
+# in openssl syntax (e.g., "IP:1.2.3.4").
+# If there is no scheme part in the given name then it is assumed to be
+# a domain name and "DNS:" is implicitly added.
 # This script prints one line that parses as three bash words:
 # the first holds the absolute pathname of the CA's public cert,
 # the second holds the absolute pathname of the server cert,
@@ -13,7 +15,7 @@
 # Join the last two with a comma and give that value to the `--tls-sni-cert-key`
 # command line flag of a kcp or plain kube apiserver.
 # Also edit the dns-name and CA cert into kube client config,
-# to make that client connect to that domain name and verify
+# to make that client connect to that subject name and verify
 # the server's cert against that CA.
 
 if [ $# != 1 ]; then
@@ -25,10 +27,14 @@ set -e
 set -o pipefail
 
 this="$0"
-domain="$1"
+SAN="$1"
 
-if [ $(wc -w <<<$domain) != 1 ]; then
-    echo "$0: the given domain name must be one word" >&2
+if ! [[ "$SAN" =~ .*:.* ]]; then
+	SAN="DNS:$SAN"
+fi
+
+if [ $(wc -w <<<$SAN) != 1 ]; then
+    echo "$0: the given SubjectAlternativeName must be one word" >&2
     exit 2
 fi
 
@@ -38,12 +44,11 @@ export EASYRSA_PKI=${PWD}/pki
 
 need=true
 
-if ! domhash=$(sha256sum <<<"$domain" 2> /dev/null | awk '{ print $1 }')
-then domhash=$(shasum -a 256 <<<"$domain" | awk '{ print $1 }')
+if ! sanhash=$(sha256sum <<<"$SAN" 2> /dev/null | awk '{ print $1 }')
+then sanhash=$(shasum -a 256 <<<"$SAN" | awk '{ print $1 }')
 fi
 
-#FILE_NAME_BASE="kcp-DNS-$domain"
-FILE_NAME_BASE="kcp-server-${domhash:1:33}"
+FILE_NAME_BASE="kcp-server-${sanhash:1:33}"
 
 cacert="${PWD}/pki/ca.crt"
 svrcert="${PWD}/pki/issued/${FILE_NAME_BASE}.crt"
@@ -54,16 +59,16 @@ if [ -r "$svrcert" ] && [ -r "$svrkey" ]; then
     if oldsan=$(easyrsa show-cert $FILE_NAME_BASE |
 		    grep -A1 'X509v3 Subject Alternative Name' |
 		    tail -1 | awk '{ print $1 }'); then
-	if [ "$oldsan" == "DNS:$domain" ]
-	then echo Accepting existing credentials >&2
+		if [ "$oldsan" == "$SAN" ]
+		then echo Accepting existing credentials >&2
 	     need=false
-	else echo Rejecting existing credentials with SAN ${oldsan@Q} >&2
-	fi
+		else echo Rejecting existing credentials with SAN ${oldsan@Q} >&2
+		fi
     fi
 fi
 
 if [ "$need" == "true" ];
-then ${this%ensure-kcp-server-creds}make-kcp-server-cert "$FILE_NAME_BASE" "DNS:$domain" >&2
+then ${this%ensure-kcp-server-creds}make-kcp-server-cert "$FILE_NAME_BASE" "$SAN" >&2
 fi
 
 echo ${cacert@Q} ${svrcert@Q} ${svrkey@Q}

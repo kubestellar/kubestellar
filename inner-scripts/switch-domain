@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: $0 inpath outpath context domain port
+# Usage: $0 inpath outpath context host port cacert_file
 
 # Reads a kubeconfig file from $inpath and writes a modified
 # kubeconfig file on $outpath.
@@ -9,7 +9,7 @@
 # matched that of the cluster of the given context.
 
 if [ $# != 6 ]; then
-   echo "Usage: $0 inpath outpath context domain port cacert_file" >&2
+   echo "Usage: $0 inpath outpath context host port cacert_file" >&2
    exit 1
 fi
 
@@ -22,7 +22,7 @@ outpath="$1"
 shift
 context=$1
 shift
-domain=$1
+host=$1
 shift
 port=$1
 shift
@@ -46,7 +46,7 @@ protocol=$(cut -d: -f1 <<<$protourl)
 authpath=$(cut -d: -f2- <<<$protourl)
 authority=${protocol}:$(cut -d/ -f1-3 <<<$authpath)
 authpat="^"$(sed 's/\./\\./g' <<<$authority)
-replacement="${protocol}://${domain}:${port}"
+replacement="${protocol}://${host}:${port}"
 
 export authpat replacement cacert
 

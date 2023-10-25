@@ -16,7 +16,7 @@
 
 # Purpose: deploy the KubeStellar Helm chart
 
-# Usage: $0 (--external-endpoint $domain_name:$port | --openshift $bool | -X | kubectl_flag)*
+# Usage: $0 (--external-endpoint $host:$port | --openshift $bool | -X | kubectl_flag)*
 
 KSDIR=$(cd -- $(dirname $(realpath ${BASH_SOURCE[0]})); cd ..; pwd)
 
@@ -29,7 +29,7 @@ helm_flags=()
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar deploy (\$kubectl_flag | --external_endpoint \$domain_name:$port | --openshift \$boolean)*"
+	    echo "Usage: kubectl kubestellar deploy (\$kubectl_flag | --external_endpoint \$host:$port | --openshift \$boolean)*"
 	    exit 0;;
 	(--external-endpoint)
 	    if (( $# >1 ))

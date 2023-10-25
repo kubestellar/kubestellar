@@ -70,14 +70,15 @@ that installed too.
 
 ##### kubestellar-ensure-kcp-server-creds usage
 
-This command is given exactly one thing on the command line, a DNS
-domain name.  This command creates --- or re-uses if it finds already
-existing --- a private key and public X.509 certificate for the kcp
-server to use.  The certificate has exactly one
-SubjectAlternativeName, which is of the DNS form and specifies the
-given domain name.  For example: `kubestellar-ensure-kcp-server-creds
-foo.bar` creates a certificate with one SAN, commonly rendered as
-`DNS:foo.bar`.
+This command is given exactly one thing on the command line, a
+SubjectAlternativeName in OpenSSL syntax. For example,
+`IP:192.168.1.42` or `DNS:myhost.my.org`. In the case of a domain
+name, the `DNS:` prefix can be omitted.  This command creates --- or
+re-uses if it finds already existing --- a private key and public
+X.509 certificate for the kcp server to use.  The certificate has
+exactly one SubjectAlternativeName, the one given on the command line.
+For example: `kubestellar-ensure-kcp-server-creds foo.bar` creates a
+certificate with one SAN, commonly rendered as `DNS:foo.bar`.
 
 This command uses a Public Key Infrastructure (PKI) and Certificate
 Authority (CA) implemented by
@@ -144,7 +145,7 @@ arguments, as follows.
 1. Pathname (absolute or relative) of the input kubeconfig.
 2. Pathname (absolute or relative) of the output kubeconfig.
 3. Name of the kubeconfig "context" that identifies what to replace.
-4. Domain name to put in the replacement server URLs.
+4. Host (domain name or IP address) to put in the replacement server URLs.
 5. Port number to put in the replacement server URLs.
 6. Pathname (absolute or relative) of a file holding the CA
    certificate to put in the alternate kubeconfig file.
@@ -158,7 +159,7 @@ the cluster objects whose server URLs start with that same prefix.
 There will be the following two differences.
 
 1. In the server URL's `protocol://host:port` prefix, the host will be
-   replaced by the given domain name and the port will be replaced by
+   replaced by the given host and the port will be replaced by
    the given port.
 2. The cluster will be given a `certificate-authority-data` that holds
    the contents (base64 encoded, as usual) of the given CA certificate
@@ -308,8 +309,15 @@ default. See [QEMU configuration
 recommendations](https://www.qemu.org/docs/master/system/i386/cpu.html),
 for example.
 
-You will need a domain name that, on each of your clients, resolves to
-an IP address that gets to the Ingress controller's listening socket.
+The Ingress controller of your hosting cluster needs to be listening
+at an IP address that can be reached from all the clients that will
+try. That includes any `kubectl` commands you may use to access the
+core, and all the deployed syncer pods in their WECs.
+
+You do not have to deal directly with that IP address if you have a
+suitable domain name to use instead. This needs to be a domain name
+that, on each of your clients, resolves to an IP address that gets to
+the Ingress controller's listening socket.
 
 ### Deploy to cluster
 
@@ -325,19 +333,18 @@ appear on the command line, in any order.
   OpenShift cluster.  If so then a Route will be created to the kcp
   server; otherwise, an Ingress object will direct incoming TLS
   connections to the kcp server.  The default is `false`.
-- `--external-endpoint $domain_name:$port`, saying how the kcp server
-  will be reached from outside the cluster.  The given domain name
-  must be something that the external clients will resolve to an IP
-  address where the cluster's Ingress controller or OpenShift router
-  will be listening, and the given port must be the corresponding TCP
-  port number.  For a plain Kubernetes cluster, this must be
-  specified.  For an OpenShift cluster this may be omitted, in which
-  case the command will (a) assume that the external port number is
-  443 and (b) extract the external hostname from the Route object
-  after it is created and updated by OpenShift.  FYI, that external
-  hostname will start with a string derived from the Route in the
-  chart (currently "kubestellar-route-kubestellar") and continue with
-  "." and then the ingress domain name for the cluster.
+- `--external-endpoint $host:$port`, saying how the kcp server will be
+  reached from outside the cluster.  The given host (domain name or IP
+  address) and port must be something that all the clients can use to
+  open a TCP connection to the Ingress controller's listening port.
+  For a plain Kubernetes cluster, this must be specified.  For an
+  OpenShift cluster this may be omitted, in which case the command
+  will (a) assume that the external port number is 443 and (b) extract
+  the external hostname from the Route object after it is created and
+  updated by OpenShift.  FYI, that external hostname will start with a
+  string derived from the Route in the chart (currently
+  "kubestellar-route-kubestellar") and continue with "." and then the
+  ingress domain name for the cluster.
 - a command line flag for the `helm upgrade` command. This includes
   the usual control over namespace: you can set it on the command
   line, otherwise the namespace that is current in your kubeconfig
@@ -353,6 +360,17 @@ issue the following command.
 
 ```shell
 kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:1234
+```
+
+For another example, if the hosting cluster is a `kind` cluster with a
+port mapping that maps port 443 inside the cluster (where the Ingress
+controller is listening for HTTPS traffic) to port 1119 on the host of
+that cluster, and that host has IP address 192.168.1.42 and that
+address can be reached from all your clients, you could issue the
+following command.
+
+```shell
+kubectl kubestellar deploy --external-endpoint 192.168.1.42:1119
 ```
 
 The Helm chart takes care of setting up the KubeStellar MCCM core,
