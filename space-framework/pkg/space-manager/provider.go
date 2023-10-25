@@ -18,13 +18,15 @@ package spacemanager
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
@@ -66,7 +68,7 @@ func newProviderClient(providerDesc *spacev1alpha1apis.SpaceProviderDesc) spacep
 	case spacev1alpha1apis.KindProviderType:
 		pClient = kindprovider.New(providerDesc.Name)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(providerDesc.Name)
+		pClient = kflexprovider.New(providerDesc.Name, providerDesc.Spec.Config)
 	case spacev1alpha1apis.KcpProviderType:
 		pClient, err := providerkcp.New(providerDesc.Spec.Config)
 		if err != nil {
@@ -182,21 +184,29 @@ func (p *provider) processProviderWatchEvents() {
 				space.Name = spaceName
 				space.Spec.SpaceProviderDescName = p.name
 				space.Spec.Type = spacev1alpha1apis.SpaceTypeUnmanaged
-				space.Status.SpaceConfig = event.SpaceInfo.Config
+				err := p.createSpaceSecrets(&space, event.SpaceInfo)
+				if err != nil {
+					logger.Error(err, "Failed to create secrests for space "+p.name)
+				}
 				space.Status.Phase = spacev1alpha1apis.SpacePhaseReady
-				_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, v1.CreateOptions{})
+				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, metav1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't create the corresponding Space", "space name", spaceName)
 			} else {
 				logger.V(2).Info("Updating Space object", "space", event.Name)
 				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
-				refspace.Status.SpaceConfig = event.SpaceInfo.Config
+
+				err := p.createSpaceSecrets(refspace, event.SpaceInfo)
+				if err != nil {
+					logger.Error(err, "Failed to create secrests for space "+p.name)
+					continue
+				}
 				if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged && !containsFinalizer(refspace, finalizerName) {
 					// When a physical space is removed we remove its finalizer
 					// from the space object. when the space returns, we
 					// need to restore the finalizer.
 					refspace.ObjectMeta.Finalizers = append(refspace.ObjectMeta.Finalizers, finalizerName)
 				}
-				_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, v1.UpdateOptions{})
+				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't update the corresponding Space status", "space name", spaceName)
 			}
 
@@ -207,6 +217,7 @@ func (p *provider) processProviderWatchEvents() {
 				continue
 			}
 			if refspace.Spec.Type == spacev1alpha1apis.SpaceTypeManaged {
+				_ = p.deleteSpaceSecrets(refspace)
 				// If managed then we need to remove the finalizer.
 				f := refspace.ObjectMeta.Finalizers
 				for i := 0; i < len(refspace.ObjectMeta.Finalizers); i++ {
@@ -218,13 +229,87 @@ func (p *provider) processProviderWatchEvents() {
 			}
 			// If managed then we need to remove the finalizer.
 			refspace.Status.Phase = spacev1alpha1apis.SpacePhaseNotReady
-			_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, v1.UpdateOptions{})
+			_, err := p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
 			chkErrAndReturn(logger, err, "Space was removed, Couldn't update the Space status")
 
 		default:
 			logger.Info("unknown event type", "type", event.Type)
 		}
 	}
+}
+
+const (
+	SECRET_NS       = "default"
+	SECRET_DATA_KEY = "kubeconfig"
+)
+
+func (p *provider) deleteSpaceSecrets(space *spacev1alpha1apis.Space) error {
+	if space.Status.InClusterSecretRef != nil {
+		p.c.k8sClientset.CoreV1().Secrets(space.Status.InClusterSecretRef.Namespace).Delete(p.c.ctx, space.Status.InClusterSecretRef.Name, metav1.DeleteOptions{})
+	}
+
+	if space.Status.ExternalSecretRef != nil {
+		p.c.k8sClientset.CoreV1().Secrets(space.Status.ExternalSecretRef.Namespace).Delete(p.c.ctx, space.Status.ExternalSecretRef.Name, metav1.DeleteOptions{})
+
+	}
+	return nil
+}
+
+func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spaceprovider.SpaceInfo) error {
+
+	var secret *v1.Secret
+	var secretName string
+
+	needInClustr := space.Spec.AccessScope == spacev1alpha1apis.AccessScopeBoth ||
+		space.Spec.AccessScope == spacev1alpha1apis.AccessScopeInCluster
+
+	needExternal := space.Spec.AccessScope == spacev1alpha1apis.AccessScopeBoth ||
+		space.Spec.AccessScope == spacev1alpha1apis.AccessScopeExternal
+
+	if needInClustr {
+		if spInfo.Config[spaceprovider.INCLUSTER] != "" {
+			secretName = "incluster-" + space.Name
+			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
+			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			if err != nil {
+				return err
+			}
+			space.Status.InClusterSecretRef = &v1.SecretReference{
+				Name:      secretName,
+				Namespace: SECRET_NS,
+			}
+		}
+	}
+	if needExternal {
+		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
+			secretName = "external-" + space.Name
+			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
+			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			if err != nil {
+				return err
+			}
+			space.Status.ExternalSecretRef = &v1.SecretReference{
+				Name:      secretName,
+				Namespace: SECRET_NS,
+			}
+		}
+	}
+	return nil
+}
+
+func buildSecret(secretName string, conf string) *v1.Secret {
+
+	confData := base64.StdEncoding.EncodeToString([]byte(conf))
+	secret := &v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: secretName,
+		},
+		Data: map[string][]byte{
+			SECRET_DATA_KEY: []byte(confData),
+		},
+		Type: v1.SecretTypeOpaque,
+	}
+	return secret
 }
 
 func chkErrAndReturn(logger logr.Logger, err error, msg string, keysAndValues ...interface{}) {

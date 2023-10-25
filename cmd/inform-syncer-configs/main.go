@@ -48,8 +48,8 @@ func main() {
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 
-	espwClientOpts := clientopts.NewClientOpts("espw", "access to the edge service provider workspace")
-	espwClientOpts.AddFlags(fs)
+	parentClientOpts := clientopts.NewClientOpts("parent", "access to the parent of mailbox workspaces")
+	parentClientOpts.AddFlags(fs)
 
 	allClientOpts := clientopts.NewClientOpts("all", "access to the SyncerConfig objects in all clusters")
 	allClientOpts.SetDefaultCurrentContext("system:admin")
@@ -61,14 +61,14 @@ func main() {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	espwClientConfig, err := espwClientOpts.ToRESTConfig()
+	parentClientConfig, err := parentClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to make ESPW client config")
 		os.Exit(2)
 	}
-	espwClientConfig.UserAgent = "inform-syncer-configs"
+	parentClientConfig.UserAgent = "inform-syncer-configs"
 
-	espwClient := kcpscopedclient.NewForConfigOrDie(espwClientConfig)
+	parentClient := kcpscopedclient.NewForConfigOrDie(parentClientConfig)
 
 	allClientConfig, err := allClientOpts.ToRESTConfig()
 	if err != nil {
@@ -87,8 +87,8 @@ func main() {
 	// scGVK := scGV.WithKind(kind)
 	sclGVK := scGV.WithKind(kind + "List")
 
-	espwInformerFactory := kcpinformers.NewSharedScopedInformerFactory(espwClient, 0, "")
-	mbPreInformer := espwInformerFactory.Tenancy().V1alpha1().Workspaces()
+	parentInformerFactory := kcpinformers.NewSharedScopedInformerFactory(parentClient, 0, "")
+	mbPreInformer := parentInformerFactory.Tenancy().V1alpha1().Workspaces()
 
 	informer := mailboxwatch.NewSharedInformer[edgescopedclient.SyncerConfigInterface, *edgeapi.SyncerConfigList](ctx, sclGVK, mbPreInformer, clusterEdgeSyncfgs, &edgeapi.SyncerConfig{}, 0, upstreamcache.Indexers{})
 
@@ -97,7 +97,7 @@ func main() {
 		UpdateFunc: func(oldObj, newObj any) { log(logger, "update", newObj) },
 		DeleteFunc: func(obj any) { log(logger, "delete", obj) },
 	})
-	espwInformerFactory.Start(ctx.Done())
+	parentInformerFactory.Start(ctx.Done())
 	upstreamcache.WaitForCacheSync(ctx.Done(), mbPreInformer.Informer().HasSynced)
 	go informer.Run(ctx.Done())
 	logger.Info("Running")

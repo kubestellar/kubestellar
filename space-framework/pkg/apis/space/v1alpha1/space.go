@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -63,7 +64,22 @@ type SpaceSpec struct {
 	// A space can be created through the ClusterManager (managed), discovered (unmanaged), or imported.
 	// +kubebuilder:default=managed
 	Type SpaceType `json:"Type"`
+
+	// Access indicate whether the space is going to be accessed from within the cluster the space resides on
+	// or externally
+	// +kubebuilder:default=Both
+	// +optional
+	AccessScope AccessScopeType `json:"accessscopetype,omitempty"`
 }
+
+// +kubebuilder:validation:Enum=InCluster;External;Both
+type AccessScopeType string
+
+const (
+	AccessScopeInCluster AccessScopeType = "InCluster"
+	AccessScopeExternal  AccessScopeType = "External"
+	AccessScopeBoth      AccessScopeType = "Both"
+)
 
 // SpacePhaseType is the type of the current phase of the cluster.
 // +kubebuilder:validation:Enum=Initializing;NotReady;Ready
@@ -81,9 +97,9 @@ type SpaceStatus struct {
 	// +kubebuilder
 	Phase SpacePhaseType `json:"Phase,omitempty"`
 
-	// Cluster config from the kube config file in string format.
-	// +kubebuilder
-	SpaceConfig string `json:"ClusterConfig,omitempty"`
+	InClusterSecretRef *corev1.SecretReference `json:"inClusterSecretRef,omitempty"`
+
+	ExternalSecretRef *corev1.SecretReference `json:"externalSecretRef,omitempty"`
 }
 
 // SpaceList is the API type for a list of Space

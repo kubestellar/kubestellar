@@ -35,7 +35,7 @@ function wait_kcp_ready() {
             sleep 10
         done
     )
-    echo "Succes!"
+    echo "Success!"
     echo "Copying the admin.kubeconfig from kubestellar seret..."
     mkdir -p /home/kubestellar/.kcp
     (
@@ -57,7 +57,7 @@ function wait-kubestellar-ready() {
             sleep 10
         done
     )
-    echo "Succes!"
+    echo "Success!"
 }
 
 

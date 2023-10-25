@@ -1140,7 +1140,7 @@ func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Na
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
 		"destSP", destSP,
-		"destGVK", srcObjU.GroupVersionKind,
+		"destGVK", srcObjU.GroupVersionKind(),
 		"namespace", srcObj.GetNamespace(),
 		"name", srcObj.GetName())
 	srcObjU = wp.customizeOrCopy(logger, sourceCluster, srcObjU, destSP, true)
@@ -1169,7 +1169,7 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
 		"destSP", destSP,
-		"destGVK", srcObjU.GroupVersionKind,
+		"destGVK", srcObjU.GroupVersionKind(),
 		"namespace", srcObj.GetNamespace(),
 		"name", srcObj.GetName())
 	srcObjU = wp.customizeOrCopy(logger, sourceCluster, srcObjU, destSP, false)

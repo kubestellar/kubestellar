@@ -81,8 +81,12 @@ func (k KindClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, e
 	}
 
 	spaceInfo := clusterprovider.SpaceInfo{
-		Name:   spaceName,
-		Config: cfg,
+		Name: spaceName,
+		Config: map[string]string{
+			clusterprovider.INCLUSTER: cfg,
+			//TODO  get the incluster config
+			clusterprovider.EXTERNAL: "",
+		},
 	}
 	return spaceInfo, err
 }
@@ -103,8 +107,12 @@ func (k KindClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) {
 		}
 
 		spaceInfoList = append(spaceInfoList, clusterprovider.SpaceInfo{
-			Name:   spaceName,
-			Config: cfg,
+			Name: spaceName,
+			Config: map[string]string{
+				clusterprovider.INCLUSTER: cfg,
+				//TODO  get the incluster config
+				clusterprovider.EXTERNAL: "",
+			},
 		})
 	}
 
