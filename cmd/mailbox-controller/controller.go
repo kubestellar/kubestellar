@@ -29,10 +29,7 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	apisclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/apis/v1alpha1"
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
@@ -40,7 +37,6 @@ import (
 
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
-	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
 
 const wsNameSep = "-mb-"
@@ -53,16 +49,14 @@ const mbwsNameIndexKey = "mbwsName"
 const SyncTargetNameAnnotationKey = "edge.kubestellar.io/sync-target-name"
 
 type mbCtl struct {
-	context                    context.Context
-	espwPath                   string
-	syncTargetClusterInformer  kcpcache.ScopeableSharedIndexInformer
-	syncTargetClusterLister    edgev2alpha1listers.SyncTargetClusterLister
-	syncTargetIndexer          cache.Indexer
-	workspaceScopedInformer    cache.SharedIndexInformer
-	workspaceScopedLister      tenancylisters.WorkspaceLister
-	workspaceScopedClient      tenancyclient.WorkspaceInterface
-	apiBindingClusterInterface apisclient.APIBindingClusterInterface
-	queue                      workqueue.RateLimitingInterface // of mailbox workspace Name
+	context                 context.Context
+	espwPath                string
+	syncTargetInformer      cache.SharedIndexInformer
+	syncTargetIndexer       cache.Indexer
+	workspaceScopedInformer cache.SharedIndexInformer
+	workspaceScopedLister   tenancylisters.WorkspaceLister
+	workspaceScopedClient   tenancyclient.WorkspaceInterface
+	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
 // newMailboxController constructs a new mailbox controller.
@@ -70,29 +64,26 @@ type mbCtl struct {
 // SyncTarget objects (not limited to one cluster).
 func newMailboxController(ctx context.Context,
 	espwPath string,
-	syncTargetClusterPreInformer edgev2alpha1informers.SyncTargetClusterInformer,
+	syncTargetPreInformer edgev2alpha1informers.SyncTargetInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
 	workspaceScopedClient tenancyclient.WorkspaceInterface,
-	apiBindingClusterInterface apisclient.APIBindingClusterInterface,
 ) *mbCtl {
-	syncTargetClusterInformer := syncTargetClusterPreInformer.Informer()
-	syncTargetClusterInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: mbwsNameOfObj})
+	syncTargetInformer := syncTargetPreInformer.Informer()
+	syncTargetInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: mbwsNameOfObj})
 	workspacesInformer := workspaceScopedPreInformer.Informer()
 
 	ctl := &mbCtl{
-		context:                    ctx,
-		espwPath:                   espwPath,
-		syncTargetClusterInformer:  syncTargetClusterInformer,
-		syncTargetClusterLister:    syncTargetClusterPreInformer.Lister(),
-		syncTargetIndexer:          syncTargetClusterInformer.GetIndexer(),
-		workspaceScopedInformer:    workspacesInformer,
-		workspaceScopedLister:      workspaceScopedPreInformer.Lister(),
-		workspaceScopedClient:      workspaceScopedClient,
-		apiBindingClusterInterface: apiBindingClusterInterface,
-		queue:                      workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
+		context:                 ctx,
+		espwPath:                espwPath,
+		syncTargetInformer:      syncTargetInformer,
+		syncTargetIndexer:       syncTargetInformer.GetIndexer(),
+		workspaceScopedInformer: workspacesInformer,
+		workspaceScopedLister:   workspaceScopedPreInformer.Lister(),
+		workspaceScopedClient:   workspaceScopedClient,
+		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
 
-	syncTargetClusterInformer.AddEventHandler(ctl)
+	syncTargetInformer.AddEventHandler(ctl)
 	workspacesInformer.AddEventHandler(ctl)
 	return ctl
 }
@@ -104,7 +95,7 @@ func (ctl *mbCtl) Run(concurrency int) {
 	ctx := ctl.context
 	logger := klog.FromContext(ctx)
 	doneCh := ctx.Done()
-	if !cache.WaitForNamedCacheSync("mailbox-controller", doneCh, ctl.syncTargetClusterInformer.HasSynced, ctl.workspaceScopedInformer.HasSynced) {
+	if !cache.WaitForNamedCacheSync("mailbox-controller", doneCh, ctl.syncTargetInformer.HasSynced, ctl.workspaceScopedInformer.HasSynced) {
 		logger.Error(nil, "Informer syncs not achieved")
 		return
 	}
@@ -253,51 +244,22 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "mbwsName", mbwsName)
 		return true
 	}
-	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, now check on the APIBinding to edge", "mbwsName", mbwsName)
-	return ctl.ensureEdgeBinding(ctx, workspace)
+	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, now check on the binding to edge", "mbwsName", mbwsName)
+	return ctl.ensureBinding(ctx, workspace)
 
 }
 
-const TheEdgeBindingName = "bind-edge"
-const TheEdgeExportName = "edge.kubestellar.io"
+func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
+	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
 
-func (ctl *mbCtl) ensureEdgeBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
-	logger := klog.FromContext(ctx).WithValues("mbwsName", workspace.Name)
-	mbwsCluster := logicalcluster.Name(workspace.Spec.Cluster)
-	if mbwsCluster == "" {
-		logger.V(2).Info("Mailbox workspace does not have a Spec.Cluster yet")
-		return true
-	}
-	logger = logger.WithValues("mbwsCluster", mbwsCluster, "bindingName", TheEdgeBindingName)
-	scopedAPIBindingIfc := ctl.apiBindingClusterInterface.Cluster(mbwsCluster.Path())
-	theBinding, err := scopedAPIBindingIfc.Get(ctx, TheEdgeBindingName, metav1.GetOptions{})
-	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Failed to read APIBinding")
-		return true
-	}
-	if err == nil {
-		logger.V(4).Info("Found existing APIBinding, not checking spec", "spec", theBinding.Spec)
-		return false
-	}
-	binding := &apisv1alpha1.APIBinding{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: TheEdgeBindingName,
-		},
-		Spec: apisv1alpha1.APIBindingSpec{
-			Reference: apisv1alpha1.BindingReference{
-				Export: &apisv1alpha1.ExportBindingReference{
-					Path: ctl.espwPath,
-					Name: TheEdgeExportName,
-				},
-			},
-		},
-	}
-	binding2, err := scopedAPIBindingIfc.Create(ctx, binding, metav1.CreateOptions{FieldManager: "TODO"})
-	if err != nil {
-		logger.Error(err, "Failed to create APIBinding", "binding", binding)
-		return true
-	}
-	logger.V(2).Info("Created APIBinding", "resourceVersion", binding2.ResourceVersion)
+	// TODO verify binding is already in place.
+	// ISSUE kube-bind objects(apiservicebindings) does not have clusterclientset like in KCP. Maybe dynamicClusterClient can help.
+
+	// TODO bind all resources. Note: running in pod, need to access the dex
+
+	// TODO get kube-bind NS from the output and update the Space object(label/annotation). For phase1 just log the NS
+
+	logger.V(2).Info("binding created")
 	return false
 }
 
