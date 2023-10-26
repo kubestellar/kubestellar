@@ -4455,57 +4455,69 @@ using the mailbox workspace name that you stored in Stage 1.</p>
 <a id="__codelineno-126-11" name="__codelineno-126-11" href="#__codelineno-126-11"></a>spec:
 <a id="__codelineno-126-12" name="__codelineno-126-12" href="#__codelineno-126-12"></a><span class="w">  </span>clusterScope:
 <a id="__codelineno-126-13" name="__codelineno-126-13" href="#__codelineno-126-13"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-14" name="__codelineno-126-14" href="#__codelineno-126-14"></a><span class="w">    </span>group:<span class="w"> </span>apiregistration.k8s.io
+<a id="__codelineno-126-14" name="__codelineno-126-14" href="#__codelineno-126-14"></a><span class="w">    </span>group:<span class="w"> </span>apiextensions.k8s.io
 <a id="__codelineno-126-15" name="__codelineno-126-15" href="#__codelineno-126-15"></a><span class="w">    </span>objects:
-<a id="__codelineno-126-16" name="__codelineno-126-16" href="#__codelineno-126-16"></a><span class="w">    </span>-<span class="w"> </span>v1090.example.my
-<a id="__codelineno-126-17" name="__codelineno-126-17" href="#__codelineno-126-17"></a><span class="w">    </span>resource:<span class="w"> </span>apiservices
-<a id="__codelineno-126-18" name="__codelineno-126-18" href="#__codelineno-126-18"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
-<a id="__codelineno-126-19" name="__codelineno-126-19" href="#__codelineno-126-19"></a><span class="w">  </span>namespacedObjects:
-<a id="__codelineno-126-20" name="__codelineno-126-20" href="#__codelineno-126-20"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-21" name="__codelineno-126-21" href="#__codelineno-126-21"></a><span class="w">    </span>group:<span class="w"> </span>apps
-<a id="__codelineno-126-22" name="__codelineno-126-22" href="#__codelineno-126-22"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-23" name="__codelineno-126-23" href="#__codelineno-126-23"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-24" name="__codelineno-126-24" href="#__codelineno-126-24"></a><span class="w">      </span>-<span class="w"> </span>commond
-<a id="__codelineno-126-25" name="__codelineno-126-25" href="#__codelineno-126-25"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-126-26" name="__codelineno-126-26" href="#__codelineno-126-26"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
-<a id="__codelineno-126-27" name="__codelineno-126-27" href="#__codelineno-126-27"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-28" name="__codelineno-126-28" href="#__codelineno-126-28"></a><span class="w">    </span>group:<span class="w"> </span>apps
-<a id="__codelineno-126-29" name="__codelineno-126-29" href="#__codelineno-126-29"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-30" name="__codelineno-126-30" href="#__codelineno-126-30"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-31" name="__codelineno-126-31" href="#__codelineno-126-31"></a><span class="w">      </span>-<span class="w"> </span>speciald
-<a id="__codelineno-126-32" name="__codelineno-126-32" href="#__codelineno-126-32"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
-<a id="__codelineno-126-33" name="__codelineno-126-33" href="#__codelineno-126-33"></a><span class="w">    </span>resource:<span class="w"> </span>deployments
-<a id="__codelineno-126-34" name="__codelineno-126-34" href="#__codelineno-126-34"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-35" name="__codelineno-126-35" href="#__codelineno-126-35"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-126-36" name="__codelineno-126-36" href="#__codelineno-126-36"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-37" name="__codelineno-126-37" href="#__codelineno-126-37"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-38" name="__codelineno-126-38" href="#__codelineno-126-38"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
-<a id="__codelineno-126-39" name="__codelineno-126-39" href="#__codelineno-126-39"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-126-40" name="__codelineno-126-40" href="#__codelineno-126-40"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-41" name="__codelineno-126-41" href="#__codelineno-126-41"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
-<a id="__codelineno-126-42" name="__codelineno-126-42" href="#__codelineno-126-42"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
-<a id="__codelineno-126-43" name="__codelineno-126-43" href="#__codelineno-126-43"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
-<a id="__codelineno-126-44" name="__codelineno-126-44" href="#__codelineno-126-44"></a><span class="w">  </span>upsync:
-<a id="__codelineno-126-45" name="__codelineno-126-45" href="#__codelineno-126-45"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
-<a id="__codelineno-126-46" name="__codelineno-126-46" href="#__codelineno-126-46"></a><span class="w">    </span>names:
-<a id="__codelineno-126-47" name="__codelineno-126-47" href="#__codelineno-126-47"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
-<a id="__codelineno-126-48" name="__codelineno-126-48" href="#__codelineno-126-48"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-49" name="__codelineno-126-49" href="#__codelineno-126-49"></a><span class="w">    </span>-<span class="w"> </span>widgets
-<a id="__codelineno-126-50" name="__codelineno-126-50" href="#__codelineno-126-50"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
-<a id="__codelineno-126-51" name="__codelineno-126-51" href="#__codelineno-126-51"></a><span class="w">    </span>names:
-<a id="__codelineno-126-52" name="__codelineno-126-52" href="#__codelineno-126-52"></a><span class="w">    </span>-<span class="w"> </span>george
-<a id="__codelineno-126-53" name="__codelineno-126-53" href="#__codelineno-126-53"></a><span class="w">    </span>-<span class="w"> </span>cosmo
-<a id="__codelineno-126-54" name="__codelineno-126-54" href="#__codelineno-126-54"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-126-55" name="__codelineno-126-55" href="#__codelineno-126-55"></a><span class="w">    </span>-<span class="w"> </span>orbital
-<a id="__codelineno-126-56" name="__codelineno-126-56" href="#__codelineno-126-56"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-57" name="__codelineno-126-57" href="#__codelineno-126-57"></a><span class="w">    </span>-<span class="w"> </span>sprockets
-<a id="__codelineno-126-58" name="__codelineno-126-58" href="#__codelineno-126-58"></a><span class="w">    </span>-<span class="w"> </span>flanges
-<a id="__codelineno-126-59" name="__codelineno-126-59" href="#__codelineno-126-59"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
-<a id="__codelineno-126-60" name="__codelineno-126-60" href="#__codelineno-126-60"></a><span class="w">    </span>names:
-<a id="__codelineno-126-61" name="__codelineno-126-61" href="#__codelineno-126-61"></a><span class="w">    </span>-<span class="w"> </span>william
-<a id="__codelineno-126-62" name="__codelineno-126-62" href="#__codelineno-126-62"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-63" name="__codelineno-126-63" href="#__codelineno-126-63"></a><span class="w">    </span>-<span class="w"> </span>cogs
-<a id="__codelineno-126-64" name="__codelineno-126-64" href="#__codelineno-126-64"></a>status:<span class="w"> </span><span class="o">{}</span>
+<a id="__codelineno-126-16" name="__codelineno-126-16" href="#__codelineno-126-16"></a><span class="w">    </span>-<span class="w"> </span>crontabs.stable.example.com
+<a id="__codelineno-126-17" name="__codelineno-126-17" href="#__codelineno-126-17"></a><span class="w">    </span>resource:<span class="w"> </span>customresourcedefinitions
+<a id="__codelineno-126-18" name="__codelineno-126-18" href="#__codelineno-126-18"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-126-19" name="__codelineno-126-19" href="#__codelineno-126-19"></a><span class="w">    </span>group:<span class="w"> </span>apiregistration.k8s.io
+<a id="__codelineno-126-20" name="__codelineno-126-20" href="#__codelineno-126-20"></a><span class="w">    </span>objects:
+<a id="__codelineno-126-21" name="__codelineno-126-21" href="#__codelineno-126-21"></a><span class="w">    </span>-<span class="w"> </span>v1090.example.my
+<a id="__codelineno-126-22" name="__codelineno-126-22" href="#__codelineno-126-22"></a><span class="w">    </span>resource:<span class="w"> </span>apiservices
+<a id="__codelineno-126-23" name="__codelineno-126-23" href="#__codelineno-126-23"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
+<a id="__codelineno-126-24" name="__codelineno-126-24" href="#__codelineno-126-24"></a><span class="w">  </span>namespacedObjects:
+<a id="__codelineno-126-25" name="__codelineno-126-25" href="#__codelineno-126-25"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-126-26" name="__codelineno-126-26" href="#__codelineno-126-26"></a><span class="w">    </span>group:<span class="w"> </span>apps
+<a id="__codelineno-126-27" name="__codelineno-126-27" href="#__codelineno-126-27"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-126-28" name="__codelineno-126-28" href="#__codelineno-126-28"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-126-29" name="__codelineno-126-29" href="#__codelineno-126-29"></a><span class="w">      </span>-<span class="w"> </span>commond
+<a id="__codelineno-126-30" name="__codelineno-126-30" href="#__codelineno-126-30"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-126-31" name="__codelineno-126-31" href="#__codelineno-126-31"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
+<a id="__codelineno-126-32" name="__codelineno-126-32" href="#__codelineno-126-32"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-126-33" name="__codelineno-126-33" href="#__codelineno-126-33"></a><span class="w">    </span>group:<span class="w"> </span>stable.example.com
+<a id="__codelineno-126-34" name="__codelineno-126-34" href="#__codelineno-126-34"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-126-35" name="__codelineno-126-35" href="#__codelineno-126-35"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-126-36" name="__codelineno-126-36" href="#__codelineno-126-36"></a><span class="w">      </span>-<span class="w"> </span>my-new-cron-object
+<a id="__codelineno-126-37" name="__codelineno-126-37" href="#__codelineno-126-37"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-126-38" name="__codelineno-126-38" href="#__codelineno-126-38"></a><span class="w">    </span>resource:<span class="w"> </span>crontabs
+<a id="__codelineno-126-39" name="__codelineno-126-39" href="#__codelineno-126-39"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-126-40" name="__codelineno-126-40" href="#__codelineno-126-40"></a><span class="w">    </span>group:<span class="w"> </span>apps
+<a id="__codelineno-126-41" name="__codelineno-126-41" href="#__codelineno-126-41"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-126-42" name="__codelineno-126-42" href="#__codelineno-126-42"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-126-43" name="__codelineno-126-43" href="#__codelineno-126-43"></a><span class="w">      </span>-<span class="w"> </span>speciald
+<a id="__codelineno-126-44" name="__codelineno-126-44" href="#__codelineno-126-44"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-126-45" name="__codelineno-126-45" href="#__codelineno-126-45"></a><span class="w">    </span>resource:<span class="w"> </span>deployments
+<a id="__codelineno-126-46" name="__codelineno-126-46" href="#__codelineno-126-46"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-126-47" name="__codelineno-126-47" href="#__codelineno-126-47"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-126-48" name="__codelineno-126-48" href="#__codelineno-126-48"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-126-49" name="__codelineno-126-49" href="#__codelineno-126-49"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-126-50" name="__codelineno-126-50" href="#__codelineno-126-50"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
+<a id="__codelineno-126-51" name="__codelineno-126-51" href="#__codelineno-126-51"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-126-52" name="__codelineno-126-52" href="#__codelineno-126-52"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-126-53" name="__codelineno-126-53" href="#__codelineno-126-53"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
+<a id="__codelineno-126-54" name="__codelineno-126-54" href="#__codelineno-126-54"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-126-55" name="__codelineno-126-55" href="#__codelineno-126-55"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
+<a id="__codelineno-126-56" name="__codelineno-126-56" href="#__codelineno-126-56"></a><span class="w">  </span>upsync:
+<a id="__codelineno-126-57" name="__codelineno-126-57" href="#__codelineno-126-57"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
+<a id="__codelineno-126-58" name="__codelineno-126-58" href="#__codelineno-126-58"></a><span class="w">    </span>names:
+<a id="__codelineno-126-59" name="__codelineno-126-59" href="#__codelineno-126-59"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
+<a id="__codelineno-126-60" name="__codelineno-126-60" href="#__codelineno-126-60"></a><span class="w">    </span>resources:
+<a id="__codelineno-126-61" name="__codelineno-126-61" href="#__codelineno-126-61"></a><span class="w">    </span>-<span class="w"> </span>widgets
+<a id="__codelineno-126-62" name="__codelineno-126-62" href="#__codelineno-126-62"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
+<a id="__codelineno-126-63" name="__codelineno-126-63" href="#__codelineno-126-63"></a><span class="w">    </span>names:
+<a id="__codelineno-126-64" name="__codelineno-126-64" href="#__codelineno-126-64"></a><span class="w">    </span>-<span class="w"> </span>george
+<a id="__codelineno-126-65" name="__codelineno-126-65" href="#__codelineno-126-65"></a><span class="w">    </span>-<span class="w"> </span>cosmo
+<a id="__codelineno-126-66" name="__codelineno-126-66" href="#__codelineno-126-66"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-126-67" name="__codelineno-126-67" href="#__codelineno-126-67"></a><span class="w">    </span>-<span class="w"> </span>orbital
+<a id="__codelineno-126-68" name="__codelineno-126-68" href="#__codelineno-126-68"></a><span class="w">    </span>resources:
+<a id="__codelineno-126-69" name="__codelineno-126-69" href="#__codelineno-126-69"></a><span class="w">    </span>-<span class="w"> </span>sprockets
+<a id="__codelineno-126-70" name="__codelineno-126-70" href="#__codelineno-126-70"></a><span class="w">    </span>-<span class="w"> </span>flanges
+<a id="__codelineno-126-71" name="__codelineno-126-71" href="#__codelineno-126-71"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
+<a id="__codelineno-126-72" name="__codelineno-126-72" href="#__codelineno-126-72"></a><span class="w">    </span>names:
+<a id="__codelineno-126-73" name="__codelineno-126-73" href="#__codelineno-126-73"></a><span class="w">    </span>-<span class="w"> </span>william
+<a id="__codelineno-126-74" name="__codelineno-126-74" href="#__codelineno-126-74"></a><span class="w">    </span>resources:
+<a id="__codelineno-126-75" name="__codelineno-126-75" href="#__codelineno-126-75"></a><span class="w">    </span>-<span class="w"> </span>cogs
+<a id="__codelineno-126-76" name="__codelineno-126-76" href="#__codelineno-126-76"></a>status:<span class="w"> </span><span class="o">{}</span>
 </code></pre></div></p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,replicasets<span class="w"> </span>-A
 </code></pre></div>
