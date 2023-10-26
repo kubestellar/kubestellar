@@ -148,7 +148,7 @@ func (k *KcpClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, e
 		Config: map[string]string{
 			clusterprovider.INCLUSTER: string(cfgBytes[:]),
 			//TODO  get the incluster config
-			clusterprovider.EXTERNAL: "",
+			clusterprovider.EXTERNAL: string(cfgBytes[:]),
 		},
 	}
 	return spaceInfo, err
