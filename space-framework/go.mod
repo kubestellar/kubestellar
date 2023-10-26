@@ -74,7 +74,4 @@ require (
 )
 
 // replace directive is aligned with kcp v0.11.0 (https://github.com/kcp-dev/kcp/blob/v0.11.0/go.mod)
-replace (
-	github.com/google/cel-go => github.com/google/cel-go v0.12.6
-	github.com/kubestellar/kubestellar/space-framework/space-provider/kcp => ./space-provider/kcp
-)
+replace github.com/google/cel-go => github.com/google/cel-go v0.12.6
