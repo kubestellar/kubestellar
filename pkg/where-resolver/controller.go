@@ -59,26 +59,26 @@ type controller struct {
 
 	edgeClusterClient edgeclientset.ClusterInterface
 
-	singlePlacementSliceLister  edgev2alpha1listers.SinglePlacementSliceClusterLister
+	singlePlacementSliceLister  edgev2alpha1listers.SinglePlacementSliceLister
 	singlePlacementSliceIndexer cache.Indexer
 
-	edgePlacementLister  edgev2alpha1listers.EdgePlacementClusterLister
+	edgePlacementLister  edgev2alpha1listers.EdgePlacementLister
 	edgePlacementIndexer cache.Indexer
 
-	locationLister  edgev2alpha1listers.LocationClusterLister
+	locationLister  edgev2alpha1listers.LocationLister
 	locationIndexer cache.Indexer
 
-	synctargetLister  edgev2alpha1listers.SyncTargetClusterLister
+	synctargetLister  edgev2alpha1listers.SyncTargetLister
 	synctargetIndexer cache.Indexer
 }
 
 func NewController(
 	context context.Context,
 	edgeClusterClient edgeclientset.ClusterInterface,
-	edgePlacementAccess edgev2alpha1informers.EdgePlacementClusterInformer,
-	singlePlacementSliceAccess edgev2alpha1informers.SinglePlacementSliceClusterInformer,
-	locationAccess edgev2alpha1informers.LocationClusterInformer,
-	syncTargetAccess edgev2alpha1informers.SyncTargetClusterInformer,
+	edgePlacementAccess edgev2alpha1informers.EdgePlacementInformer,
+	singlePlacementSliceAccess edgev2alpha1informers.SinglePlacementSliceInformer,
+	locationAccess edgev2alpha1informers.LocationInformer,
+	syncTargetAccess edgev2alpha1informers.SyncTargetInformer,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
