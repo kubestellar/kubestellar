@@ -119,9 +119,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-openshift.md"
+           start="<!--kubestellar-test-apache-openshift-start-->"
+           end="<!--kubestellar-test-apache-openshift-end-->"
          %}
     === "uh oh, error?"
          {%
@@ -199,9 +199,9 @@ how to create, but not overrite/update a synchronized resource
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-openshift.md"
+           start="<!--kubestellar-test-apache-openshift-start-->"
+           end="<!--kubestellar-test-apache-openshift-end-->"
          %}
     === "uh oh, error?"
          {%

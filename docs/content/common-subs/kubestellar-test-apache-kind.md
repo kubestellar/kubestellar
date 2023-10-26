@@ -1,4 +1,4 @@
-<!--kubestellar-test-apache-start-->
+<!--kubestellar-test-apache-kind-start-->
 Now, let's check that the deployment was created in the kind **ks-edge-cluster1** cluster (it may take up to 30 seconds to appear):
 ```shell
 KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 get deployments -A
@@ -59,4 +59,4 @@ you should see the output:
   </body>
 </html>
 ```
-<!--kubestellar-test-apache-end-->
+<!--kubestellar-test-apache-kind-end-->
