@@ -9,6 +9,7 @@ on:
   pull_request:
     branches:
       - "release-*"
+      - "main"
     paths:
       - "docs/content/Getting-Started/user-quickstart-kind.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
@@ -18,6 +19,7 @@ on:
   push:
     branches:
       - "release-*"
+      - "main"
     paths:
       - "docs/content/Getting-Started/user-quickstart-kind.md"
       - "docs/content/Getting-Started/quickstart-subs/**"
