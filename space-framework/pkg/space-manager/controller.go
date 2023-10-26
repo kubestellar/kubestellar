@@ -178,10 +178,10 @@ func (c *controller) process(item queueItem) error {
 	trigger, key := item.triggeringKind, item.key
 	var err error
 	switch trigger {
-	case triggeringKindSpace:
-		err = c.reconcileSpace(key)
 	case triggeringKindSpaceProviderDesc:
 		err = c.reconcileSpaceProviderDesc(key)
+	case triggeringKindSpace:
+		err = c.reconcileSpace(key)
 	}
 	return err
 }

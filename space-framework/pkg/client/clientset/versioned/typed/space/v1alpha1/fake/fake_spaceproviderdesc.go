@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeSpaceProviderDescs struct {
 	Fake *FakeSpaceV1alpha1
 }
 
-var spaceproviderdescsResource = schema.GroupVersionResource{Group: "space.kubestellar.io", Version: "v1alpha1", Resource: "spaceproviderdescs"}
+var spaceproviderdescsResource = v1alpha1.SchemeGroupVersion.WithResource("spaceproviderdescs")
 
-var spaceproviderdescsKind = schema.GroupVersionKind{Group: "space.kubestellar.io", Version: "v1alpha1", Kind: "SpaceProviderDesc"}
+var spaceproviderdescsKind = v1alpha1.SchemeGroupVersion.WithKind("SpaceProviderDesc")
 
 // Get takes name of the spaceProviderDesc, and returns the corresponding spaceProviderDesc object, and an error if there is any.
 func (c *FakeSpaceProviderDescs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.SpaceProviderDesc, err error) {

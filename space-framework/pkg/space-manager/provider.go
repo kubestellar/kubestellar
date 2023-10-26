@@ -26,20 +26,25 @@ import (
 	"github.com/go-logr/logr"
 
 	v1 "k8s.io/api/core/v1"
+	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
+	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
-	providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kind"
 	kflexprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kubeflex"
+	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName
-const prefixNamespace = "spaceprovider-"
+const (
+	prefixNamespace     = "spaceprovider-"
+	PROVIDER_CONFIG_KEY = "kubeconfig"
+)
 
 func ProviderNS(name string) string {
 	return prefixNamespace + name
@@ -62,15 +67,16 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(providerDesc *spacev1alpha1apis.SpaceProviderDesc) spaceprovider.ProviderClient {
+func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string) spaceprovider.ProviderClient {
 	var pClient spaceprovider.ProviderClient = nil
-	switch providerDesc.Spec.ProviderType {
+	switch pType {
 	case spacev1alpha1apis.KindProviderType:
-		pClient = kindprovider.New(providerDesc.Name)
+		pClient = kindprovider.New(config)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(providerDesc.Name, providerDesc.Spec.Config)
+		pClient = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err := providerkcp.New(providerDesc.Spec.Config)
+		//		pClient, err := providerkcp.New(config)
+		err := errors.New("not implemented")
 		if err != nil {
 			runtime.HandleError(err)
 			return nil
@@ -93,7 +99,12 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
-	newProviderClient := newProviderClient(providerDesc)
+	configStr, err := getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
+	if err != nil {
+		return nil, err
+	}
+
+	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStr)
 	if newProviderClient == nil {
 		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
 	}
@@ -113,6 +124,33 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 
 	c.providers[providerName] = p
 	return p, nil
+}
+
+func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (string, error) {
+
+	ctx := context.Background()
+	logger := klog.FromContext(ctx)
+
+	var kubeconfigBytes []byte
+	secret, err := cs.CoreV1().Secrets(sRef.Namespace).Get(ctx, sRef.Name, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	// Retrieve the kubeconfig data from the Secret
+	kubeconfigData, found := secret.Data[PROVIDER_CONFIG_KEY]
+	if !found {
+		return "", errors.New("secret doesn't have kubeconfig data")
+	}
+
+	kubeconfigBytes, err = base64.StdEncoding.DecodeString(string(kubeconfigData))
+	if err != nil {
+		//We assume this happen because the data was not encoded pring message and get the string
+		kubeconfigBytes = kubeconfigData
+		logger.Info("Provider secret was not encoded", "Secret", sRef.Name)
+	}
+
+	return string(kubeconfigBytes), nil
 }
 
 func (p *provider) filterOut(spaceName string) bool {
@@ -187,13 +225,13 @@ func (p *provider) processProviderWatchEvents() {
 				err := p.createSpaceSecrets(&space, event.SpaceInfo)
 				if err != nil {
 					logger.Error(err, "Failed to create secrests for space "+p.name)
+					continue
 				}
 				space.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Create(ctx, &space, metav1.CreateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't create the corresponding Space", "space name", spaceName)
 			} else {
 				logger.V(2).Info("Updating Space object", "space", event.Name)
-				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 
 				err := p.createSpaceSecrets(refspace, event.SpaceInfo)
 				if err != nil {
@@ -206,6 +244,7 @@ func (p *provider) processProviderWatchEvents() {
 					// need to restore the finalizer.
 					refspace.ObjectMeta.Finalizers = append(refspace.ObjectMeta.Finalizers, finalizerName)
 				}
+				refspace.Status.Phase = spacev1alpha1apis.SpacePhaseReady
 				_, err = p.c.clientset.SpaceV1alpha1().Spaces(p.nameSpace).Update(ctx, refspace, metav1.UpdateOptions{})
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't update the corresponding Space status", "space name", spaceName)
 			}
@@ -272,28 +311,49 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
+				if k8sapierrors.IsAlreadyExists(err) {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				return err
 			}
+
 			space.Status.InClusterSecretRef = &v1.SecretReference{
 				Name:      secretName,
 				Namespace: SECRET_NS,
 			}
+		} else {
+			return errors.New("missing needed in-cluster secret for space")
 		}
 	}
+
 	if needExternal {
 		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
 			secretName = "external-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
+				if k8sapierrors.IsAlreadyExists(err) {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				return err
 			}
 			space.Status.ExternalSecretRef = &v1.SecretReference{
 				Name:      secretName,
 				Namespace: SECRET_NS,
 			}
+		} else {
+			return errors.New("missing needed external secret for space")
 		}
 	}
+
 	return nil
 }
 

@@ -17,108 +17,176 @@ limitations under the License.
 package kflexprovider
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
-	"os"
-	"os/exec"
-	"strings"
 	"sync"
 	"time"
 
-	corev1 "k8s.io/api/core/v1"
+	"github.com/go-logr/logr"
+	kfcp "github.com/kubestellar/kubeflex/api/v1alpha1"
+
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 
 	clusterprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
 )
 
+const (
+	CPGroup    = "tenancy.kflex.kubestellar.org"
+	CPVersion  = "v1alpha1"
+	CPKind     = "ControlPlane"
+	CPResource = "controlplanes"
+)
+
 // KflexClusterProvider is a kubeflex cluster provider
 type KflexClusterProvider struct {
-	providerName string
-	pConfig      string
-	watch        clusterprovider.Watcher
+	logger     logr.Logger
+	ctx        context.Context
+	pConfig    string
+	dClient    dynamic.Interface
+	kubeClient *kubernetes.Clientset
+	watch      clusterprovider.Watcher
 }
 
 // New creates a new KflexClusterProvider
-func New(providerName string, pConfig string) KflexClusterProvider {
+func New(pConfig string) KflexClusterProvider {
+
+	ctx := context.Background()
+	logger := klog.FromContext(ctx)
+
+	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(pConfig))
+	if err != nil {
+		logger.Error(err, "Error loading kubeconfig")
+		return KflexClusterProvider{}
+	}
+
+	dClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "Failed to create dynamic clientset")
+		return KflexClusterProvider{}
+	}
+
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "Failed to create kube clientset")
+		return KflexClusterProvider{}
+	}
+
 	return KflexClusterProvider{
-		providerName: providerName,
-		pConfig:      pConfig,
+		pConfig:    pConfig,
+		dClient:    dClient,
+		kubeClient: kubeClient,
+		logger:     logger,
+		ctx:        ctx,
 	}
 }
 
-// TODO: switch from CLI to getting this info via kube directives
 func (k KflexClusterProvider) Create(name string, opts clusterprovider.Options) error {
-	logger := klog.Background()
-	logger.V(2).Info("Creating KubeFlex cluster", "name", name)
-	cmd := exec.Command("kflex", "create", name)
-	err := cmd.Run()
 
+	cpGVR := schema.GroupVersionResource{
+		Group:    CPGroup,
+		Version:  CPVersion,
+		Resource: CPResource,
+	}
+
+	crUnstruct := &unstructured.Unstructured{Object: map[string]interface{}{
+		"apiVersion": CPGroup + "/" + CPVersion,
+		"kind":       CPKind,
+		"metadata": map[string]interface{}{
+			"name": name,
+		},
+		"spec": map[string]interface{}{
+			"backend": "shared",
+			"type":    "k8s",
+		},
+	}}
+
+	_, err := k.dClient.Resource(cpGVR).Create(k.ctx, crUnstruct, v1.CreateOptions{})
 	if err != nil {
 		// TODO:  Need to differentiate between "already exists" and an error
-		logger.Error(err, "Failed to create cluster", "name", name)
+		k.logger.Error(err, "Failed to create cluster", "name", name)
 	}
 
 	return err
 }
 
-// TODO: switch from CLI to getting this info via kube directives
 func (k KflexClusterProvider) Delete(name string, opts clusterprovider.Options) error {
 	logger := klog.Background()
 	logger.V(2).Info("Deleting KubeFlex cluster", "name", name)
-	cmd := exec.Command("kflex", "delete", name)
-	err := cmd.Run()
-	if err != nil {
-		logger.V(2).Error(err, "Deleting KubeFlex cluster", "name", name)
+
+	cpGVR := schema.GroupVersionResource{
+		Group:    CPGroup,
+		Version:  CPVersion,
+		Resource: CPResource,
 	}
+
+	err := k.dClient.Resource(cpGVR).Delete(k.ctx, name, v1.DeleteOptions{})
+	if err != nil {
+		// TODO:  Need to differentiate between "already exists" and an error
+		k.logger.Error(err, "Failed to delete cluster", "name", name)
+	}
+
 	return err
 }
 
 // ListSpacesNames: returns a list of clusters in KubeFlex that are
 // in the Ready condition.
-// TODO: switch from CLI to getting this info via kube directives
 func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
-	var out bytes.Buffer
 	var listClusterNames []string
-	cmd := exec.Command("kubectl", "--context", "kind-kubeflex", "get", "controlplanes", "--no-headers")
-	cmd.Stdout = &out
-	err := cmd.Run()
+
+	listSpaces, err := k.dClient.Resource(schema.GroupVersionResource{
+		Group:    CPGroup,
+		Version:  CPVersion,
+		Resource: CPResource,
+	}).List(context.TODO(), v1.ListOptions{})
+
 	if err != nil {
+		// TODO:  Need to differentiate between "already exists" and an error
+		k.logger.Error(err, "Failed to list spaces")
 		return nil, err
 	}
-	b := out.Bytes()
-	list := strings.Split(string(b), "\n")
-	for _, v := range list {
-		words := strings.Fields(v)
-		if len(words) > 2 && words[2] == "True" {
-			listClusterNames = append(listClusterNames, words[0])
+
+	var cp kfcp.ControlPlane
+
+	for _, space := range listSpaces.Items {
+
+		spContent := space.UnstructuredContent()
+
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(spContent, &cp)
+		if err != nil {
+			k.logger.Error(err, "convert unstructured")
+			continue
+		}
+		if isSpaceReady(cp) {
+			listClusterNames = append(listClusterNames, cp.Name)
 		}
 	}
+
 	return listClusterNames, nil
+}
+
+func isSpaceReady(sp kfcp.ControlPlane) bool {
+	for _, cond := range sp.Status.Conditions {
+		if cond.Reason == kfcp.ReasonAvailable && cond.Type == kfcp.TypeReady {
+			return true
+		}
+	}
+	return false
 }
 
 // Get: obtains the kubeconfig for the given lcName cluster.
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
 
-	kubeconfigFile, err := generateKubeConfig(k.pConfig)
-	if err != nil {
-		return clusterprovider.SpaceInfo{}, err
-	}
-
-	cmd := "kubectl --kubeconfig " + kubeconfigFile + " --context kind-kubeflex get secrets admin-kubeconfig -n " + lcName
-
-	cfg, err := exec.Command("bash", "-c", cmd).Output()
-	if err != nil {
-		return clusterprovider.SpaceInfo{}, err
-	}
-
-	var secret corev1.Secret
-
-	err = json.Unmarshal(cfg, &secret)
+	secret, err := k.kubeClient.CoreV1().Secrets(lcName+"-system").Get(k.ctx, "admin-kubeconfig", v1.GetOptions{})
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
@@ -126,7 +194,6 @@ func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, err
 	externalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig"])
 	internalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig-incluster"])
 
-	//TODO get the external kubeconfig
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
@@ -238,27 +305,4 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 	})
 
 	return k.ch
-}
-
-func generateKubeConfig(config string) (string, error) {
-	cmdMktemp := exec.Command("mktemp", "-p", "/tmp/")
-	randomName, err := cmdMktemp.Output()
-	if err != nil {
-		return "", err
-	}
-
-	// Remove trailing newline character from randomName.
-	randomNameStr := string(randomName[:len(randomName)-1])
-
-	file, err := os.Create(randomNameStr)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	_, err = file.WriteString(randomNameStr)
-	if err != nil {
-		return "", err
-	}
-	return randomNameStr, nil
 }
