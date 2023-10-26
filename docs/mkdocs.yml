@@ -22,10 +22,11 @@ nav:
   - Home:
       - Overview: index.md 
       - Readme: readme.md
-      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
+      - Quickstart using Kind: Getting-Started/user-quickstart-kind.md 
+      - Quickstart using OpenShift: Getting-Started/user-quickstart-openshift.md 
   - Getting Started:
-      - Quickstart with Kind: Getting-Started/user-quickstart-kind.md 
-      - Quickstart with OpenShift: Getting-Started/user-quickstart-openshift.md 
+      - Quickstart using Kind: Getting-Started/user-quickstart-kind.md 
+      - Quickstart using OpenShift: Getting-Started/user-quickstart-openshift.md 
       - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md

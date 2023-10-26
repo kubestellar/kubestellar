@@ -14,13 +14,13 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
     === "Goals"
         This guide will show how to:
 
-        1. quickly deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component on an OpenShift cluster using helm (ks-core), 
-        2. install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins on your computer with brew,
-        3. retrieve the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component kubeconfig, 
-        4. install the <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer component on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2), 
-        5. deploy an example kubernetes workload to both edge OpenShift clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core),
+        1. quickly deploy the KubeStellar Core component on an OpenShift cluster using helm (ks-core), 
+        2. install the KubeStellar user commands and kubectl plugins on your computer with brew,
+        3. retrieve the KubeStellar Core component kubeconfig, 
+        4. install the KubeStellar Syncer component on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2), 
+        5. deploy an example kubernetes workload to both edge OpenShift clusters from KubeStellar Core (ks-core),
         6. view the example kubernetes workload running on two edge OpenShift clusters (ks-edge-cluster1 and ks-edge-cluster2)
-        7. view the status of your deployment across both edge OpenShift clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core)
+        7. view the status of your deployment across both edge OpenShift clusters from KubeStellar Core (ks-core)
 
         **important:** For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
@@ -28,9 +28,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
     === "Pre-reqs"
         + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.24-1.26)
 
-        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart
+        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the KubeStellar-core helm chart
         
-        + [__brew__](https://brew.sh) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
+        + [__brew__](https://brew.sh) - to install the KubeStellar user commands and kubectl plugins
         
         + 3 Red Hat OpenShift clusters - we will refer to them as **ks-core**, **ks-edge-cluster1**, and **ks-edge-cluster2** in this document
 
@@ -75,8 +75,8 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
-    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
-         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+    === "show all available KubeStellar Core Spaces"
+         Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
          {%
            include-markdown "../common-subs/kubestellar-show-available-spaces.md"
            start="<!--kubestellar-show-available-spaces-start-->"
@@ -92,7 +92,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 #### 4. Install <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers on your Edge Clusters
 !!! tip ""
     === "Prep and apply"
-        prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster` prepared for you
+        prepare KubeStellar Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster` prepared for you
 
          {%
            include-markdown "../common-subs/kubestellar-prep-syncer.md"
@@ -172,8 +172,8 @@ how to create, but not overrite/update a synchronized resource
 #### 2. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 
 !!! tip ""
-    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
-         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+    === "show all available KubeStellar Core Spaces"
+         Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
 
          ```
          KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \

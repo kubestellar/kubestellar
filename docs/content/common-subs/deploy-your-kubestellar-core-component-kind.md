@@ -1,7 +1,7 @@
 <!--deploy-your-kubestellar-core-component-kind-start-->
 !!! tip ""
     === "deploy"
-         deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core components on the **ks-core** Kind cluster you created in the pre-req section above  
+         deploy the KubeStellar Core components on the **ks-core** Kind cluster you created in the pre-req section above  
 
          {%
            include-markdown "install-helm-kind.md"
@@ -11,7 +11,7 @@
 
         **important:** You must add 'kubestellar.core' to your /etc/hosts file with the local network IP address (e.g., 192.168.x.y) where your **ks-core** Kind cluster is running. **DO NOT** use `127.0.0.1` because the ks-edge-cluster1 and ks-edge-cluster2 kind clusters map `127.0.0.1` to their local kubernetes cluster, **not** the ks-core kind cluster.
 
-        run the following to wait for <span class="Space-Bd-BT">KUBESTELLAR</span> to be ready to take requests:
+        run the following to wait for KubeStellar to be ready to take requests:
         {%
            include-markdown "check-kubestellar-helm-deployment-running.md"
            start="<!--check-kubestellar-helm-deployment-running-start-->"

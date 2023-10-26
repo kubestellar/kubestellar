@@ -2,7 +2,7 @@
 Did you received the following error:
 ```Error: Get "https://some_hostname.some_domain_name:{{config.ks_kind_port_num}}/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host``
 
-A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:
+A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:
          
 Check if the port specified in the **ks-core** Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:
 

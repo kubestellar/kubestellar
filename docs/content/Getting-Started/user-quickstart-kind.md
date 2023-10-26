@@ -13,13 +13,13 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
     === "Goals"
         This guide will show how to:
 
-        1. quickly deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component on a Kind cluster using helm (ks-core), 
-        2. install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins on your computer with brew,
-        3. retrieve the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component kubeconfig, 
-        4. install the <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer component on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2), 
-        5. deploy an example kubernetes workload to both edge Kind clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core),
+        1. quickly deploy the KubeStellar Core component on a Kind cluster using helm (ks-core), 
+        2. install the KubeStellar user commands and kubectl plugins on your computer with brew,
+        3. retrieve the KubeStellar Core component kubeconfig, 
+        4. install the KubeStellar Syncer component on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2), 
+        5. deploy an example kubernetes workload to both edge Kind clusters from KubeStellar Core (ks-core),
         6. view the example kubernetes workload running on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2)
-        7. view the status of your deployment across both edge Kind clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core)
+        7. view the status of your deployment across both edge Kind clusters from KubeStellar Core (ks-core)
 
         **important:** For this quickstart you will need to know how to use kubernetes' kubeconfig *context* to access multiple clusters.  You can learn more about kubeconfig context [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 
@@ -27,9 +27,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
     === "Pre-reqs"
         + [__kubectl__](https://kubernetes.io/docs/tasks/tools/) (version range expected: 1.24-1.26)
 
-        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart
+        + [__helm__](https://helm.sh/docs/intro/install/) - to deploy the KubeStellar-core helm chart
         
-        + [__brew__](https://brew.sh) - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins
+        + [__brew__](https://brew.sh) - to install the KubeStellar user commands and kubectl plugins
         
         + [__Kind__](https://kind.sigs.k8s.io) - to create a few small kubernetes clusters
 
@@ -107,8 +107,8 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
-    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
-         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+    === "show all available KubeStellar Core Spaces"
+         Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
 
          {%
            include-markdown "../common-subs/kubestellar-show-available-spaces.md"
@@ -130,7 +130,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 #### 4. Install <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers on your Edge Clusters
 !!! tip ""
     === "Prep and apply"
-        prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster` prepared for you
+        prepare KubeStellar Syncers, with `kubestellar prep-for-cluster`, for **ks-edge-cluster1** and **ks-edge-cluster2** and then apply the files that `kubestellar prep-for-cluster` prepared for you
 
         **important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
 
@@ -170,7 +170,7 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
            end="<!--kubestellar-check-syncers-end-->"
          %}
 
-          If you see a `connection refused` error in either <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer log(s):
+          If you see a `connection refused` error in either KubeStellar Syncer log(s):
 
           `E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused`
 
@@ -220,8 +220,8 @@ how to create, but not overrite/update a synchronized resource
 #### 2. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 
 !!! tip ""
-    === "show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces"
-         Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation
+    === "show all available KubeStellar Core Spaces"
+         Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation
 
          ```
          KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
@@ -264,7 +264,7 @@ how to create, but not overrite/update a synchronized resource
            end="<!--kubestellar-check-syncers-end-->"
          %}
 
-          If you see a `connection refused` error in either <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer log(s):
+          If you see a `connection refused` error in either KubeStellar Syncer log(s):
 
           `E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused`
 

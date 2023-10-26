@@ -1,7 +1,7 @@
 <!--deploy-your-kubestellar-core-component-openshift-start-->
 !!! tip ""
     === "deploy"
-         deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core components on the **ks-core** OpenShift cluster  
+         deploy the KubeStellar Core components on the **ks-core** OpenShift cluster  
         
          {%
            include-markdown "install-helm-openshift.md"
@@ -9,7 +9,7 @@
            end="<!--install-helm-openshift-end-->"
          %}
 
-        run the following to wait for <span class="Space-Bd-BT">KUBESTELLAR</span> to be ready to take requests:
+        run the following to wait for KubeStellar to be ready to take requests:
         {%
            include-markdown "check-kubestellar-helm-deployment-running.md"
            start="<!--check-kubestellar-helm-deployment-running-start-->"

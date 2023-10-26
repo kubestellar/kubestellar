@@ -199,7 +199,7 @@
 
 !!! tip "Required Packages for the example usage:"
     === "General"
-        You will need the following tools for the example usage of <span class="Space-Bd-BT">KUBESTELLAR</span> in this quickstart example.
+        You will need the following tools for the example usage of KubeStellar in this quickstart example.
         Select the tab for your environment for suggested commands to install them
 
         + [__docker__](https://docs.docker.com/engine/install/) or [__podman__](https://podman.io/), to support `kind`

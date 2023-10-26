@@ -17,7 +17,7 @@
 Table of contents:
 
 1. [Check Required Packages](#1-check-required-packages)
-2. [Install and run kcp and <span class="Space-Bd-BT">KUBESTELLAR</span>](#2-install-and-run-kcp-and-kubestellar)
+2. [Install and run kcp and KubeStellar](#2-install-and-run-kcp-and-kubestellar)
 3. [Example deployment of Apache HTTP Server workload into two local kind clusters](#3-example-deployment-of-apache-http-server-workload-into-two-local-kind-clusters)
       1. [Stand up two kind clusters: florin and guilder](#a-stand-up-two-kind-clusters-florin-and-guilder)
       2. [Onboarding the clusters](#b-onboarding-the-clusters)
@@ -26,7 +26,7 @@ Table of contents:
 5. [Next Steps](#5-next-steps)
 
 
-This guide is intended to show how to (1) quickly bring up a <span class="Space-Bd-BT">KUBESTELLAR</span> environment with its dependencies from a binary release and then (2) run through a simple example usage.
+This guide is intended to show how to (1) quickly bring up a KubeStellar environment with its dependencies from a binary release and then (2) run through a simple example usage.
 
 ## 1. Check Required Packages
    
