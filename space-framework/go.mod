@@ -4,6 +4,10 @@ go 1.19
 
 require (
 	github.com/go-logr/logr v1.2.4
+	github.com/kcp-dev/apimachinery/v2 v2.0.0-alpha.0.0.20230926071920-57d168bcbe34
+	github.com/kcp-dev/kcp/pkg/apis v0.11.0
+	github.com/kcp-dev/kcp/pkg/client v0.0.0-20230328080949-0f3bb69fdc08
+	github.com/kcp-dev/logicalcluster/v3 v3.0.4
 	github.com/kubestellar/kubeflex v0.2.4
 	k8s.io/api v0.28.3
 	k8s.io/apimachinery v0.28.3
@@ -44,7 +48,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/onsi/ginkgo/v2 v2.11.0 // indirect
 	github.com/onsi/gomega v1.27.10 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

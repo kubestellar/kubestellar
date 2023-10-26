@@ -38,7 +38,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	api "k8s.io/client-go/tools/clientcmd/api"
@@ -364,7 +363,7 @@ func (c *controller) handleAdd(logicalCluster interface{}, item queueItem) {
 		// add ready WS to cache and send an event
 		c.watcher.provider.workspaces[path] = string(lc.Status.Phase)
 		c.watcher.ch <- clusterprovider.WatchEvent{
-			Type:      watch.Added,
+			Type:      clusterprovider.Added,
 			Name:      owner.Name,
 			SpaceInfo: spaceInfo,
 		}
@@ -374,7 +373,7 @@ func (c *controller) handleAdd(logicalCluster interface{}, item queueItem) {
 		if ok {
 			delete(c.watcher.provider.workspaces, path)
 			c.watcher.ch <- clusterprovider.WatchEvent{
-				Type: watch.Deleted,
+				Type: clusterprovider.Deleted,
 				Name: lc.Spec.Owner.Name,
 			}
 		}
@@ -388,7 +387,7 @@ func (c *controller) handleDelete(item queueItem) {
 	defer c.watcher.provider.lock.Unlock()
 	delete(c.watcher.provider.workspaces, item.path)
 	c.watcher.ch <- clusterprovider.WatchEvent{
-		Type: watch.Deleted,
+		Type: clusterprovider.Deleted,
 		Name: item.owner.Name,
 	}
 }
