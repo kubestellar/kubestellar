@@ -43,9 +43,9 @@ import (
 type placementTranslator struct {
 	context                context.Context
 	apiProvider            APIWatchMapProvider
-	spsClusterInformer     kcpcache.ScopeableSharedIndexInformer
-	syncfgClusterInformer  kcpcache.ScopeableSharedIndexInformer
-	syncfgClusterLister    edgev1a1listers.SyncerConfigClusterLister
+	spsInformer            k8scache.SharedIndexInformer
+	syncfgInformer         k8scache.SharedIndexInformer
+	syncfgLister           edgev1a1listers.SyncerConfigLister
 	mbwsInformer           k8scache.SharedIndexInformer
 	mbwsLister             tenancyv1a1listers.WorkspaceLister
 	kcpClusterClientset    kcpclusterclientset.ClusterInterface
@@ -69,16 +69,15 @@ type placementTranslator struct {
 func NewPlacementTranslator(
 	numThreads int,
 	ctx context.Context,
-	//locationClusterPreInformer schedulingv1a1informers.LocationClusterInformer,
-	locationClusterPreInformer edgev1a1informers.LocationClusterInformer,
+	locationPreInformer edgev1a1informers.LocationInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
-	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
+	epPreInformer edgev1a1informers.EdgePlacementInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
-	spsClusterPreInformer edgev1a1informers.SinglePlacementSliceClusterInformer,
+	spsPreInformer edgev1a1informers.SinglePlacementSliceInformer,
 	// pre-informer on syncer config objects, should be in mailbox workspaces
-	syncfgClusterPreInformer edgev1a1informers.SyncerConfigClusterInformer,
+	syncfgPreInformer edgev1a1informers.SyncerConfigInformer,
 
-	customizerClusterPreInformer edgev1a1informers.CustomizerClusterInformer,
+	customizerPreInformer edgev1a1informers.CustomizerInformer,
 	// pre-informer on Workspaces objects
 	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
 	// all-cluster clientset for kcp APIs,
@@ -104,9 +103,9 @@ func NewPlacementTranslator(
 	pt := &placementTranslator{
 		context:                ctx,
 		apiProvider:            amp,
-		spsClusterInformer:     spsClusterPreInformer.Informer(),
-		syncfgClusterInformer:  syncfgClusterPreInformer.Informer(),
-		syncfgClusterLister:    syncfgClusterPreInformer.Lister(),
+		spsInformer:            spsPreInformer.Informer(),
+		syncfgInformer:         syncfgPreInformer.Informer(),
+		syncfgLister:           syncfgPreInformer.Lister(),
 		mbwsInformer:           mbwsPreInformer.Informer(),
 		mbwsLister:             mbwsPreInformer.Lister(),
 		kcpClusterClientset:    kcpClusterClientset,
@@ -117,14 +116,14 @@ func NewPlacementTranslator(
 		edgeClusterClientset:   edgeClusterClientset,
 		nsClusterPreInformer:   nsClusterPreInformer,
 		nsClusterClient:        nsClusterClient,
-		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
+		whatResolver: NewWhatResolver(ctx, epPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
-		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
+		whereResolver: NewWhereResolver(ctx, spsPreInformer, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes, pt.mbwsInformer, pt.mbwsLister,
-		locationClusterPreInformer.Informer(), locationClusterPreInformer.Lister(),
-		pt.syncfgClusterInformer, pt.syncfgClusterLister,
-		customizerClusterPreInformer.Informer(), customizerClusterPreInformer.Lister(),
+		locationPreInformer.Informer(), locationPreInformer.Lister(),
+		pt.syncfgInformer, pt.syncfgLister,
+		customizerPreInformer.Informer(), customizerPreInformer.Lister(),
 		edgeClusterClientset, dynamicClusterClient,
 		nsClusterPreInformer, nsClusterClient)
 
@@ -136,11 +135,11 @@ func (pt *placementTranslator) Run() {
 	logger := klog.FromContext(ctx)
 
 	doneCh := ctx.Done()
-	if !(k8scache.WaitForNamedCacheSync("placement-translator(sps)", doneCh, pt.spsClusterInformer.HasSynced) &&
+	if !(k8scache.WaitForNamedCacheSync("placement-translator(sps)", doneCh, pt.spsInformer.HasSynced) &&
 		k8scache.WaitForNamedCacheSync("placement-translator(mbws)", doneCh, pt.mbwsInformer.HasSynced) &&
 		k8scache.WaitForNamedCacheSync("placement-translator(crds)", doneCh, pt.crdClusterInformer.HasSynced) &&
 		k8scache.WaitForNamedCacheSync("placement-translator(bind)", doneCh, pt.bindingClusterInformer.HasSynced) &&
-		k8scache.WaitForNamedCacheSync("placement-translator(sync)", doneCh, pt.syncfgClusterInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(sync)", doneCh, pt.syncfgInformer.HasSynced) &&
 		true) {
 		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
