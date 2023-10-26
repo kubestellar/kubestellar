@@ -2400,10 +2400,12 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="7:1"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">deploy</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache.md '&lt;!--kubestellar-apply-apache-start--&gt;' '&lt;!--kubestellar-apply-apache-end--&gt;' -->
+<!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache-openshift.md '&lt;!--kubestellar-apply-apache-openshift-start--&gt;' '&lt;!--kubestellar-apply-apache-openshift-end--&gt;' -->
 <p>KubeStellar's helm chart automatically creates a Workload Management
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
+<p>This EdgePlacement includes downsync of a <code>RoleBinding</code> that grants
+ privileges that let the httpd pod run in an OpenShift cluster.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
  <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
@@ -2428,7 +2430,11 @@
 <a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="s">    resources: [ apibindings ]</span>
 <a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">    namespaceSelectors: []</span>
 <a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">EOF</span>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="s">    resources: [ rolebindings ]</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
+<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2483,7 +2489,21 @@
 <a id="__codelineno-15-46" name="__codelineno-15-46" href="#__codelineno-15-46"></a><span class="s">        configMap:</span>
 <a id="__codelineno-15-47" name="__codelineno-15-47" href="#__codelineno-15-47"></a><span class="s">          name: httpd-htdocs</span>
 <a id="__codelineno-15-48" name="__codelineno-15-48" href="#__codelineno-15-48"></a><span class="s">          optional: false</span>
-<a id="__codelineno-15-49" name="__codelineno-15-49" href="#__codelineno-15-49"></a><span class="s">EOF</span>
+<a id="__codelineno-15-49" name="__codelineno-15-49" href="#__codelineno-15-49"></a><span class="s">---</span>
+<a id="__codelineno-15-50" name="__codelineno-15-50" href="#__codelineno-15-50"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-15-51" name="__codelineno-15-51" href="#__codelineno-15-51"></a><span class="s">kind: RoleBinding</span>
+<a id="__codelineno-15-52" name="__codelineno-15-52" href="#__codelineno-15-52"></a><span class="s">metadata:</span>
+<a id="__codelineno-15-53" name="__codelineno-15-53" href="#__codelineno-15-53"></a><span class="s">  name: let-it-be</span>
+<a id="__codelineno-15-54" name="__codelineno-15-54" href="#__codelineno-15-54"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-15-55" name="__codelineno-15-55" href="#__codelineno-15-55"></a><span class="s">roleRef:</span>
+<a id="__codelineno-15-56" name="__codelineno-15-56" href="#__codelineno-15-56"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-15-57" name="__codelineno-15-57" href="#__codelineno-15-57"></a><span class="s">  kind: ClusterRole</span>
+<a id="__codelineno-15-58" name="__codelineno-15-58" href="#__codelineno-15-58"></a><span class="s">  name: system:openshift:scc:privileged</span>
+<a id="__codelineno-15-59" name="__codelineno-15-59" href="#__codelineno-15-59"></a><span class="s">subjects:</span>
+<a id="__codelineno-15-60" name="__codelineno-15-60" href="#__codelineno-15-60"></a><span class="s">- kind: ServiceAccount</span>
+<a id="__codelineno-15-61" name="__codelineno-15-61" href="#__codelineno-15-61"></a><span class="s">  name: default</span>
+<a id="__codelineno-15-62" name="__codelineno-15-62" href="#__codelineno-15-62"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-15-63" name="__codelineno-15-63" href="#__codelineno-15-63"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your configmap and deployment was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2646,10 +2666,12 @@ how to create, but not overrite/update a synchronized resource  </p>
 <div class="tabbed-set tabbed-alternate" data-tabs="11:1"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">deploy</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache.md '&lt;!--kubestellar-apply-apache-start--&gt;' '&lt;!--kubestellar-apply-apache-end--&gt;' -->
+<!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache-openshift.md '&lt;!--kubestellar-apply-apache-openshift-start--&gt;' '&lt;!--kubestellar-apply-apache-openshift-end--&gt;' -->
 <p>KubeStellar's helm chart automatically creates a Workload Management
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
+<p>This EdgePlacement includes downsync of a <code>RoleBinding</code> that grants
+ privileges that let the httpd pod run in an OpenShift cluster.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
  <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>
@@ -2674,7 +2696,11 @@ how to create, but not overrite/update a synchronized resource  </p>
 <a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="s">    resources: [ apibindings ]</span>
 <a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a><span class="s">    namespaceSelectors: []</span>
 <a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="s">EOF</span>
+<a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="s">    resources: [ rolebindings ]</span>
+<a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
+<a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2729,7 +2755,21 @@ how to create, but not overrite/update a synchronized resource  </p>
 <a id="__codelineno-37-46" name="__codelineno-37-46" href="#__codelineno-37-46"></a><span class="s">        configMap:</span>
 <a id="__codelineno-37-47" name="__codelineno-37-47" href="#__codelineno-37-47"></a><span class="s">          name: httpd-htdocs</span>
 <a id="__codelineno-37-48" name="__codelineno-37-48" href="#__codelineno-37-48"></a><span class="s">          optional: false</span>
-<a id="__codelineno-37-49" name="__codelineno-37-49" href="#__codelineno-37-49"></a><span class="s">EOF</span>
+<a id="__codelineno-37-49" name="__codelineno-37-49" href="#__codelineno-37-49"></a><span class="s">---</span>
+<a id="__codelineno-37-50" name="__codelineno-37-50" href="#__codelineno-37-50"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-37-51" name="__codelineno-37-51" href="#__codelineno-37-51"></a><span class="s">kind: RoleBinding</span>
+<a id="__codelineno-37-52" name="__codelineno-37-52" href="#__codelineno-37-52"></a><span class="s">metadata:</span>
+<a id="__codelineno-37-53" name="__codelineno-37-53" href="#__codelineno-37-53"></a><span class="s">  name: let-it-be</span>
+<a id="__codelineno-37-54" name="__codelineno-37-54" href="#__codelineno-37-54"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-37-55" name="__codelineno-37-55" href="#__codelineno-37-55"></a><span class="s">roleRef:</span>
+<a id="__codelineno-37-56" name="__codelineno-37-56" href="#__codelineno-37-56"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-37-57" name="__codelineno-37-57" href="#__codelineno-37-57"></a><span class="s">  kind: ClusterRole</span>
+<a id="__codelineno-37-58" name="__codelineno-37-58" href="#__codelineno-37-58"></a><span class="s">  name: system:openshift:scc:privileged</span>
+<a id="__codelineno-37-59" name="__codelineno-37-59" href="#__codelineno-37-59"></a><span class="s">subjects:</span>
+<a id="__codelineno-37-60" name="__codelineno-37-60" href="#__codelineno-37-60"></a><span class="s">- kind: ServiceAccount</span>
+<a id="__codelineno-37-61" name="__codelineno-37-61" href="#__codelineno-37-61"></a><span class="s">  name: default</span>
+<a id="__codelineno-37-62" name="__codelineno-37-62" href="#__codelineno-37-62"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-37-63" name="__codelineno-37-63" href="#__codelineno-37-63"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your configmap and deployment was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1

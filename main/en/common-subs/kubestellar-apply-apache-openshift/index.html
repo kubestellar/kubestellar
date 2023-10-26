@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-apply-apache/">
+        <link rel="canonical" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-apply-apache-openshift/">
       
       
       
@@ -17,7 +17,7 @@
     
     
       
-        <title>Kubestellar apply apache - KubeStellar</title>
+        <title>Kubestellar apply apache openshift - KubeStellar</title>
       
     
     
@@ -125,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Kubestellar apply apache
+              Kubestellar apply apache openshift
             
           </span>
         </div>
@@ -1721,7 +1721,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/common-subs/kubestellar-apply-apache.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/common-subs/kubestellar-apply-apache-openshift.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -1730,19 +1730,21 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/common-subs/kubestellar-apply-apache.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/common-subs/kubestellar-apply-apache-openshift.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
   
 
 
-  <h1>Kubestellar apply apache</h1>
+  <h1>Kubestellar apply apache openshift</h1>
 
-<!--kubestellar-apply-apache-start-->
+<!--kubestellar-apply-apache-openshift-start-->
 <p>KubeStellar's helm chart automatically creates a Workload Management
 Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
+<p>This EdgePlacement includes downsync of a <code>RoleBinding</code> that grants
+privileges that let the httpd pod run in an OpenShift cluster.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -1767,7 +1769,11 @@ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStella
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="s">    resources: [ apibindings ]</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="s">    namespaceSelectors: []</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="s">EOF</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="s">    resources: [ rolebindings ]</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -1822,14 +1828,28 @@ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStella
 <a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="s">        configMap:</span>
 <a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="s">          name: httpd-htdocs</span>
 <a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="s">          optional: false</span>
-<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="s">EOF</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="s">---</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="s">kind: RoleBinding</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="s">metadata:</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a><span class="s">  name: let-it-be</span>
+<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a><span class="s">roleRef:</span>
+<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a><span class="s">  kind: ClusterRole</span>
+<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a><span class="s">  name: system:openshift:scc:privileged</span>
+<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a><span class="s">subjects:</span>
+<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a><span class="s">- kind: ServiceAccount</span>
+<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a><span class="s">  name: default</span>
+<a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your configmap and deployment was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments/my-first-kubestellar-deployment<span class="w"> </span>-n<span class="w"> </span>my-namespace<span class="w"> </span>-o<span class="w"> </span>yaml
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,cm<span class="w"> </span>-n<span class="w"> </span>my-namespace
 </code></pre></div></p>
-<!--kubestellar-apply-apache-end-->
+<!--kubestellar-apply-apache-openshift-end-->
 
 
   
