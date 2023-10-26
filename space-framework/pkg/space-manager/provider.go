@@ -29,15 +29,14 @@ import (
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/watch"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
+	providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kind"
 	kflexprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kubeflex"
-	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName
@@ -75,8 +74,8 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 	case spacev1alpha1apis.KubeflexProviderType:
 		pClient = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		//		pClient, err := providerkcp.New(config)
-		err := errors.New("not implemented")
+		pClient, err := providerkcp.New(config)
+		//err := errors.New("not implemented")
 		if err != nil {
 			runtime.HandleError(err)
 			return nil
@@ -212,7 +211,7 @@ func (p *provider) processProviderWatchEvents() {
 			}
 		}
 		switch event.Type {
-		case watch.Added:
+		case spaceprovider.Added:
 			logger.Info("New space was detected", "space", event.Name, "provider", p.name)
 			// A new space was detected either create it or change the status to READY
 			if !found || errSpace != nil {
@@ -249,7 +248,7 @@ func (p *provider) processProviderWatchEvents() {
 				chkErrAndReturn(logger, err, "Detected New space. Couldn't update the corresponding Space status", "space name", spaceName)
 			}
 
-		case watch.Deleted:
+		case spaceprovider.Deleted:
 			logger.Info("A space was removed", "space", event.Name, "provider", p.name)
 			if !found {
 				// There is no space object so there is nothing we should do

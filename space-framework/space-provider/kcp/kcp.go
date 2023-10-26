@@ -25,6 +25,17 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+
+	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
+	api "k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/util/workqueue"
+	"k8s.io/klog/v2"
+
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	kcpcore "github.com/kcp-dev/kcp/pkg/apis/core"
 	kcpcorev1alpha1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
@@ -33,17 +44,6 @@ import (
 	kcptenancyclusteredv1alpha1 "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/typed/tenancy/v1alpha1"
 	extkcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
-
-	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/clientcmd"
-	api "k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/util/workqueue"
-	"k8s.io/klog/v2"
 
 	clusterprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
 )
@@ -149,7 +149,7 @@ func (k *KcpClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, e
 		Config: map[string]string{
 			clusterprovider.INCLUSTER: string(cfgBytes[:]),
 			//TODO  get the incluster config
-			clusterprovider.EXTERNAL: "",
+			clusterprovider.EXTERNAL: string(cfgBytes[:]),
 		},
 	}
 	return spaceInfo, err
@@ -364,7 +364,7 @@ func (c *controller) handleAdd(logicalCluster interface{}, item queueItem) {
 		// add ready WS to cache and send an event
 		c.watcher.provider.workspaces[path] = string(lc.Status.Phase)
 		c.watcher.ch <- clusterprovider.WatchEvent{
-			Type:      watch.Added,
+			Type:      clusterprovider.Added,
 			Name:      owner.Name,
 			SpaceInfo: spaceInfo,
 		}
@@ -374,7 +374,7 @@ func (c *controller) handleAdd(logicalCluster interface{}, item queueItem) {
 		if ok {
 			delete(c.watcher.provider.workspaces, path)
 			c.watcher.ch <- clusterprovider.WatchEvent{
-				Type: watch.Deleted,
+				Type: clusterprovider.Deleted,
 				Name: lc.Spec.Owner.Name,
 			}
 		}
@@ -388,7 +388,7 @@ func (c *controller) handleDelete(item queueItem) {
 	defer c.watcher.provider.lock.Unlock()
 	delete(c.watcher.provider.workspaces, item.path)
 	c.watcher.ch <- clusterprovider.WatchEvent{
-		Type: watch.Deleted,
+		Type: clusterprovider.Deleted,
 		Name: item.owner.Name,
 	}
 }

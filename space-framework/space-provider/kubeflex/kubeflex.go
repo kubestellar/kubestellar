@@ -30,7 +30,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -283,7 +282,7 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 							continue
 						}
 						k.ch <- clusterprovider.WatchEvent{
-							Type:      watch.Added,
+							Type:      clusterprovider.Added,
 							Name:      name,
 							SpaceInfo: spaceInfo,
 						}
@@ -292,7 +291,7 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					for _, cl := range setClusters.Difference(newSetClusters).UnsortedList() {
 						logger.V(2).Info("Processing KubeFlex cluster delete", "name", cl)
 						k.ch <- clusterprovider.WatchEvent{
-							Type: watch.Deleted,
+							Type: clusterprovider.Deleted,
 							Name: cl,
 						}
 					}
