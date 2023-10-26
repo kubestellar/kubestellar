@@ -1,4 +1,4 @@
-<!--kubestellar-apply-apache-start-->
+<!--kubestellar-apply-apache-kind-start-->
 KubeStellar's helm chart automatically creates a Workload Management
 Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at `root:wmw1`.
 
@@ -99,4 +99,4 @@ KUBECONFIG=ks-core.kubeconfig kubectl get deployments/my-first-kubestellar-deplo
 KUBECONFIG=ks-core.kubeconfig kubectl get deployments,cm -n my-namespace
 ```
 
-<!--kubestellar-apply-apache-end-->
+<!--kubestellar-apply-apache-kind-end-->
