@@ -23,8 +23,19 @@ function echoerr() {
 }
 
 function run_space_manager() {
-    echo "--< Starting space-manager >--"
-    if ! space_manager -v=${VERBOSITY} ; then
+    echo "--< Starting space-manager 1 >--"
+    KUBECONFIG=
+    kubectl config set-cluster space-core --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    kubectl config set-credentials usertoken --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    kubectl config set-context space-mgt --cluster=the-clusterspace-core --user=usertoken 
+    KUBECONFIG=/home/spacecore/.kube/config
+
+    # apply the space manager CRDs
+    kubectl apply -f /home/spacecore/config/crds
+    echo "Applied space manager CRDs."
+
+    # Running the space-manager 
+    if ! bin/space-manager -v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config; then
         echoerr "unable to start space-manager!"
         exit 1
     fi
@@ -47,7 +58,8 @@ echo "VERBOSITY=${VERBOSITY}"
 
 case "${ACTION}" in
 (space-manager)
-    run_space_manager;;
+    sleep infinity;;
+    #run_space_manager;;
 (sleep)
     echo "Nothing to do... sleeping forever."
     sleep infinity;;

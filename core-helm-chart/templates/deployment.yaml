@@ -29,6 +29,26 @@ spec:
       serviceAccountName: kubestellar-sa
       containers:
 
+      - name: space
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.spaceimage.repository }}:{{ .Values.spaceimage.tag }}
+        imagePullPolicy: {{ .Values.spaceimage.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/spacecore/entry.sh" , "space-manager" ]
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+
       - name: kcp
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
