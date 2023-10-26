@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://docs.kubestellar.io/main/en/Getting-Started/user-quickstart-kind/">
       
       
-        <link rel="prev" href="./">
+        <link rel="prev" href="../user-quickstart-openshift/">
       
       
         <link rel="next" href="../user-quickstart-openshift/">
@@ -21,7 +21,7 @@
     
     
       
-        <title>Quickstart with Kind - KubeStellar</title>
+        <title>Quickstart using Kind - KubeStellar</title>
       
     
     
@@ -134,7 +134,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Quickstart with Kind
+              Quickstart using Kind
             
           </span>
         </div>
@@ -372,6 +372,8 @@
         
           
         
+          
+        
       
       
         
@@ -420,238 +422,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Quickstart with Kind
+          Quickstart using Kind
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Quickstart with Kind
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-deploy-and-use-kubestellar-on-kind-kubernetes-clusters" class="md-nav__link">
-    How to deploy and use KUBESTELLAR on Kind Kubernetes Clusters
-  </a>
-  
-    <nav class="md-nav" aria-label="How to deploy and use KUBESTELLAR on Kind Kubernetes Clusters">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-deploy-the-kubestellar-core-component" class="md-nav__link">
-    1. Deploy the KUBESTELLAR Core component
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-kubestellars-user-commands-and-kubectl-plugins" class="md-nav__link">
-    2. Install KUBESTELLAR's user commands and kubectl plugins
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-view-your-kubestellar-core-space-environment" class="md-nav__link">
-    3. View your KUBESTELLAR Core Space environment
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-install-kubestellar-syncers-on-your-edge-clusters" class="md-nav__link">
-    4. Install KUBESTELLAR Syncers on your Edge Clusters
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-deploy-an-apache-web-server-to-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-view-the-apache-web-server-running-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    7. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-use-an-existing-kubestellar-environment" class="md-nav__link">
-    How to use an existing KUBESTELLAR environment
-  </a>
-  
-    <nav class="md-nav" aria-label="How to use an existing KUBESTELLAR environment">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-install-kubestellars-user-commands-and-kubectl-plugins" class="md-nav__link">
-    1. Install KUBESTELLAR's user commands and kubectl plugins
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-view-your-kubestellar-core-space-environment" class="md-nav__link">
-    2. View your KUBESTELLAR Core Space environment
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-deploy-an-apache-web-server-to-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    3. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-view-the-apache-web-server-running-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    4. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
-    5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tear-it-all-down" class="md-nav__link">
-    Tear it all down
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-    
-  
-  
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-      
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-      
-        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-          Getting Started
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_2">
-          <span class="md-nav__icon md-icon"></span>
-          Getting Started
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-    
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Quickstart with Kind
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
       
         
@@ -814,7 +590,247 @@
   
     <li class="md-nav__item">
       <a href="../user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Quickstart using Kind
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Quickstart using Kind
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-deploy-and-use-kubestellar-on-kind-kubernetes-clusters" class="md-nav__link">
+    How to deploy and use KUBESTELLAR on Kind Kubernetes Clusters
+  </a>
+  
+    <nav class="md-nav" aria-label="How to deploy and use KUBESTELLAR on Kind Kubernetes Clusters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-deploy-the-kubestellar-core-component" class="md-nav__link">
+    1. Deploy the KUBESTELLAR Core component
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-install-kubestellars-user-commands-and-kubectl-plugins" class="md-nav__link">
+    2. Install KUBESTELLAR's user commands and kubectl plugins
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-view-your-kubestellar-core-space-environment" class="md-nav__link">
+    3. View your KUBESTELLAR Core Space environment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-install-kubestellar-syncers-on-your-edge-clusters" class="md-nav__link">
+    4. Install KUBESTELLAR Syncers on your Edge Clusters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-deploy-an-apache-web-server-to-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-view-the-apache-web-server-running-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    7. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use-an-existing-kubestellar-environment" class="md-nav__link">
+    How to use an existing KUBESTELLAR environment
+  </a>
+  
+    <nav class="md-nav" aria-label="How to use an existing KUBESTELLAR environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-kubestellars-user-commands-and-kubectl-plugins" class="md-nav__link">
+    1. Install KUBESTELLAR's user commands and kubectl plugins
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-view-your-kubestellar-core-space-environment" class="md-nav__link">
+    2. View your KUBESTELLAR Core Space environment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-deploy-an-apache-web-server-to-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    3. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-view-the-apache-web-server-running-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    4. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2" class="md-nav__link">
+    5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tear-it-all-down" class="md-nav__link">
+    Tear it all down
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -2193,7 +2209,7 @@
   
 
 
-  <h1>Quickstart with Kind</h1>
+  <h1>Quickstart using Kind</h1>
 
 <p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-user-quickstart-kind.yml"><img alt="User QuickStart Kind test" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-user-quickstart-kind.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- 
@@ -2207,13 +2223,13 @@
 <div class="tabbed-block">
 <p>This guide will show how to:</p>
 <ol>
-<li>quickly deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component on a Kind cluster using helm (ks-core), </li>
-<li>install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins on your computer with brew,</li>
-<li>retrieve the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component kubeconfig, </li>
-<li>install the <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer component on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2), </li>
-<li>deploy an example kubernetes workload to both edge Kind clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core),</li>
+<li>quickly deploy the KubeStellar Core component on a Kind cluster using helm (ks-core), </li>
+<li>install the KubeStellar user commands and kubectl plugins on your computer with brew,</li>
+<li>retrieve the KubeStellar Core component kubeconfig, </li>
+<li>install the KubeStellar Syncer component on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2), </li>
+<li>deploy an example kubernetes workload to both edge Kind clusters from KubeStellar Core (ks-core),</li>
 <li>view the example kubernetes workload running on two edge Kind clusters (ks-edge-cluster1 and ks-edge-cluster2)</li>
-<li>view the status of your deployment across both edge Kind clusters from <span class="Space-Bd-BT">KUBESTELLAR</span> Core (ks-core)</li>
+<li>view the status of your deployment across both edge Kind clusters from KubeStellar Core (ks-core)</li>
 </ol>
 <p><strong>important:</strong> For this quickstart you will need to know how to use kubernetes' kubeconfig <em>context</em> to access multiple clusters.  You can learn more about kubeconfig context <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">here</a></p>
 </div>
@@ -2229,10 +2245,10 @@
 <p><a href="https://kubernetes.io/docs/tasks/tools/"><strong>kubectl</strong></a> (version range expected: 1.24-1.26)</p>
 </li>
 <li>
-<p><a href="https://helm.sh/docs/intro/install/"><strong>helm</strong></a> - to deploy the <span class="Space-Bd-BT">KUBESTELLAR</span>-core helm chart</p>
+<p><a href="https://helm.sh/docs/intro/install/"><strong>helm</strong></a> - to deploy the KubeStellar-core helm chart</p>
 </li>
 <li>
-<p><a href="https://brew.sh"><strong>brew</strong></a> - to install the <span class="Space-Bd-BT">KUBESTELLAR</span> user commands and kubectl plugins</p>
+<p><a href="https://brew.sh"><strong>brew</strong></a> - to install the KubeStellar user commands and kubectl plugins</p>
 </li>
 <li>
 <p><a href="https://kind.sigs.k8s.io"><strong>Kind</strong></a> - to create a few small kubernetes clusters</p>
@@ -2260,7 +2276,7 @@
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s">    protocol: TCP</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="s">EOF</span>
 </code></pre></div></p>
-<p>Be sure to create an ingress control with SSL passthrough to <strong>ks-core</strong>. This is a special requirement for Kind that allows access to the <span class="Space-Bd-BT">KUBESTELLAR</span> core running on <strong>ks-core</strong>.
+<p>Be sure to create an ingress control with SSL passthrough to <strong>ks-core</strong>. This is a special requirement for Kind that allows access to the KubeStellar core running on <strong>ks-core</strong>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>create<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 </code></pre></div>
@@ -2414,7 +2430,7 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">deploy</label><label for="__tabbed_3_2">uh oh, error?</label><label for="__tabbed_3_3">open a bug report</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core components on the <strong>ks-core</strong> Kind cluster you created in the pre-req section above  </p>
+<p>deploy the KubeStellar Core components on the <strong>ks-core</strong> Kind cluster you created in the pre-req section above  </p>
 <!-- BEGIN INCLUDE install-helm-kind.md '&lt;!--install-helm-kind-start--&gt;' '&lt;!--install-helm-kind-end--&gt;' -->
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-core<span class="w">  </span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>kubestellar<span class="w">  </span>
@@ -2429,7 +2445,7 @@
 </code></pre></div>
 <!-- END INCLUDE -->
 <p><strong>important:</strong> You must add 'kubestellar.core' to your /etc/hosts file with the local network IP address (e.g., 192.168.x.y) where your <strong>ks-core</strong> Kind cluster is running. <strong>DO NOT</strong> use <code>127.0.0.1</code> because the ks-edge-cluster1 and ks-edge-cluster2 kind clusters map <code>127.0.0.1</code> to their local kubernetes cluster, <strong>not</strong> the ks-core kind cluster.</p>
-<p>run the following to wait for <span class="Space-Bd-BT">KUBESTELLAR</span> to be ready to take requests:
+<p>run the following to wait for KubeStellar to be ready to take requests:
 <!-- BEGIN INCLUDE check-kubestellar-helm-deployment-running.md '&lt;!--check-kubestellar-helm-deployment-running-start--&gt;' '&lt;!--check-kubestellar-helm-deployment-running-end--&gt;' --></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;Waiting for KubeStellar to be ready&#39;</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span><span class="se">\</span>
@@ -2504,10 +2520,10 @@
 </div>
 <h4 id="3-view-your-kubestellar-core-space-environment">3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment<a class="headerlink" href="#3-view-your-kubestellar-core-space-environment" title="Permanent link">#</a></h4>
 <div class="admonition tip">
-<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces</label><label for="__tabbed_5_2">uh oh, error?</label><label for="__tabbed_5_3">open a bug report</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">show all available KubeStellar Core Spaces</label><label for="__tabbed_5_2">uh oh, error?</label><label for="__tabbed_5_3">open a bug report</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation</p>
+<p>Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation</p>
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-show-available-spaces.md '&lt;!--kubestellar-show-available-spaces-start--&gt;' '&lt;!--kubestellar-show-available-spaces-end--&gt;' -->
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>ks-core<span class="w"> </span>get<span class="w"> </span>secrets<span class="w"> </span>kubestellar<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.external\.kubeconfig}&#39;</span><span class="w"> </span><span class="se">\</span>
@@ -2521,7 +2537,7 @@
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-kind-ip-error.md '&lt;!--kubestellar-kind-ip-error-start--&gt;' '&lt;!--kubestellar-kind-ip-error-end--&gt;' -->
 <p>Did you received the following error:
  <code>`Error: Get "https://some_hostname.some_domain_name:1119/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host</code></p>
-<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:</p>
+<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:</p>
 <p>Check if the port specified in the <strong>ks-core</strong> Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the `hostPort`` specified in the <strong>ks-core</strong> Kind cluster configuration is occupied by another process?  If so, delete the <strong>ks-core</strong> Kind cluster and create it again using an available port for your 'hostPort' value</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your <strong>ks-core</strong> 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value</p>
@@ -2543,7 +2559,7 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Prep and apply</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>prepare <span class="Space-Bd-BT">KUBESTELLAR</span> Syncers, with <code>kubestellar prep-for-cluster</code>, for <strong>ks-edge-cluster1</strong> and <strong>ks-edge-cluster2</strong> and then apply the files that <code>kubestellar prep-for-cluster</code> prepared for you</p>
+<p>prepare KubeStellar Syncers, with <code>kubestellar prep-for-cluster</code>, for <strong>ks-edge-cluster1</strong> and <strong>ks-edge-cluster2</strong> and then apply the files that <code>kubestellar prep-for-cluster</code> prepared for you</p>
 <p><strong>important:</strong> make sure you created Kind clusters for <strong>ks-edge-cluster1</strong> and <strong>ks-edge-cluster2</strong> from the pre-req step above before proceeding <a href="#how-to-deploy-and-use-kubestellar">how-to-deploy-and-use-kubestellar</a></p>
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-prep-syncer.md '&lt;!--kubestellar-prep-syncer-start--&gt;' '&lt;!--kubestellar-prep-syncer-end--&gt;' -->
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>ks-edge-cluster1<span class="w"> </span><span class="se">\</span>
@@ -2577,8 +2593,8 @@
 <div class="tabbed-content">
 <div class="tabbed-block">
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache.md '&lt;!--kubestellar-apply-apache-start--&gt;' '&lt;!--kubestellar-apply-apache-end--&gt;' -->
-<p><span class="Space-Bd-BT">KUBESTELLAR</span>'s helm chart automatically creates a Workload Management
- Workspace (WMW) for you to store kubernetes workload descriptions and <span class="Space-Bd-BT">KUBESTELLAR</span> control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
+<p>KubeStellar's helm chart automatically creates a Workload Management
+ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
  <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2728,7 +2744,7 @@
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-check-syncers.md '&lt;!--kubestellar-check-syncers-start--&gt;' '&lt;!--kubestellar-check-syncers-end--&gt;' -->
 <p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>
 </code></pre></div>
- If you are unable to see the namespace 'my-namespace' or the deployment 'my-first-kubestellar-deployment' you can view the logs for the <span class="Space-Bd-BT">KUBESTELLAR</span> syncer on the <strong>ks-edge-cluster1</strong> Kind cluster:</p>
+ If you are unable to see the namespace 'my-namespace' or the deployment 'my-first-kubestellar-deployment' you can view the logs for the KubeStellar syncer on the <strong>ks-edge-cluster1</strong> Kind cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-edge-cluster1
 <a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nv">ks_ns_edge_cluster1</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>namespaces<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="w">    </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>:metadata.name<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar-&#39;</span><span class="k">)</span>
@@ -2743,7 +2759,7 @@
 <a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">    </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>:metadata.name<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar-&#39;</span><span class="k">)</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">$ks_ns_edge_cluster2</span>
 </code></pre></div>
 <!-- END INCLUDE -->
-<p>If you see a <code>connection refused</code> error in either <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer log(s):</p>
+<p>If you see a <code>connection refused</code> error in either KubeStellar Syncer log(s):</p>
 <p><code>E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&amp;resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused</code></p>
 <p>it means that your <code>/etc/hosts</code> does not have a proper IP address (NOT <code>127.0.0.1</code>) listed for the <code>kubestellar.core</code> hostname. Once there is a valid address in <code>/etc/hosts</code> for <code>kubestellar.core</code>, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. </p>
 <p>Mac OS users may also experience issues when <code>stealth mode</code> (system settings/firewall).  If you decide to disable this mode temporarily, please be sure to re-enable it once you are finished with this guide.</p>
@@ -2804,10 +2820,10 @@ how to create, but not overrite/update a synchronized resource  </p>
 </div>
 <h4 id="2-view-your-kubestellar-core-space-environment">2. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment<a class="headerlink" href="#2-view-your-kubestellar-core-space-environment" title="Permanent link">#</a></h4>
 <div class="admonition tip">
-<div class="tabbed-set tabbed-alternate" data-tabs="10:3"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">show all available <span class="Space-Bd-BT">KUBESTELLAR</span> Core Spaces</label><label for="__tabbed_10_2">uh oh, error?</label><label for="__tabbed_10_3">open a bug report</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:3"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">show all available KubeStellar Core Spaces</label><label for="__tabbed_10_2">uh oh, error?</label><label for="__tabbed_10_3">open a bug report</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>Let's store the <span class="Space-Bd-BT">KUBESTELLAR</span> kubeconfig to a file we can reference later and then check out the Spaces <span class="Space-Bd-BT">KUBESTELLAR</span> created during installation</p>
+<p>Let's store the KubeStellar kubeconfig to a file we can reference later and then check out the Spaces KubeStellar created during installation</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
 <a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>  -o jsonpath=&#39;{.data.external\.kubeconfig}&#39; \
 <a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>  -n kubestellar | base64 -d &gt; ks-core.kubeconfig
@@ -2819,7 +2835,7 @@ how to create, but not overrite/update a synchronized resource  </p>
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-kind-ip-error.md '&lt;!--kubestellar-kind-ip-error-start--&gt;' '&lt;!--kubestellar-kind-ip-error-end--&gt;' -->
 <p>Did you received the following error:
  <code>`Error: Get "https://some_hostname.some_domain_name:1119/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host</code></p>
-<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:</p>
+<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:</p>
 <p>Check if the port specified in the <strong>ks-core</strong> Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the `hostPort`` specified in the <strong>ks-core</strong> Kind cluster configuration is occupied by another process?  If so, delete the <strong>ks-core</strong> Kind cluster and create it again using an available port for your 'hostPort' value</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your <strong>ks-core</strong> 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value</p>
@@ -2842,8 +2858,8 @@ how to create, but not overrite/update a synchronized resource  </p>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-apply-apache.md '&lt;!--kubestellar-apply-apache-start--&gt;' '&lt;!--kubestellar-apply-apache-end--&gt;' -->
-<p><span class="Space-Bd-BT">KUBESTELLAR</span>'s helm chart automatically creates a Workload Management
- Workspace (WMW) for you to store kubernetes workload descriptions and <span class="Space-Bd-BT">KUBESTELLAR</span> control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
+<p>KubeStellar's helm chart automatically creates a Workload Management
+ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
  <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2993,7 +3009,7 @@ how to create, but not overrite/update a synchronized resource  </p>
 <!-- BEGIN INCLUDE ../common-subs/kubestellar-check-syncers.md '&lt;!--kubestellar-check-syncers-start--&gt;' '&lt;!--kubestellar-check-syncers-end--&gt;' -->
 <p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>
 </code></pre></div>
- If you are unable to see the namespace 'my-namespace' or the deployment 'my-first-kubestellar-deployment' you can view the logs for the <span class="Space-Bd-BT">KUBESTELLAR</span> syncer on the <strong>ks-edge-cluster1</strong> Kind cluster:</p>
+ If you are unable to see the namespace 'my-namespace' or the deployment 'my-first-kubestellar-deployment' you can view the logs for the KubeStellar syncer on the <strong>ks-edge-cluster1</strong> Kind cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-edge-cluster1
 <a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="nv">ks_ns_edge_cluster1</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>namespaces<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a><span class="w">    </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>:metadata.name<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar-&#39;</span><span class="k">)</span>
@@ -3008,7 +3024,7 @@ how to create, but not overrite/update a synchronized resource  </p>
 <a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="w">    </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>:metadata.name<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar-&#39;</span><span class="k">)</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">$ks_ns_edge_cluster2</span>
 </code></pre></div>
 <!-- END INCLUDE -->
-<p>If you see a <code>connection refused</code> error in either <span class="Space-Bd-BT">KUBESTELLAR</span> Syncer log(s):</p>
+<p>If you see a <code>connection refused</code> error in either KubeStellar Syncer log(s):</p>
 <p><code>E1021 21:22:58.000110       1 reflector.go:138] k8s.io/client-go@v0.0.0-20230210192259-aaa28aa88b2d/tools/cache/reflector.go:215: Failed to watch *v2alpha1.EdgeSyncConfig: failed to list *v2alpha1.EdgeSyncConfig: Get "https://kubestellar.core:1119/apis/edge.kubestellar.io/v2alpha1/edgesyncconfigs?limit=500&amp;resourceVersion=0": dial tcp 127.0.0.1:1119: connect: connection refused</code></p>
 <p>it means that your <code>/etc/hosts</code> does not have a proper IP address (NOT <code>127.0.0.1</code>) listed for the <code>kubestellar.core</code> hostname. Once there is a valid address in <code>/etc/hosts</code> for <code>kubestellar.core</code>, the syncer will begin to work properly and pull the namespace, deployment, and configmap from this instruction set. </p>
 <p>Mac OS users may also experience issues when <code>stealth mode</code> (system settings/firewall).  If you decide to disable this mode temporarily, please be sure to re-enable it once you are finished with this guide.</p>
@@ -3116,7 +3132,7 @@ how to create, but not overrite/update a synchronized resource  </p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="./" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quickstart with Kind" rel="prev">
+          <a href="../user-quickstart-openshift/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quickstart using OpenShift" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -3125,20 +3141,20 @@ how to create, but not overrite/update a synchronized resource  </p>
                 <span class="md-footer__direction">
                   Previous
                 </span>
-                Quickstart with Kind
+                Quickstart using OpenShift
               </div>
             </div>
           </a>
         
         
           
-          <a href="../user-quickstart-openshift/" class="md-footer__link md-footer__link--next" aria-label="Next: Quickstart with OpenShift" rel="next">
+          <a href="../user-quickstart-openshift/" class="md-footer__link md-footer__link--next" aria-label="Next: Quickstart using OpenShift" rel="next">
             <div class="md-footer__title">
               <div class="md-ellipsis">
                 <span class="md-footer__direction">
                   Next
                 </span>
-                Quickstart with OpenShift
+                Quickstart using OpenShift
               </div>
             </div>
             <div class="md-footer__button md-icon">

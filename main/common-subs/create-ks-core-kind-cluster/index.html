@@ -361,6 +361,8 @@
         
           
         
+          
+        
       
       
         
@@ -404,7 +406,21 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -467,7 +483,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
     </li>
   
@@ -481,7 +497,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -1742,7 +1758,7 @@
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s">    protocol: TCP</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="s">EOF</span>
 </code></pre></div></p>
-<p>Be sure to create an ingress control with SSL passthrough to <strong>ks-core</strong>. This is a special requirement for Kind that allows access to the <span class="Space-Bd-BT">KUBESTELLAR</span> core running on <strong>ks-core</strong>.
+<p>Be sure to create an ingress control with SSL passthrough to <strong>ks-core</strong>. This is a special requirement for Kind that allows access to the KubeStellar core running on <strong>ks-core</strong>.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>create<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/example/kind-nginx-ingress-with-SSL-passthrough.yaml
 </code></pre></div>

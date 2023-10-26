@@ -361,6 +361,8 @@
         
           
         
+          
+        
       
       
         
@@ -404,7 +406,21 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -467,7 +483,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
     </li>
   
@@ -481,7 +497,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -1726,7 +1742,7 @@
 <!--kubestellar-kind-ip-error-start-->
 <p>Did you received the following error:
 <code>`Error: Get "https://some_hostname.some_domain_name:1119/clusters/root/apis/tenancy.kcp.io/v1alpha1/workspaces": dial tcp: lookup some_hostname.some_domain_name on x.x.x.x: no such host</code></p>
-<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your <span class="Space-Bd-BT">KUBESTELLAR</span> Core from another host, check the following:</p>
+<p>A common error occurs if you set your port number to a pre-occupied port number and/or you set your EXTERNAL_HOSTNAME to something other than "localhost" so that you can reach your KubeStellar Core from another host, check the following:</p>
 <p>Check if the port specified in the <strong>ks-core</strong> Kind cluster configuration and the EXTERNAL_PORT helm value are occupied by another application:</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. is the `hostPort`` specified in the <strong>ks-core</strong> Kind cluster configuration is occupied by another process?  If so, delete the <strong>ks-core</strong> Kind cluster and create it again using an available port for your 'hostPort' value</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. if you change the port for your <strong>ks-core</strong> 'hostPort', remember to also use that port as the helm 'EXTERNAL_PORT' value</p>

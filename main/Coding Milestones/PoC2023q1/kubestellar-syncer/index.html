@@ -372,6 +372,8 @@
         
           
         
+          
+        
       
       
         
@@ -415,7 +417,21 @@
   
     <li class="md-nav__item">
       <a href="../../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -478,7 +494,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
     </li>
   
@@ -492,7 +508,7 @@
   
     <li class="md-nav__item">
       <a href="../../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -2954,7 +2970,7 @@ or this:
 <div class="tabbed-set tabbed-alternate" data-tabs="2:7"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><input id="__tabbed_2_6" name="__tabbed_2" type="radio" /><input id="__tabbed_2_7" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">General</label><label for="__tabbed_2_2">Mac</label><label for="__tabbed_2_3">Ubuntu</label><label for="__tabbed_2_4">Debian</label><label for="__tabbed_2_5">Fedora/RHEL/CentOS</label><label for="__tabbed_2_6">Windows</label><label for="__tabbed_2_7">WSL with Ubuntu</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>You will need the following tools for the example usage of <span class="Space-Bd-BT">KUBESTELLAR</span> in this quickstart example.
+<p>You will need the following tools for the example usage of KubeStellar in this quickstart example.
 Select the tab for your environment for suggested commands to install them</p>
 <ul>
 <li>
@@ -3552,12 +3568,12 @@ SyncTarget name, you could do it as follows.</p>
 <a id="__codelineno-98-5" name="__codelineno-98-5" href="#__codelineno-98-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-98-6" name="__codelineno-98-6" href="#__codelineno-98-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Teardown of <span class="Space-Bd-BT">KUBESTELLAR</span> depends on which style of deployment was used.</p>
+<p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
-<p>The following command will stop whatever <span class="Space-Bd-BT">KUBESTELLAR</span> controllers are running.</p>
+<p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
-<p>Stop and uninstall <span class="Space-Bd-BT">KUBESTELLAR</span> and kcp with the following command:</p>
+<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
@@ -3883,12 +3899,12 @@ e.g.
 <a id="__codelineno-119-5" name="__codelineno-119-5" href="#__codelineno-119-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-119-6" name="__codelineno-119-6" href="#__codelineno-119-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
-<p>Teardown of <span class="Space-Bd-BT">KUBESTELLAR</span> depends on which style of deployment was used.</p>
+<p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes_1">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes_1" title="Permanent link">#</a></h3>
-<p>The following command will stop whatever <span class="Space-Bd-BT">KUBESTELLAR</span> controllers are running.</p>
+<p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
-<p>Stop and uninstall <span class="Space-Bd-BT">KUBESTELLAR</span> and kcp with the following command:</p>
+<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload_1">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload_1" title="Permanent link">#</a></h3>

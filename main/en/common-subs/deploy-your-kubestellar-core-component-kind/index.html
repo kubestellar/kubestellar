@@ -361,6 +361,8 @@
         
           
         
+          
+        
       
       
         
@@ -404,7 +406,21 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -467,7 +483,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
     </li>
   
@@ -481,7 +497,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -1728,7 +1744,7 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">deploy</label><label for="__tabbed_1_2">uh oh, error?</label><label for="__tabbed_1_3">open a bug report</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core components on the <strong>ks-core</strong> Kind cluster you created in the pre-req section above  </p>
+<p>deploy the KubeStellar Core components on the <strong>ks-core</strong> Kind cluster you created in the pre-req section above  </p>
 <!-- BEGIN INCLUDE install-helm-kind.md '&lt;!--install-helm-kind-start--&gt;' '&lt;!--install-helm-kind-end--&gt;' -->
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>ks-core<span class="w">  </span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>kubestellar<span class="w">  </span>
@@ -1743,7 +1759,7 @@
 </code></pre></div>
 <!-- END INCLUDE -->
 <p><strong>important:</strong> You must add 'kubestellar.core' to your /etc/hosts file with the local network IP address (e.g., 192.168.x.y) where your <strong>ks-core</strong> Kind cluster is running. <strong>DO NOT</strong> use <code>127.0.0.1</code> because the ks-edge-cluster1 and ks-edge-cluster2 kind clusters map <code>127.0.0.1</code> to their local kubernetes cluster, <strong>not</strong> the ks-core kind cluster.</p>
-<p>run the following to wait for <span class="Space-Bd-BT">KUBESTELLAR</span> to be ready to take requests:
+<p>run the following to wait for KubeStellar to be ready to take requests:
 <!-- BEGIN INCLUDE check-kubestellar-helm-deployment-running.md '&lt;!--check-kubestellar-helm-deployment-running-start--&gt;' '&lt;!--check-kubestellar-helm-deployment-running-end--&gt;' --></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s1">&#39;Waiting for KubeStellar to be ready&#39;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span><span class="se">\</span>

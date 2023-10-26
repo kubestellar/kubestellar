@@ -361,6 +361,8 @@
         
           
         
+          
+        
       
       
         
@@ -404,7 +406,21 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -467,7 +483,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-kind/" class="md-nav__link">
-        Quickstart with Kind
+        Quickstart using Kind
       </a>
     </li>
   
@@ -481,7 +497,7 @@
   
     <li class="md-nav__item">
       <a href="../../Getting-Started/user-quickstart-openshift/" class="md-nav__link">
-        Quickstart with OpenShift
+        Quickstart using OpenShift
       </a>
     </li>
   
@@ -1724,8 +1740,8 @@
   <h1>Kubestellar apply apache</h1>
 
 <!--kubestellar-apply-apache-start-->
-<p><span class="Space-Bd-BT">KUBESTELLAR</span>'s helm chart automatically creates a Workload Management
-Workspace (WMW) for you to store kubernetes workload descriptions and <span class="Space-Bd-BT">KUBESTELLAR</span> control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
+<p>KubeStellar's helm chart automatically creates a Workload Management
+Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
