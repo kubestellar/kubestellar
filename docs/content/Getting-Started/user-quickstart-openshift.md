@@ -110,9 +110,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
 !!! tip ""
     === "deploy"
          {%
-           include-markdown "../common-subs/kubestellar-apply-apache.md"
-           start="<!--kubestellar-apply-apache-start-->"
-           end="<!--kubestellar-apply-apache-end-->"
+           include-markdown "../common-subs/kubestellar-apply-apache-openshift.md"
+           start="<!--kubestellar-apply-apache-openshift-start-->"
+           end="<!--kubestellar-apply-apache-openshift-end-->"
          %}
 
 #### 6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
@@ -190,9 +190,9 @@ how to create, but not overrite/update a synchronized resource
 !!! tip ""
     === "deploy"
          {%
-           include-markdown "../common-subs/kubestellar-apply-apache.md"
-           start="<!--kubestellar-apply-apache-start-->"
-           end="<!--kubestellar-apply-apache-end-->"
+           include-markdown "../common-subs/kubestellar-apply-apache-openshift.md"
+           start="<!--kubestellar-apply-apache-openshift-start-->"
+           end="<!--kubestellar-apply-apache-openshift-end-->"
          %}
 
 #### 4. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
