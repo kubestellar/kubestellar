@@ -16,10 +16,6 @@ limitations under the License.
 
 package providerclient
 
-import (
-	"k8s.io/apimachinery/pkg/watch"
-)
-
 const (
 	INCLUSTER = "incluster"
 	EXTERNAL  = "external"
@@ -54,6 +50,17 @@ type Watcher interface {
 	ResultChan() <-chan WatchEvent
 }
 
+// EventType defines the possible types of events.
+type EventType string
+
+const (
+	Added    EventType = "ADDED"
+	Modified EventType = "MODIFIED"
+	Deleted  EventType = "DELETED"
+	Bookmark EventType = "BOOKMARK"
+	Error    EventType = "ERROR"
+)
+
 // WatchEvent is an event that is sent when a space is added, modified, or deleted.
 type WatchEvent struct {
 	// Type is the type of event that occurred.
@@ -66,7 +73,7 @@ type WatchEvent struct {
 	// 		An error occurred while watching the space: the space is removed.
 	// - BOOKMARK
 	// 		A periodic event is sent that contains no new data: ignored.
-	Type watch.EventType
+	Type EventType
 
 	// SpaceInfo is a minimal space information.
 	SpaceInfo SpaceInfo
