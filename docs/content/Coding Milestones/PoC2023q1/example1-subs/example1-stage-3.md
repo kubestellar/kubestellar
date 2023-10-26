@@ -171,6 +171,11 @@ metadata:
 spec:
   clusterScope:
   - apiVersion: v1
+    group: apiextensions.k8s.io
+    objects:
+    - crontabs.stable.example.com
+    resource: customresourcedefinitions
+  - apiVersion: v1
     group: apiregistration.k8s.io
     objects:
     - v1090.example.my
@@ -184,6 +189,13 @@ spec:
       - commond
       namespace: commonstuff
     resource: replicasets
+  - apiVersion: v1
+    group: stable.example.com
+    objectsByNamespace:
+    - names:
+      - my-new-cron-object
+      namespace: specialstuff
+    resource: crontabs
   - apiVersion: v1
     group: apps
     objectsByNamespace:

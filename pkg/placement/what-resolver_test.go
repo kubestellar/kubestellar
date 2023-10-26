@@ -23,6 +23,8 @@ import (
 
 	k8scorev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	fakeapiext "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned/fake"
+	apiextinfact "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	machruntime "k8s.io/apimachinery/pkg/runtime"
@@ -35,6 +37,8 @@ import (
 	fakeclusterdynamic "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/dynamic/fake"
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	kcpapisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
+	fakeclusterkcp "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
+	bindingfactory "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
@@ -122,10 +126,17 @@ func TestWhatResolver(t *testing.T) {
 	orDie(apiextensionsv1.AddToScheme(scheme))
 	orDie(kcpapisv1alpha1.AddToScheme(scheme))
 	orDie(k8scorev1.AddToScheme(scheme))
+	fakeKCPClient := fakeclusterkcp.NewSimpleClientset()
+	bindingFactory := bindingfactory.NewSharedInformerFactory(fakeKCPClient, 0)
+	bindingClusterPreInformer := bindingFactory.Apis().V1alpha1().APIBindings()
 	fakeDynamicClusterClientset := fakeclusterdynamic.NewSimpleDynamicClient(scheme, ns1, cm1, ns2, cm3)
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(fakeDynamicClusterClientset, 0)
-	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+	// crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	// bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+
+	fakeApiExtClusterClientset := fakeapiext.NewSimpleClientset()
+	apiExtClusterFactory := apiextinfact.NewSharedInformerFactory(fakeApiExtClusterClientset, 0)
+	crdClusterPreInformer := apiExtClusterFactory.Apiextensions().V1().CustomResourceDefinitions()
 
 	whatResolver := NewWhatResolver(ctx, epClusterPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
 	edgeClusterInformerFactory.Start(ctx.Done())
