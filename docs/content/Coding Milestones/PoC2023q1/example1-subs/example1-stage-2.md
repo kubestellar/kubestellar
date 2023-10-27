@@ -150,10 +150,8 @@ spec:
   - apiGroup: apps
     resources: [ replicasets ]
     namespaces: [ commonstuff ]
-    objectNames: [ "*" ]
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
-    namespaceSelectors: []
     objectNames: [ "bind-kubernetes", "bind-apps" ]
   wantSingletonReportedState: true
   upsync:
@@ -362,7 +360,6 @@ spec:
     resources: [ configmaps ]
     namespaceSelectors:
     - matchLabels: {"special":"yes"}
-    objectNames: [ "*" ]
   - apiGroup: apps
     resources: [ deployments ]
     namespaceSelectors:

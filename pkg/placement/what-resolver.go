@@ -628,62 +628,91 @@ func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePl
 	objNS := whatObj.GetNamespace()
 	objName := whatObj.GetName()
 	objLabels := whatObj.GetLabels()
-	for _, objTest := range spec.Downsync {
+	match, ok := downsyncMatches(logger, wsd, spec.Downsync, whatResource, gvk, objNS, objName, objLabels)
+	if !(match && ok) {
+		return match, ok
+	}
+	return !upsyncMatches(logger, wsd, spec.Upsync, whatResource, gvk, objNS, objName, objLabels), true
+}
+
+func upsyncMatches(logger klog.Logger, wsd *workspaceDetails, upsync []edgeapi.UpsyncSet, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) bool {
+	for _, objTest := range upsync {
 		if objTest.APIGroup != gvk.Group {
 			continue
 		}
-		if !(len(objTest.Resources) == 1 && objTest.Resources[0] == "*" || SliceContains(objTest.Resources, whatResource)) {
+		if !(SliceContains(objTest.Resources, "*") || SliceContains(objTest.Resources, whatResource)) {
 			continue
 		}
-		if objNS == "" {
-			if len(objTest.NamespaceSelectors) > 0 || len(objTest.Namespaces) > 0 {
-				continue
-			}
-		} else {
-			nsMatch, ok, retry := wsd.namespaceMatch(logger, objTest, objNS)
-			if !ok {
-				return retry, retry
-			}
-			if !nsMatch {
-				continue
-			}
+		if objNS != "" && !(SliceContains(objTest.Namespaces, "*") || SliceContains(objTest.Resources, objNS)) {
+			continue
 		}
-		if len(objTest.ObjectNames) == 1 && objTest.ObjectNames[0] == "*" || SliceContains(objTest.ObjectNames, objName) {
-			return true, true
+		if !(SliceContains(objTest.Names, "*") || SliceContains(objTest.Resources, objName)) {
+			continue
 		}
-		return labelsMatchAny(logger, objLabels, objTest.LabelSelectors), true
+		return true
+	}
+	return false
+}
+
+func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgeapi.DownsyncObjectTest, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) (bool, bool) {
+	for _, objTest := range downsync {
+		if objTest.APIGroup != nil && (*objTest.APIGroup) != gvk.Group {
+			continue
+		}
+		if len(objTest.Resources) > 0 && !(SliceContains(objTest.Resources, "*") || SliceContains(objTest.Resources, whatResource)) {
+			continue
+		}
+		if len(objTest.Namespaces) > 0 && !(SliceContains(objTest.Namespaces, "*") || SliceContains(objTest.Namespaces, objNS)) {
+			continue
+		}
+		nsMatch, ok, retry := wsd.namespaceLabelsMatch(logger, objTest, objNS)
+		if !ok {
+			return retry, retry
+		}
+		if !nsMatch {
+			continue
+		}
+		if len(objTest.ObjectNames) > 0 && !(SliceContains(objTest.ObjectNames, "*") || SliceContains(objTest.ObjectNames, objName)) {
+			continue
+		}
+		if len(objTest.LabelSelectors) > 0 && !labelsMatchAny(logger, objLabels, objTest.LabelSelectors) {
+			continue
+		}
+		return true, true
 	}
 	return false, true
 }
 
 // Returns match, ok, retry.
-func (wsd *workspaceDetails) namespaceMatch(logger klog.Logger, objTest edgeapi.DownsyncObjectTest, objNS string) (bool, bool, bool) {
-	if len(objTest.Namespaces) == 1 && objTest.Namespaces[0] == "*" || SliceContains(objTest.Namespaces, objNS) {
+func (wsd *workspaceDetails) namespaceLabelsMatch(logger klog.Logger, objTest edgeapi.DownsyncObjectTest, objNS string) (bool, bool, bool) {
+	if len(objTest.NamespaceSelectors) == 0 {
 		return true, true, false
 	}
-	if len(objTest.NamespaceSelectors) == 0 {
-		return false, true, false
-	}
-	nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
-	nsRR := wsd.resources[nsARName]
-	var objNSR k8sruntime.Object
-	if nsRR != nil {
+	var nsLabels map[string]string
+	if objNS == "" {
+		nsLabels = map[string]string{}
+	} else {
+		nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
+		nsRR := wsd.resources[nsARName]
+		var objNSR k8sruntime.Object
+		if nsRR == nil {
+			logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
+			return false, false, false
+		}
 		var err error
 		objNSR, err = nsRR.lister.Get(objNS)
 		if err != nil && !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Impossible: failed to fetch namespace from Lister", "objNS", objNS)
-			return false, true, true
+			return false, true, false
 		}
 		if objNSR == nil || err != nil && k8sapierrors.IsNotFound(err) {
 			logger.V(2).Info("Going around again because namespace is not known yet", "objNSR", objNSR)
-			return false, false, false
+			return false, false, true
 		}
 		objNSM := objNSR.(metav1.Object)
-		nsLabels := objNSM.GetLabels()
-		return labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors), true, false
+		nsLabels = objNSM.GetLabels()
 	}
-	logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
-	return false, false, false
+	return labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors), true, false
 }
 
 func labelsMatchAny(logger klog.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {

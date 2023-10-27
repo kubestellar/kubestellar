@@ -74,6 +74,7 @@ type EdgePlacement struct {
 
 // EdgePlacementSpec holds a desired binding between (a) a set of Locations and
 // (b) a way of identifying objects to downsync and a way of identifying objects to upsync.
+// An object that matches both the downsync and the upsync is upsynced (i.e., upsync has precedence).
 type EdgePlacementSpec struct {
 	// `locationSelectors` identifies the relevant Location objects in terms of their labels.
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
@@ -111,51 +112,59 @@ type EdgePlacementSpec struct {
 // mailboxwatch library and the aspiration for summarization.
 const ExecutingCountKey string = "kubestellar.io/executing-count"
 
+const validationErrorKeyPrefix string = "validation-error.kubestellar.io/"
+
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
 // - the `apiGroup` criterion is satisfied;
 // - the `resources` criterion is satisfied;
-// - EITHER the `namespaces` criterion or the `namespaceSelectors` criterion is satisfied; and
-// - EITHER the `objectNames` criterion or the `labelSelectors` criterion matches.
+// - the `namespaces` criterion is satisfied;
+// - the `namespaceSelectors` criterion is satisfied;
+// - the `objectNames` criterion is satisfied; and
+// - the `labelSelectors` criterion is satisfied.
+// At least one of the fields must make some discrimination;
+// it is not valid for every field to match all objects.
+// Validation might not be fully checked by apiservers until the Kubernetes dependency is release 1.25;
+// in the meantime validation error messages will appear
+// in annotations whose key is `validation-error.kubestellar.io/{number}`.
 type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
-	APIGroup string `json:"apiGroup,omitempty"`
+	// `nil` matches every API group.
+	APIGroup *string `json:"apiGroup"`
 
 	// `resources` is a list of lowercase plural names for the sorts of objects to match.
 	// An entry of `"*"` means that all match.
 	// If this list contains `"*"` then it should contain nothing else.
-	// Empty list means nothing matches.
-	Resources []string `json:"resources"`
+	// Empty list is a special case, it matches every object.
+	// +optional
+	Resources []string `json:"resources,omitempty"`
 
-	// `namespaces` is a simple way to test the namespace of the potentially
-	// matching object.
+	// `namespaces` is a list of acceptable names for the object's namespace.
+	// An entry of `"*"` means that any namespace is acceptable;
+	// this is the only way to match a cluster-scoped object.
 	// If this list contains `"*"` then it should contain nothing else.
-	// The object satisfies this criterion if any of the following is true.
-	// 1. The object is cluster-scoped and this list and `namespaceSelectors` are empty.
-	// 2. The object is namespaced and its namespace is in this list.
-	// 3. The object is namespaced and `"*"` (the 1-character string containing an asterisk) appears in this list.
+	// Empty list is a special case, it matches every object.
 	// +optional
 	Namespaces []string `json:"namespaces,omitempty"`
 
-	// `namespaceSelectors` is another way to identify matching namespaces,
-	// alternative to the simple list in `namespaces`.
-	// This field tests the labels on the Namespace object (the one whose name
-	// equals the workload object's namespace).
-	// A non-namespaced object matches if and only if this list and `namespaces` are empty.
-	// A namespaced object matches if and only if the namespace's labels match
-	// at least one member of this list.
+	// `namespaceSelectors` a list of label selectors.
+	// For a namespaced object, at least one of these label selectors has to match
+	// the labels of the Namespace object that defines the namespace of the object that this DownsyncObjectTest is testing.
+	// For a cluster-scoped object, at least one of these label selectors must be `{}`.
+	// Empty list is a special case, it matches every object.
 	// +optional
 	NamespaceSelectors []metav1.LabelSelector `json:"namespaceSelectors,omitempty"`
 
 	// `objectNames` is a list of object names that match.
 	// An entry of `"*"` means that all match.
 	// If this list contains `"*"` then it should contain nothing else.
-	// Empty list means nothing matches.
+	// Empty list is a special case, it matches every object.
 	// +optional
 	ObjectNames []string `json:"objectNames,omitempty"`
 
-	// `labelSelectors` allows matching objects by a rule rather than listing individuals.
-	// An object maches if and only if its labels match at least one member of this list.
+	// `labelSelectors` is a list of label selectors.
+	// At least one of them must match the labels of the object being tested.
+	// Empty list is a special case, it matches every object.
 	// +optional
 	LabelSelectors []metav1.LabelSelector `json:"labelSelectors,omitempty"`
 }
