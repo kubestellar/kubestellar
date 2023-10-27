@@ -2515,21 +2515,19 @@
 <a id="__codelineno-15-72" name="__codelineno-15-72" href="#__codelineno-15-72"></a><span class="s">      targetPort: 80</span>
 <a id="__codelineno-15-73" name="__codelineno-15-73" href="#__codelineno-15-73"></a><span class="s">  selector:</span>
 <a id="__codelineno-15-74" name="__codelineno-15-74" href="#__codelineno-15-74"></a><span class="s">    app: common</span>
-<a id="__codelineno-15-75" name="__codelineno-15-75" href="#__codelineno-15-75"></a><span class="s">status:</span>
-<a id="__codelineno-15-76" name="__codelineno-15-76" href="#__codelineno-15-76"></a><span class="s">  loadBalancer: {}</span>
-<a id="__codelineno-15-77" name="__codelineno-15-77" href="#__codelineno-15-77"></a><span class="s">---</span>
-<a id="__codelineno-15-78" name="__codelineno-15-78" href="#__codelineno-15-78"></a><span class="s">apiVersion: route.openshift.io/v1</span>
-<a id="__codelineno-15-79" name="__codelineno-15-79" href="#__codelineno-15-79"></a><span class="s">kind: Route</span>
-<a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="s">metadata:</span>
-<a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a><span class="s">  name: my-route</span>
-<a id="__codelineno-15-82" name="__codelineno-15-82" href="#__codelineno-15-82"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a><span class="s">spec:</span>
-<a id="__codelineno-15-84" name="__codelineno-15-84" href="#__codelineno-15-84"></a><span class="s">  port:</span>
-<a id="__codelineno-15-85" name="__codelineno-15-85" href="#__codelineno-15-85"></a><span class="s">    targetPort: 80</span>
-<a id="__codelineno-15-86" name="__codelineno-15-86" href="#__codelineno-15-86"></a><span class="s">  to:</span>
-<a id="__codelineno-15-87" name="__codelineno-15-87" href="#__codelineno-15-87"></a><span class="s">    kind: Service</span>
-<a id="__codelineno-15-88" name="__codelineno-15-88" href="#__codelineno-15-88"></a><span class="s">    name: my-service</span>
-<a id="__codelineno-15-89" name="__codelineno-15-89" href="#__codelineno-15-89"></a><span class="s">EOF</span>
+<a id="__codelineno-15-75" name="__codelineno-15-75" href="#__codelineno-15-75"></a><span class="s">---</span>
+<a id="__codelineno-15-76" name="__codelineno-15-76" href="#__codelineno-15-76"></a><span class="s">apiVersion: route.openshift.io/v1</span>
+<a id="__codelineno-15-77" name="__codelineno-15-77" href="#__codelineno-15-77"></a><span class="s">kind: Route</span>
+<a id="__codelineno-15-78" name="__codelineno-15-78" href="#__codelineno-15-78"></a><span class="s">metadata:</span>
+<a id="__codelineno-15-79" name="__codelineno-15-79" href="#__codelineno-15-79"></a><span class="s">  name: my-route</span>
+<a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a><span class="s">spec:</span>
+<a id="__codelineno-15-82" name="__codelineno-15-82" href="#__codelineno-15-82"></a><span class="s">  port:</span>
+<a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a><span class="s">    targetPort: 80</span>
+<a id="__codelineno-15-84" name="__codelineno-15-84" href="#__codelineno-15-84"></a><span class="s">  to:</span>
+<a id="__codelineno-15-85" name="__codelineno-15-85" href="#__codelineno-15-85"></a><span class="s">    kind: Service</span>
+<a id="__codelineno-15-86" name="__codelineno-15-86" href="#__codelineno-15-86"></a><span class="s">    name: my-service</span>
+<a id="__codelineno-15-87" name="__codelineno-15-87" href="#__codelineno-15-87"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your configmap, deployment, service, and route was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2809,21 +2807,19 @@ how to create, but not overrite/update a synchronized resource  </p>
 <a id="__codelineno-37-72" name="__codelineno-37-72" href="#__codelineno-37-72"></a><span class="s">      targetPort: 80</span>
 <a id="__codelineno-37-73" name="__codelineno-37-73" href="#__codelineno-37-73"></a><span class="s">  selector:</span>
 <a id="__codelineno-37-74" name="__codelineno-37-74" href="#__codelineno-37-74"></a><span class="s">    app: common</span>
-<a id="__codelineno-37-75" name="__codelineno-37-75" href="#__codelineno-37-75"></a><span class="s">status:</span>
-<a id="__codelineno-37-76" name="__codelineno-37-76" href="#__codelineno-37-76"></a><span class="s">  loadBalancer: {}</span>
-<a id="__codelineno-37-77" name="__codelineno-37-77" href="#__codelineno-37-77"></a><span class="s">---</span>
-<a id="__codelineno-37-78" name="__codelineno-37-78" href="#__codelineno-37-78"></a><span class="s">apiVersion: route.openshift.io/v1</span>
-<a id="__codelineno-37-79" name="__codelineno-37-79" href="#__codelineno-37-79"></a><span class="s">kind: Route</span>
-<a id="__codelineno-37-80" name="__codelineno-37-80" href="#__codelineno-37-80"></a><span class="s">metadata:</span>
-<a id="__codelineno-37-81" name="__codelineno-37-81" href="#__codelineno-37-81"></a><span class="s">  name: my-route</span>
-<a id="__codelineno-37-82" name="__codelineno-37-82" href="#__codelineno-37-82"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-37-83" name="__codelineno-37-83" href="#__codelineno-37-83"></a><span class="s">spec:</span>
-<a id="__codelineno-37-84" name="__codelineno-37-84" href="#__codelineno-37-84"></a><span class="s">  port:</span>
-<a id="__codelineno-37-85" name="__codelineno-37-85" href="#__codelineno-37-85"></a><span class="s">    targetPort: 80</span>
-<a id="__codelineno-37-86" name="__codelineno-37-86" href="#__codelineno-37-86"></a><span class="s">  to:</span>
-<a id="__codelineno-37-87" name="__codelineno-37-87" href="#__codelineno-37-87"></a><span class="s">    kind: Service</span>
-<a id="__codelineno-37-88" name="__codelineno-37-88" href="#__codelineno-37-88"></a><span class="s">    name: my-service</span>
-<a id="__codelineno-37-89" name="__codelineno-37-89" href="#__codelineno-37-89"></a><span class="s">EOF</span>
+<a id="__codelineno-37-75" name="__codelineno-37-75" href="#__codelineno-37-75"></a><span class="s">---</span>
+<a id="__codelineno-37-76" name="__codelineno-37-76" href="#__codelineno-37-76"></a><span class="s">apiVersion: route.openshift.io/v1</span>
+<a id="__codelineno-37-77" name="__codelineno-37-77" href="#__codelineno-37-77"></a><span class="s">kind: Route</span>
+<a id="__codelineno-37-78" name="__codelineno-37-78" href="#__codelineno-37-78"></a><span class="s">metadata:</span>
+<a id="__codelineno-37-79" name="__codelineno-37-79" href="#__codelineno-37-79"></a><span class="s">  name: my-route</span>
+<a id="__codelineno-37-80" name="__codelineno-37-80" href="#__codelineno-37-80"></a><span class="s">  namespace: my-namespace</span>
+<a id="__codelineno-37-81" name="__codelineno-37-81" href="#__codelineno-37-81"></a><span class="s">spec:</span>
+<a id="__codelineno-37-82" name="__codelineno-37-82" href="#__codelineno-37-82"></a><span class="s">  port:</span>
+<a id="__codelineno-37-83" name="__codelineno-37-83" href="#__codelineno-37-83"></a><span class="s">    targetPort: 80</span>
+<a id="__codelineno-37-84" name="__codelineno-37-84" href="#__codelineno-37-84"></a><span class="s">  to:</span>
+<a id="__codelineno-37-85" name="__codelineno-37-85" href="#__codelineno-37-85"></a><span class="s">    kind: Service</span>
+<a id="__codelineno-37-86" name="__codelineno-37-86" href="#__codelineno-37-86"></a><span class="s">    name: my-service</span>
+<a id="__codelineno-37-87" name="__codelineno-37-87" href="#__codelineno-37-87"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your configmap, deployment, service, and route was applied to the <strong>ks-core</strong> <code>my-namespace</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
