@@ -213,6 +213,8 @@ how to create, but not overrite/update a synchronized resource
 
 ## 5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 
-```
-TODO
-```
+{%
+           include-markdown "../common-subs/kubestellar-list-syncing.md"
+           start="<!--kubestellar-list-syncing-start-->"
+           end="<!--kubestellar-list-syncing-end-->"
+%}
