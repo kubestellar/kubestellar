@@ -8,13 +8,6 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/release-0.9/banner/</loc>
-         <lastmod>2023-10-27</lastmod>
-         <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/release-0.9/en/banner/"/>
-         
-    </url>
-    <url>
          <loc>https://docs.kubestellar.io/release-0.9/readme/</loc>
          <lastmod>2023-10-27</lastmod>
          <changefreq>daily</changefreq>
