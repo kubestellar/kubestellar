@@ -84,7 +84,6 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8081
           protocol: TCP
         volumeMounts:
         - name: htdocs
@@ -120,10 +119,6 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  internalTrafficPolicy: Cluster
-  type: ClusterIP
-  ipFamilyPolicy: SingleStack
-  sessionAffinity: None
   selector:
     app: common
 status:
