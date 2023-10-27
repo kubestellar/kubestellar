@@ -4,12 +4,36 @@
 {{ super() }}
 
 <!--kubestellar-->
-<section class="main-background w-100">
+<section class="main-background">
   <div class="md-grid conteiner-row pt-1 pt-lg-5 my-4">
     <div class="px-3 ctx-header-text conteiner">
       <div class="conteiner-row">
         <p class="h1 text-xs-center">
-            
+
+
+          <script>
+            // Fetch github counts
+            fetch(`https://api.github.com/repos/{{config.repo_short_name}}`)
+              .then((response) => response.json())
+              .then((data) => {
+                const starCount = data.stargazers_count;
+                if (typeof starCount !== 'undefined') {
+                  document.getElementById('star-count').setAttribute('hasInfo','true');
+                  document.getElementById('star-count').textContent = `${starCount}`;
+                }
+                const forkCount = data.forks_count;
+                if (typeof forkCount !== 'undefined') {
+                  document.getElementById('fork-count').setAttribute('hasInfo','true');
+                  document.getElementById('fork-count').textContent = `${forkCount}`;
+                  // const releaseName = data.name;
+                  // document.getElementById('current-release').textContent = `${releaseName}`;
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          
+          </script>
           <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="150px"/>
         </p>
       </div>
@@ -26,7 +50,7 @@
         <button
           type="button"
           title="{{ page.next_page.title | e }}"
-          onclick="location.href='https://docs.kubestellar.io/{{config.ks_branch}}/readme'"
+          onclick="location.href='https://docs.kubestellar.io/main/readme'"
           class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
         >
             Documentation
@@ -46,13 +70,23 @@
     </div>
   </div>
 
+  <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
+  <ul class="md-source__facts">
+    <!-- <li id="current-release" class="md-source__fact md-source__fact--version"></li> -->
+    <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
+    <li id="fork-count" class="custom-paragraph md-source__fact md-source__fact--forks"></li>
+  </ul>
+</div>
+
 </section>
+
 
 <section class="blue-background w-100">
   <div class="md-grid conteiner-row pt-4 my-4">
     <div class="card-white py-3 mx-xs-3 mx-sm-3 mx-4 mx-xl-0 ">
-      <div class="conteiner-row">
+      <div class="conteiner-row">      
         <div class="conteiner ctx-card-white-1 pt-4">
+          
           <div class="d-sm text-align-center">
             <p class="display-3 Telegraf-UltraBold text-dark mx-auto mt-4">Build once</p>
             <p class="display-3 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
