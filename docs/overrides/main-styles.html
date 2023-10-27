@@ -16,6 +16,16 @@
     
     <!-- Additional styles for landing page -->
     <style>
+
+.centered {
+  width: 7%;
+  height: 55%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
     
         .d-flex {
             display: flex;
@@ -497,11 +507,15 @@
             box-shadow: -5px 5px 10px 1px rgb(0 0 0 / 75%);
         }
     
+        .custom-paragraph:not([hasInfo]) {
+            display: none;
+        }
     
         .main-background {
             background: rgba(79, 79, 175, 0.52);
-            background: linear-gradient(0deg, rgb(174, 174, 178, 0.52) 0%, rgba(36, 37, 113, 0.265) 20%);
+            background: linear-gradient(0deg, rgb(174, 174, 178, 0.52) 0%, rgba(0, 101, 203, 0) 30%);
         }
+        /* rgba(36, 37, 113, 0.265) */
         .blue-background {
             background: rgba(174, 174, 178, 0.52);
         }
