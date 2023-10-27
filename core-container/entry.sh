@@ -35,7 +35,7 @@ function wait_kcp_ready() {
             sleep 10
         done
     )
-    echo "Success!"
+    echo "Succes!"
     echo "Copying the admin.kubeconfig from kubestellar seret..."
     mkdir -p /home/kubestellar/.kcp
     (
@@ -45,26 +45,8 @@ function wait_kcp_ready() {
 }
 
 
-function wait_space_manager_ready() {
-    echo "Waiting for the space-manager to be ready... this may take a while."
-    (
-        KUBECONFIG=
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
-            sleep 10
-        done
-    )
-    echo "Succes!"
-    echo "Copying the admin.kubeconfig from kubestellar seret..."
-    mkdir -p /home/kubestellar/.kube
-    (
-        KUBECONFIG=
-        kubectl get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > /home/kubestellar/.kube/admin.kubeconfig
-    )
-}
-
-
 function wait-kubestellar-ready() {
-    wait_space_manager_ready
+    wait_kcp_ready
     echo "Waiting for KubeStellar to be ready... this may take a while."
     (
         KUBECONFIG=
@@ -192,44 +174,11 @@ function run_kcp() {
 }
 
 
-function run_space_manager() {
-    echo "--< Starting space-manager  >--"
-
-    # apply the space manager CRDs
-    kubectl apply -f /home/spacecore/config/crds
-    echo 'Applied space manager CRDs.'
-
-    # Running the space-manager 
-    if ! bin/space-manager -v=${VERBOSITY} --kubeconfig ${KUBECONFIG}; then
-        echoerr "unable to start space-manager!"
-        exit 1
-    fi
-}
-
-
-function wait_space_manager_ready() {
-    # Ensure kubeconfig secret
-    echo Creating the kubestellar secret...
-    (
-        KUBECONFIG=
-        kubectl create secret generic kubestellar --from-file=".kube/admin.kubeconfig"
-    )
-
-    # Create the provider object
-    kubectl apply -f config/spaceproviderdesc.yaml
-
-    # creat the espw space
-    kubectl apply -f config/espw-space.yaml
-
-    echo "Succes!"
-}
-
-
 function run_init() {
     echo "--< Starting init >--"
     wait_kcp_ready
-    wait_space_manager_ready
     kubestellar init --local-kcp false --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW
+    kubectl ws root
     touch ready
     echo "***READY***"
     sleep infinity
@@ -239,10 +188,7 @@ function run_init() {
 function run_mailbox_controller() {
     echo "--< Starting mailbox-controller >--"
     wait-kubestellar-ready
-
-    # kubectl ws root:espw
-    TODO set kubeconfig to espw
-
+    kubectl ws root:espw
     if ! mailbox-controller -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
@@ -253,10 +199,7 @@ function run_mailbox_controller() {
 function run_where_resolver() {
     echo "--< Starting where-resolver >--"
     wait-kubestellar-ready
-
-    # kubectl ws root:espw
-    TODO set kubeconfig to espw
-
+    kubectl ws root:espw
     if ! kubestellar-where-resolver -v ${VERBOSITY} ; then
         echoerr "unable to start kubestellar-where-resolver!"
         exit 1
@@ -267,10 +210,7 @@ function run_where_resolver() {
 function run_placement_translator() {
     echo "--< Starting placement-translator >--"
     wait-kubestellar-ready
-
-    # kubectl ws root:espw
-    TODO set kubeconfig to espw
-
+    kubectl ws root:espw
     if ! placement-translator --allclusters-context  "system:admin" -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
@@ -300,8 +240,6 @@ echo "ENSURE_WMW=${ENSURE_WMW}"
 
 
 case "${ACTION}" in
-(space-manager)
-    run_space_manager;;
 (kcp)
     run_kcp;;
 (init)

@@ -22,7 +22,7 @@ image:
 spaceimage:
   repository: quay.io/kubestellar/space-framework
   pullPolicy: IfNotPresent
-  tag: git-ad0f1a321-dirty
+  tag: main
 
 # Storage size
 storageSize: 8Gi

@@ -29,7 +29,6 @@ ADD pkg/             pkg/
 ADD space-provider/  space-provider/
 ADD test/            test/
 ADD Makefile go.mod go.sum git-info.txt .
-ADD .kube/           .kube/
 
 # Avoid self-reference
 #RUN rm scripts/kubectl-kubestellar-deploy
@@ -55,7 +54,7 @@ COPY --from=builder /home/spacecore/config/crds     config/crds
 
 # add entry script
 ADD entry.sh entry.sh
-ADD .kube/ .kube/
+ADD bin/kflex bin/kflex
 
 RUN chown -R spacecore:0 /home/spacecore && \
     chmod -R g=u /home/spacecore
