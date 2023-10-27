@@ -2999,7 +2999,7 @@ clusters. The IMW that is automatically created for the user is at
 </code></pre></div>
 <p>Now, let's onboard the <code>guilder</code> cluster:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>si
+<a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw1<span class="w"> </span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes
 </code></pre></div>
 <p>Apply the created edge syncer manifest:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>guilder-syncer.yaml
@@ -3012,7 +3012,7 @@ clusters. The IMW that is automatically created for the user is at
 <p>KubeStellar will have automatically created a Workload Management
 Workspace (WMW) for the user to store workload descriptions and MCCM
 control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
-<p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters.</p>
+<p>Create the <code>EdgePlacement</code> object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (<code>florin</code> and <code>guilder</code>) created earlier, thus directing the workload to both edge clusters. The <code>upsync</code> field is only a demonstration of the syntax, it plays no functional role in this scenario.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: </p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>
@@ -3027,27 +3027,25 @@ control objects in. The automatically created WMW is at <code>root:wmw1</code>.<
 <a id="__codelineno-79-11" name="__codelineno-79-11" href="#__codelineno-79-11"></a><span class="s">  downsync:</span>
 <a id="__codelineno-79-12" name="__codelineno-79-12" href="#__codelineno-79-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
 <a id="__codelineno-79-13" name="__codelineno-79-13" href="#__codelineno-79-13"></a><span class="s">    resources: [ configmaps ]</span>
-<a id="__codelineno-79-14" name="__codelineno-79-14" href="#__codelineno-79-14"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-79-15" name="__codelineno-79-15" href="#__codelineno-79-15"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-79-16" name="__codelineno-79-16" href="#__codelineno-79-16"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-<a id="__codelineno-79-17" name="__codelineno-79-17" href="#__codelineno-79-17"></a><span class="s">  - apiGroup: apps</span>
-<a id="__codelineno-79-18" name="__codelineno-79-18" href="#__codelineno-79-18"></a><span class="s">    resources: [ deployments ]</span>
-<a id="__codelineno-79-19" name="__codelineno-79-19" href="#__codelineno-79-19"></a><span class="s">    namespaceSelectors:</span>
-<a id="__codelineno-79-20" name="__codelineno-79-20" href="#__codelineno-79-20"></a><span class="s">    - matchLabels: {&quot;common&quot;:&quot;si&quot;}</span>
-<a id="__codelineno-79-21" name="__codelineno-79-21" href="#__codelineno-79-21"></a><span class="s">    objectNames: [ commond ]</span>
-<a id="__codelineno-79-22" name="__codelineno-79-22" href="#__codelineno-79-22"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-79-23" name="__codelineno-79-23" href="#__codelineno-79-23"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-79-24" name="__codelineno-79-24" href="#__codelineno-79-24"></a><span class="s">    namespaceSelectors: []</span>
-<a id="__codelineno-79-25" name="__codelineno-79-25" href="#__codelineno-79-25"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-79-26" name="__codelineno-79-26" href="#__codelineno-79-26"></a><span class="s">  upsync:</span>
-<a id="__codelineno-79-27" name="__codelineno-79-27" href="#__codelineno-79-27"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-79-28" name="__codelineno-79-28" href="#__codelineno-79-28"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-79-29" name="__codelineno-79-29" href="#__codelineno-79-29"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-79-30" name="__codelineno-79-30" href="#__codelineno-79-30"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-79-31" name="__codelineno-79-31" href="#__codelineno-79-31"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-79-32" name="__codelineno-79-32" href="#__codelineno-79-32"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-79-33" name="__codelineno-79-33" href="#__codelineno-79-33"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-79-34" name="__codelineno-79-34" href="#__codelineno-79-34"></a><span class="s">EOF</span>
+<a id="__codelineno-79-14" name="__codelineno-79-14" href="#__codelineno-79-14"></a><span class="s">    namespaces: [ commonstuff ]</span>
+<a id="__codelineno-79-15" name="__codelineno-79-15" href="#__codelineno-79-15"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-79-16" name="__codelineno-79-16" href="#__codelineno-79-16"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-79-17" name="__codelineno-79-17" href="#__codelineno-79-17"></a><span class="s">    resources: [ deployments ]</span>
+<a id="__codelineno-79-18" name="__codelineno-79-18" href="#__codelineno-79-18"></a><span class="s">    namespaceSelectors:</span>
+<a id="__codelineno-79-19" name="__codelineno-79-19" href="#__codelineno-79-19"></a><span class="s">    - matchLabels: {common: &quot;yes&quot;}</span>
+<a id="__codelineno-79-20" name="__codelineno-79-20" href="#__codelineno-79-20"></a><span class="s">    objectNames: [ commond ]</span>
+<a id="__codelineno-79-21" name="__codelineno-79-21" href="#__codelineno-79-21"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-79-22" name="__codelineno-79-22" href="#__codelineno-79-22"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-79-23" name="__codelineno-79-23" href="#__codelineno-79-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-79-24" name="__codelineno-79-24" href="#__codelineno-79-24"></a><span class="s">  upsync:</span>
+<a id="__codelineno-79-25" name="__codelineno-79-25" href="#__codelineno-79-25"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-79-26" name="__codelineno-79-26" href="#__codelineno-79-26"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-79-27" name="__codelineno-79-27" href="#__codelineno-79-27"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-79-28" name="__codelineno-79-28" href="#__codelineno-79-28"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-79-29" name="__codelineno-79-29" href="#__codelineno-79-29"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-79-30" name="__codelineno-79-30" href="#__codelineno-79-30"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-79-31" name="__codelineno-79-31" href="#__codelineno-79-31"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-79-32" name="__codelineno-79-32" href="#__codelineno-79-32"></a><span class="s">EOF</span>
 </code></pre></div>
 <p>Put the prescription of the HTTP server workload into the WMW. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (<code>edge-placement-c</code>) object created above. </p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
@@ -3055,7 +3053,7 @@ control objects in. The automatically created WMW is at <code>root:wmw1</code>.<
 <a id="__codelineno-80-3" name="__codelineno-80-3" href="#__codelineno-80-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-80-4" name="__codelineno-80-4" href="#__codelineno-80-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-80-5" name="__codelineno-80-5" href="#__codelineno-80-5"></a><span class="s">  name: commonstuff</span>
-<a id="__codelineno-80-6" name="__codelineno-80-6" href="#__codelineno-80-6"></a><span class="s">  labels: {common: &quot;si&quot;}</span>
+<a id="__codelineno-80-6" name="__codelineno-80-6" href="#__codelineno-80-6"></a><span class="s">  labels: {common: &quot;yes&quot;}</span>
 <a id="__codelineno-80-7" name="__codelineno-80-7" href="#__codelineno-80-7"></a><span class="s">---</span>
 <a id="__codelineno-80-8" name="__codelineno-80-8" href="#__codelineno-80-8"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-80-9" name="__codelineno-80-9" href="#__codelineno-80-9"></a><span class="s">kind: ConfigMap</span>
