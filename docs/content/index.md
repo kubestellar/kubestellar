@@ -1,3 +1,7 @@
+---
+title: Title
+template: home.html
+---
 <!-- <img alt="" width="500px" align="left" src="../KubeStellar-with-Logo.png" />
 
 <br/>
@@ -29,7 +33,7 @@
 
 [Learn more about KubeStellar](./readme.md)
 
-[Try our QuickStart]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
+[Try our QuickStart]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/user-quickstart-kind/) 
 
 Instantly get access to our documents and meeting invites [http://kubestellar.io/joinus](http://kubestellar.io/joinus)
 
