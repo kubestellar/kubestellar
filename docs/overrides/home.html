@@ -1,0 +1,95 @@
+{% extends "main-styles.html" %}
+
+{% block tabs %}
+{{ super() }}
+
+<!--kubestellar-->
+<section class="main-background w-100">
+  <div class="md-grid conteiner-row pt-1 pt-lg-5 my-4">
+    <div class="px-3 ctx-header-text conteiner">
+      <div class="conteiner-row">
+        <p class="h1 text-xs-center">
+            
+          <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="150px"/>
+        </p>
+      </div>
+      <p class="h3 text-xs-center">The most natural and flexible way to deploy existing Kubernetes workloads across multiple clusters and clouds.  Unleashing the true power of Kubernetes at scale.</p>
+      <div class="conteiner-row conteiner-xs">
+        <button
+          type="button"
+          title="{{ page.next_page.title | e }}"
+          onclick="location.href='https://kubestellar.io/quickstart'"
+          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+        >
+            Get Started
+        </button>
+        <button
+          type="button"
+          title="{{ page.next_page.title | e }}"
+          onclick="location.href='https://kubestellar.io'"
+          class="btn-dark btn-xl-large btn-lg-large mx-3  mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+        >
+            Documentation
+        </button>
+        <button
+          type="button"
+          title="{{ page.next_page.title | e }}"
+          onclick="window.open('https://kubestellar.io/joinus', '_blank')"
+          class="btn-warning btn-xl-large btn-lg-large mx-3 mt-3 my-md-5 my-lg-5 my-xl-5 box-shadow"
+        >
+          Join Us
+        </button>
+      </div>
+    </div>
+    <div class="ctx-header-img d-lg">
+      <img src="kubestellar-deploy.png" class="laverage-header-img" style="width:90%"" />
+    </div>
+  </div>
+
+</section>
+
+<section class="blue-background w-100">
+  <div class="md-grid conteiner-row pt-4 my-4">
+    <div class="card-white py-3 mx-xs-3 mx-sm-3 mx-4 mx-xl-0 ">
+      <div class="conteiner-row">
+        <div class="conteiner ctx-card-white-1 pt-4">
+          <div class="d-sm text-align-center">
+            <p class="display-3 Telegraf-UltraBold text-dark mx-auto mt-4">Build once</p>
+            <p class="display-3 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
+          </div>
+
+
+          <button
+            onclick="window.open('https://github.com/kubestellar/kubestellar', '_blank')"
+            title="{{ lang.t('source.link.title') }}"
+            type="button"
+            class="btn-white btn-xl-large btn-lg-large box-shadow mx-auto my-4"
+          >
+            Contribute on GitHub
+          </button>
+        </div>
+        <div class="conteiner ctx-card-white-1 text-dark h3 d-lg">
+          <ul>
+            <li>- Centrally deploy Kubernetes resources across multiple clusters</li>
+          </br>          
+            <li>- Return more than just status from any deployment</li>
+          </br>
+            <li>- Manage cluster connectivity interruptions gracefully</li>
+          </br>
+            <li>- Designed for scalability with 1:many and many:1 scenarios</li>
+          </br>
+            <li>- Modular design to ensure compatibility with popular tools</li>
+          <!-- </br>
+            <li>- Designed to support virtual clusters</li> -->
+          </br>
+            <li>- Easy to install with Helm and Brew</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</section>
+
+{% endblock %}
