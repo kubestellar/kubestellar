@@ -84,7 +84,6 @@ spec:
         ports:
         - name: http
           containerPort: 80
-          hostPort: 8081
           protocol: TCP
         volumeMounts:
         - name: htdocs
@@ -109,15 +108,42 @@ subjects:
 - kind: ServiceAccount
   name: default
   namespace: my-namespace
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: my-namespace
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: common
+status:
+  loadBalancer: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: my-route
+  namespace: my-namespace
+spec:
+  port:
+    targetPort: 80
+  to:
+    kind: Service
+    name: my-service
 EOF
 ```
 
-check if your configmap and deployment was applied to the **ks-core** `my-namespace` namespace correctly
+check if your configmap, deployment, service, and route was applied to the **ks-core** `my-namespace` namespace correctly
 ```shell
 
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 KUBECONFIG=ks-core.kubeconfig kubectl get deployments/my-first-kubestellar-deployment -n my-namespace -o yaml
-KUBECONFIG=ks-core.kubeconfig kubectl get deployments,cm -n my-namespace
+KUBECONFIG=ks-core.kubeconfig kubectl get deployments,cm,service,route -n my-namespace
 ```
 
 <!--kubestellar-apply-apache-openshift-end-->

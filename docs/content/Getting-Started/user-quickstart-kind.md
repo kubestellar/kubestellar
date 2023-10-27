@@ -159,9 +159,9 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-kind.md"
+           start="<!--kubestellar-test-apache-kind-start-->"
+           end="<!--kubestellar-test-apache-kind-end-->"
          %}
     === "uh oh, error?"
          {%
@@ -253,9 +253,9 @@ how to create, but not overrite/update a synchronized resource
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-kind.md"
+           start="<!--kubestellar-test-apache-kind-start-->"
+           end="<!--kubestellar-test-apache-kind-end-->"
          %}
     === "uh oh, error?"
          {%
