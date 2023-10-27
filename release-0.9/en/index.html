@@ -2387,12 +2387,12 @@
                 const starCount = data.stargazers_count;
                 if (typeof starCount !== 'undefined') {
                   document.getElementById('star-count').setAttribute('hasInfo','true');
-                  document.getElementById('star-count').textContent = `${starCount}`;
+                  document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
                 }
                 const forkCount = data.forks_count;
                 if (typeof forkCount !== 'undefined') {
                   document.getElementById('fork-count').setAttribute('hasInfo','true');
-                  document.getElementById('fork-count').textContent = `${forkCount}`;
+                  document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
                   // const releaseName = data.name;
                   // document.getElementById('current-release').textContent = `${releaseName}`;
                 }
