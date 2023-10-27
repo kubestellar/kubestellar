@@ -121,8 +121,6 @@ spec:
       targetPort: 80
   selector:
     app: common
-status:
-  loadBalancer: {}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
