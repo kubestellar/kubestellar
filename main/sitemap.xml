@@ -659,10 +659,17 @@
          
     </url>
     <url>
-         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-test-apache/</loc>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-test-apache-kind/</loc>
          <lastmod>2023-10-27</lastmod>
          <changefreq>daily</changefreq>
-         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-test-apache/"/>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-test-apache-kind/"/>
+         
+    </url>
+    <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-test-apache-openshift/</loc>
+         <lastmod>2023-10-27</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-test-apache-openshift/"/>
          
     </url>
     <url>
