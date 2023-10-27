@@ -66,7 +66,34 @@
     
     
   <meta name="google-site-verification" content="QZFIkG95fMxODWgQDK2OUn73HUIu9fZmuTer-ZA4UwI" />
+
+  <!-- Determine title -->
   
+  
+    
+  
+
+  <!-- The image needs to have an absolute URL -->
+  
+
+  <!-- Open graph meta tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="KubeStellar - QuickStart" />
+  <meta property="og:description" content="None" />
+  <meta property="og:url" content="https://docs.kubestellar.io/release-0.9/Getting-Started/quickstart/" />
+  <meta property="og:image" content="https://docs.kubestellar.io/release-0.9assets/images/illustrations/banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1080" />
+  <meta property="og:image:height" content="568" />
+
+  <!-- google-site-verification meta-tag -->
+  <meta name="google-site-verification" content="-Rj8YMCn9uu5IwOFdC-WfAzXp4ZOMJtYKxU40ZgcJIU" />
+
+<!-- Extra stylesheets -->
+<!--  <link
+    rel="stylesheet"
+    href="../../assets/stylesheets/overrides.css"
+  />-->
 
   </head>
   
@@ -92,6 +119,29 @@
       
     </div>
     <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+  <!-- Extra stylesing -->
+  <style>
+      .md-announce a,
+      .md-announce a:focus,
+      .md-announce a:hover{color:currentColor}.md-announce
+      strong{white-space:nowrap}.md-announce
+  </style>
+
+<a href="https://www.linkedin.com/feed/hashtag/?keywords=kubestellar">
+  <p style="color: #D5EE1C">For updates follow <strong style="color: #D5EE1C">@kubestellar</strong> on
+    <strong style="color: white">LinkedIn</strong>
+  </p>
+</a>
+
+
+          </div>
+          
+        </aside>
       
     </div>
     
@@ -2759,7 +2809,7 @@ that cluster.</p>
 </code></pre></div>
 <p>The next command relies on <code>kubectl</code> already being configured to manipulate the hosting cluster, which is indeed the state that <code>kind create cluster</code> leaves it in.</p>
 <p>The following commands will (a) download the kcp and <strong>KubeStellar</strong> executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) kcp and KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add <code>--deploy false</code> to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for <a href="../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster">the commands about deployment into a Kubernetes cluster</a>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.9/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.9.0<span class="w"> </span>--external-endpoint<span class="w"> </span>hostname.favorite.my:6443
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>bash<span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.9/bootstrap/bootstrap-kubestellar.sh<span class="o">)</span><span class="w"> </span>--kubestellar-version<span class="w"> </span>v0.9.0<span class="w"> </span>--external-endpoint<span class="w"> </span>hostname.favorite.my:<span class="o">{{</span><span class="w"> </span>no<span class="w"> </span>such<span class="w"> </span>element:<span class="w"> </span>mkdocs.config.defaults.MkDocsConfig<span class="w"> </span>object<span class="o">[</span><span class="s1">&#39;ks_kind_port_num&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">}}</span>
 <a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kcp/bin:</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/kubestellar/bin&quot;</span>
 </code></pre></div>
 <p>Using your original <code>kubectl</code> configuration that manipulates the hosting cluster, check that the KubeStellar Deployment has its intended one running Pod.</p>
