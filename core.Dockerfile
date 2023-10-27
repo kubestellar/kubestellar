@@ -38,6 +38,19 @@ RUN mkdir -p .kcp && \
     mkdir -p bin && \
     mkdir -p scripts
 
+RUN git clone https://github.com/kube-bind/kube-bind.git && \
+    pushd kube-bind && \
+    IGNORE_GO_VERSION=1 make build && \
+    popd && \
+    git clone -b autobind https://github.com/waltforme/kube-bind.git kube-bind-autobind && \
+    pushd kube-bind-autobind && \
+    IGNORE_GO_VERSION=1 go build -o ../kube-bind/bin/kubectl-bind cmd/kubectl-bind/main.go && \
+    popd && \
+    git clone https://github.com/dexidp/dex.git && \
+    pushd dex && \
+    IGNORE_GO_VERSION=1 make build && \
+    popd
+
 ENV PATH=$PATH:/root/go/bin
 
 ADD cmd/             cmd/
@@ -65,13 +78,18 @@ RUN dnf install -y jq procps && \
     mkdir -p .kcp
 
 # copy binaries from the builder image
-COPY --from=builder /home/kubestellar/easy-rsa        easy-rsa/
-COPY --from=builder /root/go/bin                      /usr/local/bin/
-COPY --from=builder /usr/local/bin/kubectl            /usr/local/bin/kubectl
-COPY --from=builder /home/kubestellar/kcp/bin         kcp/bin/
-COPY --from=builder /home/kubestellar/kcp-plugins/bin kcp/bin/
-COPY --from=builder /home/kubestellar/bin             bin/
-COPY --from=builder /home/kubestellar/config          config/
+COPY --from=builder /home/kubestellar/easy-rsa                           easy-rsa/
+COPY --from=builder /root/go/bin                                         /usr/local/bin/
+COPY --from=builder /usr/local/bin/kubectl                               /usr/local/bin/kubectl
+COPY --from=builder /home/kubestellar/kcp/bin                            kcp/bin/
+COPY --from=builder /home/kubestellar/kcp-plugins/bin                    kcp/bin/
+COPY --from=builder /home/kubestellar/bin                                bin/
+COPY --from=builder /home/kubestellar/config                             config/
+COPY --from=builder /home/kubestellar/kube-bind/bin                      kube-bind/bin/
+COPY --from=builder /home/kubestellar/kube-bind/deploy/crd               kube-bind/deploy/crd
+COPY --from=builder /home/kubestellar/kube-bind/deploy/examples          kube-bind/deploy/examples
+COPY --from=builder /home/kubestellar/dex/bin                            dex/bin/
+COPY --from=builder /home/kubestellar/kube-bind/hack/dex-config-dev.yaml dex/dex-config-dev.yaml
 
 # add entry script
 ADD core-container/entry.sh entry.sh
@@ -80,7 +98,7 @@ RUN chown -R kubestellar:0 /home/kubestellar && \
     chmod -R g=u /home/kubestellar
 
 # setup the environment variables
-ENV PATH=/home/kubestellar/bin:/home/kubestellar/kcp/bin:/home/kubestellar/easy-rsa:$PATH
+ENV PATH=/home/kubestellar/bin:/home/kubestellar/kcp/bin:/home/kubestellar/kube-bind/bin:/home/kubestellar/dex/bin:/home/kubestellar/easy-rsa:$PATH
 ENV KUBECONFIG=/home/kubestellar/.kcp/admin.kubeconfig
 ENV EXTERNAL_HOSTNAME=""
 ENV EXTERNAL_PORT=""
