@@ -1550,6 +1550,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#kubestellar-list-syncing-objects" class="md-nav__link">
+    kubestellar-list-syncing-objects
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bootstrap" class="md-nav__link">
     Bootstrap
   </a>
@@ -2260,6 +2267,13 @@
         <li class="md-nav__item">
   <a href="#removing-a-workload-management-workspace" class="md-nav__link">
     Removing a Workload Management Workspace
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubestellar-list-syncing-objects" class="md-nav__link">
+    kubestellar-list-syncing-objects
   </a>
   
 </li>
@@ -3050,6 +3064,72 @@ the parent of the workload management workspace to delete.</p>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
+<h2 id="kubestellar-list-syncing-objects">kubestellar-list-syncing-objects<a class="headerlink" href="#kubestellar-list-syncing-objects" title="Permanent link">#</a></h2>
+<p>The <code>kubestellar-list-syncing-objects</code> command will list or watch one
+kind of objects in the mailbox spaces. These are full (not summarized)
+workload objects in the intermediate place between WDSes and WECs,
+participating in downsync or upsync. The user of this command is not
+very exposed to the mailbox spaces themselves; the command is directed
+at the whole of this intermediate place and lists all of the requested
+kind of objects there. The kind of objects to list/watch is given by
+command line flags. In general the user has to also give the
+"resource" that is roughly equivalent to the "kind", but that can be
+defaulted in the easy case.</p>
+<p>The output is suitable for piping to <code>jq</code> or <code>yq</code>. In the JSON case,
+the output is one object per line (not pretty-printed). The default is
+to output YAML.</p>
+<p>This command will either do a one-shot listing or an ongoing
+list+watch. In the latter case each object is extended with a field
+named <code>Action</code> having a value of either <code>add</code>, <code>update</code>, or <code>delete</code>.</p>
+<p>This command is given two Kubernetes client configurations.  One,
+called "all", is for reading the chosen objects from all workspaces.
+The other, called "parent", is for reading the mailbox Workspace
+objects from their parent Workspace.</p>
+<p>Following are the command line flags beyond the baseline golang flags.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="w">      </span>--api-group<span class="w"> </span>string<span class="w">                 </span>API<span class="w"> </span>group<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>is<span class="w"> </span>Kubernetes<span class="w"> </span>core<span class="w"> </span>group<span class="o">)</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="w">      </span>--api-kind<span class="w"> </span>string<span class="w">                  </span>kind<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch
+<a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a><span class="w">      </span>--api-resource<span class="w"> </span>string<span class="w">              </span>API<span class="w"> </span>resource<span class="w"> </span><span class="o">(</span>lowercase<span class="w"> </span>plural<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>defaults<span class="w"> </span>to<span class="w"> </span>lowercase<span class="o">(</span>kind<span class="o">)</span>+<span class="s1">&#39;s&#39;</span><span class="o">)</span>
+<a id="__codelineno-57-4" name="__codelineno-57-4" href="#__codelineno-57-4"></a><span class="w">      </span>--api-version<span class="w"> </span>string<span class="w">               </span>API<span class="w"> </span>version<span class="w"> </span><span class="o">(</span>just<span class="w"> </span>version,<span class="w"> </span>no<span class="w"> </span>group<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="o">)</span>
+<a id="__codelineno-57-5" name="__codelineno-57-5" href="#__codelineno-57-5"></a><span class="w">      </span>--json<span class="w">                             </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>as<span class="w"> </span>lines<span class="w"> </span>of<span class="w"> </span>JSON<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>YAML
+<a id="__codelineno-57-6" name="__codelineno-57-6" href="#__codelineno-57-6"></a><span class="w">      </span>--watch<span class="w">                            </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>inform<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>just<span class="w"> </span>list
+<a id="__codelineno-57-7" name="__codelineno-57-7" href="#__codelineno-57-7"></a>...
+<a id="__codelineno-57-8" name="__codelineno-57-8" href="#__codelineno-57-8"></a><span class="w">      </span>--all-cluster<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-57-9" name="__codelineno-57-9" href="#__codelineno-57-9"></a><span class="w">      </span>--all-context<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;system:admin&quot;</span><span class="o">)</span>
+<a id="__codelineno-57-10" name="__codelineno-57-10" href="#__codelineno-57-10"></a><span class="w">      </span>--all-kubeconfig<span class="w"> </span>string<span class="w">            </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-57-11" name="__codelineno-57-11" href="#__codelineno-57-11"></a><span class="w">      </span>--all-user<span class="w"> </span>string<span class="w">                  </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-57-12" name="__codelineno-57-12" href="#__codelineno-57-12"></a>...
+<a id="__codelineno-57-13" name="__codelineno-57-13" href="#__codelineno-57-13"></a><span class="w">      </span>--parent-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+<a id="__codelineno-57-14" name="__codelineno-57-14" href="#__codelineno-57-14"></a><span class="w">      </span>--parent-context<span class="w"> </span>string<span class="w">            </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
+<a id="__codelineno-57-15" name="__codelineno-57-15" href="#__codelineno-57-15"></a><span class="w">      </span>--parent-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+<a id="__codelineno-57-16" name="__codelineno-57-16" href="#__codelineno-57-16"></a><span class="w">      </span>--parent-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+</code></pre></div>
+<p>Following is an example of its usage; the elipses show where this
+document omits many lines for brevity.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
+<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="go">---</span>
+<a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a><span class="go">apiVersion: apps/v1</span>
+<a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="go">kind: ReplicaSet</span>
+<a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="go">metadata:</span>
+<a id="__codelineno-58-6" name="__codelineno-58-6" href="#__codelineno-58-6"></a><span class="go">...</span>
+<a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="go">status:</span>
+<a id="__codelineno-58-8" name="__codelineno-58-8" href="#__codelineno-58-8"></a><span class="go">  availableReplicas: 1</span>
+<a id="__codelineno-58-9" name="__codelineno-58-9" href="#__codelineno-58-9"></a><span class="go">  fullyLabeledReplicas: 1</span>
+<a id="__codelineno-58-10" name="__codelineno-58-10" href="#__codelineno-58-10"></a><span class="go">  observedGeneration: 1</span>
+<a id="__codelineno-58-11" name="__codelineno-58-11" href="#__codelineno-58-11"></a><span class="go">  readyReplicas: 1</span>
+<a id="__codelineno-58-12" name="__codelineno-58-12" href="#__codelineno-58-12"></a><span class="go">  replicas: 1</span>
+<a id="__codelineno-58-13" name="__codelineno-58-13" href="#__codelineno-58-13"></a>
+<a id="__codelineno-58-14" name="__codelineno-58-14" href="#__codelineno-58-14"></a><span class="go">---</span>
+<a id="__codelineno-58-15" name="__codelineno-58-15" href="#__codelineno-58-15"></a><span class="go">apiVersion: apps/v1</span>
+<a id="__codelineno-58-16" name="__codelineno-58-16" href="#__codelineno-58-16"></a><span class="go">kind: ReplicaSet</span>
+<a id="__codelineno-58-17" name="__codelineno-58-17" href="#__codelineno-58-17"></a><span class="go">metadata:</span>
+<a id="__codelineno-58-18" name="__codelineno-58-18" href="#__codelineno-58-18"></a><span class="go">...</span>
+<a id="__codelineno-58-19" name="__codelineno-58-19" href="#__codelineno-58-19"></a><span class="go">status:</span>
+<a id="__codelineno-58-20" name="__codelineno-58-20" href="#__codelineno-58-20"></a><span class="go">  availableReplicas: 1</span>
+<a id="__codelineno-58-21" name="__codelineno-58-21" href="#__codelineno-58-21"></a><span class="go">  fullyLabeledReplicas: 1</span>
+<a id="__codelineno-58-22" name="__codelineno-58-22" href="#__codelineno-58-22"></a><span class="go">  observedGeneration: 1</span>
+<a id="__codelineno-58-23" name="__codelineno-58-23" href="#__codelineno-58-23"></a><span class="go">  readyReplicas: 1</span>
+<a id="__codelineno-58-24" name="__codelineno-58-24" href="#__codelineno-58-24"></a><span class="go">  replicas: 1</span>
+</code></pre></div>
 <h2 id="bootstrap">Bootstrap<a class="headerlink" href="#bootstrap" title="Permanent link">#</a></h2>
 <p>This is a combination of some installation and setup steps, for use in
 <a href="../../../Getting-Started/quickstart/">the
