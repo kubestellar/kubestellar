@@ -32,14 +32,14 @@ for ii in "${mbxws[@]}"; do
   while ! kubectl get SyncerConfig the-one &> /dev/null; do
     sleep 10
   done
-  echo "* SyncerConfig resource exists"
+  echo "* SyncerConfig resource exists in mailbox $ii"
   # wait for ReplicaSet resource
   while ! kubectl get rs &> /dev/null; do
     sleep 10
   done
-  echo "* ReplicaSet resource exists"
+  echo "* ReplicaSet resource exists in mailbox $ii"
   # wait until ReplicaSet in mailbox
-  while [ "$(kubectl get rs -n commonstuff commond -o 'jsonpath={.status.readyReplicas}')" != 1 ]; do
+  while ! kubectl get rs -n commonstuff commond; do
     sleep 10
   done
   echo "* commonstuff ReplicaSet in mailbox $ii"
@@ -49,7 +49,7 @@ while ! kubectl get deploy -A &> /dev/null; do
   sleep 10
 done
 echo "* Deployment resource exists"
-while [ "$(kubectl get deploy -n specialstuff speciald -o 'jsonpath={.status.availableReplicas}')" != 1 ]; do
+while ! kubectl get deploy -n specialstuff speciald; do
   sleep 10
 done
 echo "* specialstuff Deployment in its mailbox"
@@ -60,6 +60,50 @@ echo "* CronTab CRD is established in its mailbox"
 # wait for my-new-cron-object to be in its mailbox
 while ! kubectl get ct -n specialstuff my-new-cron-object; do sleep 10; done
 echo "* CronTab my-new-cron-object is in its mailbox"
+```
+
+You can check that the common workload's ReplicaSet objects got to
+their mailbox workspaces with the following command. It will list the
+two copies of that object, each with an annotation whose key is
+`kcp.io/cluster` and whose value is the kcp `logicalcluster.Name` of
+the mailbox workspace; those names appear in the "CLUSTER" column of
+the custom-columns listing near the end of [the section above about
+the mailbox controller](../#the-mailbox-controller).
+
+```shell
+kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
+```
+
+``` { .bash .no-copy }
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    edge.kubestellar.io/customizer: example-customizer
+    kcp.io/cluster: 1y7wll1dz806h3sb
+    ... (lots of other details) ...
+  name: commond
+  namespace: commonstuff
+spec:
+  ... (the customized spec) ...
+status:
+  ... (may be filled in by the time you look) ...
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    edge.kubestellar.io/customizer: example-customizer
+    kcp.io/cluster: 1najcltzt2nqax47
+    ... (lots of other details) ...
+  name: commond
+  namespace: commonstuff
+spec:
+  ... (the customized spec) ...
+status:
+  ... (may be filled in by the time you look) ...
 ```
 
 The florin cluster gets only the common workload.  Examine florin's
@@ -122,25 +166,6 @@ spec:
     resources:
     - cogs
 status: {}
-```
-
-You can check that the workload got there too.
-
-```shell
-kubectl get ns
-```
-``` { .bash .no-copy }
-NAME          STATUS   AGE
-commonstuff   Active   6m34s
-default       Active   32m
-```
-
-```shell
-kubectl get replicasets -A
-```
-``` { .bash .no-copy }
-NAMESPACE     NAME      DESIRED   CURRENT   READY   AGE
-commonstuff   commond   0         1         1       10m
 ```
 
 The guilder cluster gets both the common and special workloads.
@@ -235,6 +260,9 @@ spec:
     - cogs
 status: {}
 ```
+
+You can check for specific workload objects here with the following
+command.
 
 ```shell
 kubectl get deployments,replicasets -A
