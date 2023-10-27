@@ -4394,14 +4394,14 @@ job done for this example.</p>
 <a id="__codelineno-114-6" name="__codelineno-114-6" href="#__codelineno-114-6"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-114-7" name="__codelineno-114-7" href="#__codelineno-114-7"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-114-8" name="__codelineno-114-8" href="#__codelineno-114-8"></a><span class="w">  </span><span class="k">done</span>
-<a id="__codelineno-114-9" name="__codelineno-114-9" href="#__codelineno-114-9"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* SyncerConfig resource exists&quot;</span>
+<a id="__codelineno-114-9" name="__codelineno-114-9" href="#__codelineno-114-9"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* SyncerConfig resource exists in mailbox </span><span class="nv">$ii</span><span class="s2">&quot;</span>
 <a id="__codelineno-114-10" name="__codelineno-114-10" href="#__codelineno-114-10"></a><span class="w">  </span><span class="c1"># wait for ReplicaSet resource</span>
 <a id="__codelineno-114-11" name="__codelineno-114-11" href="#__codelineno-114-11"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-114-12" name="__codelineno-114-12" href="#__codelineno-114-12"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-114-13" name="__codelineno-114-13" href="#__codelineno-114-13"></a><span class="w">  </span><span class="k">done</span>
-<a id="__codelineno-114-14" name="__codelineno-114-14" href="#__codelineno-114-14"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* ReplicaSet resource exists&quot;</span>
+<a id="__codelineno-114-14" name="__codelineno-114-14" href="#__codelineno-114-14"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* ReplicaSet resource exists in mailbox </span><span class="nv">$ii</span><span class="s2">&quot;</span>
 <a id="__codelineno-114-15" name="__codelineno-114-15" href="#__codelineno-114-15"></a><span class="w">  </span><span class="c1"># wait until ReplicaSet in mailbox</span>
-<a id="__codelineno-114-16" name="__codelineno-114-16" href="#__codelineno-114-16"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span><span class="s1">&#39;jsonpath={.status.readyReplicas}&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-114-16" name="__codelineno-114-16" href="#__codelineno-114-16"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-114-17" name="__codelineno-114-17" href="#__codelineno-114-17"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-114-18" name="__codelineno-114-18" href="#__codelineno-114-18"></a><span class="w">  </span><span class="k">done</span>
 <a id="__codelineno-114-19" name="__codelineno-114-19" href="#__codelineno-114-19"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* commonstuff ReplicaSet in mailbox </span><span class="nv">$ii</span><span class="s2">&quot;</span>
@@ -4411,7 +4411,7 @@ job done for this example.</p>
 <a id="__codelineno-114-23" name="__codelineno-114-23" href="#__codelineno-114-23"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-114-24" name="__codelineno-114-24" href="#__codelineno-114-24"></a><span class="k">done</span>
 <a id="__codelineno-114-25" name="__codelineno-114-25" href="#__codelineno-114-25"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* Deployment resource exists&quot;</span>
-<a id="__codelineno-114-26" name="__codelineno-114-26" href="#__codelineno-114-26"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span><span class="s1">&#39;jsonpath={.status.availableReplicas}&#39;</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-114-26" name="__codelineno-114-26" href="#__codelineno-114-26"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-114-27" name="__codelineno-114-27" href="#__codelineno-114-27"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-114-28" name="__codelineno-114-28" href="#__codelineno-114-28"></a><span class="k">done</span>
 <a id="__codelineno-114-29" name="__codelineno-114-29" href="#__codelineno-114-29"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* specialstuff Deployment in its mailbox&quot;</span>
@@ -4423,164 +4423,193 @@ job done for this example.</p>
 <a id="__codelineno-114-35" name="__codelineno-114-35" href="#__codelineno-114-35"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>ct<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>my-new-cron-object<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>sleep<span class="w"> </span><span class="m">10</span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
 <a id="__codelineno-114-36" name="__codelineno-114-36" href="#__codelineno-114-36"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;* CronTab my-new-cron-object is in its mailbox&quot;</span>
 </code></pre></div>
+<p>You can check that the common workload's ReplicaSet objects got to
+their mailbox workspaces with the following command. It will list the
+two copies of that object, each with an annotation whose key is
+<code>kcp.io/cluster</code> and whose value is the kcp <code>logicalcluster.Name</code> of
+the mailbox workspace; those names appear in the "CLUSTER" column of
+the custom-columns listing near the end of <a href="./#the-mailbox-controller">the section above about
+the mailbox controller</a>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a>---
+<a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a>apiVersion:<span class="w"> </span>apps/v1
+<a id="__codelineno-116-3" name="__codelineno-116-3" href="#__codelineno-116-3"></a>kind:<span class="w"> </span>ReplicaSet
+<a id="__codelineno-116-4" name="__codelineno-116-4" href="#__codelineno-116-4"></a>metadata:
+<a id="__codelineno-116-5" name="__codelineno-116-5" href="#__codelineno-116-5"></a><span class="w">  </span>annotations:
+<a id="__codelineno-116-6" name="__codelineno-116-6" href="#__codelineno-116-6"></a><span class="w">    </span>edge.kubestellar.io/customizer:<span class="w"> </span>example-customizer
+<a id="__codelineno-116-7" name="__codelineno-116-7" href="#__codelineno-116-7"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>1y7wll1dz806h3sb
+<a id="__codelineno-116-8" name="__codelineno-116-8" href="#__codelineno-116-8"></a><span class="w">    </span>...<span class="w"> </span><span class="o">(</span>lots<span class="w"> </span>of<span class="w"> </span>other<span class="w"> </span>details<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-116-9" name="__codelineno-116-9" href="#__codelineno-116-9"></a><span class="w">  </span>name:<span class="w"> </span>commond
+<a id="__codelineno-116-10" name="__codelineno-116-10" href="#__codelineno-116-10"></a><span class="w">  </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-116-11" name="__codelineno-116-11" href="#__codelineno-116-11"></a>spec:
+<a id="__codelineno-116-12" name="__codelineno-116-12" href="#__codelineno-116-12"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>the<span class="w"> </span>customized<span class="w"> </span>spec<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-116-13" name="__codelineno-116-13" href="#__codelineno-116-13"></a>status:
+<a id="__codelineno-116-14" name="__codelineno-116-14" href="#__codelineno-116-14"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>may<span class="w"> </span>be<span class="w"> </span>filled<span class="w"> </span><span class="k">in</span><span class="w"> </span>by<span class="w"> </span>the<span class="w"> </span><span class="nb">time</span><span class="w"> </span>you<span class="w"> </span>look<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-116-15" name="__codelineno-116-15" href="#__codelineno-116-15"></a>
+<a id="__codelineno-116-16" name="__codelineno-116-16" href="#__codelineno-116-16"></a>---
+<a id="__codelineno-116-17" name="__codelineno-116-17" href="#__codelineno-116-17"></a>apiVersion:<span class="w"> </span>apps/v1
+<a id="__codelineno-116-18" name="__codelineno-116-18" href="#__codelineno-116-18"></a>kind:<span class="w"> </span>ReplicaSet
+<a id="__codelineno-116-19" name="__codelineno-116-19" href="#__codelineno-116-19"></a>metadata:
+<a id="__codelineno-116-20" name="__codelineno-116-20" href="#__codelineno-116-20"></a><span class="w">  </span>annotations:
+<a id="__codelineno-116-21" name="__codelineno-116-21" href="#__codelineno-116-21"></a><span class="w">    </span>edge.kubestellar.io/customizer:<span class="w"> </span>example-customizer
+<a id="__codelineno-116-22" name="__codelineno-116-22" href="#__codelineno-116-22"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>1najcltzt2nqax47
+<a id="__codelineno-116-23" name="__codelineno-116-23" href="#__codelineno-116-23"></a><span class="w">    </span>...<span class="w"> </span><span class="o">(</span>lots<span class="w"> </span>of<span class="w"> </span>other<span class="w"> </span>details<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-116-24" name="__codelineno-116-24" href="#__codelineno-116-24"></a><span class="w">  </span>name:<span class="w"> </span>commond
+<a id="__codelineno-116-25" name="__codelineno-116-25" href="#__codelineno-116-25"></a><span class="w">  </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-116-26" name="__codelineno-116-26" href="#__codelineno-116-26"></a>spec:
+<a id="__codelineno-116-27" name="__codelineno-116-27" href="#__codelineno-116-27"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>the<span class="w"> </span>customized<span class="w"> </span>spec<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-116-28" name="__codelineno-116-28" href="#__codelineno-116-28"></a>status:
+<a id="__codelineno-116-29" name="__codelineno-116-29" href="#__codelineno-116-29"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>may<span class="w"> </span>be<span class="w"> </span>filled<span class="w"> </span><span class="k">in</span><span class="w"> </span>by<span class="w"> </span>the<span class="w"> </span><span class="nb">time</span><span class="w"> </span>you<span class="w"> </span>look<span class="o">)</span><span class="w"> </span>...
+</code></pre></div>
 <p>The florin cluster gets only the common workload.  Examine florin's
 <code>SyncerConfig</code> as follows.  Utilize the name of the mailbox workspace
 for florin (which you stored in Stage 1) here.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:<span class="nv">$FLORIN_WS</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:<span class="nv">$FLORIN_WS</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
-<a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a>kind:<span class="w"> </span>SyncerConfig
-<a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a>metadata:
-<a id="__codelineno-118-4" name="__codelineno-118-4" href="#__codelineno-118-4"></a><span class="w">  </span>annotations:
-<a id="__codelineno-118-5" name="__codelineno-118-5" href="#__codelineno-118-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>12299slctppnhjnn
-<a id="__codelineno-118-6" name="__codelineno-118-6" href="#__codelineno-118-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
-<a id="__codelineno-118-7" name="__codelineno-118-7" href="#__codelineno-118-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">3</span>
-<a id="__codelineno-118-8" name="__codelineno-118-8" href="#__codelineno-118-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
-<a id="__codelineno-118-9" name="__codelineno-118-9" href="#__codelineno-118-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1323&quot;</span>
-<a id="__codelineno-118-10" name="__codelineno-118-10" href="#__codelineno-118-10"></a><span class="w">  </span>uid:<span class="w"> </span>8840fee6-37dc-407e-ad01-2ad59389d4ff
-<a id="__codelineno-118-11" name="__codelineno-118-11" href="#__codelineno-118-11"></a>spec:
-<a id="__codelineno-118-12" name="__codelineno-118-12" href="#__codelineno-118-12"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
-<a id="__codelineno-118-13" name="__codelineno-118-13" href="#__codelineno-118-13"></a><span class="w">  </span>namespacedObjects:
-<a id="__codelineno-118-14" name="__codelineno-118-14" href="#__codelineno-118-14"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-118-15" name="__codelineno-118-15" href="#__codelineno-118-15"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-118-16" name="__codelineno-118-16" href="#__codelineno-118-16"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-118-17" name="__codelineno-118-17" href="#__codelineno-118-17"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-118-18" name="__codelineno-118-18" href="#__codelineno-118-18"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
-<a id="__codelineno-118-19" name="__codelineno-118-19" href="#__codelineno-118-19"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-118-20" name="__codelineno-118-20" href="#__codelineno-118-20"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
-<a id="__codelineno-118-21" name="__codelineno-118-21" href="#__codelineno-118-21"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-118-22" name="__codelineno-118-22" href="#__codelineno-118-22"></a><span class="w">    </span>group:<span class="w"> </span>apps
-<a id="__codelineno-118-23" name="__codelineno-118-23" href="#__codelineno-118-23"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-118-24" name="__codelineno-118-24" href="#__codelineno-118-24"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-118-25" name="__codelineno-118-25" href="#__codelineno-118-25"></a><span class="w">      </span>-<span class="w"> </span>commond
-<a id="__codelineno-118-26" name="__codelineno-118-26" href="#__codelineno-118-26"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-118-27" name="__codelineno-118-27" href="#__codelineno-118-27"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
-<a id="__codelineno-118-28" name="__codelineno-118-28" href="#__codelineno-118-28"></a><span class="w">  </span>upsync:
-<a id="__codelineno-118-29" name="__codelineno-118-29" href="#__codelineno-118-29"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
-<a id="__codelineno-118-30" name="__codelineno-118-30" href="#__codelineno-118-30"></a><span class="w">    </span>names:
-<a id="__codelineno-118-31" name="__codelineno-118-31" href="#__codelineno-118-31"></a><span class="w">    </span>-<span class="w"> </span>george
-<a id="__codelineno-118-32" name="__codelineno-118-32" href="#__codelineno-118-32"></a><span class="w">    </span>-<span class="w"> </span>cosmo
-<a id="__codelineno-118-33" name="__codelineno-118-33" href="#__codelineno-118-33"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-118-34" name="__codelineno-118-34" href="#__codelineno-118-34"></a><span class="w">    </span>-<span class="w"> </span>orbital
-<a id="__codelineno-118-35" name="__codelineno-118-35" href="#__codelineno-118-35"></a><span class="w">    </span>resources:
-<a id="__codelineno-118-36" name="__codelineno-118-36" href="#__codelineno-118-36"></a><span class="w">    </span>-<span class="w"> </span>sprockets
-<a id="__codelineno-118-37" name="__codelineno-118-37" href="#__codelineno-118-37"></a><span class="w">    </span>-<span class="w"> </span>flanges
-<a id="__codelineno-118-38" name="__codelineno-118-38" href="#__codelineno-118-38"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
-<a id="__codelineno-118-39" name="__codelineno-118-39" href="#__codelineno-118-39"></a><span class="w">    </span>names:
-<a id="__codelineno-118-40" name="__codelineno-118-40" href="#__codelineno-118-40"></a><span class="w">    </span>-<span class="w"> </span>william
-<a id="__codelineno-118-41" name="__codelineno-118-41" href="#__codelineno-118-41"></a><span class="w">    </span>resources:
-<a id="__codelineno-118-42" name="__codelineno-118-42" href="#__codelineno-118-42"></a><span class="w">    </span>-<span class="w"> </span>cogs
-<a id="__codelineno-118-43" name="__codelineno-118-43" href="#__codelineno-118-43"></a>status:<span class="w"> </span><span class="o">{}</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a>kind:<span class="w"> </span>SyncerConfig
+<a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a>metadata:
+<a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a><span class="w">  </span>annotations:
+<a id="__codelineno-120-5" name="__codelineno-120-5" href="#__codelineno-120-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>12299slctppnhjnn
+<a id="__codelineno-120-6" name="__codelineno-120-6" href="#__codelineno-120-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
+<a id="__codelineno-120-7" name="__codelineno-120-7" href="#__codelineno-120-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">3</span>
+<a id="__codelineno-120-8" name="__codelineno-120-8" href="#__codelineno-120-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
+<a id="__codelineno-120-9" name="__codelineno-120-9" href="#__codelineno-120-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1323&quot;</span>
+<a id="__codelineno-120-10" name="__codelineno-120-10" href="#__codelineno-120-10"></a><span class="w">  </span>uid:<span class="w"> </span>8840fee6-37dc-407e-ad01-2ad59389d4ff
+<a id="__codelineno-120-11" name="__codelineno-120-11" href="#__codelineno-120-11"></a>spec:
+<a id="__codelineno-120-12" name="__codelineno-120-12" href="#__codelineno-120-12"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
+<a id="__codelineno-120-13" name="__codelineno-120-13" href="#__codelineno-120-13"></a><span class="w">  </span>namespacedObjects:
+<a id="__codelineno-120-14" name="__codelineno-120-14" href="#__codelineno-120-14"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-120-15" name="__codelineno-120-15" href="#__codelineno-120-15"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-120-16" name="__codelineno-120-16" href="#__codelineno-120-16"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-120-17" name="__codelineno-120-17" href="#__codelineno-120-17"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-120-18" name="__codelineno-120-18" href="#__codelineno-120-18"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
+<a id="__codelineno-120-19" name="__codelineno-120-19" href="#__codelineno-120-19"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-120-20" name="__codelineno-120-20" href="#__codelineno-120-20"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
+<a id="__codelineno-120-21" name="__codelineno-120-21" href="#__codelineno-120-21"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-120-22" name="__codelineno-120-22" href="#__codelineno-120-22"></a><span class="w">    </span>group:<span class="w"> </span>apps
+<a id="__codelineno-120-23" name="__codelineno-120-23" href="#__codelineno-120-23"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-120-24" name="__codelineno-120-24" href="#__codelineno-120-24"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-120-25" name="__codelineno-120-25" href="#__codelineno-120-25"></a><span class="w">      </span>-<span class="w"> </span>commond
+<a id="__codelineno-120-26" name="__codelineno-120-26" href="#__codelineno-120-26"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-120-27" name="__codelineno-120-27" href="#__codelineno-120-27"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
+<a id="__codelineno-120-28" name="__codelineno-120-28" href="#__codelineno-120-28"></a><span class="w">  </span>upsync:
+<a id="__codelineno-120-29" name="__codelineno-120-29" href="#__codelineno-120-29"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
+<a id="__codelineno-120-30" name="__codelineno-120-30" href="#__codelineno-120-30"></a><span class="w">    </span>names:
+<a id="__codelineno-120-31" name="__codelineno-120-31" href="#__codelineno-120-31"></a><span class="w">    </span>-<span class="w"> </span>george
+<a id="__codelineno-120-32" name="__codelineno-120-32" href="#__codelineno-120-32"></a><span class="w">    </span>-<span class="w"> </span>cosmo
+<a id="__codelineno-120-33" name="__codelineno-120-33" href="#__codelineno-120-33"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-120-34" name="__codelineno-120-34" href="#__codelineno-120-34"></a><span class="w">    </span>-<span class="w"> </span>orbital
+<a id="__codelineno-120-35" name="__codelineno-120-35" href="#__codelineno-120-35"></a><span class="w">    </span>resources:
+<a id="__codelineno-120-36" name="__codelineno-120-36" href="#__codelineno-120-36"></a><span class="w">    </span>-<span class="w"> </span>sprockets
+<a id="__codelineno-120-37" name="__codelineno-120-37" href="#__codelineno-120-37"></a><span class="w">    </span>-<span class="w"> </span>flanges
+<a id="__codelineno-120-38" name="__codelineno-120-38" href="#__codelineno-120-38"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
+<a id="__codelineno-120-39" name="__codelineno-120-39" href="#__codelineno-120-39"></a><span class="w">    </span>names:
+<a id="__codelineno-120-40" name="__codelineno-120-40" href="#__codelineno-120-40"></a><span class="w">    </span>-<span class="w"> </span>william
+<a id="__codelineno-120-41" name="__codelineno-120-41" href="#__codelineno-120-41"></a><span class="w">    </span>resources:
+<a id="__codelineno-120-42" name="__codelineno-120-42" href="#__codelineno-120-42"></a><span class="w">    </span>-<span class="w"> </span>cogs
+<a id="__codelineno-120-43" name="__codelineno-120-43" href="#__codelineno-120-43"></a>status:<span class="w"> </span><span class="o">{}</span>
 </code></pre></div>
-<p>You can check that the workload got there too.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ns
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>NAME<span class="w">          </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a>commonstuff<span class="w">   </span>Active<span class="w">   </span>6m34s
-<a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a>default<span class="w">       </span>Active<span class="w">   </span>32m
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>replicasets<span class="w"> </span>-A
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">      </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
-<a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a>commonstuff<span class="w">   </span>commond<span class="w">   </span><span class="m">0</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>10m
-</code></pre></div></p>
 <p>The guilder cluster gets both the common and special workloads.
 Examine guilder's <code>SyncerConfig</code> object and workloads as follows,
 using the mailbox workspace name that you stored in Stage 1.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:<span class="nv">$GUILDER_WS</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:<span class="nv">$GUILDER_WS</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>SyncerConfig<span class="w"> </span>the-one<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
-<a id="__codelineno-126-2" name="__codelineno-126-2" href="#__codelineno-126-2"></a>kind:<span class="w"> </span>SyncerConfig
-<a id="__codelineno-126-3" name="__codelineno-126-3" href="#__codelineno-126-3"></a>metadata:
-<a id="__codelineno-126-4" name="__codelineno-126-4" href="#__codelineno-126-4"></a><span class="w">  </span>annotations:
-<a id="__codelineno-126-5" name="__codelineno-126-5" href="#__codelineno-126-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>yk9a66vjms1pi8hu
-<a id="__codelineno-126-6" name="__codelineno-126-6" href="#__codelineno-126-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
-<a id="__codelineno-126-7" name="__codelineno-126-7" href="#__codelineno-126-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-126-8" name="__codelineno-126-8" href="#__codelineno-126-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
-<a id="__codelineno-126-9" name="__codelineno-126-9" href="#__codelineno-126-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1325&quot;</span>
-<a id="__codelineno-126-10" name="__codelineno-126-10" href="#__codelineno-126-10"></a><span class="w">  </span>uid:<span class="w"> </span>3da056c7-0d5c-45a3-9d91-d04f04415f30
-<a id="__codelineno-126-11" name="__codelineno-126-11" href="#__codelineno-126-11"></a>spec:
-<a id="__codelineno-126-12" name="__codelineno-126-12" href="#__codelineno-126-12"></a><span class="w">  </span>clusterScope:
-<a id="__codelineno-126-13" name="__codelineno-126-13" href="#__codelineno-126-13"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-14" name="__codelineno-126-14" href="#__codelineno-126-14"></a><span class="w">    </span>group:<span class="w"> </span>apiextensions.k8s.io
-<a id="__codelineno-126-15" name="__codelineno-126-15" href="#__codelineno-126-15"></a><span class="w">    </span>objects:
-<a id="__codelineno-126-16" name="__codelineno-126-16" href="#__codelineno-126-16"></a><span class="w">    </span>-<span class="w"> </span>crontabs.stable.example.com
-<a id="__codelineno-126-17" name="__codelineno-126-17" href="#__codelineno-126-17"></a><span class="w">    </span>resource:<span class="w"> </span>customresourcedefinitions
-<a id="__codelineno-126-18" name="__codelineno-126-18" href="#__codelineno-126-18"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-19" name="__codelineno-126-19" href="#__codelineno-126-19"></a><span class="w">    </span>group:<span class="w"> </span>apiregistration.k8s.io
-<a id="__codelineno-126-20" name="__codelineno-126-20" href="#__codelineno-126-20"></a><span class="w">    </span>objects:
-<a id="__codelineno-126-21" name="__codelineno-126-21" href="#__codelineno-126-21"></a><span class="w">    </span>-<span class="w"> </span>v1090.example.my
-<a id="__codelineno-126-22" name="__codelineno-126-22" href="#__codelineno-126-22"></a><span class="w">    </span>resource:<span class="w"> </span>apiservices
-<a id="__codelineno-126-23" name="__codelineno-126-23" href="#__codelineno-126-23"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
-<a id="__codelineno-126-24" name="__codelineno-126-24" href="#__codelineno-126-24"></a><span class="w">  </span>namespacedObjects:
-<a id="__codelineno-126-25" name="__codelineno-126-25" href="#__codelineno-126-25"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-26" name="__codelineno-126-26" href="#__codelineno-126-26"></a><span class="w">    </span>group:<span class="w"> </span>apps
-<a id="__codelineno-126-27" name="__codelineno-126-27" href="#__codelineno-126-27"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-28" name="__codelineno-126-28" href="#__codelineno-126-28"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-29" name="__codelineno-126-29" href="#__codelineno-126-29"></a><span class="w">      </span>-<span class="w"> </span>commond
-<a id="__codelineno-126-30" name="__codelineno-126-30" href="#__codelineno-126-30"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-126-31" name="__codelineno-126-31" href="#__codelineno-126-31"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
-<a id="__codelineno-126-32" name="__codelineno-126-32" href="#__codelineno-126-32"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-33" name="__codelineno-126-33" href="#__codelineno-126-33"></a><span class="w">    </span>group:<span class="w"> </span>stable.example.com
-<a id="__codelineno-126-34" name="__codelineno-126-34" href="#__codelineno-126-34"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-35" name="__codelineno-126-35" href="#__codelineno-126-35"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-36" name="__codelineno-126-36" href="#__codelineno-126-36"></a><span class="w">      </span>-<span class="w"> </span>my-new-cron-object
-<a id="__codelineno-126-37" name="__codelineno-126-37" href="#__codelineno-126-37"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
-<a id="__codelineno-126-38" name="__codelineno-126-38" href="#__codelineno-126-38"></a><span class="w">    </span>resource:<span class="w"> </span>crontabs
-<a id="__codelineno-126-39" name="__codelineno-126-39" href="#__codelineno-126-39"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-40" name="__codelineno-126-40" href="#__codelineno-126-40"></a><span class="w">    </span>group:<span class="w"> </span>apps
-<a id="__codelineno-126-41" name="__codelineno-126-41" href="#__codelineno-126-41"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-42" name="__codelineno-126-42" href="#__codelineno-126-42"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-43" name="__codelineno-126-43" href="#__codelineno-126-43"></a><span class="w">      </span>-<span class="w"> </span>speciald
-<a id="__codelineno-126-44" name="__codelineno-126-44" href="#__codelineno-126-44"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
-<a id="__codelineno-126-45" name="__codelineno-126-45" href="#__codelineno-126-45"></a><span class="w">    </span>resource:<span class="w"> </span>deployments
-<a id="__codelineno-126-46" name="__codelineno-126-46" href="#__codelineno-126-46"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
-<a id="__codelineno-126-47" name="__codelineno-126-47" href="#__codelineno-126-47"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
-<a id="__codelineno-126-48" name="__codelineno-126-48" href="#__codelineno-126-48"></a><span class="w">    </span>objectsByNamespace:
-<a id="__codelineno-126-49" name="__codelineno-126-49" href="#__codelineno-126-49"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-50" name="__codelineno-126-50" href="#__codelineno-126-50"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
-<a id="__codelineno-126-51" name="__codelineno-126-51" href="#__codelineno-126-51"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
-<a id="__codelineno-126-52" name="__codelineno-126-52" href="#__codelineno-126-52"></a><span class="w">    </span>-<span class="w"> </span>names:
-<a id="__codelineno-126-53" name="__codelineno-126-53" href="#__codelineno-126-53"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
-<a id="__codelineno-126-54" name="__codelineno-126-54" href="#__codelineno-126-54"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
-<a id="__codelineno-126-55" name="__codelineno-126-55" href="#__codelineno-126-55"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
-<a id="__codelineno-126-56" name="__codelineno-126-56" href="#__codelineno-126-56"></a><span class="w">  </span>upsync:
-<a id="__codelineno-126-57" name="__codelineno-126-57" href="#__codelineno-126-57"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
-<a id="__codelineno-126-58" name="__codelineno-126-58" href="#__codelineno-126-58"></a><span class="w">    </span>names:
-<a id="__codelineno-126-59" name="__codelineno-126-59" href="#__codelineno-126-59"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
-<a id="__codelineno-126-60" name="__codelineno-126-60" href="#__codelineno-126-60"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-61" name="__codelineno-126-61" href="#__codelineno-126-61"></a><span class="w">    </span>-<span class="w"> </span>widgets
-<a id="__codelineno-126-62" name="__codelineno-126-62" href="#__codelineno-126-62"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
-<a id="__codelineno-126-63" name="__codelineno-126-63" href="#__codelineno-126-63"></a><span class="w">    </span>names:
-<a id="__codelineno-126-64" name="__codelineno-126-64" href="#__codelineno-126-64"></a><span class="w">    </span>-<span class="w"> </span>george
-<a id="__codelineno-126-65" name="__codelineno-126-65" href="#__codelineno-126-65"></a><span class="w">    </span>-<span class="w"> </span>cosmo
-<a id="__codelineno-126-66" name="__codelineno-126-66" href="#__codelineno-126-66"></a><span class="w">    </span>namespaces:
-<a id="__codelineno-126-67" name="__codelineno-126-67" href="#__codelineno-126-67"></a><span class="w">    </span>-<span class="w"> </span>orbital
-<a id="__codelineno-126-68" name="__codelineno-126-68" href="#__codelineno-126-68"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-69" name="__codelineno-126-69" href="#__codelineno-126-69"></a><span class="w">    </span>-<span class="w"> </span>sprockets
-<a id="__codelineno-126-70" name="__codelineno-126-70" href="#__codelineno-126-70"></a><span class="w">    </span>-<span class="w"> </span>flanges
-<a id="__codelineno-126-71" name="__codelineno-126-71" href="#__codelineno-126-71"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
-<a id="__codelineno-126-72" name="__codelineno-126-72" href="#__codelineno-126-72"></a><span class="w">    </span>names:
-<a id="__codelineno-126-73" name="__codelineno-126-73" href="#__codelineno-126-73"></a><span class="w">    </span>-<span class="w"> </span>william
-<a id="__codelineno-126-74" name="__codelineno-126-74" href="#__codelineno-126-74"></a><span class="w">    </span>resources:
-<a id="__codelineno-126-75" name="__codelineno-126-75" href="#__codelineno-126-75"></a><span class="w">    </span>-<span class="w"> </span>cogs
-<a id="__codelineno-126-76" name="__codelineno-126-76" href="#__codelineno-126-76"></a>status:<span class="w"> </span><span class="o">{}</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>apiVersion:<span class="w"> </span>edge.kubestellar.io/v2alpha1
+<a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a>kind:<span class="w"> </span>SyncerConfig
+<a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a>metadata:
+<a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a><span class="w">  </span>annotations:
+<a id="__codelineno-124-5" name="__codelineno-124-5" href="#__codelineno-124-5"></a><span class="w">    </span>kcp.io/cluster:<span class="w"> </span>yk9a66vjms1pi8hu
+<a id="__codelineno-124-6" name="__codelineno-124-6" href="#__codelineno-124-6"></a><span class="w">  </span>creationTimestamp:<span class="w"> </span><span class="s2">&quot;2023-04-23T05:39:56Z&quot;</span>
+<a id="__codelineno-124-7" name="__codelineno-124-7" href="#__codelineno-124-7"></a><span class="w">  </span>generation:<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-124-8" name="__codelineno-124-8" href="#__codelineno-124-8"></a><span class="w">  </span>name:<span class="w"> </span>the-one
+<a id="__codelineno-124-9" name="__codelineno-124-9" href="#__codelineno-124-9"></a><span class="w">  </span>resourceVersion:<span class="w"> </span><span class="s2">&quot;1325&quot;</span>
+<a id="__codelineno-124-10" name="__codelineno-124-10" href="#__codelineno-124-10"></a><span class="w">  </span>uid:<span class="w"> </span>3da056c7-0d5c-45a3-9d91-d04f04415f30
+<a id="__codelineno-124-11" name="__codelineno-124-11" href="#__codelineno-124-11"></a>spec:
+<a id="__codelineno-124-12" name="__codelineno-124-12" href="#__codelineno-124-12"></a><span class="w">  </span>clusterScope:
+<a id="__codelineno-124-13" name="__codelineno-124-13" href="#__codelineno-124-13"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-14" name="__codelineno-124-14" href="#__codelineno-124-14"></a><span class="w">    </span>group:<span class="w"> </span>apiextensions.k8s.io
+<a id="__codelineno-124-15" name="__codelineno-124-15" href="#__codelineno-124-15"></a><span class="w">    </span>objects:
+<a id="__codelineno-124-16" name="__codelineno-124-16" href="#__codelineno-124-16"></a><span class="w">    </span>-<span class="w"> </span>crontabs.stable.example.com
+<a id="__codelineno-124-17" name="__codelineno-124-17" href="#__codelineno-124-17"></a><span class="w">    </span>resource:<span class="w"> </span>customresourcedefinitions
+<a id="__codelineno-124-18" name="__codelineno-124-18" href="#__codelineno-124-18"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-19" name="__codelineno-124-19" href="#__codelineno-124-19"></a><span class="w">    </span>group:<span class="w"> </span>apiregistration.k8s.io
+<a id="__codelineno-124-20" name="__codelineno-124-20" href="#__codelineno-124-20"></a><span class="w">    </span>objects:
+<a id="__codelineno-124-21" name="__codelineno-124-21" href="#__codelineno-124-21"></a><span class="w">    </span>-<span class="w"> </span>v1090.example.my
+<a id="__codelineno-124-22" name="__codelineno-124-22" href="#__codelineno-124-22"></a><span class="w">    </span>resource:<span class="w"> </span>apiservices
+<a id="__codelineno-124-23" name="__codelineno-124-23" href="#__codelineno-124-23"></a><span class="w">  </span>namespaceScope:<span class="w"> </span><span class="o">{}</span>
+<a id="__codelineno-124-24" name="__codelineno-124-24" href="#__codelineno-124-24"></a><span class="w">  </span>namespacedObjects:
+<a id="__codelineno-124-25" name="__codelineno-124-25" href="#__codelineno-124-25"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-26" name="__codelineno-124-26" href="#__codelineno-124-26"></a><span class="w">    </span>group:<span class="w"> </span>apps
+<a id="__codelineno-124-27" name="__codelineno-124-27" href="#__codelineno-124-27"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-124-28" name="__codelineno-124-28" href="#__codelineno-124-28"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-124-29" name="__codelineno-124-29" href="#__codelineno-124-29"></a><span class="w">      </span>-<span class="w"> </span>commond
+<a id="__codelineno-124-30" name="__codelineno-124-30" href="#__codelineno-124-30"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-124-31" name="__codelineno-124-31" href="#__codelineno-124-31"></a><span class="w">    </span>resource:<span class="w"> </span>replicasets
+<a id="__codelineno-124-32" name="__codelineno-124-32" href="#__codelineno-124-32"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-33" name="__codelineno-124-33" href="#__codelineno-124-33"></a><span class="w">    </span>group:<span class="w"> </span>stable.example.com
+<a id="__codelineno-124-34" name="__codelineno-124-34" href="#__codelineno-124-34"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-124-35" name="__codelineno-124-35" href="#__codelineno-124-35"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-124-36" name="__codelineno-124-36" href="#__codelineno-124-36"></a><span class="w">      </span>-<span class="w"> </span>my-new-cron-object
+<a id="__codelineno-124-37" name="__codelineno-124-37" href="#__codelineno-124-37"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-124-38" name="__codelineno-124-38" href="#__codelineno-124-38"></a><span class="w">    </span>resource:<span class="w"> </span>crontabs
+<a id="__codelineno-124-39" name="__codelineno-124-39" href="#__codelineno-124-39"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-40" name="__codelineno-124-40" href="#__codelineno-124-40"></a><span class="w">    </span>group:<span class="w"> </span>apps
+<a id="__codelineno-124-41" name="__codelineno-124-41" href="#__codelineno-124-41"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-124-42" name="__codelineno-124-42" href="#__codelineno-124-42"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-124-43" name="__codelineno-124-43" href="#__codelineno-124-43"></a><span class="w">      </span>-<span class="w"> </span>speciald
+<a id="__codelineno-124-44" name="__codelineno-124-44" href="#__codelineno-124-44"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-124-45" name="__codelineno-124-45" href="#__codelineno-124-45"></a><span class="w">    </span>resource:<span class="w"> </span>deployments
+<a id="__codelineno-124-46" name="__codelineno-124-46" href="#__codelineno-124-46"></a><span class="w">  </span>-<span class="w"> </span>apiVersion:<span class="w"> </span>v1
+<a id="__codelineno-124-47" name="__codelineno-124-47" href="#__codelineno-124-47"></a><span class="w">    </span>group:<span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-124-48" name="__codelineno-124-48" href="#__codelineno-124-48"></a><span class="w">    </span>objectsByNamespace:
+<a id="__codelineno-124-49" name="__codelineno-124-49" href="#__codelineno-124-49"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-124-50" name="__codelineno-124-50" href="#__codelineno-124-50"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
+<a id="__codelineno-124-51" name="__codelineno-124-51" href="#__codelineno-124-51"></a><span class="w">      </span>namespace:<span class="w"> </span>commonstuff
+<a id="__codelineno-124-52" name="__codelineno-124-52" href="#__codelineno-124-52"></a><span class="w">    </span>-<span class="w"> </span>names:
+<a id="__codelineno-124-53" name="__codelineno-124-53" href="#__codelineno-124-53"></a><span class="w">      </span>-<span class="w"> </span>httpd-htdocs
+<a id="__codelineno-124-54" name="__codelineno-124-54" href="#__codelineno-124-54"></a><span class="w">      </span>namespace:<span class="w"> </span>specialstuff
+<a id="__codelineno-124-55" name="__codelineno-124-55" href="#__codelineno-124-55"></a><span class="w">    </span>resource:<span class="w"> </span>configmaps
+<a id="__codelineno-124-56" name="__codelineno-124-56" href="#__codelineno-124-56"></a><span class="w">  </span>upsync:
+<a id="__codelineno-124-57" name="__codelineno-124-57" href="#__codelineno-124-57"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group3.test
+<a id="__codelineno-124-58" name="__codelineno-124-58" href="#__codelineno-124-58"></a><span class="w">    </span>names:
+<a id="__codelineno-124-59" name="__codelineno-124-59" href="#__codelineno-124-59"></a><span class="w">    </span>-<span class="w"> </span><span class="s1">&#39;*&#39;</span>
+<a id="__codelineno-124-60" name="__codelineno-124-60" href="#__codelineno-124-60"></a><span class="w">    </span>resources:
+<a id="__codelineno-124-61" name="__codelineno-124-61" href="#__codelineno-124-61"></a><span class="w">    </span>-<span class="w"> </span>widgets
+<a id="__codelineno-124-62" name="__codelineno-124-62" href="#__codelineno-124-62"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group1.test
+<a id="__codelineno-124-63" name="__codelineno-124-63" href="#__codelineno-124-63"></a><span class="w">    </span>names:
+<a id="__codelineno-124-64" name="__codelineno-124-64" href="#__codelineno-124-64"></a><span class="w">    </span>-<span class="w"> </span>george
+<a id="__codelineno-124-65" name="__codelineno-124-65" href="#__codelineno-124-65"></a><span class="w">    </span>-<span class="w"> </span>cosmo
+<a id="__codelineno-124-66" name="__codelineno-124-66" href="#__codelineno-124-66"></a><span class="w">    </span>namespaces:
+<a id="__codelineno-124-67" name="__codelineno-124-67" href="#__codelineno-124-67"></a><span class="w">    </span>-<span class="w"> </span>orbital
+<a id="__codelineno-124-68" name="__codelineno-124-68" href="#__codelineno-124-68"></a><span class="w">    </span>resources:
+<a id="__codelineno-124-69" name="__codelineno-124-69" href="#__codelineno-124-69"></a><span class="w">    </span>-<span class="w"> </span>sprockets
+<a id="__codelineno-124-70" name="__codelineno-124-70" href="#__codelineno-124-70"></a><span class="w">    </span>-<span class="w"> </span>flanges
+<a id="__codelineno-124-71" name="__codelineno-124-71" href="#__codelineno-124-71"></a><span class="w">  </span>-<span class="w"> </span>apiGroup:<span class="w"> </span>group2.test
+<a id="__codelineno-124-72" name="__codelineno-124-72" href="#__codelineno-124-72"></a><span class="w">    </span>names:
+<a id="__codelineno-124-73" name="__codelineno-124-73" href="#__codelineno-124-73"></a><span class="w">    </span>-<span class="w"> </span>william
+<a id="__codelineno-124-74" name="__codelineno-124-74" href="#__codelineno-124-74"></a><span class="w">    </span>resources:
+<a id="__codelineno-124-75" name="__codelineno-124-75" href="#__codelineno-124-75"></a><span class="w">    </span>-<span class="w"> </span>cogs
+<a id="__codelineno-124-76" name="__codelineno-124-76" href="#__codelineno-124-76"></a>status:<span class="w"> </span><span class="o">{}</span>
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,replicasets<span class="w"> </span>-A
+<p>You can check for specific workload objects here with the following
+command.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deployments,replicasets<span class="w"> </span>-A
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">                       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-128-2" name="__codelineno-128-2" href="#__codelineno-128-2"></a>specialstuff<span class="w">   </span>deployment.apps/speciald<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>12m
-<a id="__codelineno-128-3" name="__codelineno-128-3" href="#__codelineno-128-3"></a>
-<a id="__codelineno-128-4" name="__codelineno-128-4" href="#__codelineno-128-4"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">                      </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
-<a id="__codelineno-128-5" name="__codelineno-128-5" href="#__codelineno-128-5"></a>commonstuff<span class="w">   </span>replicaset.apps/commond<span class="w">   </span><span class="m">0</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>7m4s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a>NAMESPACE<span class="w">      </span>NAME<span class="w">                       </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-126-2" name="__codelineno-126-2" href="#__codelineno-126-2"></a>specialstuff<span class="w">   </span>deployment.apps/speciald<span class="w">   </span><span class="m">0</span>/0<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">0</span><span class="w">           </span>12m
+<a id="__codelineno-126-3" name="__codelineno-126-3" href="#__codelineno-126-3"></a>
+<a id="__codelineno-126-4" name="__codelineno-126-4" href="#__codelineno-126-4"></a>NAMESPACE<span class="w">     </span>NAME<span class="w">                      </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
+<a id="__codelineno-126-5" name="__codelineno-126-5" href="#__codelineno-126-5"></a>commonstuff<span class="w">   </span>replicaset.apps/commond<span class="w">   </span><span class="m">0</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>7m4s
 </code></pre></div></p>
 <!--example1-stage-3-stop-->
 
@@ -4603,136 +4632,136 @@ workspace.  This is driven by the <code>SyncerConfig</code> object named
 <code>the-one</code> in that mailbox workspace.</p>
 <p>Using the kubeconfig that <code>kind</code> modified, examine the florin cluster.
 Find just the <code>commonstuff</code> namespace and the <code>commond</code> Deployment.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a><span class="o">(</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
-<a id="__codelineno-129-2" name="__codelineno-129-2" href="#__codelineno-129-2"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
-<a id="__codelineno-129-3" name="__codelineno-129-3" href="#__codelineno-129-3"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span>commonstuff<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-129-4" name="__codelineno-129-4" href="#__codelineno-129-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-129-5" name="__codelineno-129-5" href="#__codelineno-129-5"></a><span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The commonstuff namespace failed to appear in florin!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<a id="__codelineno-129-6" name="__codelineno-129-6" href="#__codelineno-129-6"></a><span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-129-7" name="__codelineno-129-7" href="#__codelineno-129-7"></a><span class="w">    </span><span class="k">fi</span>
-<a id="__codelineno-129-8" name="__codelineno-129-8" href="#__codelineno-129-8"></a><span class="w">    </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
-<a id="__codelineno-129-9" name="__codelineno-129-9" href="#__codelineno-129-9"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-129-10" name="__codelineno-129-10" href="#__codelineno-129-10"></a><span class="w">  </span><span class="k">done</span>
-<a id="__codelineno-129-11" name="__codelineno-129-11" href="#__codelineno-129-11"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
-<a id="__codelineno-129-12" name="__codelineno-129-12" href="#__codelineno-129-12"></a><span class="o">)</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a><span class="o">(</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
+<a id="__codelineno-127-2" name="__codelineno-127-2" href="#__codelineno-127-2"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-127-3" name="__codelineno-127-3" href="#__codelineno-127-3"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span>commonstuff<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-127-4" name="__codelineno-127-4" href="#__codelineno-127-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-127-5" name="__codelineno-127-5" href="#__codelineno-127-5"></a><span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The commonstuff namespace failed to appear in florin!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-127-6" name="__codelineno-127-6" href="#__codelineno-127-6"></a><span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-127-7" name="__codelineno-127-7" href="#__codelineno-127-7"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-127-8" name="__codelineno-127-8" href="#__codelineno-127-8"></a><span class="w">    </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
+<a id="__codelineno-127-9" name="__codelineno-127-9" href="#__codelineno-127-9"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-127-10" name="__codelineno-127-10" href="#__codelineno-127-10"></a><span class="w">  </span><span class="k">done</span>
+<a id="__codelineno-127-11" name="__codelineno-127-11" href="#__codelineno-127-11"></a><span class="w">  </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>ns
+<a id="__codelineno-127-12" name="__codelineno-127-12" href="#__codelineno-127-12"></a><span class="o">)</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a>NAME<span class="w">                                 </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-130-2" name="__codelineno-130-2" href="#__codelineno-130-2"></a>commonstuff<span class="w">                          </span>Active<span class="w">   </span>6m51s
-<a id="__codelineno-130-3" name="__codelineno-130-3" href="#__codelineno-130-3"></a>default<span class="w">                              </span>Active<span class="w">   </span>57m
-<a id="__codelineno-130-4" name="__codelineno-130-4" href="#__codelineno-130-4"></a>kubestellar-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
-<a id="__codelineno-130-5" name="__codelineno-130-5" href="#__codelineno-130-5"></a>kube-node-lease<span class="w">                      </span>Active<span class="w">   </span>57m
-<a id="__codelineno-130-6" name="__codelineno-130-6" href="#__codelineno-130-6"></a>kube-public<span class="w">                          </span>Active<span class="w">   </span>57m
-<a id="__codelineno-130-7" name="__codelineno-130-7" href="#__codelineno-130-7"></a>kube-system<span class="w">                          </span>Active<span class="w">   </span>57m
-<a id="__codelineno-130-8" name="__codelineno-130-8" href="#__codelineno-130-8"></a>local-path-storage<span class="w">                   </span>Active<span class="w">   </span>57m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a>NAME<span class="w">                                 </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-128-2" name="__codelineno-128-2" href="#__codelineno-128-2"></a>commonstuff<span class="w">                          </span>Active<span class="w">   </span>6m51s
+<a id="__codelineno-128-3" name="__codelineno-128-3" href="#__codelineno-128-3"></a>default<span class="w">                              </span>Active<span class="w">   </span>57m
+<a id="__codelineno-128-4" name="__codelineno-128-4" href="#__codelineno-128-4"></a>kubestellar-syncer-florin-1t9zgidy<span class="w">   </span>Active<span class="w">   </span>17m
+<a id="__codelineno-128-5" name="__codelineno-128-5" href="#__codelineno-128-5"></a>kube-node-lease<span class="w">                      </span>Active<span class="w">   </span>57m
+<a id="__codelineno-128-6" name="__codelineno-128-6" href="#__codelineno-128-6"></a>kube-public<span class="w">                          </span>Active<span class="w">   </span>57m
+<a id="__codelineno-128-7" name="__codelineno-128-7" href="#__codelineno-128-7"></a>kube-system<span class="w">                          </span>Active<span class="w">   </span>57m
+<a id="__codelineno-128-8" name="__codelineno-128-8" href="#__codelineno-128-8"></a>local-path-storage<span class="w">                   </span>Active<span class="w">   </span>57m
 </code></pre></div></p>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a>sleep<span class="w"> </span><span class="m">15</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-florin<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s1">&#39;NAME|stuff&#39;</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-133-2" name="__codelineno-133-2" href="#__codelineno-133-2"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
-<a id="__codelineno-133-3" name="__codelineno-133-3" href="#__codelineno-133-3"></a>commonstuff<span class="w">                          </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>13m
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                 </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-131-2" name="__codelineno-131-2" href="#__codelineno-131-2"></a>NAMESPACE<span class="w">                            </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
+<a id="__codelineno-131-3" name="__codelineno-131-3" href="#__codelineno-131-3"></a>commonstuff<span class="w">                          </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>13m
 </code></pre></div></p>
 <p>Examine the guilder cluster.  Find both workload namespaces and both
 Deployments.</p>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a>sleep<span class="w"> </span><span class="m">15</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
-<a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
-<a id="__codelineno-136-3" name="__codelineno-136-3" href="#__codelineno-136-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a>NAME<span class="w">                               </span>STATUS<span class="w">   </span>AGE
+<a id="__codelineno-134-2" name="__codelineno-134-2" href="#__codelineno-134-2"></a>commonstuff<span class="w">                        </span>Active<span class="w">   </span>8m33s
+<a id="__codelineno-134-3" name="__codelineno-134-3" href="#__codelineno-134-3"></a>specialstuff<span class="w">                       </span>Active<span class="w">   </span>8m33s
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>deploy,rs<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span>NAME<span class="se">\|</span>stuff
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
-<a id="__codelineno-138-2" name="__codelineno-138-2" href="#__codelineno-138-2"></a>specialstuff<span class="w">                          </span>deployment.apps/speciald<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>23m
-<a id="__codelineno-138-3" name="__codelineno-138-3" href="#__codelineno-138-3"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
-<a id="__codelineno-138-4" name="__codelineno-138-4" href="#__codelineno-138-4"></a>commonstuff<span class="w">                           </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>23m
-<a id="__codelineno-138-5" name="__codelineno-138-5" href="#__codelineno-138-5"></a>specialstuff<span class="w">                          </span>replicaset.apps/speciald-76cdbb69b5<span class="w">                             </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>14s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                  </span>READY<span class="w">   </span>UP-TO-DATE<span class="w">   </span>AVAILABLE<span class="w">   </span>AGE
+<a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a>specialstuff<span class="w">                          </span>deployment.apps/speciald<span class="w">                              </span><span class="m">1</span>/1<span class="w">     </span><span class="m">1</span><span class="w">            </span><span class="m">1</span><span class="w">           </span>23m
+<a id="__codelineno-136-3" name="__codelineno-136-3" href="#__codelineno-136-3"></a>NAMESPACE<span class="w">                             </span>NAME<span class="w">                                                            </span>DESIRED<span class="w">   </span>CURRENT<span class="w">   </span>READY<span class="w">   </span>AGE
+<a id="__codelineno-136-4" name="__codelineno-136-4" href="#__codelineno-136-4"></a>commonstuff<span class="w">                           </span>replicaset.apps/commond<span class="w">                                         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>23m
+<a id="__codelineno-136-5" name="__codelineno-136-5" href="#__codelineno-136-5"></a>specialstuff<span class="w">                          </span>replicaset.apps/speciald-76cdbb69b5<span class="w">                             </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">         </span><span class="m">1</span><span class="w">       </span>14s
 </code></pre></div></p>
 <p>Examine the <code>APIService</code> objects in the guilder cluster, find the one
 named <code>v1090.example.my</code>. It is broken because it refers to a Service
 object that we have not bothered to create.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>apiservices<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">1090</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>apiservices<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">1090</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a>v1090.example.my<span class="w">                       </span>my-example/my-service<span class="w">   </span>False<span class="w"> </span><span class="o">(</span>ServiceNotFound<span class="o">)</span><span class="w">   </span>2m39s
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a>v1090.example.my<span class="w">                       </span>my-example/my-service<span class="w">   </span>False<span class="w"> </span><span class="o">(</span>ServiceNotFound<span class="o">)</span><span class="w">   </span>2m39s
 </code></pre></div></p>
 <p>Examining the common workload in the guilder cluster, for example,
 will show that the replacement-style customization happened.</p>
-<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a>sleep<span class="w"> </span><span class="m">15</span>
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>--context<span class="w"> </span>kind-guilder<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a>...
-<a id="__codelineno-143-2" name="__codelineno-143-2" href="#__codelineno-143-2"></a><span class="w">      </span>containers:
-<a id="__codelineno-143-3" name="__codelineno-143-3" href="#__codelineno-143-3"></a><span class="w">      </span>-<span class="w"> </span>env:
-<a id="__codelineno-143-4" name="__codelineno-143-4" href="#__codelineno-143-4"></a><span class="w">        </span>-<span class="w"> </span>name:<span class="w"> </span>EXAMPLE_VAR
-<a id="__codelineno-143-5" name="__codelineno-143-5" href="#__codelineno-143-5"></a><span class="w">          </span>value:<span class="w"> </span>env<span class="w"> </span>is<span class="w"> </span>prod
-<a id="__codelineno-143-6" name="__codelineno-143-6" href="#__codelineno-143-6"></a><span class="w">        </span>image:<span class="w"> </span>library/httpd:2.4
-<a id="__codelineno-143-7" name="__codelineno-143-7" href="#__codelineno-143-7"></a><span class="w">        </span>imagePullPolicy:<span class="w"> </span>IfNotPresent
-<a id="__codelineno-143-8" name="__codelineno-143-8" href="#__codelineno-143-8"></a><span class="w">        </span>name:<span class="w"> </span>httpd
-<a id="__codelineno-143-9" name="__codelineno-143-9" href="#__codelineno-143-9"></a>...
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a>...
+<a id="__codelineno-141-2" name="__codelineno-141-2" href="#__codelineno-141-2"></a><span class="w">      </span>containers:
+<a id="__codelineno-141-3" name="__codelineno-141-3" href="#__codelineno-141-3"></a><span class="w">      </span>-<span class="w"> </span>env:
+<a id="__codelineno-141-4" name="__codelineno-141-4" href="#__codelineno-141-4"></a><span class="w">        </span>-<span class="w"> </span>name:<span class="w"> </span>EXAMPLE_VAR
+<a id="__codelineno-141-5" name="__codelineno-141-5" href="#__codelineno-141-5"></a><span class="w">          </span>value:<span class="w"> </span>env<span class="w"> </span>is<span class="w"> </span>prod
+<a id="__codelineno-141-6" name="__codelineno-141-6" href="#__codelineno-141-6"></a><span class="w">        </span>image:<span class="w"> </span>library/httpd:2.4
+<a id="__codelineno-141-7" name="__codelineno-141-7" href="#__codelineno-141-7"></a><span class="w">        </span>imagePullPolicy:<span class="w"> </span>IfNotPresent
+<a id="__codelineno-141-8" name="__codelineno-141-8" href="#__codelineno-141-8"></a><span class="w">        </span>name:<span class="w"> </span>httpd
+<a id="__codelineno-141-9" name="__codelineno-141-9" href="#__codelineno-141-9"></a>...
 </code></pre></div></p>
 <p>Check that the common workload on the florin cluster is working.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
-<a id="__codelineno-144-2" name="__codelineno-144-2" href="#__codelineno-144-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8094<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-142-2" name="__codelineno-142-2" href="#__codelineno-142-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8094<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-142-3" name="__codelineno-142-3" href="#__codelineno-142-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-142-4" name="__codelineno-142-4" href="#__codelineno-142-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on florin!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-142-5" name="__codelineno-142-5" href="#__codelineno-142-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-142-6" name="__codelineno-142-6" href="#__codelineno-142-6"></a><span class="w">  </span><span class="k">fi</span>
+<a id="__codelineno-142-7" name="__codelineno-142-7" href="#__codelineno-142-7"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
+<a id="__codelineno-142-8" name="__codelineno-142-8" href="#__codelineno-142-8"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-142-9" name="__codelineno-142-9" href="#__codelineno-142-9"></a><span class="k">done</span>
+<a id="__codelineno-142-10" name="__codelineno-142-10" href="#__codelineno-142-10"></a>curl<span class="w"> </span>http://localhost:8094
+</code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
+<a id="__codelineno-143-2" name="__codelineno-143-2" href="#__codelineno-143-2"></a>&lt;html&gt;
+<a id="__codelineno-143-3" name="__codelineno-143-3" href="#__codelineno-143-3"></a><span class="w">  </span>&lt;body&gt;
+<a id="__codelineno-143-4" name="__codelineno-143-4" href="#__codelineno-143-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-143-5" name="__codelineno-143-5" href="#__codelineno-143-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>florin.
+<a id="__codelineno-143-6" name="__codelineno-143-6" href="#__codelineno-143-6"></a><span class="w">  </span>&lt;/body&gt;
+<a id="__codelineno-143-7" name="__codelineno-143-7" href="#__codelineno-143-7"></a>&lt;/html&gt;
+</code></pre></div></p>
+<p>Check that the special workload on the guilder cluster is working.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-144-2" name="__codelineno-144-2" href="#__codelineno-144-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8097<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-144-3" name="__codelineno-144-3" href="#__codelineno-144-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-144-4" name="__codelineno-144-4" href="#__codelineno-144-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on florin!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-144-4" name="__codelineno-144-4" href="#__codelineno-144-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The special workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <a id="__codelineno-144-5" name="__codelineno-144-5" href="#__codelineno-144-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-144-6" name="__codelineno-144-6" href="#__codelineno-144-6"></a><span class="w">  </span><span class="k">fi</span>
 <a id="__codelineno-144-7" name="__codelineno-144-7" href="#__codelineno-144-7"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
 <a id="__codelineno-144-8" name="__codelineno-144-8" href="#__codelineno-144-8"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-144-9" name="__codelineno-144-9" href="#__codelineno-144-9"></a><span class="k">done</span>
-<a id="__codelineno-144-10" name="__codelineno-144-10" href="#__codelineno-144-10"></a>curl<span class="w"> </span>http://localhost:8094
+<a id="__codelineno-144-10" name="__codelineno-144-10" href="#__codelineno-144-10"></a>curl<span class="w"> </span>http://localhost:8097
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-145-1" name="__codelineno-145-1" href="#__codelineno-145-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-145-2" name="__codelineno-145-2" href="#__codelineno-145-2"></a>&lt;html&gt;
 <a id="__codelineno-145-3" name="__codelineno-145-3" href="#__codelineno-145-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-145-4" name="__codelineno-145-4" href="#__codelineno-145-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
-<a id="__codelineno-145-5" name="__codelineno-145-5" href="#__codelineno-145-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>florin.
+<a id="__codelineno-145-4" name="__codelineno-145-4" href="#__codelineno-145-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>special<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-145-5" name="__codelineno-145-5" href="#__codelineno-145-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
 <a id="__codelineno-145-6" name="__codelineno-145-6" href="#__codelineno-145-6"></a><span class="w">  </span>&lt;/body&gt;
 <a id="__codelineno-145-7" name="__codelineno-145-7" href="#__codelineno-145-7"></a>&lt;/html&gt;
 </code></pre></div></p>
-<p>Check that the special workload on the guilder cluster is working.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
-<a id="__codelineno-146-2" name="__codelineno-146-2" href="#__codelineno-146-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8097<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<p>Check that the common workload on the guilder cluster is working.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-146-2" name="__codelineno-146-2" href="#__codelineno-146-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8096<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-146-3" name="__codelineno-146-3" href="#__codelineno-146-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-146-4" name="__codelineno-146-4" href="#__codelineno-146-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The special workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-146-4" name="__codelineno-146-4" href="#__codelineno-146-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
 <a id="__codelineno-146-5" name="__codelineno-146-5" href="#__codelineno-146-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-146-6" name="__codelineno-146-6" href="#__codelineno-146-6"></a><span class="w">  </span><span class="k">fi</span>
 <a id="__codelineno-146-7" name="__codelineno-146-7" href="#__codelineno-146-7"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
 <a id="__codelineno-146-8" name="__codelineno-146-8" href="#__codelineno-146-8"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-146-9" name="__codelineno-146-9" href="#__codelineno-146-9"></a><span class="k">done</span>
-<a id="__codelineno-146-10" name="__codelineno-146-10" href="#__codelineno-146-10"></a>curl<span class="w"> </span>http://localhost:8097
+<a id="__codelineno-146-10" name="__codelineno-146-10" href="#__codelineno-146-10"></a>curl<span class="w"> </span>http://localhost:8096
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-147-1" name="__codelineno-147-1" href="#__codelineno-147-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
 <a id="__codelineno-147-2" name="__codelineno-147-2" href="#__codelineno-147-2"></a>&lt;html&gt;
 <a id="__codelineno-147-3" name="__codelineno-147-3" href="#__codelineno-147-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-147-4" name="__codelineno-147-4" href="#__codelineno-147-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>special<span class="w"> </span>web<span class="w"> </span>site.
+<a id="__codelineno-147-4" name="__codelineno-147-4" href="#__codelineno-147-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
 <a id="__codelineno-147-5" name="__codelineno-147-5" href="#__codelineno-147-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
 <a id="__codelineno-147-6" name="__codelineno-147-6" href="#__codelineno-147-6"></a><span class="w">  </span>&lt;/body&gt;
 <a id="__codelineno-147-7" name="__codelineno-147-7" href="#__codelineno-147-7"></a>&lt;/html&gt;
-</code></pre></div></p>
-<p>Check that the common workload on the guilder cluster is working.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span><span class="m">1</span>
-<a id="__codelineno-148-2" name="__codelineno-148-2" href="#__codelineno-148-2"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>curl<span class="w"> </span>http://localhost:8096<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-148-3" name="__codelineno-148-3" href="#__codelineno-148-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>tries<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-148-4" name="__codelineno-148-4" href="#__codelineno-148-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;The common workload failed to come up on guilder!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
-<a id="__codelineno-148-5" name="__codelineno-148-5" href="#__codelineno-148-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-148-6" name="__codelineno-148-6" href="#__codelineno-148-6"></a><span class="w">  </span><span class="k">fi</span>
-<a id="__codelineno-148-7" name="__codelineno-148-7" href="#__codelineno-148-7"></a><span class="w">  </span><span class="nb">let</span><span class="w"> </span><span class="nv">tries</span><span class="o">=</span>tries+1
-<a id="__codelineno-148-8" name="__codelineno-148-8" href="#__codelineno-148-8"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-148-9" name="__codelineno-148-9" href="#__codelineno-148-9"></a><span class="k">done</span>
-<a id="__codelineno-148-10" name="__codelineno-148-10" href="#__codelineno-148-10"></a>curl<span class="w"> </span>http://localhost:8096
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a>&lt;!DOCTYPE<span class="w"> </span>html&gt;
-<a id="__codelineno-149-2" name="__codelineno-149-2" href="#__codelineno-149-2"></a>&lt;html&gt;
-<a id="__codelineno-149-3" name="__codelineno-149-3" href="#__codelineno-149-3"></a><span class="w">  </span>&lt;body&gt;
-<a id="__codelineno-149-4" name="__codelineno-149-4" href="#__codelineno-149-4"></a><span class="w">    </span>This<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>common<span class="w"> </span>web<span class="w"> </span>site.
-<a id="__codelineno-149-5" name="__codelineno-149-5" href="#__codelineno-149-5"></a><span class="w">    </span>Running<span class="w"> </span><span class="k">in</span><span class="w"> </span>guilder.
-<a id="__codelineno-149-6" name="__codelineno-149-6" href="#__codelineno-149-6"></a><span class="w">  </span>&lt;/body&gt;
-<a id="__codelineno-149-7" name="__codelineno-149-7" href="#__codelineno-149-7"></a>&lt;/html&gt;
 </code></pre></div></p>
 <!--example1-stage-4-stop-->
 
@@ -4750,18 +4779,18 @@ executing copies is exactly 1.</p>
 executing copies should be 2.  The assertion causes the actual number
 of executing copies to be reported.  Check that the reported number is
 2.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
-<a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;2&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-c
+<a id="__codelineno-148-2" name="__codelineno-148-2" href="#__codelineno-148-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;2&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>rs<span class="w"> </span>-n<span class="w"> </span>commonstuff<span class="w"> </span>commond<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
 <p>For the special workload, the number of executing copies should be 1.
 Check that the reported number agrees.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
-<a id="__codelineno-151-2" name="__codelineno-151-2" href="#__codelineno-151-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;1&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw-s
+<a id="__codelineno-149-2" name="__codelineno-149-2" href="#__codelineno-149-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;kubestellar.io/executing-count: &quot;1&quot;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span>
 </code></pre></div>
 <p>Look at the status section of the "speciald" <code>Deployment</code> and see that
 it has been filled in with the information from the guilder cluster.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
-<a id="__codelineno-152-2" name="__codelineno-152-2" href="#__codelineno-152-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
+<a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span>
 </code></pre></div>
 <h3 id="status-summarization-aspirational">Status Summarization (aspirational)<a class="headerlink" href="#status-summarization-aspirational" title="Permanent link">#</a></h3>
 <p><img alt="Summarization for special" src="../Edge-PoC-2023q1-Scenario-1-stage-5s.svg" title="Status summarization for special" /></p>
@@ -4781,27 +4810,27 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-teardown.md '&lt;!--example1-teardown-start--&gt;' '&lt;!--example1-teardown-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-153-2" name="__codelineno-153-2" href="#__codelineno-153-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-153-3" name="__codelineno-153-3" href="#__codelineno-153-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
-<a id="__codelineno-153-4" name="__codelineno-153-4" href="#__codelineno-153-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
-<a id="__codelineno-153-5" name="__codelineno-153-5" href="#__codelineno-153-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
-<a id="__codelineno-153-6" name="__codelineno-153-6" href="#__codelineno-153-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
-<a id="__codelineno-153-7" name="__codelineno-153-7" href="#__codelineno-153-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
-<a id="__codelineno-153-8" name="__codelineno-153-8" href="#__codelineno-153-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-153-9" name="__codelineno-153-9" href="#__codelineno-153-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-151-2" name="__codelineno-151-2" href="#__codelineno-151-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-151-3" name="__codelineno-151-3" href="#__codelineno-151-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
+<a id="__codelineno-151-4" name="__codelineno-151-4" href="#__codelineno-151-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
+<a id="__codelineno-151-5" name="__codelineno-151-5" href="#__codelineno-151-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
+<a id="__codelineno-151-6" name="__codelineno-151-6" href="#__codelineno-151-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
+<a id="__codelineno-151-7" name="__codelineno-151-7" href="#__codelineno-151-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
+<a id="__codelineno-151-8" name="__codelineno-151-8" href="#__codelineno-151-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-151-9" name="__codelineno-151-9" href="#__codelineno-151-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 

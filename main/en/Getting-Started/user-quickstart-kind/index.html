@@ -3091,8 +3091,59 @@ how to create, but not overrite/update a synchronized resource  </p>
 </div>
 </div>
 <h2 id="5-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2">5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2<a class="headerlink" href="#5-check-the-status-of-your-apache-server-on-ks-edge-cluster1-and-ks-edge-cluster2" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>TODO
+<!-- BEGIN INCLUDE ../common-subs/kubestellar-list-syncing.md '&lt;!--kubestellar-list-syncing-start--&gt;' '&lt;!--kubestellar-list-syncing-end--&gt;' -->
+
+<p>Every object subject to downsync or upsync has a full per-WEC copy in
+the core. These include reported state from the WECs. If you are using
+release 0.10 or later of KubeStellar then you can list these copies of
+your httpd <code>Deployment</code> objects with the following command.</p>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>Deployment
 </code></pre></div>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>---
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>apiVersion:<span class="w"> </span>apps/v1
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>kind:<span class="w"> </span>Deployment
+<a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a>metadata:
+<a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="w">  </span>annotations:
+<a id="__codelineno-62-6" name="__codelineno-62-6" href="#__codelineno-62-6"></a><span class="w">    </span>...<span class="w"> </span><span class="o">(</span>lots<span class="w"> </span>of<span class="w"> </span>other<span class="w"> </span>details<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-62-7" name="__codelineno-62-7" href="#__codelineno-62-7"></a><span class="w">  </span>name:<span class="w"> </span>my-first-kubestellar-deployment
+<a id="__codelineno-62-8" name="__codelineno-62-8" href="#__codelineno-62-8"></a><span class="w">  </span>namespace:<span class="w"> </span>my-namespace
+<a id="__codelineno-62-9" name="__codelineno-62-9" href="#__codelineno-62-9"></a>spec:
+<a id="__codelineno-62-10" name="__codelineno-62-10" href="#__codelineno-62-10"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>the<span class="w"> </span>spec<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-62-11" name="__codelineno-62-11" href="#__codelineno-62-11"></a>status:
+<a id="__codelineno-62-12" name="__codelineno-62-12" href="#__codelineno-62-12"></a><span class="w">  </span>availableReplicas:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-62-13" name="__codelineno-62-13" href="#__codelineno-62-13"></a><span class="w">  </span>conditions:
+<a id="__codelineno-62-14" name="__codelineno-62-14" href="#__codelineno-62-14"></a><span class="w">  </span>-<span class="w"> </span>lastTransitionTime:<span class="w"> </span><span class="s2">&quot;2023-10-27T07:00:19Z&quot;</span>
+<a id="__codelineno-62-15" name="__codelineno-62-15" href="#__codelineno-62-15"></a><span class="w">    </span>lastUpdateTime:<span class="w"> </span><span class="s2">&quot;2023-10-27T07:00:19Z&quot;</span>
+<a id="__codelineno-62-16" name="__codelineno-62-16" href="#__codelineno-62-16"></a><span class="w">    </span>message:<span class="w"> </span>Deployment<span class="w"> </span>has<span class="w"> </span>minimum<span class="w"> </span>availability.
+<a id="__codelineno-62-17" name="__codelineno-62-17" href="#__codelineno-62-17"></a><span class="w">    </span>reason:<span class="w"> </span>MinimumReplicasAvailable
+<a id="__codelineno-62-18" name="__codelineno-62-18" href="#__codelineno-62-18"></a><span class="w">    </span>status:<span class="w"> </span><span class="s2">&quot;True&quot;</span>
+<a id="__codelineno-62-19" name="__codelineno-62-19" href="#__codelineno-62-19"></a><span class="w">    </span>type:<span class="w"> </span>Available
+<a id="__codelineno-62-20" name="__codelineno-62-20" href="#__codelineno-62-20"></a><span class="w">  </span>-<span class="w"> </span>lastTransitionTime:<span class="w"> </span><span class="s2">&quot;2023-10-27T07:00:19Z&quot;</span>
+<a id="__codelineno-62-21" name="__codelineno-62-21" href="#__codelineno-62-21"></a><span class="w">    </span>lastUpdateTime:<span class="w"> </span><span class="s2">&quot;2023-10-27T07:00:19Z&quot;</span>
+<a id="__codelineno-62-22" name="__codelineno-62-22" href="#__codelineno-62-22"></a><span class="w">    </span>message:<span class="w"> </span>ReplicaSet<span class="w"> </span><span class="s2">&quot;my-first-kubestellar-deployment-76f6fc4cfc&quot;</span><span class="w"> </span>has<span class="w"> </span>successfully<span class="w"> </span>progressed.
+<a id="__codelineno-62-23" name="__codelineno-62-23" href="#__codelineno-62-23"></a><span class="w">    </span>reason:<span class="w"> </span>NewReplicaSetAvailable
+<a id="__codelineno-62-24" name="__codelineno-62-24" href="#__codelineno-62-24"></a><span class="w">    </span>status:<span class="w"> </span><span class="s2">&quot;True&quot;</span>
+<a id="__codelineno-62-25" name="__codelineno-62-25" href="#__codelineno-62-25"></a><span class="w">    </span>type:<span class="w"> </span>Progressing
+<a id="__codelineno-62-26" name="__codelineno-62-26" href="#__codelineno-62-26"></a><span class="w">  </span>observedGeneration:<span class="w"> </span><span class="m">618</span>
+<a id="__codelineno-62-27" name="__codelineno-62-27" href="#__codelineno-62-27"></a><span class="w">  </span>readyReplicas:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-62-28" name="__codelineno-62-28" href="#__codelineno-62-28"></a><span class="w">  </span>replicas:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-62-29" name="__codelineno-62-29" href="#__codelineno-62-29"></a><span class="w">  </span>updatedReplicas:<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-62-30" name="__codelineno-62-30" href="#__codelineno-62-30"></a>
+<a id="__codelineno-62-31" name="__codelineno-62-31" href="#__codelineno-62-31"></a>---
+<a id="__codelineno-62-32" name="__codelineno-62-32" href="#__codelineno-62-32"></a>apiVersion:<span class="w"> </span>apps/v1
+<a id="__codelineno-62-33" name="__codelineno-62-33" href="#__codelineno-62-33"></a>kind:<span class="w"> </span>Deployment
+<a id="__codelineno-62-34" name="__codelineno-62-34" href="#__codelineno-62-34"></a>metadata:
+<a id="__codelineno-62-35" name="__codelineno-62-35" href="#__codelineno-62-35"></a><span class="w">  </span>annotations:
+<a id="__codelineno-62-36" name="__codelineno-62-36" href="#__codelineno-62-36"></a><span class="w">    </span>...<span class="w"> </span><span class="o">(</span>lots<span class="w"> </span>of<span class="w"> </span>other<span class="w"> </span>details<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-62-37" name="__codelineno-62-37" href="#__codelineno-62-37"></a><span class="w">  </span>name:<span class="w"> </span>my-first-kubestellar-deployment
+<a id="__codelineno-62-38" name="__codelineno-62-38" href="#__codelineno-62-38"></a><span class="w">  </span>namespace:<span class="w"> </span>my-namespace
+<a id="__codelineno-62-39" name="__codelineno-62-39" href="#__codelineno-62-39"></a>spec:
+<a id="__codelineno-62-40" name="__codelineno-62-40" href="#__codelineno-62-40"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>the<span class="w"> </span>spec<span class="o">)</span><span class="w"> </span>...
+<a id="__codelineno-62-41" name="__codelineno-62-41" href="#__codelineno-62-41"></a>status:
+<a id="__codelineno-62-42" name="__codelineno-62-42" href="#__codelineno-62-42"></a><span class="w">  </span>...<span class="w"> </span><span class="o">(</span>another<span class="w"> </span>happy<span class="w"> </span>status<span class="o">)</span><span class="w"> </span>...
+</code></pre></div>
+<!-- END INCLUDE -->
+
 <h2 id="_2"><br><a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
 <hr />
 <p><br></p>
@@ -3104,22 +3155,22 @@ how to create, but not overrite/update a synchronized resource  </p>
 <!-- BEGIN INCLUDE ../common-subs/tear-down-kind.md '&lt;!--tear-down-kind-start--&gt;' '&lt;!--tear-down-kind-end--&gt;' -->
 <p>to remove what you just installed:</p>
 <!-- BEGIN INCLUDE ../common-subs/brew-remove.md '&lt;!--brew-remove-start--&gt;' '&lt;!--brew-remove-end--&gt;' -->
-<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>
+<p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>brew remove kubestellar_cli
-<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>brew remove kcp_cli
-<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>brew untap kubestellar/kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>brew remove kubestellar_cli
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>brew remove kcp_cli
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>brew untap kubestellar/kubestellar
 </code></pre></div></p>
 <p><!-- END INCLUDE -->
-<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-core
-<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster1
-<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-core
+<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster1
+<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>ks-edge-cluster2
 </code></pre></div>
 <!-- BEGIN INCLUDE ../common-subs/delete-contexts-for-kind-and-openshift-clusters.md '&lt;!--delete-contexts-for-kind-and-openshift-clusters-start--&gt;' '&lt;!--delete-contexts-for-kind-and-openshift-clusters-end--&gt;' --></p>
 <p><strong>important:</strong> delete and existing kubernetes contexts of the clusters you may have created previously
-<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-core<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster2<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-core<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster1<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>delete-context<span class="w"> </span>ks-edge-cluster2<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 </code></pre></div></p>
 <!-- END INCLUDE -->
 <!-- END INCLUDE -->

@@ -645,6 +645,13 @@
          
     </url>
     <url>
+         <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-list-syncing/</loc>
+         <lastmod>2023-10-27</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://docs.kubestellar.io/main/en/common-subs/kubestellar-list-syncing/"/>
+         
+    </url>
+    <url>
          <loc>https://docs.kubestellar.io/main/common-subs/kubestellar-prep-syncer/</loc>
          <lastmod>2023-10-27</lastmod>
          <changefreq>daily</changefreq>
