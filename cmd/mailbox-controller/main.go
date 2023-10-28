@@ -46,7 +46,6 @@ import (
 
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
-
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
