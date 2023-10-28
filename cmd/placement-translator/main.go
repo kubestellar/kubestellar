@@ -49,7 +49,6 @@ import (
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
 	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
 	kcpkubeclient "github.com/kcp-dev/client-go/kubernetes"
-
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
