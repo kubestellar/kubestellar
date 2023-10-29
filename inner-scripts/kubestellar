@@ -323,8 +323,31 @@ function ensure_espw() {
     else
         kubectl ws create "$espw_name" --enter
     fi
+    run_dex
+    run_kb_backend
     eval kubectl apply -f "$bindir/../config/exports" $verbdir
     echo "Finished populating the espw with kubestellar apiexports"
+}
+
+function run_dex() {
+    echo "--< starting dex in background >--"
+    dex serve /home/kubestellar/dex/dex-config-dev.yaml &
+    if ! pgrep dex &> /dev/null; then
+        echo "dex not started"
+        exit 1
+    fi
+}
+
+function run_kb_backend() {
+    echo "--< starting kube-bind example-backend in background >--"
+    kubectl ws root:espw
+    kubectl apply -f /home/kubestellar/kube-bind/deploy/crd
+    kubectl apply -f /home/kubestellar/kube-bind/deploy/examples/crd-mangodb.yaml
+    example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &
+    if ! pgrep example-backend &> /dev/null; then
+        echo "kube-bind example-backend not started"
+        exit 1
+    fi
 }
 
 if [ "$subcommand" != init ]; then
