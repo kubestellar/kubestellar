@@ -367,6 +367,27 @@
     <!-- Additional styles for landing page -->
     <style>
 
+.section-sm {
+  display: none;
+  text-align: center;
+}
+
+.d-sm-mid {
+    display: none;
+}
+
+@media (max-width: 960px) {
+    .d-lg-mid {
+        display:none;
+    }
+    .d-sm-mid {
+        display: contents;
+    }
+    .section-sm {
+        display:contents;
+    }
+}
+
 .shortcut-bar-text {
     font-size: 15px;
     transition: color 0.3s;
@@ -386,16 +407,54 @@
   text-align: center;
   line-height: 60px;
 }
-
 .centered {
-  width: 7%;
+  width: 20%;
   height: 55%;
-  position:absolute;
-  top: 22%;
-  left: 50%;
+  position:relative;
+  top: -25px;
+  right: -75%;
   /* transform: translate(-50%, -50%); */
   text-align: center;
 }
+
+/* Add a media query for screens with a maximum width of 768px (adjust as needed) */
+@media (max-width: 1000px) {
+  .shortcut-bar {
+    width: 100%; /* Adjust the width for mobile screens */
+    height: auto; /* Adjust the height for mobile screens */
+    top: 3%; /* Adjust the top position for mobile screens */
+    left: 50%; /* Adjust the left position for mobile screens */
+    transform: translateX(-50%); /* Adjust the horizontal centering for mobile screens */
+    line-height: 40px; /* Adjust the line height for mobile screens */
+  }
+}
+@media (max-width: 1000px) {
+  .centered {
+    width: 40%; /* Adjust the width for mobile screens and (min-width: 800px) */ 
+    /* height: auto;  */
+    top: -10px;
+    right: -82%;
+    transform: translateX(-50%); /* Adjust horizontal centering for mobile screens */
+    text-align: center;
+    padding-left: 20px;
+  }
+}
+@media (max-width: 1000px) {
+  .mx-3 {
+     margin-left: 1rem;
+     margin-right: 1rem;
+     width: 90%;
+     height: 100%;
+  }
+  .md-source__repository {
+    display: inline-block;
+    /* max-width: calc(100% - 1.2rem); */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+}
+
     
         .d-flex {
             display: flex;
@@ -634,6 +693,16 @@
             margin-top: 1.5rem;
             margin-bottom: 1.5rem;
         }
+        @media (max-width: 1000px) {
+          .my-4 {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+          }
+          .text-xs-center {
+            padding-top: 8px;
+          }
+        }
+
         .my-5 {
             margin-top: 3rem;
             margin-bottom: 3rem;
@@ -1106,7 +1175,7 @@
                 display: flex;
                 flex-flow: row;
             }
-    
+            
             .d-lg-none {
                 display: none;
             }
@@ -1173,6 +1242,12 @@
             .d-xl {
                 display: none;
             }
+            .d-lg-mid {
+                display:contents;
+            }
+            .d-sm {
+                display: none;
+            }
             .d-lg {
                 display: none;
             }
@@ -1221,9 +1296,12 @@
     
          @media (min-width: 540px) and (max-width: 719px) {
             .d-sm-none {
-                display: none;
+                display:contents;
             }
             .d-xl {
+                display: none;
+            }
+            .d-sm {
                 display: none;
             }
             .d-lg {
@@ -1279,15 +1357,18 @@
             .d-xl {
                 display: none;
             }
+            .d-sm {
+                display: none;
+            }
             .d-lg {
                 display: none;
             }
             .d-md {
                 display: none;
             }
-            .d-sm {
+            /* .d-sm {
                 display: none;
-            }
+            } */
     
             .text-xs-center {
                 text-align: center;
@@ -2377,34 +2458,39 @@
       </span>
       <div class="conteiner-row">
         <p class="h1 text-xs-center">
-
-
-          <script>
-            // Fetch github counts
-            fetch(`https://api.github.com/repos/kubestellar/kubestellar`)
-              .then((response) => response.json())
-              .then((data) => {
-                const starCount = data.stargazers_count;
-                if (typeof starCount !== 'undefined') {
-                  document.getElementById('star-count').setAttribute('hasInfo','true');
-                  document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
-                }
-                const forkCount = data.forks_count;
-                if (typeof forkCount !== 'undefined') {
-                  document.getElementById('fork-count').setAttribute('hasInfo','true');
-                  document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
-                  // const releaseName = data.name;
-                  // document.getElementById('current-release').textContent = `${releaseName}`;
-                }
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          
-          </script>
           <img src="KubeStellar-with-Logo-transparent-v2.png" class="mx-3 leverage-title-logo" height="150px"/>
         </p>
       </div>
+      <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
+        <script>
+          // Fetch github counts
+          fetch(`https://api.github.com/repos/kubestellar/kubestellar`)
+            .then((response) => response.json())
+            .then((data) => {
+              const starCount = data.stargazers_count;
+              if (typeof starCount !== 'undefined') {
+                document.getElementById('star-count').setAttribute('hasInfo','true');
+                document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
+              }
+              const forkCount = data.forks_count;
+              if (typeof forkCount !== 'undefined') {
+                document.getElementById('fork-count').setAttribute('hasInfo','true');
+                document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
+                // const releaseName = data.name;
+                // document.getElementById('current-release').textContent = `${releaseName}`;
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        </script>
+        <ul class="md-source__facts">
+          <!-- <li id="current-release" class="md-source__fact md-source__fact--version"></li> -->
+          <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
+          <li id="fork-count" class="custom-paragraph md-source__fact md-source__fact--forks"></li>
+        </ul>
+        </div>
+      
       <p class="h3 text-xs-center">Unleashing the true power of multi-cluster Kubernetes environments with <strong>the most natural and flexible way to deploy workload</strong></p>
       <div class="conteiner-row conteiner-xs">
         <button
@@ -2438,14 +2524,7 @@
     </div>
   </div>
 
-  <div style="color:#0065cb" class="centered md-source__repository md-source__repository--active">
-  <ul class="md-source__facts">
-    <!-- <li id="current-release" class="md-source__fact md-source__fact--version"></li> -->
-    <li id="star-count" class="custom-paragraph md-source__fact md-source__fact--stars"></li>
-    <li id="fork-count" class="custom-paragraph md-source__fact md-source__fact--forks"></li>
-  </ul>
-</div>
-
+  
 </section>
 
 
@@ -2456,10 +2535,14 @@
         <div class="conteiner ctx-card-white-1 pt-4">
           
           <div class="d-sm text-align-center">
-            <p class="display-3 Telegraf-UltraBold text-dark mx-auto mt-4">Create once</p>
-            <p class="display-3 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
+            <p class="display-4 Telegraf-UltraBold text-dark mx-auto mt-4">Create once</p>
+            <p class="display-4 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
           </div>
 
+          <div class="d-sm-mid">
+            <p class="display-4 Telegraf-UltraBold text-dark mx-auto mt-4">Create once</p>
+            <p class="display-4 Telegraf-UltraBold text-blue mx-auto my-4">Deploy many</p>
+          </div>
 
           <button
             onclick="window.open('https://github.com/kubestellar/kubestellar', '_blank')"
@@ -2469,6 +2552,24 @@
           >
             Contribute on GitHub
           </button>
+          <div class="text-dark h3 section-sm">
+          </br></br>
+            <ul>
+              <li>- Centrally deploy Kubernetes resources across multiple clusters</li>
+            </br>          
+              <li>- Return more than just status from any deployment</li>
+            </br>
+              <li>- Manage cluster connectivity interruptions gracefully</li>
+            </br>
+              <li>- Designed for scalability with 1:many and many:1 scenarios</li>
+            </br>
+              <li>- Modular design to ensure compatibility with popular tools</li>
+            <!-- </br>
+              <li>- Designed to support virtual clusters</li> -->
+            </br>
+              <li>- Easy to install with Helm and Brew</li>
+            </ul>
+          </div>
         </div>
         <div class="conteiner ctx-card-white-1 text-dark h3 d-lg">
           <ul>
@@ -2490,7 +2591,6 @@
       </div>
     </div>
   </div>
-
 
 </section>
 
