@@ -25,12 +25,12 @@
               .then((response) => response.json())
               .then((data) => {
                 const starCount = data.stargazers_count;
-                if (typeof starCount !== 'undefined') {
+                if (typeof starCount !== 'undefine') {
                   document.getElementById('star-count').setAttribute('hasInfo','true');
                   document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
                 }
                 const forkCount = data.forks_count;
-                if (typeof forkCount !== 'undefined') {
+                if (typeof forkCount !== 'undefine') {
                   document.getElementById('fork-count').setAttribute('hasInfo','true');
                   document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
                   // const releaseName = data.name;
