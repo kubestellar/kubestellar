@@ -36,12 +36,12 @@ type KindClusterProvider struct {
 }
 
 // New creates a new KindClusterProvider
-func New(pConfig string) KindClusterProvider {
+func New(pConfig string) (KindClusterProvider, error) {
 	kindProvider := kind.NewProvider()
 	return KindClusterProvider{
 		kindProvider: kindProvider,
 		pConfig:      pConfig,
-	}
+	}, nil
 }
 
 func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) error {

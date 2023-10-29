@@ -56,7 +56,7 @@ type KflexClusterProvider struct {
 }
 
 // New creates a new KflexClusterProvider
-func New(pConfig string) KflexClusterProvider {
+func New(pConfig string) (KflexClusterProvider, error) {
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -64,19 +64,19 @@ func New(pConfig string) KflexClusterProvider {
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(pConfig))
 	if err != nil {
 		logger.Error(err, "Error loading kubeconfig")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	dClient, err := dynamic.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed to create dynamic clientset")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed to create kube clientset")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	return KflexClusterProvider{
@@ -85,7 +85,7 @@ func New(pConfig string) KflexClusterProvider {
 		kubeClient: kubeClient,
 		logger:     logger,
 		ctx:        ctx,
-	}
+	}, nil
 }
 
 func (k KflexClusterProvider) Create(name string, opts clusterprovider.Options) error {

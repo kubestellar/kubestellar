@@ -68,22 +68,22 @@ type provider struct {
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
 func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string) spaceprovider.ProviderClient {
 	var pClient spaceprovider.ProviderClient = nil
+	var err error
 	switch pType {
 	case spacev1alpha1apis.KindProviderType:
-		pClient = kindprovider.New(config)
+		pClient, err = kindprovider.New(config)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient = kflexprovider.New(config)
+		pClient, err = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err := providerkcp.New(config)
-		//err := errors.New("not implemented")
-		if err != nil {
-			runtime.HandleError(err)
-			return nil
-		}
-		return pClient
+		pClient, err = providerkcp.New(config)
 	default:
 		return nil
 	}
+	if err != nil {
+		runtime.HandleError(err)
+		return nil
+	}
+
 	return pClient
 }
 
