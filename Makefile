@@ -209,11 +209,6 @@ update-contextual-logging: $(LOGCHECK)
 # 	go run hack/generate/cli-doc/gen-cli-doc.go
 # 	./hack/generate/crd-ref/run-crd-ref-gen.sh
 
-vendor: ## Vendor the dependencies
-	go mod tidy
-	go mod vendor
-.PHONY: vendor
-
 VENVDIR=$(abspath docs/venv)
 REQUIREMENTS_TXT=docs/requirements.txt
 
