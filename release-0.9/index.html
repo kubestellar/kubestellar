@@ -386,7 +386,6 @@
   text-align: center;
   line-height: 60px;
 }
-
 .centered {
   width: 7%;
   height: 55%;
@@ -396,6 +395,41 @@
   /* transform: translate(-50%, -50%); */
   text-align: center;
 }
+
+/* Add a media query for screens with a maximum width of 768px (adjust as needed) */
+@media (max-width: 1000px) {
+  .shortcut-bar {
+    width: 80%; /* Adjust the width for mobile screens */
+    height: auto; /* Adjust the height for mobile screens */
+    top: 10%; /* Adjust the top position for mobile screens */
+    left: 50%; /* Adjust the left position for mobile screens */
+    transform: translateX(-50%); /* Adjust the horizontal centering for mobile screens */
+    line-height: 40px; /* Adjust the line height for mobile screens */
+  }
+}
+@media (max-width: 1000px) {
+  .centered {
+    width: 20%; /* Adjust the width for mobile screens */
+    height: auto; /* Adjust the height for mobile screens */
+    top: 26%; /* Adjust the top position for mobile screens */
+    left: 50%; /* Center horizontally on mobile screens */
+    transform: translateX(-50%); /* Adjust horizontal centering for mobile screens */
+  }
+  .mx-3 {
+     margin-left: 1rem;
+     margin-right: 1rem;
+     width: 90%;
+     height: 100%;
+  }
+  .md-source__repository {
+    display: inline-block;
+    /* max-width: calc(100% - 1.2rem); */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+}
+
     
         .d-flex {
             display: flex;
@@ -2385,12 +2419,12 @@
               .then((response) => response.json())
               .then((data) => {
                 const starCount = data.stargazers_count;
-                if (typeof starCount !== 'undefined') {
+                if (typeof starCount !== 'undefine') {
                   document.getElementById('star-count').setAttribute('hasInfo','true');
                   document.getElementById('star-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${starCount}</a>`;
                 }
                 const forkCount = data.forks_count;
-                if (typeof forkCount !== 'undefined') {
+                if (typeof forkCount !== 'undefine') {
                   document.getElementById('fork-count').setAttribute('hasInfo','true');
                   document.getElementById('fork-count').innerHTML = `<a href="https://github.com/kubestellar/kubestellar">${forkCount}</a>`;
                   // const releaseName = data.name;
