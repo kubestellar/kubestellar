@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/informers/externalversions/apiextensions/v1"
+	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextkcpinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -40,6 +40,7 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
+	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
@@ -98,6 +99,8 @@ type resourceResolver struct {
 
 	// byObjName maps object namespace (if namespaced) and name to relevant details
 	byObjName map[NamespacedName]*objectDetails
+
+	definers Set[ksmetav1a1.Definer]
 }
 
 type NamespacedName = Pair[NamespaceName, ObjectName]
@@ -233,17 +236,11 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 	wr.queue.Add(item)
 }
 
-func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
-	wr.Lock()
-	defer wr.Unlock()
-	resolvedWhat := wr.getPartsLocked(placement.Cluster, placement.Name)
-	kont(resolvedWhat.Downsync)
-}
-
 func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName ObjectName) ResolvedWhat {
 	parts := WorkloadParts{}
 	var upsyncs []edgeapi.UpsyncSet
 	wsDetails, found := wr.workspaceDetails[wldCluster]
+	var definers MutableSet[ksmetav1a1.Definer] = NewEmptyMapSet[ksmetav1a1.Definer]()
 	if !found {
 		return ResolvedWhat{parts, upsyncs}
 	}
@@ -251,6 +248,7 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		upsyncs = ep.Spec.Upsync
 	}
 	for _, rr := range wsDetails.resources {
+		var gotSome bool
 		for objName, objDetails := range rr.byObjName {
 			// TODO: add index by EdgePlacement name to make this faster
 			wantSingletonReturn, found := objDetails.placementBits.Get(epName)
@@ -259,10 +257,38 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 			}
 			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
 			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, ReturnSingletonState: wantSingletonReturn}
+			wr.logger.V(4).Info("Returning part", "partID", partID, "partDetails", partDetails, "definers", rr.definers)
 			parts[partID] = partDetails
+			gotSome = true
+		}
+		if gotSome {
+			SetAddAll[ksmetav1a1.Definer](definers, rr.definers)
 		}
 	}
+	definers.Visit(func(definer ksmetav1a1.Definer) error {
+		if definer.Kind == "APIBinding" && definer.Name == "espw" {
+			// not neceesary to add, already in every mailbox workspace
+			return nil
+		}
+		nsName := NamespaceName("")
+		objName := ObjectName(definer.Name)
+		pieces := definerKindToPieces[definer.Kind]
+		definerID := NewTriple(pieces.First, nsName, objName)
+		otherDetails, found := parts[definerID]
+		if found {
+			return nil
+		}
+		pieces.Second.ReturnSingletonState = pieces.Second.ReturnSingletonState || otherDetails.ReturnSingletonState
+		parts[definerID] = pieces.Second
+		wr.logger.V(4).Info("Implicitly adding definer", "definerID", definerID, "details", pieces.Second)
+		return nil
+	})
 	return ResolvedWhat{parts, upsyncs}
+}
+
+var definerKindToPieces = map[string]Pair[metav1.GroupResource, WorkloadPartDetails]{
+	"CustomResourceDefinition": NewPair(metav1.GroupResource{Group: apiext.GroupName, Resource: "customresourcedefinitions"}, WorkloadPartDetails{APIVersion: apiext.SchemeGroupVersion.Version}),
+	"APIBinding":               NewPair(metav1.GroupResource{Group: apisv1alpha1.SchemeGroupVersion.Group, Resource: "apibindings"}, WorkloadPartDetails{APIVersion: apisv1alpha1.SchemeGroupVersion.Version}),
 }
 
 func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements Set[ObjectName]) {
@@ -428,6 +454,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		Group:    ar.Spec.Group,
 		Resource: ar.Spec.Name,
 	}
+	logger = logger.WithValues("gvr", gvr, "arName", arName, "definers", ar.Spec.Definers)
 	if _, found := GRsNotSupported[gr]; found {
 		logger.V(4).Info("Ignoring unsupported resource")
 		return true
@@ -437,6 +464,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		return true
 	}
 	gk := schema.GroupKind{Group: ar.Spec.Group, Kind: ar.Spec.Kind}
+	logger = logger.WithValues("gk", gk)
 	if rr == nil {
 		informerCtx, stopInformer := context.WithCancel(wsDetails.ctx)
 		preInformer := wsDetails.dynamicInformerFactory.ForResource(gvr)
@@ -448,13 +476,24 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			lister:    preInformer.Lister(),
 			stop:      stopInformer,
 			byObjName: map[NamespacedName]*objectDetails{},
+			definers:  NewSliceSet(ar.Spec.Definers...),
 		}
 		go rr.informer.Run(informerCtx.Done())
-		logger.V(3).Info("Started watching resource", "gvr", gvr, "arName", arName, "gk", gk)
+		logger.V(3).Info("Started to watch resource")
 		wsDetails.resources[arName] = rr
 		wsDetails.gkToARName[gk] = arName
 	} else {
-		logger.V(4).Info("Continuing to watch resource")
+		var newDefiners Set[ksmetav1a1.Definer] = NewSliceSet(ar.Spec.Definers...)
+		changed := !SetEqual(rr.definers, newDefiners)
+		logger.V(4).Info("Continuing to watch resource", "changed", changed)
+		if changed {
+			rr.definers = newDefiners
+			changedPlacements := NewEmptyMapSet[ObjectName]()
+			for _, objDetails := range rr.byObjName {
+				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+			}
+			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
+		}
 	}
 	return true
 }
@@ -481,11 +520,10 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		}
 		wsCtx, stopWS := context.WithCancel(wr.ctx)
 		discoveryScopedClient := wr.discoveryClusterClient.Cluster(cluster.Path())
-		var crdPreInformer apiextinformers.CustomResourceDefinitionInformer
-		var bindingPreInformer bindinginformers.APIBindingInformer
-		crdPreInformer = wr.crdClusterPreInformer.Cluster(cluster)
-		bindingPreInformer = wr.bindingClusterPreInformer.Cluster(cluster)
-		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false, crdPreInformer.Informer(), bindingPreInformer.Informer())
+		crdInformer := wr.crdClusterPreInformer.Cluster(cluster).Informer()
+		bindingInformer := wr.bindingClusterPreInformer.Cluster(cluster).Informer()
+		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false,
+			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
 		scopedDynamic := wr.dynamicClusterClient.Cluster(cluster.Path())
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{

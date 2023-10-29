@@ -150,9 +150,6 @@ spec:
   - apiGroup: apps
     resources: [ replicasets ]
     namespaces: [ commonstuff ]
-  - apiGroup: apis.kcp.io
-    resources: [ apibindings ]
-    objectNames: [ "bind-kubernetes", "bind-apps" ]
   wantSingletonReportedState: true
   upsync:
   - apiGroup: "group1.test"
@@ -373,16 +370,9 @@ spec:
     namespaceSelectors:
     - matchLabels: {"special":"yes"}
     objectNames: [ speciald ]
-  - apiGroup: apis.kcp.io
-    resources: [ apibindings ]
-    namespaceSelectors: []
-    objectNames: [ bind-kubernetes, bind-apps, bind-apiregistration.k8s.io ]
   - apiGroup: apiregistration.k8s.io
     resources: [ apiservices ]
     objectNames: [ v1090.example.my ]
-  - apiGroup: apiextensions.k8s.io
-    resources: [ customresourcedefinitions ]
-    objectNames: [ crontabs.stable.example.com ]
   - apiGroup: stable.example.com
     resources: [ crontabs ]
     namespaces: [ specialstuff ]

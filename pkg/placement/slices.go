@@ -162,6 +162,7 @@ type Slice[Elt any] []Elt
 
 var _ Visitable[float64] = Slice[float64]{}
 
+// NewSlice makes a Visitable from a slice
 func NewSlice[Elt any](elts ...Elt) Slice[Elt] { return Slice[Elt](elts) }
 
 func (slice Slice[Elt]) IsEmpty() bool    { return len(slice) == 0 }
@@ -179,4 +180,20 @@ func (slice Slice[Elt]) Visit(visitor func(Elt) error) error {
 
 func (slice Slice[Elt]) Append(elt Elt) Slice[Elt] {
 	return append(slice, elt)
+}
+
+type SliceSet[Elt comparable] struct{ Slice[Elt] }
+
+var _ Set[int64] = SliceSet[int64]{}
+
+// NewSliceSet makes a Set from a slice that has no duplicates
+func NewSliceSet[Elt comparable](elts ...Elt) SliceSet[Elt] { return SliceSet[Elt]{NewSlice(elts...)} }
+
+func (slice SliceSet[Elt]) Has(seek Elt) bool {
+	for _, have := range slice.Slice {
+		if seek == have {
+			return true
+		}
+	}
+	return false
 }

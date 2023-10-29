@@ -83,6 +83,8 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	defer awp.Unlock()
 	wpc := MapGetAdd(awp.perCluster, clusterName, true, func(clusterName logicalcluster.Name) *apiWatchProviderPerCluster {
 		ctx := context.Background()
+		logger := klog.FromContext(ctx).WithValues("part", "apiwatch-map-provider")
+		ctx = klog.NewContext(ctx, logger)
 		wpc := &apiWatchProviderPerCluster{
 			awp:     awp,
 			cluster: clusterName,

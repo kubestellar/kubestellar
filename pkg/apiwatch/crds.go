@@ -19,10 +19,17 @@ package apiwatch
 import (
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type CRDAnalyzer struct {
 	ObjectNotifier
+}
+
+var _ ResourceDefinitionSupplier = CRDAnalyzer{}
+
+func (crda CRDAnalyzer) GetGVK(obj any) schema.GroupVersionKind {
+	return apiext.SchemeGroupVersion.WithKind("CustomResourceDefinition")
 }
 
 func (crda CRDAnalyzer) EnumerateDefinedResources(obj any) ResourceDefinitionEnumerator {

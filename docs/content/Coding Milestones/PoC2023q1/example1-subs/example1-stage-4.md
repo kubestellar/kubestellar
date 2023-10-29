@@ -59,8 +59,8 @@ NAMESPACE                            NAME                                       
 commonstuff                          replicaset.apps/commond                                         1         1         1       13m
 ```
 
-Examine the guilder cluster.  Find both workload namespaces and both
-Deployments.
+Examine the guilder cluster.  Find both workload namespaces, the
+Deployment, and both ReplicaSets.
 
 ``` {.bash .hide-me}
 sleep 15
@@ -95,6 +95,16 @@ KUBECONFIG=~/.kube/config kubectl --context kind-guilder get apiservices | grep 
 ```
 ``` {.bash .no-copy }
 v1090.example.my                       my-example/my-service   False (ServiceNotFound)   2m39s
+```
+
+See the crontab in the guilder cluster.
+
+```shell
+KUBECONFIG=~/.kube/config kubectl --context kind-guilder get crontabs -n specialstuff
+```
+``` {.bash .no-copy }
+NAME                 AGE
+my-new-cron-object   37m
 ```
 
 Examining the common workload in the guilder cluster, for example,

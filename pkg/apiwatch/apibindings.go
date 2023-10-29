@@ -18,12 +18,19 @@ package apiwatch
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
 )
 
 type APIBindingAnalyzer struct {
 	ObjectNotifier
+}
+
+var _ ResourceDefinitionSupplier = APIBindingAnalyzer{}
+
+func (aba APIBindingAnalyzer) GetGVK(obj any) schema.GroupVersionKind {
+	return apisv1alpha1.SchemeGroupVersion.WithKind("APIBinding")
 }
 
 func (aba APIBindingAnalyzer) EnumerateDefinedResources(obj any) ResourceDefinitionEnumerator {

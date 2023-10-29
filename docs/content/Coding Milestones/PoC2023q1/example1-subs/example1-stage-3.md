@@ -106,6 +106,30 @@ status:
   ... (may be filled in by the time you look) ...
 ```
 
+That display should show objects in two different mailbox workspaces;
+the following command checks that.
+
+```shell
+test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
+```
+
+The various APIBinding and CustomResourceDefinition objects involved
+should also appear in the mailbox workspaces.
+
+```shell
+test $(kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -cw "name: bind-apps") -ge 2
+kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -w "name: bind-kubernetes"
+kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
+```
+
+The `APIService` of the special workload should also appear, along
+with some error messages about `APIService` not being known in the
+other mailbox workspaces.
+
+```shell
+kubestellar-list-syncing-objects --api-group apiregistration.k8s.io --api-kind APIService 2>&1 | grep -v "APIService.*the server could not find the requested resource" | fgrep -w "name: v1090.example.my"
+```
+
 The florin cluster gets only the common workload.  Examine florin's
 `SyncerConfig` as follows.  Utilize the name of the mailbox workspace
 for florin (which you stored in Stage 1) here.
