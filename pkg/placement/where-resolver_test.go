@@ -28,7 +28,7 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
+	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 )
 
@@ -53,11 +53,11 @@ func TestWhereResolver(t *testing.T) {
 	}
 	ep1EN := ExternalName{wds1N, ObjectName(sps1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(sps1)
-	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
-	spsClusterPreInformer := edgeClusterInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
+	edgeInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, 0)
+	spsClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
 	spsClusterPreInformer.Informer() // get the informer created so that it will start
 	whereResolver := NewWhereResolver(ctx, spsClusterPreInformer, 3)
-	edgeClusterInformerFactory.Start(ctx.Done())
+	edgeInformerFactory.Start(ctx.Done())
 	rcvr := NewMapMap[ExternalName, ResolvedWhere](nil)
 	runnable := whereResolver(rcvr)
 	go runnable.Run(ctx)

@@ -42,8 +42,8 @@ type whereResolver struct {
 	numThreads int
 	queue      workqueue.RateLimitingInterface
 
-	spsInformer kcpcache.ScopeableSharedIndexInformer
-	spsLister   edgev2alpha1listers.SinglePlacementSliceClusterLister
+	spsInformer upstreamcache.SharedIndexInformer
+	spsLister   edgev2alpha1listers.SinglePlacementSliceLister
 
 	// resolutions maps EdgePlacement name to its ResolvedWhere
 	resolutions RelayMap[ExternalName, ResolvedWhere]
@@ -62,7 +62,7 @@ func (qi queueItem) toExternalName() ExternalName {
 // NewWhereResolver returns a WhereResolver.
 func NewWhereResolver(
 	ctx context.Context,
-	spsPreInformer edgev2alpha1informers.SinglePlacementSliceClusterInformer,
+	spsPreInformer edgev2alpha1informers.SinglePlacementSliceInformer,
 	numThreads int,
 ) WhereResolver {
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
@@ -171,7 +171,7 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 	cluster := item.cluster
 	epName := item.name
 	objName := item.toExternalName()
-	sps, err := wr.spsLister.Cluster(cluster).Get(epName)
+	sps, err := wr.spsLister.Get(epName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
 		logger.Error(err, "Failed to fetch SinglePlacementSlice from local cache", "cluster", cluster, "epName", epName)
 		return true // I think these errors are not transient
