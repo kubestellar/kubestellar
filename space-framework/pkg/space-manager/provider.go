@@ -76,7 +76,6 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 		pClient, err = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
 		pClient, err = providerkcp.New(config)
-		return pClient
 	default:
 		return nil
 	}
