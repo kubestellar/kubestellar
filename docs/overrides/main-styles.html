@@ -17,6 +17,27 @@
     <!-- Additional styles for landing page -->
     <style>
 
+.section-sm {
+  display: none;
+  text-align: center;
+}
+
+.d-sm-mid {
+    display: none;
+}
+
+@media (max-width: 960px) {
+    .d-lg-mid {
+        display:none;
+    }
+    .d-sm-mid {
+        display: contents;
+    }
+    .section-sm {
+        display:contents;
+    }
+}
+
 .shortcut-bar-text {
     font-size: 15px;
     transition: color 0.3s;
@@ -37,11 +58,11 @@
   line-height: 60px;
 }
 .centered {
-  width: 15%;
+  width: 20%;
   height: 55%;
-  position:absolute;
-  top: 250px;
-  left: 50%;
+  position:relative;
+  top: -25px;
+  right: -75%;
   /* transform: translate(-50%, -50%); */
   text-align: center;
 }
@@ -51,7 +72,7 @@
   .shortcut-bar {
     width: 100%; /* Adjust the width for mobile screens */
     height: auto; /* Adjust the height for mobile screens */
-    top: 9%; /* Adjust the top position for mobile screens */
+    top: 3%; /* Adjust the top position for mobile screens */
     left: 50%; /* Adjust the left position for mobile screens */
     transform: translateX(-50%); /* Adjust the horizontal centering for mobile screens */
     line-height: 40px; /* Adjust the line height for mobile screens */
@@ -59,9 +80,10 @@
 }
 @media (max-width: 1000px) {
   .centered {
-    width: 30%; /* Adjust the width for mobile screens and (min-width: 800px) */ 
-    height: auto; 
-    top: 24%; 
+    width: 40%; /* Adjust the width for mobile screens and (min-width: 800px) */ 
+    /* height: auto;  */
+    top: -10px;
+    right: -82%;
     transform: translateX(-50%); /* Adjust horizontal centering for mobile screens */
     text-align: center;
     padding-left: 20px;
@@ -803,7 +825,7 @@
                 display: flex;
                 flex-flow: row;
             }
-    
+            
             .d-lg-none {
                 display: none;
             }
@@ -870,6 +892,12 @@
             .d-xl {
                 display: none;
             }
+            .d-lg-mid {
+                display:contents;
+            }
+            .d-sm {
+                display: none;
+            }
             .d-lg {
                 display: none;
             }
@@ -921,6 +949,9 @@
                 display:contents;
             }
             .d-xl {
+                display: none;
+            }
+            .d-sm {
                 display: none;
             }
             .d-lg {
@@ -976,15 +1007,18 @@
             .d-xl {
                 display: none;
             }
+            .d-sm {
+                display: none;
+            }
             .d-lg {
                 display: none;
             }
             .d-md {
                 display: none;
             }
-            .d-sm {
+            /* .d-sm {
                 display: none;
-            }
+            } */
     
             .text-xs-center {
                 text-align: center;
