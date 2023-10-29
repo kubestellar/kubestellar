@@ -141,7 +141,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		}
 		// clusterWhatWhereFull is a map from ClusterWhatWhereFullKey to API version (no group),
-		// factored into a map from NonNamespacedDistributionTuple to epName to API version.
+		// factored into a map from NonNamespacedDistributionTuple to epName to WorkloadPartDetails.
 		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */, WorkloadPartDetails](
 			factorClusterWhatWhereFullKey,
 			nil,
@@ -213,7 +213,6 @@ var factorUpsyncTuple = NewFactorer(
 // As a relational algebra expression, the desired computation is as follows.
 // common = WhatWheres.GroupBy(all but epName).Aggregate(OR[returnSingleton])
 // (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> (APIVersion, returnSingleton))
-// // NamespacedDistributionTuples = common.Keys()
 // NamespacedObjectDistributions = common.ProjectOut(APIVersion)
 // ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
@@ -226,7 +225,6 @@ var factorUpsyncTuple = NewFactorer(
 // is given the stream of changes to the following map:
 // - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> (APIVersion, returnSingleton)
 // and produces the change streams to the following two maps:
-// // - set of NonNamespacedDistributionTuple (epCluster,GroupResource,ObjName,destination)
 // - map of NonNamespacedObjectDistribution (epCluster,GroupResource,ObjName,destination) -> returnSingleton
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
@@ -239,9 +237,7 @@ var factorUpsyncTuple = NewFactorer(
 //
 // The query plan is as follows.
 // clusterModesReceiver <- ctSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// // clusterDistributionsReceiver <- ctSansEPName.keys()
 // clusterObjectDistributions <- ctSansEPName.ProjectOut(APIVersion)
-// // ctSansEPName <- WhatWheres.ProjectOut(epName)
 // ctSansEPName <- WhatWheres.GroupBy(all but epName).Aggregate(OR[returnSingleton])
 //
 // For the upsyncs, as a SingleBinder this organizer is given the stream of changes
