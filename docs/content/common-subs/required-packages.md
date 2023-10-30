@@ -98,26 +98,26 @@
         choco install kubernetes-helm
         ```
     === "WSL with Ubuntu"  
-        ### How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
+        <h3>How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution</h3>
 
         (Tested on a Intel(R) Core(TM) i7-9850H CPU @ 2.60GHz 2.59 GHz with 32GB RAM, a 64-bit operating system, x64-based processor
         Using Windows 11 Enterprise)
 
-        ###### 1. If you're using a VPN, turn it off
+        <h6> 1. If you're using a VPN, turn it off</h6>
 
-        ###### 2. Install Ubuntu into WSL
+        <h6> 2. Install Ubuntu into WSL</h6>
 
-        ###### 2.0 If wsl is not yet installed, open a powershell administrator window and run the following
+        <h6> 2.0 If wsl is not yet installed, open a powershell administrator window and run the following</h6>
         ```
         wsl --install
         ```
-        ###### 2.1 reboot your system
+        <h6> 2.1 reboot your system</h6>
 
-        ###### 2.2 In a Windows command terminal run the following to list all the linux distributions that are available online
+        <h6> 2.2 In a Windows command terminal run the following to list all the linux distributions that are available online</h6>
         ```
         wsl -l -o
         ```
-        ###### 2.3 Select a linux distribution and install it into WSL
+        <h6> 2.3 Select a linux distribution and install it into WSL</h6>
         ```
         wsl --install -d Ubuntu 22.04.01
         ```
@@ -129,23 +129,23 @@
         Enter new UNIX username:
         ```
 
-        ###### 2.4 Enter your new username and password at the prompts, and you will eventually see something like:
+        <h6> 2.4 Enter your new username and password at the prompts, and you will eventually see something like:</h6>
         ```
         Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
         ```
 
-        ###### 2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
-        Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.
+        <h6> 2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
+        Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.</h6>
         Start a VM using your distribution by clicking on the App.
 
-        ###### 3. Install pre-requisites into your new VM
-        ###### 3.1 update and apply apt-get packages
+        <h6> 3. Install pre-requisites into your new VM</h6>
+        <h6> 3.1 update and apply apt-get packages</h6>
         ```
         sudo apt-get update
         sudo apt-get upgrade
         ```
         
-        ###### 3.2 Install golang
+        <h6> 3.2 Install golang</h6>
         ```
         wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
         sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
@@ -155,12 +155,12 @@
         go version
         ```
         
-        ###### 3.3 Install ko (but don't do ko set action step)
+        <h6> 3.3 Install ko (but don't do ko set action step)</h6>
         ```
         go install github.com/google/ko@latest
         ```
 
-        ###### 3.4 Install gcc
+        <h6> 3.4 Install gcc</h6>
         Either run this:
         ```
         sudo apt install build-essential
@@ -172,25 +172,25 @@
         gcc --version
         ```
 
-        ###### 3.5 Install make (if you installed build-essential this may already be installed)
+        <h6> 3.5 Install make (if you installed build-essential this may already be installed)</h6>
         ```
         apt install make
         ```
 
-        ###### 3.6 Install jq
+        <h6> 3.6 Install jq</h6>
         ```
         DEBIAN_FRONTEND=noninteractive apt-get install -y jq
         jq --version
         ```
 
-        ###### 3.7 install kubectl
+        <h6> 3.7 install kubectl</h6>
         ```
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
         echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
         ```
-        ###### 3.8 install helm (required when deploying as workload)
+        <h6> 3.8 install helm (required when deploying as workload)</h6>
         ```
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
         chmod 700 get_helm.sh
@@ -288,18 +288,18 @@
         curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.14.0/kind-windows-amd64
         ```
     === "WSL with Ubuntu"  
-        ## How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
+        <h3> How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution</h3>
 
-        ###### 1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
+        <h6> 1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.</h6>
         
-        ###### 2.0 Install docker
+        <h6> 2.0 Install docker</h6>
         The installation instructions from docker are not sufficient to get docker working with WSL
 
-        ###### 2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
+        <h6> 2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/</h6>
 
-        Here some additonal steps you will need to take:
+        Here some additional steps you will need to take:
 
-        ###### 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
+        <h6> 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.</h6>
         If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
         ```
         sudo vi /etc/wsl.conf
@@ -310,7 +310,7 @@
         systemd=true
         ```
 
-        ###### 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
+        <h6> 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via</h6>
         ```
         sudo vi /etc/sudoers.d/docker
         ``` 
@@ -320,28 +320,28 @@
         <your user account> ALL=(ALL) NOPASSWD: /usr/bin/dockerd
         ```
 
-        ###### 2.4 Add your user to the docker group
+        <h6> 2.4 Add your user to the docker group</h6>
         ```
         sudo usermod -aG docker $USER
         ```
 
-        ###### 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
+        <h6> 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):</h6>
         ```
         sudo systemctl stop docker
         sudo dockerd &
         ```
 
-        ###### 2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
-        The following commands will fix the issue: 
+        <h6> 2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
+        The following commands will fix the issue:</h6>
         ```
         sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
         sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
         sudo dockerd & 
         ``` 
 
-        ###### 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal   
+        <h6> 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal</h6>
 
-        ###### 3.1 In your new terminal, install kind
+        <h6> 3.1 In your new terminal, install kind</h6>
         ```
         wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
         sudo install -m 0755 kind /usr/local/bin/kind 
