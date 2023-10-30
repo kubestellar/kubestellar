@@ -122,7 +122,7 @@ build: require-jq require-go require-git verify-go-versions ## Build all executa
 	cp inner-scripts/* bin/
 .PHONY: build
 
-userbuild: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-list-syncing-objects
+userbuild: WHAT ?= ./cmd/test-space-framework ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-list-syncing-objects
 userbuild: require-jq require-go require-git verify-go-versions ## Build executables needed by users outside the core image
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
 	cp outer-scripts/* bin/
