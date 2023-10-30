@@ -25,17 +25,32 @@ function echoerr() {
 function run_space_manager() {
     echo "--< Starting space-manager 1 >--"
     KUBECONFIG=
-    kubectl config set-cluster space-core --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    kubectl config set-credentials usertoken --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-    kubectl config set-context space-mgt --cluster=the-clusterspace-core --user=usertoken 
+    kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
+    kubectl config use-context space-mgt
     KUBECONFIG=/home/spacecore/.kube/config
 
-    echo "Create a secret for the core cluster."
-    kubectl --context space-mgt create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
+    echo "Apply space manager CRDs."
+    kubectl apply -f /home/spacecore/config/crds
 
-    # apply the space manager CRDs
-    # kubectl apply -f /home/spacecore/config/crds
-    echo "Applied space manager CRDs."
+    echo "Waiting for kcp to be ready... this may take a while."
+    (
+        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
+            sleep 10
+        done
+    )
+ 
+    echo "Create the kcp provider secret."
+    kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
+    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
+
+    echo "Create a secret for the core cluster which is also where the kubeflex core cluster."
+    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
+
+    echo "Apply kubeflex and kcp providers."
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f config/spaceproviderdesc-kflex.yaml
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f config/spaceproviderdesc-kcp.yaml
 
     # Running the space-manager 
     if ! bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config; then

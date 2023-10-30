@@ -55,6 +55,8 @@ COPY --from=builder /home/spacecore/config/crds     config/crds
 # add entry script
 ADD entry.sh entry.sh
 ADD bin/kflex bin/kflex
+ADD config/spaceproviderdesc-kflex.yaml config/spaceproviderdesc-kflex.yaml
+ADD config/spaceproviderdesc-kcp.yaml config/spaceproviderdesc-kcp.yaml
 
 RUN chown -R spacecore:0 /home/spacecore && \
     chmod -R g=u /home/spacecore

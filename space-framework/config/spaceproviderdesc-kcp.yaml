@@ -1,0 +1,10 @@
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: pkcp
+spec:
+  ProviderType: "kcp"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: default
+    name: kcpsec
