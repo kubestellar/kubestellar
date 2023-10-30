@@ -1063,13 +1063,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio" class="md-nav__link">
-    Update the kubestellar container image just build and uploaded to quay.io
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#create-a-release-in-gh-ui" class="md-nav__link">
     Create a release in GH UI
   </a>
@@ -2129,13 +2122,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio" class="md-nav__link">
-    Update the kubestellar container image just build and uploaded to quay.io
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#create-a-release-in-gh-ui" class="md-nav__link">
     Create a release in GH UI
   </a>
@@ -2326,9 +2312,6 @@
 <h3 id="create-a-build">Create a build<a class="headerlink" href="#create-a-build" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.11.0
 </code></pre></div>
-<h3 id="update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio">Update the kubestellar container image just build and uploaded to quay.io<a class="headerlink" href="#update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio" title="Permanent link">#</a></h3>
-<p>Head up to quay.io and look for the image of KubeStellar container just uploaded.
-Make this image 'stable' so that helm and other install methods pickup this image.</p>
 <h3 id="create-a-release-in-gh-ui">Create a release in GH UI<a class="headerlink" href="#create-a-release-in-gh-ui" title="Permanent link">#</a></h3>
 <ul>
 <li>Navigate to the KubeStellar GitHub Source Repository Releases section at https://github.com/kubestellar/kubestellar/releases</li>
@@ -2368,7 +2351,7 @@ then, make the KubeStellar image from within the local copy of the release branc
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>mv ~/kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;ks_new_helm_version&#39;] }}.tar.gz charts
 </code></pre></div></p>
 <p>next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):<br />
-``` h_lines="5 6 8 13 14 15
+```shell title="index.yaml" h_lines="5 6 8 13 14 15
 apiVersion: v1
 entries:
   kubestellar-core:
@@ -2384,22 +2367,27 @@ entries:
     - https://helm.kubestellar.io/charts/kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object['ks_new_helm_version'] }}.tar.gz
     version: "3"
 generated: "2023-10-30T12:00:00.727185806-04:00"
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>### Check that GH Workflows for docs are working
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>### Update the KubeStellar Core container image just build and uploaded to quay.io
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>Make this image &#39;stable&#39; so that helm and other install methods pickup this image.
 <a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
-<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
-<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>
-<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>&lt;!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
-<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>- Configure prow for the new release branch
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>### Check that GH Workflows for docs are working
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>
 <a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>
-<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>    - Make sure you have openshift/release cloned
-<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>    - Create a new branch
-<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-&lt;version&gt;.yaml
-<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>    - Edit the new file
-<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>    - Change main to the name of the release branch, such as release-0.11
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>&lt;!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>- Configure prow for the new release branch
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a>    - Make sure you have openshift/release cloned
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a>    - Create a new branch
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-&lt;version&gt;.yaml
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a>    - Edit the new file
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a>    - Change main to the name of the release branch, such as release-0.11
 </code></pre></div>
 zz_generated_metadata:
   branch: main
