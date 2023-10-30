@@ -28,7 +28,6 @@ import (
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
@@ -38,6 +37,7 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 type placementTranslator struct {
@@ -55,7 +55,6 @@ type placementTranslator struct {
 	dynamicClusterClient   clusterdynamic.ClusterInterface
 	edgeClusterClientset   edgeclusterclientset.ClusterInterface
 	nsClusterPreInformer   kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient        kcpkubecorev1client.NamespaceClusterInterface
 
 	workloadProjector interface {
 		WorkloadProjector
@@ -70,18 +69,12 @@ func NewPlacementTranslator(
 	numThreads int,
 	ctx context.Context,
 	locationPreInformer edgev1a1informers.LocationInformer,
-	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	epPreInformer edgev1a1informers.EdgePlacementInformer,
-	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	spsPreInformer edgev1a1informers.SinglePlacementSliceInformer,
-	// pre-informer on syncer config objects, should be in mailbox workspaces
 	syncfgPreInformer edgev1a1informers.SyncerConfigInformer,
 
 	customizerPreInformer edgev1a1informers.CustomizerInformer,
-	// pre-informer on Workspaces objects
 	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
-	// all-cluster clientset for kcp APIs,
-	// needed to manipulate TMC objects in mailbox workspaces
 	kcpClusterClientset kcpclusterclientset.ClusterInterface,
 	// needed for enumerating resources in workload mgmt workspaces
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
@@ -95,8 +88,8 @@ func NewPlacementTranslator(
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	// for monitoring namespaces in mailbox workspaces
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
-	// for creating namespaces in mailbox workspaces
-	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	mbwsPreInformer.Lister()
@@ -115,7 +108,6 @@ func NewPlacementTranslator(
 		dynamicClusterClient:   dynamicClusterClient,
 		edgeClusterClientset:   edgeClusterClientset,
 		nsClusterPreInformer:   nsClusterPreInformer,
-		nsClusterClient:        nsClusterClient,
 		whatResolver: NewWhatResolver(ctx, epPreInformer, discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsPreInformer, numThreads),
@@ -125,7 +117,7 @@ func NewPlacementTranslator(
 		pt.syncfgInformer, pt.syncfgLister,
 		customizerPreInformer.Informer(), customizerPreInformer.Lister(),
 		edgeClusterClientset, dynamicClusterClient,
-		nsClusterPreInformer, nsClusterClient)
+		nsClusterPreInformer, spaceclient, spaceProviderNs)
 
 	return pt
 }
@@ -159,7 +151,6 @@ func (pt *placementTranslator) Run() {
 		DefaultResourceModes, // TODO: replace with configurable
 		nil,                  // TODO: get this right
 	)
-	// workloadProjector := NewLoggingWorkloadProjector(logger)
 	runner := AssemplePlacementTranslator(whatResolver, whereResolver, setBinder, pt.workloadProjector)
 	// TODO: move all that stuff up before Run
 	go pt.apiProvider.Run(ctx)       // TODO: also wait for this to finish

@@ -32,6 +32,8 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 func NewResolverCommand() *cobra.Command {
@@ -81,14 +83,27 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	ctx = klog.NewContext(ctx, logger)
 
 	// create edgeSharedInformerFactory
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := options.SpaceMgtOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to create config from flags")
+		logger.Error(err, "failed to create config from flags for space management cluster")
+		return err
+	}
+	// create space-aware client
+	spaceclient, err := msclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "failed to create space-aware client")
+		return err
+	}
+	spaceProviderNs := spacemanager.ProviderNS(options.Provider)
+
+	espwRestConfig, err := spaceclient.ConfigForSpace(options.EspwName, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "failed to fetch space config", "spacename", options.EspwName)
 		return err
 	}
 	espwClientset, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create config for edge exports")
+		logger.Error(err, "failed to create clientset for service provider space")
 		return err
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)

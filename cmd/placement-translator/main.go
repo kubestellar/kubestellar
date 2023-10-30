@@ -52,13 +52,13 @@ import (
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 type ClientOpts struct {
@@ -94,19 +94,22 @@ func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10204"
+	espwSpace := "espw"
+	spaceProvider := "default"
 	fs := pflag.NewFlagSet("placement-translator", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	espwClientOpts := NewClientOpts("espw", "access to the edge service provider workspace")
-	espwClientOpts.AddFlags(fs)
 	rootClientOpts := NewClientOpts("root", "access to root workspace")
 	rootClientOpts.overrides.CurrentContext = "root"
 	rootClientOpts.AddFlags(fs)
 	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
 	baseClientOpts.overrides.CurrentContext = "system:admin"
 	baseClientOpts.AddFlags(fs)
+	fs.StringVar(&espwSpace, "espw-space-name", espwSpace, "the name of the KubeStellar service provider space")
+	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
+	spaceMgtClientOpts := NewClientOpts("space-mgt", "access to space management workspaces")
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -128,9 +131,21 @@ func main() {
 		}
 	}()
 
-	espwRestConfig, err := espwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
+		logger.Error(err, "failed to create space management config from flags")
+		os.Exit(2)
+	}
+	// create space-aware client
+	spaceclient, err := msclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create space-aware client")
+		os.Exit(5)
+	}
+	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
+	espwRestConfig, err := spaceclient.ConfigForSpace(espwSpace, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "failed to fetch space config", "spacename", espwSpace)
 		os.Exit(10)
 	}
 
@@ -172,7 +187,6 @@ func main() {
 		logger.Error(err, "Failed to create kcp-kube all-cluster client")
 		os.Exit(44)
 	}
-	nsClusterClient := kubeClusterClient.CoreV1().Namespaces()
 	kubeClusterInformerFactory := kcpkubeinformers.NewSharedInformerFactory(kubeClusterClient, 0)
 	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
 
@@ -181,7 +195,6 @@ func main() {
 	spsPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
 	syncfgPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
 	customizerPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
-	var _ edgev1a1informers.SinglePlacementSliceInformer = spsPreInformer
 
 	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
@@ -191,10 +204,8 @@ func main() {
 
 	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
 	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
-	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
 	locationPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
-	var _ edgev1a1informers.LocationInformer = locationPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
@@ -220,10 +231,10 @@ func main() {
 	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
 
 	doneCh := ctx.Done()
-	// TODO: more
+
 	pt := placement.NewPlacementTranslator(concurrency, ctx, locationPreInformer, epPreInformer, spsPreInformer, syncfgPreInformer, customizerPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, spaceclient, spaceProviderNs)
 
 	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)

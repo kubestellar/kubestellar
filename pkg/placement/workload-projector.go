@@ -45,7 +45,6 @@ import (
 
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpcorev1a1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
 	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
@@ -55,6 +54,7 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev2a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 const SyncerConfigName = "the-one"
@@ -95,7 +95,8 @@ func NewWorkloadProjector(
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
-	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
@@ -113,7 +114,8 @@ func NewWorkloadProjector(
 		edgeClusterClientset: edgeClusterClientset,
 		dynamicClusterClient: dynamicClusterClient,
 		nsClusterPreInformer: nsClusterPreInformer,
-		nsClusterClient:      nsClusterClient,
+		spaceclient:          spaceclient,
+		spaceProviderNs:      spaceProviderNs,
 
 		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
 		clusterToMBWSName: WrapMapWithMutex[logicalcluster.Name, string](NewMapMap[logicalcluster.Name, string](nil)),
@@ -323,7 +325,8 @@ type workloadProjector struct {
 	edgeClusterClientset edgeclusterclientset.ClusterInterface
 	dynamicClusterClient clusterdynamic.ClusterInterface
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient      kcpkubecorev1client.NamespaceClusterInterface
+	spaceclient          msclient.KubestellarSpaceInterface
+	spaceProviderNs      string
 
 	mbwsNameToCluster MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
 	clusterToMBWSName MutableMap[logicalcluster.Name, string /*mailbox workspace name*/]
@@ -445,7 +448,15 @@ func (wpd *wpPerDestination) getDynamicDuoLocked(gr metav1.GroupResource, apiVer
 					opts.LabelSelector = opts.LabelSelector + "," + justMineStr
 				}
 			})
-		wpd.namespaceClient = wpd.wp.nsClusterClient.Cluster(mbwsCluster.Path())
+		mbwsConfig, err := wpd.wp.spaceclient.ConfigForSpace(mbwsName, wpd.wp.spaceProviderNs)
+		if err != nil {
+			return dynamicDuo{}, nil, err
+		}
+		mbwsClient, err := k8scorev1client.NewForConfig(mbwsConfig)
+		if err != nil {
+			return dynamicDuo{}, nil, err
+		}
+		wpd.namespaceClient = mbwsClient.Namespaces()
 		wpd.namespacePreInformer = wpd.wp.nsClusterPreInformer.Cluster(mbwsCluster)
 		nsInformer := wpd.namespacePreInformer.Informer()
 		nsReadyChan := make(chan struct{})

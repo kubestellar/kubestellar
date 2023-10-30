@@ -40,32 +40,32 @@ import (
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	"github.com/kcp-dev/logicalcluster/v3"
-
-	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	spaceclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	spaceinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
+	spaceclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
+	espwSpace := "espw"
+	spaceProvider := "default"
 	serverBindAddress := ":10203"
-	espwPath := logicalcluster.Name("root").Path().Join("espw").String()
 	fs := pflag.NewFlagSet("mailbox-controller", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	fs.StringVar(&espwPath, "espw-path", espwPath, "the pathname of the edge service provider workspace")
+	fs.StringVar(&espwSpace, "espw-space", espwSpace, "the name of the KubeStellar service provider space")
+	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
 
-	rootClientOpts := clientopts.NewClientOpts("root", "access to the root workspace")
-	rootClientOpts.SetDefaultCurrentContext("root")
-	rootClientOpts.AddFlags(fs)
+	spaceMgtOpts := clientopts.NewClientOpts("space-mgt", "access to space management workspace")
+	spaceMgtOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -89,45 +89,49 @@ func main() {
 	}()
 
 	// create edgeSharedInformerFactory
-	options := resolveroptions.NewOptions()
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to create config from flags")
+		logger.Error(err, "failed to create space management config from flags")
 		os.Exit(3)
+	}
+	// create space-aware client
+	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "failed to create space-aware client")
+		os.Exit(4)
+	}
+	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
+
+	espwRestConfig, err := spaceclient.ConfigForSpace(espwSpace, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "failed to fetch space config", "spacename", espwSpace)
+		os.Exit(5)
 	}
 
 	edgeClientset, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create clientset for view of edge exports")
+		logger.Error(err, "failed to create clientset for service provider space")
 		os.Exit(6)
 	}
-
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
-	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
+	syncTargetPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
 
-	rootRestConfig, err := rootClientOpts.ToRESTConfig()
+	managementClientset, err := spaceclientset.NewForConfig(spaceManagementConfig)
 	if err != nil {
-		logger.Error(err, "failed to make root config")
-		os.Exit(8)
-	}
-	rootRestConfig.UserAgent = "mailbox-controller"
-
-	workspaceScopedClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create clientset for workspaces")
+		logger.Error(err, "failed to create clientset for space management")
 	}
 
-	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
-	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
+	spaceInformerFactory := spaceinformers.NewSharedInformerFactory(managementClientset, resyncPeriod)
+	spacePreInformer := spaceInformerFactory.Space().V1alpha1().Spaces()
 
-	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
-		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
+	ctl := newMailboxController(ctx, syncTargetPreInformer, spacePreInformer,
+		managementClientset, spaceProvider, spaceProviderNs,
 	)
 
 	doneCh := ctx.Done()
 	edgeSharedInformerFactory.Start(doneCh)
 
-	workspaceScopedInformerFactory.Start(doneCh)
+	spaceInformerFactory.Start(doneCh)
 
 	ctl.Run(concurrency)
 
