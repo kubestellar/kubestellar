@@ -979,6 +979,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-the-core-helm-chart-chartyaml-and-valuesyaml-files-with-a-reference-to-the-new-version-of-the-kubestellar-helm-chart-version" class="md-nav__link">
+    Update the core-helm-chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-the-version-file" class="md-nav__link">
     Update the VERSION file
   </a>
@@ -2031,6 +2038,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#update-the-core-helm-chart-chartyaml-and-valuesyaml-files-with-a-reference-to-the-new-version-of-the-kubestellar-helm-chart-version" class="md-nav__link">
+    Update the core-helm-chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#update-the-version-file" class="md-nav__link">
     Update the VERSION file
   </a>
@@ -2191,87 +2205,101 @@
 <p>change the version in the following line:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">syncer_image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.10.0&quot;</span>
 </code></pre></div></p>
+<h3 id="update-the-core-helm-chart-chartyaml-and-valuesyaml-files-with-a-reference-to-the-new-version-of-the-kubestellar-helm-chart-version">Update the core-helm-chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version<a class="headerlink" href="#update-the-core-helm-chart-chartyaml-and-valuesyaml-files-with-a-reference-to-the-new-version-of-the-kubestellar-helm-chart-version" title="Permanent link">#</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vi<span class="w"> </span>core-helm-chart/Chart.yaml
+</code></pre></div>
+<p>change the versions in the following line:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>version:<span class="w"> </span><span class="m">3</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>appVersion:<span class="w"> </span>v0.10.0
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>vi<span class="w"> </span>core-helm-chart/values.yaml
+</code></pre></div>
+<p>change the version in the following line:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>tag:<span class="w"> </span>release-0.10
+</code></pre></div></p>
 <h3 id="update-the-version-file">Update the VERSION file<a class="headerlink" href="#update-the-version-file" title="Permanent link">#</a></h3>
 <p>The VERSION file points to the 'latest' and 'stable' release tags associated with the most recent release (latest) and the most stable release (stable).  Update the 'stable' and 'latest tags accordingly</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vi<span class="w"> </span>VERSION
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>vi<span class="w"> </span>VERSION
 </code></pre></div>
 <p><b>before:</b>
-<div class="highlight"><span class="filename">VERSION</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>...
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="hll"><span class="nv">stable</span><span class="o">=</span>v0.9.0
-</span><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.9.0
-</span><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>...
+<div class="highlight"><span class="filename">VERSION</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>...
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="hll"><span class="nv">stable</span><span class="o">=</span>v0.9.0
+</span><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.9.0
+</span><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="hll"><span class="nv">ks_current_helm_version</span><span class="o">=</span><span class="m">2</span>
+</span><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>...
 </code></pre></div></p>
 <p><b>after:</b>
-<div class="highlight"><span class="filename">VERSION</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>...
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="hll"><span class="nv">stable</span><span class="o">=</span>v0.9.0
-</span><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.10.0
-</span><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>...
+<div class="highlight"><span class="filename">VERSION</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>...
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="hll"><span class="nv">stable</span><span class="o">=</span>v0.9.0
+</span><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.10.0
+</span><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="hll"><span class="nv">ks_next_helm_version</span><span class="o">=</span><span class="m">3</span>
+</span><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>...
 </code></pre></div></p>
 <h3 id="push-the-main-branch">Push the main branch<a class="headerlink" href="#push-the-main-branch" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support new release&quot;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;updates to main to support new release&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
 <h3 id="create-a-release-majorminor-branch">Create a release-major.minor branch<a class="headerlink" href="#create-a-release-majorminor-branch" title="Permanent link">#</a></h3>
 <p>To create a release branch, identify the current 'release' branches' name (e.g. release-0.10).  Increment the <major> or <minor> segment as part of the 'release' branches' name.  For instance, the 'release' branch is 'main', you might name the new release branch 'release-0.10'.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release-0.10
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>release-0.10
 </code></pre></div></p>
 <h3 id="update-the-mkdocsyml-file">Update the mkdocs.yml file<a class="headerlink" href="#update-the-mkdocsyml-file" title="Permanent link">#</a></h3>
 <p>The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>vi<span class="w"> </span>docs/mkdocs.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>vi<span class="w"> </span>docs/mkdocs.yml
 </code></pre></div>
 <p><b>before:</b>
-<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>...
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="hll">edit_uri:<span class="w"> </span>edit/main/docs/content
-</span><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;main&#39;</span>
-</span><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.9.0&#39;</span>
-</span><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="hll">ks_next_branch:<span class="w"> </span><span class="s1">&#39;release-0.10&#39;</span>
-</span><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="hll">ks_next_tag:<span class="w"> </span><span class="s1">&#39;v0.10.0&#39;</span>
-</span><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>...
+<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>...
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="hll">edit_uri:<span class="w"> </span>edit/main/docs/content
+</span><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;main&#39;</span>
+</span><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.9.0&#39;</span>
+</span><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="hll">ks_next_branch:<span class="w"> </span><span class="s1">&#39;release-0.10&#39;</span>
+</span><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="hll">ks_next_tag:<span class="w"> </span><span class="s1">&#39;v0.10.0&#39;</span>
+</span><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>...
 </code></pre></div></p>
 <p><b>after:</b>
-<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>...
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="hll">edit_uri:<span class="w"> </span>edit/release-0.10/docs/content
-</span><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.10&#39;</span>
-</span><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.10.0&#39;</span>
-</span><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="hll">ks_next_branch:<span class="w">    </span><span class="c1"># put the branch name of the next numerical branch that will come in the future</span>
-</span><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="hll">ks_next_tag:<span class="w">       </span><span class="c1"># put the tag name of the next numerical tag that will come in the future</span>
-</span><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>...
+<div class="highlight"><span class="filename">mkdocs.yml</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>...
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="hll">edit_uri:<span class="w"> </span>edit/release-0.10/docs/content
+</span><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="hll">ks_branch:<span class="w"> </span><span class="s1">&#39;release-0.10&#39;</span>
+</span><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="hll">ks_tag:<span class="w"> </span><span class="s1">&#39;v0.10.0&#39;</span>
+</span><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="hll">ks_next_branch:<span class="w">    </span><span class="c1"># put the branch name of the next numerical branch that will come in the future</span>
+</span><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="hll">ks_next_tag:<span class="w">       </span><span class="c1"># put the tag name of the next numerical tag that will come in the future</span>
+</span><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>...
 </code></pre></div></p>
 <h3 id="remove-the-current-stable-alias-using-mike-danger">Remove the current 'stable' alias using 'mike' (DANGER!)<a class="headerlink" href="#remove-the-current-stable-alias-using-mike-danger" title="Permanent link">#</a></h3>
 <p>Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span><span class="w"> </span>docs
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the current &#39;main&#39; branches&#39; doc set</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>stable<span class="w"> </span><span class="c1"># this generates the &#39;main&#39; branches&#39; docs set and points &#39;stable&#39; at it temporarily</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nb">cd</span><span class="w"> </span>..
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the current &#39;main&#39; branches&#39; doc set</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>main<span class="w"> </span>stable<span class="w"> </span><span class="c1"># this generates the &#39;main&#39; branches&#39; docs set and points &#39;stable&#39; at it temporarily</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div></p>
 <h3 id="push-the-new-release-branch">Push the new release branch<a class="headerlink" href="#push-the-new-release-branch" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;new release version release-0.10&quot;</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>release-0.10<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;new release version release-0.10&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>release-0.10<span class="w"> </span><span class="c1"># replace &lt;major&gt;.&lt;minor&gt; with your incremented &lt;major&gt;.&lt;minor&gt; pair</span>
 </code></pre></div>
 <h3 id="update-the-stable-alias-using-mike">Update the 'stable' alias using 'mike'<a class="headerlink" href="#update-the-stable-alias-using-mike" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">cd</span><span class="w"> </span>docs
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>git<span class="w"> </span>pull
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.10<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-0.10&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="nb">cd</span><span class="w"> </span>..
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">cd</span><span class="w"> </span>docs
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>mike<span class="w"> </span>delete<span class="w"> </span>stable<span class="w"> </span><span class="c1"># remove the &#39;stable&#39; alias from the &#39;main&#39; branches&#39; doc set</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>git<span class="w"> </span>pull
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--rebase<span class="w"> </span>--update-aliases<span class="w"> </span>release-0.10<span class="w"> </span>stable<span class="w">  </span><span class="c1"># this generates the new &#39;release-0.10&#39; branches&#39; doc set and points &#39;stable&#39; at it</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="nb">cd</span><span class="w"> </span>..
 </code></pre></div>
 <h3 id="test-your-doc-site">Test your doc site<a class="headerlink" href="#test-your-doc-site" title="Permanent link">#</a></h3>
 <p>Open a Chrome Incognito browser to <a href="https://docs.kubestellar.io">https://docs.kubestellar.io</a> and look for the version drop down to be updated to the new release you just pushed with 'git' and deployed with 'mike'</p>
 <h3 id="create-a-tagged-release">Create a tagged release<a class="headerlink" href="#create-a-tagged-release" title="Permanent link">#</a></h3>
 <p>View the existing tags you have for the repo</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>git<span class="w"> </span>tag
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>git<span class="w"> </span>tag
 </code></pre></div>
 <p>create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.9.0' to 'v0.10.0'</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">TAG</span><span class="o">=</span>v0.10.0
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nv">REF</span><span class="o">=</span>release-0.10
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>--tags
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">TAG</span><span class="o">=</span>v0.10.0
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nv">REF</span><span class="o">=</span>release-0.10
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>--tags
 </code></pre></div>
 <h3 id="create-a-build">Create a build<a class="headerlink" href="#create-a-build" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.10.0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>./hack/make-release-full.sh<span class="w"> </span>v0.10.0
 </code></pre></div>
 <h3 id="update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio">Update the kubestellar container image just build and uploaded to quay.io<a class="headerlink" href="#update-the-kubestellar-container-image-just-build-and-uploaded-to-quayio" title="Permanent link">#</a></h3>
 <p>Head up to quay.io and look for the image of KubeStellar container just uploaded.
@@ -2308,15 +2336,15 @@ Make this image 'stable' so that helm and other install methods pickup this imag
     - Edit the new file
     - Change main to the name of the release branch, such as release-0.10
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>zz_generated_metadata:
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>  branch: main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>zz_generated_metadata:
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>  branch: main
 </code></pre></div>
 Change latest to the name of the release branch
 
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>promotion:
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>  namespace: kubestellar
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>  tag: latest
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>  tag_by_commit: true
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>promotion:
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>  namespace: kubestellar
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>  tag: latest
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>  tag_by_commit: true
 </code></pre></div>
     - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
     - Copy the main branch configuration to a new release-x.y entry
@@ -2355,37 +2383,37 @@ Publish the release
 Notify -->
 
 <h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com">kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>Subject: KubeStellar release v0.10.0
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>Body:
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>Dear KubeStellar Community,
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    Release v0.10.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.10.0
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>What&#39;s Changed
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>
-<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
-<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
-<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
-<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
-<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
-<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>📖Update dev-env.md by @francostellari in #1157
-<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
-<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
-<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
-<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
-<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
-<a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
-<a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
-<a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a>New Contributors
-<a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a>
-<a id="__codelineno-19-26" name="__codelineno-19-26" href="#__codelineno-19-26"></a>@fab7 made their first contribution in #1155
-<a id="__codelineno-19-27" name="__codelineno-19-27" href="#__codelineno-19-27"></a>Full Changelog: v0.8.0…v0.9.0
-<a id="__codelineno-19-28" name="__codelineno-19-28" href="#__codelineno-19-28"></a>
-<a id="__codelineno-19-29" name="__codelineno-19-29" href="#__codelineno-19-29"></a>Thank you for your continued support,
-<a id="__codelineno-19-30" name="__codelineno-19-30" href="#__codelineno-19-30"></a>
-<a id="__codelineno-19-31" name="__codelineno-19-31" href="#__codelineno-19-31"></a>Andy
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>Subject: KubeStellar release v0.10.0
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>Body:
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>Dear KubeStellar Community,
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    Release v0.10.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.10.0
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>What&#39;s Changed
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a>📖Update dev-env.md by @francostellari in #1157
+<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
+<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+<a id="__codelineno-23-20" name="__codelineno-23-20" href="#__codelineno-23-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
+<a id="__codelineno-23-21" name="__codelineno-23-21" href="#__codelineno-23-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+<a id="__codelineno-23-22" name="__codelineno-23-22" href="#__codelineno-23-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+<a id="__codelineno-23-23" name="__codelineno-23-23" href="#__codelineno-23-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a>New Contributors
+<a id="__codelineno-23-25" name="__codelineno-23-25" href="#__codelineno-23-25"></a>
+<a id="__codelineno-23-26" name="__codelineno-23-26" href="#__codelineno-23-26"></a>@fab7 made their first contribution in #1155
+<a id="__codelineno-23-27" name="__codelineno-23-27" href="#__codelineno-23-27"></a>Full Changelog: v0.8.0…v0.9.0
+<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a>
+<a id="__codelineno-23-29" name="__codelineno-23-29" href="#__codelineno-23-29"></a>Thank you for your continued support,
+<a id="__codelineno-23-30" name="__codelineno-23-30" href="#__codelineno-23-30"></a>
+<a id="__codelineno-23-31" name="__codelineno-23-31" href="#__codelineno-23-31"></a>Andy
 </code></pre></div>
 <h3 id="post-the-same-message-in-the-kubestellar-slack-channel">Post the same message in the <a href="https://kubestellar.io/slack">#kubestellar</a> Slack channel<a class="headerlink" href="#post-the-same-message-in-the-kubestellar-slack-channel" title="Permanent link">#</a></h3>
 
