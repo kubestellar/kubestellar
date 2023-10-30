@@ -120,6 +120,18 @@ ks_next_helm_version: # put the number of the next logical helm version
 ...
 ```
 
+### Update the branch name in kubestellar/docs/content/readme.md
+There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
+<b>before:</b>
+```shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
+```
+
+<b>after:</b>
+```shell
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
+```
+
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
