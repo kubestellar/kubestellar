@@ -2630,7 +2630,7 @@ accomplishing the same thing as the <a href="#kubestellar-start">kubestellar
 start</a> command above.</p>
 <h3 id="fetch-kubeconfig-for-internal-clients">Fetch kubeconfig for internal clients<a class="headerlink" href="#fetch-kubeconfig-for-internal-clients" title="Permanent link">#</a></h3>
 <p>To fetch a kubeconfig for use by clients inside the hosting cluster,
-use the <code>kubectl kubestellar get-internal-kubeconfig</code> command.  It
+use the <code>kubectl kubestellar get-internal-kubeconfig -n kubestellar</code> command.  It
 takes the following on the command line.</p>
 <ul>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
@@ -2640,12 +2640,13 @@ takes the following on the command line.</p>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
+<li><code>-n</code> namespace is required. default is 'kubestellar'</li>
 </ul>
 <h3 id="fetch-kubeconfig-for-external-clients">Fetch kubeconfig for external clients<a class="headerlink" href="#fetch-kubeconfig-for-external-clients" title="Permanent link">#</a></h3>
 <p>To fetch a kubeconfig for use by clients outside of the hosting
 cluster --- those that will reach the kcp server via the external
 endpoint specified in the deployment command --- use the <code>kubectl
-kubestellar get-external-kubeconfig</code> command.  It takes the following
+kubestellar get-external-kubeconfig -n kubestellar</code> command.  It takes the following
 on the command line.</p>
 <ul>
 <li><code>-o $output_pathname</code>, saying where to write the kubeconfig. This
@@ -2655,6 +2656,7 @@ on the command line.</p>
 <li><code>-X</code> turns on debug echoing of all the commands in the script that
   implements this command.</li>
 <li><code>-h</code> prints a brief usage message and terminates with success.</li>
+<li><code>-n</code> namespace is required. default is 'kubestellar'</li>
 </ul>
 <h3 id="fetch-a-log-from-a-kubestellar-runtime-container">Fetch a log from a KubeStellar runtime container<a class="headerlink" href="#fetch-a-log-from-a-kubestellar-runtime-container" title="Permanent link">#</a></h3>
 <!-- BEGIN INCLUDE ../../../../core-helm-chart/README.md '&lt;!--check-log-start--&gt;' '&lt;!--check-log-end--&gt;' -->
