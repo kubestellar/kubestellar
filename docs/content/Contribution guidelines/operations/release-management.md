@@ -58,20 +58,18 @@ vi VERSION
 ```
 
 <b>before:</b>
-```shell title="VERSION" hl_lines="2 3 4"
+```shell title="VERSION" hl_lines="2 3"
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_tag }}
-ks_current_helm_version={{ config.ks_current_helm_version }}
 ...
 ```
 
 <b>after:</b>
-```shell title="VERSION" hl_lines="2 3 4" 
+```shell title="VERSION" hl_lines="2 3" 
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_next_tag }}
-ks_next_helm_version={{ config.ks_next_helm_version }}
 ...
 ```
 
@@ -96,24 +94,28 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6"
+```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8"
 ...
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: '{{ config.ks_tag }}'
+ks_current_helm_version: {{ config.ks_current_helm_version }}
 ks_next_branch: '{{ config.ks_next_branch }}'
 ks_next_tag: '{{ config.ks_next_tag }}'
+ks_next_helm_version: {{ config.ks_next_helm_version }}
 ...
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6" 
+```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8" 
 ...
 edit_uri: edit/{{ config.ks_next_branch }}/docs/content
 ks_branch: '{{ config.ks_next_branch }}'
 ks_tag: '{{ config.ks_next_tag }}'
+ks_current_helm_version: {{ config.ks_next_helm_version }}
 ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
 ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
+ks_next_helm_version: # put the number of the next logical helm version
 ...
 ```
 
