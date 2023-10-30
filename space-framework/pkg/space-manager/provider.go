@@ -35,9 +35,8 @@ import (
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
 	kindprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kind"
-
-	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kflexprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kubeflex"
+	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 )
 
 // Each provider gets its own namespace named prefixNamespace+providerName
