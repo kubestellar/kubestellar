@@ -59,7 +59,7 @@ vi VERSION
 ```
 
 <b>before:</b>
-```shell title="VERSION" hl_lines="2 3 4"
+```shell title="VERSION" hl_lines="2 3"
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_tag }}
@@ -67,7 +67,7 @@ latest={{ config.ks_tag }}
 ```
 
 <b>after:</b>
-```shell title="VERSION" hl_lines="2 3 4" 
+```shell title="VERSION" hl_lines="2 3" 
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_next_tag }}
