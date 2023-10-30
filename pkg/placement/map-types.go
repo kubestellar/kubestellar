@@ -245,6 +245,45 @@ type mapReadonly[Key, Val any] struct {
 	Map[Key, Val]
 }
 
+func NewMapTransformVal[Key, Val1, Val2 any](inner Map[Key, Val1], transformKey func(Val1) Val2) Map[Key, Val2] {
+	return &MapTransformVal[Key, Val1, Val2]{Inner: inner, TransformKey: transformKey}
+}
+
+type MapTransformVal[Key, Val1, Val2 any] struct {
+	Inner        Map[Key, Val1]
+	TransformKey func(Val1) Val2
+}
+
+var _ Map[int32, string] = &MapTransformVal[int32, float64, string]{}
+
+func (mtv *MapTransformVal[Key, Val1, Val2]) IsEmpty() bool {
+	return mtv.Inner.IsEmpty()
+}
+
+func (mtv *MapTransformVal[Key, Val1, Val2]) LenIsCheap() bool {
+	return mtv.Inner.LenIsCheap()
+}
+
+func (mtv *MapTransformVal[Key, Val1, Val2]) Len() int {
+	return mtv.Inner.Len()
+}
+
+func (mtv *MapTransformVal[Key, Val1, Val2]) Get(key Key) (Val2, bool) {
+	v1, ok := mtv.Inner.Get(key)
+	if ok {
+		return mtv.TransformKey(v1), true
+	}
+	var zero Val2
+	return zero, false
+}
+
+func (mtv *MapTransformVal[Key, Val1, Val2]) Visit(visitor func(Pair[Key, Val2]) error) error {
+	return mtv.Inner.Visit(func(tup Pair[Key, Val1]) error {
+		v2 := mtv.TransformKey(tup.Second)
+		return visitor(NewPair(tup.First, v2))
+	})
+}
+
 func MutableMapWithKeyObserver[Key, Val any](mm MutableMap[Key, Val], observer SetWriter[Key]) MutableMap[Key, Val] {
 	return &mutableMapWithKeyObserver[Key, Val]{mm, observer}
 }

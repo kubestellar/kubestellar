@@ -71,8 +71,10 @@ func NewPlacementTranslator(
 	ctx context.Context,
 	//locationClusterPreInformer schedulingv1a1informers.LocationClusterInformer,
 	locationClusterPreInformer edgev1a1informers.LocationClusterInformer,
-	// pre-informer on all SinglePlacementSlice objects, cross-workspace
+	// pre-informer on all EdgePlacement objects, cross-workspace
 	epClusterPreInformer edgev1a1informers.EdgePlacementClusterInformer,
+	// pre-informer on all DownsyncWorkloadPartSlice objects, cross-workspace
+	dwpsClusterPreInformer edgev1a1informers.DownsyncWorkloadPartSliceClusterInformer,
 	// pre-informer on all SinglePlacementSlice objects, cross-workspace
 	spsClusterPreInformer edgev1a1informers.SinglePlacementSliceClusterInformer,
 	// pre-informer on syncer config objects, should be in mailbox workspaces
@@ -117,7 +119,9 @@ func NewPlacementTranslator(
 		edgeClusterClientset:   edgeClusterClientset,
 		nsClusterPreInformer:   nsClusterPreInformer,
 		nsClusterClient:        nsClusterClient,
-		whatResolver: NewWhatResolver(ctx, epClusterPreInformer, discoveryClusterClient,
+		whatResolver: NewWhatResolver(ctx, epClusterPreInformer,
+			edgeClusterClientset.EdgeV2alpha1().DownsyncWorkloadPartSlices(), dwpsClusterPreInformer,
+			discoveryClusterClient,
 			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsClusterPreInformer, numThreads),
 	}

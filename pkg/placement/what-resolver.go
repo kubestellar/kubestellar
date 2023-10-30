@@ -47,6 +47,7 @@ import (
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
+	edgeclientv2 "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 )
@@ -58,8 +59,11 @@ type whatResolver struct {
 	queue      workqueue.RateLimitingInterface
 	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
-	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
-	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
+	edgePlacementInformer          kcpcache.ScopeableSharedIndexInformer
+	edgePlacementLister            edgev2alpha1listers.EdgePlacementClusterLister
+	downsyncPartSliceClusterClient edgeclientv2.DownsyncWorkloadPartSliceClusterInterface
+	downsyncPartSliceInformer      kcpcache.ScopeableSharedIndexInformer
+	downsyncPartSliceLister        edgev2alpha1listers.DownsyncWorkloadPartSliceClusterLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
 	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
@@ -117,6 +121,8 @@ type objectDetails struct {
 func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
+	downsyncPartSliceClusterClient edgeclientv2.DownsyncWorkloadPartSliceClusterInterface,
+	downsyncPartSlicePreInformer edgev2alpha1informers.DownsyncWorkloadPartSliceClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
@@ -127,22 +133,33 @@ func NewWhatResolver(
 	logger := klog.FromContext(ctx).WithValues("part", controllerName)
 	ctx = klog.NewContext(ctx, logger)
 	wr := &whatResolver{
-		ctx:                       ctx,
-		logger:                    logger,
-		numThreads:                numThreads,
-		queue:                     workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-		edgePlacementInformer:     edgePlacementPreInformer.Informer(),
-		edgePlacementLister:       edgePlacementPreInformer.Lister(),
-		discoveryClusterClient:    discoveryClusterClient,
-		crdClusterPreInformer:     crdClusterPreInformer,
-		bindingClusterPreInformer: bindingClusterPreInformer,
-		dynamicClusterClient:      dynamicClusterClient,
-		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
+		ctx:                            ctx,
+		logger:                         logger,
+		numThreads:                     numThreads,
+		queue:                          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
+		edgePlacementInformer:          edgePlacementPreInformer.Informer(),
+		edgePlacementLister:            edgePlacementPreInformer.Lister(),
+		downsyncPartSliceClusterClient: downsyncPartSliceClusterClient,
+		discoveryClusterClient:         discoveryClusterClient,
+		crdClusterPreInformer:          crdClusterPreInformer,
+		bindingClusterPreInformer:      bindingClusterPreInformer,
+		dynamicClusterClient:           dynamicClusterClient,
+		workspaceDetails:               map[logicalcluster.Name]*workspaceDetails{},
+	}
+	if downsyncPartSlicePreInformer != nil {
+		wr.downsyncPartSliceInformer = downsyncPartSlicePreInformer.Informer()
+		wr.downsyncPartSliceLister = downsyncPartSlicePreInformer.Lister()
 	}
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
 		wr.receiver = receiver
 		wr.edgePlacementInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "EdgePlacement")})
-		if !upstreamcache.WaitForNamedCacheSync(controllerName, ctx.Done(), wr.edgePlacementInformer.HasSynced) {
+		if wr.downsyncPartSliceInformer != nil {
+			wr.downsyncPartSliceInformer.AddEventHandler(WhatResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "DownsyncWorkloadPartSlice")})
+			if !upstreamcache.WaitForNamedCacheSync(controllerName+"(dwps)", ctx.Done(), wr.downsyncPartSliceInformer.HasSynced) {
+				logger.Info("Failed to sync DownsyncWorkloadPartSlices in time")
+			}
+		}
+		if !upstreamcache.WaitForNamedCacheSync(controllerName+"(ep)", ctx.Done(), wr.edgePlacementInformer.HasSynced) {
 			logger.Info("Failed to sync EdgePlacements in time")
 		}
 		return wr
@@ -185,6 +202,9 @@ func (wrh WhatResolverClusterHandler) OnDelete(obj any) {
 }
 
 func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
+	if gk.Kind == "DownsyncWorkloadPartSlice" {
+		wr.logger.V(4).Info("How did we get here?")
+	}
 	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(objAny)
 	if err != nil {
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
@@ -291,14 +311,17 @@ var definerKindToPieces = map[string]Pair[metav1.GroupResource, WorkloadPartDeta
 	"APIBinding":               NewPair(metav1.GroupResource{Group: apisv1alpha1.SchemeGroupVersion.Group, Resource: "apibindings"}, WorkloadPartDetails{APIVersion: apisv1alpha1.SchemeGroupVersion.Version}),
 }
 
-func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements Set[ObjectName]) {
+func (wr *whatResolver) notifyReceiversOfPlacementsLocked(cluster logicalcluster.Name, placements Set[ObjectName]) {
 	placements.Visit(func(epName ObjectName) error {
-		wr.notifyReceivers(cluster, epName)
+		wr.notifyReceiversLocked(cluster, epName)
+		item := namespacedQueueItem{GK: schema.GroupKind{Group: edgeapi.SchemeGroupVersion.Group, Kind: "DownsyncWorkloadPartSlice"}, Cluster: cluster, NN: NewPair(NamespaceName(""), epName)}
+		wr.logger.V(4).Info("Relay to report", "item", item)
+		wr.queue.Add(item)
 		return nil
 	})
 }
 
-func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName ObjectName) {
+func (wr *whatResolver) notifyReceiversLocked(wldCluster logicalcluster.Name, epName ObjectName) {
 	resolvedWhat := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
 	wr.receiver.Put(epRef, resolvedWhat)
@@ -334,13 +357,141 @@ func (wr *whatResolver) processNextWorkItem() bool {
 
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
-	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+	if item.GK.Group == edgeapi.SchemeGroupVersion.Group {
+		switch item.GK.Kind {
+		case "EdgePlacement":
+			return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+		case "DownsyncWorkloadPartSlice":
+			return wr.processDownsyncWorkloadPartSlice(ctx, item.Cluster, item.NN.Second)
+		default:
+			logger := klog.FromContext(wr.ctx)
+			logger.Error(nil, "Impossible kind of queue item", "item", item)
+			return false
+		}
 	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
 		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
 		return wr.processCenterObject(ctx, item.Cluster, item.GK, item.NN)
 	}
+}
+
+// returns true on success or unrecoverable error, false to retry
+func (wr *whatResolver) processDownsyncWorkloadPartSlice(ctx context.Context, cluster logicalcluster.Name, sliceName ObjectName) bool {
+	sliceNameS := string(sliceName)
+	logger := klog.FromContext(ctx).WithValues("cluster", cluster, "sliceName", sliceName)
+	var slice *edgeapi.DownsyncWorkloadPartSlice
+	var err error
+	if wr.downsyncPartSliceLister != nil {
+		slice, err = wr.downsyncPartSliceLister.Cluster(cluster).Get(string(sliceName))
+	} else {
+		slice, err = wr.downsyncPartSliceClusterClient.Cluster(cluster.Path()).Get(ctx, sliceNameS, metav1.GetOptions{})
+	}
+	if err != nil {
+		if !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Failed to fetch DownsyncWorkloadPartSlice from local cache")
+			return true // I think these errors are not transient
+		}
+		slice = nil
+	}
+	sliceFound := slice != nil
+	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(sliceNameS)
+	if err != nil {
+		if !k8sapierrors.IsNotFound(err) {
+			logger.Error(err, "Impossible: failed to seek EdgePlacement in local cace")
+			return true
+		}
+		ep = nil
+	} else if ep != nil && ep.DeletionTimestamp != nil {
+		logger.V(4).Info("EdgePlacement is in deletion process, treating as gone")
+		ep = nil
+	}
+	wr.Lock()
+	defer wr.Unlock()
+	_, wsDetailsFound := wr.workspaceDetails[cluster]
+	if ep == nil || !wsDetailsFound {
+		if !sliceFound {
+			logger.V(4).Info("Nothing to do about absent slice", "wsDetailsFound", wsDetailsFound, "epIsNil", ep == nil)
+			return true
+		}
+		if wr.downsyncPartSliceLister == nil {
+			logger.V(4).Info("Bogusly declining to delete unwanted slice", "wsDetailsFound", wsDetailsFound, "epIsNil", ep == nil)
+			return true
+		}
+		logger.V(4).Info("Deleting DownsyncWorkloadPartSlice", "wsDetailsFound", wsDetailsFound, "epIsNil", ep == nil)
+		err := wr.downsyncPartSliceClusterClient.Cluster(cluster.Path()).Delete(ctx, sliceNameS, metav1.DeleteOptions{})
+		if err == nil || k8sapierrors.IsNotFound(err) {
+			return true
+		}
+		logger.V(2).Info("Failed to delete DownsyncWorkloadPartSlice", "err", err)
+		return false
+	}
+	what := wr.getPartsLocked(cluster, sliceName)
+	if !sliceFound {
+		troo := true
+		slice2 := &edgeapi.DownsyncWorkloadPartSlice{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:   sliceNameS,
+				Labels: map[string]string{edgeapi.SourcePlacementLabelKey: sliceNameS},
+				OwnerReferences: []metav1.OwnerReference{{APIVersion: edgeapi.SchemeGroupVersion.String(),
+					Kind:       "EdgePlacement",
+					Name:       sliceNameS,
+					UID:        ep.UID,
+					Controller: &troo}}},
+			Parts: externalizeParts(what.Downsync),
+		}
+		slice3, err := wr.downsyncPartSliceClusterClient.Cluster(cluster.Path()).Create(ctx, slice2, metav1.CreateOptions{FieldManager: "what-resolver"})
+		if err == nil {
+			logger.V(3).Info("Created DownsyncWorkloadPartSlice", "resourceVersion", slice3.ResourceVersion)
+			return true
+		}
+		wr.logger.V(2).Info("Failed to create DownsyncWorkloadPartSlice", "err", err)
+		return false
+	}
+	diff := len(what.Downsync) != len(slice.Parts)
+	if !diff {
+		for _, objRef := range slice.Parts {
+			partID, partDetails := internalizeWorkloadPart(objRef)
+			wantDetails, want := what.Downsync[partID]
+			if (!want) || wantDetails != partDetails {
+				diff = true
+				break
+			}
+		}
+	}
+	if !diff {
+		logger.V(4).Info("No change needed")
+		return true
+	}
+	slice = slice.DeepCopy()
+	slice.Parts = externalizeParts(what.Downsync)
+	_, err = wr.downsyncPartSliceClusterClient.Cluster(cluster.Path()).Update(ctx, slice, metav1.UpdateOptions{FieldManager: "what-resolver"})
+	if err == nil {
+		logger.V(3).Info("Updated DownsyncWorkloadPartSlice")
+		return true
+	}
+	logger.V(3).Info("Failed to update DownsyncWorkloadPartSlice", "err", err)
+	return false
+}
+
+func internalizeWorkloadPart(objRef edgeapi.DownsyncWorkloadPart) (WorkloadPartID, WorkloadPartDetails) {
+	return NewTriple(metav1.GroupResource{Group: objRef.Group, Resource: objRef.Resource}, NamespaceName(objRef.Namespace), ObjectName(objRef.Name)),
+		WorkloadPartDetails{APIVersion: objRef.Version, ReturnSingletonState: objRef.ReturnSingletonState, CreateOnly: objRef.CreateOnly}
+
+}
+
+func externalizeParts(parts map[WorkloadPartID]WorkloadPartDetails) []edgeapi.DownsyncWorkloadPart {
+	ans := make([]edgeapi.DownsyncWorkloadPart, 0, len(parts))
+	for id, details := range parts {
+		objRef := edgeapi.DownsyncWorkloadPart{
+			GroupVersionResource: metav1.GroupVersionResource{Group: id.First.Group, Resource: id.First.Resource, Version: details.APIVersion},
+			Namespace:            string(id.Second),
+			Name:                 string(id.Third),
+			ReturnSingletonState: details.ReturnSingletonState,
+			CreateOnly:           details.CreateOnly,
+		}
+		ans = append(ans, objRef)
+	}
+	return ans
 }
 
 // process returns true on success or unrecoverable error, false to retry
@@ -401,7 +552,7 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 	if rObj != nil {
 		rr.byObjName[objName] = newDetails
 	}
-	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, DistributionBits](changedPlacements))
+	wr.notifyReceiversOfPlacementsLocked(cluster, MapKeySet[ObjectName, DistributionBits](changedPlacements))
 	return true
 }
 
@@ -442,7 +593,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
-		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
+		wr.notifyReceiversOfPlacementsLocked(cluster, changedPlacements)
 		return true
 	}
 	gvr := schema.GroupVersionResource{
@@ -492,7 +643,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			for _, objDetails := range rr.byObjName {
 				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 			}
-			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
+			wr.notifyReceiversOfPlacementsLocked(cluster, changedPlacements)
 		}
 	}
 	return true
@@ -566,10 +717,8 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 			wsDetails.stop()
 			logger.V(2).Info("Stopped watching logical cluster")
 			delete(wr.workspaceDetails, cluster)
-		} else {
-			wr.notifyReceivers(cluster, epName)
 		}
-		wr.notifyReceivers(cluster, epName)
+		wr.notifyReceiversLocked(cluster, epName)
 		return true
 	}
 	// Now we know that ep != nil
@@ -615,7 +764,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 	}
 	logger.V(5).Info("Finished looping over resources", "numResources", len(wsDetails.resources))
 	if anyChange {
-		wr.notifyReceivers(cluster, epName)
+		wr.notifyReceiversLocked(cluster, epName)
 	}
 	return completeSuccess
 }

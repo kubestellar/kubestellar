@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -26,6 +27,7 @@ import (
 	fakeapiext "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned/fake"
 	apiextinfact "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	machmeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	machruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -44,6 +46,7 @@ import (
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	edgeinformersv2 "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 )
 
 func TestWhatResolver(t *testing.T) {
@@ -124,6 +127,7 @@ func TestWhatResolver(t *testing.T) {
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(ep1)
 	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
 	epClusterPreInformer := edgeClusterInformerFactory.Edge().V2alpha1().EdgePlacements()
+	var dwpsClusterPreInformer edgeinformersv2.DownsyncWorkloadPartSliceClusterInformer = nil // fake client does not support dynamism well enough for informers
 	fakeKubeClusterClientset := fakekube.NewSimpleClientset(ns1, cm1)
 	k8sCoreGroupVersion := metav1.GroupVersion{Version: "v1"}
 	usualVerbs := []string{"get", "list", "watch"}
@@ -143,14 +147,12 @@ func TestWhatResolver(t *testing.T) {
 	bindingClusterPreInformer := bindingFactory.Apis().V1alpha1().APIBindings()
 	fakeDynamicClusterClientset := fakeclusterdynamic.NewSimpleDynamicClient(scheme, ns1, cm1, ns2, cm2, cm3)
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(fakeDynamicClusterClientset, 0)
-	// crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	// bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
 
 	fakeApiExtClusterClientset := fakeapiext.NewSimpleClientset()
 	apiExtClusterFactory := apiextinfact.NewSharedInformerFactory(fakeApiExtClusterClientset, 0)
 	crdClusterPreInformer := apiExtClusterFactory.Apiextensions().V1().CustomResourceDefinitions()
 
-	whatResolver := NewWhatResolver(ctx, epClusterPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
+	whatResolver := NewWhatResolver(ctx, epClusterPreInformer, edgeViewClusterClientset.EdgeV2alpha1().DownsyncWorkloadPartSlices(), dwpsClusterPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
 	edgeClusterInformerFactory.Start(ctx.Done())
 	dynamicClusterInformerFactory.Start(ctx.Done())
 	rcvr := NewMapMap[ExternalName, ResolvedWhat](nil)
@@ -170,6 +172,49 @@ func TestWhatResolver(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get expected ResolvedWhat (%v) in time: %v", expectedWhat, err)
 	}
+	trackerCluster := edgeViewClusterClientset.Tracker()
+	// trackerC1 := trackerCluster.Cluster(wds1N.Path())
+	dwpsGVK := edgeapi.SchemeGroupVersion.WithKind("DownsyncWorkloadPartSlice")
+	dwpsGVR := edgeapi.SchemeGroupVersion.WithResource("downsyncworkloadpartslices")
+	expectedM := MintMapMap(expectedWhat.Downsync, nil)
+	err = wait.PollWithContext(ctx, time.Second, 5*time.Second, func(context.Context) (bool, error) {
+		dwpsListO, err := trackerCluster.List(dwpsGVR, dwpsGVK, "")
+		if err != nil {
+			return false, err
+		}
+		dwpsListOS, err := machmeta.ExtractList(dwpsListO)
+		if err != nil {
+			return false, err
+		}
+		if num := len(dwpsListOS); num != 1 {
+			t.Logf("expected 1 DownsyncWorkloadPartSlice, got %v", num)
+			return false, nil
+		}
+		dwps, ok := dwpsListOS[0].(*edgeapi.DownsyncWorkloadPartSlice)
+		if !ok {
+			return false, fmt.Errorf("failed to cast %#+v (type %T) to DownsyncWorkloadPartSlice", dwpsListOS[0], dwpsListOS[0])
+		}
+		dwpsMap := internalizeParts(dwps.Parts)
+		t.Logf("gotWhat=%v", dwpsMap)
+		dwpsMapM := MintMapMap(dwpsMap, nil)
+		return MapEqual[WorkloadPartID, WorkloadPartDetails](dwpsMapM, expectedM), nil
+	})
+	if err != nil {
+		t.Fatalf("Failed to get expected ObjectReferences (%v) in time: %v", expectedM, err)
+	}
+}
+
+func WorkloadPartDetailsToProjectionModeVal(det WorkloadPartDetails) ProjectionModeVal {
+	return ProjectionModeVal{det.APIVersion}
+}
+
+func internalizeParts(parts []edgeapi.DownsyncWorkloadPart) map[WorkloadPartID]WorkloadPartDetails {
+	ans := map[WorkloadPartID]WorkloadPartDetails{}
+	for _, part := range parts {
+		id, deets := internalizeWorkloadPart(part)
+		ans[id] = deets
+	}
+	return ans
 }
 
 func setFakeClusterAPIResources(fake *kcptesting.Fake, cluster logicalcluster.Path, resources []*metav1.APIResourceList) {

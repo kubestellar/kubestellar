@@ -49,6 +49,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&EdgePlacementList{},
 		&SinglePlacementSlice{},
 		&SinglePlacementSliceList{},
+		&DownsyncWorkloadPartSlice{},
+		&DownsyncWorkloadPartSliceList{},
 		&Customizer{},
 		&CustomizerList{},
 		&SyncerConfig{},

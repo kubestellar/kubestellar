@@ -20,8 +20,141 @@ placement-translator &
 sleep 10
 ```
 
-The following commands wait for the placement translator to get its
-job done for this example.
+The following commands wait for the placement translator to create the
+reports of what objects matched the "what predicates" of the
+EdgePlacement objects.
+
+```shell
+kubectl ws root:wmw-c
+while [ $(kubectl get downsyncworkloadpartslices -l edge.kubestellar.io/source-placement=edge-placement-c | wc -l) -lt 2 ]; do
+    sleep 10
+done
+kubectl ws root:wmw-s
+while [ $(kubectl get downsyncworkloadpartslices -l edge.kubestellar.io/source-placement=edge-placement-s | wc -l) -lt 2 ]; do
+    sleep 10
+done
+```
+
+Now you can see the report for the common EdgePlacement with the
+following command.
+
+```shell
+kubectl ws root:wmw-c
+kubectl get downsyncworkloadpartslices -l edge.kubestellar.io/source-placement=edge-placement-c -o yaml
+```
+``` { .bash .no-copy }
+apiVersion: v1
+items:
+- apiVersion: edge.kubestellar.io/v2alpha1
+  kind: DownsyncWorkloadPartSlice
+  metadata:
+    annotations:
+      kcp.io/cluster: 2a9eqy63qujbtanz
+    creationTimestamp: "2023-10-30T09:05:30Z"
+    generation: 3
+    labels:
+      edge.kubestellar.io/source-placement: edge-placement-c
+    name: edge-placement-c
+    ownerReferences:
+    - apiVersion: edge.kubestellar.io/v2alpha1
+      controller: true
+      kind: EdgePlacement
+      name: edge-placement-c
+      uid: 9874707c-fb2b-41bd-b279-e78947f00d95
+    resourceVersion: "1736"
+    uid: 2d5eb242-dd50-4ae6-8236-4abc33cfbc4e
+  parts:
+  - group: ""
+    name: httpd-htdocs
+    namespace: commonstuff
+    resource: configmaps
+    version: v1
+  - group: apps
+    name: commond
+    namespace: commonstuff
+    resource: replicasets
+    version: v1
+  - group: apis.kcp.io
+    name: bind-apps
+    namespace: ""
+    resource: apibindings
+    version: v1alpha1
+kind: List
+metadata:
+  resourceVersion: ""
+```
+
+You can see the report for the special EdgePlacement with the
+following command.
+
+```shell
+kubectl ws root:wmw-s
+kubectl get downsyncworkloadpartslices -l edge.kubestellar.io/source-placement=edge-placement-s -o yaml
+```
+``` { .bash .no-copy }
+apiVersion: v1
+items:
+- apiVersion: edge.kubestellar.io/v2alpha1
+  kind: DownsyncWorkloadPartSlice
+  metadata:
+    annotations:
+      kcp.io/cluster: 2db6e2il5jg69k97
+    creationTimestamp: "2023-10-30T09:05:30Z"
+    generation: 5
+    labels:
+      edge.kubestellar.io/source-placement: edge-placement-s
+    name: edge-placement-s
+    ownerReferences:
+    - apiVersion: edge.kubestellar.io/v2alpha1
+      controller: true
+      kind: EdgePlacement
+      name: edge-placement-s
+      uid: b74424cd-68e4-4896-b662-a94e581029d7
+    resourceVersion: "1737"
+    uid: 7342f4c7-b667-426a-a596-f9fe849f69fc
+  parts:
+  - group: stable.example.com
+    name: my-new-cron-object
+    namespace: specialstuff
+    resource: crontabs
+    version: v1
+  - group: apps
+    name: speciald
+    namespace: specialstuff
+    resource: deployments
+    version: v1
+  - group: ""
+    name: httpd-htdocs
+    namespace: specialstuff
+    resource: configmaps
+    version: v1
+  - group: apiextensions.k8s.io
+    name: crontabs.stable.example.com
+    namespace: ""
+    resource: customresourcedefinitions
+    version: v1
+  - group: apis.kcp.io
+    name: bind-kubernetes
+    namespace: ""
+    resource: apibindings
+    version: v1alpha1
+  - group: apis.kcp.io
+    name: bind-apiregistration.k8s.io
+    namespace: ""
+    resource: apibindings
+    version: v1alpha1
+  - group: apiregistration.k8s.io
+    name: v1090.example.my
+    namespace: ""
+    resource: apiservices
+    version: v1
+kind: List
+metadata:
+  resourceVersion: ""
+```
+
+The following commands wait for the placement translator to get the
+rest of its job done for this example.
 
 ```shell
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
