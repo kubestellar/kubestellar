@@ -183,11 +183,6 @@ git push origin --tags
 ./hack/make-release-full.sh {{ config.ks_next_tag }}
 ```
 
-### Update the kubestellar container image just build and uploaded to quay.io
-
-Head up to quay.io and look for the image of KubeStellar container just uploaded.
-Make this image 'stable' so that helm and other install methods pickup this image.
-
 ### Create a release in GH UI
 - Navigate to the KubeStellar GitHub Source Repository Releases section at {{ config.repo_url }}/releases
 - Click 'Draft a new release' and select the tag ('{{ config.ks_next_tag }}')
@@ -230,7 +225,7 @@ mv ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz charts
 ```
 
 next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):  
-``` h_lines="5 6 8 13 14 15
+```shell title="index.yaml" h_lines="5 6 8 13 14 15
 apiVersion: v1
 entries:
   kubestellar-core:
@@ -247,6 +242,11 @@ entries:
     version: "3"
 generated: "2023-10-30T12:00:00.727185806-04:00"
 ```
+
+### Update the KubeStellar Core container image just build and uploaded to quay.io
+
+Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
+Make this image 'stable' so that helm and other install methods pickup this image.
 
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
