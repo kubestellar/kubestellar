@@ -11,6 +11,9 @@ ks_branch: 'main'
 ks_tag: 'v0.9.0'
 ks_next_branch: 'release-0.10'
 ks_next_tag: 'v0.10.0'
+ks_current_helm_version: '2'
+ks_next_helm_version: '3'
+
 ks_kind_port_num: '1119'
 
 # Site content

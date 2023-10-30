@@ -30,6 +30,26 @@ change the version in the following line:
 syncer_image="quay.io/kubestellar/syncer:{{ config.ks_next_tag }}"
 ```
 
+### Update the core-helm-chart 'Chart.yaml' and 'values.yaml' files with a reference to the new version of the KubeStellar Helm chart version
+```shell
+vi core-helm-chart/Chart.yaml
+```
+
+change the versions in the following line:
+```shell
+version: {{ config.ks_next_helm_version }}
+appVersion: {{ config.ks_next_tag }}
+```
+
+```shell
+vi core-helm-chart/values.yaml
+```
+
+change the version in the following line:
+```shell
+tag: {{ config.ks_next_branch }}
+```
+
 ### Update the VERSION file
 The VERSION file points to the 'latest' and 'stable' release tags associated with the most recent release (latest) and the most stable release (stable).  Update the 'stable' and 'latest tags accordingly
 
@@ -38,18 +58,20 @@ vi VERSION
 ```
 
 <b>before:</b>
-```shell title="VERSION" hl_lines="2 3"
+```shell title="VERSION" hl_lines="2 3 4"
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_tag }}
+ks_current_helm_version={{ config.ks_current_helm_version }}
 ...
 ```
 
 <b>after:</b>
-```shell title="VERSION" hl_lines="2 3" 
+```shell title="VERSION" hl_lines="2 3 4" 
 ...
 stable={{ config.ks_tag }}
 latest={{ config.ks_next_tag }}
+ks_next_helm_version={{ config.ks_next_helm_version }}
 ...
 ```
 
