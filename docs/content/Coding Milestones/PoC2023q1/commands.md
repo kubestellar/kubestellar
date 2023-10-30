@@ -362,7 +362,7 @@ start](#kubestellar-start) command above.
 ### Fetch kubeconfig for internal clients
 
 To fetch a kubeconfig for use by clients inside the hosting cluster,
-use the `kubectl kubestellar get-internal-kubeconfig` command.  It
+use the `kubectl kubestellar get-internal-kubeconfig -n kubestellar` command.  It
 takes the following on the command line.
 
 - `-o $output_pathname`, saying where to write the kubeconfig. This
@@ -372,13 +372,14 @@ takes the following on the command line.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
+- `-n` namespace is required. default is 'kubestellar'
 
 ### Fetch kubeconfig for external clients
 
 To fetch a kubeconfig for use by clients outside of the hosting
 cluster --- those that will reach the kcp server via the external
 endpoint specified in the deployment command --- use the `kubectl
-kubestellar get-external-kubeconfig` command.  It takes the following
+kubestellar get-external-kubeconfig -n kubestellar` command.  It takes the following
 on the command line.
 
 - `-o $output_pathname`, saying where to write the kubeconfig. This
@@ -388,6 +389,7 @@ on the command line.
 - `-X` turns on debug echoing of all the commands in the script that
   implements this command.
 - `-h` prints a brief usage message and terminates with success.
+- `-n` namespace is required. default is 'kubestellar'
 
 ### Fetch a log from a KubeStellar runtime container
 
