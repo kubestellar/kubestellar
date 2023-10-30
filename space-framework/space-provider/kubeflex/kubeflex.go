@@ -23,11 +23,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	kfcp "github.com/kubestellar/kubeflex/api/v1alpha1"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/dynamic"
@@ -153,31 +151,54 @@ func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
 		return nil, err
 	}
 
-	var cp kfcp.ControlPlane
+	for _, unspace := range listSpaces.Items {
 
-	for _, space := range listSpaces.Items {
-
-		spContent := space.UnstructuredContent()
-
-		err = runtime.DefaultUnstructuredConverter.FromUnstructured(spContent, &cp)
-		if err != nil {
-			k.logger.Error(err, "convert unstructured")
-			continue
-		}
-		if isSpaceReady(cp) {
-			listClusterNames = append(listClusterNames, cp.Name)
+		if isSpaceReady(unspace) {
+			metadata, found, err := unstructured.NestedMap(unspace.Object, "metadata")
+			if err != nil || !found {
+				k.logger.Error(err, "can't find the metadata field in the KF ControlPlan object")
+				return nil, err
+			}
+			listClusterNames = append(listClusterNames, metadata["name"].(string))
 		}
 	}
 
 	return listClusterNames, nil
 }
 
-func isSpaceReady(sp kfcp.ControlPlane) bool {
-	for _, cond := range sp.Status.Conditions {
-		if cond.Reason == kfcp.ReasonAvailable && cond.Type == kfcp.TypeReady {
-			return true
+func isSpaceReady(unspace unstructured.Unstructured) bool {
+
+	logger := klog.Background()
+
+	// Access the "status" field as a map.
+	status, found, err := unstructured.NestedMap(unspace.Object, "status")
+	if err != nil || !found {
+		logger.Error(err, "can't find the status field in the KF ControlPlan object")
+		return false
+	}
+
+	// Access the "conditions" field as a slice of maps.
+	conditions, found, err := unstructured.NestedSlice(status, "conditions")
+	if err != nil || !found {
+		logger.Error(err, "can't find the conditions field in the KF ControlPlan status")
+		return false
+	}
+
+	// Iterate through the array of maps and access a specific entry (e.g., "key1") in each map.
+	for _, item := range conditions {
+		if cond, ok := item.(map[string]interface{}); ok {
+			if reason, exists := cond["reason"]; exists {
+				if reason == "Available" {
+					if type1, exists := cond["type"]; exists {
+						if type1 == "Ready" {
+							return true
+						}
+					}
+				}
+			}
 		}
 	}
+
 	return false
 }
 
