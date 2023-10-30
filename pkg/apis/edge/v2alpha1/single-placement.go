@@ -22,6 +22,7 @@ import (
 )
 
 // SourcePlacementLabelKey is the key of the label used in a SinglePlacementSlice
+// or DownsyncWorkloadPartSlice
 // to reference the EdgePlacement that it is part of the response to.
 // We use a label rather than a field because field selectors do not work
 // on a resource defined by a CRD.
