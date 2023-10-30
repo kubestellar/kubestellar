@@ -113,7 +113,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-skip">
+        <a href="#linking-synctarget-with-mailbox-workspace" class="md-skip">
           Skip to content
         </a>
       
@@ -1071,221 +1071,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-if-youre-using-a-vpn-turn-it-off" class="md-nav__link">
-    1. If you're using a VPN, turn it off
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-ubuntu-into-wsl" class="md-nav__link">
-    2. Install Ubuntu into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" class="md-nav__link">
-    2.0 If wsl is not yet installed, open a powershell administrator window and run the following
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-reboot-your-system" class="md-nav__link">
-    2.1 reboot your system
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" class="md-nav__link">
-    2.2 In a Windows command terminal run the following to list all the linux distributions that are available online
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-select-a-linux-distribution-and-install-it-into-wsl" class="md-nav__link">
-    2.3 Select a linux distribution and install it into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" class="md-nav__link">
-    2.4 Enter your new username and password at the prompts, and you will eventually see something like:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" class="md-nav__link">
-    2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-install-pre-requisites-into-your-new-vm" class="md-nav__link">
-    3. Install pre-requisites into your new VM
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-update-and-apply-apt-get-packages" class="md-nav__link">
-    3.1 update and apply apt-get packages
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#32-install-golang" class="md-nav__link">
-    3.2 Install golang
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#33-install-ko-but-dont-do-ko-set-action-step" class="md-nav__link">
-    3.3 Install ko (but don't do ko set action step)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#34-install-gcc" class="md-nav__link">
-    3.4 Install gcc
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" class="md-nav__link">
-    3.5 Install make (if you installed build-essential this may already be installed)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#36-install-jq" class="md-nav__link">
-    3.6 Install jq
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#37-install-kubectl" class="md-nav__link">
-    3.7 install kubectl
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#38-install-helm-required-when-deploying-as-workload" class="md-nav__link">
-    3.8 install helm (required when deploying as workload)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" class="md-nav__link">
-    1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-install-docker" class="md-nav__link">
-    2.0 Install docker
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" class="md-nav__link">
-    2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" class="md-nav__link">
-    2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" class="md-nav__link">
-    2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-add-your-user-to-the-docker-group" class="md-nav__link">
-    2.4 Add your user to the docker group
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" class="md-nav__link">
-    2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" class="md-nav__link">
-    2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" class="md-nav__link">
-    3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-in-your-new-terminal-install-kind" class="md-nav__link">
-    3.1 In your new terminal, install kind
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#linking-synctarget-with-mailbox-workspace" class="md-nav__link">
     Linking SyncTarget with Mailbox Workspace
   </a>
@@ -2007,221 +1792,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-if-youre-using-a-vpn-turn-it-off" class="md-nav__link">
-    1. If you're using a VPN, turn it off
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-ubuntu-into-wsl" class="md-nav__link">
-    2. Install Ubuntu into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" class="md-nav__link">
-    2.0 If wsl is not yet installed, open a powershell administrator window and run the following
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-reboot-your-system" class="md-nav__link">
-    2.1 reboot your system
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" class="md-nav__link">
-    2.2 In a Windows command terminal run the following to list all the linux distributions that are available online
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-select-a-linux-distribution-and-install-it-into-wsl" class="md-nav__link">
-    2.3 Select a linux distribution and install it into WSL
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" class="md-nav__link">
-    2.4 Enter your new username and password at the prompts, and you will eventually see something like:
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" class="md-nav__link">
-    2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-install-pre-requisites-into-your-new-vm" class="md-nav__link">
-    3. Install pre-requisites into your new VM
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-update-and-apply-apt-get-packages" class="md-nav__link">
-    3.1 update and apply apt-get packages
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#32-install-golang" class="md-nav__link">
-    3.2 Install golang
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#33-install-ko-but-dont-do-ko-set-action-step" class="md-nav__link">
-    3.3 Install ko (but don't do ko set action step)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#34-install-gcc" class="md-nav__link">
-    3.4 Install gcc
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" class="md-nav__link">
-    3.5 Install make (if you installed build-essential this may already be installed)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#36-install-jq" class="md-nav__link">
-    3.6 Install jq
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#37-install-kubectl" class="md-nav__link">
-    3.7 install kubectl
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#38-install-helm-required-when-deploying-as-workload" class="md-nav__link">
-    3.8 install helm (required when deploying as workload)
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" class="md-nav__link">
-    How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution
-  </a>
-  
-    <nav class="md-nav" aria-label="How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" class="md-nav__link">
-    1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#20-install-docker" class="md-nav__link">
-    2.0 Install docker
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" class="md-nav__link">
-    2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" class="md-nav__link">
-    2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" class="md-nav__link">
-    2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#24-add-your-user-to-the-docker-group" class="md-nav__link">
-    2.4 Add your user to the docker group
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" class="md-nav__link">
-    2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" class="md-nav__link">
-    2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" class="md-nav__link">
-    3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#31-in-your-new-terminal-install-kind" class="md-nav__link">
-    3.1 In your new terminal, install kind
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#linking-synctarget-with-mailbox-workspace" class="md-nav__link">
     Linking SyncTarget with Mailbox Workspace
   </a>
@@ -2417,20 +1987,20 @@ Select the tab for your environment for suggested commands to install them</p>
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<h3 id="how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution">How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution<a class="headerlink" href="#how-to-install-pre-requisites-for-a-windows-subsystem-for-linux-wsl-envronment-using-an-ubuntu-220401-distribution" title="Permanent link">#</a></h3>
+<p><h3>How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution</h3></p>
 <p>(Tested on a Intel(R) Core(TM) i7-9850H CPU @ 2.60GHz 2.59 GHz with 32GB RAM, a 64-bit operating system, x64-based processor
 Using Windows 11 Enterprise)</p>
-<h6 id="1-if-youre-using-a-vpn-turn-it-off">1. If you're using a VPN, turn it off<a class="headerlink" href="#1-if-youre-using-a-vpn-turn-it-off" title="Permanent link">#</a></h6>
-<h6 id="2-install-ubuntu-into-wsl">2. Install Ubuntu into WSL<a class="headerlink" href="#2-install-ubuntu-into-wsl" title="Permanent link">#</a></h6>
-<h6 id="20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following">2.0 If wsl is not yet installed, open a powershell administrator window and run the following<a class="headerlink" href="#20-if-wsl-is-not-yet-installed-open-a-powershell-administrator-window-and-run-the-following" title="Permanent link">#</a></h6>
+<p><h6> 1. If you're using a VPN, turn it off</h6></p>
+<p><h6> 2. Install Ubuntu into WSL</h6></p>
+<p><h6> 2.0 If wsl is not yet installed, open a powershell administrator window and run the following</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>wsl --install
 </code></pre></div>
-<h6 id="21-reboot-your-system">2.1 reboot your system<a class="headerlink" href="#21-reboot-your-system" title="Permanent link">#</a></h6>
-<h6 id="22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online">2.2 In a Windows command terminal run the following to list all the linux distributions that are available online<a class="headerlink" href="#22-in-a-windows-command-terminal-run-the-following-to-list-all-the-linux-distributions-that-are-available-online" title="Permanent link">#</a></h6>
+<h6> 2.1 reboot your system</h6></p>
+<p><h6> 2.2 In a Windows command terminal run the following to list all the linux distributions that are available online</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>wsl -l -o
 </code></pre></div>
-<h6 id="23-select-a-linux-distribution-and-install-it-into-wsl">2.3 Select a linux distribution and install it into WSL<a class="headerlink" href="#23-select-a-linux-distribution-and-install-it-into-wsl" title="Permanent link">#</a></h6>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>wsl --install -d Ubuntu 22.04.01
+<h6> 2.3 Select a linux distribution and install it into WSL</h6>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>wsl --install -d Ubuntu 22.04.01
 </code></pre></div>
 You will see something like:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Installing, this may take a few minutes...
@@ -2438,30 +2008,30 @@ You will see something like:
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>For more information visit: https://aka.ms/wslusers
 <a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>Enter new UNIX username:
 </code></pre></div></p>
-<h6 id="24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like">2.4 Enter your new username and password at the prompts, and you will eventually see something like:<a class="headerlink" href="#24-enter-your-new-username-and-password-at-the-prompts-and-you-will-eventually-see-something-like" title="Permanent link">#</a></h6>
+<p><h6> 2.4 Enter your new username and password at the prompts, and you will eventually see something like:</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>Welcome to Ubuntu 22.04.1 LTS (GNU/Linux 5.10.102.1-microsoft-standard-WSL2 x86_64)
-</code></pre></div>
-<h6 id="25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box">2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.<a class="headerlink" href="#25-click-on-the-windows-start-icon-and-type-in-the-name-of-your-distribution-into-the-search-box" title="Permanent link">#</a></h6>
-<p>Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.
+</code></pre></div></p>
+<p><h6> 2.5 Click on the Windows "Start" icon and type in the name of your distribution into the search box.
+Your new linux distribution should appear as a local "App". You can pin it to the Windows task bar or to Start for your future convenience.</h6>
 Start a VM using your distribution by clicking on the App.</p>
-<h6 id="3-install-pre-requisites-into-your-new-vm">3. Install pre-requisites into your new VM<a class="headerlink" href="#3-install-pre-requisites-into-your-new-vm" title="Permanent link">#</a></h6>
-<h6 id="31-update-and-apply-apt-get-packages">3.1 update and apply apt-get packages<a class="headerlink" href="#31-update-and-apply-apt-get-packages" title="Permanent link">#</a></h6>
+<p><h6> 3. Install pre-requisites into your new VM</h6>
+<h6> 3.1 update and apply apt-get packages</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>sudo apt-get update
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>sudo apt-get upgrade
-</code></pre></div>
-<h6 id="32-install-golang">3.2 Install golang<a class="headerlink" href="#32-install-golang" title="Permanent link">#</a></h6>
+</code></pre></div></p>
+<p><h6> 3.2 Install golang</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>sudo tar -zxvf go1.19.linux-amd64.tar.gz -C /usr/local
 <a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>echo export GOROOT=/usr/local/go | sudo tee -a /etc/profile
 <a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>echo export PATH=&quot;$PATH:/usr/local/go/bin&quot; | sudo tee -a /etc/profile
 <a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>source /etc/profile
 <a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>go version
-</code></pre></div>
-<h6 id="33-install-ko-but-dont-do-ko-set-action-step">3.3 Install ko (but don't do ko set action step)<a class="headerlink" href="#33-install-ko-but-dont-do-ko-set-action-step" title="Permanent link">#</a></h6>
+</code></pre></div></p>
+<p><h6> 3.3 Install ko (but don't do ko set action step)</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>go install github.com/google/ko@latest
-</code></pre></div>
-<h6 id="34-install-gcc">3.4 Install gcc<a class="headerlink" href="#34-install-gcc" title="Permanent link">#</a></h6>
-<p>Either run this:
+</code></pre></div></p>
+<p><h6> 3.4 Install gcc</h6>
+Either run this:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sudo apt install build-essential
 </code></pre></div>
 or this:
@@ -2469,24 +2039,24 @@ or this:
 <a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>apt install gcc
 <a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>gcc --version
 </code></pre></div></p>
-<h6 id="35-install-make-if-you-installed-build-essential-this-may-already-be-installed">3.5 Install make (if you installed build-essential this may already be installed)<a class="headerlink" href="#35-install-make-if-you-installed-build-essential-this-may-already-be-installed" title="Permanent link">#</a></h6>
+<p><h6> 3.5 Install make (if you installed build-essential this may already be installed)</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>apt install make
-</code></pre></div>
-<h6 id="36-install-jq">3.6 Install jq<a class="headerlink" href="#36-install-jq" title="Permanent link">#</a></h6>
+</code></pre></div></p>
+<p><h6> 3.6 Install jq</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 <a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>jq --version
-</code></pre></div>
-<h6 id="37-install-kubectl">3.7 install kubectl<a class="headerlink" href="#37-install-kubectl" title="Permanent link">#</a></h6>
+</code></pre></div></p>
+<p><h6> 3.7 install kubectl</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
 <a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>curl -LO &quot;https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
 <a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>echo &quot;$(cat kubectl.sha256)  kubectl&quot; | sha256sum --check
 <a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 </code></pre></div>
-<h6 id="38-install-helm-required-when-deploying-as-workload">3.8 install helm (required when deploying as workload)<a class="headerlink" href="#38-install-helm-required-when-deploying-as-workload" title="Permanent link">#</a></h6>
+<h6> 3.8 install helm (required when deploying as workload)</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>chmod 700 get_helm.sh
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>./get_helm.sh
-</code></pre></div>
+</code></pre></div></p>
 </div>
 </div>
 </div>
@@ -2573,47 +2143,47 @@ Enable rootless usage of Docker by following the instructions at <a href="https:
 </code></pre></div></p>
 </div>
 <div class="tabbed-block">
-<h2 id="how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution">How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution<a class="headerlink" href="#how-to-install-docker-and-kind-into-a-windows-subsystem-for-linux-wsl-environment-using-an-ubuntu-220401-distribution" title="Permanent link">#</a></h2>
-<h6 id="10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above">1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.<a class="headerlink" href="#10-start-a-vm-terminal-by-clicking-on-the-app-you-configured-using-the-instructions-in-the-general-pre-requisites-described-above" title="Permanent link">#</a></h6>
-<h6 id="20-install-docker">2.0 Install docker<a class="headerlink" href="#20-install-docker" title="Permanent link">#</a></h6>
-<p>The installation instructions from docker are not sufficient to get docker working with WSL</p>
-<h6 id="21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu">2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/<a class="headerlink" href="#21-follow-instructions-here-to-install-docker-httpsdocsdockercomengineinstallubuntu" title="Permanent link">#</a></h6>
-<p>Here some additonal steps you will need to take:</p>
-<h6 id="22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting">2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.<a class="headerlink" href="#22-ensure-that-etcwslconf-is-configured-so-that-systemd-will-run-on-booting" title="Permanent link">#</a></h6>
-<p>If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
+<p><h3> How to install docker and kind into a Windows Subsystem for Linux (WSL) environment using an Ubuntu 22.04.01 distribution</h3></p>
+<p><h6> 1.0 Start a VM terminal by clicking on the App you configured using the instructions in the General pre-requisites described above.</h6></p>
+<p><h6> 2.0 Install docker</h6>
+The installation instructions from docker are not sufficient to get docker working with WSL</p>
+<p><h6> 2.1 Follow instructions here to install docker https://docs.docker.com/engine/install/ubuntu/</h6></p>
+<p>Here some additional steps you will need to take:</p>
+<p><h6> 2.2 Ensure that /etc/wsl.conf is configured so that systemd will run on booting.</h6>
+If /etc/wsl.conf does not contain [boot] systemd=true, then edit /etc/wsl.com as follows:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>sudo vi /etc/wsl.conf
 </code></pre></div>
 Insert
 <div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>[boot]
 <a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>systemd=true
 </code></pre></div></p>
-<h6 id="23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via">2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via<a class="headerlink" href="#23-edit-etcsudoers-it-is-strongly-recommended-to-not-add-directives-directly-to-etcsudoers-but-instead-to-put-them-in-files-in-etcsudoersd-which-are-auto-included-so-makemodify-a-new-file-via" title="Permanent link">#</a></h6>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>sudo vi /etc/sudoers.d/docker
+<p><h6> 2.3 Edit /etc/sudoers: it is strongly recommended to not add directives directly to /etc/sudoers, but instead to put them in files in /etc/sudoers.d which are auto-included. So make/modify a new file via</h6>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>sudo vi /etc/sudoers.d/docker
 </code></pre></div>
 Insert
 <div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a># Docker daemon specification
 <a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>&lt;your user account&gt; ALL=(ALL) NOPASSWD: /usr/bin/dockerd
 </code></pre></div></p>
-<h6 id="24-add-your-user-to-the-docker-group">2.4 Add your user to the docker group<a class="headerlink" href="#24-add-your-user-to-the-docker-group" title="Permanent link">#</a></h6>
+<p><h6> 2.4 Add your user to the docker group</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>sudo usermod -aG docker $USER
-</code></pre></div>
-<h6 id="25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground">2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):<a class="headerlink" href="#25-if-dockerd-is-already-running-then-stop-it-and-restart-it-as-follows-note-the-new-dockerd-instance-will-be-running-in-the-foreground" title="Permanent link">#</a></h6>
+</code></pre></div></p>
+<p><h6> 2.5 If dockerd is already running, then stop it and restart it as follows (note: the new dockerd instance will be running in the foreground):</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>sudo systemctl stop docker
 <a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>sudo dockerd &amp;
-</code></pre></div>
-<h6 id="251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655">2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655<a class="headerlink" href="#251-if-you-encounter-an-iptables-issue-which-is-described-here-httpsgithubcommicrosoftwslissues6655" title="Permanent link">#</a></h6>
-<p>The following commands will fix the issue: 
+</code></pre></div></p>
+<p><h6> 2.5.1 If you encounter an iptables issue, which is described here: https://github.com/microsoft/WSL/issues/6655 
+The following commands will fix the issue:</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
 <a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 <a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>sudo dockerd &amp; 
 </code></pre></div></p>
-<h6 id="3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal">3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal<a class="headerlink" href="#3-you-will-now-need-to-open-new-terminals-to-access-the-vm-since-dockerd-is-running-in-the-foreground-of-this-terminal" title="Permanent link">#</a></h6>
-<h6 id="31-in-your-new-terminal-install-kind">3.1 In your new terminal, install kind<a class="headerlink" href="#31-in-your-new-terminal-install-kind" title="Permanent link">#</a></h6>
+<p><h6> 3. You will now need to open new terminals to access the VM since dockerd is running in the foreground of this terminal</h6></p>
+<p><h6> 3.1 In your new terminal, install kind</h6>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>wget -nv https://github.com/kubernetes-sigs/kind/releases/download/v0.17.0/kind-linux-$(dpkg --print-architecture) -O kind 
 <a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>sudo install -m 0755 kind /usr/local/bin/kind 
 <a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>rm kind 
 <a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>kind version
-</code></pre></div>
+</code></pre></div></p>
 </div>
 </div>
 </div>
