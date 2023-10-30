@@ -129,7 +129,7 @@ https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.y
 
 <b>after:</b>
 ```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{config.ks_next_branch}}
 ```
 
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
@@ -201,7 +201,16 @@ First, login to quay.io with a user that has credentials to 'write' to the kubes
 ```
 docker login quay.io
 ```
-then, make the KubeStellar image from within the local copy of the release branch '{{config.ks_next_branch}}'
+
+then, remove the 'buildx' container image from your local docker images
+```
+REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
+moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
+
+docker rmi 16fc6c95ddff
+```
+
+finally, make the KubeStellar image from within the local copy of the release branch '{{config.ks_next_branch}}'
 ```
 make kubestellar-image
 ```
@@ -214,18 +223,18 @@ brew install gnu-tar
 
 then, from root of local copy of https://github.com/kubestellar/kubestellar repo:
 ```
-gtar -zcf kubestellar-core-{{config.ks_new_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
-mv kubestellar-core-{{config.ks_new_helm_version}}.tar.gz ~
-shasum -a 256 ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz
+gtar -zcf kubestellar-core-{{config.ks_next_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+mv kubestellar-core-{{config.ks_next_helm_version}}.tar.gz ~
+shasum -a 256 ~/kubestellar-core-{{config.ks_next_helm_version}}.tar.gz
 ```
 
 then, from root of local copy of https://github.com/kubestellar/helm repo
 ```
-mv ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz charts
+mv ~/kubestellar-core-{{config.ks_next_helm_version}}.tar.gz charts
 ```
 
 next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):  
-```shell title="index.yaml" h_lines="5 6 8 13 14 15
+```shell title="index.yaml" hl_lines="5 6 8 13 14 15"
 apiVersion: v1
 entries:
   kubestellar-core:
@@ -242,6 +251,8 @@ entries:
     version: "3"
 generated: "2023-10-30T12:00:00.727185806-04:00"
 ```
+
+
 
 ### Update the KubeStellar Core container image just build and uploaded to quay.io
 
