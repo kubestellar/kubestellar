@@ -34,8 +34,9 @@ import (
 
 	spacev1alpha1apis "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spaceprovider "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager/providerclient"
-	providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kindprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kind"
+
+	//providerkcp "github.com/kubestellar/kubestellar/space-framework/space-provider/kcp"
 	kflexprovider "github.com/kubestellar/kubestellar/space-framework/space-provider/kubeflex"
 )
 
@@ -75,7 +76,7 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 	case spacev1alpha1apis.KubeflexProviderType:
 		pClient, err = kflexprovider.New(config)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err = providerkcp.New(config)
+	//	pClient, err = providerkcp.New(config)
 	default:
 		return nil
 	}

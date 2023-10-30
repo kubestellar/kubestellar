@@ -34,7 +34,8 @@ type Interface interface {
 	SpaceV1alpha1() spacev1alpha1.SpaceV1alpha1Interface
 }
 
-// Clientset contains the clients for groups.
+// Clientset contains the clients for groups. Each group has exactly one
+// version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
 	spaceV1alpha1 *spacev1alpha1.SpaceV1alpha1Client
