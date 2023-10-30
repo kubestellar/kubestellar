@@ -1077,15 +1077,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#check-that-gh-workflows-for-docs-are-working" class="md-nav__link">
-    Check that GH Workflows for docs are working
+  <a href="#create-the-kubestellar-core-container-image" class="md-nav__link">
+    Create the KubeStellar Core container image
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" class="md-nav__link">
-    Create an email addressed to kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com
+  <a href="#update-kubestellar-core-helm-repository" class="md-nav__link">
+    Update KubeStellar Core Helm repository
   </a>
   
 </li>
@@ -2143,15 +2143,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#check-that-gh-workflows-for-docs-are-working" class="md-nav__link">
-    Check that GH Workflows for docs are working
+  <a href="#create-the-kubestellar-core-container-image" class="md-nav__link">
+    Create the KubeStellar Core container image
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" class="md-nav__link">
-    Create an email addressed to kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com
+  <a href="#update-kubestellar-core-helm-repository" class="md-nav__link">
+    Update KubeStellar Core Helm repository
   </a>
   
 </li>
@@ -2348,98 +2348,131 @@ Make this image 'stable' so that helm and other install methods pickup this imag
 <p><img alt="Release Example" src="../gh-draft-new-release.png" /></p>
 </li>
 </ul>
-<h3 id="check-that-gh-workflows-for-docs-are-working">Check that GH Workflows for docs are working<a class="headerlink" href="#check-that-gh-workflows-for-docs-are-working" title="Permanent link">#</a></h3>
-<p>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
-<a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml">https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml</a>
-<a href="https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml">https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml</a></p>
-<!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
-- Configure prow for the new release branch
-
-    - Make sure you have openshift/release cloned
-    - Create a new branch
-    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
-    - Edit the new file
-    - Change main to the name of the release branch, such as release-0.11
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>zz_generated_metadata:
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>  branch: main
+<h3 id="create-the-kubestellar-core-container-image">Create the KubeStellar Core container image<a class="headerlink" href="#create-the-kubestellar-core-container-image" title="Permanent link">#</a></h3>
+<p>First, login to quay.io with a user that has credentials to 'write' to the kubestellar quay repo
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>docker login quay.io
 </code></pre></div>
-Change latest to the name of the release branch
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>promotion:
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>  namespace: kubestellar
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>  tag: latest
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>  tag_by_commit: true
+then, make the KubeStellar image from within the local copy of the release branch 'release-0.11'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>make kubestellar-image
+</code></pre></div></p>
+<h3 id="update-kubestellar-core-helm-repository">Update KubeStellar Core Helm repository<a class="headerlink" href="#update-kubestellar-core-helm-repository" title="Permanent link">#</a></h3>
+<p>First, make sure you have a version of 'tar' that supports '--transform'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>brew install gnu-tar
+</code></pre></div></p>
+<p>then, from root of local copy of https://github.com/kubestellar/kubestellar repo:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>gtar -zcf kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;ks_new_helm_version&#39;] }}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>mv kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;ks_new_helm_version&#39;] }}.tar.gz ~
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>shasum -a 256 ~/kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;ks_new_helm_version&#39;] }}.tar.gz
+</code></pre></div></p>
+<p>then, from root of local copy of https://github.com/kubestellar/helm repo
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>mv ~/kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object[&#39;ks_new_helm_version&#39;] }}.tar.gz charts
+</code></pre></div></p>
+<p>next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):<br />
+``` h_lines="5 6 8 13 14 15
+apiVersion: v1
+entries:
+  kubestellar-core:
+  - apiVersion: v2
+    appVersion: v0.10.0
+    created: "2023-10-30T12:00:00.727185806-04:00"
+    description: A Helm chart for KubeStellar Core deployment as a service
+    digest: 6f42d9e850308f8852842cd23d1b03ae5be068440c60b488597e4122809dec1e
+    icon: https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/favicons/favicon.ico
+    name: kubestellar
+    type: application
+    urls:
+    - https://helm.kubestellar.io/charts/kubestellar-core-{{ no such element: mkdocs.config.defaults.MkDocsConfig object['ks_new_helm_version'] }}.tar.gz
+    version: "3"
+generated: "2023-10-30T12:00:00.727185806-04:00"
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>### Check that GH Workflows for docs are working
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>[https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>&lt;!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>- Configure prow for the new release branch
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>    - Make sure you have openshift/release cloned
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>    - Create a new branch
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-&lt;version&gt;.yaml
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>    - Edit the new file
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>    - Change main to the name of the release branch, such as release-0.11
 </code></pre></div>
-    - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
-    - Copy the main branch configuration to a new release-x.y entry
-    - Run make update
-    - Add the new/updated files and commit your changes
-    - Push your branch to your fork
-    - Open a pull request
-    - Wait for it to be reviewed and merged
-    - Update testgrid
-
-- Make sure you have a clone of kubernetes/test-infra
-- Edit config/testgrids/kcp/kcp.yaml
-- In the test_groups section:
-- Copy all the entries under # main to the bottom of the map
-- Rename -main- to -release-<version>-
-- In the dashboard_groups section:
-    - Add a new entry under dashboard_names for kcp-release-<version>
-    - In the dashboards section:
-        - Copy the kcp-main entry, including dashboard_tab and all its entries, to a new entry called kcp-release-<version>
-        - Rename main to release-<version> in the new entry
-        - Commit your changes
-        - Push your branch to your fork
-        - Open a pull request
-        - Wait for it to be reviewed and merged
-        - Review/edit/publish the release in GitHub
-
-The goreleaser workflow automatically creates a draft GitHub release for each tag.
-
-Navigate to the draft release for the tag you just pushed. You'll be able to find it under the releases page.
-If the release notes have been pre-populated, delete them.
-For the "previous tag," select the most recent, appropriate tag as the starting point
-If this is a new minor release (e.g. v0.8.0), select the initial version of the previous minor release (e.g. v0.7.0)
-If this is a patch release (e.g. v0.8.7), select the previous patch release (e.g. v0.8.6)
-Click "Generate release notes"
-Publish the release
-Notify -->
-
-<h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com">kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Subject: KubeStellar release v0.11.0
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>Body:
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>Dear KubeStellar Community,
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    Release v0.11.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.11.0
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>What&#39;s Changed
-<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
-<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
-<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
-<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
-<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
-<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
-<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
-<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>📖Update dev-env.md by @francostellari in #1157
-<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
-<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
-<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
-<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
-<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
-<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
-<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
-<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>New Contributors
-<a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>
-<a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a>@fab7 made their first contribution in #1155
-<a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a>Full Changelog: v0.8.0…v0.9.0
-<a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a>
-<a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a>Thank you for your continued support,
-<a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a>
-<a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a>Andy
+zz_generated_metadata:
+  branch: main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>Change latest to the name of the release branch
 </code></pre></div>
+promotion:
+  namespace: kubestellar
+  tag: latest
+  tag_by_commit: true
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>    - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    - Copy the main branch configuration to a new release-x.y entry
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    - Run make update
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    - Add the new/updated files and commit your changes
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    - Push your branch to your fork
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>    - Open a pull request
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>    - Wait for it to be reviewed and merged
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>    - Update testgrid
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>- Make sure you have a clone of kubernetes/test-infra
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>- Edit config/testgrids/kcp/kcp.yaml
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>- In the test_groups section:
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>- Copy all the entries under # main to the bottom of the map
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>- Rename -main- to -release-&lt;version&gt;-
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>- In the dashboard_groups section:
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>    - Add a new entry under dashboard_names for kcp-release-&lt;version&gt;
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>    - In the dashboards section:
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>        - Copy the kcp-main entry, including dashboard_tab and all its entries, to a new entry called kcp-release-&lt;version&gt;
+<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>        - Rename main to release-&lt;version&gt; in the new entry
+<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a>        - Commit your changes
+<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>        - Push your branch to your fork
+<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>        - Open a pull request
+<a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a>        - Wait for it to be reviewed and merged
+<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>        - Review/edit/publish the release in GitHub
+<a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a>
+<a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a>The goreleaser workflow automatically creates a draft GitHub release for each tag.
+<a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a>
+<a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a>Navigate to the draft release for the tag you just pushed. You&#39;ll be able to find it under the releases page.
+<a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a>If the release notes have been pre-populated, delete them.
+<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>For the &quot;previous tag,&quot; select the most recent, appropriate tag as the starting point
+<a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a>If this is a new minor release (e.g. v0.8.0), select the initial version of the previous minor release (e.g. v0.7.0)
+<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>If this is a patch release (e.g. v0.8.7), select the previous patch release (e.g. v0.8.6)
+<a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a>Click &quot;Generate release notes&quot;
+<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>Publish the release
+<a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a>Notify --&gt;
+<a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a>
+<a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a>
+<a id="__codelineno-30-38" name="__codelineno-30-38" href="#__codelineno-30-38"></a>### Create an email addressed to [kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com](mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com) 
+</code></pre></div>
+Subject: KubeStellar release v0.11.0</p>
+<p>Body:</p>
+<p>Dear KubeStellar Community,
+    Release v0.11.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.11.0</p>
+<p>What's Changed</p>
+<p>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+✨ Switch to use k8s code generators by @ezrasilvera in #1139
+✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+📖Update dev-env.md by @francostellari in #1157
+📖Update Chart.yaml appVersion by @francostellari in #1158
+🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+📖 Document syncer removal by @MikeSpreitzer in #1164
+🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+New Contributors</p>
+<p>@fab7 made their first contribution in #1155
+Full Changelog: v0.8.0…v0.9.0</p>
+<p>Thank you for your continued support,</p>
+<p>Andy
+```</p>
 <h3 id="post-the-same-message-in-the-kubestellar-slack-channel">Post the same message in the <a href="https://kubestellar.io/slack">#kubestellar</a> Slack channel<a class="headerlink" href="#post-the-same-message-in-the-kubestellar-slack-channel" title="Permanent link">#</a></h3>
 
 
