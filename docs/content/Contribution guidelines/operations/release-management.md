@@ -201,6 +201,53 @@ Make this image 'stable' so that helm and other install methods pickup this imag
 
     ![Release Example](gh-draft-new-release.png)
 
+### Create the KubeStellar Core container image
+First, login to quay.io with a user that has credentials to 'write' to the kubestellar quay repo
+```
+docker login quay.io
+```
+then, make the KubeStellar image from within the local copy of the release branch '{{config.ks_next_branch}}'
+```
+make kubestellar-image
+```
+
+### Update KubeStellar Core Helm repository
+First, make sure you have a version of 'tar' that supports '--transform'
+```
+brew install gnu-tar
+```
+
+then, from root of local copy of https://github.com/kubestellar/kubestellar repo:
+```
+gtar -zcf kubestellar-core-{{config.ks_new_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+mv kubestellar-core-{{config.ks_new_helm_version}}.tar.gz ~
+shasum -a 256 ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz
+```
+
+then, from root of local copy of https://github.com/kubestellar/helm repo
+```
+mv ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz charts
+```
+
+next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):  
+``` h_lines="5 6 8 13 14 15
+apiVersion: v1
+entries:
+  kubestellar-core:
+  - apiVersion: v2
+    appVersion: v0.10.0
+    created: "2023-10-30T12:00:00.727185806-04:00"
+    description: A Helm chart for KubeStellar Core deployment as a service
+    digest: 6f42d9e850308f8852842cd23d1b03ae5be068440c60b488597e4122809dec1e
+    icon: https://raw.githubusercontent.com/kubestellar/kubestellar/main/docs/favicons/favicon.ico
+    name: kubestellar
+    type: application
+    urls:
+    - https://helm.kubestellar.io/charts/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz
+    version: "3"
+generated: "2023-10-30T12:00:00.727185806-04:00"
+```
+
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
 [{{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
