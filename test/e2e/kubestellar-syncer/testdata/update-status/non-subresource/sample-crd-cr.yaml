@@ -1,0 +1,8 @@
+apiVersion: my.domain/v1alpha1
+kind: Sample
+metadata:
+  name: sample
+  annotations:
+    edge.kubestellar.io/downsync-overwrite: "false"
+spec:
+  foo: bar downsync
