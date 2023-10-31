@@ -173,7 +173,7 @@ function run_kcp() {
         echo "***READY***"
         sleep 600
     done
-
+}
 
 function run_init() {
     echo "--< Starting init >--"
