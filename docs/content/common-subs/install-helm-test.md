@@ -8,7 +8,7 @@ helm repo update
 KUBECONFIG=~/.kube/config helm install kubestellar/kubestellar-core \
   --set EXTERNAL_HOSTNAME="kubestellar.core" \
   --set EXTERNAL_PORT={{ config.ks_kind_port_num }} \
-  --set image.tag EXTRA_CORE_TAG \
+  --set image.tag=$EXTRA_CORE_TAG \
   --namespace kubestellar \
   --generate-name
 ```
