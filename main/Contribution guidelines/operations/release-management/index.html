@@ -2312,7 +2312,7 @@
 <p><b>before:</b>
 <div class="highlight"><span class="filename">VERSION</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>...
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="hll"><span class="nv">stable</span><span class="o">=</span>v0.9.0
-</span><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.9.0
+</span><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="hll"><span class="nv">latest</span><span class="o">=</span>v0.11.0
 </span><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>...
 </code></pre></div></p>
 <p><b>after:</b>
@@ -2404,7 +2404,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>git<span class="w"> </span>fetch<span class="w"> </span>--tags
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>git<span class="w"> </span>tag
 </code></pre></div>
-<p>create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'latest' to 'v0.12.0'</p>
+<p>create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag 'v0.11.0' to 'v0.12.0'</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">TAG</span><span class="o">=</span>v0.12.0
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nv">REF</span><span class="o">=</span>release-0.12
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>git<span class="w"> </span>tag<span class="w"> </span>--sign<span class="w"> </span>--message<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TAG</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REF</span><span class="s2">&quot;</span>
@@ -2499,7 +2499,7 @@ finally, push to the main branch
 <p>edit the kubestellar_cli.rb file
 <div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>vi<span class="w"> </span>Formula/kubestellar_cli.rb
 </code></pre></div></p>
-<p>update all instances of 'url' with <strong>v0.12.0</strong> (should be 6 of these)
+<p>update all instances of 'url' from v0.11.0 to <strong>v0.12.0</strong> (should be 6 of these)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>...
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">    </span>when<span class="w"> </span>:arm64
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="hll"><span class="w">      </span>url<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kubestellaruser_v0.12.0_darwin_arm64.tar.gz&quot;</span>
