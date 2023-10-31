@@ -1,0 +1,87 @@
+name: docs-ecutable - User Quickstart Test
+run-name: docs-ecutable - User Quickstart Test - ${{ github.ref_name }}
+
+on:
+  workflow_call:
+  # So we can trigger manually if needed
+  workflow_dispatch:
+  # To confirm any changes to docs build successfully, without deploying them
+  pull_request:
+    branches:
+      - "release-*"
+      - "main"
+    paths:
+      - "docs/content/Getting-Started/user-quickstart-test.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-user-quickstart-test.yml"
+      - "docs/scripts/docs-ecutable.sh"
+  push:
+    branches:
+      - "release-*"
+      - "main"
+    paths:
+      - "docs/content/Getting-Started/user-quickstart-test.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-user-quickstart-test.yml"
+      - "docs/scripts/docs-ecutable.sh"
+    tags:
+      - 'v*'
+  #   branches:
+  #     - main
+  #     - "release-*"
+  # push:
+  #   branches:
+  #     - main
+  #     - "release-*"
+  #   tags:
+  #     - 'v*'
+      
+env:
+  docs-ecutable-filename: user-quickstart-test
+  docs-ecutable-md-filename: "'docs/content/Getting-Started/user-quickstart-test.md'"
+
+jobs:
+  docs-ecutable:
+    #if: github.repository_owner == 'kubestellar'
+    name: docs-ecutable - for user-quickstart-test e2e
+    runs-on: ubuntu-latest
+    outputs:
+      docs-ecutable-filename: ${{ steps.step1.outputs.docs-ecutable-filename }}
+    steps:
+      - id: step1
+        run: echo "docs-ecutable-filename=${{ env.docs-ecutable-filename }}" >> "$GITHUB_OUTPUT"
+
+      - run: echo ${{ steps.step1.outputs.docs-ecutable-filename }}
+
+      - uses: actions/checkout@v4.1.1
+      
+      - uses: actions/setup-go@v4
+        with:
+          go-version: v1.19
+          cache: true
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+
+        # with:
+          # version: 'v1.27.4'
+      - run: kubectl version || true
+
+      # - run: sudo apt install coreutils
+
+      - name: 🔎 Check IP
+        run: curl https://api.ipify.org
+
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo echo $(tail -n 1 /etc/hosts | awk '{print $1}') kubestellar.core | sudo tee -a /etc/hosts
+        # sudo echo $(curl https://api.ipify.org) kubestellar.core | sudo tee -a /etc/hosts
+
+      - run: more /etc/hosts
+      
+      - run: |
+          make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
+          docs-ecutable
