@@ -19,7 +19,6 @@ package syncers
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -394,15 +393,10 @@ func (ds *DownSyncer) BackStatusMany(resource edgev2alpha1.EdgeSyncConfigResourc
 }
 
 func updateStatusByResource(upstreamClient *Client, resourceForUp edgev2alpha1.EdgeSyncConfigResource, upstreamResource *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	// TODO: make a more informed choice
-	if isKubeResource(resourceForUp) {
+	if upstreamClient.HasStatusInSubresources() {
 		return upstreamClient.UpdateStatus(resourceForUp, upstreamResource)
 	}
 	return upstreamClient.Update(resourceForUp, upstreamResource)
-}
-
-func isKubeResource(rsc edgev2alpha1.EdgeSyncConfigResource) bool {
-	return strings.HasSuffix(rsc.Group, ".k8s.io") || !strings.Contains(rsc.Group, ".")
 }
 
 func findWithObject(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) (*unstructured.Unstructured, bool) {

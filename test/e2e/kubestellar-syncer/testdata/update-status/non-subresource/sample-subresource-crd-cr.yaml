@@ -1,0 +1,6 @@
+apiVersion: my.domain/v1alpha1
+kind: SampleSubresource
+metadata:
+  name: sample-subresource
+spec:
+  foo: bar downsync

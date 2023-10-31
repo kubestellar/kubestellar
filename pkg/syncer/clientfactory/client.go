@@ -28,12 +28,17 @@ import (
 )
 
 type Client struct {
-	ResourceClient dynamic.NamespaceableResourceInterface
-	scope          meta.RESTScope
+	ResourceClient          dynamic.NamespaceableResourceInterface
+	scope                   meta.RESTScope
+	hasStatusInSubresources bool
 }
 
 func (c *Client) IsNamespaced() bool {
 	return c.scope == meta.RESTScopeNamespace
+}
+
+func (c *Client) HasStatusInSubresources() bool {
+	return c.hasStatusInSubresources
 }
 
 func (c *Client) Create(resource edgev2alpha1.EdgeSyncConfigResource, unstObj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
