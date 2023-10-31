@@ -196,6 +196,11 @@ metadata:
 spec:
   clusterScope:
   - apiVersion: v1
+    group: ""
+    objects:
+    - specialstuff
+    resource: namespaces
+  - apiVersion: v1
     group: apiextensions.k8s.io
     objects:
     - crontabs.stable.example.com

@@ -26,6 +26,7 @@ import (
 	"time"
 
 	k8scorev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -398,7 +399,7 @@ type wpPerDestination struct {
 type dynamicDuo struct {
 	apiVersion  string
 	namespaced  bool
-	preInformer upstreaminformers.GenericInformer // nil iff resource is namespaces
+	preInformer upstreaminformers.GenericInformer // nil iff resource is namespaces and duo is in a wpPerDestination
 	client      k8sdynamic.NamespaceableResourceInterface
 }
 
@@ -409,6 +410,7 @@ func (duo *dynamicDuo) clientForMaybeNamespace(namespaced bool, namespace string
 	return duo.client
 }
 
+// may no be called on the duo for namespaces in a wpd
 func (duo *dynamicDuo) clientAndGetterForMaybeNamespace(namespaced bool, namespace string) (k8sdynamic.ResourceInterface, getter) {
 	if namespaced {
 		return duo.client.Namespace(namespace), duo.preInformer.Lister().ByNamespace(namespace)
@@ -488,6 +490,8 @@ func (wpd *wpPerDestination) getDynamicDuoLocked(gr metav1.GroupResource, apiVer
 	return duo, wpd.nsReadyChan, nil
 }
 
+// resyncGroupResource enqueues references to every instance of the given resource in the destination.
+// May not be called with gr==nsGR.
 func (wpd *wpPerDestination) resyncGroupResource(gr metav1.GroupResource, duo dynamicDuo) {
 	objs := duo.preInformer.Informer().GetStore().List()
 	for _, obj := range objs {
@@ -740,8 +744,19 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 	return false
 }
 
+var crdGR = metav1.GroupResource{Group: apiextensionsv1.SchemeGroupVersion.Group, Resource: "customresourcedefinitions"}
+var nsGR = metav1.GroupResource{Resource: "namespaces"}
+
+// syncDestinationObject is applied to a workload object in a WEC and will
+// delete that workload object if it is no longer desired and will report its
+// reported state in the singleton case.
+// For CustomResourceDefinition, only the former is applicable;
+// for Namespace, neither is applicable.
 // Returns `retry bool`.
 func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef destinationObjectRef) bool {
+	if doRef.groupResource == nsGR {
+		return false
+	}
 	namespaced := doRef.namespace != noNamespace
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("objectRef", doRef)
@@ -781,6 +796,9 @@ func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef de
 				return returnFalse
 			}
 			logger.V(4).Info("Retaining destination object", "namespaced", namespaced, "sources", VisitableToSlice[Pair[logicalcluster.Name, bool]](sourcesWants))
+			if doRef.groupResource == crdGR {
+				return returnFalse
+			}
 			tryem := triers{}
 			addRetry := false
 			// accumulate reported state return tasks
@@ -1361,6 +1379,10 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			logger.V(4).Info("No Upsyncs after transaction")
 		}
 		wpd.preInformers.Visit(func(tup Pair[metav1.GroupResource, dynamicDuo]) error {
+			if tup.First == nsGR {
+				logger.V(4).Info("No need to resync GroupResource at destination", "groupResource", tup.First, "namespaced", tup.Second.namespaced)
+				return nil
+			}
 			// Reconsider every instance of this resource in case it should stop being projected.
 			logger.V(4).Info("Resyncing GroupResource at destination", "groupResource", tup.First, "namespaced", tup.Second.namespaced)
 			wpd.resyncGroupResource(tup.First, tup.Second)
