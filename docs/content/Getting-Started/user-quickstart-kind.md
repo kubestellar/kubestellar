@@ -1,7 +1,6 @@
 ---
 short_name: user-quickstart-kind
 manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
-syncer_image_sets: ''
 qs_sort: kind
 ---
 [![User QuickStart Kind test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml)&nbsp;&nbsp;&nbsp;

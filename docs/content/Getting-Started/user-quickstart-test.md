@@ -1,7 +1,6 @@
 ---
 short_name: user-quickstart-test
 manifest_name: 'docs/content/Getting-Started/user-quickstart-test.md'
-syncer_image_sets: '--syncer-image ko.local/syncer:test '
 qs_sort: test
 ---
 [![User QuickStart Kind test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-test.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-test.yml)&nbsp;&nbsp;&nbsp;
@@ -161,9 +160,9 @@ qs_sort: test
         **important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
 
          {%
-           include-markdown "../common-subs/kubestellar-prep-syncer.md"
-           start="<!--kubestellar-prep-syncer-start-->"
-           end="<!--kubestellar-prep-syncer-end-->"
+           include-markdown "../common-subs/kubestellar-prep-syncer-test.md"
+           start="<!--kubestellar-prep-syncer-test-start-->"
+           end="<!--kubestellar-prep-syncer-test-end-->"
          %}
 
          {%

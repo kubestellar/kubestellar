@@ -1,7 +1,6 @@
 ---
 short_name: user-quickstart-openshift
 manifest_name: 'docs/content/Getting-Started/user-quickstart-openshift.md'
-syncer_image_sets: ''
 ---
 <!-- [![User QuickStart OpenShift test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-openshift.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-openshift.yml)&nbsp;&nbsp;&nbsp; -->
 
