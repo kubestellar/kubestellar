@@ -26,7 +26,7 @@ vi outer-scripts/kubectl-kubestellar-prep_for_syncer
 ```
 
 change the version in the following line:
-```shell
+```shell hl_lines="1"
 syncer_image="quay.io/kubestellar/syncer:{{ config.ks_next_tag }}"
 ```
 
@@ -36,9 +36,12 @@ vi core-helm-chart/Chart.yaml
 ```
 
 change the versions in the 'Chart.yaml' file in the following lines:
-```shell hl_lines="1 2"
+```shell hl_lines="2 4"
+...
 version: {{ config.ks_next_helm_version }}
+...
 appVersion: {{ config.ks_next_tag }}
+...
 ```
 
 then in 'values.yaml'
@@ -61,23 +64,57 @@ vi VERSION
 <b>before:</b>
 ```shell title="VERSION" hl_lines="2 3"
 ...
-stable={{ config.ks_tag }}
-latest={{ config.ks_tag }}
+stable={{ config.ks_stable_tag }}
+latest={{ config.ks_current_tag }}
 ...
 ```
 
 <b>after:</b>
 ```shell title="VERSION" hl_lines="2 3" 
 ...
-stable={{ config.ks_tag }}
+stable={{ config.ks_stable_tag }}
 latest={{ config.ks_next_tag }}
 ...
 ```
 
+### Update the mkdocs.yml file (pre branch)
+The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
+
+```shell
+vi docs/mkdocs.yml
+```
+
+<b>before:</b>
+```shell title="mkdocs.yml" hl_lines="2 3 4 6 7 8"
+...
+ks_current_branch: '{{ config.ks_current_branch }}'
+ks_current_tag: '{{ config.ks_current_tag }}'
+ks_current_helm_version: {{ config.ks_current_helm_version }}
+
+ks_next_branch: '{{ config.ks_next_branch }}'
+ks_next_tag: '{{ config.ks_next_tag }}'
+ks_next_helm_version: {{ config.ks_next_helm_version }}
+...
+```
+
+<b>after:</b>
+```shell title="mkdocs.yml" hl_lines="2 3 4 6 7 8" 
+...
+ks_current_branch: '{{ config.ks_next_branch }}'
+ks_current_tag: '{{ config.ks_next_tag }}'
+ks_current_helm_version: {{ config.ks_next_helm_version }}
+
+ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
+ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
+ks_next_helm_version: # put the number of the next logical helm version
+...
+```
+
+
 ### Push the main branch
 ```shell
 git add .
-git commit -m "updates to main to support new release"
+git commit -m "updates to main to support new release {{ config.ks_next_tag }}"
 git push -u origin main
 ```
 
@@ -87,7 +124,7 @@ To create a release branch, identify the current 'release' branches' name (e.g. 
 git checkout -b {{ config.ks_next_branch }}
 ```
 
-### Update the mkdocs.yml file
+### Update the mkdocs.yml file (post branch)
 The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
 
 ```shell
@@ -95,41 +132,45 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8"
+```shell title="mkdocs.yml" hl_lines="2 3 4"
 ...
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: '{{ config.ks_tag }}'
-ks_current_helm_version: {{ config.ks_current_helm_version }}
-ks_next_branch: '{{ config.ks_next_branch }}'
-ks_next_tag: '{{ config.ks_next_tag }}'
-ks_next_helm_version: {{ config.ks_next_helm_version }}
 ...
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8" 
+```shell title="mkdocs.yml" hl_lines="2 3 4" 
 ...
 edit_uri: edit/{{ config.ks_next_branch }}/docs/content
 ks_branch: '{{ config.ks_next_branch }}'
 ks_tag: '{{ config.ks_next_tag }}'
-ks_current_helm_version: {{ config.ks_next_helm_version }}
-ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
-ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
-ks_next_helm_version: # put the number of the next logical helm version
 ...
 ```
 
-### Update the branch name in kubestellar/docs/content/readme.md
-There are about 6 instances of these in the readme.md.  They connect the GitHub Actions for the specific branch to the readme.md page.
-<b>before:</b>
+### Update the branch name in /README.MD
+There are quite a few references to the main branch /README.MD.  They connect the GitHub Actions for the specific branch to the README.MD page.  Since we are on the new release branch, its time to update these to point to the release itself.
+
 ```shell
+vi README.MD
+```
+
+<b>before:</b>
+```shell hl_lines="1"
 https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main
 ```
 
 <b>after:</b>
+```shell hl_lines="1"
+https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{config.ks_next_branch}}
+```
+
+### Push the new release branch
 ```shell
-https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=release-0.3.0
+git add .
+git commit -m "new release version {{ config.ks_next_branch }}"
+git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
@@ -139,14 +180,6 @@ cd docs
 mike delete stable # remove the 'stable' alias from the current '{{ config.ks_branch }}' branches' doc set
 mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
 cd ..
-```
-
-
-### Push the new release branch
-```shell
-git add .
-git commit -m "new release version {{ config.ks_next_branch }}"
-git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'stable' alias using 'mike'
@@ -169,7 +202,7 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag '{{ config.ks_tag }}' to '{{ config.ks_next_tag }}'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag '{{ config.ks_current_tag }}' to '{{ config.ks_next_tag }}'
 
 ```shell
 TAG={{ config.ks_next_tag }}
@@ -177,6 +210,9 @@ REF={{ config.ks_next_branch }}
 git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
+
+### Clean out previous release tar images and the checksums256.txt file from your local build environment
+When you create a build, output goes to your local __/build/release__.  Make sure this path is empty before you start so there is no mixup with your current build.
 
 ### Create a build
 ```shell
@@ -191,7 +227,7 @@ git push origin --tags
     - Add some release notes ('generate release notes' if you like)
     - select 'pre-release' as a the first step.  Once validated the release is working properly, come back and mark as 'release'
     - Attach the binaries that were created in the 'make-release-full' process above
-        - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
+        - You add the KubeStellar-specific '*.tar.gz' and the 'checksums256.txt' files
         - GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'
 
     ![Release Example](gh-draft-new-release.png)
@@ -201,36 +237,65 @@ First, login to quay.io with a user that has credentials to 'write' to the kubes
 ```
 docker login quay.io
 ```
-then, make the KubeStellar image from within the local copy of the release branch '{{config.ks_next_branch}}'
+
+then, remove any runnning container from moby/buildkit
+```
+CONTAINER ID   IMAGE                           COMMAND              
+c943925fd137   moby/buildkit:buildx-stable-1   "buildkitd" 
+
+docker rm c943925fd137 -f
+```
+
+and remove the 'buildx' container image from your local docker images
+```
+REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
+moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
+
+docker rmi 16fc6c95ddff
+```
+
+finally, make the KubeStellar image from within the local copy of the release branch '{{config.ks_next_branch}}'
 ```
 make kubestellar-image
 ```
 
+### Update the KubeStellar Core container image just build and uploaded to quay.io
+
+Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
+Tag the image with: __'latest'__, __'{{ config.ks_next_branch }}'__, and __'{{ config.ks_next_tag }}'__ so that helm and other install methods pickup this image.
+
+
 ### Update KubeStellar Core Helm repository
-First, make sure you have a version of 'tar' that supports '--transform'
+First, make sure you have a version of __'tar'__ that supports the __'--transform'__ command line option
 ```
 brew install gnu-tar
 ```
 
-then, from root of local copy of https://github.com/kubestellar/kubestellar repo:
+then, from root of local copy of [https://github.com/kubestellar/kubestellar](https://github.com/kubestellar/kubestellar) repo:
 ```
-gtar -zcf kubestellar-core-{{config.ks_new_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
-mv kubestellar-core-{{config.ks_new_helm_version}}.tar.gz ~
-shasum -a 256 ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz
+gtar -zcf kubestellar-core-{{config.ks_next_helm_version}}.tar.gz core-helm-chart/ --transform s/core-helm-chart/kubestellar-core/
+mv kubestellar-core-{{config.ks_next_helm_version}}.tar.gz ~
+shasum -a 256 ~/kubestellar-core-{{config.ks_next_helm_version}}.tar.gz
+```
+Clone the homebrew-kubestellar repo
+```shell
+git clone git@github.com:{{ config.helm_repo_short_name }}.git
+cd {{ config.helm_repo_default_file_path }}
+git checkout main
 ```
 
-then, from root of local copy of https://github.com/kubestellar/helm repo
+then, from root of local copy of [https://github.com/kubestellar/helm](https://github.com/kubestellar/helm) repo
 ```
-mv ~/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz charts
+mv ~/kubestellar-core-{{config.ks_next_helm_version}}.tar.gz charts
 ```
 
-next, update 'index.yaml' in root of local copy of helm repo (only update the data, not time, on lines 6 and 15):  
-```shell title="index.yaml" h_lines="5 6 8 13 14 15
+next, update 'index.yaml' in root of local copy of __helm repo__ (only update the data, not time, on lines 6 and 15):  
+```shell title="index.yaml" hl_lines="5 6 8 13 14 15"
 apiVersion: v1
 entries:
   kubestellar-core:
   - apiVersion: v2
-    appVersion: v0.10.0
+    appVersion: {{ config.ks_next_tag }}
     created: "2023-10-30T12:00:00.727185806-04:00"
     description: A Helm chart for KubeStellar Core deployment as a service
     digest: 6f42d9e850308f8852842cd23d1b03ae5be068440c60b488597e4122809dec1e
@@ -239,14 +304,65 @@ entries:
     type: application
     urls:
     - https://helm.kubestellar.io/charts/kubestellar-core-{{config.ks_new_helm_version}}.tar.gz
-    version: "3"
+    version: "{{config.ks_next_helm_version}}"
 generated: "2023-10-30T12:00:00.727185806-04:00"
 ```
 
-### Update the KubeStellar Core container image just build and uploaded to quay.io
+finally,
+finally, push to the main branch
+```shell
+git add .
+git commit -m "updates to main to support release {{ config.ks_next_tag }} of KubeStellar Helm component"
+git push -u origin main
+```
 
-Head up to quay.io and look for the image of KubeStellar Core container just uploaded.
-Make this image 'stable' so that helm and other install methods pickup this image.
+
+### Update KubeStellar CLI Brew repository
+Clone the homebrew-kubestellar repo
+```shell
+git clone git@github.com:{{ config.brew_repo_short_name }}.git
+cd {{ config.brew_repo_default_file_path }}
+git checkout main
+```
+
+edit the kubestellar_cli.rb file
+```shell
+vi Formula/kubestellar_cli.rb
+```
+
+update all instances of 'url' from {{ config.ks_current_tag }} to __{{ config.ks_next_tag }}__ (should be 6 of these)
+```shell hl_lines="3"
+...
+    when :arm64
+      url "https://github.com/kubestellar/kubestellar/releases/download/{{ config.ks_next_tag }}/kubestellaruser_{{ config.ks_next_tag }}_darwin_arm64.tar.gz"
+      sha256 "5be4c0b676e8a4f5985d09f2cfe6c473bd2f56ebd3ef4803ca345e6f04d83d6b" 
+...
+```
+
+then, update all instances of 'sha256' with the corresponding sha256 hash values in the build/release/checksums256.txt you create during the make-full-release.sh section above. (should be 6 of these)
+
+```shell hl_lines="4"
+...
+    when :arm64
+      url "https://github.com/kubestellar/kubestellar/releases/download/{{ config.ks_next_tag }}/kubestellaruser_{{ config.ks_next_tag }}_darwin_arm64.tar.gz"
+      sha256 "<corresponding sha256 hash from checksums256.txt>" 
+...
+```
+
+finally, push to the main branch
+```shell
+git add .
+git commit -m "updates to main to support release {{ config.ks_next_tag }} of KubeStellar Brew component"
+git push -u origin main
+```
+
+and, to test
+```shell
+brew update
+brew install kubestellar_cli
+```
+
+you should see output that indicates an update for the kubestellar brew tap and then an update to version {{ config.ks_next_tag }} of the kubestellar_cli brew formula.
 
 ### Check that GH Workflows for docs are working
 Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing

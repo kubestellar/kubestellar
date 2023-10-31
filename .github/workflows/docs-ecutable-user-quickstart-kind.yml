@@ -28,6 +28,15 @@ on:
       - "docs/scripts/docs-ecutable.sh"
     tags:
       - 'v*'
+  #   branches:
+  #     - main
+  #     - "release-*"
+  # push:
+  #   branches:
+  #     - main
+  #     - "release-*"
+  #   tags:
+  #     - 'v*'
       
 env:
   docs-ecutable-filename: user-quickstart-kind

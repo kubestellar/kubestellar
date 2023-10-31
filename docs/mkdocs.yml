@@ -4,16 +4,25 @@ site_url: https://docs.kubestellar.io/
 
 repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
+helm_repo_short_name: kubestellar/helm
+helm_repo_default_file_path: helm
+brew_repo_short_name: kubestellar/homebrew-kubestellar
+brew_repo_default_file_path: homebrew-kubestellar
 docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
-ks_current_helm_version: '3'
 
-ks_next_branch: 'release-0.11'
-ks_next_tag: 'v0.11.0'
-ks_next_helm_version: '4'
+ks_stable_tag: 'v0.9.0'
+
+ks_current_branch: 'release-0.12'
+ks_current_tag: 'v0.12.0'
+ks_current_helm_version: '5'
+
+ks_next_branch: 'release-0.13'
+ks_next_tag: 'v0.13.0'
+ks_next_helm_version: '6'
 
 ks_kind_port_num: '1119'
 

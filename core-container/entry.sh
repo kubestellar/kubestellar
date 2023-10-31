@@ -28,12 +28,12 @@ function wait_kcp_ready() {
     echo "Waiting for kcp to be ready... this may take a while."
     (
         KUBECONFIG=
-        while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp -- ls /home/kubestellar/ready &> /dev/null; do
-            sleep 10
-        done
-        # until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
+        # while ! kubectl exec $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp -- ls /home/kubestellar/ready &> /dev/null; do
         #    sleep 10
         # done
+        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
+           sleep 10
+        done
     )
     echo "Success!"
     echo "Copying the admin.kubeconfig from kubestellar seret..."
@@ -169,10 +169,11 @@ function run_kcp() {
     )
 
     touch ready
-    echo "***READY***"
-    sleep infinity
+    while true ; do
+        echo "***READY***"
+        sleep 600
+    done
 }
-
 
 function run_init() {
     echo "--< Starting init >--"

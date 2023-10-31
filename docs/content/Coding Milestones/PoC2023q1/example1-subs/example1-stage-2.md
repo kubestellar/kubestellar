@@ -251,6 +251,7 @@ kind: Namespace
 metadata:
   name: specialstuff
   labels: {special: "yes"}
+  annotations: {just-for: fun}
 ---
 apiVersion: "stable.example.com/v1"
 kind: CronTab
@@ -345,6 +346,13 @@ Finally, use `kubectl` to create the following EdgePlacement object.
 Its "where predicate" (the `locationSelectors` array) has one label
 selector that matches only one of the Location objects created
 earlier, thus directing the special workload to just one edge cluster.
+
+The "what predicate" explicitly includes the `Namespace` object named
+"specialstuff", which causes all of its desired state (including
+labels and annotations) to be downsynced. This contrasts with the
+common EdgePlacement, which does not explicitly mention the
+`commonstuff` namespace, relying on the implicit creation of
+namespaces as needed in the WECs.
    
 ```shell
 kubectl apply -f - <<EOF
@@ -379,6 +387,9 @@ spec:
     resources: [ crontabs ]
     namespaces: [ specialstuff ]
     objectNames: [ my-new-cron-object ]
+  - apiGroup: ""
+    resources: [ namespaces ]
+    objectNames: [ specialstuff ]
   wantSingletonReportedState: true
   upsync:
   - apiGroup: "group1.test"
