@@ -8,33 +8,33 @@ on:
   # To confirm any changes to docs build successfully, without deploying them
   pull_request:
     branches:
-      - main
       - "release-*"
+      - "main"
+    paths:
+      - "docs/content/Getting-Started/user-quickstart-kind.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
+      - "docs/scripts/docs-ecutable.sh"
   push:
     branches:
-      - main
       - "release-*"
+      - "main"
+    paths:
+      - "docs/content/Getting-Started/user-quickstart-kind.md"
+      - "docs/content/Getting-Started/quickstart-subs/**"
+      - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
+      - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
+      - "docs/scripts/docs-ecutable.sh"
     tags:
       - 'v*'
   #   branches:
+  #     - main
   #     - "release-*"
-  #     - "main"
-  #   paths:
-  #     - "docs/content/Getting-Started/user-quickstart-kind.md"
-  #     - "docs/content/Getting-Started/quickstart-subs/**"
-  #     - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-  #     - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
-  #     - "docs/scripts/docs-ecutable.sh"
   # push:
   #   branches:
+  #     - main
   #     - "release-*"
-  #     - "main"
-  #   paths:
-  #     - "docs/content/Getting-Started/user-quickstart-kind.md"
-  #     - "docs/content/Getting-Started/quickstart-subs/**"
-  #     - "docs/content/Coding Milestones/PoC2023q1/common-subs/**"
-  #     - ".github/workflows/docs-ecutable-user-quickstart-kind.yml"
-  #     - "docs/scripts/docs-ecutable.sh"
   #   tags:
   #     - 'v*'
       
