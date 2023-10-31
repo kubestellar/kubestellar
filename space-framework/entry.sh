@@ -22,8 +22,58 @@ function echoerr() {
    echo "ERROR: $1" >&2
 }
 
-function run_space_manager() {
-    echo "--< Starting space-manager 1 >--"
+function set_provider_adapters() {
+    echo "Waiting for kcp to be ready... this may take a while."
+    (
+        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
+            sleep 10
+        done
+    )
+
+    echo "Create the kcp provider secret."
+    kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
+    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
+
+    echo "Waiting for the kubestellar provider to be ready... this may take a while."
+    (
+        until [ "$(kubectl get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
+            sleep 10
+        done
+    )
+ 
+    echo "Create a secret for the core cluster which is also the kubeflex core cluster."
+    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
+
+    echo "Apply kubeflex and kcp providers."
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: pkflex
+spec:
+  ProviderType: "kubeflex"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: default
+    name: kflex
+EOF
+
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: pkcp
+spec:
+  ProviderType: "kcp"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: default
+    name: kcpsec
+EOF
+
+}
+
+function set_kubeconfig_and_crds() {
     KUBECONFIG=
     kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
@@ -32,27 +82,11 @@ function run_space_manager() {
     KUBECONFIG=/home/spacecore/.kube/config
 
     echo "Apply space manager CRDs."
-    kubectl apply -f /home/spacecore/config/crds
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f /home/spacecore/config/crds
+}
 
-    echo "Waiting for kcp to be ready... this may take a while."
-    (
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
-            sleep 10
-        done
-    )
- 
-    echo "Create the kcp provider secret."
-    kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
-    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
-
-    echo "Create a secret for the core cluster which is also where the kubeflex core cluster."
-    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
-
-    echo "Apply kubeflex and kcp providers."
-    kubectl --kubeconfig /home/spacecore/.kube/config apply -f config/spaceproviderdesc-kflex.yaml
-    kubectl --kubeconfig /home/spacecore/.kube/config apply -f config/spaceproviderdesc-kcp.yaml
-
-    # Running the space-manager 
+function run_space_manager() {
+    echo "--< Starting space-manager 1 >--"
     if ! bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config; then
         echoerr "unable to start space-manager!"
         exit 1
@@ -76,6 +110,8 @@ echo "VERBOSITY=${VERBOSITY}"
 
 case "${ACTION}" in
 (space-manager)
+    set_kubeconfig_and_crds
+    set_provider_adapters
     run_space_manager;;
 (sleep)
     echo "Nothing to do... sleeping forever."
