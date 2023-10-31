@@ -65,7 +65,7 @@ vi VERSION
 ```shell title="VERSION" hl_lines="2 3"
 ...
 stable={{ config.ks_stable_tag }}
-latest={{ config.ks_stable_tag }}
+latest={{ config.ks_current_tag }}
 ...
 ```
 
@@ -197,7 +197,7 @@ git fetch --tags
 git tag
 ```
 
-create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag '{{ config.ks_tag }}' to '{{ config.ks_next_tag }}'
+create a tag that follows <major>.<minor>.<patch>.  For this example we will increment tag '{{ config.ks_current_tag }}' to '{{ config.ks_next_tag }}'
 
 ```shell
 TAG={{ config.ks_next_tag }}
@@ -317,7 +317,7 @@ edit the kubestellar_cli.rb file
 vi Formula/kubestellar_cli.rb
 ```
 
-update all instances of 'url' with __{{ config.ks_next_tag }}__ (should be 6 of these)
+update all instances of 'url' from {{ config.ks_current_tag }} to __{{ config.ks_next_tag }}__ (should be 6 of these)
 ```shell hl_lines="3"
 ...
     when :arm64
