@@ -14,6 +14,12 @@
 
         + [__helm__](https://helm.sh/docs/intro/install/) (required when deploying as workload)
 
+        __If you intend to build kubestellar from source__  you will also need 
+
+        + [__go__](https://go.dev/doc/install) (Go version >=1.19 required; 1.19 recommended) [__go releases__] (https://go.dev/dl)
+
+        + for simplicity, here's a [__direct link to go releases__](https://go.dev/dl) Remember you need go v1.19 or greater; 1.19 recommended!
+
     === "Mac"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         brew install jq
@@ -27,6 +33,20 @@
         ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
         brew install helm
         ```
+        ``` title="go (only required if you build kubestellar from source)"        
+        ```
+
+           1. Download the package from [__https://go.dev/dl#go1.19__](https://go.dev/dl#go1.19)  Be sure to get the correct one for your architecture
+
+           2. Open the package file you downloaded and follow the prompts to install Go.
+           The package installs the Go distribution to /usr/local/go. The package should put the /usr/local/go/bin directory in your PATH environment variable. You may need to restart any open Terminal sessions for the change to take effect.
+
+           3. Verify that you've installed Go by opening a command prompt and typing the following command:
+              `
+              $ go version 
+             `
+           Confirm that the command prints the desired installed version of Go. 
+   
     === "Ubuntu"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
@@ -44,6 +64,30 @@
         sudo apt-get update
         sudo apt-get install helm
         ```
+        ``` title="go (only required if you build kubestellar from source)"         
+        ```
+           
+           visit https://go.dev/doc/install for latest instructions
+                
+           1. Remove any previous Go installation by deleting the /usr/local/go folder (if it exists), then extract the archive you just downloaded into /usr/local, creating a fresh Go tree in /usr/local/go:
+
+              ```$ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz```
+
+              (You may need to run the command as root or through sudo).
+
+              __Do not__ untar the archive into an existing /usr/local/go tree. This is known to produce broken Go installations.
+
+           2. Add /usr/local/go/bin to the PATH environment variable.
+              You can do this by adding the following line to your $HOME/.profile or /etc/profile (for a system-wide installation):
+
+              ``` export PATH=$PATH:/usr/local/go/bin ```
+        
+              __Note:__ Changes made to a profile file may not apply until the next time you log into your computer. To apply the changes immediately, just run the shell commands directly or execute them from the profile using a command such as source $HOME/.profile.
+           3. Verify that you've installed Go by opening a command prompt and typing the following command:
+
+              ``` $ go version ```
+
+           4. Confirm that the command prints the installed version of Go.
     === "Debian"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         sudo apt-get install jq
@@ -61,6 +105,30 @@
         sudo apt-get update
         sudo apt-get install helm
         ```
+        ``` title="go (only required if you build kubestellar from source)"         
+        ```
+           
+           visit https://go.dev/doc/install for latest instructions
+                
+           1. Remove any previous Go installation by deleting the /usr/local/go folder (if it exists), then extract the archive you just downloaded into /usr/local, creating a fresh Go tree in /usr/local/go:
+
+              ```$ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz```
+
+              (You may need to run the command as root or through sudo).
+
+              __Do not__ untar the archive into an existing /usr/local/go tree. This is known to produce broken Go installations.
+
+           2. Add /usr/local/go/bin to the PATH environment variable.
+              You can do this by adding the following line to your $HOME/.profile or /etc/profile (for a system-wide installation):
+
+              ``` export PATH=$PATH:/usr/local/go/bin ```
+        
+              __Note:__ Changes made to a profile file may not apply until the next time you log into your computer. To apply the changes immediately, just run the shell commands directly or execute them from the profile using a command such as source $HOME/.profile.
+           3. Verify that you've installed Go by opening a command prompt and typing the following command:
+
+              ``` $ go version ```
+
+           4. Confirm that the command prints the installed version of Go.
     === "Fedora/RHEL/CentOS"
         ``` title="jq - https://stedolan.github.io/jq/download/"
         yum -y install jq
@@ -78,6 +146,30 @@
         ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
         dnf install helm
         ```
+        ``` title="go (only required if you build kubestellar from source)"         
+        ```
+           
+           visit https://go.dev/doc/install for latest instructions
+                
+           1. Remove any previous Go installation by deleting the /usr/local/go folder (if it exists), then extract the archive you just downloaded into /usr/local, creating a fresh Go tree in /usr/local/go:
+
+              ```$ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz```
+
+              (You may need to run the command as root or through sudo).
+
+              __Do not__ untar the archive into an existing /usr/local/go tree. This is known to produce broken Go installations.
+
+           2. Add /usr/local/go/bin to the PATH environment variable.
+              You can do this by adding the following line to your $HOME/.profile or /etc/profile (for a system-wide installation):
+
+              ``` export PATH=$PATH:/usr/local/go/bin ```
+        
+              __Note:__ Changes made to a profile file may not apply until the next time you log into your computer. To apply the changes immediately, just run the shell commands directly or execute them from the profile using a command such as source $HOME/.profile.
+           3. Verify that you've installed Go by opening a command prompt and typing the following command:
+
+              ``` $ go version ```
+
+           4. Confirm that the command prints the installed version of Go.
     === "Windows"
         ``` title="Chocolatey - https://chocolatey.org/install#individual"
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -97,6 +189,28 @@
         ``` title="helm (required when deploying as workload) - https://helm.sh/docs/intro/install/"
         choco install kubernetes-helm
         ```
+        ``` title="go (only required if you build kubestellar from source)"
+        visit https://go.dev/doc/install for latest instructions
+        ```
+
+           1. Download the go 1.19 MSI package from [__https://go.dev/dl#go1.19__](https://go.dev/dl#go1.19)  Be sure to get the correct one for your architecture
+
+           2. Open the MSI file you downloaded and follow the prompts to install Go.
+           
+              By default, the installer will install Go to Program Files or Program Files (x86). You can change the location as needed. After installing, you will need to close and reopen any open command prompts so that changes to the environment made by the installer are reflected at the command prompt. 
+
+           3. Verify that you've installed Go:
+
+              1. In Windows, click the Start menu.
+
+              2. In the menu's search box, type cmd, then press the Enter key.
+
+              3. In the Command Prompt window that appears, type the following command:
+                ```$ go version 
+                 ```
+
+              4. Confirm that the command prints the installed version of Go.
+  
     === "WSL with Ubuntu"  
         <h3>How to install pre-requisites for a Windows Subsystem for Linux (WSL) envronment using an Ubuntu 22.04.01 distribution</h3>
 
