@@ -166,6 +166,13 @@ https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.y
 https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{config.ks_next_branch}}
 ```
 
+### Push the new release branch
+```shell
+git add .
+git commit -m "new release version {{ config.ks_next_branch }}"
+git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
+```
+
 ### Remove the current 'stable' alias using 'mike' (DANGER!)
 Be careful, this will cause links to the 'stable' docs, which is the default for our community, to become unavailable.  For now, point 'stable' at 'main'
 ```shell
@@ -173,14 +180,6 @@ cd docs
 mike delete stable # remove the 'stable' alias from the current '{{ config.ks_branch }}' branches' doc set
 mike deploy --push --rebase --update-aliases main stable # this generates the 'main' branches' docs set and points 'stable' at it temporarily
 cd ..
-```
-
-
-### Push the new release branch
-```shell
-git add .
-git commit -m "new release version {{ config.ks_next_branch }}"
-git push -u origin {{ config.ks_next_branch }} # replace <major>.<minor> with your incremented <major>.<minor> pair
 ```
 
 ### Update the 'stable' alias using 'mike'
@@ -212,7 +211,7 @@ git tag --sign --message "$TAG" "$TAG" "$REF"
 git push origin --tags
 ```
 
-### Clean out previous release and checksum tar images from your local build environment
+### Clean out previous release tar images and the checksums256.txt file from your local build environment
 When you create a build, output goes to your local __/build/release__.  Make sure this path is empty before you start so there is no mixup with your current build.
 
 ### Create a build
@@ -228,7 +227,7 @@ When you create a build, output goes to your local __/build/release__.  Make sur
     - Add some release notes ('generate release notes' if you like)
     - select 'pre-release' as a the first step.  Once validated the release is working properly, come back and mark as 'release'
     - Attach the binaries that were created in the 'make-release-full' process above
-        - You add the KubeStellar-specific '*.tar.gz' and the 'checksum256.txt' files
+        - You add the KubeStellar-specific '*.tar.gz' and the 'checksums256.txt' files
         - GitHub will automatically add the 'Source Code (zip)' and 'Source Code (tar.gz)'
 
     ![Release Example](gh-draft-new-release.png)
@@ -239,7 +238,15 @@ First, login to quay.io with a user that has credentials to 'write' to the kubes
 docker login quay.io
 ```
 
-then, remove the 'buildx' container image from your local docker images
+then, remove any runnning container from moby/buildkit
+```
+CONTAINER ID   IMAGE                           COMMAND              
+c943925fd137   moby/buildkit:buildx-stable-1   "buildkitd" 
+
+docker rm c943925fd137 -f
+```
+
+and remove the 'buildx' container image from your local docker images
 ```
 REPOSITORY      TAG               IMAGE ID       CREATED        SIZE
 moby/buildkit   buildx-stable-1   16fc6c95ddff   10 days ago    168MB
@@ -332,13 +339,13 @@ update all instances of 'url' from {{ config.ks_current_tag }} to __{{ config.ks
 ...
 ```
 
-then, update all instances of 'sha256' with the corresponding sha256 hash values in the build/release/checksum.txt you create during the make-full-release.sh section above. (should be 6 of these)
+then, update all instances of 'sha256' with the corresponding sha256 hash values in the build/release/checksums256.txt you create during the make-full-release.sh section above. (should be 6 of these)
 
 ```shell hl_lines="4"
 ...
     when :arm64
       url "https://github.com/kubestellar/kubestellar/releases/download/{{ config.ks_next_tag }}/kubestellaruser_{{ config.ks_next_tag }}_darwin_arm64.tar.gz"
-      sha256 "<corresponding sha256 hash from checksum.txt>" 
+      sha256 "<corresponding sha256 hash from checksums256.txt>" 
 ...
 ```
 
