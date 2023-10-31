@@ -2727,8 +2727,12 @@ the center as well in the edge clusters.</p>
 <p>These should have their usual effect in both center and edge; they
 need no distinct treatment.</p>
 <p>Note, however, that they <em>do</em> have some sequencing implications.  They
-have to be created before any dependent objects, deleted after all
-dependent objects.</p>
+should be created before any dependent objects, deleted after all
+dependent objects. Ordering violations only cause log noise.</p>
+<p>These are also exceptional in their reported state. It is managed by
+the apiserver. Leaving them natured in the WDS and the mailbox
+workspace means that they can not hold their reported state from the
+WEC.</p>
 <table>
 <thead>
 <tr>
