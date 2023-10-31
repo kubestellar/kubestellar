@@ -15,9 +15,34 @@
 # limitations under the License.
 
 #################################################################################
+
 # Get a kubeflex release, untar it, and use kflex to install and initialize kflex.
 #################################################################################
+
+
+while (( $# > 0 )); do
+    case "$1" in
+    (--kubeconfig)
+        if (( $# > 1 ));
+        then { config="$2"; shift; }
+        else { echo "$0: kubeconfig file" >&2; exit 1; }
+        fi;;
+    (-h|--help)
+        echo "Usage: $0 [--kubeconfig]"
+        exit 0;;
+    (-*)
+        echo "$0: unknown flag" >&2 ; exit 1;
+        exit 1;;
+    (*)
+        echo "$0: unknown positional argument" >&2; exit 1;
+        exit 1;;
+    esac
+    shift
+done
+
 wget https://github.com/kubestellar/kubeflex/releases/download/v0.2.5/kubeflex_0.2.5_linux_amd64.tar.gz
-tar xf kubeflex_0.2.5_linux_amd64.tar.gz
-bin/kflex init
+mkdir kubeflex
+tar xf kubeflex_0.2.5_linux_amd64.tar.gz -C kubeflex
+kubeflex/bin/kflex --kubeconfig $config init
+rm kubeflex_0.2.5_linux_amd64.tar.gz
 

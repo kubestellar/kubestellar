@@ -34,7 +34,7 @@ function set_provider_adapters() {
     kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
     kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
 
-    echo "Waiting for the kubestellar provider to be ready... this may take a while."
+    echo "Waiting for the kcp provider to be ready... this may take a while."
     (
         until [ "$(kubectl get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
             sleep 10
@@ -45,7 +45,7 @@ function set_provider_adapters() {
     kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
 
     echo "Apply kubeflex and kcp providers."
-    kubectl --kubeconfig /home/spacecore/.kube/config apply -f - <<EOF
+    kubectl --kubeconfig /home/spacecore/.kube/config create -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -58,7 +58,7 @@ spec:
     name: kflex
 EOF
 
-    kubectl --kubeconfig /home/spacecore/.kube/config apply -f - <<EOF
+    kubectl --kubeconfig /home/spacecore/.kube/config create -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -111,8 +111,8 @@ echo "VERBOSITY=${VERBOSITY}"
 case "${ACTION}" in
 (space-manager)
     set_kubeconfig_and_crds
-    set_provider_adapters
-    run_space_manager;;
+    run_space_manager
+    set_provider_adapters;;
 (sleep)
     echo "Nothing to do... sleeping forever."
     sleep infinity;;
