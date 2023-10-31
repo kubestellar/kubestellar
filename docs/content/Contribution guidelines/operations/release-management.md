@@ -85,9 +85,12 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5"
+```shell title="mkdocs.yml" hl_lines="2 3 4 6 7 8"
 ...
+ks_current_branch: '{{ config.ks_current_branch }}'
+ks_current_tag: '{{ config.ks_current_tag }}'
 ks_current_helm_version: {{ config.ks_current_helm_version }}
+
 ks_next_branch: '{{ config.ks_next_branch }}'
 ks_next_tag: '{{ config.ks_next_tag }}'
 ks_next_helm_version: {{ config.ks_next_helm_version }}
@@ -95,9 +98,12 @@ ks_next_helm_version: {{ config.ks_next_helm_version }}
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5" 
+```shell title="mkdocs.yml" hl_lines="2 3 4 6 7 8" 
 ...
+ks_current_branch: '{{ config.ks_next_branch }}'
+ks_current_tag: '{{ config.ks_next_tag }}'
 ks_current_helm_version: {{ config.ks_next_helm_version }}
+
 ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
 ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
 ks_next_helm_version: # put the number of the next logical helm version
