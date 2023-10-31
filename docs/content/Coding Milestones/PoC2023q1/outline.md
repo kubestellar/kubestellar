@@ -259,8 +259,13 @@ These should have their usual effect in both center and edge; they
 need no distinct treatment.
 
 Note, however, that they _do_ have some sequencing implications.  They
-have to be created before any dependent objects, deleted after all
-dependent objects.
+should be created before any dependent objects, deleted after all
+dependent objects. Ordering violations only cause log noise.
+
+These are also exceptional in their reported state. It is managed by
+the apiserver. Leaving them natured in the WDS and the mailbox
+workspace means that they can not hold their reported state from the
+WEC.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
