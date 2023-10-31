@@ -26,7 +26,7 @@ vi outer-scripts/kubectl-kubestellar-prep_for_syncer
 ```
 
 change the version in the following line:
-```shell
+```shell hl_lines="1"
 syncer_image="quay.io/kubestellar/syncer:{{ config.ks_next_tag }}"
 ```
 
@@ -36,9 +36,12 @@ vi core-helm-chart/Chart.yaml
 ```
 
 change the versions in the 'Chart.yaml' file in the following lines:
-```shell hl_lines="1 2"
+```shell hl_lines="2 4"
+...
 version: {{ config.ks_next_helm_version }}
+...
 appVersion: {{ config.ks_next_tag }}
+...
 ```
 
 then in 'values.yaml'
@@ -74,6 +77,34 @@ latest={{ config.ks_next_tag }}
 ...
 ```
 
+### Update the mkdocs.yml file (pre branch)
+The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
+
+```shell
+vi docs/mkdocs.yml
+```
+
+<b>before:</b>
+```shell title="mkdocs.yml" hl_lines="1 2 3 4"
+...
+ks_current_helm_version: {{ config.ks_current_helm_version }}
+ks_next_branch: '{{ config.ks_next_branch }}'
+ks_next_tag: '{{ config.ks_next_tag }}'
+ks_next_helm_version: {{ config.ks_next_helm_version }}
+...
+```
+
+<b>after:</b>
+```shell title="mkdocs.yml" hl_lines="2 3 4" 
+...
+ks_current_helm_version: {{ config.ks_next_helm_version }}
+ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
+ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
+ks_next_helm_version: # put the number of the next logical helm version
+...
+```
+
+
 ### Push the main branch
 ```shell
 git add .
@@ -87,7 +118,7 @@ To create a release branch, identify the current 'release' branches' name (e.g. 
 git checkout -b {{ config.ks_next_branch }}
 ```
 
-### Update the mkdocs.yml file
+### Update the mkdocs.yml file (post branch)
 The mkdocs.yml file points to the branch and tag associated with the branch you have checked out.  Update the ks_branch and ks_tag key/value pairs at the top of the file
 
 ```shell
@@ -95,28 +126,20 @@ vi docs/mkdocs.yml
 ```
 
 <b>before:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8"
+```shell title="mkdocs.yml" hl_lines="1 2 3"
 ...
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: '{{ config.ks_tag }}'
-ks_current_helm_version: {{ config.ks_current_helm_version }}
-ks_next_branch: '{{ config.ks_next_branch }}'
-ks_next_tag: '{{ config.ks_next_tag }}'
-ks_next_helm_version: {{ config.ks_next_helm_version }}
 ...
 ```
 
 <b>after:</b>
-```shell title="mkdocs.yml" hl_lines="2 3 4 5 6 7 8" 
+```shell title="mkdocs.yml" hl_lines="1 2 3" 
 ...
 edit_uri: edit/{{ config.ks_next_branch }}/docs/content
 ks_branch: '{{ config.ks_next_branch }}'
 ks_tag: '{{ config.ks_next_tag }}'
-ks_current_helm_version: {{ config.ks_next_helm_version }}
-ks_next_branch:    # put the branch name of the next numerical branch that will come in the future
-ks_next_tag:       # put the tag name of the next numerical tag that will come in the future
-ks_next_helm_version: # put the number of the next logical helm version
 ...
 ```
 

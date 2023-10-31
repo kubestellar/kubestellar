@@ -9,12 +9,13 @@ repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
 ks_tag: 'latest'
-ks_current_helm_version: '3'
 
 ks_stable_tag: 'v0.9.0'
-ks_next_branch: 'release-0.11'
-ks_next_tag: 'v0.11.0'
-ks_next_helm_version: '4'
+
+ks_current_helm_version: '4'
+ks_next_branch: 'release-0.12'
+ks_next_tag: 'v0.12.0'
+ks_next_helm_version: '5'
 
 ks_kind_port_num: '1119'
 
