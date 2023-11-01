@@ -39,24 +39,29 @@ import (
 	ksinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
 )
 
-const defaultProviderNs = "spaceprovider-default"
+const (
+	defaultProviderNs = "spaceprovider-default"
+	refAnnotationKey  = "space-framework.io/service-provider-reference"
+)
 
 type KubestellarSpaceInterface interface {
 	// Space returns clientset for given space.
-
 	//Space(name string, namespace ...string) (client mcclientset.Interface)
 
 	// ConfigForSpace returns rest config for given space.
 	ConfigForSpace(name string, providerNS string) (*rest.Config, error)
+
+	// ConfigForSpaceByExportRef returns rest config for given space, by space reference
+	// from object in API export view.
+	ConfigForSpaceByExportRef(ref string) (*rest.Config, error)
 }
 
 type multiSpaceClient struct {
 	ctx context.Context
 	// Currently configs holds the kubeconfig as a string for each Space.
-	// This is temporary as Space is bing changed to use secrets instead of holding the config as
-	// text string
 	// The key to the map is the spaceName+ProviderNS  (currently we use the provider NS and not directly the provider name)
 	configs          map[string]*rest.Config
+	refToSpace       map[string]string
 	managerClientset *mgtclientset.Clientset
 	kubeClientset    *kubernetes.Clientset
 	lock             sync.Mutex
@@ -83,22 +88,30 @@ type multiSpaceClient struct {
 // The folowing functions are temporary, once Space become a cluster-scope resurce
 // We will not use the providerNS anymore.
 func (mcc *multiSpaceClient) ConfigForSpace(name string, providerNS string) (*rest.Config, error) {
-	nameS := defaultProviderNs
-	if len(providerNS) > 0 {
-		nameS = providerNS
+	namespace := defaultProviderNs
+	if providerNS != "" {
+		namespace = providerNS
 	}
-	key, ns := namespaceKey(name, nameS)
+	key := namespaceKey(name, namespace)
 	var err error
 	mcc.lock.Lock()
 	defer mcc.lock.Unlock()
 	config, ok := mcc.configs[key]
 	if !ok {
 		// Try to get Space from API server.
-		if config, err = mcc.getFromServer(name, ns); err != nil {
+		if config, err = mcc.getFromServer(name, namespace); err != nil {
 			return nil, err
 		}
 	}
 	return config, nil
+}
+
+func (mcc *multiSpaceClient) ConfigForSpaceByExportRef(ref string) (*rest.Config, error) {
+	namespace, spacename, err := mcc.getSpaceNameByRef(ref)
+	if err != nil {
+		return nil, err
+	}
+	return mcc.ConfigForSpace(spacename, namespace)
 }
 
 var client *multiSpaceClient
@@ -125,6 +138,7 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 	client = &multiSpaceClient{
 		ctx:              ctx,
 		configs:          make(map[string]*rest.Config),
+		refToSpace:       make(map[string]string),
 		managerClientset: managerClientset,
 		kubeClientset:    kubeClientset,
 		lock:             sync.Mutex{},
@@ -170,8 +184,8 @@ func (mcc *multiSpaceClient) getFromServer(name string, namespace string) (*rest
 	return restConfig, nil
 }
 
-func namespaceKey(name string, ns string) (key string, namespace string) {
-	return ns + "/" + name, ns
+func namespaceKey(name string, ns string) (key string) {
+	return ns + "/" + name
 }
 
 const CUBEKONFIG_KEY = "kubeconfig"
@@ -212,4 +226,14 @@ func (mcc *multiSpaceClient) getRestConfigFromSecret(internalAccess bool, space 
 		os.Exit(1)
 	}
 	return restConfig, nil
+}
+
+func (mcc *multiSpaceClient) getSpaceNameByRef(ref string) (string, string, error) {
+	mcc.lock.Lock()
+	defer mcc.lock.Unlock()
+	spaceKey, ok := mcc.refToSpace[ref]
+	if !ok {
+		return "", "", errors.New("failed to retrive space name by reference")
+	}
+	return cache.SplitMetaNamespaceKey(spaceKey)
 }
