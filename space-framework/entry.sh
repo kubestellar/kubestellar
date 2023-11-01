@@ -30,6 +30,13 @@ function set_provider_adapters() {
         done
     )
 
+    echo "Waiting for space manager to be ready... this may take a while."
+    (
+        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
+            sleep 10
+        done
+    )
+
     echo "Create the kcp provider secret."
     kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
     kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
@@ -71,29 +78,32 @@ spec:
     name: kcpsec
 EOF
 
+    sleep infinity
 }
 
-function set_kubeconfig_and_crds() {
-    KUBECONFIG=
-    kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-    kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
-    kubectl config use-context space-mgt
-    KUBECONFIG=/home/spacecore/.kube/config
-
+function set_crds() {
     echo "Apply space manager CRDs."
     kubectl --kubeconfig /home/spacecore/.kube/config apply -f /home/spacecore/config/crds
+
+    echo "***READY***"
 }
 
 function run_space_manager() {
-    echo "--< Starting space-manager 1 >--"
-    if ! bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config; then
+    echo "--< Starting space-manager >--"
+    if ! bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config ; then
         echoerr "unable to start space-manager!"
         exit 1
     fi
 }
 
 echo "--< Starting SpaceManager container >--"
+
+KUBECONFIG=
+kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
+kubectl config use-context space-mgt
+KUBECONFIG=/home/spacecore/.kube/config
 
 echo "Environment variables:"
 if [ $# -ne 0 ] ; then
@@ -110,8 +120,9 @@ echo "VERBOSITY=${VERBOSITY}"
 
 case "${ACTION}" in
 (space-manager)
-    set_kubeconfig_and_crds
-    run_space_manager
+    set_crds
+    run_space_manager;;
+(set_provider_adapters)
     set_provider_adapters;;
 (sleep)
     echo "Nothing to do... sleeping forever."
