@@ -40,6 +40,7 @@ nav:
   - Getting Started:
       - Quickstart using Kind: Getting-Started/user-quickstart-kind.md 
       - Quickstart using OpenShift: Getting-Started/user-quickstart-openshift.md 
+      - Quickstart for testing: Getting-Started/user-quickstart-test.md 
       - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md

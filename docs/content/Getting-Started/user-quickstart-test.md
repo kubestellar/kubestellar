@@ -1,9 +1,9 @@
 ---
-short_name: user-quickstart-kind
-manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
-qs_sort: kind
+short_name: user-quickstart-test
+manifest_name: 'docs/content/Getting-Started/user-quickstart-test.md'
+qs_sort: test
 ---
-[![User QuickStart Kind test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml)&nbsp;&nbsp;&nbsp;
+[![User QuickStart Kind test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-test.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-test.yml)&nbsp;&nbsp;&nbsp;
 
 <!-- 
 !!! tip "Estimated time to complete this example:" 
@@ -37,9 +37,27 @@ qs_sort: kind
         + 3 Kind clusters configured as follows
         
         {%
+          include-markdown "../common-subs/build-core-image.md"
+          start="<!--build-core-image-start-->"
+          end="<!--build-core-image-end-->"
+        %}
+
+        {%
+          include-markdown "../common-subs/build-syncer-image.md"
+          start="<!--build-syncer-image-start-->"
+          end="<!--build-syncer-image-end-->"
+        %}
+
+        {%
           include-markdown "../common-subs/create-ks-core-kind-cluster.md"
           start="<!--create-ks-core-kind-cluster-start-->"
           end="<!--create-ks-core-kind-cluster-end-->"
+        %}
+
+        {%
+          include-markdown "../common-subs/pre-position-core-image.md"
+          start="<!--pre-position-core-image-start-->"
+          end="<!--pre-position-core-image-end-->"
         %}
 
         {%
@@ -52,6 +70,12 @@ qs_sort: kind
           include-markdown "../common-subs/create-ks-edge-cluster2-kind-cluster.md"
           start="<!--create-ks-edge-cluster2-kind-cluster-start-->"
           end="<!--create-ks-edge-cluster2-kind-cluster-end-->"
+        %}
+
+        {%
+          include-markdown "../common-subs/pre-position-syncer-image.md"
+          start="<!--pre-position-syncer-image-start-->"
+          end="<!--pre-position-syncer-image-end-->"
         %}
 
         {%
@@ -80,9 +104,9 @@ qs_sort: kind
    
 #### 1. Deploy the <span class="Space-Bd-BT">KUBESTELLAR</span> Core component  
 {%
-  include-markdown "../common-subs/deploy-your-kubestellar-core-component-kind.md"
-  start="<!--deploy-your-kubestellar-core-component-kind-start-->"
-  end="<!--deploy-your-kubestellar-core-component-kind-end-->"
+  include-markdown "../common-subs/deploy-your-kubestellar-core-component-test.md"
+  start="<!--deploy-your-kubestellar-core-component-test-start-->"
+  end="<!--deploy-your-kubestellar-core-component-test-end-->"
 %}
 
 #### 2. Install <span class="Space-Bd-BT">KUBESTELLAR</span>'s user commands and kubectl plugins
@@ -136,9 +160,9 @@ qs_sort: kind
         **important:** make sure you created Kind clusters for **ks-edge-cluster1** and **ks-edge-cluster2** from the pre-req step above before proceeding [how-to-deploy-and-use-kubestellar](#how-to-deploy-and-use-kubestellar)
 
          {%
-           include-markdown "../common-subs/kubestellar-prep-syncer.md"
-           start="<!--kubestellar-prep-syncer-start-->"
-           end="<!--kubestellar-prep-syncer-end-->"
+           include-markdown "../common-subs/kubestellar-prep-syncer-test.md"
+           start="<!--kubestellar-prep-syncer-test-start-->"
+           end="<!--kubestellar-prep-syncer-test-end-->"
          %}
 
          {%
