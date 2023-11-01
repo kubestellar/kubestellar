@@ -4302,7 +4302,25 @@ Check that the reported number agrees.</p>
 <p>Look at the status section of the "speciald" <code>Deployment</code> and see that
 it has been filled in with the information from the guilder cluster.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml
-<a id="__codelineno-155-2" name="__codelineno-155-2" href="#__codelineno-155-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span>
+</code></pre></div>
+<p>Current status might not be there yet. The following command waits for
+status that reports that there is a special workload pod "ready".</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a><span class="nb">let</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-156-2" name="__codelineno-156-2" href="#__codelineno-156-2"></a><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-156-3" name="__codelineno-156-3" href="#__codelineno-156-3"></a><span class="w">    </span><span class="nv">rsyaml</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>specialstuff<span class="w"> </span>speciald<span class="w"> </span>-o<span class="w"> </span>yaml<span class="k">)</span>
+<a id="__codelineno-156-4" name="__codelineno-156-4" href="#__codelineno-156-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;readyReplicas: 1&#39;</span><span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="s2">&quot;</span><span class="nv">$rsyaml</span><span class="s2">&quot;</span>
+<a id="__codelineno-156-5" name="__codelineno-156-5" href="#__codelineno-156-5"></a><span class="w">    </span><span class="k">then</span><span class="w"> </span><span class="nb">break</span>
+<a id="__codelineno-156-6" name="__codelineno-156-6" href="#__codelineno-156-6"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-156-7" name="__codelineno-156-7" href="#__codelineno-156-7"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-156-8" name="__codelineno-156-8" href="#__codelineno-156-8"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Got:&quot;</span>
+<a id="__codelineno-156-9" name="__codelineno-156-9" href="#__codelineno-156-9"></a><span class="w">    </span>cat<span class="w"> </span><span class="o">&lt;&lt;&lt;</span><span class="s2">&quot;</span><span class="nv">$rsyaml</span><span class="s2">&quot;</span>
+<a id="__codelineno-156-10" name="__codelineno-156-10" href="#__codelineno-156-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span>count<span class="w"> </span>&gt;<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-156-11" name="__codelineno-156-11" href="#__codelineno-156-11"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;Giving up!&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-156-12" name="__codelineno-156-12" href="#__codelineno-156-12"></a><span class="w">        </span><span class="nb">false</span>
+<a id="__codelineno-156-13" name="__codelineno-156-13" href="#__codelineno-156-13"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-156-14" name="__codelineno-156-14" href="#__codelineno-156-14"></a><span class="w">    </span>sleep<span class="w"> </span><span class="m">15</span>
+<a id="__codelineno-156-15" name="__codelineno-156-15" href="#__codelineno-156-15"></a><span class="w">    </span><span class="nb">let</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span>count+1
+<a id="__codelineno-156-16" name="__codelineno-156-16" href="#__codelineno-156-16"></a><span class="k">done</span>
 </code></pre></div>
 <h3 id="status-summarization-aspirational">Status Summarization (aspirational)<a class="headerlink" href="#status-summarization-aspirational" title="Permanent link">#</a></h3>
 <p><img alt="Summarization for special" src="../Edge-PoC-2023q1-Scenario-1-stage-5s.svg" title="Status summarization for special" /></p>
@@ -4322,27 +4340,27 @@ the <code>commond</code> Deployment objects in the two mailbox workspaces.</p>
 <!-- BEGIN INCLUDE example1-subs/example1-teardown.md '&lt;!--example1-teardown-start--&gt;' '&lt;!--example1-teardown-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-156-2" name="__codelineno-156-2" href="#__codelineno-156-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-156-3" name="__codelineno-156-3" href="#__codelineno-156-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
-<a id="__codelineno-156-4" name="__codelineno-156-4" href="#__codelineno-156-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
-<a id="__codelineno-156-5" name="__codelineno-156-5" href="#__codelineno-156-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
-<a id="__codelineno-156-6" name="__codelineno-156-6" href="#__codelineno-156-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
-<a id="__codelineno-156-7" name="__codelineno-156-7" href="#__codelineno-156-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
-<a id="__codelineno-156-8" name="__codelineno-156-8" href="#__codelineno-156-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-156-9" name="__codelineno-156-9" href="#__codelineno-156-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-157-2" name="__codelineno-157-2" href="#__codelineno-157-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-157-3" name="__codelineno-157-3" href="#__codelineno-157-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
+<a id="__codelineno-157-4" name="__codelineno-157-4" href="#__codelineno-157-4"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$FLORIN_WS</span>
+<a id="__codelineno-157-5" name="__codelineno-157-5" href="#__codelineno-157-5"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span><span class="nv">$GUILDER_WS</span>
+<a id="__codelineno-157-6" name="__codelineno-157-6" href="#__codelineno-157-6"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-c
+<a id="__codelineno-157-7" name="__codelineno-157-7" href="#__codelineno-157-7"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw-s
+<a id="__codelineno-157-8" name="__codelineno-157-8" href="#__codelineno-157-8"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-157-9" name="__codelineno-157-9" href="#__codelineno-157-9"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-160-1" name="__codelineno-160-1" href="#__codelineno-160-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
