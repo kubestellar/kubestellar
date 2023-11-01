@@ -2,8 +2,8 @@
 ``` {.bash .hide-me}
 ```
 ```
-brew remove kubestellar_cli
-brew remove kcp_cli
+brew remove kubestellar-cli
+brew remove kcp-cli
 brew untap kubestellar/kubestellar
 ```
 <!--brew-remove-end-->
