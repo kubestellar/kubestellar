@@ -65,9 +65,9 @@ function run_kb_konnector_for_imw() {
 
 function bind_resource_for_imw() {
     RESOURCE="$1"
-    echo "bind $RESOURCE for imw"
+    echo "binding $RESOURCE for imw"
     if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
-        echoerr "unable to bind $RESOURCE for imw"
+        echo "unable to bind $RESOURCE for imw"
         exit 1
     fi
 }
@@ -373,8 +373,6 @@ function run_kb_backend() {
     echo "--< starting kube-bind example-backend in background >--"
     kubectl ws root:espw
     kubectl apply -f /home/kubestellar/kube-bind/deploy/crd
-    # TODO: remove mangodb crd
-    kubectl apply -f /home/kubestellar/kube-bind/deploy/examples/crd-mangodb.yaml
     example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &
     if ! pgrep example-backend &> /dev/null; then
         echo "kube-bind example-backend not started"
