@@ -56,7 +56,7 @@ nav:
           - Contacts: Contribution guidelines/security/security_contacts.md
       - Operations: 
           - Code Management: Contribution guidelines/operations/code-management.md
-          - Packaing and Versioning: Contribution guidelines/operations/packaging-and-versioning.md
+          - Packaging and Versioning: Contribution guidelines/operations/packaging-and-versioning.md
           - Release Management: Contribution guidelines/operations/release-management.md
           - Document Management: Contribution guidelines/operations/document-management.md
           - Testing Documentation PRs: Contribution guidelines/operations/testing-doc-prs.md
