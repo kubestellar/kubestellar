@@ -359,7 +359,7 @@ git push -u origin main
 and, to test
 ```shell
 brew update
-brew install kubestellar_cli
+brew install kubestellar-cli
 ```
 
 you should see output that indicates an update for the kubestellar brew tap and then an update to version {{ config.ks_next_tag }} of the kubestellar_cli brew formula.

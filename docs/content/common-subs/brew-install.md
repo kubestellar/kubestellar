@@ -11,7 +11,7 @@ fi
 ```shell
 brew tap kubestellar/kubestellar
 brew update
-brew install kcp_cli
-brew install kubestellar_cli
+brew install kcp-cli
+brew install kubestellar-cli
 ```
 <!--brew-install-end-->
