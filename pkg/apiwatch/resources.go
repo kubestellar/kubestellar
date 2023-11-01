@@ -52,6 +52,7 @@ type ObjectNotifier interface {
 
 type ResourceDefinitionSupplier interface {
 	ObjectNotifier
+	GetGVK(obj any) schema.GroupVersionKind
 	EnumerateDefinedResources(definer any) ResourceDefinitionEnumerator
 }
 
@@ -198,8 +199,8 @@ func (rlw *resourcesListWatcher) invalidateWithDefinerLocked(obj any, supplier R
 		return
 	}
 	objM := obj.(metav1.Object)
-	objR := obj.(k8sruntime.Object)
-	gvk := objR.GetObjectKind().GroupVersionKind()
+	gvk := supplier.GetGVK(obj)
+	rlw.logger.V(4).Info("Examining resource definer", "obj", obj, "supplierType", fmt.Sprintf("%T", supplier), "gvk", gvk)
 	apiVersion, kind := gvk.ToAPIVersionAndKind()
 	oid := objectID{apiVersion, kind, objM.GetName()}
 	if oid.apiVersion == "" {

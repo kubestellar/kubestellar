@@ -80,6 +80,7 @@ package placement
 //   that enumerates and formats members.
 // - type Slice adds Visitable behavior to a slice,
 //   and adds a functional Append method.
+// - Slice is a slice with added methods that make it a Visible and almost a Set.
 
 // Set types:
 // - Interface Set declares methods to read aspects of a set.
@@ -101,6 +102,7 @@ package placement
 // - SetRemoveAll(MutableSet, Visitable) (someNew, allNew bool).
 // - MutableSetUnion1Elt(MutableSet, Elt).
 // - MutableSetUnion1Set(MutableSet, Set).
+// - SliceSet is a Set implemented by a slice with no duplicates
 
 // - MapSet implements MutableSet in the same way as the generic Set of Kubernetes
 //   (which is not in Kubernetes release 1.24).
