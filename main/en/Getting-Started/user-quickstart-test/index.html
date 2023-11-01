@@ -2381,7 +2381,7 @@
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>kubestellar<span class="w"> </span>https://helm.kubestellar.io
 <a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>helm<span class="w"> </span>install<span class="w"> </span>kubestellar/kubestellar-core<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config<span class="w"> </span>helm<span class="w"> </span>install<span class="w"> </span>./core-helm-chart<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="hll"><span class="w">  </span>--set<span class="w"> </span><span class="nv">EXTERNAL_HOSTNAME</span><span class="o">=</span><span class="s2">&quot;kubestellar.core&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span>--set<span class="w"> </span><span class="nv">EXTERNAL_PORT</span><span class="o">=</span><span class="m">1119</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span>--set<span class="w"> </span>image.tag<span class="o">=</span><span class="nv">$EXTRA_CORE_TAG</span><span class="w"> </span><span class="se">\</span>
@@ -2447,8 +2447,8 @@
 <!-- BEGIN INCLUDE ../common-subs/brew-remove.md '&lt;!--brew-remove-start--&gt;' '&lt;!--brew-remove-end--&gt;' -->
 <p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>
 </code></pre></div>
- <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>brew remove kubestellar_cli
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>brew remove kcp_cli
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>brew remove kubestellar-cli
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>brew remove kcp-cli
 <a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>brew untap kubestellar/kubestellar
 </code></pre></div></p>
 <!-- END INCLUDE -->
@@ -2752,8 +2752,8 @@ how to create, but not overrite/update a synchronized resource  </p>
 <!-- BEGIN INCLUDE ../common-subs/brew-remove.md '&lt;!--brew-remove-start--&gt;' '&lt;!--brew-remove-end--&gt;' -->
 <p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>
 </code></pre></div>
- <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>brew remove kubestellar_cli
-<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>brew remove kcp_cli
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>brew remove kubestellar-cli
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>brew remove kcp-cli
 <a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>brew untap kubestellar/kubestellar
 </code></pre></div></p>
 <!-- END INCLUDE -->
@@ -3052,8 +3052,8 @@ your httpd <code>Deployment</code> objects with the following command.</p>
 <!-- BEGIN INCLUDE ../common-subs/brew-remove.md '&lt;!--brew-remove-start--&gt;' '&lt;!--brew-remove-end--&gt;' -->
 <p><div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>brew remove kubestellar_cli
-<a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a>brew remove kcp_cli
+<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>brew remove kubestellar-cli
+<a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a>brew remove kcp-cli
 <a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a>brew untap kubestellar/kubestellar
 </code></pre></div></p>
 <p><!-- END INCLUDE -->
