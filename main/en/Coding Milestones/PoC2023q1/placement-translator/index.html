@@ -3360,19 +3360,16 @@ directing the common workload to both edge clusters.</p>
 <a id="__codelineno-103-14" name="__codelineno-103-14" href="#__codelineno-103-14"></a><span class="s">  - apiGroup: apps</span>
 <a id="__codelineno-103-15" name="__codelineno-103-15" href="#__codelineno-103-15"></a><span class="s">    resources: [ replicasets ]</span>
 <a id="__codelineno-103-16" name="__codelineno-103-16" href="#__codelineno-103-16"></a><span class="s">    namespaces: [ commonstuff ]</span>
-<a id="__codelineno-103-17" name="__codelineno-103-17" href="#__codelineno-103-17"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-103-18" name="__codelineno-103-18" href="#__codelineno-103-18"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-103-19" name="__codelineno-103-19" href="#__codelineno-103-19"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-103-20" name="__codelineno-103-20" href="#__codelineno-103-20"></a><span class="s">  wantSingletonReportedState: true</span>
-<a id="__codelineno-103-21" name="__codelineno-103-21" href="#__codelineno-103-21"></a><span class="s">  upsync:</span>
-<a id="__codelineno-103-22" name="__codelineno-103-22" href="#__codelineno-103-22"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-103-23" name="__codelineno-103-23" href="#__codelineno-103-23"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-103-24" name="__codelineno-103-24" href="#__codelineno-103-24"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-103-25" name="__codelineno-103-25" href="#__codelineno-103-25"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-103-26" name="__codelineno-103-26" href="#__codelineno-103-26"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
-<a id="__codelineno-103-27" name="__codelineno-103-27" href="#__codelineno-103-27"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
-<a id="__codelineno-103-28" name="__codelineno-103-28" href="#__codelineno-103-28"></a><span class="s">    names: [&quot;william&quot;]</span>
-<a id="__codelineno-103-29" name="__codelineno-103-29" href="#__codelineno-103-29"></a><span class="s">EOF</span>
+<a id="__codelineno-103-17" name="__codelineno-103-17" href="#__codelineno-103-17"></a><span class="s">  wantSingletonReportedState: true</span>
+<a id="__codelineno-103-18" name="__codelineno-103-18" href="#__codelineno-103-18"></a><span class="s">  upsync:</span>
+<a id="__codelineno-103-19" name="__codelineno-103-19" href="#__codelineno-103-19"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-103-20" name="__codelineno-103-20" href="#__codelineno-103-20"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-103-21" name="__codelineno-103-21" href="#__codelineno-103-21"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-103-22" name="__codelineno-103-22" href="#__codelineno-103-22"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-103-23" name="__codelineno-103-23" href="#__codelineno-103-23"></a><span class="s">  - apiGroup: &quot;group2.test&quot;</span>
+<a id="__codelineno-103-24" name="__codelineno-103-24" href="#__codelineno-103-24"></a><span class="s">    resources: [&quot;cogs&quot;]</span>
+<a id="__codelineno-103-25" name="__codelineno-103-25" href="#__codelineno-103-25"></a><span class="s">    names: [&quot;william&quot;]</span>
+<a id="__codelineno-103-26" name="__codelineno-103-26" href="#__codelineno-103-26"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
@@ -3564,33 +3561,26 @@ namespaces as needed in the WECs.</p>
 <a id="__codelineno-110-16" name="__codelineno-110-16" href="#__codelineno-110-16"></a><span class="s">    namespaceSelectors:</span>
 <a id="__codelineno-110-17" name="__codelineno-110-17" href="#__codelineno-110-17"></a><span class="s">    - matchLabels: {&quot;special&quot;:&quot;yes&quot;}</span>
 <a id="__codelineno-110-18" name="__codelineno-110-18" href="#__codelineno-110-18"></a><span class="s">    objectNames: [ speciald ]</span>
-<a id="__codelineno-110-19" name="__codelineno-110-19" href="#__codelineno-110-19"></a><span class="s">  - apiGroup: apis.kcp.io</span>
-<a id="__codelineno-110-20" name="__codelineno-110-20" href="#__codelineno-110-20"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-110-21" name="__codelineno-110-21" href="#__codelineno-110-21"></a><span class="s">    namespaceSelectors: []</span>
-<a id="__codelineno-110-22" name="__codelineno-110-22" href="#__codelineno-110-22"></a><span class="s">    objectNames: [ bind-kubernetes, bind-apps, bind-apiregistration.k8s.io ]</span>
-<a id="__codelineno-110-23" name="__codelineno-110-23" href="#__codelineno-110-23"></a><span class="s">  - apiGroup: apiregistration.k8s.io</span>
-<a id="__codelineno-110-24" name="__codelineno-110-24" href="#__codelineno-110-24"></a><span class="s">    resources: [ apiservices ]</span>
-<a id="__codelineno-110-25" name="__codelineno-110-25" href="#__codelineno-110-25"></a><span class="s">    objectNames: [ v1090.example.my ]</span>
-<a id="__codelineno-110-26" name="__codelineno-110-26" href="#__codelineno-110-26"></a><span class="s">  - apiGroup: apiextensions.k8s.io</span>
-<a id="__codelineno-110-27" name="__codelineno-110-27" href="#__codelineno-110-27"></a><span class="s">    resources: [ customresourcedefinitions ]</span>
-<a id="__codelineno-110-28" name="__codelineno-110-28" href="#__codelineno-110-28"></a><span class="s">    objectNames: [ crontabs.stable.example.com ]</span>
-<a id="__codelineno-110-29" name="__codelineno-110-29" href="#__codelineno-110-29"></a><span class="s">  - apiGroup: stable.example.com</span>
-<a id="__codelineno-110-30" name="__codelineno-110-30" href="#__codelineno-110-30"></a><span class="s">    resources: [ crontabs ]</span>
-<a id="__codelineno-110-31" name="__codelineno-110-31" href="#__codelineno-110-31"></a><span class="s">    namespaces: [ specialstuff ]</span>
-<a id="__codelineno-110-32" name="__codelineno-110-32" href="#__codelineno-110-32"></a><span class="s">    objectNames: [ my-new-cron-object ]</span>
-<a id="__codelineno-110-33" name="__codelineno-110-33" href="#__codelineno-110-33"></a><span class="s">  - apiGroup: &quot;&quot;</span>
-<a id="__codelineno-110-34" name="__codelineno-110-34" href="#__codelineno-110-34"></a><span class="s">    resources: [ namespaces ]</span>
-<a id="__codelineno-110-35" name="__codelineno-110-35" href="#__codelineno-110-35"></a><span class="s">    objectNames: [ specialstuff ]</span>
-<a id="__codelineno-110-36" name="__codelineno-110-36" href="#__codelineno-110-36"></a><span class="s">  wantSingletonReportedState: true</span>
-<a id="__codelineno-110-37" name="__codelineno-110-37" href="#__codelineno-110-37"></a><span class="s">  upsync:</span>
-<a id="__codelineno-110-38" name="__codelineno-110-38" href="#__codelineno-110-38"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
-<a id="__codelineno-110-39" name="__codelineno-110-39" href="#__codelineno-110-39"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
-<a id="__codelineno-110-40" name="__codelineno-110-40" href="#__codelineno-110-40"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
-<a id="__codelineno-110-41" name="__codelineno-110-41" href="#__codelineno-110-41"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
-<a id="__codelineno-110-42" name="__codelineno-110-42" href="#__codelineno-110-42"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
-<a id="__codelineno-110-43" name="__codelineno-110-43" href="#__codelineno-110-43"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
-<a id="__codelineno-110-44" name="__codelineno-110-44" href="#__codelineno-110-44"></a><span class="s">    names: [&quot;*&quot;]</span>
-<a id="__codelineno-110-45" name="__codelineno-110-45" href="#__codelineno-110-45"></a><span class="s">EOF</span>
+<a id="__codelineno-110-19" name="__codelineno-110-19" href="#__codelineno-110-19"></a><span class="s">  - apiGroup: apiregistration.k8s.io</span>
+<a id="__codelineno-110-20" name="__codelineno-110-20" href="#__codelineno-110-20"></a><span class="s">    resources: [ apiservices ]</span>
+<a id="__codelineno-110-21" name="__codelineno-110-21" href="#__codelineno-110-21"></a><span class="s">    objectNames: [ v1090.example.my ]</span>
+<a id="__codelineno-110-22" name="__codelineno-110-22" href="#__codelineno-110-22"></a><span class="s">  - apiGroup: stable.example.com</span>
+<a id="__codelineno-110-23" name="__codelineno-110-23" href="#__codelineno-110-23"></a><span class="s">    resources: [ crontabs ]</span>
+<a id="__codelineno-110-24" name="__codelineno-110-24" href="#__codelineno-110-24"></a><span class="s">    namespaces: [ specialstuff ]</span>
+<a id="__codelineno-110-25" name="__codelineno-110-25" href="#__codelineno-110-25"></a><span class="s">    objectNames: [ my-new-cron-object ]</span>
+<a id="__codelineno-110-26" name="__codelineno-110-26" href="#__codelineno-110-26"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+<a id="__codelineno-110-27" name="__codelineno-110-27" href="#__codelineno-110-27"></a><span class="s">    resources: [ namespaces ]</span>
+<a id="__codelineno-110-28" name="__codelineno-110-28" href="#__codelineno-110-28"></a><span class="s">    objectNames: [ specialstuff ]</span>
+<a id="__codelineno-110-29" name="__codelineno-110-29" href="#__codelineno-110-29"></a><span class="s">  wantSingletonReportedState: true</span>
+<a id="__codelineno-110-30" name="__codelineno-110-30" href="#__codelineno-110-30"></a><span class="s">  upsync:</span>
+<a id="__codelineno-110-31" name="__codelineno-110-31" href="#__codelineno-110-31"></a><span class="s">  - apiGroup: &quot;group1.test&quot;</span>
+<a id="__codelineno-110-32" name="__codelineno-110-32" href="#__codelineno-110-32"></a><span class="s">    resources: [&quot;sprockets&quot;, &quot;flanges&quot;]</span>
+<a id="__codelineno-110-33" name="__codelineno-110-33" href="#__codelineno-110-33"></a><span class="s">    namespaces: [&quot;orbital&quot;]</span>
+<a id="__codelineno-110-34" name="__codelineno-110-34" href="#__codelineno-110-34"></a><span class="s">    names: [&quot;george&quot;, &quot;cosmo&quot;]</span>
+<a id="__codelineno-110-35" name="__codelineno-110-35" href="#__codelineno-110-35"></a><span class="s">  - apiGroup: &quot;group3.test&quot;</span>
+<a id="__codelineno-110-36" name="__codelineno-110-36" href="#__codelineno-110-36"></a><span class="s">    resources: [&quot;widgets&quot;]</span>
+<a id="__codelineno-110-37" name="__codelineno-110-37" href="#__codelineno-110-37"></a><span class="s">    names: [&quot;*&quot;]</span>
+<a id="__codelineno-110-38" name="__codelineno-110-38" href="#__codelineno-110-38"></a><span class="s">EOF</span>
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div></p>
