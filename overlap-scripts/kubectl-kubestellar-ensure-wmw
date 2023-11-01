@@ -106,16 +106,18 @@ function run_kb_konnector_for_wmw() {
     fi
 }
 
-function bind_mangodbs_for_wmw() {
-    echo "bind mangodb for wmw"
-    if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource mangodbs ; then
-        echoerr "unable to bind mangodbs for wmw"
+function bind_resource_for_wmw() {
+    RESOURCE="$1"
+    echo "binding $RESOURCE for wmw"
+    if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
+        echo "unable to bind $RESOURCE for wmw"
         exit 1
     fi
 }
 
 run_kb_konnector_for_wmw
-bind_mangodbs_for_wmw
+bind_resource_for_wmw "edgeplacements"
+bind_resource_for_wmw "customizers"
 
 function bind_iff_wanted() { # usage: export_name
     export_name=$1
