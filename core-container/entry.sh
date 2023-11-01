@@ -24,6 +24,71 @@ function echoerr() {
 }
 
 
+function set_provider_adapters() {
+    oldKubeconfig=$KUBECONFIG
+    KUBECONFIG=
+    echo "Waiting for space manager to be ready... this may take a while."
+    (
+        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
+            sleep 10
+        done
+    )
+
+    echo "Delete the kcp provider secret if it already exists, and then create it."
+    if ! kubectl delete secret -n ${NAMESPACE} kcpsec ; then
+        echo "Nothing to delete."
+    fi
+    kubectl get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
+    kubectl create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig="kcpsecret"    
+    rm kcpsecret
+
+    echo "Delete the kcp provider object if it already exists, and then create it."
+    if ! kubectl delete spaceproviderdesc pkcp ; then
+        echo "Nothing to delete."
+    fi
+    kubectl create -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: pkcp
+spec:
+  ProviderType: "kcp"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: ${NAMESPACE}
+    name: kcpsec
+EOF
+
+    if [ "$SPACE_PROVIDER" == "kubeflex" ]; then
+        echo "Waiting for the kubeflex provider to be ready... this may take a while."
+        (
+            until [ "$(kubectl get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
+                sleep 10
+            done
+        )
+ 
+        echo "Delete the kubeflex provider object if it already exists, and then create it."
+        if ! kubectl delete spaceproviderdesc pkflex ; then
+            echo "Nothing to delete."
+        fi
+        kubectl create -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: SpaceProviderDesc
+metadata:
+  name: pkflex
+spec:
+  ProviderType: "kubeflex"
+  SpacePrefixForDiscovery: "ks-"
+  secretRef:
+    namespace: ${NAMESPACE}
+    name: corecluster
+EOF
+    fi
+
+    KUBECONFIG=$oldKubeconfig
+}
+
+
 function wait_kcp_ready() {
     echo "Waiting for kcp to be ready... this may take a while."
     (
@@ -178,6 +243,7 @@ function run_kcp() {
 function run_init() {
     echo "--< Starting init >--"
     wait_kcp_ready
+    set_provider_adapters
     kubestellar init --local-kcp false --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW
     kubectl ws root
     touch ready
@@ -234,10 +300,15 @@ fi
 if [ "$ESPW_NAME" == "" ]; then
     ESPW_NAME="espw"
 fi
+if [ "$Namespace" == "" ]; then
+    NAMESPACE="default"
+fi
 echo "ESPW_NAME=${ESPW_NAME}"
 echo "VERBOSITY=${VERBOSITY}"
 echo "ENSURE_IMW=${ENSURE_IMW}"
 echo "ENSURE_WMW=${ENSURE_WMW}"
+echo "NAMESPACE=${NAMESPACE}"
+echo "SPACE_PROVIDER=${SPACE_PROVIDER}"
 
 
 case "${ACTION}" in

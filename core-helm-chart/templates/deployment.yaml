@@ -49,27 +49,6 @@ spec:
         - name: EXTERNAL_PORT
           value: "{{ .Values.EXTERNAL_PORT }}"
 
-      - name: space-providers
-        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
-        securityContext:
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
-        {{ end }}
-        image: {{ .Values.spaceimage.repository }}:{{ .Values.spaceimage.tag }}
-        imagePullPolicy: {{ .Values.spaceimage.pullPolicy }}
-        # command: [ "sleep" , "infinity" ]
-        command: [ "/home/spacecore/entry.sh" , "set_provider_adapters" ]
-        env:
-        - name: EXTERNAL_HOSTNAME
-          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
-        - name: EXTERNAL_PORT
-          value: "{{ .Values.EXTERNAL_PORT }}"
-
-
       - name: kcp
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
@@ -119,6 +98,10 @@ spec:
           value: "{{ .Values.ENSURE_IMW }}"
         - name: ENSURE_WMW
           value: "{{ .Values.ENSURE_WMW }}"
+        - name: NAMESPACE 
+          value: "{{ .Values.spaceNamespace }}"
+        - name: SPACE_PROVIDER 
+          value: "{{ .Values.defaultSpaceProvider }}"
           # volumeMounts:
           # - name: kubestellar-secret
           #   mountPath: "/home/kubestellar/.kcp"

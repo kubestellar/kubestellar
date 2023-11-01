@@ -20,7 +20,7 @@ subjects:
 - kind: ServiceAccount
   name: kubestellar-sa
   apiGroup: ""
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: kubestellar-clusterrole

@@ -43,7 +43,8 @@ RUN dnf install -y jq procps && \
     dnf -y upgrade openssl && \
     groupadd spacecore && \
     adduser -g spacecore spacecore && \
-    mkdir -p clusterconfigs
+    mkdir -p clusterconfigs && \
+    mkdir -p .kube
 
 # copy binaries from the builder image
 COPY --from=builder /root/go/bin                    /usr/local/bin/

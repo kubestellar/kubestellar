@@ -22,108 +22,67 @@ function echoerr() {
    echo "ERROR: $1" >&2
 }
 
-function set_provider_adapters() {
-    echo "Waiting for kcp to be ready... this may take a while."
-    (
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
-            sleep 10
-        done
-    )
-
-    echo "Waiting for space manager to be ready... this may take a while."
-    (
-        until [ "$(kubectl logs $(kubectl get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
-            sleep 10
-        done
-    )
-
-    echo "Create the kcp provider secret."
-    kubectl --kubeconfig /home/spacecore/.kube/config get secrets kubestellar -o 'go-template={{index .data "admin.kubeconfig"}}' | base64 --decode > kcpsecret
-    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kcpsec --from-file=kubeconfig="kcpsecret"    
-
-    echo "Waiting for the kcp provider to be ready... this may take a while."
-    (
-        until [ "$(kubectl get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
-            sleep 10
-        done
-    )
- 
-    echo "Create a secret for the core cluster which is also the kubeflex core cluster."
-    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic kflex --from-file=kubeconfig=/home/spacecore/.kube/config
-
-    echo "Apply kubeflex and kcp providers."
-    kubectl --kubeconfig /home/spacecore/.kube/config create -f - <<EOF
-apiVersion: space.kubestellar.io/v1alpha1
-kind: SpaceProviderDesc
-metadata:
-  name: pkflex
-spec:
-  ProviderType: "kubeflex"
-  SpacePrefixForDiscovery: "ks-"
-  secretRef:
-    namespace: default
-    name: kflex
-EOF
-
-    kubectl --kubeconfig /home/spacecore/.kube/config create -f - <<EOF
-apiVersion: space.kubestellar.io/v1alpha1
-kind: SpaceProviderDesc
-metadata:
-  name: pkcp
-spec:
-  ProviderType: "kcp"
-  SpacePrefixForDiscovery: "ks-"
-  secretRef:
-    namespace: default
-    name: kcpsec
-EOF
-
-    sleep infinity
+function create_or_replace() { # usage: filename
+    filename="$1"
+    kind=$(grep kind: "$filename" | head -1 | awk '{ print $2 }')
+    name=$(grep name: "$filename" | head -1 | awk '{ print $2 }')
+    if kubectl get "$kind" "$name" &> /dev/null ; then
+        kubectl --kubeconfig /home/spacecore/.kube/config replace -f "$filename"
+    else
+        kubectl --kubeconfig /home/spacecore/.kube/config create -f "$filename"
+    fi
 }
 
-function set_crds() {
-    echo "Apply space manager CRDs."
-    kubectl --kubeconfig /home/spacecore/.kube/config apply -f /home/spacecore/config/crds
+function set_config_and_secret_and_crds() {
+    mkdir -p /home/spacecore/.kube
+    KUBECONFIG=/home/spacecore/.kube/config
+    kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
+    kubectl config use-context space-mgt
 
-    echo "***READY***"
+    echo "Delete if it exists and then create a secret for the core cluster."
+    if ! kubectl --kubeconfig /home/spacecore/.kube/config delete secret -n ${NAMESPACE} corecluster ; then
+        echo "Nothing to delete."
+    fi
+    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic -n ${NAMESPACE} corecluster --from-file=kubeconfig=/home/spacecore/.kube/config
+
+    echo "Apply space manager CRDs."
+    for crd in /home/spacecore/config/crds/*.yaml; do
+    create_or_replace $crd
+    done
 }
 
 function run_space_manager() {
     echo "--< Starting space-manager >--"
-    if ! bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config ; then
-        echoerr "unable to start space-manager!"
-        exit 1
-    fi
+    bin/space-manager --v=${VERBOSITY} --context space-mgt --kubeconfig /home/spacecore/.kube/config &
+    while true ; do
+        echo "***READY***"
+        sleep 600
+    done
 }
 
 echo "--< Starting SpaceManager container >--"
-
-KUBECONFIG=
-kubectl config set-cluster space-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-kubectl config set-credentials space-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
-kubectl config use-context space-mgt
-KUBECONFIG=/home/spacecore/.kube/config
-
 echo "Environment variables:"
 if [ $# -ne 0 ] ; then
     ACTION="$1"
 else
     ACTION="sleep"
 fi
-echo "ACTION=${ACTION}"
 if [ "$VERBOSITY" == "" ]; then
     VERBOSITY="2"
 fi
-
+if [ "$Namespace" == "" ]; then
+    NAMESPACE="default"
+fi
 echo "VERBOSITY=${VERBOSITY}"
+echo "NAMESPACE=${NAMESPACE}"
+echo "ACTION=${ACTION}"
 
 case "${ACTION}" in
 (space-manager)
-    set_crds
+    set_config_and_secret_and_crds
     run_space_manager;;
-(set_provider_adapters)
-    set_provider_adapters;;
 (sleep)
     echo "Nothing to do... sleeping forever."
     sleep infinity;;
