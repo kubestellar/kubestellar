@@ -83,7 +83,28 @@ it has been filled in with the information from the guilder cluster.
 
 ```shell
 kubectl get deploy -n specialstuff speciald -o yaml
-kubectl get deploy -n specialstuff speciald -o yaml | grep 'readyReplicas: 1'
+```
+
+Current status might not be there yet. The following command waits for
+status that reports that there is a special workload pod "ready".
+
+```shell
+let count=1
+while true; do
+    rsyaml=$(kubectl get deploy -n specialstuff speciald -o yaml)
+    if grep 'readyReplicas: 1' <<<"$rsyaml"
+    then break
+    fi
+    echo ""
+    echo "Got:"
+    cat <<<"$rsyaml"
+    if (( count > 5 )); then
+        echo 'Giving up!' >&2
+        false
+    fi
+    sleep 15
+    let count=count+1
+done
 ```
 
 ### Status Summarization (aspirational)
