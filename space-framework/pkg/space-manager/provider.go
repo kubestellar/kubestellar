@@ -277,7 +277,6 @@ func (p *provider) processProviderWatchEvents() {
 }
 
 const (
-	SECRET_NS       = "default"
 	SECRET_DATA_KEY = "kubeconfig"
 )
 
@@ -308,10 +307,10 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 		if spInfo.Config[spaceprovider.INCLUSTER] != "" {
 			secretName = "incluster-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
 				if k8sapierrors.IsAlreadyExists(err) {
-					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
@@ -322,7 +321,7 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 
 			space.Status.InClusterSecretRef = &v1.SecretReference{
 				Name:      secretName,
-				Namespace: SECRET_NS,
+				Namespace: p.nameSpace,
 			}
 		} else {
 			return errors.New("missing needed in-cluster secret for space")
@@ -333,10 +332,10 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
 			secretName = "external-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
 				if k8sapierrors.IsAlreadyExists(err) {
-					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
@@ -346,7 +345,7 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 			}
 			space.Status.ExternalSecretRef = &v1.SecretReference{
 				Name:      secretName,
-				Namespace: SECRET_NS,
+				Namespace: p.nameSpace,
 			}
 		} else {
 			return errors.New("missing needed external secret for space")
