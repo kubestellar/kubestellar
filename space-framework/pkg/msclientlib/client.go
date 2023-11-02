@@ -117,11 +117,16 @@ func NewMultiSpace(ctx context.Context, managerConfig *rest.Config) (Kubestellar
 	if err != nil {
 		return client, err
 	}
+	kubeClientset, err := kubernetes.NewForConfig(managerConfig)
+	if err != nil {
+		return client, err
+	}
 
 	client = &multiSpaceClient{
 		ctx:              ctx,
 		configs:          make(map[string]*rest.Config),
 		managerClientset: managerClientset,
+		kubeClientset:    kubeClientset,
 		lock:             sync.Mutex{},
 	}
 
@@ -175,8 +180,14 @@ func (mcc *multiSpaceClient) getRestConfigFromSecret(internalAccess bool, space 
 	var secretRef *corev1.SecretReference
 	if internalAccess {
 		secretRef = space.Status.InClusterSecretRef
+		if secretRef == nil {
+			return nil, errors.New("missing InClusterSecretRef spec fileld for space: " + space.Name)
+		}
 	} else {
 		secretRef = space.Status.ExternalSecretRef
+		if secretRef == nil {
+			return nil, errors.New("missing ExternalSecretRef spec fileld for space: " + space.Name)
+		}
 	}
 	secret, err := mcc.kubeClientset.CoreV1().Secrets(secretRef.Namespace).Get(mcc.ctx, secretRef.Name, metav1.GetOptions{})
 	if err != nil {
@@ -186,7 +197,7 @@ func (mcc *multiSpaceClient) getRestConfigFromSecret(internalAccess bool, space 
 	// Retrieve the kubeconfig data from the Secret
 	kubeconfigData, found := secret.Data[CUBEKONFIG_KEY]
 	if !found {
-		return nil, errors.New("Secret doesn't have kubeconfig data")
+		return nil, errors.New("secret doesn't have kubeconfig data")
 	}
 
 	kubeconfigBytes, err := base64.StdEncoding.DecodeString(string(kubeconfigData))
