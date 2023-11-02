@@ -92,9 +92,6 @@ function ensure_imws() {
             run_kb_konnector_for_imw
             bind_resource_for_imw "synctargets"
             bind_resource_for_imw "locations"
-            if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
-                kubectl kcp bind apiexport root:espw:edge.kubestellar.io
-            fi
         done
     done <<< "$1"
     kubectl ws use $initial_ws &> /dev/null # go back to the initial state

@@ -77,20 +77,6 @@ then kubectl ws "${kubectl_flags[@]}" "$wmw_name"
 else kubectl ws "${kubectl_flags[@]}" create "$wmw_name" --enter
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-espw &> /dev/null; then
-kubectl "${kubectl_flags[@]}" apply -f - <<EOF
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-espw
-spec:
-  reference:
-    export:
-      path: root:espw
-      name: edge.kubestellar.io
-EOF
-fi
-
 function run_kb_konnector_for_wmw() {
     if kubectl get ns kube-system &> /dev/null; then
         echo "namespace kube-system already exists, skipping"
@@ -118,6 +104,7 @@ function bind_resource_for_wmw() {
 run_kb_konnector_for_wmw
 bind_resource_for_wmw "edgeplacements"
 bind_resource_for_wmw "customizers"
+bind_resource_for_wmw "singleplacementslices"
 
 function bind_iff_wanted() { # usage: export_name
     export_name=$1
