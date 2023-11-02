@@ -21,13 +21,13 @@ which should yield something like:
 
 ``` { .sh .no-copy }
 Current workspace is "root:imw1".
-synctarget.workload.kcp.io/florin created
-location.scheduling.kcp.io/florin created
-synctarget.workload.kcp.io/florin labeled
-location.scheduling.kcp.io/florin labeled
+synctarget.edge.kubestellar.io/florin created
+location.edge.kubestellar.io/florin created
+synctarget.edge.kubestellar.io/florin labeled
+location.edge.kubestellar.io/florin labeled
 Current workspace is "root:imw1".
 Current workspace is "root:espw".
-Current workspace is "root:espw:9nemli4rpx83ahnz-mb-c44d04db-ae85-422c-9e12-c5e7865bf37a" (type root:universal).
+Current workspace is "root".
 Creating service account "kubestellar-syncer-florin-1yi5q9c4"
 Creating cluster role "kubestellar-syncer-florin-1yi5q9c4" to give service account "kubestellar-syncer-florin-1yi5q9c4"
 
