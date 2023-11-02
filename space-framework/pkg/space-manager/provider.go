@@ -95,9 +95,9 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	_, exists := c.providers[providerName]
+	prov, exists := c.providers[providerName]
 	if exists {
-		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
+		return prov, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
 	if providerDesc.Spec.ProviderType != spacev1alpha1apis.KindProviderType {
@@ -316,14 +316,14 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
-				if k8sapierrors.IsAlreadyExists(err) {
+				if !k8sapierrors.IsAlreadyExists(err) {
+					return err
+				} else {
 					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
 				}
-			} else {
-				return err
 			}
 
 			space.Status.InClusterSecretRef = &v1.SecretReference{
@@ -341,15 +341,16 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
-				if k8sapierrors.IsAlreadyExists(err) {
+				if !k8sapierrors.IsAlreadyExists(err) {
+					return err
+				} else {
 					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
 				}
-			} else {
-				return err
 			}
+
 			space.Status.ExternalSecretRef = &v1.SecretReference{
 				Name:      secretName,
 				Namespace: p.nameSpace,

@@ -51,9 +51,9 @@ func (c *controller) reconcileSpaceProviderDesc(key string) error {
 }
 
 func (c *controller) handleAdd(providerDesc *spacev1alpha1.SpaceProviderDesc) error {
-	if providerDesc.Status.Phase == spacev1alpha1.SpaceProviderDescPhaseInitializing {
-		return nil
-	}
+	//	if providerDesc.Status.Phase == spacev1alpha1.SpaceProviderDescPhaseInitializing {
+	//		return nil
+	//	}
 	name := providerDesc.Name
 	if providerDesc.Status.Phase == spacev1alpha1.SpaceProviderDescPhaseReady {
 		// check if we have this provider in cache
@@ -68,8 +68,7 @@ func (c *controller) handleAdd(providerDesc *spacev1alpha1.SpaceProviderDesc) er
 	}
 
 	provider, err := CreateProvider(c, providerDesc)
-	if err != nil {
-		// TODO: Check if the err is because the provider already exists
+	if err != nil && provider == nil {
 		return err
 	}
 
