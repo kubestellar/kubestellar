@@ -89,6 +89,8 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 
 // CreateProvider returns new provider client
 func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProviderDesc) (*provider, error) {
+	var configStr string
+	var err error
 	providerName := providerDesc.Name
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -98,11 +100,16 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
-	configStr, err := getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
-	if err != nil {
-		return nil, err
-	}
+	if providerDesc.Spec.ProviderType != spacev1alpha1apis.KindProviderType {
+		if providerDesc.Spec.SecretRef == nil {
+			return nil, fmt.Errorf("Provider description for %s is missing secret reference", string(providerDesc.Name))
+		}
 
+		configStr, err = getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
+		if err != nil {
+			return nil, err
+		}
+	}
 	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStr)
 	if newProviderClient == nil {
 		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
