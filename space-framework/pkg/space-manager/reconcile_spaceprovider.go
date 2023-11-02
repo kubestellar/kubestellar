@@ -51,9 +51,8 @@ func (c *controller) reconcileSpaceProviderDesc(key string) error {
 }
 
 func (c *controller) handleAdd(providerDesc *spacev1alpha1.SpaceProviderDesc) error {
-	//	if providerDesc.Status.Phase == spacev1alpha1.SpaceProviderDescPhaseInitializing {
-	//		return nil
-	//	}
+	//TODO	Maybe need special test for spacev1alpha1.SpaceProviderDescPhaseInitializing
+
 	name := providerDesc.Name
 	if providerDesc.Status.Phase == spacev1alpha1.SpaceProviderDescPhaseReady {
 		// check if we have this provider in cache
