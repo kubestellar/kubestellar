@@ -168,6 +168,9 @@ func (p *provider) filterOut(spaceName string) bool {
 
 // StartDiscovery will start watching provider spaces for changes
 func (p *provider) StartDiscovery() error {
+	if p.providerWatcher != nil {
+		return nil
+	}
 	watcher, err := p.providerClient.Watch()
 	if err != nil {
 		return err
