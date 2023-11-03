@@ -36,6 +36,7 @@ import (
 	"github.com/martinlindhe/base36"
 	"github.com/spf13/cobra"
 
+	authenticationv1 "k8s.io/api/authentication/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -52,6 +53,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/pointer"
 
 	"github.com/kcp-dev/kcp/pkg/cliplugins/base"
 	"github.com/kcp-dev/kcp/pkg/cliplugins/helpers"
@@ -87,6 +89,8 @@ type EdgeSyncOptions struct {
 	SyncTargetName string
 	// SyncTargetLabels are the labels to be applied to the SyncTarget in the kcp workspace.
 	SyncTargetLabels []string
+	// Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years))
+	Lifetime time.Duration
 }
 
 // NewSyncOptions returns a new EdgeSyncOptions.
@@ -98,6 +102,7 @@ func NewEdgeSyncOptions(streams genericclioptions.IOStreams) *EdgeSyncOptions {
 		KCPNamespace: "default",
 		QPS:          20,
 		Burst:        30,
+		Lifetime:     87600 * time.Hour,
 	}
 }
 
@@ -113,6 +118,7 @@ func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().Float32Var(&o.QPS, "qps", o.QPS, "QPS to use when talking to API servers.")
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
+	cmd.Flags().DurationVar(&o.Lifetime, "lifetime", o.Lifetime, "Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years)).")
 }
 
 // Complete ensures all dynamically populated fields are initialized.
@@ -459,27 +465,56 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 
 	// Wait for the service account to be updated with the name of the token secret
 	tokenSecretName := ""
-	err = wait.PollImmediateWithContext(ctx, 100*time.Millisecond, 20*time.Second, func(ctx context.Context) (bool, error) {
-		serviceAccount, err := kubeClient.CoreV1().ServiceAccounts(namespace).Get(ctx, sa.Name, metav1.GetOptions{})
+	var serviceAccount *corev1.ServiceAccount
+	_ = wait.PollImmediateWithContext(ctx, 100*time.Millisecond, 3*time.Second, func(ctx context.Context) (bool, error) {
+		serviceAccount, err = kubeClient.CoreV1().ServiceAccounts(namespace).Get(ctx, sa.Name, metav1.GetOptions{})
 		if err != nil {
 			klog.FromContext(ctx).V(5).WithValues("err", err).Info("failed to retrieve ServiceAccount")
 			return false, nil
 		}
+		// Service account token is automatically generated for older k8s (<=1.23), kcp, or the later versioned k8s with LegacyServiceAccountTokenNoAutoGeneration featuregate.
+		// There is a short time lag between the service account creation and the token generation. For now, we wait for 3 seconds to check if the sa token is generated or not.
 		if len(serviceAccount.Secrets) == 0 {
 			return false, nil
 		}
 		tokenSecretName = serviceAccount.Secrets[0].Name
 		return true, nil
 	})
-	if err != nil {
-		return "", "", nil, fmt.Errorf("timed out waiting for token secret name to be set on ServiceAccount %s/%s", namespace, sa.Name)
+
+	var tokenSecret *corev1.Secret
+	if tokenSecretName == "" {
+		tokenRequest := &authenticationv1.TokenRequest{
+			Spec: authenticationv1.TokenRequestSpec{
+				ExpirationSeconds: pointer.Int64(int64(o.Lifetime / time.Second)),
+			},
+		}
+		token, err := kubeClient.CoreV1().ServiceAccounts(namespace).CreateToken(ctx, sa.Name, tokenRequest, metav1.CreateOptions{})
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token: %w", err)
+		}
+		tokenSecret = &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            serviceAccount.Name + "-token",
+				Namespace:       serviceAccount.Namespace,
+				Annotations:     map[string]string{corev1.ServiceAccountNameKey: serviceAccount.Name},
+				OwnerReferences: syncTargetOwnerReferences,
+			},
+			Type: corev1.SecretTypeServiceAccountToken,
+			Data: map[string][]byte{
+				"token": []byte(token.Status.Token),
+			},
+		}
+		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Create(ctx, tokenSecret, metav1.CreateOptions{})
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token secret: %w", err)
+		}
+	} else {
+		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Get(ctx, tokenSecretName, metav1.GetOptions{})
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to retrieve Secret: %w", err)
+		}
 	}
 
-	// Retrieve the token that the syncer will use to authenticate to kcp
-	tokenSecret, err := kubeClient.CoreV1().Secrets(namespace).Get(ctx, tokenSecretName, metav1.GetOptions{})
-	if err != nil {
-		return "", "", nil, fmt.Errorf("failed to retrieve Secret: %w", err)
-	}
 	saTokenBytes := tokenSecret.Data["token"]
 	if len(saTokenBytes) == 0 {
 		return "", "", nil, fmt.Errorf("token secret %s/%s is missing a value for `token`", namespace, tokenSecretName)
