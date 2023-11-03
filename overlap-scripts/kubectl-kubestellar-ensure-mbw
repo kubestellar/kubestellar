@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Purpose: ensure that a mailbox workspace has the needed KubeStellar CRDs.
+
+# Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* mbw_name
+
+want_kube=true
+mbw_name=""
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar ensure mbw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    exit 0;;
+	(-X) set -o xtrace;;
+	(--with-kube)
+	    if (( $# >1 ))
+	    then want_kube="$2"; shift
+	    else echo "$0: missing with-kube value" >&2; exit 1
+	    fi;;
+	(--context*)
+	    # TODO: support --context
+	    echo "$0: --context flag not supported" >&2; exit 1;;
+	(--*=*|-?=*)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";;
+	(--*|-?)
+	    kubectl_flags[${#kubectl_flags[*]}]="$1";
+	    if (( $# > 1 )); then 
+		 kubectl_flags[${#kubectl_flags[*]}]="$2"
+		 shift
+	    fi;;
+	(-*)
+	    echo "$0: flag syntax error" >&2
+	    exit 1;;
+	(*)
+	    if [ -z "$mbw_name" ]
+	    then mbw_name="$1"
+	    else echo "$0: too many positional arguments" >&2
+		 exit 1
+	    fi
+    esac
+    shift
+done
+
+if [ "$mbw_name" == "" ]; then
+    echo "$0: workload management workspace name not specified" >&2
+    exit 1
+fi
+
+case "$want_kube" in
+    (true|false) ;;
+    (*) echo "$0: with-kube should be true or false" >&2
+	exit 1;;
+esac
+
+set -e
+
+kubectl ws "${kubectl_flags[@]}" root
+
+if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$mbw_name" &> /dev/null
+then kubectl ws "${kubectl_flags[@]}" "$mbw_name"
+else
+    echo "mailbox workspace $mbw_name doesn't exist"
+    exit 1
+fi
+
+function run_kb_konnector_for_mbw() {
+    if kubectl get ns kube-system &> /dev/null; then
+        echo "namespace kube-system already exists, skipping"
+    else
+        echo "creating namespace kube-system"
+        kubectl create ns kube-system
+    fi
+    echo "starting kube-bind konnector for mbw in background"
+    konnector &
+    if ! pgrep konnector &> /dev/null; then
+        echo "kube-bind konnector not started"
+        exit 1
+    fi
+}
+
+function bind_resource_for_mbw() {
+    RESOURCE="$1"
+    echo "binding $RESOURCE for mbw"
+    if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
+        echo "unable to bind $RESOURCE for mbw"
+        exit 1
+    fi
+}
+
+run_kb_konnector_for_mbw
+bind_resource_for_mbw "syncerconfigs"
+bind_resource_for_mbw "edgesyncconfigs"
+
+function bind_iff_wanted() { # usage: export_name
+    export_name=$1
+    binding_name=bind-$export_name
+    if [ "$want_kube" == true ] && ! kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
+kubectl "${kubectl_flags[@]}" apply -f - <<EOF
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIBinding
+metadata:
+  name: ${binding_name}
+spec:
+  reference:
+    export:
+      path: root:compute
+      name: ${export_name}
+EOF
+elif [ "$want_kube" == false ] && kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
+     kubectl "${kubectl_flags[@]}" delete APIBinding ${binding_name}
+fi
+}
+
+bind_iff_wanted kubernetes
+bind_iff_wanted apiregistration.k8s.io
+bind_iff_wanted apps
+bind_iff_wanted autoscaling
+bind_iff_wanted batch
+bind_iff_wanted core.k8s.io
+bind_iff_wanted discovery.k8s.io
+bind_iff_wanted flowcontrol.apiserver.k8s.io
+bind_iff_wanted networking.k8s.io
+bind_iff_wanted node.k8s.io
+bind_iff_wanted policy
+bind_iff_wanted scheduling.k8s.io
+bind_iff_wanted storage.k8s.io
