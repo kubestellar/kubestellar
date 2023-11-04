@@ -26,7 +26,7 @@ RUN mkdir -p .kcp && \
     mkdir easy-rsa && \
     tar -C easy-rsa -zxf easy-rsa.tar.gz --wildcards --strip-components=1 EasyRSA*/* && \
     rm easy-rsa.tar.gz && \
-    curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/v0.11.0/kcp_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
+    curl -SL -o kcp.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_${TARGETOS}_${TARGETARCH}.tar.gz" && \
     mkdir kcp && \
     tar -C kcp -zxf kcp.tar.gz && \
     rm kcp.tar.gz && \
