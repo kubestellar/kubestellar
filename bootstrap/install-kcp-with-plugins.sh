@@ -128,11 +128,11 @@ fi
 
 if [ $verbose == "true" ]; then
     echo "Downloading KCP $kcp_version $kcp_os/$kcp_arch..."
-    curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
+    curl -SL -o kcp.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_${kcp_os}_${kcp_arch}.tar.gz"
     echo "Downloading KCP plugins $kcp_version $kcp_os/$kcp_arch..."
     curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
 else
-    curl -sSL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
+    curl -sSL -o kcp.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_${kcp_os}_${kcp_arch}.tar.gz"
     curl -sSL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
 fi
 
