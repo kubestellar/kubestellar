@@ -27,7 +27,7 @@ Did you know kubernetes manages multiple nodes but does not manage multiple clus
 
 ### Distinguishing features of KubeStellar
 
-- just point your kubectl client at KubeStellar and deploy your exisiting kubernetes objects to any remote cluster - no wrapping required
+- just point your kubectl client at KubeStellar and deploy your existing kubernetes objects to any remote cluster - no wrapping required
 - use rule-based customization (grouping) to automate the customization of your large-scale deployments (just like kustomize)
 - sync your workload across your pre-existing remote clusters
 - up-sync any object, not just status from your remote clusters
