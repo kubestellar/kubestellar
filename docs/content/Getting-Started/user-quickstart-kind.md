@@ -187,7 +187,7 @@ TODO
 
 what's next...  
 how to upsync a resource  
-how to create, but not overrite/update a synchronized resource  
+how to create, but not overwrite/update a synchronized resource  
 
 <br>
 ---

@@ -307,12 +307,14 @@ coredns
 commonName
 cosmo
 cpumemload
+crd
 crds
 crt
 creationTimestamp
 creds
 cronSpec
 crontab
+crontabs
 cron
 css
 csv
@@ -371,6 +373,7 @@ golang
 goVersion
 goroutine
 grafana
+groupPriorityMinimum
 gpg
 gz
 hl
@@ -482,6 +485,7 @@ proxying
 ps
 pwd
 quickstart
+rb
 rbac
 readOnly
 readme
@@ -498,6 +502,7 @@ repo
 repos
 req
 reqs
+resolver's
 resourceNames
 resourceVersion
 resourcequotas
@@ -506,6 +511,7 @@ rolebinding
 rolebindings
 roleRef
 rollout
+rmi
 rsa
 runtime
 scalability
@@ -515,6 +521,7 @@ scheduler's
 serviceaccount
 serviceaccounts
 sexualized
+sha
 sharding
 si
 skillset
