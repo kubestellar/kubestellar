@@ -2316,7 +2316,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.13/docs/content/Coding Milestones/PoC2023q1/commands.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/Coding Milestones/PoC2023q1/commands.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -2325,7 +2325,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.13/docs/content/Coding Milestones/PoC2023q1/commands.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/Coding Milestones/PoC2023q1/commands.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -2556,7 +2556,7 @@ workspaces at pathname "root:imw1".</p>
 <li>
 <p>Ensure the existence of zero, one, or more workload management workspaces 
 depending on the value of <code>--ensure-wmw</code> flag. Default is one workload management
-workspaces at pathname "root:wmw1". The workload management workspaceshace APIBindings
+workspaces at pathname "root:wmw1". The workload management workspaces have APIBindings
 that import the namespaced Kubernetes resources (kinds of objects) for management of
 containerized workloads. At the completion of <code>kubestellar init</code> the current workspace will be
 "root".</p>
@@ -2641,7 +2641,7 @@ controller can be reached at
 issue the following command.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>deploy<span class="w"> </span>--external-endpoint<span class="w"> </span>my-long-application-name.my-region.some.cloud.com:1234
 </code></pre></div>
-<p>The Helm chart takes care of setting up the KubeStellar MCCM core,
+<p>The Helm chart takes care of setting up the KubeStellar Core,
 accomplishing the same thing as the <a href="#kubestellar-start">kubestellar
 start</a> command above.</p>
 <h3 id="fetch-kubeconfig-for-internal-clients">Fetch kubeconfig for internal clients<a class="headerlink" href="#fetch-kubeconfig-for-internal-clients" title="Permanent link">#</a></h3>
@@ -2862,7 +2862,7 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
   provider workspace.  The default is the standard location,
   <code>root:espw</code>.</li>
 <li><code>--syncer-image image_ref</code>: specifies the container image that runs
-  the syncer.  The default is <code>quay.io/kubestellar/syncer:v0.13.0</code>.</li>
+  the syncer.  The default is <code>quay.io/kubestellar/syncer:latest</code>.</li>
 <li><code>-o output_pathname</code>: specifies where to write the YAML definitions
   of the API objects to create in the edge cluster in order to deploy
   the syncer there.  The default is <code>synctarget_name +
@@ -3085,7 +3085,7 @@ the parent of the workload management workspace to delete.</p>
 <h2 id="kubestellar-list-syncing-objects">kubestellar-list-syncing-objects<a class="headerlink" href="#kubestellar-list-syncing-objects" title="Permanent link">#</a></h2>
 <p>The <code>kubestellar-list-syncing-objects</code> command will list or watch one
 kind of objects in the mailbox spaces. These are full (not summarized)
-workload objects in the intermediate place between WDSes and WECs,
+workload objects in the intermediate place between WDS' and WEC',
 participating in downsync or upsync. The user of this command is not
 very exposed to the mailbox spaces themselves; the command is directed
 at the whole of this intermediate place and lists all of the requested
@@ -3121,7 +3121,7 @@ objects from their parent Workspace.</p>
 <a id="__codelineno-57-15" name="__codelineno-57-15" href="#__codelineno-57-15"></a><span class="w">      </span>--parent-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
 <a id="__codelineno-57-16" name="__codelineno-57-16" href="#__codelineno-57-16"></a><span class="w">      </span>--parent-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
 </code></pre></div>
-<p>Following is an example of its usage; the elipses show where this
+<p>Following is an example of its usage; the ellipses show where this
 document omits many lines for brevity.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
 <a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="go">---</span>
@@ -3153,7 +3153,7 @@ document omits many lines for brevity.</p>
 <a href="../../../Getting-Started/quickstart/">the
 QuickStart</a>.</p>
 <p>The script can be read directly from
-https://raw.githubusercontent.com/kubestellar/kubestellar/release-0.13/bootstrap/bootstrap-kubestellar.sh
+https://raw.githubusercontent.com/kubestellar/kubestellar/main/bootstrap/bootstrap-kubestellar.sh
 and does the following things.</p>
 <ol>
 <li>Downloads and installs kcp executables if they are not already

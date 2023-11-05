@@ -2422,7 +2422,7 @@
                   
 
   
-    <a href="https://github.com/kubestellar/kubestellar/edit/release-0.13/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/edit/main/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -2431,7 +2431,7 @@
     
       
     
-    <a href="https://github.com/kubestellar/kubestellar/raw/release-0.13/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/kubestellar/kubestellar/raw/main/docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.15 8.15 0 0 1-1.23-2Z"/></svg>
     </a>
@@ -2440,7 +2440,7 @@
 
   <h1>KubeStellar-Syncer</h1>
 
-<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml"><img alt="docs-ecutable - kubestellar-syncer" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=release-0.13" /></a>&nbsp;&nbsp;&nbsp;</p>
+<p><a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml"><img alt="docs-ecutable - kubestellar-syncer" src="https://github.com/kubestellar/kubestellar/actions/workflows/docs-ecutable-syncer.yml/badge.svg?branch=main" /></a>&nbsp;&nbsp;&nbsp;</p>
 <!-- BEGIN INCLUDE ../../common-subs/required-packages.md '&lt;!--required-packages-start--&gt;' '&lt;!--required-packages-end--&gt;' -->
 
 <div class="admonition tip">
@@ -2867,7 +2867,7 @@ The following commands will fix the issue:</h6>
 
 <div class="admonition tip">
 <p class="admonition-title">This document is 'docs-ecutable' - you can 'run' this document, just like we do in our testing, on your local environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>git clone -b release-0.13 https://github.com/kubestellar/kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>git clone -b main https://github.com/kubestellar/kubestellar
 <a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>cd kubestellar
 <a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a>make MANIFEST=&quot;&#39;docs/content/common-subs/pre-req.md&#39;,&#39;docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md&#39;&quot; docs-ecutable
 </code></pre></div>
@@ -2959,7 +2959,7 @@ and build the kubectl-ws binary and include it in <code>$PATH</code>
 </code></pre></div></p>
 <p>Running the kcp server creates a hidden subdirectory named <code>.kcp</code> to
 hold all sorts of state related to the server. If you have run it
-before and want to start over from scrath then you should <code>rm -rf
+before and want to start over from scratch then you should <code>rm -rf
 .kcp</code> first.</p>
 <p>Use the following commands to: (a) run the kcp server in a forked
 command, (b) update your <code>KUBECONFIG</code> environment variable to
@@ -3384,7 +3384,7 @@ SyncTarget name, you could do it as follows.</p>
 <p>For the upstream access, Syncer's registration command (<code>kubectl kubestellar syncer-gen</code>) creates a ServiceAccount, ClusterRole, and ClusterRoleBinding in the workspace, and then generates a kubeconfig manifest from the ServiceAccount token, KCP server URL, and the server certificates. The kubeconfig manifest is embedded in a secret manifest and the secret is mounted to <code>/kcp/</code> in Syncer pod. The command generates such deployment manifest as Syncer reads <code>/kcp/</code> for the upstream Kubeconfig. </p>
 <p>On the other hand, for the downstream part, in addition to the deployment manifest, the command generates a ServiceAccount, Role/ClusterRole, RoleBinding/ClusterRoleBinding for Syncer to access resources on the WEC. These resources for the downstream part are the resources to be deployed to the downstream cluster. The ServiceAccount is set to <code>serviceAccountName</code> in the deployment manifest.</p>
 <p>Note: In addition to that, the command creates an EdgeSyncConfig CRD if it does not exist, and creates a default EdgeSyncConfig resource with the name specified in the command (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>). The default EdgeSyncConfig is no longer needed since Syncer now consumes all EdgeSyncConfigs in the workspace. Furthermore, creation of the EdgeSyncConfig CRD will also no longer be needed since we will switch to using SyncerConfig rather than EdgeSyncConfig in near future.</p>
-<p>The source code of the command is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.13/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go">https://github.com/kubestellar/kubestellar/blob/release-0.13/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go</a>.</p>
+<p>The source code of the command is <a href="https://github.com/kubestellar/kubestellar/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go">https://github.com/kubestellar/kubestellar/blob/main/pkg/cliplugins/kubestellar/syncer-gen/edgesync.go</a>.</p>
 <p>The equivalent manual steps are as follows: </p>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-start--&gt;' '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-end--&gt;' -->
 
@@ -3486,7 +3486,7 @@ b. Syncer image
   - Some objects are denatured if needed.
   - Other objects are as it is
 - APIExport/API Schema corresponding to CRD such as Kubernetes <a href="https://github.com/kubernetes-sigs/wg-policy-prototypes/blob/master/policy-report/crd/v1beta1/wgpolicyk8s.io_clusterpolicyreports.yaml">ClusterPolicyReport</a>.
-  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kubestellar/kubestellar/blob/release-0.13/hack/update-codegen-crds.sh#L57">here</a>). 
+  - TBD: Conversion from CRD to APIExport/APISchema could be automated by using MutatingAdmissionWebhook on workload management workspace. This automation is already available (see the script <a href="https://github.com/kubestellar/kubestellar/blob/main/hack/update-codegen-crds.sh#L57">here</a>). 
 - EdgePlacement</p>
 <p><img alt="kubestellar-syncer deploy" src="../images/kubestellar-syncer-deploy.png" /></p>
 <p>After this, KubeStellar will put the following in the mailbox workspace.
@@ -3498,7 +3498,7 @@ b. Syncer image
   - The mailbox controller will put API Binding into the mailbox workspace.</p>
 <h3 id="edgesyncconfig-will-be-replaced-to-syncerconfig">EdgeSyncConfig (will be replaced to SyncerConfig)<a class="headerlink" href="#edgesyncconfig-will-be-replaced-to-syncerconfig" title="Permanent link">#</a></h3>
 <ul>
-<li>The example of EdgeSyncConfig CR is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.13/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kubestellar/kubestellar/blob/release-0.13/config/crds/edge.kubestellar.io_edgesyncconfigs.yaml">here</a>.</li>
+<li>The example of EdgeSyncConfig CR is <a href="https://github.com/kubestellar/kubestellar/blob/main/pkg/syncer/scripts/edge-sync-config-for-kyverno-helm.yaml">here</a>. Its CRD is <a href="https://github.com/kubestellar/kubestellar/blob/main/config/crds/edge.kubestellar.io_edgesyncconfigs.yaml">here</a>.</li>
 <li>The CR here is used from edge syncer. </li>
 <li>The CR is placed at mb-ws to define</li>
 <li>object selector</li>
@@ -3506,7 +3506,7 @@ b. Syncer image
 <li>need of returning reported states of downsynced objects</li>
 <li>need of delete propagation for downsyncing</li>
 <li>The CR is managed by KubeStellar (placement transformer).</li>
-<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (WDS), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.</li>
 <li>One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (<code>kubectl kubestellar syncer-gen &lt;name&gt;</code>)</li>
@@ -3518,7 +3518,7 @@ b. Syncer image
 </ul>
 <h3 id="syncerconfig">SyncerConfig<a class="headerlink" href="#syncerconfig" title="Permanent link">#</a></h3>
 <ul>
-<li>The spec is defined in https://github.com/kubestellar/kubestellar/blob/release-0.13/pkg/apis/edge/v2alpha1/syncer-config.go</li>
+<li>The spec is defined in https://github.com/kubestellar/kubestellar/blob/main/pkg/apis/edge/v2alpha1/syncer-config.go</li>
 <li><code>namespaceScope</code> field is for namespace scoped objects.<ul>
 <li><code>namespaces</code> is field for which namespaces to be downsynced.</li>
 <li><code>resources</code> is field for what resource's objects in the above namespaces are downsynced. All objects in the selected resource are downsynced.</li>
@@ -3537,7 +3537,7 @@ b. Syncer image
 <li><code>names</code> is an array of upsynced object name. Wildcard (<code>*</code>) is available.</li>
 </ul>
 </li>
-<li>The example CR is https://github.com/kubestellar/kubestellar/blob/release-0.13/test/e2e/kubestellar-syncer/testdata/kyverno/syncer-config.yaml</li>
+<li>The example CR is https://github.com/kubestellar/kubestellar/blob/main/test/e2e/kubestellar-syncer/testdata/kyverno/syncer-config.yaml</li>
 <li>The CR is used from KubeStellar-Syncer</li>
 <li>The CR is placed in mb-ws to define</li>
 <li>object selector</li>
@@ -3545,7 +3545,7 @@ b. Syncer image
 <li>need of returning reported states of downsynced objects (May not scope in PoC2023q1)</li>
 <li>need of delete propagation for downsyncing (May not scope in PoC2023q1)</li>
 <li>The CR is managed by KubeStellar (placement translator).</li>
-<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.</li>
+<li>At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (WDS), and then which will be copied into mb-ws like other workload objects.</li>
 <li>This should be changed to be generated according to EdgePlacement spec. </li>
 <li>This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.</li>
 <li>Currently KubeStellar-Syncer watches all CRs in the workspace</li>
