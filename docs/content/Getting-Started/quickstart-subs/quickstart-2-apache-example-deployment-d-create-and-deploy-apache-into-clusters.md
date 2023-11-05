@@ -1,6 +1,6 @@
 <!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->
 KubeStellar will have automatically created a Workload Management
-Workspace (WMW) for the user to store workload descriptions and MCCM
+Workspace (WMW) for the user to store workload descriptions and KubeStellar Core
 control objects in. The automatically created WMW is at `root:wmw1`.
 
 Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters. The `upsync` field is only a demonstration of the syntax, it plays no functional role in this scenario.

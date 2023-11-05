@@ -28,7 +28,7 @@ export PATH=$(pwd)/bin:$PATH
 
 Running the kcp server creates a hidden subdirectory named `.kcp` to
 hold all sorts of state related to the server. If you have run it
-before and want to start over from scrath then you should `rm -rf
+before and want to start over from scratch then you should `rm -rf
 .kcp` first.
 
 Use the following commands to: (a) run the kcp server in a forked

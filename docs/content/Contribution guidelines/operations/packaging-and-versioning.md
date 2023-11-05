@@ -146,7 +146,7 @@ installs a `kubestellaruser` release archive from GitHub. Users invoke
 the `brew` command directly to install, upgrade, and remove these
 formulae.
 
-Following are the versions vailable.
+Following are the versions available.
 
 - `kcp_cli` `v0.11.0` for that release of kcp
 - `kubestellar_cli` `v0.9.0`, for that release of KubeStellar.

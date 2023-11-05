@@ -150,7 +150,7 @@ After this, KubeStellar will put the following in the mailbox workspace.
   - need of returning reported states of downsynced objects
   - need of delete propagation for downsyncing
 - The CR is managed by KubeStellar (placement transformer).
-  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
+  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (WDS), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - One CR is initially created by the command for KubeStellar-Syncer enablement in mb-ws (`kubectl kubestellar syncer-gen <name>`)
@@ -182,7 +182,7 @@ After this, KubeStellar will put the following in the mailbox workspace.
   - need of returning reported states of downsynced objects (May not scope in PoC2023q1)
   - need of delete propagation for downsyncing (May not scope in PoC2023q1)
 - The CR is managed by KubeStellar (placement translator).
-  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (wm-ws), and then which will be copied into mb-ws like other workload objects.
+  - At the initial implementation before KubeStellar side controller become ready, we assume SyncerConfig is on workload management workspace (WDS), and then which will be copied into mb-ws like other workload objects.
   - This should be changed to be generated according to EdgePlacement spec. 
 - This CR is a placeholder for defining how KubeStellar-Syncer behaves, and will be extended/split/merged according to further design discussion.
 - Currently KubeStellar-Syncer watches all CRs in the workspace

@@ -238,7 +238,7 @@ First, login to quay.io with a user that has credentials to 'write' to the kubes
 docker login quay.io
 ```
 
-then, remove any runnning container from moby/buildkit
+then, remove any running container from moby/buildkit
 ```
 CONTAINER ID   IMAGE                           COMMAND              
 c943925fd137   moby/buildkit:buildx-stable-1   "buildkitd" 
