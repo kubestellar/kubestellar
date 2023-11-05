@@ -89,20 +89,27 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 
 // CreateProvider returns new provider client
 func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProviderDesc) (*provider, error) {
+	var configStr string
+	var err error
 	providerName := providerDesc.Name
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	_, exists := c.providers[providerName]
+	prov, exists := c.providers[providerName]
 	if exists {
-		return nil, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
+		return prov, fmt.Errorf("provider %s already in the list", string(providerDesc.Spec.ProviderType))
 	}
 
-	configStr, err := getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
-	if err != nil {
-		return nil, err
-	}
+	if providerDesc.Spec.ProviderType != spacev1alpha1apis.KindProviderType {
+		if providerDesc.Spec.SecretRef == nil {
+			return nil, fmt.Errorf("Provider description for %s is missing secret reference", string(providerDesc.Name))
+		}
 
+		configStr, err = getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
+		if err != nil {
+			return nil, err
+		}
+	}
 	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStr)
 	if newProviderClient == nil {
 		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
@@ -161,6 +168,9 @@ func (p *provider) filterOut(spaceName string) bool {
 
 // StartDiscovery will start watching provider spaces for changes
 func (p *provider) StartDiscovery() error {
+	if p.providerWatcher != nil {
+		return nil
+	}
 	watcher, err := p.providerClient.Watch()
 	if err != nil {
 		return err
@@ -277,7 +287,6 @@ func (p *provider) processProviderWatchEvents() {
 }
 
 const (
-	SECRET_NS       = "default"
 	SECRET_DATA_KEY = "kubeconfig"
 )
 
@@ -308,21 +317,21 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 		if spInfo.Config[spaceprovider.INCLUSTER] != "" {
 			secretName = "incluster-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
-				if k8sapierrors.IsAlreadyExists(err) {
-					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+				if !k8sapierrors.IsAlreadyExists(err) {
+					return err
+				} else {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
 				}
-			} else {
-				return err
 			}
 
 			space.Status.InClusterSecretRef = &v1.SecretReference{
 				Name:      secretName,
-				Namespace: SECRET_NS,
+				Namespace: p.nameSpace,
 			}
 		} else {
 			return errors.New("missing needed in-cluster secret for space")
@@ -333,20 +342,21 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
 			secretName = "external-" + space.Name
 			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
-			_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Create(p.c.ctx, secret, metav1.CreateOptions{})
+			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
-				if k8sapierrors.IsAlreadyExists(err) {
-					_, err := p.c.k8sClientset.CoreV1().Secrets(SECRET_NS).Update(p.c.ctx, secret, metav1.UpdateOptions{})
+				if !k8sapierrors.IsAlreadyExists(err) {
+					return err
+				} else {
+					_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Update(p.c.ctx, secret, metav1.UpdateOptions{})
 					if err != nil {
 						return err
 					}
 				}
-			} else {
-				return err
 			}
+
 			space.Status.ExternalSecretRef = &v1.SecretReference{
 				Name:      secretName,
-				Namespace: SECRET_NS,
+				Namespace: p.nameSpace,
 			}
 		} else {
 			return errors.New("missing needed external secret for space")
