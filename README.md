@@ -22,18 +22,21 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-## Overview
-Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box? KubeStellar adds multi-cluster support to Kubernetes 
+## KubeStellar treats multiple Kubernetes clusters as one
 
-### Distinguishing features of KubeStellar
+- __Centrally__ deploy Kubernetes resources across multiple clusters 
+- Use __standard deployment tools__ (kubectl, helm, ArgoCD, Flux) no bundling required
+- __Discover__ objects created on edge clusters
+- Make __disconnected__ cluster operation possible
+- Designed for __scalability__ with 1:many and many:1 scenarios
+- __Modular__ design to ensure compatibility with cloud-native tools
 
-- just point your kubectl client at KubeStellar and deploy your existing kubernetes objects to any remote cluster - no wrapping required
-- use rule-based customization (grouping) to automate the customization of your large-scale deployments (just like kustomize)
-- sync your workload across your pre-existing remote clusters
-- up-sync any object, not just status from your remote clusters
-- support clusters that are disconnected or have intermittent connectivity
-- lightweight logical cluster support (KubeFlex, kcp, kind, etc.)
-- scalability - scale to a large number of objects, overcoming default Kubernetes limitations
+## KubeStellar virtual clusters (Spaces) are our secret
+- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
+- Standard Kubernetes clusters have 2-300 api-resources, KubeStellar Spaces have only 40
+- Fewer api-resources means resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
+- Denaturing is the key to accepting native, unbundled Kubernetes resources as input
+- Unbundled resources are the preferred output of most CNCF tools making KubeStellar use and integration easy
 
 ## Roadmap for the Project
 
