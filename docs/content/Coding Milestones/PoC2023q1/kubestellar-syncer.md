@@ -263,42 +263,54 @@ The behavior can be modified with some make variables; their default values are 
   `DOCKER_REPO` is `quay.io/kubestellar/syncer`.  The default for
   `IMAGE_TAG` is the concatenation of: "git-", a short ID of the
   current git commit, "-", and either "clean" or "dirty" depending on
-  what `git status` has to say about it.
+  what `git status` has to say about it. It is **STRONGLY** recommended to **NOT**
+  override `IMAGE_TAG` _unless_ the override _also_ identifies the git commit
+  and cleanliness, as this tag is the ONLY place that this is recorded (for the
+  sake of reproducable builds, the `go build` command is told to _not_ include
+  git and time metadata). To _add_ tags, use your container runtime's and/or
+  image registry's additional functionality.
 - `SYNCER_PLATFORMS`: a
   comma-separated list of `docker build` "platforms".  The default is
   "linux/amd64,linux/arm64,linux/s390x".
 - `ADDITIONAL_ARGS`: a word that will be added into the `ko build` command line.
   The default is the empty string.
 
-For example
+For example,
 ```
-$ make build-kubestellar-syncer-image DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer IMAGE_TAG=dev-2023-04-24-x SYNCER_PLATFORMS=linux/amd64,linux/arm64
-2023/04/24 11:50:16 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/{{ config.repo_short_name }}/cmd/syncer
-2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/arm64
-2023/04/24 11:50:17 Building github.com/{{ config.repo_short_name }}/cmd/syncer for linux/amd64
-2023/04/24 11:50:18 Publishing ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x
-2023/04/24 11:50:19 existing blob: sha256:85a5162a65b9641711623fa747dab446265400043a75c7dfa42c34b740dfdaba
-2023/04/24 11:50:20 pushed blob: sha256:00b7b3ca30fa5ee9336a9bc962efef2001c076a3149c936b436f409df710b06f
-2023/04/24 11:50:21 ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom: digest: sha256:4b1407327a486c0506188b67ad24222ed7924ba57576e47b59a4c1ac73dacd40 size: 368
-2023/04/24 11:50:21 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510.sbom
-2023/04/24 11:50:21 existing blob: sha256:930413008565fd110e7ab2d37aab538449f058e7d83e7091d1aa0930a0086f58
-2023/04/24 11:50:22 pushed blob: sha256:bd830efcc6c0a934a273202ffab27b1a8927368a7b99c4ae0cf850fadb865ead
-2023/04/24 11:50:23 ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom: digest: sha256:5c79e632396b893c3ecabf6b9ba43d8f20bb3990b0c6259f975bf81c63f0e41e size: 369
-2023/04/24 11:50:23 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe.sbom
-2023/04/24 11:50:24 existing blob: sha256:bb5ef9628a98afa48a9133f5890c43ed1499eb82a33fe173dd9067d7a9cdfb0a
-2023/04/24 11:50:25 pushed blob: sha256:61f19080792ae91e8b37ecf003376497b790a411d7a8fa4435c7457b0e15874c
-2023/04/24 11:50:25 ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom: digest: sha256:8d82388bb534933d7193c661743fca8378cc561a2ad8583c0107f687acb37c1b size: 369
-2023/04/24 11:50:25 Published SBOM ghcr.io/yana1205/kubestellar/syncer:sha256-c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96.sbom
-2023/04/24 11:50:26 existing manifest: sha256:02db9874546b79ee765611474eb647128292e8cda92f86ca1b7342012eb79abe
-2023/04/24 11:50:26 existing manifest: sha256:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-2023/04/24 11:50:27 ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x: digest: sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510 size: 690
-2023/04/24 11:50:27 Published ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
-echo KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-KO_DOCKER_REPO=ghcr.io/yana1205/kubestellar/syncer ko build --platform=linux/amd64,linux/arm64 --bare --tags ./cmd/syncer
-kubestellar-syncer image
-ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510
+$ make build-kubestellar-syncer-image DOCKER_REPO=quay.io/mspreitz/syncer SYNCER_PLATFORMS=linux/amd64,linux/arm64 
+2023/11/06 13:46:15 Using base cgr.dev/chainguard/static:latest@sha256:d3465871ccaba3d4aefe51d6bb2222195850f6734cbbb6ef0dd7a3da49826159 for github.com/kubestellar/kubestellar/cmd/syncer
+2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
+2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
+2023/11/06 13:46:43 Publishing quay.io/mspreitz/syncer:git-a4250b7ee-dirty
+2023/11/06 13:46:44 pushed blob: sha256:250c06f7c38e52dc77e5c7586c3e40280dc7ff9bb9007c396e06d96736cf8542
+2023/11/06 13:46:44 pushed blob: sha256:24e67d450bd33966f28c92760ffcb5eae57e75f86ce1c0e0266a5d3c159d1798
+2023/11/06 13:46:44 pushed blob: sha256:cd93f0a485889b13c1b34307d8dde4b989b45b7ebdd1f13a2084c89c87cb2fbf
+2023/11/06 13:46:44 pushed blob: sha256:aa2769d82ae2f06035ceb26ce127c604bc0797f3e9a09bfc0dc010afff25d5c6
+2023/11/06 13:46:44 pushed blob: sha256:9ac3b3732a57658f71e51d440eba76d27be0fac6db083c3e227585d5d7b0be94
+2023/11/06 13:46:44 pushed blob: sha256:512f2474620de277e19ecc783e8e2399f54cb2669873db4b54159ac3c47a1914
+2023/11/06 13:46:44 pushed blob: sha256:f2ae5118c0fadc41f16d463484970c698e9640de5d574b0fd29d4065e6d92795
+2023/11/06 13:46:44 pushed blob: sha256:836fc9b0d92a362f818a04d483219a5254b4819044506b26d2a78c27a49d8421
+2023/11/06 13:46:44 pushed blob: sha256:74256082c076ec34b147fa439ebdafffb10043cb418abe7531c49964cc2e9376
+2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom: digest: sha256:d40e5035236f888f8a1a784c4c630998dd92ee66c1b375bf379f1c915c4f296d size: 374
+2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom
+2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom: digest: sha256:cad30541f2af79b74f87a37d284fa508fefd35cb130ee35745cfe31d85318fe9 size: 373
+2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom
+2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom: digest: sha256:877daabfb8593ce25c377446f9ec07782eb89b1ff15afdf9a2dfe882b7f87b06 size: 374
+2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom
+2023/11/06 13:46:45 pushed blob: sha256:0757eb0b6bd5eb800545762141ea55fae14a3f421aa84ac0414bbf51ffd95509
+2023/11/06 13:46:45 pushed blob: sha256:9b50f69553a78acc0412f1fba1e27553f47a0f1cc76acafaad983320fb4d2edd
+2023/11/06 13:46:54 pushed blob: sha256:15df213e4830817c1a38d97fda67c3e8459c17bc955dc36ac7f2fbdea26a12d4
+2023/11/06 13:46:54 quay.io/mspreitz/syncer@sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1: digest: sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1 size: 1211
+2023/11/06 13:46:54 pushed blob: sha256:6144db4c37348e2bdba9e850652e46f260dbab377e4f62d29bcdb84fcceaca00
+2023/11/06 13:46:55 quay.io/mspreitz/syncer@sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2: digest: sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2 size: 1211
+2023/11/06 13:46:55 quay.io/mspreitz/syncer:git-a4250b7ee-dirty: digest: sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5 size: 986
+2023/11/06 13:46:55 Published quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
+echo KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty  ./cmd/syncer
+KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty ./cmd/syncer
+quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
 ```
-`ghcr.io/yana1205/kubestellar/syncer:dev-2023-04-24-x@sha256:a52fb1cf432d321b278ac83600d3b83be3b8e6985f30e5a0f6f30c594bc42510` is the image pushed to the registry.
+
+The last line of the output shows the full image reference, including both tag and digest of the "image" (technically it is a multi-platform manifest).
 
 ## Teardown the environment
 
