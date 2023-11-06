@@ -20,7 +20,7 @@ cd {{ config.repo_default_file_path }}
 git checkout main
 ```
 
-### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version
+### Update the 'kubectl-kubestellar-prep_for_syncer' file with a reference to the new version of the kubestellar syncer version IF you made a new version (and see [the syncer doc](../../../Coding Milestones/PoC2023q1/kubestellar-syncer/#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry) for how to do that, being careful to not exclude the git commit and cleanliness information from all the tags on the image).
 ```shell
 vi outer-scripts/kubectl-kubestellar-prep_for_syncer
 ```
