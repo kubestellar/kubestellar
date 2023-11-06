@@ -14,18 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Purpose: ensure that a workload management workspace exists and has
-# the needed APIBindings.
+# Purpose: ensure that a mailbox workspace has the needed KubeStellar CRDs.
 
-# Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
+# Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* mbw_name
 
 want_kube=true
-wmw_name=""
+mbw_name=""
 
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar ensure wmw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
+	    echo "Usage: kubectl kubestellar ensure mbw (\$kubectl_flag | --with-kube boolean | -X)* wm_workspace_name"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--with-kube)
@@ -48,8 +47,8 @@ while (( $# > 0 )); do
 	    echo "$0: flag syntax error" >&2
 	    exit 1;;
 	(*)
-	    if [ -z "$wmw_name" ]
-	    then wmw_name="$1"
+	    if [ -z "$mbw_name" ]
+	    then mbw_name="$1"
 	    else echo "$0: too many positional arguments" >&2
 		 exit 1
 	    fi
@@ -57,7 +56,7 @@ while (( $# > 0 )); do
     shift
 done
 
-if [ "$wmw_name" == "" ]; then
+if [ "$mbw_name" == "" ]; then
     echo "$0: workload management workspace name not specified" >&2
     exit 1
 fi
@@ -72,19 +71,21 @@ set -e
 
 kubectl ws "${kubectl_flags[@]}" root
 
-if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null
-then kubectl ws "${kubectl_flags[@]}" "$wmw_name"
-else kubectl ws "${kubectl_flags[@]}" create "$wmw_name" --enter
+if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$mbw_name" &> /dev/null
+then kubectl ws "${kubectl_flags[@]}" "$mbw_name"
+else
+    echo "mailbox workspace $mbw_name doesn't exist"
+    exit 1
 fi
 
-function run_kb_konnector_for_wmw() {
+function run_kb_konnector_for_mbw() {
     if kubectl get ns kube-system &> /dev/null; then
         echo "namespace kube-system already exists, skipping"
     else
         echo "creating namespace kube-system"
         kubectl create ns kube-system
     fi
-    echo "starting kube-bind konnector for wmw in background"
+    echo "starting kube-bind konnector for mbw in background"
     konnector &
     if ! pgrep konnector &> /dev/null; then
         echo "kube-bind konnector not started"
@@ -92,19 +93,18 @@ function run_kb_konnector_for_wmw() {
     fi
 }
 
-function bind_resource_for_wmw() {
+function bind_resource_for_mbw() {
     RESOURCE="$1"
-    echo "binding $RESOURCE for wmw"
+    echo "binding $RESOURCE for mbw"
     if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
-        echo "unable to bind $RESOURCE for wmw"
+        echo "unable to bind $RESOURCE for mbw"
         exit 1
     fi
 }
 
-run_kb_konnector_for_wmw
-bind_resource_for_wmw "edgeplacements"
-bind_resource_for_wmw "customizers"
-bind_resource_for_wmw "singleplacementslices"
+run_kb_konnector_for_mbw
+bind_resource_for_mbw "syncerconfigs"
+bind_resource_for_mbw "edgesyncconfigs"
 
 function bind_iff_wanted() { # usage: export_name
     export_name=$1
