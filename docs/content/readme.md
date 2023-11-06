@@ -35,7 +35,7 @@
 ## KubeStellar virtual clusters (Spaces) are our secret
 - KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
 - Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
-- Fewer api-resources means resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
+- Fewer api-resources mean resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
 - Denaturing is the key to accepting native, unbundled Kubernetes resources as input
 - Unbundled resources are the preferred output of most cloud-native tools making KubeStellar use and integration easy
 
