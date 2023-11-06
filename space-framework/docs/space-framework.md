@@ -8,6 +8,8 @@
 **Space Provider** - A Thing that manages the life cycle of multiple pSpaces. This includes at minimal create/delete/List operations on pSpaces. KIND is an example for Space Provider (that manages KIND clusters), KCP is another example - KCP manages KCP's workspaces. 
 
 ## High level architecture  & Main componenets
+![SF overall view](SF-All.drawio.svg "SF overall viewgit s")
+
 The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both CLI/script based and client-go based clients) to use spaces while mantaining the clients decoupled from the specific pSpace and space provider that is being used. 
 
 The The space framework uses two CRDs:
@@ -43,7 +45,7 @@ Currently the SAC exposes a simple function that supply the config access info f
 When a new SpaceProviderDesc is created the SM creates a new namespace that will be used to host all the Space objects representing pSpaces on that space provider.  
 The name of the generated namespace will be `paceprovider-<provider name>`
 
-![Space, SpaceProviderDesc and the Space provider namespace](SF1.drawio.svg "Status summarization for special")
+![Space, SpaceProviderDesc and the Space provider namespace](SF-NS.drawio.svg "SF Namespaces")
 
 Note: In the future the spaces will be created in their own namespace and not in namespace per provider. 
 
