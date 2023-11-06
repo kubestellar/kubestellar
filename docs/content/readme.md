@@ -23,7 +23,7 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-KubeStellar is an opensource project focused on multi-cluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
+The KubeStellar project tackles multi-cluster configuration management for edge, multi-cloud, and hybrid cloud
 
 ## KubeStellar treats multiple Kubernetes clusters as one
 
