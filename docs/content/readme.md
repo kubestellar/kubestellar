@@ -8,7 +8,6 @@
 <br/>
 
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
-<br/>
 
 [![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{ config.ks_branch }})](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
@@ -22,10 +21,9 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-## Overview
-The KubeStellar project tackles multi-cluster configuration management for edge, multi-cloud, and hybrid cloud
 
-## KubeStellar treats multiple Kubernetes clusters as one
+
+## KubeStellar treats multiple Kubernetes clusters as one so you can:
 
 - __Centrally__ deploy Kubernetes resources across multiple clusters 
 - Use __standard deployment tools__ (kubectl, helm, ArgoCD, Flux) no bundling required
@@ -36,10 +34,10 @@ The KubeStellar project tackles multi-cluster configuration management for edge,
 
 ## KubeStellar virtual clusters (Spaces) are our secret
 - KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
-- Standard Kubernetes clusters have 2-300 api-resources, KubeStellar Spaces have only 40
+- Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
 - Fewer api-resources means resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
 - Denaturing is the key to accepting native, unbundled Kubernetes resources as input
-- Unbundled resources are the preferred output of most CNCF tools making KubeStellar use and integration easy
+- Unbundled resources are the preferred output of most cloud-native tools making KubeStellar use and integration easy
 
 ## Roadmap for the Project
 
