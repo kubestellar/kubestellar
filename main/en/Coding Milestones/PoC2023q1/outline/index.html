@@ -2552,7 +2552,11 @@ depending on the Kubernetes release and usage style, <code>ServiceAccount</code>
 The extra consideration for <code>ServiceAccount</code> is when an associated
 <code>Secret</code> is a natural consequence.  However, that is not a practical
 problem because such <code>Secret</code> objects are recognized as system
-infrastructure (see <a href="#system-infrastructure-objects">below</a>).  Another
+infrastructure (see <a href="#system-infrastructure-objects">below</a>).
+Oops, oversight here: the controller that makes the associated
+Secret objects <em>also</em> insists that the ServiceAccount to refer to them;
+see later about denaturing ServiceAccounts.
+Another
 consideration for <code>ServiceAccount</code> objects, as for <code>Secret</code> and
 <code>ConfigMap</code> objects, is that some are in some sense "reverse-natured":
 some are created by some other thing as part of the nature of that
@@ -2739,6 +2743,12 @@ otherwise break something. The kcp server does not implement
 uninterpreted. For objects that configure calls to other servers,
 these will fail unless the user arranges for them to work when made in
 the center as well in the edge clusters.</p>
+<p><strong>NOTE on NOTE</strong>: Paolo Dettori denatured ServiceAccount objects in kcp workspaces by creating a fork of kcp v0.11.0 with <a href="https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/server/server.go#L345-L347">the activation of the relevant controller</a> (the <a href="https://v1-24.docs.kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#token-controller">ServiceAccount Token Controller</a>) disabled. Builds of this variant of kcp are in the following archives.</p>
+<ul>
+<li><a href="https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_amd64.tar.gz">https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_amd64.tar.gz</a></li>
+<li><a href="https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_arm64.tar.gz">https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_arm64.tar.gz</a></li>
+<li><a href="https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_ppc64le.tar.gz">https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_ppc64le.tar.gz</a></li>
+</ul>
 <h4 id="needs-to-be-natured-in-center-and-edge">Needs to be natured in center and edge<a class="headerlink" href="#needs-to-be-natured-in-center-and-edge" title="Permanent link">#</a></h4>
 <p>These should have their usual effect in both center and edge; they
 need no distinct treatment.</p>
