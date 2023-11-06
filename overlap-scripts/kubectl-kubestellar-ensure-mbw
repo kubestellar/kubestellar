@@ -79,6 +79,10 @@ else
 fi
 
 function run_kb_konnector_for_mbw() {
+    if kubectl get crd syncerconfigs.edge.kubestellar.io &> /dev/null && kubectl get crd edgesyncconfigs.edge.kubestellar.io &> /dev/null; then
+        echo "CRDs already in place, returning"
+        return
+    fi
     if kubectl get ns kube-system &> /dev/null; then
         echo "namespace kube-system already exists, skipping"
     else
@@ -95,6 +99,10 @@ function run_kb_konnector_for_mbw() {
 
 function bind_resource_for_mbw() {
     RESOURCE="$1"
+    if kubectl get crd $RESOURCE.edge.kubestellar.io &> /dev/null; then
+        echo "CRDs for $RESOURCE already in place, returning"
+        return
+    fi
     echo "binding $RESOURCE for mbw"
     if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
         echo "unable to bind $RESOURCE for mbw"
