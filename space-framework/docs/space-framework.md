@@ -29,7 +29,7 @@ The space manager uses a set of space provider adaptors that interacts with the 
 
 ### Space aware client (SAC)
 The Space aware client (msclient) allows clients/controllers to easily get access to the underlying space by simply using the space name. There is no direct interaction between the msclient and the Space  provider, and therefore the msclient is transparent to the specific provider of the spaces. 
-
+![Space Aware Client](SAC.drawio.svg "Space Aware Client")
 The only requirement is that the space can be accessed through regular Kube APIs when using the appropriate kubeconfig information. 
 
 **Main features**  
