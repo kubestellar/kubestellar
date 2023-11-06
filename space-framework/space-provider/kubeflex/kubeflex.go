@@ -249,7 +249,8 @@ func (k KflexClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) 
 func (k KflexClusterProvider) Watch() (clusterprovider.Watcher, error) {
 	w := &KflexWatcher{
 		ch:       make(chan clusterprovider.WatchEvent),
-		provider: &k}
+		provider: &k,
+		chClosed: false}
 	k.watch = w
 	return w, nil
 }
@@ -260,6 +261,7 @@ type KflexWatcher struct {
 	ch       chan clusterprovider.WatchEvent
 	cancel   context.CancelFunc
 	provider *KflexClusterProvider
+	chClosed bool
 }
 
 func (k *KflexWatcher) Stop() {
@@ -267,7 +269,11 @@ func (k *KflexWatcher) Stop() {
 		k.cancel()
 	}
 	k.wg.Wait()
-	close(k.ch)
+	if !k.chClosed {
+		close(k.ch)
+		k.chClosed = true
+
+	}
 }
 
 func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
