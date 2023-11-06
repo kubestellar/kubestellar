@@ -23,27 +23,23 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 ## Overview
-KubeStellar is an opensource project focused on concerns arising from multi-cluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
+KubeStellar is an opensource project focused on multi-cluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
 
-- Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
-- Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
-- Non-namespaced objects: need general support
-- Cardinality of destinations: A source object may propagate to many thousands of destinations. 
+## KubeStellar treats multiple Kubernetes clusters as one
 
-## Goals
+- __Centrally__ deploy Kubernetes resources across multiple clusters 
+- Use __standard deployment tools__ (kubectl, helm, ArgoCD, Flux) no bundling required
+- __Discover__ objects created on edge clusters
+- Make __disconnected__ cluster operation possible
+- Designed for __scalability__ with 1:many and many:1 scenarios
+- __Modular__ design to ensure compatibility with cloud-native tools
 
-- Collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, Where Resolver, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
-- Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
-- Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
-
-## Areas of exploration
-
-- Desired placement expression​: Need a way for one center object to express large number of desired copies​
-- Scheduling/syncing interface​: Need something that scales to large number of destinations​
-- Rollout control​: Client needs programmatic control of rollout, possibly including domain-specific logic​
-- Customization: Need a way for one pattern in the center to express how to customize for all the desired destinations​
-- Status from many destinations​: Center clients may need a way to access status from individual edge copies
-- Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
+## KubeStellar virtual clusters (Spaces) are our secret
+- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
+- Standard Kubernetes clusters have 2-300 api-resources, KubeStellar Spaces have only 40
+- Fewer api-resources means resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
+- Denaturing is the key to accepting native, unbundled Kubernetes resources as input
+- Unbundled resources are the preferred output of most CNCF tools making KubeStellar use and integration easy
 
 ## Roadmap for the Project
 
