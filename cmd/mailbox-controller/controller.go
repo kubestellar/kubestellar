@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -252,10 +253,18 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
 	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
 
-	// TODO verify binding is already in place.
-	// ISSUE kube-bind objects(apiservicebindings) does not have clusterclientset like in KCP. Maybe dynamicClusterClient can help.
+	// The script ensures that a mailbox workspace has the needed KubeStellar CRDs.
+	shellScriptName := "kubectl-kubestellar-ensure-mbw"
 
-	// TODO bind all resources. Note: running in pod, need to access the dex
+	// The script is idempotent.
+	logger.V(2).Info("Executing shell script", "script", shellScriptName)
+	cmdLine := shellScriptName + " " + workspace.Name
+	cmd := exec.Command("/bin/sh", "-c", cmdLine)
+	_, err := cmd.Output()
+	if err != nil {
+		logger.Error(err, "Unable to execute shell script", "script", shellScriptName)
+		return true
+	}
 
 	// TODO get kube-bind NS from the output and update the Space object(label/annotation). For phase1 just log the NS
 
