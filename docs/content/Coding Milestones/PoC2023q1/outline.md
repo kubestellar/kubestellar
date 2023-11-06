@@ -100,7 +100,11 @@ depending on the Kubernetes release and usage style, `ServiceAccount`.
 The extra consideration for `ServiceAccount` is when an associated
 `Secret` is a natural consequence.  However, that is not a practical
 problem because such `Secret` objects are recognized as system
-infrastructure (see [below](#system-infrastructure-objects)).  Another
+infrastructure (see [below](#system-infrastructure-objects)).
+Oops, oversight here: the controller that makes the associated
+Secret objects _also_ insists that the ServiceAccount to refer to them;
+see later about denaturing ServiceAccounts.
+Another
 consideration for `ServiceAccount` objects, as for `Secret` and
 `ConfigMap` objects, is that some are in some sense "reverse-natured":
 some are created by some other thing as part of the nature of that
@@ -252,6 +256,12 @@ otherwise break something. The kcp server does not implement
 uninterpreted. For objects that configure calls to other servers,
 these will fail unless the user arranges for them to work when made in
 the center as well in the edge clusters.
+
+**NOTE on NOTE**: Paolo Dettori denatured ServiceAccount objects in kcp workspaces by creating a fork of kcp v0.11.0 with [the activation of the relevant controller](https://github.com/kcp-dev/kcp/blob/v0.11.0/pkg/server/server.go#L345-L347) (the [ServiceAccount Token Controller](https://v1-24.docs.kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#token-controller)) disabled. Builds of this variant of kcp are in the following archives.
+
+- <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_amd64.tar.gz>
+- <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_arm64.tar.gz>
+- <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_ppc64le.tar.gz>
 
 #### Needs to be natured in center and edge
 
