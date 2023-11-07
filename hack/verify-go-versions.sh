@@ -17,14 +17,19 @@
 set -e
 set -o pipefail
 
-VERSION=$(grep "go 1." go.mod | sed 's/go //')
+MINIMAL_VERSION=$(grep "go 1." go.mod | sed 's/go //')
 
-# grep "FROM golang:" Dockerfile | { ! grep -v "${VERSION}"; } || { echo "Wrong go version in Dockerfile, expected ${VERSION}"; exit 1; }
-# grep -w "go-version:" .github/workflows/*.yaml | { ! grep -v "go-version: v${VERSION}"; } || { echo "Wrong go version in .github/workflows/*.yaml, expected ${VERSION}"; exit 1; }
+# grep "FROM golang:" Dockerfile | { ! grep -v "${MINIMAL_VERSION}"; } || { echo "Wrong go version in Dockerfile, expected ${MINIMAL_VERSION}"; exit 1; }
+# grep -w "go-version:" .github/workflows/*.yaml | { ! grep -v "go-version: v${MINIMAL_VERSION}"; } || { echo "Wrong go version in .github/workflows/*.yaml, expected ${MINIMAL_VERSION}"; exit 1; }
 # Note CONTRIBUTING.md isn't copied in the Dockerfile
 # if [ -e CONTRIBUTING.md ]; then
-#   grep "golang.org/doc/install" CONTRIBUTING.md | { ! grep -v "${VERSION}"; } || { echo "Wrong go version in CONTRIBUTING.md expected ${VERSION}"; exit 1; }
+#   grep "golang.org/doc/install" CONTRIBUTING.md | { ! grep -v "${MINIMAL_VERSION}"; } || { echo "Wrong go version in CONTRIBUTING.md expected ${MINIMAL_VERSION}"; exit 1; }
 # fi
+
 if [ -z "${IGNORE_GO_VERSION}" ]; then
-  go version | { ! grep -v go${VERSION}; } || { echo "Unexpected go version installed, expected ${VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."; exit 1; }
+  ENV_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+  if [[ "$ENV_VERSION" < "$MINIMAL_VERSION" ]]; then
+    echo "Unexpected go version installed. expected minimal go version ${MINIMAL_VERSION} while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
+    exit 1
+  fi
 fi
