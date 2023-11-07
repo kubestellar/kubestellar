@@ -17,6 +17,7 @@ limitations under the License.
 package placement
 
 import (
+	"fmt"
 	"sync"
 
 	"k8s.io/klog/v2"
@@ -344,7 +345,7 @@ type loggingMappingReceiver[Key, Val any] struct {
 var _ MappingReceiver[string, []any] = loggingMappingReceiver[string, []any]{}
 
 func (lmr loggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
-	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", val)
+	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", fmt.Sprintf("%+v", val))
 }
 
 func (lmr loggingMappingReceiver[Key, Val]) Delete(key Key) {
