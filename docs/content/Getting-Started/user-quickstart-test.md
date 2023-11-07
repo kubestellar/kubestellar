@@ -110,25 +110,15 @@ qs_sort: test
 %}
 
 #### 2. Install <span class="Space-Bd-BT">KUBESTELLAR</span>'s user commands and kubectl plugins
-!!! tip ""
-    === "install"
-         {%
-           include-markdown "../common-subs/brew-install.md"
-           start="<!--brew-install-start-->"
-           end="<!--brew-install-end-->"
-         %}
-    === "remove"
-         {%
-           include-markdown "../common-subs/brew-remove.md"
-           start="<!--brew-remove-start-->"
-           end="<!--brew-remove-end-->"
-         %}
-    === "uh oh, no brew?"
-         {%
-           include-markdown "../common-subs/brew-no.md"
-           start="<!--brew-no-start-->"
-           end="<!--brew-no-end-->"
-         %}
+
+```shell
+pwd
+rm -f bin/*
+make userbuild
+export PATH=$PWD/bin:$PATH
+bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
+export PATH=$PWD/kcp/bin:$PATH
+```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
