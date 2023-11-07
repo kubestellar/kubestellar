@@ -1859,19 +1859,37 @@
 ways: as bare processes on whatever host you are using to run this
 example, or as workload in a Kubernetes cluster (an OpenShift cluster
 qualifies).  Do one or the other, not both.</p>
-<p>KubeStellar only works with release <code>v0.11.0</code> of kcp.</p>
+<p>KubeStellar only works with release <code>v0.11.0</code> of kcp. To downsync ServiceAccount objects you will need a patched version of that in order to get the denaturing of them as discussed <a href="../../outline/#needs-to-be-denatured-in-center-natured-in-edge">in the design outline</a>.</p>
 <h3 id="deploy-kcp-and-kubestellar-as-bare-processes">Deploy kcp and KubeStellar as bare processes<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-bare-processes" title="Permanent link">#</a></h3>
 <h4 id="start-kcp">Start kcp<a class="headerlink" href="#start-kcp" title="Permanent link">#</a></h4>
-<p>Download and build or install <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">kcp</a>,
-according to your preference.  See the start of <a href="https://docs.kcp.io/kcp/v0.11/#quickstart">the kcp quickstart</a> for instructions on that, but get <a href="https://github.com/kcp-dev/kcp/releases/tag/v0.11.0">release v0.11.0</a> rather than the latest (the downloadable assets appear after the long list of changes/features/etc).</p>
-<p>Clone the v0.11.0 branch of the kcp source:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>v0.11.0<span class="w"> </span>https://github.com/kcp-dev/kcp<span class="w"> </span>kcp
+<p>The following commands fetch the appropriate kcp server and plugins for your OS and ISA and download them and put them on your <code>$PATH</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>kcp
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>mkdir<span class="w"> </span>kcp
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">pushd</span><span class="w"> </span>kcp
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">(</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nb">set</span><span class="w"> </span>-x
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$OSTYPE</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span>linux*<span class="o">)</span><span class="w">   </span><span class="nv">os_type</span><span class="o">=</span><span class="s2">&quot;linux&quot;</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span>darwin*<span class="o">)</span><span class="w">  </span><span class="nv">os_type</span><span class="o">=</span><span class="s2">&quot;darwin&quot;</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span>*<span class="o">)</span><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Unsupported operating system type: </span><span class="nv">$OSTYPE</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">                </span><span class="nb">false</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="k">esac</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HOSTTYPE</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span>x86_64*<span class="o">)</span><span class="w">  </span><span class="nv">arch_type</span><span class="o">=</span><span class="s2">&quot;amd64&quot;</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span>aarch64*<span class="o">)</span><span class="w"> </span><span class="nv">arch_type</span><span class="o">=</span><span class="s2">&quot;arm64&quot;</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">      </span>arm64*<span class="o">)</span><span class="w">   </span><span class="nv">arch_type</span><span class="o">=</span><span class="s2">&quot;arm64&quot;</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span>*<span class="o">)</span><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Unsupported architecture type: </span><span class="nv">$HOSTTYPE</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">                </span><span class="nb">false</span><span class="w"> </span><span class="p">;;</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="k">esac</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="nv">kcp_version</span><span class="o">=</span>v0.11.0
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="nb">trap</span><span class="w"> </span><span class="s2">&quot;rm kcp.tar.gz kcp-plugins.tar.gz&quot;</span><span class="w"> </span>EXIT
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kcp.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz&quot;</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kcp-plugins.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kcp-dev/kcp/releases/download/</span><span class="si">${</span><span class="nv">kcp_version</span><span class="si">}</span><span class="s2">/kubectl-kcp-plugin_</span><span class="si">${</span><span class="nv">kcp_version</span><span class="p">//v</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span>tar<span class="w"> </span>-xzf<span class="w"> </span>kcp-plugins.tar.gz
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span>tar<span class="w"> </span>-xzf<span class="w"> </span>kcp.tar.gz
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="o">)</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
 </code></pre></div>
-and build the kubectl-ws binary and include it in <code>$PATH</code>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">pushd</span><span class="w"> </span>kcp
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make<span class="w"> </span>build
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/bin:<span class="nv">$PATH</span>
-</code></pre></div></p>
 <p>Running the kcp server creates a hidden subdirectory named <code>.kcp</code> to
 hold all sorts of state related to the server. If you have run it
 before and want to start over from scratch then you should <code>rm -rf
@@ -1882,13 +1900,13 @@ configure <code>kubectl</code> to use the kubeconfig produced by the kcp server,
 and (c) wait for the kcp server to get through some
 initialization. The choice of <code>-v=3</code> for the kcp server makes it log a
 line for every HTTP request (among other things).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">popd</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># wait until KCP is ready checking availability of ws resource</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">done</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kcp<span class="w"> </span>start<span class="w"> </span>-v<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/kcp.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.kcp/admin.kubeconfig
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">popd</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># wait until KCP is ready checking availability of ws resource</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">done</span>
 </code></pre></div>
 <p>Note that you now care about two different kubeconfig files: the one
 that you were using earlier, which holds the contexts for your <code>kind</code>
