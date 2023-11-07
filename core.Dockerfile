@@ -51,7 +51,7 @@ ADD test/            test/
 ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
-RUN make innerbuild GIT_DIRTY=$GIT_DIRTY
+RUN make innerbuild GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
 
 FROM redhat/ubi9
 
