@@ -3388,95 +3388,97 @@ SyncTarget name, you could do it as follows.</p>
 <p>The equivalent manual steps are as follows: </p>
 <!-- BEGIN INCLUDE kubestellar-syncer-subs/kubestellar-syncer-1-syncer-gen-plugin.md '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-start--&gt;' '&lt;!--kubestellar-syncer-1-syncer-gen-plugin-end--&gt;' -->
 
+<div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+</code></pre></div>
 <p>Generate UUID for Syncer identification.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="s2">&quot;syncer-&quot;</span><span class="sb">`</span>uuidgen<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span><span class="s1">&#39;[:upper:]&#39;</span><span class="w"> </span><span class="s1">&#39;[:lower:]&#39;</span><span class="sb">`</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="s2">&quot;syncer-&quot;</span><span class="sb">`</span>uuidgen<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span><span class="s1">&#39;[:upper:]&#39;</span><span class="w"> </span><span class="s1">&#39;[:lower:]&#39;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Go to a workspace.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-109-2" name="__codelineno-109-2" href="#__codelineno-109-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>ws1<span class="w"> </span>--enter
+<div class="highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>create<span class="w"> </span>ws1<span class="w"> </span>--enter
 </code></pre></div></p>
 <p>Create the following APIBinding in the workspace (Note that in the case of mailbox workspaces, it's done by mailbox controller at creating the mailbox workspace.)
-<div class="highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
-<a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
-<a id="__codelineno-110-3" name="__codelineno-110-3" href="#__codelineno-110-3"></a><span class="s">kind: APIBinding</span>
-<a id="__codelineno-110-4" name="__codelineno-110-4" href="#__codelineno-110-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-110-5" name="__codelineno-110-5" href="#__codelineno-110-5"></a><span class="s">  name: bind-espw</span>
-<a id="__codelineno-110-6" name="__codelineno-110-6" href="#__codelineno-110-6"></a><span class="s">spec:</span>
-<a id="__codelineno-110-7" name="__codelineno-110-7" href="#__codelineno-110-7"></a><span class="s">  reference:</span>
-<a id="__codelineno-110-8" name="__codelineno-110-8" href="#__codelineno-110-8"></a><span class="s">    export:</span>
-<a id="__codelineno-110-9" name="__codelineno-110-9" href="#__codelineno-110-9"></a><span class="s">      path: root:espw</span>
-<a id="__codelineno-110-10" name="__codelineno-110-10" href="#__codelineno-110-10"></a><span class="s">      name: edge.kubestellar.io</span>
-<a id="__codelineno-110-11" name="__codelineno-110-11" href="#__codelineno-110-11"></a><span class="s">EOL</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
+<a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
+<a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="s">kind: APIBinding</span>
+<a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a><span class="s">  name: bind-espw</span>
+<a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="s">spec:</span>
+<a id="__codelineno-111-7" name="__codelineno-111-7" href="#__codelineno-111-7"></a><span class="s">  reference:</span>
+<a id="__codelineno-111-8" name="__codelineno-111-8" href="#__codelineno-111-8"></a><span class="s">    export:</span>
+<a id="__codelineno-111-9" name="__codelineno-111-9" href="#__codelineno-111-9"></a><span class="s">      path: root:espw</span>
+<a id="__codelineno-111-10" name="__codelineno-111-10" href="#__codelineno-111-10"></a><span class="s">      name: edge.kubestellar.io</span>
+<a id="__codelineno-111-11" name="__codelineno-111-11" href="#__codelineno-111-11"></a><span class="s">EOL</span>
 </code></pre></div></p>
 <p>Create a serviceaccount in the workspace.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
-<a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="s">apiVersion: v1</span>
-<a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="s">kind: ServiceAccount</span>
-<a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="s">metadata:</span>
-<a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a><span class="s">  name: $syncer_id</span>
-<a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="s">EOL</span>
-</code></pre></div></p>
-<p>Create clusterrole and clusterrolebinding to bind the serviceaccount to the role.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
-<a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
-<a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="s">kind: ClusterRole</span>
+<a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="s">apiVersion: v1</span>
+<a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="s">kind: ServiceAccount</span>
 <a id="__codelineno-112-4" name="__codelineno-112-4" href="#__codelineno-112-4"></a><span class="s">metadata:</span>
 <a id="__codelineno-112-5" name="__codelineno-112-5" href="#__codelineno-112-5"></a><span class="s">  name: $syncer_id</span>
-<a id="__codelineno-112-6" name="__codelineno-112-6" href="#__codelineno-112-6"></a><span class="s">rules:</span>
-<a id="__codelineno-112-7" name="__codelineno-112-7" href="#__codelineno-112-7"></a><span class="s">- apiGroups: [&quot;*&quot;]</span>
-<a id="__codelineno-112-8" name="__codelineno-112-8" href="#__codelineno-112-8"></a><span class="s">  resources: [&quot;*&quot;]</span>
-<a id="__codelineno-112-9" name="__codelineno-112-9" href="#__codelineno-112-9"></a><span class="s">  verbs: [&quot;*&quot;]</span>
-<a id="__codelineno-112-10" name="__codelineno-112-10" href="#__codelineno-112-10"></a><span class="s">- nonResourceURLs: [&quot;/&quot;]</span>
-<a id="__codelineno-112-11" name="__codelineno-112-11" href="#__codelineno-112-11"></a><span class="s">  verbs: [&quot;access&quot;]</span>
-<a id="__codelineno-112-12" name="__codelineno-112-12" href="#__codelineno-112-12"></a><span class="s">---</span>
-<a id="__codelineno-112-13" name="__codelineno-112-13" href="#__codelineno-112-13"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
-<a id="__codelineno-112-14" name="__codelineno-112-14" href="#__codelineno-112-14"></a><span class="s">kind: ClusterRoleBinding</span>
-<a id="__codelineno-112-15" name="__codelineno-112-15" href="#__codelineno-112-15"></a><span class="s">metadata:</span>
-<a id="__codelineno-112-16" name="__codelineno-112-16" href="#__codelineno-112-16"></a><span class="s">  name: $syncer_id</span>
-<a id="__codelineno-112-17" name="__codelineno-112-17" href="#__codelineno-112-17"></a><span class="s">roleRef:</span>
-<a id="__codelineno-112-18" name="__codelineno-112-18" href="#__codelineno-112-18"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
-<a id="__codelineno-112-19" name="__codelineno-112-19" href="#__codelineno-112-19"></a><span class="s">  kind: ClusterRole</span>
-<a id="__codelineno-112-20" name="__codelineno-112-20" href="#__codelineno-112-20"></a><span class="s">  name: $syncer_id</span>
-<a id="__codelineno-112-21" name="__codelineno-112-21" href="#__codelineno-112-21"></a><span class="s">subjects:</span>
-<a id="__codelineno-112-22" name="__codelineno-112-22" href="#__codelineno-112-22"></a><span class="s">- apiGroup: &quot;&quot;</span>
-<a id="__codelineno-112-23" name="__codelineno-112-23" href="#__codelineno-112-23"></a><span class="s">  kind: ServiceAccount</span>
-<a id="__codelineno-112-24" name="__codelineno-112-24" href="#__codelineno-112-24"></a><span class="s">  name: $syncer_id</span>
-<a id="__codelineno-112-25" name="__codelineno-112-25" href="#__codelineno-112-25"></a><span class="s">  namespace: default</span>
-<a id="__codelineno-112-26" name="__codelineno-112-26" href="#__codelineno-112-26"></a><span class="s">EOL</span>
+<a id="__codelineno-112-6" name="__codelineno-112-6" href="#__codelineno-112-6"></a><span class="s">EOL</span>
 </code></pre></div></p>
-<p>Get the serviceaccount token that will be set in the upstream kubeconfig manifest.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="nv">secret_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.name&quot;</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="nv">$syncer_id</span><span class="sb">`</span>
-<a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="nv">token</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span><span class="nv">$secret_name</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.token}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="sb">`</span>
+<p>Create clusterrole and clusterrolebinding to bind the serviceaccount to the role.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>cat<span class="w"> </span><span class="s">&lt;&lt; EOL | kubectl apply -f -</span>
+<a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-113-3" name="__codelineno-113-3" href="#__codelineno-113-3"></a><span class="s">kind: ClusterRole</span>
+<a id="__codelineno-113-4" name="__codelineno-113-4" href="#__codelineno-113-4"></a><span class="s">metadata:</span>
+<a id="__codelineno-113-5" name="__codelineno-113-5" href="#__codelineno-113-5"></a><span class="s">  name: $syncer_id</span>
+<a id="__codelineno-113-6" name="__codelineno-113-6" href="#__codelineno-113-6"></a><span class="s">rules:</span>
+<a id="__codelineno-113-7" name="__codelineno-113-7" href="#__codelineno-113-7"></a><span class="s">- apiGroups: [&quot;*&quot;]</span>
+<a id="__codelineno-113-8" name="__codelineno-113-8" href="#__codelineno-113-8"></a><span class="s">  resources: [&quot;*&quot;]</span>
+<a id="__codelineno-113-9" name="__codelineno-113-9" href="#__codelineno-113-9"></a><span class="s">  verbs: [&quot;*&quot;]</span>
+<a id="__codelineno-113-10" name="__codelineno-113-10" href="#__codelineno-113-10"></a><span class="s">- nonResourceURLs: [&quot;/&quot;]</span>
+<a id="__codelineno-113-11" name="__codelineno-113-11" href="#__codelineno-113-11"></a><span class="s">  verbs: [&quot;access&quot;]</span>
+<a id="__codelineno-113-12" name="__codelineno-113-12" href="#__codelineno-113-12"></a><span class="s">---</span>
+<a id="__codelineno-113-13" name="__codelineno-113-13" href="#__codelineno-113-13"></a><span class="s">apiVersion: rbac.authorization.k8s.io/v1</span>
+<a id="__codelineno-113-14" name="__codelineno-113-14" href="#__codelineno-113-14"></a><span class="s">kind: ClusterRoleBinding</span>
+<a id="__codelineno-113-15" name="__codelineno-113-15" href="#__codelineno-113-15"></a><span class="s">metadata:</span>
+<a id="__codelineno-113-16" name="__codelineno-113-16" href="#__codelineno-113-16"></a><span class="s">  name: $syncer_id</span>
+<a id="__codelineno-113-17" name="__codelineno-113-17" href="#__codelineno-113-17"></a><span class="s">roleRef:</span>
+<a id="__codelineno-113-18" name="__codelineno-113-18" href="#__codelineno-113-18"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-113-19" name="__codelineno-113-19" href="#__codelineno-113-19"></a><span class="s">  kind: ClusterRole</span>
+<a id="__codelineno-113-20" name="__codelineno-113-20" href="#__codelineno-113-20"></a><span class="s">  name: $syncer_id</span>
+<a id="__codelineno-113-21" name="__codelineno-113-21" href="#__codelineno-113-21"></a><span class="s">subjects:</span>
+<a id="__codelineno-113-22" name="__codelineno-113-22" href="#__codelineno-113-22"></a><span class="s">- apiGroup: &quot;&quot;</span>
+<a id="__codelineno-113-23" name="__codelineno-113-23" href="#__codelineno-113-23"></a><span class="s">  kind: ServiceAccount</span>
+<a id="__codelineno-113-24" name="__codelineno-113-24" href="#__codelineno-113-24"></a><span class="s">  name: $syncer_id</span>
+<a id="__codelineno-113-25" name="__codelineno-113-25" href="#__codelineno-113-25"></a><span class="s">  namespace: default</span>
+<a id="__codelineno-113-26" name="__codelineno-113-26" href="#__codelineno-113-26"></a><span class="s">EOL</span>
+</code></pre></div></p>
+<p>Get the serviceaccount token that will be set in the upstream kubeconfig manifest.  <strong>NOTE</strong> This part is outdated due to the recent denaturing of ServiceAccounts in kcp workspaces; the syncer-gen plugin will actually wait a little while and then create the Secret if nothing else has.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="nv">secret_name</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s2">&quot;:.metadata.name&quot;</span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="nv">$syncer_id</span><span class="sb">`</span>
+<a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a><span class="nv">token</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span><span class="nv">$secret_name</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.token}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="sb">`</span>
 </code></pre></div></p>
 <p>Get the certificates that will be set in the upstream kubeconfig manifest.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="nv">cacrt</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.certificate-authority-data&quot;</span><span class="sb">`</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="nv">cacrt</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.certificate-authority-data&quot;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Get server_url that will be set in the upstream kubeconfig manifest.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="nv">server_url</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.server&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s|https://\(.*\):\([^/]*\)/.*|https://\1:\2|g&#39;</span><span class="sb">`</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="nv">server_url</span><span class="o">=</span><span class="sb">`</span>kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span>--raw<span class="w"> </span><span class="p">|</span><span class="w"> </span>yq<span class="w"> </span><span class="s2">&quot;.clusters[0].cluster.server&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;s|https://\(.*\):\([^/]*\)/.*|https://\1:\2|g&#39;</span><span class="sb">`</span>
 </code></pre></div></p>
 <p>Set some other parameters.</br>
 a. downstream_namespace where Syncer Pod runs
-<div class="highlight"><pre><span></span><code><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kubestellar-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="nv">downstream_namespace</span><span class="o">=</span><span class="s2">&quot;kubestellar-</span><span class="nv">$syncer_id</span><span class="s2">&quot;</span>
 </code></pre></div>
 b. Syncer image
-<div class="highlight"><pre><span></span><code><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a><span class="nv">image</span><span class="o">=</span><span class="s2">&quot;quay.io/kubestellar/syncer:v0.2.2&quot;</span>
 </code></pre></div></p>
 <p>Download manifest template.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/kubestellar/kubestellar/main/pkg/syncer/scripts/kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div></p>
 <p>Generate manifests to bootstrap KubeStellar-Syncer.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a><span class="nv">syncer_id</span><span class="o">=</span><span class="nv">$syncer_id</span><span class="w"> </span><span class="nv">cacrt</span><span class="o">=</span><span class="nv">$cacrt</span><span class="w"> </span><span class="nv">token</span><span class="o">=</span><span class="nv">$token</span><span class="w"> </span><span class="nv">server_url</span><span class="o">=</span><span class="nv">$server_url</span><span class="w"> </span><span class="nv">downstream_namespace</span><span class="o">=</span><span class="nv">$downstream_namespace</span><span class="w"> </span><span class="nv">image</span><span class="o">=</span><span class="nv">$image</span><span class="w"> </span>envsubst<span class="w"> </span>&lt;<span class="w"> </span>kubestellar-syncer-bootstrap.template.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a>---
-<a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a>apiVersion: v1
-<a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a>kind: Namespace
-<a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a>metadata:
-<a id="__codelineno-120-5" name="__codelineno-120-5" href="#__codelineno-120-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
-<a id="__codelineno-120-6" name="__codelineno-120-6" href="#__codelineno-120-6"></a>---
-<a id="__codelineno-120-7" name="__codelineno-120-7" href="#__codelineno-120-7"></a>apiVersion: v1
-<a id="__codelineno-120-8" name="__codelineno-120-8" href="#__codelineno-120-8"></a>kind: ServiceAccount
-<a id="__codelineno-120-9" name="__codelineno-120-9" href="#__codelineno-120-9"></a>metadata:
-<a id="__codelineno-120-10" name="__codelineno-120-10" href="#__codelineno-120-10"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>---
+<a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a>apiVersion: v1
+<a id="__codelineno-121-3" name="__codelineno-121-3" href="#__codelineno-121-3"></a>kind: Namespace
+<a id="__codelineno-121-4" name="__codelineno-121-4" href="#__codelineno-121-4"></a>metadata:
+<a id="__codelineno-121-5" name="__codelineno-121-5" href="#__codelineno-121-5"></a>  name: kubestellar-syncer-9ee90de6-eb76-4ddb-9346-c4c8d92075e1
+<a id="__codelineno-121-6" name="__codelineno-121-6" href="#__codelineno-121-6"></a>---
+<a id="__codelineno-121-7" name="__codelineno-121-7" href="#__codelineno-121-7"></a>apiVersion: v1
+<a id="__codelineno-121-8" name="__codelineno-121-8" href="#__codelineno-121-8"></a>kind: ServiceAccount
+<a id="__codelineno-121-9" name="__codelineno-121-9" href="#__codelineno-121-9"></a>metadata:
+<a id="__codelineno-121-10" name="__codelineno-121-10" href="#__codelineno-121-10"></a>...
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -3596,21 +3598,21 @@ b. Syncer image
 <ol>
 <li><code>make build-kubestellar-syncer-image-local</code>
 e.g.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>$ make build-kubestellar-syncer-image-local
-<a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
-<a id="__codelineno-121-3" name="__codelineno-121-3" href="#__codelineno-121-3"></a>2023/04/24 11:50:38 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
-<a id="__codelineno-121-4" name="__codelineno-121-4" href="#__codelineno-121-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-121-5" name="__codelineno-121-5" href="#__codelineno-121-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
-<a id="__codelineno-121-6" name="__codelineno-121-6" href="#__codelineno-121-6"></a>2023/04/24 11:50:40 Adding tag latest
-<a id="__codelineno-121-7" name="__codelineno-121-7" href="#__codelineno-121-7"></a>2023/04/24 11:50:40 Added tag latest
-<a id="__codelineno-121-8" name="__codelineno-121-8" href="#__codelineno-121-8"></a>kubestellar-syncer image:
-<a id="__codelineno-121-9" name="__codelineno-121-9" href="#__codelineno-121-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<div class="highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a>$ make build-kubestellar-syncer-image-local
+<a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a>2023/04/24 11:50:37 Using base distroless.dev/static:latest@sha256:81018475098138883b80dcc9c1242eb02b53465297724b18e88591a752d2a49c for github.com/kubestellar/kubestellar/cmd/syncer
+<a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a>2023/04/24 11:50:38 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
+<a id="__codelineno-122-4" name="__codelineno-122-4" href="#__codelineno-122-4"></a>2023/04/24 11:50:39 Loading ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-122-5" name="__codelineno-122-5" href="#__codelineno-122-5"></a>2023/04/24 11:50:40 Loaded ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
+<a id="__codelineno-122-6" name="__codelineno-122-6" href="#__codelineno-122-6"></a>2023/04/24 11:50:40 Adding tag latest
+<a id="__codelineno-122-7" name="__codelineno-122-7" href="#__codelineno-122-7"></a>2023/04/24 11:50:40 Added tag latest
+<a id="__codelineno-122-8" name="__codelineno-122-8" href="#__codelineno-122-8"></a>kubestellar-syncer image:
+<a id="__codelineno-122-9" name="__codelineno-122-9" href="#__codelineno-122-9"></a>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96
 </code></pre></div>
 <code>ko.local/syncer-273dfcc28dbb16dfcde62c61d54e1ca9:c4759f6f841075649a22ff08bdf4afe32600f8bb31743d1aa553454e07375c96</code> is the image stored in your local Docker registry.</li>
 </ol>
 <p>You can also set a shell variable to the output of this Make task.</p>
 <p>For example
-<div class="highlight"><pre><span></span><code><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a>image=`make build-kubestellar-syncer-image-local`
+<div class="highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a>image=`make build-kubestellar-syncer-image-local`
 </code></pre></div></p>
 <h3 id="how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry">How to build the image with multiple architectures and push it to Docker registry<a class="headerlink" href="#how-to-build-the-image-with-multiple-architectures-and-push-it-to-docker-registry" title="Permanent link">#</a></h3>
 <ol>
@@ -3636,61 +3638,61 @@ e.g.
   The default is the empty string.</li>
 </ul>
 <p>For example,
-<div class="highlight"><pre><span></span><code><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=quay.io/mspreitz/syncer SYNCER_PLATFORMS=linux/amd64,linux/arm64 
-<a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a>2023/11/06 13:46:15 Using base cgr.dev/chainguard/static:latest@sha256:d3465871ccaba3d4aefe51d6bb2222195850f6734cbbb6ef0dd7a3da49826159 for github.com/kubestellar/kubestellar/cmd/syncer
-<a id="__codelineno-123-3" name="__codelineno-123-3" href="#__codelineno-123-3"></a>2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
-<a id="__codelineno-123-4" name="__codelineno-123-4" href="#__codelineno-123-4"></a>2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
-<a id="__codelineno-123-5" name="__codelineno-123-5" href="#__codelineno-123-5"></a>2023/11/06 13:46:43 Publishing quay.io/mspreitz/syncer:git-a4250b7ee-dirty
-<a id="__codelineno-123-6" name="__codelineno-123-6" href="#__codelineno-123-6"></a>2023/11/06 13:46:44 pushed blob: sha256:250c06f7c38e52dc77e5c7586c3e40280dc7ff9bb9007c396e06d96736cf8542
-<a id="__codelineno-123-7" name="__codelineno-123-7" href="#__codelineno-123-7"></a>2023/11/06 13:46:44 pushed blob: sha256:24e67d450bd33966f28c92760ffcb5eae57e75f86ce1c0e0266a5d3c159d1798
-<a id="__codelineno-123-8" name="__codelineno-123-8" href="#__codelineno-123-8"></a>2023/11/06 13:46:44 pushed blob: sha256:cd93f0a485889b13c1b34307d8dde4b989b45b7ebdd1f13a2084c89c87cb2fbf
-<a id="__codelineno-123-9" name="__codelineno-123-9" href="#__codelineno-123-9"></a>2023/11/06 13:46:44 pushed blob: sha256:aa2769d82ae2f06035ceb26ce127c604bc0797f3e9a09bfc0dc010afff25d5c6
-<a id="__codelineno-123-10" name="__codelineno-123-10" href="#__codelineno-123-10"></a>2023/11/06 13:46:44 pushed blob: sha256:9ac3b3732a57658f71e51d440eba76d27be0fac6db083c3e227585d5d7b0be94
-<a id="__codelineno-123-11" name="__codelineno-123-11" href="#__codelineno-123-11"></a>2023/11/06 13:46:44 pushed blob: sha256:512f2474620de277e19ecc783e8e2399f54cb2669873db4b54159ac3c47a1914
-<a id="__codelineno-123-12" name="__codelineno-123-12" href="#__codelineno-123-12"></a>2023/11/06 13:46:44 pushed blob: sha256:f2ae5118c0fadc41f16d463484970c698e9640de5d574b0fd29d4065e6d92795
-<a id="__codelineno-123-13" name="__codelineno-123-13" href="#__codelineno-123-13"></a>2023/11/06 13:46:44 pushed blob: sha256:836fc9b0d92a362f818a04d483219a5254b4819044506b26d2a78c27a49d8421
-<a id="__codelineno-123-14" name="__codelineno-123-14" href="#__codelineno-123-14"></a>2023/11/06 13:46:44 pushed blob: sha256:74256082c076ec34b147fa439ebdafffb10043cb418abe7531c49964cc2e9376
-<a id="__codelineno-123-15" name="__codelineno-123-15" href="#__codelineno-123-15"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom: digest: sha256:d40e5035236f888f8a1a784c4c630998dd92ee66c1b375bf379f1c915c4f296d size: 374
-<a id="__codelineno-123-16" name="__codelineno-123-16" href="#__codelineno-123-16"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom
-<a id="__codelineno-123-17" name="__codelineno-123-17" href="#__codelineno-123-17"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom: digest: sha256:cad30541f2af79b74f87a37d284fa508fefd35cb130ee35745cfe31d85318fe9 size: 373
-<a id="__codelineno-123-18" name="__codelineno-123-18" href="#__codelineno-123-18"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom
-<a id="__codelineno-123-19" name="__codelineno-123-19" href="#__codelineno-123-19"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom: digest: sha256:877daabfb8593ce25c377446f9ec07782eb89b1ff15afdf9a2dfe882b7f87b06 size: 374
-<a id="__codelineno-123-20" name="__codelineno-123-20" href="#__codelineno-123-20"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom
-<a id="__codelineno-123-21" name="__codelineno-123-21" href="#__codelineno-123-21"></a>2023/11/06 13:46:45 pushed blob: sha256:0757eb0b6bd5eb800545762141ea55fae14a3f421aa84ac0414bbf51ffd95509
-<a id="__codelineno-123-22" name="__codelineno-123-22" href="#__codelineno-123-22"></a>2023/11/06 13:46:45 pushed blob: sha256:9b50f69553a78acc0412f1fba1e27553f47a0f1cc76acafaad983320fb4d2edd
-<a id="__codelineno-123-23" name="__codelineno-123-23" href="#__codelineno-123-23"></a>2023/11/06 13:46:54 pushed blob: sha256:15df213e4830817c1a38d97fda67c3e8459c17bc955dc36ac7f2fbdea26a12d4
-<a id="__codelineno-123-24" name="__codelineno-123-24" href="#__codelineno-123-24"></a>2023/11/06 13:46:54 quay.io/mspreitz/syncer@sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1: digest: sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1 size: 1211
-<a id="__codelineno-123-25" name="__codelineno-123-25" href="#__codelineno-123-25"></a>2023/11/06 13:46:54 pushed blob: sha256:6144db4c37348e2bdba9e850652e46f260dbab377e4f62d29bcdb84fcceaca00
-<a id="__codelineno-123-26" name="__codelineno-123-26" href="#__codelineno-123-26"></a>2023/11/06 13:46:55 quay.io/mspreitz/syncer@sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2: digest: sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2 size: 1211
-<a id="__codelineno-123-27" name="__codelineno-123-27" href="#__codelineno-123-27"></a>2023/11/06 13:46:55 quay.io/mspreitz/syncer:git-a4250b7ee-dirty: digest: sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5 size: 986
-<a id="__codelineno-123-28" name="__codelineno-123-28" href="#__codelineno-123-28"></a>2023/11/06 13:46:55 Published quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
-<a id="__codelineno-123-29" name="__codelineno-123-29" href="#__codelineno-123-29"></a>echo KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty  ./cmd/syncer
-<a id="__codelineno-123-30" name="__codelineno-123-30" href="#__codelineno-123-30"></a>KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty ./cmd/syncer
-<a id="__codelineno-123-31" name="__codelineno-123-31" href="#__codelineno-123-31"></a>quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
+<div class="highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>$ make build-kubestellar-syncer-image DOCKER_REPO=quay.io/mspreitz/syncer SYNCER_PLATFORMS=linux/amd64,linux/arm64 
+<a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a>2023/11/06 13:46:15 Using base cgr.dev/chainguard/static:latest@sha256:d3465871ccaba3d4aefe51d6bb2222195850f6734cbbb6ef0dd7a3da49826159 for github.com/kubestellar/kubestellar/cmd/syncer
+<a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a>2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/amd64
+<a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a>2023/11/06 13:46:16 Building github.com/kubestellar/kubestellar/cmd/syncer for linux/arm64
+<a id="__codelineno-124-5" name="__codelineno-124-5" href="#__codelineno-124-5"></a>2023/11/06 13:46:43 Publishing quay.io/mspreitz/syncer:git-a4250b7ee-dirty
+<a id="__codelineno-124-6" name="__codelineno-124-6" href="#__codelineno-124-6"></a>2023/11/06 13:46:44 pushed blob: sha256:250c06f7c38e52dc77e5c7586c3e40280dc7ff9bb9007c396e06d96736cf8542
+<a id="__codelineno-124-7" name="__codelineno-124-7" href="#__codelineno-124-7"></a>2023/11/06 13:46:44 pushed blob: sha256:24e67d450bd33966f28c92760ffcb5eae57e75f86ce1c0e0266a5d3c159d1798
+<a id="__codelineno-124-8" name="__codelineno-124-8" href="#__codelineno-124-8"></a>2023/11/06 13:46:44 pushed blob: sha256:cd93f0a485889b13c1b34307d8dde4b989b45b7ebdd1f13a2084c89c87cb2fbf
+<a id="__codelineno-124-9" name="__codelineno-124-9" href="#__codelineno-124-9"></a>2023/11/06 13:46:44 pushed blob: sha256:aa2769d82ae2f06035ceb26ce127c604bc0797f3e9a09bfc0dc010afff25d5c6
+<a id="__codelineno-124-10" name="__codelineno-124-10" href="#__codelineno-124-10"></a>2023/11/06 13:46:44 pushed blob: sha256:9ac3b3732a57658f71e51d440eba76d27be0fac6db083c3e227585d5d7b0be94
+<a id="__codelineno-124-11" name="__codelineno-124-11" href="#__codelineno-124-11"></a>2023/11/06 13:46:44 pushed blob: sha256:512f2474620de277e19ecc783e8e2399f54cb2669873db4b54159ac3c47a1914
+<a id="__codelineno-124-12" name="__codelineno-124-12" href="#__codelineno-124-12"></a>2023/11/06 13:46:44 pushed blob: sha256:f2ae5118c0fadc41f16d463484970c698e9640de5d574b0fd29d4065e6d92795
+<a id="__codelineno-124-13" name="__codelineno-124-13" href="#__codelineno-124-13"></a>2023/11/06 13:46:44 pushed blob: sha256:836fc9b0d92a362f818a04d483219a5254b4819044506b26d2a78c27a49d8421
+<a id="__codelineno-124-14" name="__codelineno-124-14" href="#__codelineno-124-14"></a>2023/11/06 13:46:44 pushed blob: sha256:74256082c076ec34b147fa439ebdafffb10043cb418abe7531c49964cc2e9376
+<a id="__codelineno-124-15" name="__codelineno-124-15" href="#__codelineno-124-15"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom: digest: sha256:d40e5035236f888f8a1a784c4c630998dd92ee66c1b375bf379f1c915c4f296d size: 374
+<a id="__codelineno-124-16" name="__codelineno-124-16" href="#__codelineno-124-16"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1.sbom
+<a id="__codelineno-124-17" name="__codelineno-124-17" href="#__codelineno-124-17"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom: digest: sha256:cad30541f2af79b74f87a37d284fa508fefd35cb130ee35745cfe31d85318fe9 size: 373
+<a id="__codelineno-124-18" name="__codelineno-124-18" href="#__codelineno-124-18"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5.sbom
+<a id="__codelineno-124-19" name="__codelineno-124-19" href="#__codelineno-124-19"></a>2023/11/06 13:46:44 quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom: digest: sha256:877daabfb8593ce25c377446f9ec07782eb89b1ff15afdf9a2dfe882b7f87b06 size: 374
+<a id="__codelineno-124-20" name="__codelineno-124-20" href="#__codelineno-124-20"></a>2023/11/06 13:46:44 Published SBOM quay.io/mspreitz/syncer:sha256-25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2.sbom
+<a id="__codelineno-124-21" name="__codelineno-124-21" href="#__codelineno-124-21"></a>2023/11/06 13:46:45 pushed blob: sha256:0757eb0b6bd5eb800545762141ea55fae14a3f421aa84ac0414bbf51ffd95509
+<a id="__codelineno-124-22" name="__codelineno-124-22" href="#__codelineno-124-22"></a>2023/11/06 13:46:45 pushed blob: sha256:9b50f69553a78acc0412f1fba1e27553f47a0f1cc76acafaad983320fb4d2edd
+<a id="__codelineno-124-23" name="__codelineno-124-23" href="#__codelineno-124-23"></a>2023/11/06 13:46:54 pushed blob: sha256:15df213e4830817c1a38d97fda67c3e8459c17bc955dc36ac7f2fbdea26a12d4
+<a id="__codelineno-124-24" name="__codelineno-124-24" href="#__codelineno-124-24"></a>2023/11/06 13:46:54 quay.io/mspreitz/syncer@sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1: digest: sha256:905d0fda05d7f9312c0af44856e9af5004ed6e2369f38b71469761cb3f9da2d1 size: 1211
+<a id="__codelineno-124-25" name="__codelineno-124-25" href="#__codelineno-124-25"></a>2023/11/06 13:46:54 pushed blob: sha256:6144db4c37348e2bdba9e850652e46f260dbab377e4f62d29bcdb84fcceaca00
+<a id="__codelineno-124-26" name="__codelineno-124-26" href="#__codelineno-124-26"></a>2023/11/06 13:46:55 quay.io/mspreitz/syncer@sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2: digest: sha256:25d71940766653861e3175feec34fd2a6faff4f4c4f7bd55784f035a860d3be2 size: 1211
+<a id="__codelineno-124-27" name="__codelineno-124-27" href="#__codelineno-124-27"></a>2023/11/06 13:46:55 quay.io/mspreitz/syncer:git-a4250b7ee-dirty: digest: sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5 size: 986
+<a id="__codelineno-124-28" name="__codelineno-124-28" href="#__codelineno-124-28"></a>2023/11/06 13:46:55 Published quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
+<a id="__codelineno-124-29" name="__codelineno-124-29" href="#__codelineno-124-29"></a>echo KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty  ./cmd/syncer
+<a id="__codelineno-124-30" name="__codelineno-124-30" href="#__codelineno-124-30"></a>KO_DOCKER_REPO=quay.io/mspreitz/syncer GOFLAGS=-buildvcs=false ko build --platform=linux/amd64,linux/arm64 --bare --tags git-a4250b7ee-dirty ./cmd/syncer
+<a id="__codelineno-124-31" name="__codelineno-124-31" href="#__codelineno-124-31"></a>quay.io/mspreitz/syncer:git-a4250b7ee-dirty@sha256:18045f17222f9d0ec4fa3f736eaba891041d2980d1fb8c9f7f0a7a562172c9e5
 </code></pre></div></p>
 <p>The last line of the output shows the full image reference, including both tag and digest of the "image" (technically it is a multi-platform manifest).</p>
 <h2 id="teardown-the-environment_1">Teardown the environment<a class="headerlink" href="#teardown-the-environment_1" title="Permanent link">#</a></h2>
 <!-- BEGIN INCLUDE ../../common-subs/teardown-the-environment.md '&lt;!--teardown-the-environment-start--&gt;' '&lt;!--teardown-the-environment-end--&gt;' -->
 
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-<a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-124-4" name="__codelineno-124-4" href="#__codelineno-124-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
-<a id="__codelineno-124-5" name="__codelineno-124-5" href="#__codelineno-124-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
-<a id="__codelineno-124-6" name="__codelineno-124-6" href="#__codelineno-124-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
+<div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
+<a id="__codelineno-125-4" name="__codelineno-125-4" href="#__codelineno-125-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-125-5" name="__codelineno-125-5" href="#__codelineno-125-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
+<a id="__codelineno-125-6" name="__codelineno-125-6" href="#__codelineno-125-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
 <p>Teardown of KubeStellar depends on which style of deployment was used.</p>
 <h3 id="teardown-bare-processes_1">Teardown bare processes<a class="headerlink" href="#teardown-bare-processes_1" title="Permanent link">#</a></h3>
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a>kubestellar<span class="w"> </span>stop
+<div class="highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
 <p>Stop and uninstall KubeStellar and kcp with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a>remove-kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload_1">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload_1" title="Permanent link">#</a></h3>
 <p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!-- END INCLUDE -->
 
