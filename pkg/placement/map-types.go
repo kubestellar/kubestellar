@@ -17,7 +17,6 @@ limitations under the License.
 package placement
 
 import (
-	"fmt"
 	"sync"
 
 	"k8s.io/klog/v2"
@@ -210,21 +209,21 @@ func (mrf MapChangeReceiverFork[Key, Val]) DeleteWithFinal(key Key, val Val) {
 
 // MappingReceiverDiscardsPrevious produces a MapChangeReceiver that dumbs down its info to pass along to the given MappingReceiver
 func MappingReceiverDiscardsPrevious[Key, Val any](mr MappingReceiver[Key, Val]) MapChangeReceiver[Key, Val] {
-	return mappingReceiverDiscardsPrevious[Key, Val]{inner: mr}
+	return mappingReceiverDiscardsPrevious[Key, Val]{Inner: mr}
 }
 
-type mappingReceiverDiscardsPrevious[Key, Val any] struct{ inner MappingReceiver[Key, Val] }
+type mappingReceiverDiscardsPrevious[Key, Val any] struct{ Inner MappingReceiver[Key, Val] }
 
 func (mr mappingReceiverDiscardsPrevious[Key, Val]) Create(key Key, val Val) {
-	mr.inner.Put(key, val)
+	mr.Inner.Put(key, val)
 }
 
 func (mr mappingReceiverDiscardsPrevious[Key, Val]) Update(key Key, oldVal, newVal Val) {
-	mr.inner.Put(key, newVal)
+	mr.Inner.Put(key, newVal)
 }
 
 func (mr mappingReceiverDiscardsPrevious[Key, Val]) DeleteWithFinal(key Key, val Val) {
-	mr.inner.Delete(key)
+	mr.Inner.Delete(key)
 }
 
 // TransactionalMappingReceiver is one that takes updates in batches
@@ -252,17 +251,17 @@ func MutableMapWithKeyObserver[Key, Val any](mm MutableMap[Key, Val], observer S
 
 type mutableMapWithKeyObserver[Key, Val any] struct {
 	MutableMap[Key, Val]
-	observer SetWriter[Key]
+	Observer SetWriter[Key]
 }
 
 func (mko *mutableMapWithKeyObserver[Key, Val]) Put(key Key, val Val) {
 	mko.MutableMap.Put(key, val)
-	mko.observer.Add(key)
+	mko.Observer.Add(key)
 }
 
 func (mko *mutableMapWithKeyObserver[Key, Val]) Delete(key Key) {
 	mko.MutableMap.Delete(key)
-	mko.observer.Remove(key)
+	mko.Observer.Remove(key)
 }
 
 type TransformMappingReceiver[KeyOriginal, KeyTransformed, ValOriginal, ValTransformed any] struct {
@@ -285,52 +284,52 @@ func (xr TransformMappingReceiver[KeyOriginal, KeyTransformed, ValOriginal, ValT
 }
 
 func WrapMapWithMutex[Key comparable, Val any](theMap MutableMap[Key, Val]) MutableMap[Key, Val] {
-	return &mapMutex[Key, Val]{theMap: theMap}
+	return &mapMutex[Key, Val]{TheMap: theMap}
 }
 
 type mapMutex[Key comparable, Val any] struct {
 	sync.RWMutex
-	theMap MutableMap[Key, Val]
+	TheMap MutableMap[Key, Val]
 }
 
 func (mm *mapMutex[Key, Val]) IsEmpty() bool {
 	mm.RLock()
 	defer mm.RUnlock()
-	return mm.theMap.IsEmpty()
+	return mm.TheMap.IsEmpty()
 }
 
 func (mm *mapMutex[Key, Val]) LenIsCheap() bool {
-	return mm.theMap.LenIsCheap()
+	return mm.TheMap.LenIsCheap()
 }
 
 func (mm *mapMutex[Key, Val]) Len() int {
 	mm.RLock()
 	defer mm.RUnlock()
-	return mm.theMap.Len()
+	return mm.TheMap.Len()
 }
 
 func (mm *mapMutex[Key, Val]) Delete(key Key) {
 	mm.Lock()
 	defer mm.Unlock()
-	mm.theMap.Delete(key)
+	mm.TheMap.Delete(key)
 }
 
 func (mm *mapMutex[Key, Val]) Put(key Key, val Val) {
 	mm.Lock()
 	defer mm.Unlock()
-	mm.theMap.Put(key, val)
+	mm.TheMap.Put(key, val)
 }
 
 func (mm *mapMutex[Key, Val]) Get(key Key) (Val, bool) {
 	mm.RLock()
 	defer mm.RUnlock()
-	return mm.theMap.Get(key)
+	return mm.TheMap.Get(key)
 }
 
 func (mm *mapMutex[Key, Val]) Visit(visitor func(Pair[Key, Val]) error) error {
 	mm.RLock()
 	defer mm.RUnlock()
-	return mm.theMap.Visit(visitor)
+	return mm.TheMap.Visit(visitor)
 }
 
 func NewLoggingMappingReceiver[Key comparable, Val any](mapName string, logger klog.Logger) MappingReceiver[Key, Val] {
@@ -338,18 +337,18 @@ func NewLoggingMappingReceiver[Key comparable, Val any](mapName string, logger k
 }
 
 type loggingMappingReceiver[Key, Val any] struct {
-	mapName string
+	MapName string
 	logger  klog.Logger
 }
 
 var _ MappingReceiver[string, []any] = loggingMappingReceiver[string, []any]{}
 
 func (lmr loggingMappingReceiver[Key, Val]) Put(key Key, val Val) {
-	lmr.logger.Info("Put", "map", lmr.mapName, "key", key, "val", fmt.Sprintf("%+v", val))
+	lmr.logger.Info("Put", "map", lmr.MapName, "key", key, "val", val)
 }
 
 func (lmr loggingMappingReceiver[Key, Val]) Delete(key Key) {
-	lmr.logger.Info("Delete", "map", lmr.mapName, "key", key)
+	lmr.logger.Info("Delete", "map", lmr.MapName, "key", key)
 }
 
 func MappingReceiverAsVisitor[Key, Val any](receiver MappingReceiver[Key, Val]) func(Pair[Key, Val]) error {

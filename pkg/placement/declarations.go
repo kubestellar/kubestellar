@@ -17,6 +17,7 @@ limitations under the License.
 package placement
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -169,6 +170,12 @@ type ResolvedWhat struct {
 // match the corresponding CRD when the workload includes an object
 // of a kind that is not built into the edge cluster.
 type WorkloadParts map[WorkloadPartID]WorkloadPartDetails
+
+var _ json.Marshaler = WorkloadParts{}
+
+func (wp WorkloadParts) MarshalJSON() ([]byte, error) {
+	return MarshalMap(wp)
+}
 
 // WorkloadPartID identifies part of a workload.
 type WorkloadPartID = Triple[metav1.GroupResource, NamespaceName, ObjectName]
