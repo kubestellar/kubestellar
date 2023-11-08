@@ -39,6 +39,11 @@
 - Denaturing is the key to accepting native, unbundled Kubernetes resources as input
 - Unbundled resources are the preferred output of most cloud-native tools making KubeStellar use and integration easy
 
+## QuickStart
+
+Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/user-quickstart-kind/)
+
+
 ## Roadmap for the Project
 
 We have defined and largely completed the
@@ -46,10 +51,6 @@ We have defined and largely completed the
 The current activity is refining the definition of, and producing, the
 [PoC2023q4](../Coding%20Milestones/PoC2023q4/outline/).
 Goals not addressed in that PoC are to be explored later.
-
-## QuickStart
-
-Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
 
 ## Contributing
 
