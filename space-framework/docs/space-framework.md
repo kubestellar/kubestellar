@@ -10,15 +10,15 @@
 ## High level architecture  & Main components
 ![SF overall view](SF-All.drawio.svg "SF overall view")
 
-The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both CLI/script based and client-go based clients) to use spaces while maintaining the clients decoupled from the specific pSpace and space provider that is being used. 
+The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both script/kubectl based and client-go based clients) to use spaces while maintaining the clients decoupled from the specific pSpace and space provider that is being used. 
 
 The space framework uses two CRDs:
 - **SpaceProviderDesc:** This CRD represents a space provider it holds the information needed in order to interact with a specific Space  provider. 
 - **Space:** This CRD represents a space as defined above. It includes reference to secrets that allow clients to connect to the pSpace that it represents and also several attributes used by the SF that will be described later on. 
 
 Spaces can be divided into two categories:
-1. Provider based spaces: The Space Manager (SM) uses a space provider to get information (or perform operations) on the spaces. We can think of such pSpaces as "belong" to the space provider. There are two types of spaces in this category which control the way these spaces are added to the space framework: 
-   * **Managed Space**: The pSpace is created through an explicit request to the management api server to create a new Space. For Managed spaces the space framework initiates a request to the Space provider to create the pSpace, the space frame work will then continuously reconcile between the Space and the pSpace states. For managed spaces the desired state is controlled through the Space object. For example, in order to delete the pSpace the client need to delete the corresponding Space object and the SF will interact with the space provider in order to delete the pSpace.
+1. Provider based spaces: The Space Manager (SM) uses a space provider to get information (or perform operations) on the spaces. We can think of such pSpaces as "belonging" to the space provider. There are two types of spaces in this category which controls the way these spaces are added to the space framework: 
+   * **Managed Space**: The pSpace is created through an explicit request to the management api server to create a new Space. For Managed spaces the space framework initiates a request to the Space provider to create the pSpace, the space framework will then continuously reconcile between the Space and the pSpace states. For managed spaces the desired state is controlled through the Space object. For example, in order to delete the pSpace the client need to delete the corresponding Space object and the SF will interact with the space provider in order to delete the pSpace.
    * **Unmanaged Space**: The SF supports discovery of existing pSpaces on a space provider and adding them as "Unmanaged Spaces" into the framework. This mode is similar to the import mode in terms of the "source of truth" - the desired state is defined by the pSpace. However, as oppose to import, here the pSpaces are automatically discovered through the space provider regular interface and the pSpace access information is retrieved from the  space provider similarly to how it is done in the managed space case. The SF supports pattern based filtering rules to limit the discovery of pSpaces. 
   2. Providerless spaces: This spaces don't belong to a space provider and are called "Imported spaces". Such Space is created by importing an existing pSpace. In this case the Space is not linked to any space provider and the client which imports that Space need to supply the access information that allows other clients to connect to the pSpace. For imported spaces the desired state is derived by the pSpace. This means that the SF is not responsible for the life cycle management of the pSpace but only update the corresponding Space object. For example, when deleting the space object of an existing imported pSpace the space framework will recreate the space object. 
 ### Space Manager 
@@ -26,23 +26,21 @@ The Space Manager (SM) is a Kubernetes controller that is responsible for maint
 The SM uses a library of space provider adaptors to communicate with the space providers. Currently the SF supports 3 space providers KCP, KIND, and KubeFlex, and includes 3 space provider adaptors that the SM uses.
 
 ### Space provider adaptors
-The space manager uses a set of space provider adaptors that interacts with the space provider. All space provider adaptors implement a simple "space client interface" that includes basic pSpace life cycle operations. In addition the interface also defines the events that are sent from the adaptors to the space manager.
+The space manager uses a set of space provider adaptors that interact with the space provider. All space provider adaptors implement a simple "space client interface" that includes basic pSpace life cycle operations. In addition the interface also defines the events that are sent from the adaptors to the space manager.
 
 ### Space aware client (SAC)
-The Space aware client (SAC) allows clients/controllers to easily get access to the underlying space by simply using the space name. There is no direct interaction between the SAC and the Space  provider, and therefore the SAC is transparent to the specific provider of the spaces. 
+The Space aware client (SAC) allows clients/controllers to easily get access to the underlying space by simply using the space name and optionally the SpaceProviderDesc name. There is no direct interaction between the SAC and the Space  provider, and therefore the SAC is transparent to the specific provider of the spaces. 
 ![Space Aware Client](SAC.drawio.svg "Space Aware Client")
 The only requirement is that the space can be accessed through regular Kube APIs when using the appropriate kubeconfig information. 
 
 **Main features**  
 - Constantly watch for changes in the available spaces. The SAC is using an informer on Space objects using the SF Space client-go APIs.
     - Holds a cache of the pSpace access info for each Space 
-- Exposes utility functions to get RestConfig by simply specifying the space name, and optionally the provider name (if the provider is not specified the default provider is being used). The namespace where the Space resides can be derived from the name of the provider.  
-
-Currently the SAC exposes a simple function that that supplies a rest.Config data structure that gives access to a physical space with the identity of a user that is authorized to do everything. In the future we will add a SAC space aware ClientSets
+- Exposes utility functions to get the [rest.Config](https://pkg.go.dev/k8s.io/client-go@v0.28.3/rest#Config) data structure that gives access to a physical space with the identity of a user that is authorized to do everything. This convenient function only needs the space name, and optionally the provider name (if the provider name is omitted the default provider is being used. The namespace where the Space resides can be derived from the name of the provider. In the future we will add a SAC space aware ClientSets as well.
 
 ## Architecture details 
 When a new SpaceProviderDesc is created the SM creates a new namespace that will be used to host all the Space objects representing pSpaces on that space provider.  
-The name of the generated namespace will be `paceprovider-<provider name>`
+The name of the generated namespace will be `spaceprovider-<provider name>`
 
 ![Space, SpaceProviderDesc and the Space provider namespace](SF-NS.drawio.svg "SF Namespaces")
 
@@ -63,7 +61,7 @@ The SM uses finalizers for the space deletion flow - the Space object is not rem
 ## Examples
 
 **SpaceProviderDesc**
-The following is a SpaceProviderDesc for for a KubeFlex provider type. The secret referenced by `secretRef` should be created before the SpaceProviderDesc object is created.
+The following is a SpaceProviderDesc for for a KubeFlex provider type. The SpaceProviderDesc will become "Ready" only after the secret referenced by `secretRef` is successfully retrieved.
 ```
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
