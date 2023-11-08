@@ -32,7 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	corev1 "k8s.io/api/core/v1"
+	authenticationv1 "k8s.io/api/authentication/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,6 +46,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/utils/pointer"
 	"sigs.k8s.io/yaml"
 
 	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
@@ -341,28 +342,17 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 	upstreamConfig, err := clientcmd.RESTConfigFromKubeConfig(upstreamConfigBytes)
 	require.NoError(t, err, "failed to load upstream config")
 
-	// Read the downstream token from the deployment's service account secret
-	var tokenSecret corev1.Secret
-	framework.Eventually(t, func() (bool, string) {
-		secrets, err := downstreamKubeClient.CoreV1().Secrets(namespace).List(ctx, metav1.ListOptions{})
-		if err != nil {
-			t.Errorf("failed to list secrets: %v", err)
-			return false, fmt.Sprintf("failed to list secrets downstream: %v", err)
-		}
-		for _, secret := range secrets.Items {
-			t.Logf("checking secret %s/%s for annotation %s=%s", secret.Namespace, secret.Name, corev1.ServiceAccountNameKey, syncerID)
-			if secret.Annotations[corev1.ServiceAccountNameKey] == syncerID {
-				tokenSecret = secret
-				return len(secret.Data["token"]) > 0, fmt.Sprintf("token secret %s/%s for service account %s found", namespace, secret.Name, syncerID)
-			}
-		}
-		return false, fmt.Sprintf("token secret for service account %s/%s not found", namespace, syncerID)
-	}, wait.ForeverTestTimeout, time.Millisecond*100, "token secret in namespace %q for syncer service account %q not found", namespace, syncerID)
-	token := tokenSecret.Data["token"]
-	require.NotEmpty(t, token, "token is required")
+	// Create the downstream token from the deployment's service account secret
+	tokenRequest := &authenticationv1.TokenRequest{
+		Spec: authenticationv1.TokenRequestSpec{
+			ExpirationSeconds: pointer.Int64(3600),
+		},
+	}
+	token, err := downstreamKubeClient.CoreV1().ServiceAccounts(namespace).CreateToken(ctx, syncerID, tokenRequest, metav1.CreateOptions{})
+	require.NoError(t, err)
 
 	// Compose a new downstream config that uses the token
-	downstreamConfigWithToken := framework.ConfigWithToken(string(token), rest.CopyConfig(downstreamConfig))
+	downstreamConfigWithToken := framework.ConfigWithToken(token.Status.Token, rest.CopyConfig(downstreamConfig))
 	return &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfigWithToken,
