@@ -110,25 +110,15 @@ qs_sort: test
 %}
 
 #### 2. Install <span class="Space-Bd-BT">KUBESTELLAR</span>'s user commands and kubectl plugins
-!!! tip ""
-    === "install"
-         {%
-           include-markdown "../common-subs/brew-install.md"
-           start="<!--brew-install-start-->"
-           end="<!--brew-install-end-->"
-         %}
-    === "remove"
-         {%
-           include-markdown "../common-subs/brew-remove.md"
-           start="<!--brew-remove-start-->"
-           end="<!--brew-remove-end-->"
-         %}
-    === "uh oh, no brew?"
-         {%
-           include-markdown "../common-subs/brew-no.md"
-           start="<!--brew-no-start-->"
-           end="<!--brew-no-end-->"
-         %}
+
+```shell
+pwd
+rm -f bin/*
+make userbuild
+export PATH=$PWD/bin:$PATH
+bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
+export PATH=$PWD/kcp/bin:$PATH
+```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
@@ -171,6 +161,17 @@ qs_sort: test
            end="<!--kubestellar-apply-syncer-end-->"
          %}
 
+Wait for the mailbox controller to create the corresponding mailbox workspaces and remember them.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl ws root
+while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+echo The mailbox for ks-edge-cluster1 is $MB1
+MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+echo The mailbox for ks-edge-cluster2 is $MB2
+```
+
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
     === "deploy"
@@ -179,6 +180,77 @@ qs_sort: test
            start="<!--kubestellar-apply-apache-kind-start-->"
            end="<!--kubestellar-apply-apache-kind-end-->"
          %}
+
+Add a ServiceAccount that will be downsynced.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
+KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    edge.kubestellar.io/downsync-overwrite: "true"
+  namespace: my-namespace
+  name: test-sa
+EOF
+```
+
+Add an EdgePlacement that calls for that ServiceAccount to be downsynced.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v2alpha1
+kind: EdgePlacement
+metadata:
+  name: sa-test
+spec:
+  locationSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - apiGroup: ""
+    resources: [ serviceaccounts ]
+    namespaces: [ my-namespace ]
+    objectNames: [ test-sa ]
+EOF
+```
+
+Wait for the ServiceAccount to get to the mailbox workspaces.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB1
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
+    sleep 10
+done
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB2
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
+    sleep 10
+done
+```
+
+Give the controllers some time to fight over ServiceAccount secrets.
+
+```shell
+sleep 120
+```
+
+Look for excess secrets in the WDS.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
+KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
+[ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 2 ]
+```
+
+Look for excess secrets in the two mailbox spaces.
+
+```shell
+for mb in $MB1 $MB2; do
+    KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
+    KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 2 ]
+done
+```
 
 #### 6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""

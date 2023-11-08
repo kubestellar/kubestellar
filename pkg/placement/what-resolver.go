@@ -107,9 +107,9 @@ type NamespacedName = Pair[NamespaceName, ObjectName]
 
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	// placementBits holds an entry for each EdgePlacement whose what predicate
+	// PlacementBits holds an entry for each EdgePlacement whose what predicate
 	// matches the object, and the bool value is WantSingletonReportedState.
-	placementBits MutableMap[ObjectName, bool]
+	PlacementBits MutableMap[ObjectName, bool]
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -162,9 +162,9 @@ func (wr *whatResolver) Run(ctx context.Context) {
 }
 
 type namespacedQueueItem struct {
-	gk      schema.GroupKind
-	cluster logicalcluster.Name
-	nn      NamespacedName
+	GK      schema.GroupKind
+	Cluster logicalcluster.Name
+	NN      NamespacedName
 }
 
 type WhatResolverClusterHandler struct {
@@ -197,7 +197,7 @@ func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
 	if namespace != "" {
 		panic("Namespace must be empty here")
 	}
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -231,7 +231,7 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 		wr.logger.Error(err, "Impossible! SplitMetaNamespaceKey failed", "key", key)
 	}
 	nn := NewPair(NamespaceName(namespace), ObjectName(name))
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: nn}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: nn}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -251,7 +251,7 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		var gotSome bool
 		for objName, objDetails := range rr.byObjName {
 			// TODO: add index by EdgePlacement name to make this faster
-			wantSingletonReturn, found := objDetails.placementBits.Get(epName)
+			wantSingletonReturn, found := objDetails.PlacementBits.Get(epName)
 			if !found {
 				continue
 			}
@@ -334,12 +334,12 @@ func (wr *whatResolver) processNextWorkItem() bool {
 
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
-	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.cluster, item.nn.Second)
-	} else if item.gk.Group == ksmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
-		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
+	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
+		return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
+		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
-		return wr.processCenterObject(ctx, item.cluster, item.gk, item.nn)
+		return wr.processCenterObject(ctx, item.Cluster, item.GK, item.NN)
 	}
 }
 
@@ -392,8 +392,8 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 	}
 	changedPlacements := NewMapMap[ObjectName, bool](nil)
 	// TODO: make a way to not enumerate two when the bool changes
-	MapEnumerateDifferences[ObjectName, bool](newDetails.placementBits, oldDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
-	MapEnumerateDifferences[ObjectName, bool](oldDetails.placementBits, newDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
+	MapEnumerateDifferences[ObjectName, bool](newDetails.PlacementBits, oldDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
+	MapEnumerateDifferences[ObjectName, bool](oldDetails.PlacementBits, newDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if changedPlacements.IsEmpty() {
 		return true
@@ -406,7 +406,7 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 }
 
 func newObjectDetails() *objectDetails {
-	return &objectDetails{placementBits: NewMapMap[ObjectName, bool](nil)}
+	return &objectDetails{PlacementBits: NewMapMap[ObjectName, bool](nil)}
 }
 
 // process returns true on success or unrecoverable error, false to retry
@@ -439,7 +439,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		delete(wsDetails.resources, arName)
 		changedPlacements := NewEmptyMapSet[ObjectName]()
 		for _, objDetails := range rr.byObjName {
-			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.PlacementBits))
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -490,7 +490,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			rr.definers = newDefiners
 			changedPlacements := NewEmptyMapSet[ObjectName]()
 			for _, objDetails := range rr.byObjName {
-				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.PlacementBits))
 			}
 			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
 		}
@@ -555,8 +555,8 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		delete(wsDetails.placements, epName)
 		for _, rr := range wsDetails.resources {
 			for objName, objDetails := range rr.byObjName {
-				objDetails.placementBits.Delete(epName)
-				if objDetails.placementBits.IsEmpty() {
+				objDetails.PlacementBits.Delete(epName)
+				if objDetails.PlacementBits.IsEmpty() {
 					delete(rr.byObjName, objName)
 				}
 			}
@@ -639,7 +639,7 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 
 // returns `(changed bool, success bool)`
 func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
-	wantSingletonReturn, found := od.placementBits.Get(epName)
+	wantSingletonReturn, found := od.PlacementBits.Get(epName)
 	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
 		return false, false
@@ -648,9 +648,9 @@ func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, s
 		return false, true
 	}
 	if objMatch {
-		od.placementBits.Put(epName, spec.WantSingletonReportedState)
+		od.PlacementBits.Put(epName, spec.WantSingletonReportedState)
 	} else {
-		od.placementBits.Delete(epName)
+		od.PlacementBits.Delete(epName)
 	}
 	return true, true
 }
