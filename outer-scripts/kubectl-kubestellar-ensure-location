@@ -118,11 +118,6 @@ then kubectl ws "${kubectl_flags[@]}" "$imw"
      cwsi=$imw
 fi
 echo "current cwsi is $cwsi"
-if ! kubectl "${kubectl_flags[@]}" get apibinding "edge.kubestellar.io" &> /dev/null; then
-    kubectl kcp "${kubectl_flags[@]}" bind apiexport root:espw:edge.kubestellar.io
-    echo "bound apiexport root:espw:edge.kubestellar.io into $cwsi:edge.kubestellar.io"
-else echo "edge.kubestellar.io apibinding exists in workspace $cwsi"
-fi
 
 if ! kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$objname" &> /dev/null; then
 (cat <<EOF
