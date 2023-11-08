@@ -47,6 +47,29 @@ The kubectl plugin lines use fully specific executables (e.g.,
 `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
+#### Get binaries of kube-bind and dex
+The command below makes kube-bind binaries and dex binary available in `$PATH`.
+
+```shell
+rm -rf kube-bind
+rm -rf kube-bind-autobind
+git clone https://github.com/kube-bind/kube-bind.git && \
+pushd kube-bind && \
+IGNORE_GO_VERSION=1 make build && \
+export PATH=$(pwd)/bin:$PATH && \
+popd && \
+git clone -b autobind https://github.com/waltforme/kube-bind.git kube-bind-autobind && \
+pushd kube-bind-autobind && \
+IGNORE_GO_VERSION=1 go build -o ../kube-bind/bin/kubectl-bind cmd/kubectl-bind/main.go && \
+popd && \
+git clone https://github.com/dexidp/dex.git && \
+pushd dex && \
+IGNORE_GO_VERSION=1 make build && \
+export PATH=$(pwd)/bin:$PATH && \
+popd && \
+cp ./kube-bind/hack/dex-config-dev.yaml ./dex/dex-config-dev.yaml
+```
+
 #### Initialize the KubeStellar platform as bare processes
 
 In this step KubeStellar creates and populates the Edge Service
