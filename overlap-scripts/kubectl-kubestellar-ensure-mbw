@@ -90,7 +90,7 @@ function run_kb_konnector_for_mbw() {
         kubectl create ns kube-system
     fi
     echo "starting kube-bind konnector for mbw in background"
-    konnector &
+    konnector &> /dev/null &
     if ! pgrep konnector &> /dev/null; then
         echo "kube-bind konnector not started"
         exit 1
