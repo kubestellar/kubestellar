@@ -262,6 +262,8 @@ the center as well in the edge clusters.
 - <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_amd64.tar.gz>
 - <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_arm64.tar.gz>
 - <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_linux_ppc64le.tar.gz>
+- <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_darwin_amd64.tar.gz>
+- <https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_darwin_arm64.tar.gz>
 
 #### Needs to be natured in center and edge
 
