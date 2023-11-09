@@ -1886,16 +1886,16 @@ chosen release of KubeStellar (see <a href="https://github.com/kubestellar/kubes
 GitHub</a>) and
 <code>$os_type</code> and <code>$arch_type</code> are chosen according to the list of
 "assets" for your chosen release.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl -SL -o kubestellar.tar.gz &quot;https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>tar xzf kubestellar.tar.gz
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>export PATH=$PWD/bin:$PATH
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-SL<span class="w"> </span>-o<span class="w"> </span>kubestellar.tar.gz<span class="w"> </span><span class="s2">&quot;https://github.com/kubestellar/kubestellar/releases/download/</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">/kubestellar_</span><span class="si">${</span><span class="nv">kubestellar_version</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">os_type</span><span class="si">}</span><span class="s2">_</span><span class="si">${</span><span class="nv">arch_type</span><span class="si">}</span><span class="s2">.tar.gz</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="s2">tar xzf kubestellar.tar.gz</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s2">export PATH=</span><span class="nv">$PWD</span><span class="s2">/bin:</span><span class="nv">$PATH</span>
 </code></pre></div>
 <h5 id="get-from-github">Get from GitHub<a class="headerlink" href="#get-from-github" title="Permanent link">#</a></h5>
 <p>You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add <code>-b
 $branch</code> to the <code>git</code> command in order to get a different branch.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git clone https://github.com/kubestellar/kubestellar
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cd kubestellar
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kubestellar/kubestellar
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>kubestellar
 </code></pre></div>
 <p>Use the following commands to build and add the executables to your
 <code>$PATH</code>.</p>
@@ -1953,8 +1953,8 @@ using kcp or KubeStellar. For example, you might use the following
 commands to fetch and start using that kubeconfig file; the first
 assumes that you deployed the core into a Kubernetes namespace named
 "kubestellar".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl kubestellar get-external-kubeconfig -n kubestellar -o kcs.kubeconfig
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>export KUBECONFIG=$(pwd)/kcs.kubeconfig
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>get-external-kubeconfig<span class="w"> </span>-n<span class="w"> </span>kubestellar<span class="w"> </span>-o<span class="w"> </span>kcs.kubeconfig
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/kcs.kubeconfig
 </code></pre></div>
 <p>Note that you now care about two different kubeconfig files: the one
 that you were using earlier, which holds the contexts for your <code>kind</code>
