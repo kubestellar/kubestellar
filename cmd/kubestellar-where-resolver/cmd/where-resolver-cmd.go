@@ -88,7 +88,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 	espwClientset, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create config for edge exports")
+		logger.Error(err, "failed to create clientset for service provider space")
 		return err
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)

@@ -52,12 +52,10 @@ import (
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -181,7 +179,6 @@ func main() {
 	spsPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
 	syncfgPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
 	customizerPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
-	var _ edgev1a1informers.SinglePlacementSliceInformer = spsPreInformer
 
 	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
@@ -191,10 +188,8 @@ func main() {
 
 	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
 	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
-	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
 	locationPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
-	var _ edgev1a1informers.LocationInformer = locationPreInformer
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
