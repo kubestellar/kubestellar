@@ -1,8 +1,4 @@
 <!--kubestellar-syncer-1-syncer-gen-plugin-start-->
-``` {.bash .hide-me}
-exit 0
-```
-
 Generate UUID for Syncer identification.
 ```shell
 syncer_id="syncer-"`uuidgen | tr '[:upper:]' '[:lower:]'`
@@ -69,10 +65,29 @@ subjects:
 EOL
 ```
 
-Get the serviceaccount token that will be set in the upstream kubeconfig manifest.  **NOTE** This part is outdated due to the recent denaturing of ServiceAccounts in kcp workspaces; the syncer-gen plugin will actually wait a little while and then create the Secret if nothing else has.
+Wait a little for the secret to be created for kubernetes cluster with LegacyServiceAccountTokenNoAutoGeneration disabled and get the token from the secret. 
 ```shell
-secret_name=`kubectl get secret -o custom-columns=":.metadata.name"| grep $syncer_id`
-token=`kubectl get secret $secret_name -o jsonpath='{.data.token}' | base64 -d`
+token=""
+count=0
+while [[ $count -lt 5 ]]
+do
+  secret_name=`kubectl get secret -o custom-columns=":.metadata.name"| grep $syncer_id` || true
+  if [[ "$secret_name" == "" ]];then
+    echo retry in 1s
+    sleep 1
+    let count=count+1
+  else
+    token=`kubectl get secret $secret_name -o jsonpath='{.data.token}' | base64 -d`
+    break
+  fi
+done
+```
+
+If the SA token secret is not created, it means the kubernetes version is equal or later then v1.24. In that case, generate SA token manually.
+```shell
+if [[ "$token" == "" ]];then
+  token=`kubectl create token $syncer_id`
+fi
 ```
 
 Get the certificates that will be set in the upstream kubeconfig manifest.
