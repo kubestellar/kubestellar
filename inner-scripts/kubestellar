@@ -46,6 +46,34 @@ function echoerr() {
    echo "ERROR: $1" >&2
 }
 
+# Check if a given process name is running
+process_running() {
+  SERVICE="$1"
+  if pgrep -f "$SERVICE" >/dev/null
+  then
+      echo "running"
+  else
+      echo "stopped"
+  fi
+}
+
+wait_for_process(){
+  status=$(process_running $1)
+  MAX_RETRIES=10
+  retries=0
+  status_code=0
+  while [ $status != "running" ]; do
+      if [ $retries -eq $MAX_RETRIES ]; then
+           status_code=1
+           break
+      fi
+
+      retries=$(( retries + 1 ))
+      sleep 3
+      status=$(process_running $1)
+  done
+  echo $status_code
+}
 
 function run_kb_konnector_for_imw() {
     if kubectl get ns kube-system &> /dev/null; then
@@ -56,8 +84,13 @@ function run_kb_konnector_for_imw() {
     fi
     echo "starting kube-bind konnector for imw in background"
     konnector &
-    if ! pgrep konnector &> /dev/null; then
-        echo "kube-bind konnector not started"
+
+    run_status=$(wait_for_process konnector)
+    if [ $run_status -eq 0 ]; then
+        echo " konnector started"
+    else
+        echo "konnector not started"
+        sleep 2
         exit 1
     fi
 }
@@ -170,16 +203,6 @@ case "$local_kcp" in
 esac
 
 
-# Check if a given process name is running
-process_running() {
-  SERVICE="$1"
-  if pgrep -f "$SERVICE" >/dev/null
-  then
-      echo "running"
-  else
-      echo "stopped"
-  fi
-}
 
 function create_or_replace() { # usage: filename
     filename="$1"
@@ -360,8 +383,13 @@ function ensure_espw() {
 function run_dex() {
     echo "--< starting dex in background >--"
     dex serve "$bindir/../dex/dex-config-dev.yaml" &
-    if ! pgrep dex &> /dev/null; then
+
+    run_status=$(wait_for_process dex)
+    if [ $run_status -eq 0 ]; then
+        echo " dex started"
+    else
         echo "dex not started"
+        sleep 2
         exit 1
     fi
 }
@@ -371,8 +399,13 @@ function run_kb_backend() {
     kubectl ws root:espw
     kubectl apply -f "$bindir/../kube-bind/deploy/crd"
     example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &
-    if ! pgrep example-backend &> /dev/null; then
-        echo "kube-bind example-backend not started"
+
+    run_status=$(wait_for_process example-backend)
+    if [ $run_status -eq 0 ]; then
+        echo " example-backend started"
+    else
+        echo "example-backend not started"
+        sleep 2
         exit 1
     fi
 }
@@ -432,23 +465,6 @@ if [ $subcommand == init ]; then
     exit 0
 fi
 
-wait_for_process(){
-  status=$(process_running $1)
-  MAX_RETRIES=5
-  retries=0
-  status_code=0
-  while [ $status != "running" ]; do
-      if [ $retries -eq $MAX_RETRIES ]; then
-           status_code=1
-           break
-      fi
-
-      retries=$(( retries + 1 ))
-      sleep 3
-      status=$(process_running $1)
-  done
-  echo $status_code
-}
 
 
 # Start the kubestellar controllers
