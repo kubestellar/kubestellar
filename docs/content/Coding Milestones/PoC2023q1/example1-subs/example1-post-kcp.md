@@ -14,7 +14,7 @@ GitHub](https://github.com/kubestellar/kubestellar/releases)) and
 `$os_type` and `$arch_type` are chosen according to the list of
 "assets" for your chosen release.
 
-```{.base}
+``` {.bash}
 curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
 tar xzf kubestellar.tar.gz
 export PATH=$PWD/bin:$PATH
@@ -26,7 +26,7 @@ You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add `-b
 $branch` to the `git` command in order to get a different branch.
 
-```{.base}
+``` {.bash}
 git clone {{ config.repo_url }}
 cd kubestellar
 ```
@@ -104,7 +104,7 @@ commands to fetch and start using that kubeconfig file; the first
 assumes that you deployed the core into a Kubernetes namespace named
 "kubestellar".
 
-```{.base}
+``` {.bash}
 kubectl kubestellar get-external-kubeconfig -n kubestellar -o kcs.kubeconfig
 export KUBECONFIG=$(pwd)/kcs.kubeconfig
 ```
