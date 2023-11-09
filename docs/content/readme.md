@@ -22,12 +22,18 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 
+Think of KubeStellar as a post office where you drop off packages. You don't want the post office to open your packages, you want them to deliver your packages to one or more recipients where they will be opened. Like a post office for Kubernetes resources, KubeStellar is a super handy solution for deploying your Kubernetes configurations across multiple clusters anywhere in the world (public, private, edge, etc). 
+
+How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
+
+Think of KubeStellar as an innovative way to store inactive Kubernetes resources and then send them to wherever you them need to run.  
+
 
 ## KubeStellar treats multiple Kubernetes clusters as one so you can:
 
-- __Centrally__ deploy Kubernetes resources across multiple clusters 
-- Use __standard deployment tools__ (kubectl, helm, ArgoCD, Flux) no bundling required
-- __Discover__ objects created on edge clusters
+- __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters 
+- Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux) without special bundling 
+- __Discover__ dynamically created objects created on remote clusters
 - Make __disconnected__ cluster operation possible
 - Designed for __scalability__ with 1:many and many:1 scenarios
 - __Modular__ design to ensure compatibility with cloud-native tools
@@ -35,16 +41,16 @@
 ## KubeStellar virtual clusters (Spaces) are our secret
 - KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
 - Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
-- Fewer api-resources mean resources remain denatured – they do not expand into other resources like replicasets, pods, etc.
-- Denaturing is the key to accepting native, unbundled Kubernetes resources as input
-- Unbundled resources are the preferred output of most cloud-native tools making KubeStellar use and integration easy
+- Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
+- Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them
+- Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
 
 ## QuickStart
 
 Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/user-quickstart-kind/)
 
 
-## Roadmap for the Project
+## Roadmaps for the Project
 
 We have defined and largely completed the
 [PoC2023q1](../Coding%20Milestones/PoC2023q1/outline/).
