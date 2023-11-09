@@ -7,7 +7,7 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw1 guilder
+kubectl kubestellar prep-for-syncer --imw root:imw1 guilder --central
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw1".
@@ -68,7 +68,7 @@ local-path-storage                 local-path-provisioner             1/1     1 
 Do the analogous stuff for the florin cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw1 florin
+kubectl kubestellar prep-for-syncer --imw root:imw1 florin --central
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw1".
