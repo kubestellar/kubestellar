@@ -22,7 +22,7 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 
-Think of KubeStellar as a post office where you drop off packages. You don't want the post office to open your packages, you want them to deliver your packages to one or more recipients where they will be opened. Like a post office for Kubernetes resources, KubeStellar is a super handy solution for deploying your Kubernetes configurations across multiple clusters anywhere in the world (public, private, edge, etc). 
+Think of KubeStellar like a post office where you drop off packages. You don't want the post office to open your packages, you want them to deliver your packages to one or more recipients where they will be opened. Like a post office for Kubernetes, KubeStellar is a super handy solution for deploying your Kubernetes resources across multiple clusters anywhere in the world (public, private, edge, etc). 
 
 How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
 
