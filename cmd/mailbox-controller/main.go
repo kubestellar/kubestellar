@@ -44,7 +44,6 @@ import (
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
@@ -66,6 +65,8 @@ func main() {
 	rootClientOpts := clientopts.NewClientOpts("root", "access to the root workspace")
 	rootClientOpts.SetDefaultCurrentContext("root")
 	rootClientOpts.AddFlags(fs)
+	espwClientOpts := clientopts.NewClientOpts("espw", "access to the edge service provider workspace")
+	espwClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -89,8 +90,7 @@ func main() {
 	}()
 
 	// create edgeSharedInformerFactory
-	options := resolveroptions.NewOptions()
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	espwRestConfig, err := espwClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		os.Exit(3)
