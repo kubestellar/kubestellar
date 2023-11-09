@@ -19,6 +19,40 @@
 
 # Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
 
+function create_space() { # usage: space_name
+    space_name=$1
+    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} create -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: $space_name
+  namespace: "${PROVIDER_NAMESPACE}"
+spec:
+  SpaceProviderDescName: "${PROVIDER_NAME}"
+  Type: "managed"
+EOF
+    echo "Waiting for space $space_name to get into the Ready phase."
+    until [ "$(kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n ${PROVIDER_NAMESPACE} -o yaml | grep Ready)" != "" ]; do
+        sleep 1
+    done
+}
+
+function get_kubeconfig_file() { # usage: space_name provider_namespace
+    space_name="$1"
+    provider_namespace="$2"
+    secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.name}'`
+    secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.namespace}'`
+    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > ${KUBECONFIG_DIR}/${provider_namespace}-${space_name}
+}
+
+function create_space_if_needed_and_get_config() { # usage: space_name
+    space_name="$1"
+    if kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n ${PROVIDER_NAMESPACE} 2>&1 | grep "not found" ; then
+        create_space $space_name
+    fi
+    get_kubeconfig_file $space_name ${PROVIDER_NAMESPACE}
+}
+
 want_kube=true
 wmw_name=""
 
@@ -70,12 +104,8 @@ esac
 
 set -e
 
-kubectl ws "${kubectl_flags[@]}" root
-
-if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &> /dev/null
-then kubectl ws "${kubectl_flags[@]}" "$wmw_name"
-else kubectl ws "${kubectl_flags[@]}" create "$wmw_name" --enter
-fi
+create_space_if_needed_and_get_config ${wmw_name}
+kubectl ws "${kubectl_flags[@]}" root:"$wmw_name"
 
 if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-espw &> /dev/null; then
 kubectl "${kubectl_flags[@]}" apply -f - <<EOF
