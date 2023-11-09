@@ -520,8 +520,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#roadmap-for-the-project" class="md-nav__link">
-    Roadmap for the Project
+  <a href="#roadmaps-for-the-project" class="md-nav__link">
+    Roadmaps for the Project
   </a>
   
 </li>
@@ -1916,8 +1916,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#roadmap-for-the-project" class="md-nav__link">
-    Roadmap for the Project
+  <a href="#roadmaps-for-the-project" class="md-nav__link">
+    Roadmaps for the Project
   </a>
   
 </li>
@@ -1996,11 +1996,14 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a></p>
+<p>Think of KubeStellar as a post office where you drop off packages. You don't want the post office to open your packages, you want them to deliver your packages to one or more recipients where they will be opened. Like a post office for Kubernetes resources, KubeStellar is a super handy solution for deploying your Kubernetes configurations across multiple clusters anywhere in the world (public, private, edge, etc). </p>
+<p>How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. </p>
+<p>Think of KubeStellar as an innovative way to store inactive Kubernetes resources and then send them to wherever you them need to run.  </p>
 <h2 id="kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can">KubeStellar treats multiple Kubernetes clusters as one so you can:<a class="headerlink" href="#kubestellar-treats-multiple-kubernetes-clusters-as-one-so-you-can" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>Centrally</strong> deploy Kubernetes resources across multiple clusters </li>
-<li>Use <strong>standard deployment tools</strong> (kubectl, helm, ArgoCD, Flux) no bundling required</li>
-<li><strong>Discover</strong> objects created on edge clusters</li>
+<li><strong>Centrally</strong> apply Kubernetes resources for selective deployment across multiple clusters </li>
+<li>Use <strong>standard Kubernetes native deployment tools</strong> (kubectl, Helm, Kustomize, ArgoCD, Flux) without special bundling </li>
+<li><strong>Discover</strong> dynamically created objects created on remote clusters</li>
 <li>Make <strong>disconnected</strong> cluster operation possible</li>
 <li>Designed for <strong>scalability</strong> with 1:many and many:1 scenarios</li>
 <li><strong>Modular</strong> design to ensure compatibility with cloud-native tools</li>
@@ -2009,13 +2012,13 @@
 <ul>
 <li>KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster</li>
 <li>Standard Kubernetes clusters have <strong>2-300</strong> api-resources, KubeStellar Spaces have only <strong>40</strong></li>
-<li>Fewer api-resources mean resources remain denatured – they do not expand into other resources like replicasets, pods, etc.</li>
-<li>Denaturing is the key to accepting native, unbundled Kubernetes resources as input</li>
-<li>Unbundled resources are the preferred output of most cloud-native tools making KubeStellar use and integration easy</li>
+<li>Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.</li>
+<li>Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them</li>
+<li>Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy</li>
 </ul>
 <h2 id="quickstart">QuickStart<a class="headerlink" href="#quickstart" title="Permanent link">#</a></h2>
 <p>Checkout our <a href="https://docs.kubestellar.io/main/Getting-Started/user-quickstart-kind/">QuickStart Guide</a></p>
-<h2 id="roadmap-for-the-project">Roadmap for the Project<a class="headerlink" href="#roadmap-for-the-project" title="Permanent link">#</a></h2>
+<h2 id="roadmaps-for-the-project">Roadmaps for the Project<a class="headerlink" href="#roadmaps-for-the-project" title="Permanent link">#</a></h2>
 <p>We have defined and largely completed the
 <a href="../Coding%20Milestones/PoC2023q1/outline/">PoC2023q1</a>.
 The current activity is refining the definition of, and producing, the
