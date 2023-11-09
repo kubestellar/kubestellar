@@ -16,20 +16,27 @@
 image:
   repository: quay.io/kubestellar/kubestellar
   pullPolicy: IfNotPresent
-  tag: release-0.14
+  tag: sp-mgt-pr2
 
 # Space abstraction layer image parameters
 spaceimage:
   repository: quay.io/kubestellar/space-framework
   pullPolicy: IfNotPresent
-  tag: sp-mgt
+  tag: sp-mgt-pr2
 
-# The namespace used by the space abstraction layer.  
+# The namespace used by the space abstraction layer. This is where
+# the space provider object and the applicable secrets are created.
 spaceNamespace: default
 
-# The space framework default provider
+# The space framework default provider type.
 # Possible values: [kcp|kubeflex]
-defaultSpaceProvider: kcp
+defaultSpaceProviderType: kcp
+
+# Spaces are located within the same cluster as the kubestellar pod.
+inClusterSpaces: true
+
+# Directory where the spaces kubeconfig files are located.
+spaceConfigDirectory: /home/kubestellar/spaces
 
 # Storage size
 storageSize: 8Gi
@@ -48,7 +55,7 @@ CONTROLLER_VERBOSITY: 2
 ESPW_NAME: "espw"
 
 # List comma separated inventories to be created (e.g., "root:inv-1,root:abc:inv-2")
-ENSURE_IMW: "root:imw1"
+ENSURE_IMW: "imw1"
 
 # List comma separated WMWs to be created (e.g., "root:wmw-1,root:wmw-2")
-ENSURE_WMW: "root:wmw1"
+ENSURE_WMW: "wmw1"

@@ -48,6 +48,8 @@ spec:
           value: "{{ .Values.EXTERNAL_HOSTNAME }}"
         - name: EXTERNAL_PORT
           value: "{{ .Values.EXTERNAL_PORT }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
 
       - name: kcp
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
@@ -68,6 +70,8 @@ spec:
           value: "{{ .Values.EXTERNAL_HOSTNAME }}"
         - name: EXTERNAL_PORT
           value: "{{ .Values.EXTERNAL_PORT }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
         volumeMounts:
         - name: kubestellar-pv
           mountPath: "/home/kubestellar/.kcp"
@@ -100,8 +104,12 @@ spec:
           value: "{{ .Values.ENSURE_WMW }}"
         - name: NAMESPACE 
           value: "{{ .Values.spaceNamespace }}"
-        - name: SPACE_PROVIDER 
-          value: "{{ .Values.defaultSpaceProvider }}"
+        - name: SPACE_PROVIDER_TYPE
+          value: "{{ .Values.defaultSpaceProviderType }}"
+        - name: IN_CLUSTER
+          value: "{{ .Values.inClusterSpaces }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
           # volumeMounts:
           # - name: kubestellar-secret
           #   mountPath: "/home/kubestellar/.kcp"
@@ -123,6 +131,8 @@ spec:
         env:
         - name: VERBOSITY
           value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
         # volumeMounts:
         # - name: kubestellar-secret
         #   mountPath: "/home/kubestellar/.kcp"
@@ -144,6 +154,8 @@ spec:
         env:
         - name: VERBOSITY
           value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
         # volumeMounts:
         # - name: kubestellar-secret
         #   mountPath: "/home/kubestellar/.kcp"
@@ -165,6 +177,8 @@ spec:
         env:
         - name: VERBOSITY
           value: "{{ .Values.CONTROLLER_VERBOSITY }}"
+        - name: KUBECONFIG_DIR
+          value: "{{ .Values.spaceConfigDirectory }}"
         # volumeMounts:
         # - name: kubestellar-secret
         #   mountPath: "/home/kubestellar/.kcp"
