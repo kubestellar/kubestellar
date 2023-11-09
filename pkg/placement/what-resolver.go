@@ -108,8 +108,8 @@ type NamespacedName = Pair[NamespaceName, ObjectName]
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
 	// PlacementBits holds an entry for each EdgePlacement whose what predicate
-	// matches the object, and the bool value is WantSingletonReportedState.
-	PlacementBits MutableMap[ObjectName, bool]
+	// matches the object.
+	PlacementBits MutableMap[ObjectName, DistributionBits]
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -251,12 +251,12 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		var gotSome bool
 		for objName, objDetails := range rr.byObjName {
 			// TODO: add index by EdgePlacement name to make this faster
-			wantSingletonReturn, found := objDetails.PlacementBits.Get(epName)
+			distrBits, found := objDetails.PlacementBits.Get(epName)
 			if !found {
 				continue
 			}
 			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
-			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, ReturnSingletonState: wantSingletonReturn}
+			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version}.setDistributionBits(distrBits)
 			wr.logger.V(4).Info("Returning part", "partID", partID, "partDetails", partDetails, "definers", rr.definers)
 			parts[partID] = partDetails
 			gotSome = true
@@ -390,10 +390,10 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 			return false
 		}
 	}
-	changedPlacements := NewMapMap[ObjectName, bool](nil)
-	// TODO: make a way to not enumerate two when the bool changes
-	MapEnumerateDifferences[ObjectName, bool](newDetails.PlacementBits, oldDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
-	MapEnumerateDifferences[ObjectName, bool](oldDetails.PlacementBits, newDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
+	changedPlacements := NewMapMap[ObjectName, DistributionBits](nil)
+	// TODO: make a way to not enumerate two when the bits change
+	MapEnumerateDifferences[ObjectName, DistributionBits](newDetails.PlacementBits, oldDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
+	MapEnumerateDifferences[ObjectName, DistributionBits](oldDetails.PlacementBits, newDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if changedPlacements.IsEmpty() {
 		return true
@@ -401,12 +401,12 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 	if rObj != nil {
 		rr.byObjName[objName] = newDetails
 	}
-	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, bool](changedPlacements))
+	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, DistributionBits](changedPlacements))
 	return true
 }
 
 func newObjectDetails() *objectDetails {
-	return &objectDetails{PlacementBits: NewMapMap[ObjectName, bool](nil)}
+	return &objectDetails{PlacementBits: NewMapMap[ObjectName, DistributionBits](nil)}
 }
 
 // process returns true on success or unrecoverable error, false to retry
@@ -439,7 +439,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		delete(wsDetails.resources, arName)
 		changedPlacements := NewEmptyMapSet[ObjectName]()
 		for _, objDetails := range rr.byObjName {
-			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.PlacementBits))
+			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -490,7 +490,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			rr.definers = newDefiners
 			changedPlacements := NewEmptyMapSet[ObjectName]()
 			for _, objDetails := range rr.byObjName {
-				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.PlacementBits))
+				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 			}
 			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
 		}
@@ -639,20 +639,30 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 
 // returns `(changed bool, success bool)`
 func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
-	wantSingletonReturn, found := od.PlacementBits.Get(epName)
+	oldDistrBits, found := od.PlacementBits.Get(epName)
+	newDistrBits := DistributionBits{ReturnSingletonState: spec.WantSingletonReportedState,
+		CreateOnly: whatObj != nil && isCreateOnly(whatObj)}
 	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
 		return false, false
 	}
-	if objMatch == found && (wantSingletonReturn == spec.WantSingletonReportedState || !found) {
+	if objMatch == found && (oldDistrBits == newDistrBits || !found) {
 		return false, true
 	}
 	if objMatch {
-		od.PlacementBits.Put(epName, spec.WantSingletonReportedState)
+		od.PlacementBits.Put(epName, newDistrBits)
 	} else {
 		od.PlacementBits.Delete(epName)
 	}
 	return true, true
+}
+
+func isCreateOnly(whatObj mrObject) bool {
+	annotations := whatObj.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+	return annotations[edgeapi.DownsyncOverwriteKey] == "false"
 }
 
 // whatMatches tests the given object against the "what predicate" of an EdgePlacementSpec.

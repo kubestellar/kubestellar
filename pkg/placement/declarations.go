@@ -92,9 +92,9 @@ type WorkloadProjector interface {
 // The FooDistributions are denormalized: the `returnSingletonReport bool` is duplicated for all destinations.
 // The booleans returned from the SetWriters may not be meaningful.
 type WorkloadProjectionSections struct {
-	NamespacedObjectDistributions    MappingReceiver[NamespacedDistributionTuple, bool]
+	NamespacedObjectDistributions    MappingReceiver[NamespacedDistributionTuple, DistributionBits]
 	NamespacedModes                  MappingReceiver[ProjectionModeKey, ProjectionModeVal]
-	NonNamespacedObjectDistributions MappingReceiver[NonNamespacedDistributionTuple, bool]
+	NonNamespacedObjectDistributions MappingReceiver[NonNamespacedDistributionTuple, DistributionBits]
 	NonNamespacedModes               MappingReceiver[ProjectionModeKey, ProjectionModeVal]
 	Upsyncs                          SetWriter[Pair[SinglePlacement, edgeapi.UpsyncSet]]
 }
@@ -106,6 +106,11 @@ type ExternalNamespacedName = Triple[logicalcluster.Name, NamespaceName, ObjectN
 type NamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/]
 
 type NonNamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalName /*of downsynced object*/]
+
+type DistributionBits struct {
+	ReturnSingletonState bool
+	CreateOnly           bool
+}
 
 type ProjectionModeKey struct {
 	GroupResource metav1.GroupResource
@@ -201,6 +206,23 @@ type WorkloadPartDetails struct {
 	// This is denormalized: this is duplicated among all the downsynced objects selected
 	// by a given EdgePlacement.
 	ReturnSingletonState bool
+
+	// CreateOnly says that all of the desired state of the object
+	// (excluding the identity of the object) is malleable in the WECs and
+	// the WDS only supplies an initial value.
+	// When multiple EdgePlacement objects provide different values for this bit,
+	// they are combined by OR.
+	CreateOnly bool
+}
+
+func (wpd WorkloadPartDetails) distributionBits() DistributionBits {
+	return DistributionBits{ReturnSingletonState: wpd.ReturnSingletonState, CreateOnly: wpd.CreateOnly}
+}
+
+func (wpd WorkloadPartDetails) setDistributionBits(bits DistributionBits) WorkloadPartDetails {
+	wpd.ReturnSingletonState = bits.ReturnSingletonState
+	wpd.CreateOnly = bits.CreateOnly
+	return wpd
 }
 
 // ProjectionKey identifies the topmost level of organization,

@@ -93,10 +93,11 @@ func TestWhatResolver(t *testing.T) {
 	cm3 := &k8scorev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{Kind: "ConfigMap", APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace:   "default",
-			Name:        "cm3",
-			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String()},
-			Labels:      map[string]string{"foo": "baz"},
+			Namespace: "default",
+			Name:      "cm3",
+			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String(),
+				edgeapi.DownsyncOverwriteKey: "false"},
+			Labels: map[string]string{"foo": "baz"},
 		}}
 	ep1 := &edgeapi.EdgePlacement{
 		TypeMeta: metav1.TypeMeta{Kind: "EdgePlacement", APIVersion: edgeapi.SchemeGroupVersion.String()},
@@ -159,7 +160,8 @@ func TestWhatResolver(t *testing.T) {
 	partdt1 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true}
 	partid2 := WorkloadPartID{metav1.GroupResource{Resource: "namespaces"}, "", "ns2"}
 	partid3 := WorkloadPartID{metav1.GroupResource{Resource: "configmaps"}, "default", "cm3"}
-	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt1}}
+	partdt3 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true, CreateOnly: true}
+	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt3}}
 	err := wait.PollWithContext(ctx, time.Second, 5*time.Second, func(context.Context) (bool, error) {
 		gotWhat, found := rcvr.Get(ep1EN)
 		t.Logf("gotWhat=%v, found=%v", gotWhat, found)

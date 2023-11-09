@@ -127,53 +127,53 @@ func NewWorkloadProjector(
 			HashSinglePlacement{}, HashUpsyncSet{}),
 	}
 	wp.nsdDistributionsForProj = NewGenericFactoredMap[NamespacedDistributionTuple,
-		logicalcluster.Name, Triple[metav1.GroupResource, NamespacedName, SinglePlacement], bool,
+		logicalcluster.Name, Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits,
 		wpPerSourceNSDistributions, wpPerSourceNSDistributions](
 		factorNamespacedDistributionTupleForProj1and234,
 		func(source logicalcluster.Name) wpPerSourceNSDistributions {
 			wps := MapGetAdd(wp.perSource, source, true, wp.newPerSourceLocked)
 			return wpPerSourceNSDistributions{wps}
 		},
-		func(nsd wpPerSourceNSDistributions) MutableMap[Triple[metav1.GroupResource, NamespacedName, SinglePlacement], bool] {
+		func(nsd wpPerSourceNSDistributions) MutableMap[Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits] {
 			return nsd.wps.nsdDistributions
 		},
 		Identity1[wpPerSourceNSDistributions],
 		NewMapMap[logicalcluster.Name, wpPerSourceNSDistributions](nil),
 		nil, nil)
 	wp.nnsDistributionsForProj = NewGenericFactoredMap[NonNamespacedDistributionTuple,
-		logicalcluster.Name, Triple[metav1.GroupResource, ObjectName, SinglePlacement], bool,
+		logicalcluster.Name, Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits,
 		wpPerSourceNNSDistributions, wpPerSourceNNSDistributions](
 		factorNonNamespacedDistributionTupleForProj1and234,
 		func(source logicalcluster.Name) wpPerSourceNNSDistributions {
 			wps := MapGetAdd(wp.perSource, source, true, wp.newPerSourceLocked)
 			return wpPerSourceNNSDistributions{wps}
 		},
-		func(nsd wpPerSourceNNSDistributions) MutableMap[Triple[metav1.GroupResource, ObjectName, SinglePlacement], bool] {
+		func(nsd wpPerSourceNNSDistributions) MutableMap[Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits] {
 			return nsd.wps.nnsDistributions
 		},
 		Identity1[wpPerSourceNNSDistributions],
 		NewMapMap[logicalcluster.Name, wpPerSourceNNSDistributions](nil),
 		nil, nil)
 	wp.nsdDistributionsForSync = NewGenericFactoredMap[NamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceNamespacedName, logicalcluster.Name],
-		bool, wpPerDestinationNSDistributions, wpPerDestinationNSDistributions](
+		DistributionBits, wpPerDestinationNSDistributions, wpPerDestinationNSDistributions](
 		factorNamespacedDistributionTupleForSync1,
 		func(destination SinglePlacement) wpPerDestinationNSDistributions {
 			wpd := MapGetAdd(wp.perDestination, destination, true, wp.newPerDestinationLocked)
 			return wpPerDestinationNSDistributions{wpd}
 		},
-		func(nsd wpPerDestinationNSDistributions) MutableMap[Pair[GroupResourceNamespacedName, logicalcluster.Name], bool] {
+		func(nsd wpPerDestinationNSDistributions) MutableMap[Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits] {
 			return nsd.wpd.nsdDistributions
 		},
 		Identity1[wpPerDestinationNSDistributions],
 		NewMapMap[SinglePlacement, wpPerDestinationNSDistributions](nil), nil, nil)
 	wp.nnsDistributionsForSync = NewGenericFactoredMap[NonNamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceObjectName, logicalcluster.Name],
-		bool, wpPerDestinationNNSDistributions, wpPerDestinationNNSDistributions](
+		DistributionBits, wpPerDestinationNNSDistributions, wpPerDestinationNNSDistributions](
 		factorNonNamespacedDistributionTupleForSync1,
 		func(destination SinglePlacement) wpPerDestinationNNSDistributions {
 			wpd := MapGetAdd(wp.perDestination, destination, true, wp.newPerDestinationLocked)
 			return wpPerDestinationNNSDistributions{wpd}
 		},
-		func(nsd wpPerDestinationNNSDistributions) MutableMap[Pair[GroupResourceObjectName, logicalcluster.Name], bool] {
+		func(nsd wpPerDestinationNNSDistributions) MutableMap[Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits] {
 			return nsd.wpd.nnsDistributions
 		},
 		Identity1[wpPerDestinationNNSDistributions],
@@ -340,22 +340,22 @@ type workloadProjector struct {
 
 	// NonNamespacedDistributions indexed for projection
 	nsdDistributionsForProj GenericFactoredMap[NamespacedDistributionTuple, logicalcluster.Name,
-		Triple[metav1.GroupResource, NamespacedName, SinglePlacement], bool, wpPerSourceNSDistributions]
+		Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits, wpPerSourceNSDistributions]
 
 	// NonNamespacedDistributions indexed for projection
 	nnsDistributionsForProj GenericFactoredMap[NonNamespacedDistributionTuple, logicalcluster.Name,
-		Triple[metav1.GroupResource, ObjectName, SinglePlacement], bool, wpPerSourceNNSDistributions]
+		Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits, wpPerSourceNNSDistributions]
 
 	nsModesForProj  FactoredMap[ProjectionModeKey, metav1.GroupResource, SinglePlacement, ProjectionModeVal]
 	nnsModesForProj FactoredMap[ProjectionModeKey, metav1.GroupResource, SinglePlacement, ProjectionModeVal]
 
 	// NamespacedDistributions indexed for SyncerConfig maintenance
 	nsdDistributionsForSync GenericFactoredMap[NamespacedDistributionTuple, SinglePlacement,
-		Pair[GroupResourceNamespacedName, logicalcluster.Name], bool, wpPerDestinationNSDistributions]
+		Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits, wpPerDestinationNSDistributions]
 
 	// NonNamespacedDistributions indexed for SyncerConfig maintenance
 	nnsDistributionsForSync GenericFactoredMap[NonNamespacedDistributionTuple, SinglePlacement,
-		Pair[GroupResourceObjectName, logicalcluster.Name], bool, wpPerDestinationNNSDistributions]
+		Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits, wpPerDestinationNNSDistributions]
 
 	nsModesForSync  FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal]
 	nnsModesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal]
@@ -370,8 +370,8 @@ type GroupResourceObjectName = Pair[metav1.GroupResource, ObjectName]
 func (wp *workloadProjector) newPerDestinationLocked(destination SinglePlacement) *wpPerDestination {
 	wpd := &wpPerDestination{wp: wp, destination: destination,
 		logger:           klog.FromContext(wp.ctx).WithValues("destination", destination),
-		nsdDistributions: NewSingleIndexedMapMap2[GroupResourceNamespacedName, logicalcluster.Name, bool](),
-		nnsDistributions: NewSingleIndexedMapMap2[GroupResourceObjectName, logicalcluster.Name, bool](),
+		nsdDistributions: NewSingleIndexedMapMap2[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits](),
+		nnsDistributions: NewSingleIndexedMapMap2[GroupResourceObjectName, logicalcluster.Name, DistributionBits](),
 		preInformers:     NewMapMap[metav1.GroupResource, dynamicDuo](nil),
 	}
 	return wpd
@@ -384,8 +384,8 @@ type wpPerDestination struct {
 	wp               *workloadProjector
 	destination      SinglePlacement
 	logger           klog.Logger
-	nsdDistributions SingleIndexedMap2[GroupResourceNamespacedName, logicalcluster.Name, bool]
-	nnsDistributions SingleIndexedMap2[GroupResourceObjectName, logicalcluster.Name, bool]
+	nsdDistributions SingleIndexedMap2[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits]
+	nnsDistributions SingleIndexedMap2[GroupResourceObjectName, logicalcluster.Name, DistributionBits]
 
 	namespaceClient      k8scorev1client.NamespaceInterface
 	namespacePreInformer k8scorev1informers.NamespaceInformer
@@ -503,7 +503,7 @@ type wpPerDestinationNSDistributions struct {
 	wpd *wpPerDestination
 }
 
-func (nsd wpPerDestinationNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceNamespacedName, logicalcluster.Name, bool, sourcesWantReturns] {
+func (nsd wpPerDestinationNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits, sourcesWantReturns] {
 	return nsd.wpd.nsdDistributions.GetIndex()
 }
 
@@ -511,11 +511,11 @@ type wpPerDestinationNNSDistributions struct {
 	wpd *wpPerDestination
 }
 
-func (nsd wpPerDestinationNNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceObjectName, logicalcluster.Name, bool, sourcesWantReturns] {
+func (nsd wpPerDestinationNNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceObjectName, logicalcluster.Name, DistributionBits, sourcesWantReturns] {
 	return nsd.wpd.nnsDistributions.GetIndex()
 }
 
-type sourcesWantReturns = Map[logicalcluster.Name, bool]
+type sourcesWantReturns = Map[logicalcluster.Name, DistributionBits]
 
 // Constructs the data structure specific to a workload management workspace
 func (wp *workloadProjector) newPerSourceLocked(source logicalcluster.Name) *wpPerSource {
@@ -523,8 +523,8 @@ func (wp *workloadProjector) newPerSourceLocked(source logicalcluster.Name) *wpP
 	dynamicInformerFactory := k8sdynamicinformer.NewDynamicSharedInformerFactory(dynamicClient, 0)
 	wps := &wpPerSource{wp: wp, source: source,
 		logger:                 klog.FromContext(wp.ctx).WithValues("source", source),
-		nsdDistributions:       NewSingleIndexedMapMap3[metav1.GroupResource, NamespacedName, SinglePlacement, bool](),
-		nnsDistributions:       NewSingleIndexedMapMap3[metav1.GroupResource, ObjectName, SinglePlacement, bool](),
+		nsdDistributions:       NewSingleIndexedMapMap3[metav1.GroupResource, NamespacedName, SinglePlacement, DistributionBits](),
+		nnsDistributions:       NewSingleIndexedMapMap3[metav1.GroupResource, ObjectName, SinglePlacement, DistributionBits](),
 		dynamicClient:          dynamicClient,
 		dynamicInformerFactory: dynamicInformerFactory,
 		preInformers:           NewMapMap[metav1.GroupResource, dynamicDuo](nil),
@@ -540,8 +540,8 @@ type wpPerSource struct {
 	wp                     *workloadProjector
 	source                 logicalcluster.Name
 	logger                 klog.Logger
-	nsdDistributions       SingleIndexedMap3[metav1.GroupResource, NamespacedName, SinglePlacement, bool]
-	nnsDistributions       SingleIndexedMap3[metav1.GroupResource, ObjectName, SinglePlacement, bool]
+	nsdDistributions       SingleIndexedMap3[metav1.GroupResource, NamespacedName, SinglePlacement, DistributionBits]
+	nnsDistributions       SingleIndexedMap3[metav1.GroupResource, ObjectName, SinglePlacement, DistributionBits]
 	dynamicClient          k8sdynamic.Interface
 	dynamicInformerFactory k8sdynamicinformer.DynamicSharedInformerFactory
 	preInformers           MutableMap[metav1.GroupResource, dynamicDuo]
@@ -552,7 +552,7 @@ type wpPerSourceNSDistributions struct {
 }
 
 func (nsd wpPerSourceNSDistributions) GetIndex() GenericFactoredMapIndex[metav1.GroupResource,
-	Pair[NamespacedName, SinglePlacement], bool, NamspacedNameToObjectDestinations] {
+	Pair[NamespacedName, SinglePlacement], DistributionBits, NamspacedNameToObjectDestinations] {
 	return nsd.wps.nsdDistributions.GetIndex()
 }
 
@@ -560,14 +560,14 @@ type NamspacedNameToDestinations = GenericIndexedSet[Pair[NamespacedName, Single
 	NamespacedName, SinglePlacement, Set[SinglePlacement]]
 
 type NamspacedNameToObjectDestinations = GenericFactoredMap[Pair[NamespacedName, SinglePlacement],
-	NamespacedName, SinglePlacement, bool, Map[SinglePlacement, bool]]
+	NamespacedName, SinglePlacement, DistributionBits, Map[SinglePlacement, DistributionBits]]
 
 type wpPerSourceNNSDistributions struct {
 	wps *wpPerSource
 }
 
 func (nsd wpPerSourceNNSDistributions) GetIndex() GenericFactoredMapIndex[metav1.GroupResource,
-	Pair[ObjectName, SinglePlacement], bool, ObjectNameToObjectDestinations] {
+	Pair[ObjectName, SinglePlacement], DistributionBits, ObjectNameToObjectDestinations] {
 	return nsd.wps.nnsDistributions.GetIndex()
 }
 
@@ -575,7 +575,7 @@ type ObjectNameToDestinations = GenericIndexedSet[Pair[ObjectName, SinglePlaceme
 	ObjectName, SinglePlacement, Set[SinglePlacement]]
 
 type ObjectNameToObjectDestinations = GenericFactoredMap[Pair[ObjectName, SinglePlacement],
-	ObjectName, SinglePlacement, bool, Map[SinglePlacement, bool]]
+	ObjectName, SinglePlacement, DistributionBits, Map[SinglePlacement, DistributionBits]]
 
 // The workqueue contains the following types of object references.
 // - SinglePlacementSlice
@@ -795,15 +795,15 @@ func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef de
 				logger.V(4).Info("Ignoring destination object that is being deleted", "namespaced", namespaced)
 				return returnFalse
 			}
-			logger.V(4).Info("Retaining destination object", "namespaced", namespaced, "sources", VisitableToSlice[Pair[logicalcluster.Name, bool]](sourcesWants))
+			logger.V(4).Info("Retaining destination object", "namespaced", namespaced, "sources", VisitableToSlice[Pair[logicalcluster.Name, DistributionBits]](sourcesWants))
 			if doRef.GroupResource == crdGR {
 				return returnFalse
 			}
 			tryem := triers{}
 			addRetry := false
 			// accumulate reported state return tasks
-			sourcesWants.Visit(func(sourceWant Pair[logicalcluster.Name, bool]) error {
-				if !sourceWant.Second {
+			sourcesWants.Visit(func(sourceWant Pair[logicalcluster.Name, DistributionBits]) error {
+				if !sourceWant.Second.ReturnSingletonState {
 					return nil
 				}
 				wps, haveWPS := wp.perSource.Get(sourceWant.First)
@@ -811,7 +811,7 @@ func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef de
 					logger.Error(nil, "Impossible: no wps found for source that wants singleton reported state", "source", sourceWant.First)
 					return nil
 				}
-				var destWants Map[SinglePlacement, bool]
+				var destWants Map[SinglePlacement, DistributionBits]
 				var haveDestWants bool
 				if namespaced {
 					rem, haveRem := wps.nsdDistributions.GetIndex().Get(doRef.GroupResource)
@@ -913,7 +913,7 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 			srcMRObject = srcObj.(mrObject)
 			deleted = srcMRObject.GetDeletionTimestamp() != nil
 		}
-		var objectDestinations Map[SinglePlacement, bool]
+		var objectDestinations Map[SinglePlacement, DistributionBits]
 		var haveDestinations bool
 		if namespaced {
 			byNN, have := wps.nsdDistributions.GetIndex().Get(soRef.GroupResource)
@@ -942,7 +942,7 @@ func (wp *workloadProjector) syncSourceObject(ctx context.Context, soRef sourceO
 		}
 		var tryAgain bool
 		remWork := triers{}
-		objectDestinations.Visit(func(tup Pair[SinglePlacement, bool]) error {
+		objectDestinations.Visit(func(tup Pair[SinglePlacement, DistributionBits]) error {
 			retryThis, rem := wps.syncSourceToDestLocked(ctx, logger, srcClient, soRef, srcMRObject, namespaced, deleted, modesForSync, tup.First, tup.Second, numDestinations)
 			tryAgain = tryAgain || retryThis
 			if rem != nil {
@@ -980,7 +980,7 @@ func (wps *wpPerSource) syncSourceToDestLocked(ctx context.Context, logger klog.
 	srcClient k8sdynamic.ResourceInterface,
 	soRef sourceObjectRef, srcMRObject mrObject, namespaced, deleted bool,
 	modesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal],
-	destination SinglePlacement, returnSingletonReport bool, numDestinations int) (bool, func() bool) {
+	destination SinglePlacement, distributionBits DistributionBits, numDestinations int) (bool, func() bool) {
 	wp := wps.wp
 	logger = logger.WithValues("destination", destination)
 	wpd, have := wp.perDestination.Get(destination)
@@ -1014,7 +1014,7 @@ func (wps *wpPerSource) syncSourceToDestLocked(ctx context.Context, logger klog.
 			}
 			return false
 		}
-		if returnSingletonReport {
+		if distributionBits.ReturnSingletonState {
 			if !wp.ensureDestCount(ctx, logger, srcClient, srcMRObject, numDestinations) {
 				return false
 			}
@@ -1051,11 +1051,15 @@ func (wps *wpPerSource) syncSourceToDestLocked(ctx context.Context, logger klog.
 			logger.Error(err, "Failed to fetch object from mailbox workspace")
 			return true
 		} else if err == nil {
-			if returnSingletonReport && numDestinations == 1 {
+			if distributionBits.ReturnSingletonState && numDestinations == 1 {
 				srcU := srcMRObject.(*unstructured.Unstructured)
 				if !wps.reportSingletonState(ctx, logger, srcClient, srcU, destObj) {
 					return false
 				}
+			}
+			if distributionBits.CreateOnly {
+				logger.V(4).Info("Not considering update of create-only object in mailbox workspace")
+				return false
 			}
 			revisedDestObj := wpd.wp.genericObjectMerge(soRef.Cluster, destination, srcMRObject, destObj)
 			if apiequality.Semantic.DeepEqual(destObj, revisedDestObj) {
@@ -1283,13 +1287,13 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	wp.changedDestinations = &changedDestinations
 	recordLogger := logger.V(4)
 	changedSources := WrapSetWithMutex[logicalcluster.Name](NewMapSet[logicalcluster.Name]())
-	nsod := MappingReceiverFork[NamespacedDistributionTuple, bool]{
-		MapKeySetReceiverLossy[NamespacedDistributionTuple, bool](SetWriterFork[NamespacedDistributionTuple](false,
+	nsod := MappingReceiverFork[NamespacedDistributionTuple, DistributionBits]{
+		MapKeySetReceiverLossy[NamespacedDistributionTuple, DistributionBits](SetWriterFork[NamespacedDistributionTuple](false,
 			recordPart(recordLogger, "nsd.src", &changedDestinations, factorNamespacedDistributionTupleForSync1),
 			recordPart(recordLogger, "nsd.dest", &changedSources, factorNamespacedDistributionTupleForProj1))),
 		wp.nsdDistributionsForSync, wp.nsdDistributionsForProj}
-	nnsod := MappingReceiverFork[NonNamespacedDistributionTuple, bool]{
-		MapKeySetReceiverLossy[NonNamespacedDistributionTuple, bool](SetWriterFork[NonNamespacedDistributionTuple](false,
+	nnsod := MappingReceiverFork[NonNamespacedDistributionTuple, DistributionBits]{
+		MapKeySetReceiverLossy[NonNamespacedDistributionTuple, DistributionBits](SetWriterFork[NonNamespacedDistributionTuple](false,
 			recordPart(recordLogger, "nns.src", &changedDestinations, factorNonNamespacedDistributionTupleForSync1),
 			recordPart(recordLogger, "nns.dest", &changedSources, factorNonNamespacedDistributionTupleForProj1))),
 		wp.nnsDistributionsForSync, wp.nnsDistributionsForProj}
@@ -1312,8 +1316,8 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			return nil
 		}
 		logger.V(4).Info("Finishing transaction wrt source",
-			"nsdDistributions", VisitableToSlice[Pair[Triple[metav1.GroupResource, NamespacedName, SinglePlacement], bool]](wps.nsdDistributions),
-			"nnsDistributions", VisitableToSlice[Pair[Triple[metav1.GroupResource, ObjectName, SinglePlacement], bool]](wps.nnsDistributions),
+			"nsdDistributions", VisitableToSlice[Pair[Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits]](wps.nsdDistributions),
+			"nnsDistributions", VisitableToSlice[Pair[Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits]](wps.nnsDistributions),
 		)
 		wps.preInformers.Visit(func(tup Pair[metav1.GroupResource, dynamicDuo]) error {
 			logger.V(4).Info("Resyncing old informer for resource in source", "groupResource", tup.First, "namespaced", tup.Second.namespaced)
@@ -1359,8 +1363,8 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			logger.Error(nil, "Impossible: no per-destination record for affected destination")
 			return nil
 		}
-		logger.V(4).Info("NamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceNamespacedName, logicalcluster.Name], bool]](wpd.nsdDistributions))
-		logger.V(4).Info("NonNamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceObjectName, logicalcluster.Name], bool]](wpd.nnsDistributions))
+		logger.V(4).Info("NamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits]](wpd.nsdDistributions))
+		logger.V(4).Info("NonNamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits]](wpd.nnsDistributions))
 		nsms, have := wp.nsModesForSync.GetIndex().Get(destination)
 		if have {
 			logger.V(4).Info("Namespaced modes after transaction", "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
