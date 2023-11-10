@@ -37,8 +37,8 @@ __Don't change anything, just add KubeStellar!__
 - Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required
 - __Discover__ dynamically created objects created on remote clusters
 - Make __disconnected__ cluster operation possible
-- Designed for __scalability__ with 1:many and many:1 scenarios
-- __Modular__ design to ensure compatibility with cloud-native tools
+- __Scale__ with 1:many and many:1 scenarios
+- __Remain compatible__ with cloud-native solutions
 
 ## KubeStellar virtual clusters (Spaces) are our secret
 - KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
