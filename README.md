@@ -10,6 +10,9 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
+[![License](https://img.shields.io/github/license/kubestellar/kubestellar)](/LICENSE)
 [![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
