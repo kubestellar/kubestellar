@@ -85,7 +85,7 @@ function run_kb_konnector_for_wmw() {
         kubectl create ns kube-system
     fi
     echo "starting kube-bind konnector for wmw in background"
-    konnector &
+    konnector &> /dev/null &
     if ! pgrep konnector &> /dev/null; then
         echo "kube-bind konnector not started"
         exit 1
