@@ -134,13 +134,12 @@ else
     kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
 
-if [ "$silent" == "true" ]; then
-    kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
-else
+if [ "$central" == "true" ]; then
+    echo "looking for synctargets in the center"
     kubectl ws "${kubectl_flags[@]}" "$espw"
 fi
-
-mbwsname=$(kubectl get "$(kubectl get "${kubectl_flags[@]}" synctargets.edge -oname | grep $stname)" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+prefixed_stname="$(kubectl get synctargets.edge --no-headers=true -o custom-columns=":metadata.name" | grep $stname)"
+mbwsname=$(kubectl get synctargets.edge $prefixed_stname -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
 if [ "$silent" == "true" ]; then
     kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
@@ -160,11 +159,13 @@ else
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
-    sleep 15 # maybe the mailbox controller is slow, give it a chance
+	echo "maybe the mailbox controller is slow, give it a chance"
+    sleep 15
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
-    sleep 15 # maybe the mailbox controller is slow, give it another chance
+	echo "maybe the mailbox controller is slow, give it another chance"
+    sleep 15
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
@@ -172,15 +173,19 @@ if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
     exit 5
 fi
 
-# Now that workspace _exists_, but is it _ready_?
+echo "now that workspace _exists_, but is it _ready_?"
 sleep 5
 
 if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+	echo "tried once to switch to $mbwsname"
     sleep 15
     if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+	echo "tried twice to switch to $mbwsname"
 	sleep 15
 	kubectl ws "${kubectl_flags[@]}" "$mbwsname"
     fi
 fi
 
-"$bindir/kubectl-kubestellar-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"
+echo "what is the workspace now?"
+kubectl ws .
+"$bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
