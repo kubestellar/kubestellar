@@ -114,6 +114,14 @@ const ExecutingCountKey string = "kubestellar.io/executing-count"
 
 const validationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 
+// DownsyncOverwriteKey is the name or key of an annotation that can be used
+// to put a downsynced object in "create-only" mode. In this mode the desired state
+// (excluding object ID) of the object is malleable in the WECs and the state in
+// the WDS is only an initial value.
+// Omit this annotation or give it a value of "true" to get the normal behavior;
+// give it a value of "false" to get "create-only" mode.
+const DownsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
+
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
 // - the `apiGroup` criterion is satisfied;
