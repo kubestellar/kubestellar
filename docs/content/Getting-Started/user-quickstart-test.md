@@ -234,12 +234,13 @@ Give the controllers some time to fight over ServiceAccount secrets.
 sleep 120
 ```
 
-Look for excess secrets in the WDS.
+Look for excess secrets in the WDS. Expect 2 token Secrets: one for
+the default ServiceAccount and one for `test-sa`.
 
 ```shell
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
-[ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 2 ]
+[ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 ```
 
 Look for excess secrets in the two mailbox spaces.
@@ -248,7 +249,7 @@ Look for excess secrets in the two mailbox spaces.
 for mb in $MB1 $MB2; do
     KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
     KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
-    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 2 ]
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 done
 ```
 
