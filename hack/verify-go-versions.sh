@@ -26,7 +26,12 @@ MINIMAL_VERSION=$(grep "go 1." go.mod | sed 's/go //')
 #   grep "golang.org/doc/install" CONTRIBUTING.md | { ! grep -v "${MINIMAL_VERSION}"; } || { echo "Wrong go version in CONTRIBUTING.md expected ${MINIMAL_VERSION}"; exit 1; }
 # fi
 
-if [ -z "${IGNORE_GO_VERSION}" ]; then
+if ! [ -x "$(command -v go)" ]; then # validate go is installed
+    echo "go is not installed on your machine, exiting."
+    exit 1
+fi
+
+if [ -z "${IGNORE_GO_VERSION}" ]; then # validate go version is sufficient
   ENV_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
   if [[ "$ENV_VERSION" < "$MINIMAL_VERSION" ]]; then
     echo "Unexpected go version installed. expected minimal go version ${MINIMAL_VERSION} while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
