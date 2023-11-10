@@ -22,17 +22,19 @@
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
 
-Think of KubeStellar like a post office where you drop off packages. You don't want the post office to open your packages, you want them to deliver your packages to one or more recipients where they will be opened. Like a post office for Kubernetes, KubeStellar is a super handy solution for deploying your Kubernetes resources across multiple clusters anywhere in the world (public, private, edge, etc). 
+Imagine KubeStellar as a post office for your Kubernetes resources. When you drop packages at the post office, they don't open them; they deliver them to the right recipients. Similarly, KubeStellar works like this for your Kubernetes resources. Instead of running resources right away, KubeStellar safely stores and sends resources to selected clusters across the globe—whether they're in public clouds, private clouds, or on the edge of your network. It's a super useful tool for spreading your Kubernetes resources wherever you need them without disrupting your existing tools and workflows.
 
 How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
 
-Think of KubeStellar as an innovative way to store inactive Kubernetes resources and then send them to wherever you them need to run.  
+KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure. 
+
+__Don't change anything, just add KubeStellar!__
 
 
 ## KubeStellar treats multiple Kubernetes clusters as one so you can:
 
 - __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters 
-- Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux) without special bundling 
+- Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required
 - __Discover__ dynamically created objects created on remote clusters
 - Make __disconnected__ cluster operation possible
 - Designed for __scalability__ with 1:many and many:1 scenarios
