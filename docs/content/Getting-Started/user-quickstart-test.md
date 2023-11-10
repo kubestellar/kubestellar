@@ -243,13 +243,17 @@ KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
 [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 ```
 
-Look for excess secrets in the two mailbox spaces.
+Look for excess secrets in the two mailbox spaces. Allow up to three:
+one for the `default` ServiceAccount, one dragged down from the WDS
+for the `test-sa` ServiceAccount, and one generated locally for the
+`test-sa` ServiceAccount.
 
 ```shell
 for mb in $MB1 $MB2; do
     KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
+    KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
     KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
-    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
 done
 ```
 
@@ -385,10 +389,22 @@ how to create, but not overwrite/update a synchronized resource
 <br>
 
 ## Tear it all down
-!!! tip ""
-    === "uninstall brew, delete kind clusters, delete kubernetes contexts"
-        {%
-          include-markdown "../common-subs/tear-down-kind.md"
-          start="<!--tear-down-kind-start-->"
-          end="<!--tear-down-kind-end-->"
-        %}
+
+The following command deletes the `kind` clusters created above.
+
+``` {.bash}
+kind delete cluster --name ks-core; kind delete cluster --name ks-edge-cluster1; kind delete cluster --name ks-edge-cluster2
+```
+
+Or, you could get out the big footgun and delete all your `kind` clusters as follows.
+
+``` {.bash}
+for clu in $(kind get clusters | grep -v enabling); do kind delete cluster --name "$clu"; done
+```
+
+The following commands delete the filesystem contents created above.
+
+``` {.bash}
+rm ks-core.kubeconfig ks-edge-cluster1-syncer.yaml ks-edge-cluster2-syncer.yaml
+rm -rf kcp
+```
