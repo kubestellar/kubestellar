@@ -91,6 +91,12 @@ type EdgeSyncOptions struct {
 	SyncTargetLabels []string
 	// Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years))
 	Lifetime time.Duration
+	// ServiceAccountTokenWait is how long syncer-gen will wait for the ServiceAccount Token controller
+	// to supply a token Secret for the syncer's ServiceAccount, before syncer-gen does the deed itself.
+	// Default is 20 seconds.
+	// Set it short if you know the ServiceAccount Token controller will never do the job.
+	// Set it long if you know the ServiceAccount controller _is_ eventually going to do the job.
+	ServiceAccountTokenWait time.Duration
 }
 
 // NewSyncOptions returns a new EdgeSyncOptions.
@@ -98,11 +104,12 @@ func NewEdgeSyncOptions(streams genericclioptions.IOStreams) *EdgeSyncOptions {
 	return &EdgeSyncOptions{
 		Options: base.NewOptions(streams),
 
-		Replicas:     1,
-		KCPNamespace: "default",
-		QPS:          20,
-		Burst:        30,
-		Lifetime:     87600 * time.Hour,
+		Replicas:                1,
+		KCPNamespace:            "default",
+		QPS:                     20,
+		Burst:                   30,
+		Lifetime:                87600 * time.Hour,
+		ServiceAccountTokenWait: 20 * time.Second,
 	}
 }
 
@@ -119,6 +126,7 @@ func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
 	cmd.Flags().DurationVar(&o.Lifetime, "lifetime", o.Lifetime, "Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years)).")
+	cmd.Flags().DurationVar(&o.ServiceAccountTokenWait, "service-account-token-wait", o.ServiceAccountTokenWait, "Time to wait for the ServiceAccount Token controller to create a token Secret (default: 20 sec)")
 }
 
 // Complete ensures all dynamically populated fields are initialized.
@@ -466,7 +474,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 	// Wait for the service account to be updated with the name of the token secret
 	tokenSecretName := ""
 	var serviceAccount *corev1.ServiceAccount
-	_ = wait.PollImmediateWithContext(ctx, 100*time.Millisecond, 3*time.Second, func(ctx context.Context) (bool, error) {
+	_ = wait.PollImmediateWithContext(ctx, 300*time.Millisecond, o.ServiceAccountTokenWait, func(ctx context.Context) (bool, error) {
 		serviceAccount, err = kubeClient.CoreV1().ServiceAccounts(namespace).Get(ctx, sa.Name, metav1.GetOptions{})
 		if err != nil {
 			klog.FromContext(ctx).V(5).WithValues("err", err).Info("failed to retrieve ServiceAccount")
@@ -483,6 +491,38 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 
 	var tokenSecret *corev1.Secret
 	if tokenSecretName == "" {
+		tokenSecret = &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:            serviceAccount.Name + "-token",
+				Namespace:       serviceAccount.Namespace,
+				Annotations:     map[string]string{corev1.ServiceAccountNameKey: serviceAccount.Name},
+				OwnerReferences: syncTargetOwnerReferences,
+			},
+			Type: corev1.SecretTypeServiceAccountToken,
+		}
+		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Create(ctx, tokenSecret, metav1.CreateOptions{})
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token secret: %w", err)
+		}
+		tokenSecretName = tokenSecret.Name
+	}
+	var fetchError error
+	var saTokenBytes []byte
+	err = wait.PollImmediateWithContext(ctx, 300*time.Millisecond, o.ServiceAccountTokenWait, func(ctx context.Context) (bool, error) {
+		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Get(ctx, tokenSecretName, metav1.GetOptions{})
+		if err == nil {
+			saTokenBytes = tokenSecret.Data["token"]
+			return len(saTokenBytes) > 0, nil
+		}
+		logger := klog.FromContext(ctx)
+		logger.V(4).Info("Failed to fetch ServiceAccount Secret", "secretName", tokenSecretName, "err", err)
+		fetchError = err
+		return false, nil
+	})
+	if err != nil && err != wait.ErrWaitTimeout {
+		return "", "", nil, fmt.Errorf("failed to get ServiceAccount token, namespace=%v, name=%v, err=%v, fetchError=%v", namespace, tokenSecretName, err, fetchError)
+	}
+	if err == wait.ErrWaitTimeout {
 		tokenRequest := &authenticationv1.TokenRequest{
 			Spec: authenticationv1.TokenRequestSpec{
 				ExpirationSeconds: pointer.Int64(int64(o.Lifetime / time.Second)),
@@ -492,32 +532,29 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 		if err != nil {
 			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token: %w", err)
 		}
-		tokenSecret = &corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:            serviceAccount.Name + "-token",
-				Namespace:       serviceAccount.Namespace,
-				Annotations:     map[string]string{corev1.ServiceAccountNameKey: serviceAccount.Name},
-				OwnerReferences: syncTargetOwnerReferences,
-			},
-			Type: corev1.SecretTypeServiceAccountToken,
-			Data: map[string][]byte{
-				"token": []byte(token.Status.Token),
-			},
-		}
-		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Create(ctx, tokenSecret, metav1.CreateOptions{})
+		saTokenBytes = []byte(token.Status.Token)
+		oldData, err := json.Marshal(corev1.Secret{})
 		if err != nil {
-			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token secret: %w", err)
+			return "", "", nil, fmt.Errorf("failed to marshal old data for token Secret %s|%s: %w", edgeSyncTargetName, syncerID, err)
 		}
-	} else {
-		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Get(ctx, tokenSecretName, metav1.GetOptions{})
-		if err != nil {
-			return "", "", nil, fmt.Errorf("failed to retrieve Secret: %w", err)
-		}
-	}
 
-	saTokenBytes := tokenSecret.Data["token"]
-	if len(saTokenBytes) == 0 {
-		return "", "", nil, fmt.Errorf("token secret %s/%s is missing a value for `token`", namespace, tokenSecretName)
+		newData, err := json.Marshal(corev1.Secret{
+			Data: map[string][]byte{"token": saTokenBytes},
+		})
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to marshal new data for token Secret %s|%s: %w", edgeSyncTargetName, syncerID, err)
+		}
+
+		patchBytes, err := jsonpatch.CreateMergePatch(oldData, newData)
+		if err != nil {
+			return "", "", nil, fmt.Errorf("failed to create patch for token Secret %s|%s: %w", edgeSyncTargetName, syncerID, err)
+		}
+
+		fmt.Fprintf(o.ErrOut, "Updating token Secret %q with requested token", tokenSecretName)
+		if _, err = kubeClient.CoreV1().Secrets(namespace).Patch(ctx, tokenSecretName, types.MergePatchType, patchBytes, metav1.PatchOptions{}); err != nil {
+			return "", "", nil, fmt.Errorf("failed to patch token Secret %s|%s/%s: %w", edgeSyncTargetName, syncerID, namespace, err)
+		}
+
 	}
 
 	return string(saTokenBytes), syncerID, edgeSyncTarget, nil
