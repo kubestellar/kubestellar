@@ -190,7 +190,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    edge.kubestellar.io/downsync-overwrite: "true"
+    edge.kubestellar.io/downsync-overwrite: "false"
   namespace: my-namespace
   name: test-sa
 EOF
@@ -225,6 +225,16 @@ done
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB2
 while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
+done
+```
+
+Thrash the ServiceAccount some in its WDS.
+
+```shell
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
+for key in k1 k2 k3 k4; do
+    sleep 15
+    KUBECONFIG=ks-core.kubeconfig kubectl annotate sa -n my-namespace test-sa ${key}=${key}
 done
 ```
 
