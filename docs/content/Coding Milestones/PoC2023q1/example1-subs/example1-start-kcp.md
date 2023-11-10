@@ -6,40 +6,23 @@ ways: as bare processes on whatever host you are using to run this
 example, or as workload in a Kubernetes cluster (an OpenShift cluster
 qualifies).  Do one or the other, not both.
 
-KubeStellar only works with release `v0.11.0` of kcp. To downsync ServiceAccount objects you will need a patched version of that in order to get the denaturing of them as discussed [in the design outline](../../outline/#needs-to-be-denatured-in-center-natured-in-edge).
+KubeStellar only works with release `v0.11.0` of kcp.
 
 ### Deploy kcp and KubeStellar as bare processes
 
 #### Start kcp
 
-The following commands fetch the appropriate kcp server and plugins for your OS and ISA and download them and put them on your `$PATH`.
+Download and build or install [kcp](https://github.com/kcp-dev/kcp/releases/tag/v0.11.0),
+according to your preference.  See the start of [the kcp quickstart](https://docs.kcp.io/kcp/v0.11/#quickstart) for instructions on that, but get [release v0.11.0](https://github.com/kcp-dev/kcp/releases/tag/v0.11.0) rather than the latest (the downloadable assets appear after the long list of changes/features/etc).
 
+Clone the v0.11.0 branch of the kcp source:
 ```shell
-rm -rf kcp
-mkdir kcp
+git clone -b v0.11.0 https://github.com/kcp-dev/kcp kcp
+```
+and build the kubectl-ws binary and include it in `$PATH`
+```shell
 pushd kcp
-(
-  set -x
-  case "$OSTYPE" in
-      linux*)   os_type="linux" ;;
-      darwin*)  os_type="darwin" ;;
-      *)        echo "Unsupported operating system type: $OSTYPE" >&2
-                false ;;
-  esac
-  case "$HOSTTYPE" in
-      x86_64*)  arch_type="amd64" ;;
-      aarch64*) arch_type="arm64" ;;
-      arm64*)   arch_type="arm64" ;;
-      *)        echo "Unsupported architecture type: $HOSTTYPE" >&2
-                false ;;
-  esac
-  kcp_version=v0.11.0
-  trap "rm kcp.tar.gz kcp-plugins.tar.gz" EXIT
-  curl -SL -o kcp.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/v0.12.0/kcp_0.11.0_${os_type}_${arch_type}.tar.gz"
-  curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
-  tar -xzf kcp-plugins.tar.gz
-  tar -xzf kcp.tar.gz
-)
+make build
 export PATH=$(pwd)/bin:$PATH
 ```
 
