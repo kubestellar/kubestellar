@@ -64,6 +64,7 @@ var embeddedResources embed.FS
 
 const (
 	SyncerSecretConfigKey = "kubeconfig"
+	fieldManager          = "syncer-gen"
 )
 
 // EdgeSyncOptions contains options for configuring a SyncTarget and its corresponding syncer.
@@ -332,7 +333,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 				Name:            syncerID,
 				OwnerReferences: syncTargetOwnerReferences,
 			},
-		}, metav1.CreateOptions{}); err != nil && !apierrors.IsAlreadyExists(err) {
+		}, metav1.CreateOptions{FieldManager: fieldManager}); err != nil && !apierrors.IsAlreadyExists(err) {
 			return "", "", nil, fmt.Errorf("failed to create ServiceAccount %s|%s/%s: %w", edgeSyncTargetName, namespace, syncerID, err)
 		}
 	case err == nil:
@@ -362,7 +363,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 		}
 
 		fmt.Fprintf(o.ErrOut, "Updating service account %q.\n", syncerID)
-		if sa, err = kubeClient.CoreV1().ServiceAccounts(namespace).Patch(ctx, sa.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}); err != nil {
+		if sa, err = kubeClient.CoreV1().ServiceAccounts(namespace).Patch(ctx, sa.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{FieldManager: fieldManager}); err != nil {
 			return "", "", nil, fmt.Errorf("failed to patch ServiceAccount %s|%s/%s: %w", edgeSyncTargetName, syncerID, namespace, err)
 		}
 	default:
@@ -396,7 +397,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 				OwnerReferences: syncTargetOwnerReferences,
 			},
 			Rules: rules,
-		}, metav1.CreateOptions{}); err != nil && !apierrors.IsAlreadyExists(err) {
+		}, metav1.CreateOptions{FieldManager: fieldManager}); err != nil && !apierrors.IsAlreadyExists(err) {
 			return "", "", nil, err
 		}
 	case err == nil:
@@ -428,7 +429,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 		}
 
 		fmt.Fprintf(o.ErrOut, "Updating cluster role %q with\n\n 1. write and sync access to the synctarget %q\n 2. write access to apiresourceimports.\n\n", syncerID, syncerID)
-		if _, err = kubeClient.RbacV1().ClusterRoles().Patch(ctx, cr.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{}); err != nil {
+		if _, err = kubeClient.RbacV1().ClusterRoles().Patch(ctx, cr.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{FieldManager: fieldManager}); err != nil {
 			return "", "", nil, fmt.Errorf("failed to patch ClusterRole %s|%s/%s: %w", edgeSyncTargetName, syncerID, namespace, err)
 		}
 	default:
@@ -467,7 +468,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 		},
 		Subjects: subjects,
 		RoleRef:  roleRef,
-	}, metav1.CreateOptions{}); err != nil && !apierrors.IsAlreadyExists(err) {
+	}, metav1.CreateOptions{FieldManager: fieldManager}); err != nil && !apierrors.IsAlreadyExists(err) {
 		return "", "", nil, err
 	}
 
@@ -500,7 +501,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 			},
 			Type: corev1.SecretTypeServiceAccountToken,
 		}
-		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Create(ctx, tokenSecret, metav1.CreateOptions{})
+		tokenSecret, err = kubeClient.CoreV1().Secrets(namespace).Create(ctx, tokenSecret, metav1.CreateOptions{FieldManager: fieldManager})
 		if err != nil {
 			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token secret: %w", err)
 		}
@@ -528,7 +529,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 				ExpirationSeconds: pointer.Int64(int64(o.Lifetime / time.Second)),
 			},
 		}
-		token, err := kubeClient.CoreV1().ServiceAccounts(namespace).CreateToken(ctx, sa.Name, tokenRequest, metav1.CreateOptions{})
+		token, err := kubeClient.CoreV1().ServiceAccounts(namespace).CreateToken(ctx, sa.Name, tokenRequest, metav1.CreateOptions{FieldManager: fieldManager})
 		if err != nil {
 			return "", "", nil, fmt.Errorf("failed to create ServiceAccount token: %w", err)
 		}
@@ -551,7 +552,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 		}
 
 		fmt.Fprintf(o.ErrOut, "Updating token Secret %q with requested token", tokenSecretName)
-		if _, err = kubeClient.CoreV1().Secrets(namespace).Patch(ctx, tokenSecretName, types.MergePatchType, patchBytes, metav1.PatchOptions{}); err != nil {
+		if _, err = kubeClient.CoreV1().Secrets(namespace).Patch(ctx, tokenSecretName, types.MergePatchType, patchBytes, metav1.PatchOptions{FieldManager: fieldManager}); err != nil {
 			return "", "", nil, fmt.Errorf("failed to patch token Secret %s|%s/%s: %w", edgeSyncTargetName, syncerID, namespace, err)
 		}
 
@@ -711,7 +712,7 @@ func createEdgeSyncConfig(ctx context.Context, cfg *rest.Config, edgeSyncTargetN
 			},
 			"spec": map[string]interface{}{},
 		}}
-		cr, err := dynamicClient.Resource(mapping.Resource).Create(ctx, cr, metav1.CreateOptions{})
+		cr, err := dynamicClient.Resource(mapping.Resource).Create(ctx, cr, metav1.CreateOptions{FieldManager: fieldManager})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create EdgeSyncConfig :%w", err)
 		}

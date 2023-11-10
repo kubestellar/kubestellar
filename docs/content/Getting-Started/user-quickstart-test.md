@@ -243,13 +243,17 @@ KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
 [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 ```
 
-Look for excess secrets in the two mailbox spaces.
+Look for excess secrets in the two mailbox spaces. Allow up to three:
+one for the `default` ServiceAccount, one dragged down from the WDS
+for the `test-sa` ServiceAccount, and one generated locally for the
+`test-sa` ServiceAccount.
 
 ```shell
 for mb in $MB1 $MB2; do
     KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
+    KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
     KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
-    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
 done
 ```
 
@@ -385,6 +389,11 @@ how to create, but not overwrite/update a synchronized resource
 <br>
 
 ## Tear it all down
+``` {.bash .hide-me}
+: not really
+exit 0
+```
+
 !!! tip ""
     === "uninstall brew, delete kind clusters, delete kubernetes contexts"
         {%
