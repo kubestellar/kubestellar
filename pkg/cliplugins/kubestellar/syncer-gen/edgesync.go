@@ -91,6 +91,13 @@ type EdgeSyncOptions struct {
 	SyncTargetLabels []string
 	// Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years))
 	Lifetime time.Duration
+	// ServiceAccountTokenWait is how long syncer-gen will wait for the ServiceAccount Token controller
+	// to supply a token Secret for the syncer's ServiceAccount, before syncer-gen assumes that
+	// controller is absent and does the deed itself.
+	// Default is 20 seconds.
+	// Set it short if you know there is no ServiceAccount Token controller active in the mailbox space.
+	// Set it long if you know that said controller _is_ eventually going to do the job.
+	ServiceAccountTokenWait time.Duration
 }
 
 // NewSyncOptions returns a new EdgeSyncOptions.
@@ -119,6 +126,7 @@ func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
 	cmd.Flags().DurationVar(&o.Lifetime, "lifetime", o.Lifetime, "Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years)).")
+	cmd.Flags().DurationVar(&o.ServiceAccountTokenWait, "service-account-token-wait", o.ServiceAccountTokenWait, "Time to wait for the ServiceAccount Token controller to do its job (default: 20 sec)")
 }
 
 // Complete ensures all dynamically populated fields are initialized.
@@ -466,7 +474,7 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 	// Wait for the service account to be updated with the name of the token secret
 	tokenSecretName := ""
 	var serviceAccount *corev1.ServiceAccount
-	_ = wait.PollImmediateWithContext(ctx, 100*time.Millisecond, 3*time.Second, func(ctx context.Context) (bool, error) {
+	_ = wait.PollImmediateWithContext(ctx, 300*time.Millisecond, o.ServiceAccountTokenWait, func(ctx context.Context) (bool, error) {
 		serviceAccount, err = kubeClient.CoreV1().ServiceAccounts(namespace).Get(ctx, sa.Name, metav1.GetOptions{})
 		if err != nil {
 			klog.FromContext(ctx).V(5).WithValues("err", err).Info("failed to retrieve ServiceAccount")
