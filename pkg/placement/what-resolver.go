@@ -640,12 +640,13 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 // returns `(changed bool, success bool)`
 func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
 	oldDistrBits, found := od.PlacementBits.Get(epName)
-	newDistrBits := DistributionBits{ReturnSingletonState: spec.WantSingletonReportedState,
-		CreateOnly: whatObj != nil && isCreateOnly(whatObj)}
-	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
+	objMatch, success, modes := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
 		return false, false
 	}
+	modes = CombineModes(modes, edgeapi.DownsyncObjectModes{CreateOnly: whatObj != nil && isCreateOnly(whatObj)})
+	newDistrBits := DistributionBits{ReturnSingletonState: spec.WantSingletonReportedState,
+		CreateOnly: modes.CreateOnly}
 	if objMatch == found && (oldDistrBits == newDistrBits || !found) {
 		return false, true
 	}
@@ -668,19 +669,19 @@ func isCreateOnly(whatObj mrObject) bool {
 // whatMatches tests the given object against the "what predicate" of an EdgePlacementSpec.
 // The first returned bool indicates whether there is a match.
 // The second indicates whether an accurate answer was found.
-func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, whatResource string, whatObj mrObject) (bool, bool) {
+func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, whatResource string, whatObj mrObject) (bool, bool, edgeapi.DownsyncObjectModes) {
 	if ObjectIsSystem(whatObj) {
-		return false, true
+		return false, true, edgeapi.DownsyncObjectModes{}
 	}
 	gvk := whatObj.GetObjectKind().GroupVersionKind()
 	objNS := whatObj.GetNamespace()
 	objName := whatObj.GetName()
 	objLabels := whatObj.GetLabels()
-	match, ok := downsyncMatches(logger, wsd, spec.Downsync, whatResource, gvk, objNS, objName, objLabels)
+	match, ok, modes := downsyncMatches(logger, wsd, spec.Downsync, whatResource, gvk, objNS, objName, objLabels)
 	if !(match && ok) {
-		return match, ok
+		return match, ok, modes
 	}
-	return !upsyncMatches(logger, wsd, spec.Upsync, whatResource, gvk, objNS, objName, objLabels), true
+	return !upsyncMatches(logger, wsd, spec.Upsync, whatResource, gvk, objNS, objName, objLabels), true, modes
 }
 
 func upsyncMatches(logger klog.Logger, wsd *workspaceDetails, upsync []edgeapi.UpsyncSet, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) bool {
@@ -702,7 +703,10 @@ func upsyncMatches(logger klog.Logger, wsd *workspaceDetails, upsync []edgeapi.U
 	return false
 }
 
-func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgeapi.DownsyncObjectTest, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) (bool, bool) {
+// downsyncMatches returns (match, ok bool, modes DownsyncObjectModes)
+func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgeapi.DownsyncObjectTestAndModes, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) (bool, bool, edgeapi.DownsyncObjectModes) {
+	modes := edgeapi.DownsyncObjectModes{}
+	match := true
 	for _, objTest := range downsync {
 		if objTest.APIGroup != nil && (*objTest.APIGroup) != gvk.Group {
 			continue
@@ -713,9 +717,9 @@ func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgea
 		if len(objTest.Namespaces) > 0 && !(SliceContains(objTest.Namespaces, "*") || SliceContains(objTest.Namespaces, objNS)) {
 			continue
 		}
-		nsMatch, ok, retry := wsd.namespaceLabelsMatch(logger, objTest, objNS)
+		nsMatch, ok, retry := wsd.namespaceLabelsMatch(logger, objTest.DownsyncObjectTest, objNS)
 		if !ok {
-			return retry, retry
+			return retry, retry, edgeapi.DownsyncObjectModes{}
 		}
 		if !nsMatch {
 			continue
@@ -726,9 +730,16 @@ func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgea
 		if len(objTest.LabelSelectors) > 0 && !labelsMatchAny(logger, objLabels, objTest.LabelSelectors) {
 			continue
 		}
-		return true, true
+		match = true
+		modes = CombineModes(modes, objTest.DownsyncObjectModes)
 	}
-	return false, true
+	return match, true, modes
+}
+
+func CombineModes(left, right edgeapi.DownsyncObjectModes) edgeapi.DownsyncObjectModes {
+	return edgeapi.DownsyncObjectModes{
+		CreateOnly: left.CreateOnly || right.CreateOnly,
+	}
 }
 
 // Returns match, ok, retry.

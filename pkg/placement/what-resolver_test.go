@@ -106,17 +106,17 @@ func TestWhatResolver(t *testing.T) {
 			Name:        "ep1",
 		},
 		Spec: edgeapi.EdgePlacementSpec{
-			Downsync: []edgeapi.DownsyncObjectTest{
-				{APIGroup: &emptyString,
+			Downsync: []edgeapi.DownsyncObjectTestAndModes{
+				{DownsyncObjectTest: edgeapi.DownsyncObjectTest{APIGroup: &emptyString,
 					Resources:          []string{"configmaps"},
 					NamespaceSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"kubernetes.io/metadata.name": "default"}}},
 					ObjectNames:        []string{"cm1", "cmx", "cm3"},
 					LabelSelectors:     []metav1.LabelSelector{{MatchLabels: map[string]string{"foo": "baz"}}, {MatchLabels: map[string]string{"foo": "bar"}}},
-				},
-				{APIGroup: &emptyString,
+				}},
+				{DownsyncObjectTest: edgeapi.DownsyncObjectTest{APIGroup: &emptyString,
 					Resources:   []string{"namespaces"},
 					ObjectNames: []string{"ns2"},
-				},
+				}},
 			},
 			WantSingletonReportedState: true,
 		}}

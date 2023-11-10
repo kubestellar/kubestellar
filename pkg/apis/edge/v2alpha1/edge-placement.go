@@ -80,10 +80,11 @@ type EdgePlacementSpec struct {
 	// A Location is relevant if and only if it passes any of the LabelSelectors in this field.
 	LocationSelectors []metav1.LabelSelector `json:"locationSelectors,omitempty"`
 
-	// `downsync` selects the objects to bind with the selected Locations for downsync.
+	// `downsync` selects the objects to bind with the selected Locations for downsync,
+	// and says some things about how those objects are downsynced.
 	// An object is selected if it matches at least one member of this list.
 	// +optional
-	Downsync []DownsyncObjectTest `json:"downsync,omitempty"`
+	Downsync []DownsyncObjectTestAndModes `json:"downsync,omitempty"`
 
 	// WantSingletonReportedState indicates that (a) the number of selected locations is intended
 	// to be 1 and (b) the reported state of each downsynced object should be returned back to
@@ -121,6 +122,27 @@ const validationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 // Omit this annotation or give it a value of "true" to get the normal behavior;
 // give it a value of "false" to get "create-only" mode.
 const DownsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
+
+// DownsyncObjectTestAndModes selects some objects for downsync and adds some
+// adjectives about how they are downsynced.
+type DownsyncObjectTestAndModes struct {
+	DownsyncObjectTest  `json:",inline"`
+	DownsyncObjectModes `json:",inline"`
+}
+
+// DownsyncObjectModes modulates how a downsynced object is treated.
+type DownsyncObjectModes struct {
+	// `createOnly` means that the desired state in the WDS is only the initial state to
+	// apply outward, after that the WEC is allowed to change the desired state in any way.
+	// This means the same thing as setting the "edge.kubestellar.io/downsync-overwrite"
+	// annotation to "false".
+	// When multiple DownsyncObjectTestAndModes match the same object, their
+	// `createOnly` settings combine with OR.
+	// Setting that annotation to "false" also puts a downsynced object in "create-only"
+	// mode regardless of any settings in a DownsyncObjectTestAndModes.
+	// +optional
+	CreateOnly bool `json:"createOnly,omitempty"`
+}
 
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:

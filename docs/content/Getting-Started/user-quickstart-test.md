@@ -189,14 +189,13 @@ KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  annotations:
-    edge.kubestellar.io/downsync-overwrite: "false"
   namespace: my-namespace
   name: test-sa
 EOF
 ```
 
-Add an EdgePlacement that calls for that ServiceAccount to be downsynced.
+Add an EdgePlacement that calls for that ServiceAccount to be
+downsynced in "create-only" mode.
 
 ```shell
 KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
@@ -212,6 +211,7 @@ spec:
     resources: [ serviceaccounts ]
     namespaces: [ my-namespace ]
     objectNames: [ test-sa ]
+    createOnly: true
 EOF
 ```
 
@@ -256,12 +256,14 @@ KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
 Look for excess secrets in the two mailbox spaces. Allow up to three:
 one for the `default` ServiceAccount, one dragged down from the WDS
 for the `test-sa` ServiceAccount, and one generated locally for the
-`test-sa` ServiceAccount.
+`test-sa` ServiceAccount. Also check that the "create-only" setting
+got rendered in an annotation.
 
 ```shell
 for mb in $MB1 $MB2; do
     KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
     KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
+    KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa -o jsonpath='{.metadata.annotations.edge\.kubestellar\.io/downsync-overwrite}' | grep -w false
     KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
     [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
 done

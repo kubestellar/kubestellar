@@ -1061,7 +1061,7 @@ func (wps *wpPerSource) syncSourceToDestLocked(ctx context.Context, logger klog.
 				logger.V(4).Info("Not considering update of create-only object in mailbox workspace")
 				return false
 			}
-			revisedDestObj := wpd.wp.genericObjectMerge(soRef.Cluster, destination, srcMRObject, destObj)
+			revisedDestObj := wpd.wp.genericObjectMerge(soRef.Cluster, destination, srcMRObject, destObj, distributionBits.CreateOnly)
 			if apiequality.Semantic.DeepEqual(destObj, revisedDestObj) {
 				logger.V(4).Info("No need to update object in mailbox workspace")
 				return false
@@ -1080,7 +1080,7 @@ func (wps *wpPerSource) syncSourceToDestLocked(ctx context.Context, logger klog.
 				"newResourceVersion", asUpdated.GetResourceVersion())
 			return false
 		}
-		destObj = wpd.wp.xformForDestination(soRef.Cluster, destination, srcMRObject)
+		destObj = wpd.wp.xformForDestination(soRef.Cluster, destination, srcMRObject, distributionBits.CreateOnly)
 		time.Sleep(time.Second)
 		asCreated, err := rscClient.Create(ctx, destObj, metav1.CreateOptions{FieldManager: FieldManager})
 		if err != nil {
@@ -1157,7 +1157,7 @@ func LabelsGet[Val any](labels map[string]Val, key string) Val {
 const ProjectedLabelKey string = "edge.kubestellar.io/projected"
 const ProjectedLabelVal string = "yes"
 
-func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject) *unstructured.Unstructured {
+func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject, createOnly bool) *unstructured.Unstructured {
 	srcObjU := srcObj.(*unstructured.Unstructured)
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
@@ -1182,11 +1182,22 @@ func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Na
 	}
 	labels[ProjectedLabelKey] = ProjectedLabelVal
 	destObj.SetLabels(labels)
+	if createOnly {
+		annotations := destObj.GetAnnotations()
+		if annotations == nil {
+			annotations = map[string]string{edgeapi.DownsyncOverwriteKey: "false"}
+			destObj.SetAnnotations(annotations)
+		} else if annotations[edgeapi.DownsyncOverwriteKey] != "false" {
+			annotations = MapMapCopy[string, string](nil, MintMapMap(annotations, nil)).theMap
+			annotations[edgeapi.DownsyncOverwriteKey] = "false"
+			destObj.SetAnnotations(annotations)
+		}
+	}
 	return destObj
 }
 
 func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Name, destSP SinglePlacement,
-	srcObj mrObject, inputDest *unstructured.Unstructured) *unstructured.Unstructured {
+	srcObj mrObject, inputDest *unstructured.Unstructured, createOnly bool) *unstructured.Unstructured {
 	srcObjU := srcObj.(*unstructured.Unstructured)
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
@@ -1215,8 +1226,12 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 		}
 		return outputDest
 	}
-	if len(srcObjU.GetAnnotations()) != 0 { // If nothing to merge then do not gratuitously change absent to empty map.
-		outputDestU.SetAnnotations(kvMerge("annotations", srcObjU.GetAnnotations(), inputDest.GetAnnotations()))
+	if len(srcObjU.GetAnnotations()) != 0 || createOnly && (len(inputDest.GetAnnotations()) == 0 || inputDest.GetAnnotations()[edgeapi.DownsyncOverwriteKey] != "false") { // If nothing to merge then do not gratuitously change absent to empty map.
+		merged := kvMerge("annotations", srcObjU.GetAnnotations(), inputDest.GetAnnotations())
+		if createOnly {
+			merged[edgeapi.DownsyncOverwriteKey] = "false"
+		}
+		outputDestU.SetAnnotations(merged)
 	}
 	mergedLabels := kvMerge("labels", srcObjU.GetLabels(), inputDest.GetLabels())
 	mergedLabels[ProjectedLabelKey] = ProjectedLabelVal

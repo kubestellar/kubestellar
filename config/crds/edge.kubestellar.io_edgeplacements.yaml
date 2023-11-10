@@ -58,26 +58,29 @@ spec:
             properties:
               downsync:
                 description: '`downsync` selects the objects to bind with the selected
-                  Locations for downsync. An object is selected if it matches at least
-                  one member of this list.'
+                  Locations for downsync, and says some things about how those objects
+                  are downsynced. An object is selected if it matches at least one
+                  member of this list.'
                 items:
-                  description: 'DownsyncObjectTest is a set of criteria that characterize
-                    matching objects. An object matches if: - the `apiGroup` criterion
-                    is satisfied; - the `resources` criterion is satisfied; - the
-                    `namespaces` criterion is satisfied; - the `namespaceSelectors`
-                    criterion is satisfied; - the `objectNames` criterion is satisfied;
-                    and - the `labelSelectors` criterion is satisfied. At least one
-                    of the fields must make some discrimination; it is not valid for
-                    every field to match all objects. Validation might not be fully
-                    checked by apiservers until the Kubernetes dependency is release
-                    1.25; in the meantime validation error messages will appear in
-                    annotations whose key is `validation-error.kubestellar.io/{number}`.'
+                  description: DownsyncObjectTestAndModes selects some objects for
+                    downsync and adds some adjectives about how they are downsynced.
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
                         object, empty string for the core API group. `nil` matches
                         every API group.'
                       type: string
+                    createOnly:
+                      description: '`createOnly` means that the desired state in the
+                        WDS is only the initial state to apply outward, after that
+                        the WEC is allowed to change the desired state in any way.
+                        This means the same thing as setting the "edge.kubestellar.io/downsync-overwrite"
+                        annotation to "false". When multiple DownsyncObjectTestAndModes
+                        match the same object, their `createOnly` settings combine
+                        with OR. Setting that annotation to "false" also puts a downsynced
+                        object in "create-only" mode regardless of any settings in
+                        a DownsyncObjectTestAndModes.'
+                      type: boolean
                     labelSelectors:
                       description: '`labelSelectors` is a list of label selectors.
                         At least one of them must match the labels of the object being
