@@ -373,6 +373,7 @@ function ensure_espw() {
         kubectl ws create "$espw_name" --enter
     fi
     run_dex
+    sleep 2
     run_kb_backend
     kubectl apply -f "$bindir/../config/crds/"
     kubectl get crd -oname | grep kubestellar.io | xargs -i kubectl label {} kube-bind.io/exported=true
@@ -398,7 +399,7 @@ function run_kb_backend() {
     echo "--< starting kube-bind example-backend in background >--"
     kubectl ws root:espw
     kubectl apply -f "$bindir/../kube-bind/deploy/crd"
-    example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &
+    example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &
 
     run_status=$(wait_for_process example-backend)
     if [ $run_status -eq 0 ]; then
