@@ -55,7 +55,7 @@ Each provider adaptor constantly watches for pSpace creation/deletion events and
 When the pSpace is deleted the SM deletes the corresponding Space object.
 
 **Creation & Deletion flow of managed Spaces**  
-The SM sets the status of the Space according to the actual status of the pSpace. When a space is created a creation command is sent to the space provider and the state of the the Space is set to `Initializing`. Only when the pSpace is becoming available (each space provider validate this in its own way) the SM sets the Space state to `Ready`.   
+The SM sets the status of the Space according to the actual status of the pSpace. When a space is created a creation command is sent to the space provider and the state of the Space is set to `Initializing`. Only when the pSpace is becoming available (each space provider validate this in its own way) the SM sets the Space state to `Ready`.   
 The SM uses finalizers for the space deletion flow - the Space object is not removed until the corresponding pSpace is deleted by the space provider.
 
 ## Examples
