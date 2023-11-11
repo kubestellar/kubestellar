@@ -20,7 +20,7 @@
 
 KSDIR=$(cd -- $(dirname $(realpath ${BASH_SOURCE[0]})); cd ..; pwd)
 
-image_tag=v0.10.0-alpha.2.git2b11954-clean
+image_tag=release-0.15
 
 external_endpoint=""
 openshift=false
