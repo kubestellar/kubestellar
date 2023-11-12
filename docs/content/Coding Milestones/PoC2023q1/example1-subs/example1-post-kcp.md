@@ -60,7 +60,7 @@ containerized workloads from the four resources built into kcp TMC
 are meaningful in KubeStellar.
 
 ```shell
-kubestellar init
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubestellar init
 ```
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
