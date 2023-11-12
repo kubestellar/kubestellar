@@ -63,8 +63,8 @@ func TripleHashDomain[First, Second, Third any](first HashDomain[First], second 
 	}
 }
 
-func NewTransformHashDomain[Original, Transformed any](tranform func(Original) Transformed, transformedDomain HashDomain[Transformed]) HashDomain[Original] {
-	return TransformHashDomain[Original, Transformed]{tranform, transformedDomain}
+func NewTransformHashDomain[Original, Transformed any](transform func(Original) Transformed, transformedDomain HashDomain[Transformed]) HashDomain[Original] {
+	return TransformHashDomain[Original, Transformed]{transform, transformedDomain}
 }
 
 type TransformHashDomain[Original, Transformed any] struct {

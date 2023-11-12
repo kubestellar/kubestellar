@@ -102,7 +102,7 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	})
 	wpc.groupReceivers = append(MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{groupReceiver}, wpc.groupReceivers...)
 	wpc.resourceReceivers = append(MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{resourceReceiver}, wpc.resourceReceivers...)
-	// The following make sure that the new receiver is notified about aready-known resources
+	// The following make sure that the new receiver is notified about already-known resources
 	awp.queue.Add(receiverForCluster[string /*group name*/, APIGroupInfo]{groupReceiver, clusterName})
 	awp.queue.Add(receiverForCluster[metav1.GroupResource, ResourceDetails]{resourceReceiver, clusterName})
 }

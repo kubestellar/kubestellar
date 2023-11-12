@@ -226,7 +226,7 @@ func (wpd WorkloadPartDetails) setDistributionBits(bits DistributionBits) Worklo
 }
 
 // ProjectionKey identifies the topmost level of organization,
-// the combinatin of the destination and the API group and resource.
+// the combination of the destination and the API group and resource.
 type ProjectionKey struct {
 	metav1.GroupResource
 	Destination SinglePlacement
