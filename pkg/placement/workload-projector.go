@@ -644,7 +644,7 @@ func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
 	var retry bool
 	switch typed := ref.(type) {
 	case SinglePlacement:
-		retry = wp.syncConifgDestination(ctx, typed)
+		retry = wp.syncConfigDestination(ctx, typed)
 	case syncerConfigRef:
 		retry = wp.syncConfigObject(ctx, typed)
 	case sourceObjectRef:
@@ -662,7 +662,7 @@ func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
 }
 
 // Returns `retry bool`.
-func (wp *workloadProjector) syncConifgDestination(ctx context.Context, destination SinglePlacement) bool {
+func (wp *workloadProjector) syncConfigDestination(ctx context.Context, destination SinglePlacement) bool {
 	mbwsName := SPMailboxWorkspaceName(destination)
 	mbwsCluster, ok := wp.mbwsNameToCluster.Get(mbwsName)
 	logger := klog.FromContext(ctx)
