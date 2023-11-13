@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -X)* synctarget_name
+
+# Purpose: Retrieve the kubeconfig information for a specific space and generate a kubeconfig for it
+
+
+bindir="$(dirname "$0")"
+
+in_cluster="false"
+provider_name="default"
+sm_context="sm-mgt"
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath "
+	    exit 0;;
+	(-X) set -o xtrace;;
+	(--space-name)
+	    if (( $# >1 ))
+	    then space_name="$2"; shift
+	    else echo "$0: missing space name" >&2; exit 1
+	    fi;;
+	(--space-config-file)
+	    if (( $# >1 ))
+	    then space_config_file_name="$2"; shift
+	    else echo "$0: missing output filename" >&2; exit 1
+	    fi;;	
+	(--sm-context)
+	    if (( $# >1 ))
+	    then sm_context="$2"; shift
+	    else echo "$0: missing space context" >&2; exit 1
+	    fi;;	
+	(--provider-name)
+	    if (( $# >1 ))
+	    then provider_name="$2"; shift
+	    else echo "$0: missing provider name" >&2; exit 1
+	    fi;;	
+	(--sm-core-config)
+	    if (( $# >1 ))
+	    then sm_core_config="$2"; shift
+	    else echo "$0: missing space core config file name" >&2; exit 1
+	    fi;;
+	(--in-cluster)
+	    in_cluster="true";;
+	(--provider-name)
+	    if (( $# >1 ))
+	    then provider_name="$2"; shift
+	    else echo "$0: missing space provider name" >&2; exit 1
+	    fi;;
+    (-*)
+        echo "$0: unknown flag" >&2 ; exit 1;
+        exit 1;;
+    (*)
+        echo "$0: unknown positional argument" >&2; exit 1;
+        exit 1;;
+    esac
+    shift
+done
+
+if [ -z "$space_name" ]; then
+    echo "$0: must be given a non-empty space name" >&2
+    exit 1
+fi
+
+if [ -z "$sm_core_config" ]; then
+    echo "$0: must be given a non-empty SM core config file" >&2
+    exit 1
+fi
+
+space_ns="spaceprovider-${provider_name}"
+
+file_pref="exterrnal"
+secret_ctx="externalSecretRef"
+if [ "$in_cluster" == "true" ]; then
+    secret_ctx="inClusterSecretRef"
+	file_pref="incluster"
+fi
+
+if [ -z "$space_config_file_name" ]; then
+	space_config_file_name="${provider_name}_${space_name}_${file_pref}.config"
+    echo "$0: output config file name was not supplied. Using $space_config_file_name" >&2
+fi
+
+
+sm_kubectl="kubectl --kubeconfig $sm_core_config  --context $sm_context"
+
+SECRET_NAME=$($sm_kubectl get space ${space_name} -n ${space_ns} -o jsonpath="{$.status.${secret_ctx}.name}")
+echo "SECRET_NAME=${SECRET_NAME}"
+SECRET_NAMESPACE=$($sm_kubectl get space ${space_name} -n ${space_ns} -o jsonpath="{$.status.${secret_ctx}.namespace}")
+echo "SECRET_NAMESPACE=${SECRET_NAMESPACE}"
+
+$sm_kubectl get secret ${SECRET_NAME} -n ${SECRET_NAMESPACE} -o jsonpath='{$.data.kubeconfig}' | base64 -d| base64 -d > $space_config_file_name
+
+export SPACE_KONFIG=$space_config_file_name
