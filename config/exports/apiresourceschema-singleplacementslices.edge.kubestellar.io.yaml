@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v231005-c6f7728ef.singleplacementslices.edge.kubestellar.io
+  name: v231113-f0837626.singleplacementslices.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -34,7 +34,7 @@ spec:
               EdgePlacement.
             properties:
               cluster:
-                description: Cluster is the logicacluster.Name of the logical cluster
+                description: Cluster is the logicalcluster.Name of the logical cluster
                   that contains both the Location and the SyncTarget.
                 type: string
               locationName:
