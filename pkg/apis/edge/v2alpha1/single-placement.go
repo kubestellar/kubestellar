@@ -52,7 +52,7 @@ type SinglePlacementSlice struct {
 
 // SinglePlacement describes one Location that matches the relevant EdgePlacement.
 type SinglePlacement struct {
-	// Cluster is the logicacluster.Name of the logical cluster that contains
+	// Cluster is the logicalcluster.Name of the logical cluster that contains
 	// both the Location and the SyncTarget.
 	Cluster string `json:"cluster"`
 
