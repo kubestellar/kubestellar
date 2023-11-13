@@ -341,7 +341,7 @@ func (p *provider) createSpaceSecrets(space *spacev1alpha1apis.Space, spInfo spa
 	if needExternal {
 		if spInfo.Config[spaceprovider.EXTERNAL] != "" {
 			secretName = "external-" + space.Name
-			secret = buildSecret(secretName, spInfo.Config[spaceprovider.INCLUSTER])
+			secret = buildSecret(secretName, spInfo.Config[spaceprovider.EXTERNAL])
 			_, err := p.c.k8sClientset.CoreV1().Secrets(p.nameSpace).Create(p.c.ctx, secret, metav1.CreateOptions{})
 			if err != nil {
 				if !k8sapierrors.IsAlreadyExists(err) {
