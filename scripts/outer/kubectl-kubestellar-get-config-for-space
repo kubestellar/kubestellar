@@ -105,6 +105,5 @@ echo "SECRET_NAME=${SECRET_NAME}"
 SECRET_NAMESPACE=$($sm_kubectl get space ${space_name} -n ${space_ns} -o jsonpath="{$.status.${secret_ctx}.namespace}")
 echo "SECRET_NAMESPACE=${SECRET_NAMESPACE}"
 
-$sm_kubectl get secret ${SECRET_NAME} -n ${SECRET_NAMESPACE} -o jsonpath='{$.data.kubeconfig}' | base64 -d| base64 -d > $space_config_file_name
+$sm_kubectl get secret ${SECRET_NAME} -n ${SECRET_NAMESPACE} -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > $space_config_file_name
 
-export SPACE_KONFIG=$space_config_file_name
