@@ -40,8 +40,13 @@ EOF
 function get_kubeconfig_file() { # usage: space_name provider_namespace
     space_name="$1"
     provider_namespace="$2"
-    secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.name}'`
-    secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.namespace}'`
+    if [ "$IN_CLUSTER" == "true" ] ; then
+        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.name}'`
+        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.namespace}'`
+    else
+        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.name}'`
+        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.namespace}'`
+    fi
     kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > ${KUBECONFIG_DIR}/${provider_namespace}-${space_name}
 }
 
@@ -90,6 +95,28 @@ while (( $# > 0 )); do
     esac
     shift
 done
+
+if [ "$PROVIDER_NAME" == "" ]; then
+    PROVIDER_NAME="default"
+    export PROVIDER_NAME
+fi
+if [ "$PROVIDER_NAMESPACE" == "" ]; then
+    PROVIDER_NAMESPACE=spaceprovider-${PROVIDER_NAME}
+    export PROVIDER_NAMESPACE
+fi
+if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
+    SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
+    export SPACE_MANAGER_KUBECONFIG
+fi
+if [ "$IN_CLUSTER" == "" ]; then
+    IN_CLUSTER=true
+    export IN_CLUSTER
+fi
+
+echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "PROVIDER_NAME=${PROVIDER_NAME}"
+echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
+echo "IN_CLUSTER=${IN_CLUSTER}"
 
 if [ "$wmw_name" == "" ]; then
     echo "$0: workload management workspace name not specified" >&2

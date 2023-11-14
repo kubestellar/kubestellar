@@ -17,8 +17,7 @@ management workspace (WMW).  Start by creating a WMW for the common
 workload, with the following commands.
 
 ```shell
-kubectl ws root
-kubectl kubestellar ensure wmw wmw-c
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubectl kubestellar ensure wmw wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -171,8 +170,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-kubectl ws root
-kubectl kubestellar ensure wmw wmw-s
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/configkubectl kubestellar ensure wmw wmw-s
 ```
 
 In this workload we will also demonstrate how to downsync objects
