@@ -104,6 +104,11 @@ if [ "$PROVIDER_NAMESPACE" == "" ]; then
     PROVIDER_NAMESPACE=spaceprovider-${PROVIDER_NAME}
     export PROVIDER_NAMESPACE
 fi
+if [ "$KUBECONFIG_DIR" == "" ]; then
+    KUBECONFIG_DIR="temp-space-config"
+    mkdir -p $KUBECONFIG_DIR
+    export KUBECONFIG_DIR
+fi
 if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
     SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
     export SPACE_MANAGER_KUBECONFIG
