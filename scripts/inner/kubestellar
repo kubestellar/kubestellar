@@ -72,8 +72,8 @@ function get_kubeconfig_file() { # usage: space_name provider_namespace
         secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.name}'`
         secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.namespace}'`
     else
-        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalClusterSecretRef.name}'`
-        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalClusterSecretRef.namespace}'`
+        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.name}'`
+        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.namespace}'`
     fi
     kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > ${KUBECONFIG_DIR}/${provider_namespace}-${space_name}
 }
@@ -183,6 +183,7 @@ if [ "$PROVIDER_NAMESPACE" == "" ]; then
 fi
 if [ "$KUBECONFIG_DIR" == "" ]; then
     KUBECONFIG_DIR="temp-space-config"
+    mkdir -p $KUBECONFIG_DIR
     export KUBECONFIG_DIR
 fi
 if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
