@@ -30,9 +30,21 @@ The KubeStellar-Syncer can be exercised after setting up KubeStellar mailbox wor
 %}
 
 {%
+   include-markdown "example1-subs/example1-space-manager.md"
+   start="<!--example1-space-manager-start-->"
+   end="<!--example1-space-manager-end-->"
+%}
+
+{%
    include-markdown "example1-subs/example1-start-kcp.md"
    start="<!--example1-start-kcp-start-->"
    end="<!--example1-start-kcp-end-->"
+%}
+
+{%
+   include-markdown "example1-subs/example1-kcp-provider.md"
+   start="<!--example1-kcp-provider-start-->"
+   end="<!--example1-kcp-provider-end-->"
 %}
 
 {%
