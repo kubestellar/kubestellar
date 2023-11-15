@@ -19,16 +19,16 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"errors"
 	"flag"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"k8s.io/klog/v2"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/klog/v2"
 
 	"github.com/kubestellar/kubestellar/cmd/kubectl-kubestellar/cmd/ensure"
 	"github.com/kubestellar/kubestellar/cmd/kubectl-kubestellar/cmd/remove"
@@ -50,15 +50,15 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "kubectl\u00A0kubestellar",
 	Short: "KubeStellar plugin for kubectl",
-	Long:  `KubeStellar is a flexible solution for challenges associated with multi-cluster 
+	Long: `KubeStellar is a flexible solution for challenges associated with multi-cluster 
 configuration management for edge, multi-cloud, and hybrid cloud.
 This command provides the kubestellar sub-command for kubectl.`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	// If an invalid sub-command is sent, the function in RunE will execute.
 	// Use this to inform of invalid arguments, and return an error.
 	// For details on inconsistent error behavior, see
 	// https://github.com/spf13/cobra/issues/706
-	RunE:  func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
 			// NOTE this only runs if "Args:  cobra.ExactArgs(1)" is set; if not
 			// set the error message is brief and does not print the help.
@@ -74,8 +74,8 @@ This command provides the kubestellar sub-command for kubectl.`,
 // Dummy function to disable auto-completion script generation, since this
 // feature is broken (see comments above rootCmd).
 var completionCmd = &cobra.Command{
-	Use:	"completion",
-	Short:	"Generate the autocompletion script for the specified shell",
+	Use:   "completion",
+	Short: "Generate the autocompletion script for the specified shell",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return errors.New("Not implemented\n")
 	},

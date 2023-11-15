@@ -23,8 +23,8 @@ import (
 	"regexp"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 
@@ -53,7 +53,7 @@ func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, wdsN
 		logger.Info(fmt.Sprintf("Found WDS workspace root:%s", wdsName))
 		return err
 	}
-	if ! apierrors.IsNotFound(err) {
+	if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant workspace
 		logger.Error(err, fmt.Sprintf("Error checking for root:WDS %s", wdsName))
 		return err
@@ -62,12 +62,12 @@ func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, wdsN
 	// WDS workspace does not exist, create it
 	logger.Info(fmt.Sprintf("No WDS workspace root:%s, creating it", wdsName))
 
-	workspace := &tenancyv1alpha1.Workspace {
-		TypeMeta: metav1.TypeMeta {
-			Kind: "Workspace",
+	workspace := &tenancyv1alpha1.Workspace{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Workspace",
 			APIVersion: "tenancy.kcp.io/v1alpha1",
 		},
-		ObjectMeta: metav1.ObjectMeta {
+		ObjectMeta: metav1.ObjectMeta{
 			Name: wdsName,
 		},
 	}
@@ -97,7 +97,7 @@ func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, wdsN
 		// apibindings.apis.kcp.io "bind-flowcontrol.apiserver.k8s.io" is
 		// forbidden: User "kcp-admin" cannot get resource "apibindings" in API
 		// group "apis.kcp.io" at the cluster scope: access denied
-		time.Sleep(time.Millisecond*1000)
+		time.Sleep(time.Millisecond * 1000)
 		return true, nil
 	})
 	if err != nil {
@@ -115,7 +115,7 @@ func VerifyKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, 
 	logger := klog.FromContext(ctx)
 
 	// APIBindings to check
-	binds := []string {
+	binds := []string{
 		"kubernetes",
 		"apiregistration.k8s.io",
 		"apps",
@@ -168,7 +168,7 @@ func DeleteAPIBinding(client *kcpclientset.Clientset, ctx context.Context, bindN
 	if err == nil {
 		// Removed the APIBinding
 		return true, nil
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant APIBinding
 		return false, err
 	}

@@ -33,7 +33,6 @@ import (
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
-
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/ensure"
@@ -51,8 +50,8 @@ func newCmdEnsureLocation() *cobra.Command {
 		// We actually require at least 2 arguments (location name and a label),
 		// but more descriptive error messages will be provided by leaving this
 		// set to 1.
-		Args:    cobra.MinimumNArgs(1),
-		RunE:    func(cmd *cobra.Command, args []string) error {
+		Args: cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// At this point set silence usage to true, so that any errors
 			// following do not result in the help being printed. We only
 			// want the help to be displayed when the error is due to an

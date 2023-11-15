@@ -17,8 +17,8 @@ limitations under the License.
 package plugin
 
 import (
-    "context"
-    "fmt"
+	"context"
+	"fmt"
 	"io"
 	"os"
 

@@ -28,9 +28,9 @@ limitations under the License.
 package cmd
 
 import (
-    "context"
-    "fmt"
+	"context"
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -43,8 +43,8 @@ import (
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/get-kubeconfig"
 )
 
-const ksContext = "ks-core" // Context for interacting with KubeStellar componnet pods
-const ksNamespace = "kubestellar" // Namespace the KubeStellar pods are running in
+const ksContext = "ks-core"          // Context for interacting with KubeStellar componnet pods
+const ksNamespace = "kubestellar"    // Namespace the KubeStellar pods are running in
 const ksSelector = "app=kubestellar" // Selector (label query) for KubeStellar pods
 
 var fname string // Filename/path for output configuration file (--output flag)
@@ -57,7 +57,7 @@ func newGetExternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Com
 		Aliases: []string{"gek"},
 		Short:   "Get KubeStellar kubectl configuration when external to host cluster",
 		Args:    cobra.ExactArgs(0),
-		RunE:    func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// At this point set silence usage to true, so that any errors
 			// following do not result in the help being printed. We only
 			// want the help to be displayed when the error is due to an
@@ -82,7 +82,7 @@ func newGetInternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Com
 		Aliases: []string{"gik"},
 		Short:   "Get KubeStellar kubectl configuration from inside same cluster",
 		Args:    cobra.ExactArgs(0),
-		RunE:    func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// At this point set silence usage to true, so that any errors
 			// following do not result in the help being printed. We only
 			// want the help to be displayed when the error is due to an
@@ -174,12 +174,12 @@ func getKubeconfig(cmdGetKubeconfig *cobra.Command, cliOpts *genericclioptions.C
 	logger.V(1).Info(fmt.Sprintf("kubeconfig: %s", string(ksConfig)))
 
 	// Write to file
-    err = os.WriteFile(fname, ksConfig, 0644)
+	err = os.WriteFile(fname, ksConfig, 0644)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Problem writing kubeconfig to output file %s", fname))
 		return err
 	}
 	logger.Info(fmt.Sprintf("Wrote kubeconfig to file %s", fname))
 
-    return nil
+	return nil
 }

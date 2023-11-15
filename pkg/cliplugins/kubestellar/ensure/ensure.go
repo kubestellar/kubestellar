@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 
@@ -41,7 +41,7 @@ func VerifyOrCreateAPIBinding(client *kcpclientset.Clientset, ctx context.Contex
 	if err == nil {
 		logger.Info(fmt.Sprintf("Found APIBinding %s", bindName))
 		return err
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant APIBinding
 		logger.Error(err, fmt.Sprintf("Problem checking for APIBinding %s", bindName))
 		return err
@@ -50,19 +50,19 @@ func VerifyOrCreateAPIBinding(client *kcpclientset.Clientset, ctx context.Contex
 	// APIBinding does not exist, create it
 	logger.Info(fmt.Sprintf("No APIBinding %s, creating it", bindName))
 
-	apiBinding := v1alpha1.APIBinding {
-		TypeMeta: metav1.TypeMeta {
-			Kind: "APIBinding",
+	apiBinding := v1alpha1.APIBinding{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "APIBinding",
 			APIVersion: "apis.kcp.io/v1alpha1",
 		},
-		ObjectMeta: metav1.ObjectMeta {
+		ObjectMeta: metav1.ObjectMeta{
 			Name: bindName,
 		},
-		Spec: v1alpha1.APIBindingSpec {
-			Reference: v1alpha1.BindingReference {
-					Export: &v1alpha1.ExportBindingReference {
-						Path: exportPath,
-						Name: exportName,
+		Spec: v1alpha1.APIBindingSpec{
+			Reference: v1alpha1.BindingReference{
+				Export: &v1alpha1.ExportBindingReference{
+					Path: exportPath,
+					Name: exportName,
 				},
 			},
 		},

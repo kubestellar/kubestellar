@@ -19,9 +19,9 @@ limitations under the License.
 package remove
 
 import (
-	"fmt"
 	"errors"
 	"flag"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -36,7 +36,7 @@ var RemoveCmd = &cobra.Command{
 	Short:   "Remove a KubeStellar object",
 	// If an invalid sub-command is sent, the function in RunE will execute.
 	// Use this to inform of invalid arguments, and return an error.
-	RunE:    func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
 			return errors.New(fmt.Sprintf("Invalid sub-command for 'remove': %s\n", args[0]))
 		} else {
@@ -56,7 +56,7 @@ func init() {
 	// Add cliOpts flags to fs (flow from syntax is confusing, goes -->)
 	cliOpts.AddFlags(fs)
 	// Allow logging to pick up flags
-//	klog.InitFlags(flag.CommandLine)
+	//	klog.InitFlags(flag.CommandLine)
 	// Add logging flags to fs
 	fs.AddGoFlagSet(flag.CommandLine)
 	// Add flags to our command; make these persistent (available to this

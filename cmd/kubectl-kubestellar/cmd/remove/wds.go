@@ -20,8 +20,8 @@ limitations under the License.
 package remove
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -42,7 +42,7 @@ func newCmdRemoveWds() *cobra.Command {
 		Aliases: []string{"wmw"},
 		Short:   "Delete a workload description space (WDS, formerly WMW)",
 		Args:    cobra.ExactArgs(1),
-		RunE:    func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// At this point set silence usage to true, so that any errors
 			// following do not result in the help being printed. We only
 			// want the help to be displayed when the error is due to an

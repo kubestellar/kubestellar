@@ -42,10 +42,10 @@ var withKube bool // Variable for --with-kube flag
 func newCmdEnsureWds() *cobra.Command {
 	// Make wds command
 	cmdWds := &cobra.Command{
-		Use:   "wds <WDS_NAME> --with-kube=<TRUE/FALSE>",
+		Use:     "wds <WDS_NAME> --with-kube=<TRUE/FALSE>",
 		Aliases: []string{"wmw"},
-		Short:  "Ensure existence and configuration of a workload description space (WDS, formerly WMW)",
-		Args:  cobra.ExactArgs(1),
+		Short:   "Ensure existence and configuration of a workload description space (WDS, formerly WMW)",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// At this point set silence usage to true, so that any errors
 			// following do not result in the help being printed. We only
@@ -57,7 +57,7 @@ func newCmdEnsureWds() *cobra.Command {
 		},
 	}
 
-	// Add flag for 
+	// Add flag for
 	cmdWds.Flags().BoolVar(&withKube, "with-kube", true, "Include root:compute API bindings")
 	cmdWds.MarkFlagRequired("with-kube")
 	return cmdWds
@@ -66,13 +66,13 @@ func newCmdEnsureWds() *cobra.Command {
 // Perform validation of workload description space (WDS). The user will provide
 // the WDS name as a command-line argument, along with a boolean for --with-kube.
 // This function will:
-// - At the root KCP level, check for a WDS workspace having the user provided
-//   name, create if needed
-// - At the root KCP level, check for an APIBinding "bind-espw" with export path
-//   "root:espw" and export name "edge.kubestellar.io"
-// - If --with-kube is true, ensure a list of APIBindings exist with export path
-//   "root:compute" (create any that are missing). If --with-kube is false, make
-//   sure none of these exist (delete as needed).
+//   - At the root KCP level, check for a WDS workspace having the user provided
+//     name, create if needed
+//   - At the root KCP level, check for an APIBinding "bind-espw" with export path
+//     "root:espw" and export name "edge.kubestellar.io"
+//   - If --with-kube is true, ensure a list of APIBindings exist with export path
+//     "root:compute" (create any that are missing). If --with-kube is false, make
+//     sure none of these exist (delete as needed).
 func ensureWds(cmdWds *cobra.Command, args []string) error {
 	wdsName := args[0] // name of WDS
 	ctx := context.Background()

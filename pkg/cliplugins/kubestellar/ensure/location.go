@@ -23,8 +23,8 @@ import (
 	"regexp"
 	"strings"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
 	v2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
@@ -105,7 +105,7 @@ func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, 
 		// Check that SyncTarget has user provided key=value pairs, add them if not
 		err = VerifySyncTargetLabels(syncTarget, client, ctx, imw, locationName, labels)
 		return err
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
 		logger.Error(err, fmt.Sprintf("Problem checking for SyncTarget %s in workspace root:%s", locationName, imw))
 		return err
@@ -113,13 +113,13 @@ func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, 
 	// SyncTarget does not exist, must create
 	logger.Info(fmt.Sprintf("No SyncTarget %s in workspace root:%s, creating it", locationName, imw))
 
-	syncTarget = &v2alpha1.SyncTarget {
-		TypeMeta: metav1.TypeMeta {
-			Kind: "SyncTarget",
+	syncTarget = &v2alpha1.SyncTarget{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "SyncTarget",
 			APIVersion: "edge.kubestellar.io/v2alpha1",
 		},
-		ObjectMeta: metav1.ObjectMeta {
-			Name: locationName,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   locationName,
 			Labels: map[string]string{"id": locationName},
 		},
 	}
@@ -224,7 +224,7 @@ func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, im
 		// Check that Location has user provided key=value pairs, add them if not
 		err = VerifyLocationLabels(location, client, ctx, imw, locationName, labels)
 		return err
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
 		logger.Error(err, fmt.Sprintf("Problem checking for Location %s in workspace root:%s", locationName, imw))
 		return err
@@ -232,21 +232,21 @@ func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, im
 	// Location does not exist, must create
 	logger.Info(fmt.Sprintf("No Location %s in workspace root:%s, creating it", locationName, imw))
 
-	location = &v2alpha1.Location {
-		TypeMeta: metav1.TypeMeta {
-			Kind: "Location",
+	location = &v2alpha1.Location{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Location",
 			APIVersion: "edge.kubestellar.io/v2alpha1",
 		},
-		ObjectMeta: metav1.ObjectMeta {
+		ObjectMeta: metav1.ObjectMeta{
 			Name: locationName,
 		},
-		Spec: v2alpha1.LocationSpec {
-			Resource: v2alpha1.GroupVersionResource {
-				Group: "edge.kubestellar.io",
-				Version: "v2alpha1",
+		Spec: v2alpha1.LocationSpec{
+			Resource: v2alpha1.GroupVersionResource{
+				Group:    "edge.kubestellar.io",
+				Version:  "v2alpha1",
 				Resource: "synctargets",
 			},
-			InstanceSelector: &metav1.LabelSelector {
+			InstanceSelector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{"id": locationName},
 			},
 		},

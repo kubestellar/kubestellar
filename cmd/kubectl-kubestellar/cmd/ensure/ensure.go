@@ -29,13 +29,11 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-
-
 // Create Cobra sub-command for 'kubectl kubestellar ensure'
 var EnsureCmd = &cobra.Command{
-	Use:	"ensure",
-	Short:  "Ensure a KubeStellar object is correctly configured",
-//	Args:  cobra.ExactArgs(1),
+	Use:   "ensure",
+	Short: "Ensure a KubeStellar object is correctly configured",
+	//	Args:  cobra.ExactArgs(1),
 	// If an invalid sub-command is sent, the function in RunE will execute.
 	// Use this to inform of invalid arguments, and return an error.
 	RunE: func(cmd *cobra.Command, args []string) error {

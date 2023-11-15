@@ -19,8 +19,8 @@ package plugin
 import (
 	"context"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
@@ -36,7 +36,7 @@ func DeleteLocation(client *clientset.Clientset, ctx context.Context, locationNa
 	if err == nil {
 		// Removed Location
 		return true, nil
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant Location
 		return false, err
 	}
@@ -53,7 +53,7 @@ func DeleteSyncTarget(client *clientset.Clientset, ctx context.Context, syncTarg
 	if err == nil {
 		// Removed SyncTarget
 		return true, nil
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
 		return false, err
 	}
@@ -70,7 +70,7 @@ func DeleteWorkspace(client *kcpclientset.Clientset, ctx context.Context, wsName
 	if err == nil {
 		// Removed workspace
 		return true, nil
-	} else if ! apierrors.IsNotFound(err) {
+	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant workspace
 		return false, err
 	}
