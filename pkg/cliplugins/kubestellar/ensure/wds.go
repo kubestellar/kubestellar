@@ -41,7 +41,9 @@ func CheckWdsName(wdsName string) error {
 }
 
 // Check if WDS workspace exists, and if not create it
-func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, logger klog.Logger, wdsName string) error {
+func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, wdsName string) error {
+	logger := klog.FromContext(ctx)
+
 	// Check if WDS workspace exists
 	_, err := client.TenancyV1alpha1().Workspaces().Get(ctx, wdsName, metav1.GetOptions{})
 	if err == nil {
@@ -106,7 +108,9 @@ func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, logg
 // Check for Kube APIBindings
 // If withKube is true, create any bindings that don't exist
 // If withKube is false, delete any bindings that exist
-func VerifyKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, logger klog.Logger, withKube bool) error {
+func VerifyKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, withKube bool) error {
+	logger := klog.FromContext(ctx)
+
 	// APIBindings to check
 	binds := []string {
 		"kubernetes",
@@ -131,7 +135,7 @@ func VerifyKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, 
 		bindName := "bind-" + exportName
 		if withKube {
 			// Make sure these bindings exist
-			err := VerifyOrCreateAPIBinding(client, ctx, logger, bindName, exportName, "root:compute")
+			err := VerifyOrCreateAPIBinding(client, ctx, bindName, exportName, "root:compute")
 			if err != nil {
 				return err
 			}

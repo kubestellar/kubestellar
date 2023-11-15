@@ -30,7 +30,9 @@ import (
 const timeoutTime = 5 // Time (in seconds) to wait for a resource to become ready
 
 // Check if an APIBinding exists, create if not
-func VerifyOrCreateAPIBinding(client *kcpclientset.Clientset, ctx context.Context, logger klog.Logger, bindName, exportName, exportPath string) error {
+func VerifyOrCreateAPIBinding(client *kcpclientset.Clientset, ctx context.Context, bindName, exportName, exportPath string) error {
+	logger := klog.FromContext(ctx)
+
 	// Get the APIBinding
 	_, err := client.ApisV1alpha1().APIBindings().Get(ctx, bindName, metav1.GetOptions{})
 	if err == nil {

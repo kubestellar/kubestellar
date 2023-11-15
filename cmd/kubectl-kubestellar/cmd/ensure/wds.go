@@ -107,9 +107,8 @@ func ensureWds(cmdWds *cobra.Command, args []string) error {
 	}
 
 	// Check for WDS workspace, create if it does not exist
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyOrCreateWDS(client, ctx, logger, wdsName)
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyOrCreateWDS(client, ctx, wdsName)
 	if err != nil {
 		return err
 	}
@@ -126,21 +125,18 @@ func ensureWds(cmdWds *cobra.Command, args []string) error {
 	}
 
 	// Check for APIBinding bind-espw, create if it does not exist
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyOrCreateAPIBinding(client, ctx, logger, "bind-espw", "edge.kubestellar.io", "root:espw")
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyOrCreateAPIBinding(client, ctx, "bind-espw", "edge.kubestellar.io", "root:espw")
 	if err != nil {
 		return err
 	}
 
 	// Check for Kube APIBindings, add/remove as needed depending on withKube
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyKubeAPIBindings(client, ctx, logger, withKube)
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyKubeAPIBindings(client, ctx, withKube)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-

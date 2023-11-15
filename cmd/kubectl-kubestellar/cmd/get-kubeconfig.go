@@ -173,7 +173,7 @@ func getKubeconfig(cmdGetKubeconfig *cobra.Command, cliOpts *genericclioptions.C
 	// Write to file
     err = os.WriteFile(fname, ksConfig, 0644)
 	if err != nil {
-		logger.Error(err, "Problem writing kubeconfig to output file %s", fname)
+		logger.Error(err, fmt.Sprintf("Problem writing kubeconfig to output file %s", fname))
 		return err
 	}
 	logger.Info(fmt.Sprintf("Wrote kubeconfig to file %s", fname))

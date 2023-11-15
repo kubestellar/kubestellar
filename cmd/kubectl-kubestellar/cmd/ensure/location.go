@@ -127,9 +127,8 @@ func ensureLocation(cmdLocation *cobra.Command, args []string) error {
 	}
 
 	// Check that APIBinding exists, create if not
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyOrCreateAPIBinding(kcpClient, ctx, logger, "edge.kubestellar.io", "edge.kubestellar.io", "root:espw")
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyOrCreateAPIBinding(kcpClient, ctx, "edge.kubestellar.io", "edge.kubestellar.io", "root:espw")
 	if err != nil {
 		return err
 	}
@@ -142,29 +141,25 @@ func ensureLocation(cmdLocation *cobra.Command, args []string) error {
 	}
 
 	// Check that SyncTarget exists and is configured, create/update if not
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyOrCreateSyncTarget(client, ctx, logger, imw, locationName, labels)
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyOrCreateSyncTarget(client, ctx, imw, locationName, labels)
 	if err != nil {
 		return err
 	}
 
 	// Check if Location exists and is configured, create/update if not
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyOrCreateLocation(client, ctx, logger, imw, locationName, labels)
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyOrCreateLocation(client, ctx, imw, locationName, labels)
 	if err != nil {
 		return err
 	}
 
 	// Check if "default" Location exists, and delete it if so
-	// This function performs a lot of tasks, so pass it the logger and let it
-	// do the talking.
-	err = plugin.VerifyNoDefaultLocation(client, ctx, logger, imw)
+	// This function prints its own log messages, so no need to add any here.
+	err = plugin.VerifyNoDefaultLocation(client, ctx, imw)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-

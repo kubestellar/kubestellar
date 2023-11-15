@@ -87,18 +87,20 @@ func CheckLabelArgs(labels []string) error {
 }
 
 // Check if SyncTarget exists; if not, create one
-func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw, locationName string, labels []string) error {
+func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+	logger := klog.FromContext(ctx)
+
 	// Get the SyncTarget object
 	syncTarget, err := client.EdgeV2alpha1().SyncTargets().Get(ctx, locationName, metav1.GetOptions{})
 	if err == nil {
 		logger.Info(fmt.Sprintf("Found SyncTarget %s in workspace root:%s", locationName, imw))
 		// Check that SyncTarget has an "id" label matching locationName
-		err = VerifySyncTargetId(syncTarget, client, ctx, logger, imw, locationName)
+		err = VerifySyncTargetId(syncTarget, client, ctx, imw, locationName)
 		if err != nil {
 			return err
 		}
 		// Check that SyncTarget has user provided key=value pairs, add them if not
-		err = VerifySyncTargetLabels(syncTarget, client, ctx, logger, imw, locationName, labels)
+		err = VerifySyncTargetLabels(syncTarget, client, ctx, imw, locationName, labels)
 		return err
 	} else if ! apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
@@ -136,7 +138,9 @@ func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, 
 }
 
 // Make sure the SyncTarget has an id label matching locationName (update if not)
-func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw, locationName string) error {
+func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imw, locationName string) error {
+	logger := klog.FromContext(ctx)
+
 	if syncTarget.ObjectMeta.Labels != nil {
 		// We're missing a labels field, create it
 		id := syncTarget.ObjectMeta.Labels["id"]
@@ -165,7 +169,9 @@ func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clien
 }
 
 // Check that SyncTarget has user provided key=value pairs, add them if not
-func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw, locationName string, labels []string) error {
+func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+	logger := klog.FromContext(ctx)
+
 	updateSyncTarget := false // bool to see if we need to update SyncTarget
 	// Check for labels missing or not matching those provide by user
 	for _, labelString := range labels {
@@ -205,13 +211,15 @@ func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.C
 }
 
 // Check if Location exists; if not, create one
-func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw, locationName string, labels []string) error {
+func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+	logger := klog.FromContext(ctx)
+
 	// Get the Location object
 	location, err := client.EdgeV2alpha1().Locations().Get(ctx, locationName, metav1.GetOptions{})
 	if err == nil {
 		logger.Info(fmt.Sprintf("Found Location %s in workspace root:%s", locationName, imw))
 		// Check that Location has user provided key=value pairs, add them if not
-		err = VerifyLocationLabels(location, client, ctx, logger, imw, locationName, labels)
+		err = VerifyLocationLabels(location, client, ctx, imw, locationName, labels)
 		return err
 	} else if ! apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
@@ -264,7 +272,9 @@ func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, lo
 }
 
 // Check that Location has user provided key=value pairs, add them if not
-func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw, locationName string, labels []string) error {
+func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+	logger := klog.FromContext(ctx)
+
 	updateLocation := false // bool to see if we need to update Location
 	// Check for labels missing or not matching those provide by user
 	for _, labelString := range labels {
@@ -304,7 +314,9 @@ func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clients
 }
 
 // Check if default Location exists, delete it if so
-func VerifyNoDefaultLocation(client *clientset.Clientset, ctx context.Context, logger klog.Logger, imw string) error {
+func VerifyNoDefaultLocation(client *clientset.Clientset, ctx context.Context, imw string) error {
+	logger := klog.FromContext(ctx)
+
 	// Check for "default" Location object
 	_, err := client.EdgeV2alpha1().Locations().Get(ctx, "default", metav1.GetOptions{})
 	if err != nil {
