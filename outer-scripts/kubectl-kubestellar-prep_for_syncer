@@ -177,11 +177,14 @@ echo "now that workspace _exists_, but is it _ready_?"
 sleep 5
 
 if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+	kubectl ws .
 	echo "tried once to switch to $mbwsname"
     sleep 15
     if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+	kubectl ws .
 	echo "tried twice to switch to $mbwsname"
 	sleep 15
+	kubectl ws .
 	kubectl ws "${kubectl_flags[@]}" "$mbwsname"
     fi
 fi
