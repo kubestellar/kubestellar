@@ -93,10 +93,7 @@ To perform a squash, checkout the branch you want to squash,
 6. The text editor will open again to let you edit comments for your new squashed commit.
 7. Make your edits if any and save and exit the file.
 The commits will then be squashed into one commit.
-<<<<<<< HEAD
-=======
 8. run the "git push --force-with-lease" command
->>>>>>> 0010022a94efb6c964137af346d3169dc4c7a4b1
 
 ### When you are done, push your changes to your remote branch
 ```
