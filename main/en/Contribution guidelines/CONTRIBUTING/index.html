@@ -2204,7 +2204,7 @@ central container; for example, if that will be in a local <code>kind</code>
 cluster then you can use <a href="https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster">kind
 load</a>.</p>
 <p>To get the image you just built used in your testing, edit
-<code>outer-scripts/kubectl-kubestellar-deploy</code> and update the line that defines
+<code>scripts/outer/kubectl-kubestellar-deploy</code> and update the line that defines
 <code>$image_tag</code>; follow this with your <code>make build</code>.  For the sake of
 future users of a merged change, your last edit like this should refer
 to a tag that you pushed to quay.io/kubestellar/kubestellar.</p>
