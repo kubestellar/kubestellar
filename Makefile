@@ -117,23 +117,21 @@ require-%:
 build: WHAT ?= ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator ./cmd/kubestellar-list-syncing-objects
 build: require-jq require-go require-git verify-go-versions ## Build all executables
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp outer-scripts/* bin/
-	cp overlap-scripts/* bin/
-	cp inner-scripts/* bin/
+	cp scripts/*/* bin/
 .PHONY: build
 
 userbuild: WHAT ?= ./cmd/test-space-framework ./cmd/kubectl-kubestellar-syncer_gen ./cmd/kubestellar-version ./cmd/kubestellar-list-syncing-objects
 userbuild: require-jq require-go require-git verify-go-versions ## Build executables needed by users outside the core image
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp outer-scripts/* bin/
-	cp overlap-scripts/* bin/
+	cp scripts/outer/*   bin/
+	cp scripts/overlap/* bin/
 .PHONY: userbuild
 
 innerbuild: WHAT ?= ./cmd/kubestellar-version ./cmd/kubestellar-where-resolver ./cmd/mailbox-controller ./cmd/placement-translator
 innerbuild: require-jq require-go require-git verify-go-versions ## Build all executables
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build $(BUILDFLAGS) -ldflags="$(LDFLAGS)" -o bin $(WHAT)
-	cp overlap-scripts/* bin/
-	cp inner-scripts/* bin/
+	cp scripts/overlap/* bin/
+	cp scripts/inner/*   bin/
 .PHONY: innerbuild
 
 .PHONY: build-all

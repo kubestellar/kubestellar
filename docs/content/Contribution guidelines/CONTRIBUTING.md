@@ -154,7 +154,7 @@ cluster then you can use [kind
 load](https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster).
 
 To get the image you just built used in your testing, edit
-`outer-scripts/kubectl-kubestellar-deploy` and update the line that defines
+`scripts/outer/kubectl-kubestellar-deploy` and update the line that defines
 `$image_tag`; follow this with your `make build`.  For the sake of
 future users of a merged change, your last edit like this should refer
 to a tag that you pushed to quay.io/kubestellar/kubestellar.
