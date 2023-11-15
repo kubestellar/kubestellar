@@ -124,15 +124,12 @@ spec:
           optional: false
 EOF
 ```
-``` {.bash .hide-me}
-sleep 10
-```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
 Its "where predicate" (the `locationSelectors` array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.
-   
+
 ```shell
 kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
@@ -334,9 +331,6 @@ spec:
   version: v1090
   versionPriority: 42
 EOF
-```
-``` {.bash .hide-me}
-sleep 10
 ```
 
 Finally, use `kubectl` to create the following EdgePlacement object.
