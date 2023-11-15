@@ -256,11 +256,12 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
 
 	// The script ensures that a mailbox workspace has the needed KubeStellar CRDs.
-	// The script is idempotent.
+	// The script must be idempotent.
 	shellScriptName := "kubectl-kubestellar-ensure-mbw"
 
 	logger.V(2).Info("Executing shell script", "script", shellScriptName)
-	cmdLine := shellScriptName + " " + workspace.Name
+	// Make a sandbox for the concurrent access of the kubeconfig from the mailbox-controller
+	cmdLine := "cp $KUBECONFIG $KUBECONFIG.copy	&& " + "KUBECONFIG=$KUBECONFIG.copy" + " " + shellScriptName + " " + workspace.Name
 	logger.V(2).Info(cmdLine)
 	cmd := exec.Command("/bin/sh", "-c", cmdLine)
 	stdout, err := cmd.StdoutPipe()
@@ -300,7 +301,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 		logger.V(2).Info("Kube-bind cluster namespace", "namespaceName", namespaceName)
 	}
 
-	// There is a contact between the script and the code here that this message is the signal for successful bindings
+	// There is a contact between the script and the code that this message is the signal for successful bindings
 	r, _ = regexp.Compile("CRDs already in place, returning")
 	established := false
 	for {
