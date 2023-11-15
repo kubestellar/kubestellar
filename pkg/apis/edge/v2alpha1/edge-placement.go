@@ -138,7 +138,8 @@ const DownsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
 type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	// `nil` matches every API group.
-	APIGroup *string `json:"apiGroup"`
+	// +optional
+	APIGroup *string `json:"apiGroup,omitempty"`
 
 	// `resources` is a list of lowercase plural names for the sorts of objects to match.
 	// An entry of `"*"` means that all match.
