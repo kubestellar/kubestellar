@@ -67,6 +67,11 @@ nothing to commit, working tree clean
 
 ## Ongoing contributions
 
+### Prior to working on an issue
+
+Ensure that you personal repository if up to date with the kubestellar repository.
+You can do this by opening your github repository page, check that the selected branch is "main", and press the "sync fork" button.
+
 ### Select an issue to work on and create a local branch, 
 
 Create a local branch for your work, preferably including the issue number in the branch name
