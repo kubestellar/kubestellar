@@ -123,7 +123,7 @@ Take a look at https://github.com/kubestellar/kubestellar/blob/main/CONTRIBUTING
 
 You can create a Pull Request from your Github web repository by selecting the "Compare & pull request" button.
 
-You be will presented with a Github web page titled Comparing Changes, which allows you to enter metadata regarding your pull request
+You will be presented with a Github web page titled Comparing Changes, which allows you to enter metadata regarding your pull request
 
 Reference the issue you are addressing ( add #issue-number)
 Add one of the listed emojis to the first character of the title of your new PR indicating the type of issue (bug fix, feature, etc)
