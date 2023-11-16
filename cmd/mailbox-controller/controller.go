@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 
@@ -258,7 +259,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	shellScriptName := "kube-bind"
 
 	resourcesToBind := []string{"syncerconfigs", "edgesyncconfigs"}
-	for _, resource := range resourcesToBind {
+	for idx, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 		cmdLine := strings.Join([]string{
 			"cp $KUBECONFIG $KUBECONFIG.copy && KUBECONFIG=$KUBECONFIG.copy", // Make a sandbox for the concurrent access of the kubeconfig from the mailbox-controller
@@ -266,6 +267,9 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 			workspace.Name,
 			resource,
 		}, " ")
+		if idx == 0 {
+			cmdLine = cmdLine + " --start-konnector true"
+		}
 		logger.V(2).Info(cmdLine)
 		cmd := exec.Command("/bin/sh", "-c", cmdLine)
 		stdout, err := cmd.StdoutPipe()
@@ -288,16 +292,26 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 		for {
 			line, _, err := outBuf.ReadLine()
 			if err != nil {
-				logger.V(2).Info("End of stdout")
-				break
+				if err == io.EOF {
+					logger.V(4).Info("End of stdout")
+					break
+				} else {
+					logger.Error(err, "Unable to read stdout")
+					return true
+				}
 			}
 			logger.V(2).Info(string(line))
 		}
 		for {
 			line, _, err := errBuf.ReadLine()
 			if err != nil {
-				logger.V(4).Info("End of stderr")
-				break
+				if err == io.EOF {
+					logger.V(4).Info("End of stderr")
+					break
+				} else {
+					logger.Error(err, "Unable to read stderr")
+					return true
+				}
 			}
 			logger.V(2).Info(string(line))
 		}
