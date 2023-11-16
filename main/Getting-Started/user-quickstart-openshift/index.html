@@ -2496,7 +2496,7 @@
 </span><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="hll"><span class="s">  - matchLabels: {&quot;location-group&quot;:&quot;edge&quot;}</span>
 </span><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="s">  downsync:</span>
 <a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="s">    resources: [ configmaps, services ]</span>
 <a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
 </span><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
 <a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="s">  - apiGroup: apps</span>
@@ -2509,8 +2509,8 @@
 <a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
 <a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
 <a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="s">    resources: [ rolebindings ]</span>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
 <a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
@@ -2551,10 +2551,10 @@
 <a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a><span class="s">    spec:</span>
 <a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a><span class="s">      containers:</span>
 <a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a><span class="s">      - name: httpd</span>
-<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a><span class="s">        image: library/httpd:2.4</span>
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a><span class="s">        image: registry.redhat.io/rhel8/httpd-24</span>
 <a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a><span class="s">        ports:</span>
 <a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a><span class="s">        - name: http</span>
-<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a><span class="s">          containerPort: 80</span>
+<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a><span class="s">          containerPort: 8080</span>
 <a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a><span class="s">          protocol: TCP</span>
 <a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a><span class="s">        volumeMounts:</span>
 <a id="__codelineno-15-40" name="__codelineno-15-40" href="#__codelineno-15-40"></a><span class="s">        - name: htdocs</span>
@@ -2588,8 +2588,8 @@
 <a id="__codelineno-15-68" name="__codelineno-15-68" href="#__codelineno-15-68"></a><span class="s">spec:</span>
 <a id="__codelineno-15-69" name="__codelineno-15-69" href="#__codelineno-15-69"></a><span class="s">  ports:</span>
 <a id="__codelineno-15-70" name="__codelineno-15-70" href="#__codelineno-15-70"></a><span class="s">    - protocol: TCP</span>
-<a id="__codelineno-15-71" name="__codelineno-15-71" href="#__codelineno-15-71"></a><span class="s">      port: 80</span>
-<a id="__codelineno-15-72" name="__codelineno-15-72" href="#__codelineno-15-72"></a><span class="s">      targetPort: 80</span>
+<a id="__codelineno-15-71" name="__codelineno-15-71" href="#__codelineno-15-71"></a><span class="s">      port: 8080</span>
+<a id="__codelineno-15-72" name="__codelineno-15-72" href="#__codelineno-15-72"></a><span class="s">      targetPort: http</span>
 <a id="__codelineno-15-73" name="__codelineno-15-73" href="#__codelineno-15-73"></a><span class="s">  selector:</span>
 <a id="__codelineno-15-74" name="__codelineno-15-74" href="#__codelineno-15-74"></a><span class="s">    app: common</span>
 <a id="__codelineno-15-75" name="__codelineno-15-75" href="#__codelineno-15-75"></a><span class="s">---</span>
@@ -2791,7 +2791,7 @@ how to create, but not overwrite/update a synchronized resource  </p>
 </span><a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="hll"><span class="s">  - matchLabels: {&quot;location-group&quot;:&quot;edge&quot;}</span>
 </span><a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="s">  downsync:</span>
 <a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
-<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="s">    resources: [ configmaps, services ]</span>
 <a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
 </span><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
 <a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="s">  - apiGroup: apps</span>
@@ -2804,8 +2804,8 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
 <a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
 <a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="s">    resources: [ rolebindings ]</span>
-<a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
 <a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
@@ -2846,10 +2846,10 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-37-31" name="__codelineno-37-31" href="#__codelineno-37-31"></a><span class="s">    spec:</span>
 <a id="__codelineno-37-32" name="__codelineno-37-32" href="#__codelineno-37-32"></a><span class="s">      containers:</span>
 <a id="__codelineno-37-33" name="__codelineno-37-33" href="#__codelineno-37-33"></a><span class="s">      - name: httpd</span>
-<a id="__codelineno-37-34" name="__codelineno-37-34" href="#__codelineno-37-34"></a><span class="s">        image: library/httpd:2.4</span>
+<a id="__codelineno-37-34" name="__codelineno-37-34" href="#__codelineno-37-34"></a><span class="s">        image: registry.redhat.io/rhel8/httpd-24</span>
 <a id="__codelineno-37-35" name="__codelineno-37-35" href="#__codelineno-37-35"></a><span class="s">        ports:</span>
 <a id="__codelineno-37-36" name="__codelineno-37-36" href="#__codelineno-37-36"></a><span class="s">        - name: http</span>
-<a id="__codelineno-37-37" name="__codelineno-37-37" href="#__codelineno-37-37"></a><span class="s">          containerPort: 80</span>
+<a id="__codelineno-37-37" name="__codelineno-37-37" href="#__codelineno-37-37"></a><span class="s">          containerPort: 8080</span>
 <a id="__codelineno-37-38" name="__codelineno-37-38" href="#__codelineno-37-38"></a><span class="s">          protocol: TCP</span>
 <a id="__codelineno-37-39" name="__codelineno-37-39" href="#__codelineno-37-39"></a><span class="s">        volumeMounts:</span>
 <a id="__codelineno-37-40" name="__codelineno-37-40" href="#__codelineno-37-40"></a><span class="s">        - name: htdocs</span>
@@ -2883,8 +2883,8 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-37-68" name="__codelineno-37-68" href="#__codelineno-37-68"></a><span class="s">spec:</span>
 <a id="__codelineno-37-69" name="__codelineno-37-69" href="#__codelineno-37-69"></a><span class="s">  ports:</span>
 <a id="__codelineno-37-70" name="__codelineno-37-70" href="#__codelineno-37-70"></a><span class="s">    - protocol: TCP</span>
-<a id="__codelineno-37-71" name="__codelineno-37-71" href="#__codelineno-37-71"></a><span class="s">      port: 80</span>
-<a id="__codelineno-37-72" name="__codelineno-37-72" href="#__codelineno-37-72"></a><span class="s">      targetPort: 80</span>
+<a id="__codelineno-37-71" name="__codelineno-37-71" href="#__codelineno-37-71"></a><span class="s">      port: 8080</span>
+<a id="__codelineno-37-72" name="__codelineno-37-72" href="#__codelineno-37-72"></a><span class="s">      targetPort: http</span>
 <a id="__codelineno-37-73" name="__codelineno-37-73" href="#__codelineno-37-73"></a><span class="s">  selector:</span>
 <a id="__codelineno-37-74" name="__codelineno-37-74" href="#__codelineno-37-74"></a><span class="s">    app: common</span>
 <a id="__codelineno-37-75" name="__codelineno-37-75" href="#__codelineno-37-75"></a><span class="s">---</span>

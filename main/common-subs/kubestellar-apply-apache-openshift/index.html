@@ -1832,7 +1832,7 @@ privileges that let the httpd pod run in an OpenShift cluster.</p>
 </span><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="hll"><span class="s">  - matchLabels: {&quot;location-group&quot;:&quot;edge&quot;}</span>
 </span><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="s">  downsync:</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="s">  - apiGroup: &quot;&quot;</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="s">    resources: [ configmaps ]</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="s">    resources: [ configmaps, services ]</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
 </span><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="s">  - apiGroup: apps</span>
@@ -1845,8 +1845,8 @@ privileges that let the httpd pod run in an OpenShift cluster.</p>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="s">    resources: [ rolebindings ]</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="s">    objectNames: [ let-it-be ]</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
@@ -1887,10 +1887,10 @@ privileges that let the httpd pod run in an OpenShift cluster.</p>
 <a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="s">    spec:</span>
 <a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="s">      containers:</span>
 <a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="s">      - name: httpd</span>
-<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="s">        image: library/httpd:2.4</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="s">        image: registry.redhat.io/rhel8/httpd-24</span>
 <a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="s">        ports:</span>
 <a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="s">        - name: http</span>
-<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="s">          containerPort: 80</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="s">          containerPort: 8080</span>
 <a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="s">          protocol: TCP</span>
 <a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="s">        volumeMounts:</span>
 <a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="s">        - name: htdocs</span>
@@ -1924,8 +1924,8 @@ privileges that let the httpd pod run in an OpenShift cluster.</p>
 <a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a><span class="s">spec:</span>
 <a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a><span class="s">  ports:</span>
 <a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="s">    - protocol: TCP</span>
-<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a><span class="s">      port: 80</span>
-<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a><span class="s">      targetPort: 80</span>
+<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a><span class="s">      port: 8080</span>
+<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a><span class="s">      targetPort: http</span>
 <a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a><span class="s">  selector:</span>
 <a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="s">    app: common</span>
 <a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="s">---</span>
