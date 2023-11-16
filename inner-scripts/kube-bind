@@ -79,6 +79,9 @@ else
 fi
 
 #TODO: move the starting of konnector here
+if ! kubectl get namespace kube-system &> /dev/null
+then kubectl create namespace kube-system &> /dev/null
+fi
 
 kubectl ws "root:$space_name"
 
