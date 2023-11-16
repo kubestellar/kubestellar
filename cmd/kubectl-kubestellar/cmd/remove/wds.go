@@ -26,16 +26,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/klog/v2"
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
-	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/remove"
 )
 
 // Create the Cobra sub-command for 'kubectl kubestellar remove wds'
-func newCmdRemoveWds() *cobra.Command {
+func newCmdRemoveWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make wds command
 	cmdWds := &cobra.Command{
 		Use:     "wds <WDS_NAME>",
@@ -48,7 +48,7 @@ func newCmdRemoveWds() *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := removeWds(cmd, args)
+			err := removeWds(cmd, args, cliOpts)
 			return err
 		},
 	}
@@ -57,7 +57,7 @@ func newCmdRemoveWds() *cobra.Command {
 }
 
 // Perform the actual workload management workspace removal
-func removeWds(cmdWds *cobra.Command, args []string) error {
+func removeWds(cmdWds *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	wdsName := args[0] // name of WDS to remove
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -67,13 +67,12 @@ func removeWds(cmdWds *cobra.Command, args []string) error {
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 
-	// Options for root workspace
-	rootClientOpts := clientopts.NewClientOpts("root", "Access to the root workspace")
-	// Set default context to "root"
-	rootClientOpts.SetDefaultCurrentContext("root")
+	// Set context to root
+	configContext := "root"
+	cliOpts.Context = &configContext
 
 	// Get client config from flags
-	config, err := rootClientOpts.ToRESTConfig()
+	config, err := cliOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to get config from flags")
 		return err

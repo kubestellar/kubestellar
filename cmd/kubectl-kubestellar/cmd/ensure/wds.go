@@ -28,18 +28,18 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/klog/v2"
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
-	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/ensure"
 )
 
 var withKube bool // Variable for --with-kube flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar ensure wds'
-func newCmdEnsureWds() *cobra.Command {
+func newCmdEnsureWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make wds command
 	cmdWds := &cobra.Command{
 		Use:     "wds <WDS_NAME> --with-kube=<TRUE/FALSE>",
@@ -52,7 +52,7 @@ func newCmdEnsureWds() *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := ensureWds(cmd, args)
+			err := ensureWds(cmd, args, cliOpts)
 			return err
 		},
 	}
@@ -73,7 +73,7 @@ func newCmdEnsureWds() *cobra.Command {
 //   - If --with-kube is true, ensure a list of APIBindings exist with export path
 //     "root:compute" (create any that are missing). If --with-kube is false, make
 //     sure none of these exist (delete as needed).
-func ensureWds(cmdWds *cobra.Command, args []string) error {
+func ensureWds(cmdWds *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	wdsName := args[0] // name of WDS
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -90,13 +90,12 @@ func ensureWds(cmdWds *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Options for WDS workspace
-	wdsClientOpts := clientopts.NewClientOpts("wds", "Access to the WDS workspace")
-	// Set default context to "root", later on we will append the WDS name to the root server
-	wdsClientOpts.SetDefaultCurrentContext("root")
+	// Set context to root, later on we will append the WDS name to the root server
+	configContext := "root"
+	cliOpts.Context = &configContext
 
 	// Get client config from flags
-	config, err := wdsClientOpts.ToRESTConfig()
+	config, err := cliOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to get config from flags")
 		return err

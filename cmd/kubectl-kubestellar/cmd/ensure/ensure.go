@@ -63,7 +63,7 @@ func init() {
 	EnsureCmd.PersistentFlags().AddFlagSet(fs)
 
 	// Add location sub-command
-	EnsureCmd.AddCommand(newCmdEnsureLocation())
+	EnsureCmd.AddCommand(newCmdEnsureLocation(cliOpts))
 	// Add wds sub-command
-	EnsureCmd.AddCommand(newCmdEnsureWds())
+	EnsureCmd.AddCommand(newCmdEnsureWds(cliOpts))
 }

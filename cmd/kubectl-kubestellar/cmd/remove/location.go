@@ -28,17 +28,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/klog/v2"
 
-	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/remove"
 )
 
-var imw string // IMW workspace path
+var imw string // IMW name, provided by --imw flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar remove location'
-func newCmdRemoveLocation() *cobra.Command {
+func newCmdRemoveLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make location command
 	cmdLocation := &cobra.Command{
 		Use:     "location --imw <IMW_NAME> <LOCATION_NAME>",
@@ -51,13 +51,13 @@ func newCmdRemoveLocation() *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := removeLocation(cmd, args)
+			err := removeLocation(cmd, args, cliOpts)
 			return err
 		},
 	}
 
-	// Add flag for IMW workspace
-	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW workspace")
+	// Add flag for IMW name
+	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW name")
 	cmdLocation.MarkFlagRequired("imw")
 	return cmdLocation
 }
@@ -65,7 +65,7 @@ func newCmdRemoveLocation() *cobra.Command {
 // Delete SyncTarget and Location from IMW.
 // The IMW name is provided by the --imw flag (stored in the "imw" string
 // variable), and the location name is a command line argument.
-func removeLocation(cmdLocation *cobra.Command, args []string) error {
+func removeLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	locationName := args[0]
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -75,19 +75,18 @@ func removeLocation(cmdLocation *cobra.Command, args []string) error {
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 
-	// Options for IMW workspace
-	imwClientOpts := clientopts.NewClientOpts("imw", "Access to the IMW workspace")
-	// Set default context to "root"; we will need to append the IMW name to the root server
-	imwClientOpts.SetDefaultCurrentContext("root")
+	// Set context to root, later on we will append the IMW name to the root server
+	configContext := "root"
+	cliOpts.Context = &configContext
 
 	// Get client config from flags
-	config, err := imwClientOpts.ToRESTConfig()
+	config, err := cliOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to get config from flags")
 		return err
 	}
 
-	// Update host to work on objects within IMW workspace
+	// Update host to work on objects within IMW
 	config.Host += ":" + imw
 	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
 

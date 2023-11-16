@@ -29,22 +29,22 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/klog/v2"
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
-	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/ensure"
 )
 
-var imw string // IMW workspace path
+var imw string // IMW name, provided by --imw flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar ensure location'
-func newCmdEnsureLocation() *cobra.Command {
+func newCmdEnsureLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make location command
 	cmdLocation := &cobra.Command{
-		Use:     "location --imw <IMW_NAME> <LOCATION_NAME> <\"KEY=VALUE\" ...>",
+		Use:     "location --imw <IMW_NAME> <LOCATION_NAME> <LABEL_1 ...>",
 		Aliases: []string{"loc"},
 		Short:   "Ensure existence and configuration of an inventory listing for a WEC",
 		// We actually require at least 2 arguments (location name and a label),
@@ -57,13 +57,13 @@ func newCmdEnsureLocation() *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := ensureLocation(cmd, args)
+			err := ensureLocation(cmd, args, cliOpts)
 			return err
 		},
 	}
 
-	// Add flag for IMW workspace
-	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW workspace")
+	// Add flag for IMW name
+	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW name")
 	cmdLocation.MarkFlagRequired("imw")
 	return cmdLocation
 }
@@ -72,7 +72,7 @@ func newCmdEnsureLocation() *cobra.Command {
 // variable), and the location name is a command line argument.
 // Labels to check are provided as additional arguments in key=value pairs.
 // In this function we will:
-// - Work in the provided IMW workspace
+// - Work in the provided IMW
 // - Check if APIBinding "edge.kubestellar.io" exists in IMW, create if not
 // - Check for SyncTarget of provided name in IMW, create if not
 // - Check that SyncTarget has an "id" label matching the Location name
@@ -80,7 +80,7 @@ func newCmdEnsureLocation() *cobra.Command {
 // - Check for Location of provided name in IMW, create if not
 // - Ensure that Location has the labels provided by the user
 // - If Location "default" exists, delete it
-func ensureLocation(cmdLocation *cobra.Command, args []string) error {
+func ensureLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	locationName := args[0]
 	labels := args[1:]
 	ctx := context.Background()
@@ -105,19 +105,18 @@ func ensureLocation(cmdLocation *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Options for IMW workspace
-	imwClientOpts := clientopts.NewClientOpts("imw", "Access to the IMW workspace")
-	// Set default context to "root"; we will need to append the IMW name to the root server
-	imwClientOpts.SetDefaultCurrentContext("root")
+	// Set context to root, later on we will append the IMW name to the root server
+	configContext := "root"
+	cliOpts.Context = &configContext
 
 	// Get client config from flags
-	config, err := imwClientOpts.ToRESTConfig()
+	config, err := cliOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to get config from flags")
 		return err
 	}
 
-	// Update host to work on objects within IMW workspace
+	// Update host to work on objects within IMW
 	config.Host += ":" + imw
 	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
 
