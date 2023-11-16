@@ -261,7 +261,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 
 	logger.V(2).Info("Executing shell script", "script", shellScriptName)
 	// Make a sandbox for the concurrent access of the kubeconfig from the mailbox-controller
-	cmdLine := "cp $KUBECONFIG $KUBECONFIG.copy	&& " + "KUBECONFIG=$KUBECONFIG.copy" + " " + shellScriptName + " " + workspace.Name
+	cmdLine := "cp $KUBECONFIG $KUBECONFIG.copy && KUBECONFIG=$KUBECONFIG.copy " + shellScriptName + " " + workspace.Name
 	logger.V(2).Info(cmdLine)
 	cmd := exec.Command("/bin/sh", "-c", cmdLine)
 	stdout, err := cmd.StdoutPipe()
