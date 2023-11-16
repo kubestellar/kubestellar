@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+space_name=""
+resource_to_bind=""
+start_konnector=false
+cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
+
+while (( $# > 0 )); do
+    case "$1" in
+    (-h|--help)
+        echo "Usage: $0 (--start_konnector boolean | -X)* space_name resource_to_bind"
+        echo "space_name is the name of a kube-bind consumer space, which currently must be a kcp workspace whose parent is root"
+        echo "resource_to_bind is a resource offered by the kube-bind provider, in lower case and plural form"
+        exit 0;;
+    (-X)
+        set -o xtrace;;
+    (--start-konnector)
+        if (( $# >1 ))
+        then start_konnector="$2"; shift
+        else echo "$0: missing start-konnector value" >&2; exit 1
+        fi;;
+    (-*)
+        echo "$0: flag syntax error" >&2
+        exit 1;;
+    (*)
+        if [ -z "$space_name" ]
+        then space_name="$1"
+        elif [ -z "$resource_to_bind" ]
+        then resource_to_bind="$1"
+        else echo "$0: too many positional arguments" >&2
+        exit 1
+        fi
+    esac
+    shift
+done
+
+if [ -z "$space_name" ]
+then
+    echo "space_name not specified" >&2
+    exit 1
+fi
+
+if [ -z "$resource_to_bind" ]
+then
+    echo "resource_to_bind not specified" >&2
+    exit 1
+fi
+
+case "$start_konnector" in
+    (true|false) ;;
+    (*) echo "$0: start_konnector should be true or false" >&2
+	  exit 1;;
+esac
+
+initial_ws=$(kubectl ws . --short)
+
+kubectl ws root
+kcp_id="$(kubectl get ws $space_name -ojsonpath='{.metadata.annotations.internal\.tenancy\.kcp\.io/\cluster}')"
+if [ -z "$kcp_id" ]
+then
+    echo "failed to find the kcp workspace ID for $space_name"
+    exit 1
+else
+    echo "kcp workspace $space_name's ID is $kcp_id"
+fi
+
+#TODO: move the starting of konnector here
+
+kubectl ws "root:$space_name"
+
+if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
+    echo "CRDs for $resource_to_bind already in place"
+    exit 0
+fi
+
+#TODO: error check for the bind commmand
+echo "binding $resource_to_bind for $space_name"
+result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"
+
+cluster_ns="$(echo $result | grep -e 'kube-bind-\w*' -o)"
+if [ -z "$cluster_ns" ]
+then
+    echo "failed to find the cluster namespace"
+    exit 1
+else
+    echo "cluster namespace is $cluster_ns"
+fi
+
+kubectl ws root:espw
+if ! kubectl get namespace "$cm_namespace" &> /dev/null
+then kubectl create namespace "$cm_namespace"
+else echo "namespace $cm_namespace already exists"
+fi
+
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kbmap-$kcp_id
+  namespace: $cm_namespace
+  labels:
+    kubestellar.io/kube-bind-id: $cluster_ns
+data: {}
+EOF
+
+kubectl ws use $initial_ws &> /dev/null # go back to the initial state
