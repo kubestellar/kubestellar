@@ -77,23 +77,7 @@ then kubectl ws "${kubectl_flags[@]}" "$wmw_name"
 else kubectl ws "${kubectl_flags[@]}" create "$wmw_name" --enter
 fi
 
-function run_kb_konnector_for_wmw() {
-    if kubectl get ns kube-system &> /dev/null; then
-        echo "namespace kube-system already exists, skipping"
-    else
-        echo "creating namespace kube-system"
-        kubectl create ns kube-system
-    fi
-    echo "starting kube-bind konnector for wmw in background"
-    konnector &> /dev/null &
-    if ! pgrep konnector &> /dev/null; then
-        echo "kube-bind konnector not started"
-        exit 1
-    fi
-}
-
-run_kb_konnector_for_wmw
-kube-bind "$wmw_name" "edgeplacements"
+kube-bind "$wmw_name" "edgeplacements" --start-konnector true
 kube-bind "$wmw_name" "customizers"
 
 function bind_iff_wanted() { # usage: export_name

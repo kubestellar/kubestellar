@@ -75,26 +75,6 @@ wait_for_process(){
   echo $status_code
 }
 
-function run_kb_konnector_for_imw() {
-    if kubectl get ns kube-system &> /dev/null; then
-        echo "namespace kube-system already exists, skipping"
-    else
-        echo "creating namespace kube-system"
-        kubectl create ns kube-system
-    fi
-    echo "starting kube-bind konnector for imw in background"
-    konnector &> /dev/null &
-
-    run_status=$(wait_for_process konnector)
-    if [ $run_status -eq 0 ]; then
-        echo " konnector started"
-    else
-        echo "konnector not started"
-        sleep 2
-        exit 1
-    fi
-}
-
 
 function ensure_imws() {
     initial_ws=$(kubectl ws . --short)
@@ -112,8 +92,7 @@ function ensure_imws() {
                     break
                 fi
             fi
-            run_kb_konnector_for_imw
-            kube-bind "$imw" "synctargets"
+            kube-bind "$imw" "synctargets" --start-konnector true
             kube-bind "$imw" "locations"
         done
     done <<< "$1"
