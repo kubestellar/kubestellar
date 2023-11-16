@@ -57,7 +57,7 @@ while (( $# > 0 )); do
 done
 
 if [ "$mbw_name" == "" ]; then
-    echo "$0: workload management workspace name not specified" >&2
+    echo "$0: mailbox workspace name not specified" >&2
     exit 1
 fi
 
@@ -80,7 +80,7 @@ fi
 
 function run_kb_konnector_for_mbw() {
     if kubectl get crd syncerconfigs.edge.kubestellar.io &> /dev/null && kubectl get crd edgesyncconfigs.edge.kubestellar.io &> /dev/null; then
-        echo "CRDs already in place, returning"
+        echo "CRDs already in place, returning" # This message is parsed by the mailbox controller as a signal of success
         return
     fi
     if kubectl get ns kube-system &> /dev/null; then

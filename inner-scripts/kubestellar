@@ -96,16 +96,6 @@ function run_kb_konnector_for_imw() {
 }
 
 
-function bind_resource_for_imw() {
-    RESOURCE="$1"
-    echo "binding $RESOURCE for imw"
-    if ! kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource "$RESOURCE" ; then
-        echo "unable to bind $RESOURCE for imw"
-        exit 1
-    fi
-}
-
-
 function ensure_imws() {
     initial_ws=$(kubectl ws . --short)
     while IFS=',' read -ra items; do
@@ -123,8 +113,8 @@ function ensure_imws() {
                 fi
             fi
             run_kb_konnector_for_imw
-            bind_resource_for_imw "synctargets"
-            bind_resource_for_imw "locations"
+            kube-bind "$imw" "synctargets"
+            kube-bind "$imw" "locations"
         done
     done <<< "$1"
     kubectl ws use $initial_ws &> /dev/null # go back to the initial state
