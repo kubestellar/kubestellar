@@ -47,11 +47,9 @@ const ksContext = "ks-core"          // Context for interacting with KubeStellar
 const ksNamespace = "kubestellar"    // Namespace the KubeStellar pods are running in
 const ksSelector = "app=kubestellar" // Selector (label query) for KubeStellar pods
 
-var fname string // Filename/path for output configuration file (--output flag)
-
 // Create the Cobra sub-command for 'kubectl kubestellar get-external-kubeconfig'
 func newGetExternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
-	// Make wds command
+	// Make get-external-kubeconfig command
 	cmdGetExternalKubeconfig := &cobra.Command{
 		Use:     "get-external-kubeconfig --output <FILENAME>",
 		Aliases: []string{"gek"},
@@ -71,12 +69,13 @@ func newGetExternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Com
 	// Add required flag for output filename (--output or -o)
 	cmdGetExternalKubeconfig.Flags().StringVarP(&fname, "output", "o", "", "Output path/filename")
 	cmdGetExternalKubeconfig.MarkFlagRequired("output")
+	cmdGetExternalKubeconfig.MarkFlagFilename("output")
 	return cmdGetExternalKubeconfig
 }
 
 // Create the Cobra sub-command for 'kubectl kubestellar get-internal-kubeconfig'
 func newGetInternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
-	// Make wds command
+	// Make get-internal-kubeconfig command
 	cmdGetInternalKubeconfig := &cobra.Command{
 		Use:     "get-internal-kubeconfig --output <FILENAME>",
 		Aliases: []string{"gik"},

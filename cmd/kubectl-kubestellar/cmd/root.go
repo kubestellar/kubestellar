@@ -34,6 +34,8 @@ import (
 	"github.com/kubestellar/kubestellar/cmd/kubectl-kubestellar/cmd/remove"
 )
 
+var fname string // Output file path/name, for commands using --output flag
+
 // Root kubestellar command
 // HACK the usage section of help will not show "kubectl" prefixing the
 // command string if the "Use" key is set to just "kubestellar". If the "Use"
