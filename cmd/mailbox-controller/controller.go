@@ -62,6 +62,8 @@ type mbCtl struct {
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
+type ctxKey string
+
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
 // SyncTarget objects (not limited to one cluster).
@@ -149,6 +151,7 @@ func (ctl *mbCtl) syncLoop(ctx context.Context, worker int) {
 	doneCh := ctx.Done()
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("worker", worker)
+	ctx = context.WithValue(ctx, ctxKey("worker"), worker)
 	ctx = klog.NewContext(ctx, logger)
 	logger.V(4).Info("SyncLoop start")
 	for {
@@ -261,8 +264,14 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	resourcesToBind := []string{"syncerconfigs", "edgesyncconfigs"}
 	for idx, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
+
+		// Make sandboxes for the concurrent access of the kubeconfig from the mailbox-controller's multiple workers
+		// This is a compromise due to the situation that 1) we are using kcp and 2) we are running tests on bare process of this controller
+		workerIdx, _ := ctx.Value(ctxKey("worker")).(int)
+		settingKubeConfigForWorker := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d && KUBECONFIG=$KUBECONFIG.copy%d", workerIdx, workerIdx)
+
 		cmdLine := strings.Join([]string{
-			"cp $KUBECONFIG $KUBECONFIG.copy && KUBECONFIG=$KUBECONFIG.copy", // Make a sandbox for the concurrent access of the kubeconfig from the mailbox-controller
+			settingKubeConfigForWorker,
 			shellScriptName,
 			workspace.Name,
 			resource,
