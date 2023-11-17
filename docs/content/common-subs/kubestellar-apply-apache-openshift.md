@@ -8,7 +8,10 @@ This EdgePlacement includes downsync of a `RoleBinding` that grants
 privileges that let the httpd pod run in an OpenShift cluster.
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
-```shell hl_lines="9 10 14 18 19 26"
+```shell hl_lines="13 14 18 27 28 35"
+KUBECONFIG=ks-core.kubeconfig curl -sSL \
+  https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml | kubectl apply -f -
+
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 
 KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
@@ -24,6 +27,11 @@ spec:
     resources: [ configmaps, services ]
     namespaces: [ my-namespace ]
     objectNames: [ "*" ]
+  - apiGroup: route.openshift.io
+    namespaces:
+    - my-namespace
+    objectNames: [ "*" ]
+    resources: [ routes ]
   - apiGroup: apps
     resources: [ deployments ]
     namespaces: [ my-namespace ]
@@ -88,7 +96,7 @@ spec:
         volumeMounts:
         - name: htdocs
           readOnly: true
-          mountPath: /usr/local/apache2/htdocs
+          mountPath: /var/www/html/
       volumes:
       - name: htdocs
         configMap:
@@ -118,7 +126,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: http
+      targetPort: 8080
   selector:
     app: common
 ---
@@ -129,7 +137,7 @@ metadata:
   namespace: my-namespace
 spec:
   port:
-    targetPort: 80
+    targetPort: 8080
   to:
     kind: Service
     name: my-service
