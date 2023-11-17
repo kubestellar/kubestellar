@@ -22,7 +22,7 @@ cm_namespace=kubestellar # the namespace where the configmaps live in on the pro
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
-        echo "Usage: $0 (--start_konnector boolean | -X)* space_name resource_to_bind"
+        echo "Usage: $0 (--start-konnector boolean | -X)* space_name resource_to_bind"
         echo "space_name is the name of a kube-bind consumer space, which currently must be a kcp workspace whose parent is root"
         echo "resource_to_bind is a resource offered by the kube-bind provider, in lower case and plural form"
         exit 0;;
@@ -62,11 +62,12 @@ fi
 
 case "$start_konnector" in
     (true|false) ;;
-    (*) echo "$0: start_konnector should be true or false" >&2
+    (*) echo "$0: start-konnector should be true or false" >&2
 	  exit 1;;
 esac
 
 initial_ws=$(kubectl ws . --short)
+trap "kubectl ws use $initial_ws &> /dev/null # go back to the initial state" EXIT
 
 kubectl ws root
 kcp_id="$(kubectl get ws $space_name -ojsonpath='{.metadata.annotations.internal\.tenancy\.kcp\.io/\cluster}')"
@@ -78,13 +79,26 @@ else
     echo "kcp workspace $space_name's ID is $kcp_id"
 fi
 
-#TODO: move the starting of konnector here
-
 kubectl ws "root:$space_name"
 
 if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
     echo "CRDs for $resource_to_bind already in place"
     exit 0
+fi
+
+if [ "$start_konnector" == true ]
+then
+    if ! kubectl get namespace kube-system &> /dev/null
+    then kubectl create namespace kube-system &> /dev/null
+    fi
+    echo "starting kube-bind konnector for space $space_name in background"
+    konnector &> /dev/null &
+    sleep 2
+    if ! pgrep konnector &> /dev/null; then
+        #TODO: how to identify the konnector for current space?
+        echo "kube-bind konnector process not found"
+        exit 1
+    fi
 fi
 
 #TODO: error check for the bind commmand
@@ -116,5 +130,3 @@ metadata:
     kubestellar.io/kube-bind-id: $cluster_ns
 data: {}
 EOF
-
-kubectl ws use $initial_ws &> /dev/null # go back to the initial state

@@ -20,9 +20,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
-	"regexp"
 	"strings"
+	"sync/atomic"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,6 +62,8 @@ type mbCtl struct {
 	workspaceScopedClient   tenancyclient.WorkspaceInterface
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
+
+var suffix uint64 = 142857
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
@@ -255,76 +258,82 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
 	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
 
-	// The script ensures that a mailbox workspace has the needed KubeStellar CRDs.
 	// The script must be idempotent.
-	shellScriptName := "kubectl-kubestellar-ensure-mbw"
+	shellScriptName := "kube-bind"
 
-	logger.V(2).Info("Executing shell script", "script", shellScriptName)
-	// Make a sandbox for the concurrent access of the kubeconfig from the mailbox-controller
-	cmdLine := "cp $KUBECONFIG $KUBECONFIG.copy && KUBECONFIG=$KUBECONFIG.copy " + shellScriptName + " " + workspace.Name
-	logger.V(2).Info(cmdLine)
-	cmd := exec.Command("/bin/sh", "-c", cmdLine)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		logger.Error(err, "Unable to return a pipe for stdout")
-		return true
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		logger.Error(err, "Unable to return a pipe for stderr")
-		return true
-	}
-	err = cmd.Start()
-	if err != nil {
-		logger.Error(err, "Unable to start executing the script")
-		return true
-	}
-	outBuf := bufio.NewReader(stdout)
-	errBuf := bufio.NewReader(stderr)
+	resourcesToBind := []string{"syncerconfigs", "edgesyncconfigs"}
+	for idx, resource := range resourcesToBind {
+		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
-	r, _ := regexp.Compile("🔒 (Created|Updated) secret.*namespace (.*)")
-	found, namespaceName := false, ""
-	for {
-		line, _, err := errBuf.ReadLine()
+		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
+		// This is a compromise due to the situation that we are using kcp which modifies kubeconfig file when changing workspaces.
+		freshSuffix := atomic.AddUint64(&suffix, 1)
+
+		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", freshSuffix)
+		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", freshSuffix)
+		invokeScript := strings.Join([]string{
+			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", freshSuffix),
+			shellScriptName,
+			workspace.Name,
+			resource,
+		}, " ")
+		if idx == 0 {
+			invokeScript = invokeScript + " --start-konnector true"
+		}
+		cmdLine := strings.Join([]string{
+			makeCopyOfKubeConfig,
+			removeCopyWhenExits,
+			invokeScript,
+		}, "; ")
+		logger.V(2).Info("About to exec", "cmdLine", cmdLine)
+		cmd := exec.Command("/bin/sh", "-c", cmdLine)
+		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			logger.V(4).Info("End of stderr")
-			break
+			logger.Error(err, "Failed to extract stdout pipe for exec of script", "script", shellScriptName)
+			return true
 		}
-		logger.V(2).Info(string(line))
-		// kube-bind put the information that we interesed in (the cluster namespace) in stderr
-		matches := r.FindStringSubmatch(string(line))
-		if len(matches) == r.NumSubexp()+1 {
-			found, namespaceName = true, matches[len(matches)-1]
-		}
-	}
-	if found {
-		logger.V(2).Info("Kube-bind cluster namespace", "namespaceName", namespaceName)
-	}
-
-	// There is a contact between the script and the code that this message is the signal for successful bindings
-	r, _ = regexp.Compile("CRDs already in place, returning")
-	established := false
-	for {
-		line, _, err := outBuf.ReadLine()
+		stderr, err := cmd.StderrPipe()
 		if err != nil {
-			logger.V(4).Info("End of stdout")
-			break
+			logger.Error(err, "Failed to extract stderr pipe for exec of script", "script", shellScriptName)
+			return true
 		}
-		logger.V(2).Info(string(line))
-		if r.MatchString(string(line)) {
-			established = true
+		err = cmd.Start()
+		if err != nil {
+			logger.Error(err, "Unable to start executing the script", "script", shellScriptName)
+			return true
 		}
-	}
-	if established {
-		logger.V(2).Info("bindings already exist or just created")
-	}
-
-	err = cmd.Wait()
-	if !established {
-		return true
-	}
-	if err != nil {
-		logger.V(2).Info("Errors other than binding occurred during the execution", "script", shellScriptName, "error", err)
+		outBuf := bufio.NewReader(stdout)
+		errBuf := bufio.NewReader(stderr)
+		for {
+			line, _, err := outBuf.ReadLine()
+			if err != nil {
+				if err == io.EOF {
+					logger.V(4).Info("End of stdout")
+					break
+				} else {
+					logger.Error(err, "Unable to read stdout")
+					return true
+				}
+			}
+			logger.V(2).Info("Stdout from exec", "resource", resource, "line", line)
+		}
+		for {
+			line, _, err := errBuf.ReadLine()
+			if err != nil {
+				if err == io.EOF {
+					logger.V(4).Info("End of stderr")
+					break
+				} else {
+					logger.Error(err, "Unable to read stderr")
+					return true
+				}
+			}
+			logger.V(2).Info("Stderr from exec", "resource", resource, "line", line)
+		}
+		if err = cmd.Wait(); err != nil {
+			logger.Error(err, "Unable to bind", "workspace", workspace.Name, "resrouce", resource)
+			return true
+		}
 	}
 	return false
 }
