@@ -23,6 +23,7 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+	"sync/atomic"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -62,7 +63,7 @@ type mbCtl struct {
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
-type ctxKey string
+var initialSuffix uint64 = 142857
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
@@ -151,7 +152,6 @@ func (ctl *mbCtl) syncLoop(ctx context.Context, worker int) {
 	doneCh := ctx.Done()
 	logger := klog.FromContext(ctx)
 	logger = logger.WithValues("worker", worker)
-	ctx = context.WithValue(ctx, ctxKey("worker"), worker)
 	ctx = klog.NewContext(ctx, logger)
 	logger.V(4).Info("SyncLoop start")
 	for {
@@ -265,20 +265,26 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	for idx, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
-		// Make sandboxes for the concurrent access of the kubeconfig from the mailbox-controller's multiple workers
-		// This is a compromise due to the situation that 1) we are using kcp and 2) we are running tests on bare process of this controller
-		workerIdx, _ := ctx.Value(ctxKey("worker")).(int)
-		settingKubeConfigForWorker := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d && KUBECONFIG=$KUBECONFIG.copy%d", workerIdx, workerIdx)
+		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
+		// This is a compromise due to the situation that 1) we are using kcp and 2) we are running tests on bare process of this controller.
+		suffix := atomic.AddUint64(&initialSuffix, 1)
 
-		cmdLine := strings.Join([]string{
-			settingKubeConfigForWorker,
+		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", suffix)
+		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", suffix)
+		invokeScript := strings.Join([]string{
+			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", suffix),
 			shellScriptName,
 			workspace.Name,
 			resource,
 		}, " ")
 		if idx == 0 {
-			cmdLine = cmdLine + " --start-konnector true"
+			invokeScript = invokeScript + " --start-konnector true"
 		}
+		cmdLine := strings.Join([]string{
+			makeCopyOfKubeConfig,
+			removeCopyWhenExits,
+			invokeScript,
+		}, "; ")
 		logger.V(2).Info(cmdLine)
 		cmd := exec.Command("/bin/sh", "-c", cmdLine)
 		stdout, err := cmd.StdoutPipe()
