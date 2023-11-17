@@ -63,7 +63,7 @@ type mbCtl struct {
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
-var initialSuffix uint64 = 142857
+var suffix uint64 = 142857
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
@@ -266,13 +266,13 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
 		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
-		// This is a compromise due to the situation that 1) we are using kcp and 2) we are running tests on bare process of this controller.
-		suffix := atomic.AddUint64(&initialSuffix, 1)
+		// This is a compromise due to the situation that we are using kcp which modifies kubeconfig file when changing workspaces.
+		freshSuffix := atomic.AddUint64(&suffix, 1)
 
-		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", suffix)
-		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", suffix)
+		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", freshSuffix)
+		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", freshSuffix)
 		invokeScript := strings.Join([]string{
-			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", suffix),
+			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", freshSuffix),
 			shellScriptName,
 			workspace.Name,
 			resource,
@@ -285,21 +285,21 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 			removeCopyWhenExits,
 			invokeScript,
 		}, "; ")
-		logger.V(2).Info(cmdLine)
+		logger.V(2).Info("About to exec", "cmdLine", cmdLine)
 		cmd := exec.Command("/bin/sh", "-c", cmdLine)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			logger.Error(err, "Unable to return a pipe for stdout")
+			logger.Error(err, "Failed to extract stdout pipe for exec of script", "script", shellScriptName)
 			return true
 		}
 		stderr, err := cmd.StderrPipe()
 		if err != nil {
-			logger.Error(err, "Unable to return a pipe for stderr")
+			logger.Error(err, "Failed to extract stderr pipe for exec of script", "script", shellScriptName)
 			return true
 		}
 		err = cmd.Start()
 		if err != nil {
-			logger.Error(err, "Unable to start executing the script")
+			logger.Error(err, "Unable to start executing the script", "script", shellScriptName)
 			return true
 		}
 		outBuf := bufio.NewReader(stdout)
@@ -315,7 +315,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 					return true
 				}
 			}
-			logger.V(2).Info(string(line))
+			logger.V(2).Info("Stdout from exec", "resource", resource, "line", line)
 		}
 		for {
 			line, _, err := errBuf.ReadLine()
@@ -328,7 +328,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 					return true
 				}
 			}
-			logger.V(2).Info(string(line))
+			logger.V(2).Info("Stderr from exec", "resource", resource, "line", line)
 		}
 		if err = cmd.Wait(); err != nil {
 			logger.Error(err, "Unable to bind", "workspace", workspace.Name, "resrouce", resource)
