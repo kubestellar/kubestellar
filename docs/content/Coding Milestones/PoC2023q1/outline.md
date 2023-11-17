@@ -777,7 +777,9 @@ SinglePlacementSlice objects holding the matches for that
 EdgePlacement.  These SinglePlacementSlice objects appear in the same
 workspace as the corresponding EdgePlacement, and identify SyncTarget
 and Location objects by the identifiers of their original copies (not
-the copies in the KCS); the remainder of how they are linked is TBD.
+the copies in the KCS) --- with the exception of the UID of the
+SyncTarget, that comes from the copy in the KCS; the remainder of how
+they are linked is TBD.
 
 ## Placement Translator
 
