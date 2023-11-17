@@ -2482,10 +2482,11 @@
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>This EdgePlacement includes downsync of a <code>RoleBinding</code> that grants
- privileges that let the httpd pod run in an OpenShift cluster.</p>
+ privileges that let the httpd pod run in an OpenShift cluster as well
+ as applying the OpenShift route CRD so support exposure of services.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>curl<span class="w"> </span>-sSL<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
@@ -2497,29 +2498,28 @@
 <a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="s">spec:</span>
 <a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="s">  locationSelectors:</span>
 <a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="hll"><span class="s">  - matchLabels: {&quot;location-group&quot;:&quot;edge&quot;}</span>
-</span><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="hll"><span class="s">  downsync:</span>
-</span><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+</span><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="s">  downsync:</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="s">  - apiGroup: &quot;&quot;</span>
 <a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="s">    resources: [ configmaps, services ]</span>
-<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="hll"><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-</span><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="s">  - apiGroup: route.openshift.io</span>
-<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="s">    namespaces:</span>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="s">    - my-namespace</span>
-<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">    resources: [ routes ]</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">  - apiGroup: apps</span>
-<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="s">    resources: [ deployments ]</span>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="hll"><span class="s">    objectNames: [ my-first-kubestellar-deployment ]</span>
-</span><a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="hll"><span class="s">  - apiGroup: apis.kcp.io</span>
-</span><a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="s">    namespaceSelectors: []</span>
-<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
-<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="s">    resources: [ rolebindings ]</span>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="hll"><span class="s">    objectNames: [ let-it-be ]</span>
-</span><a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="s">EOF</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="s">  - apiGroup: route.openshift.io</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="s">    resources: [ routes ]</span>
+<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="s">    resources: [ deployments ]</span>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="hll"><span class="s">    objectNames: [ my-first-kubestellar-deployment ]</span>
+</span><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a><span class="s">    namespaceSelectors: []</span>
+<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a><span class="s">    resources: [ rolebindings ]</span>
+<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2578,8 +2578,8 @@
 <a id="__codelineno-15-50" name="__codelineno-15-50" href="#__codelineno-15-50"></a><span class="s">kind: RoleBinding</span>
 <a id="__codelineno-15-51" name="__codelineno-15-51" href="#__codelineno-15-51"></a><span class="s">metadata:</span>
 <a id="__codelineno-15-52" name="__codelineno-15-52" href="#__codelineno-15-52"></a><span class="s">  name: let-it-be</span>
-<a id="__codelineno-15-53" name="__codelineno-15-53" href="#__codelineno-15-53"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-15-54" name="__codelineno-15-54" href="#__codelineno-15-54"></a><span class="s">roleRef:</span>
+<a id="__codelineno-15-53" name="__codelineno-15-53" href="#__codelineno-15-53"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-15-54" name="__codelineno-15-54" href="#__codelineno-15-54"></a><span class="s">roleRef:</span>
 <a id="__codelineno-15-55" name="__codelineno-15-55" href="#__codelineno-15-55"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
 <a id="__codelineno-15-56" name="__codelineno-15-56" href="#__codelineno-15-56"></a><span class="s">  kind: ClusterRole</span>
 <a id="__codelineno-15-57" name="__codelineno-15-57" href="#__codelineno-15-57"></a><span class="s">  name: system:openshift:scc:privileged</span>
@@ -2592,8 +2592,8 @@
 <a id="__codelineno-15-64" name="__codelineno-15-64" href="#__codelineno-15-64"></a><span class="s">kind: Service</span>
 <a id="__codelineno-15-65" name="__codelineno-15-65" href="#__codelineno-15-65"></a><span class="s">metadata:</span>
 <a id="__codelineno-15-66" name="__codelineno-15-66" href="#__codelineno-15-66"></a><span class="s">  name: my-service</span>
-<a id="__codelineno-15-67" name="__codelineno-15-67" href="#__codelineno-15-67"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-15-68" name="__codelineno-15-68" href="#__codelineno-15-68"></a><span class="s">spec:</span>
+<a id="__codelineno-15-67" name="__codelineno-15-67" href="#__codelineno-15-67"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-15-68" name="__codelineno-15-68" href="#__codelineno-15-68"></a><span class="s">spec:</span>
 <a id="__codelineno-15-69" name="__codelineno-15-69" href="#__codelineno-15-69"></a><span class="s">  ports:</span>
 <a id="__codelineno-15-70" name="__codelineno-15-70" href="#__codelineno-15-70"></a><span class="s">    - protocol: TCP</span>
 <a id="__codelineno-15-71" name="__codelineno-15-71" href="#__codelineno-15-71"></a><span class="s">      port: 8080</span>
@@ -2605,8 +2605,8 @@
 <a id="__codelineno-15-77" name="__codelineno-15-77" href="#__codelineno-15-77"></a><span class="s">kind: Route</span>
 <a id="__codelineno-15-78" name="__codelineno-15-78" href="#__codelineno-15-78"></a><span class="s">metadata:</span>
 <a id="__codelineno-15-79" name="__codelineno-15-79" href="#__codelineno-15-79"></a><span class="s">  name: my-route</span>
-<a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a><span class="s">spec:</span>
+<a id="__codelineno-15-80" name="__codelineno-15-80" href="#__codelineno-15-80"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-15-81" name="__codelineno-15-81" href="#__codelineno-15-81"></a><span class="s">spec:</span>
 <a id="__codelineno-15-82" name="__codelineno-15-82" href="#__codelineno-15-82"></a><span class="s">  port:</span>
 <a id="__codelineno-15-83" name="__codelineno-15-83" href="#__codelineno-15-83"></a><span class="s">    targetPort: 8080</span>
 <a id="__codelineno-15-84" name="__codelineno-15-84" href="#__codelineno-15-84"></a><span class="s">  to:</span>
@@ -2787,10 +2787,11 @@ how to create, but not overwrite/update a synchronized resource  </p>
  Workspace (WMW) for you to store kubernetes workload descriptions and KubeStellar control objects in. The automatically created WMW is at <code>root:wmw1</code>.</p>
 <p>Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.</p>
 <p>This EdgePlacement includes downsync of a <code>RoleBinding</code> that grants
- privileges that let the httpd pod run in an OpenShift cluster.</p>
+ privileges that let the httpd pod run in an OpenShift cluster as well
+ as applying the OpenShift route CRD so support exposure of services.</p>
 <p>In the <code>root:wmw1</code> workspace create the following <code>EdgePlacement</code> object: 
- <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>curl<span class="w"> </span>-sSL<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span>https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-
+ <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>
 <a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
 <a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>
@@ -2802,29 +2803,28 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="s">spec:</span>
 <a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="s">  locationSelectors:</span>
 <a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="hll"><span class="s">  - matchLabels: {&quot;location-group&quot;:&quot;edge&quot;}</span>
-</span><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="hll"><span class="s">  downsync:</span>
-</span><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="s">  - apiGroup: &quot;&quot;</span>
+</span><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="s">  downsync:</span>
+<a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="s">  - apiGroup: &quot;&quot;</span>
 <a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="s">    resources: [ configmaps, services ]</span>
-<a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="hll"><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-</span><a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a><span class="s">  - apiGroup: route.openshift.io</span>
-<a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="s">    namespaces:</span>
-<a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="s">    - my-namespace</span>
-<a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
-<a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="s">    resources: [ routes ]</span>
-<a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="s">  - apiGroup: apps</span>
-<a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="s">    resources: [ deployments ]</span>
-<a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="hll"><span class="s">    objectNames: [ my-first-kubestellar-deployment ]</span>
-</span><a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="hll"><span class="s">  - apiGroup: apis.kcp.io</span>
-</span><a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a><span class="s">    resources: [ apibindings ]</span>
-<a id="__codelineno-35-30" name="__codelineno-35-30" href="#__codelineno-35-30"></a><span class="s">    namespaceSelectors: []</span>
-<a id="__codelineno-35-31" name="__codelineno-35-31" href="#__codelineno-35-31"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
-<a id="__codelineno-35-32" name="__codelineno-35-32" href="#__codelineno-35-32"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
-<a id="__codelineno-35-33" name="__codelineno-35-33" href="#__codelineno-35-33"></a><span class="s">    resources: [ rolebindings ]</span>
-<a id="__codelineno-35-34" name="__codelineno-35-34" href="#__codelineno-35-34"></a><span class="s">    namespaces: [ my-namespace ]</span>
-<a id="__codelineno-35-35" name="__codelineno-35-35" href="#__codelineno-35-35"></a><span class="hll"><span class="s">    objectNames: [ let-it-be ]</span>
-</span><a id="__codelineno-35-36" name="__codelineno-35-36" href="#__codelineno-35-36"></a><span class="s">EOF</span>
+<a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a><span class="s">  - apiGroup: route.openshift.io</span>
+<a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="s">    objectNames: [ &quot;*&quot; ]</span>
+<a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a><span class="s">    resources: [ routes ]</span>
+<a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="s">  - apiGroup: apps</span>
+<a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="s">    resources: [ deployments ]</span>
+<a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="hll"><span class="s">    objectNames: [ my-first-kubestellar-deployment ]</span>
+</span><a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="s">  - apiGroup: apis.kcp.io</span>
+<a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="s">    resources: [ apibindings ]</span>
+<a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a><span class="s">    namespaceSelectors: []</span>
+<a id="__codelineno-35-30" name="__codelineno-35-30" href="#__codelineno-35-30"></a><span class="s">    objectNames: [ &quot;bind-kubernetes&quot;, &quot;bind-apps&quot; ]</span>
+<a id="__codelineno-35-31" name="__codelineno-35-31" href="#__codelineno-35-31"></a><span class="s">  - apiGroup: rbac.authorization.k8s.io</span>
+<a id="__codelineno-35-32" name="__codelineno-35-32" href="#__codelineno-35-32"></a><span class="s">    resources: [ rolebindings ]</span>
+<a id="__codelineno-35-33" name="__codelineno-35-33" href="#__codelineno-35-33"></a><span class="hll"><span class="s">    namespaces: [ my-namespace ]</span>
+</span><a id="__codelineno-35-34" name="__codelineno-35-34" href="#__codelineno-35-34"></a><span class="s">    objectNames: [ let-it-be ]</span>
+<a id="__codelineno-35-35" name="__codelineno-35-35" href="#__codelineno-35-35"></a><span class="s">EOF</span>
 </code></pre></div></p>
 <p>check if your edgeplacement was applied to the <strong>ks-core</strong> <code>kubestellar</code> namespace correctly
  <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span>ks-core.kubeconfig<span class="w"> </span>kubectl<span class="w"> </span>ws<span class="w"> </span>root:wmw1
@@ -2883,8 +2883,8 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-37-50" name="__codelineno-37-50" href="#__codelineno-37-50"></a><span class="s">kind: RoleBinding</span>
 <a id="__codelineno-37-51" name="__codelineno-37-51" href="#__codelineno-37-51"></a><span class="s">metadata:</span>
 <a id="__codelineno-37-52" name="__codelineno-37-52" href="#__codelineno-37-52"></a><span class="s">  name: let-it-be</span>
-<a id="__codelineno-37-53" name="__codelineno-37-53" href="#__codelineno-37-53"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-37-54" name="__codelineno-37-54" href="#__codelineno-37-54"></a><span class="s">roleRef:</span>
+<a id="__codelineno-37-53" name="__codelineno-37-53" href="#__codelineno-37-53"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-37-54" name="__codelineno-37-54" href="#__codelineno-37-54"></a><span class="s">roleRef:</span>
 <a id="__codelineno-37-55" name="__codelineno-37-55" href="#__codelineno-37-55"></a><span class="s">  apiGroup: rbac.authorization.k8s.io</span>
 <a id="__codelineno-37-56" name="__codelineno-37-56" href="#__codelineno-37-56"></a><span class="s">  kind: ClusterRole</span>
 <a id="__codelineno-37-57" name="__codelineno-37-57" href="#__codelineno-37-57"></a><span class="s">  name: system:openshift:scc:privileged</span>
@@ -2897,8 +2897,8 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-37-64" name="__codelineno-37-64" href="#__codelineno-37-64"></a><span class="s">kind: Service</span>
 <a id="__codelineno-37-65" name="__codelineno-37-65" href="#__codelineno-37-65"></a><span class="s">metadata:</span>
 <a id="__codelineno-37-66" name="__codelineno-37-66" href="#__codelineno-37-66"></a><span class="s">  name: my-service</span>
-<a id="__codelineno-37-67" name="__codelineno-37-67" href="#__codelineno-37-67"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-37-68" name="__codelineno-37-68" href="#__codelineno-37-68"></a><span class="s">spec:</span>
+<a id="__codelineno-37-67" name="__codelineno-37-67" href="#__codelineno-37-67"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-37-68" name="__codelineno-37-68" href="#__codelineno-37-68"></a><span class="s">spec:</span>
 <a id="__codelineno-37-69" name="__codelineno-37-69" href="#__codelineno-37-69"></a><span class="s">  ports:</span>
 <a id="__codelineno-37-70" name="__codelineno-37-70" href="#__codelineno-37-70"></a><span class="s">    - protocol: TCP</span>
 <a id="__codelineno-37-71" name="__codelineno-37-71" href="#__codelineno-37-71"></a><span class="s">      port: 8080</span>
@@ -2910,8 +2910,8 @@ how to create, but not overwrite/update a synchronized resource  </p>
 <a id="__codelineno-37-77" name="__codelineno-37-77" href="#__codelineno-37-77"></a><span class="s">kind: Route</span>
 <a id="__codelineno-37-78" name="__codelineno-37-78" href="#__codelineno-37-78"></a><span class="s">metadata:</span>
 <a id="__codelineno-37-79" name="__codelineno-37-79" href="#__codelineno-37-79"></a><span class="s">  name: my-route</span>
-<a id="__codelineno-37-80" name="__codelineno-37-80" href="#__codelineno-37-80"></a><span class="s">  namespace: my-namespace</span>
-<a id="__codelineno-37-81" name="__codelineno-37-81" href="#__codelineno-37-81"></a><span class="s">spec:</span>
+<a id="__codelineno-37-80" name="__codelineno-37-80" href="#__codelineno-37-80"></a><span class="hll"><span class="s">  namespace: my-namespace</span>
+</span><a id="__codelineno-37-81" name="__codelineno-37-81" href="#__codelineno-37-81"></a><span class="s">spec:</span>
 <a id="__codelineno-37-82" name="__codelineno-37-82" href="#__codelineno-37-82"></a><span class="s">  port:</span>
 <a id="__codelineno-37-83" name="__codelineno-37-83" href="#__codelineno-37-83"></a><span class="s">    targetPort: 8080</span>
 <a id="__codelineno-37-84" name="__codelineno-37-84" href="#__codelineno-37-84"></a><span class="s">  to:</span>
