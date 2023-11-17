@@ -5,12 +5,13 @@ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStella
 Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.
 
 This EdgePlacement includes downsync of a `RoleBinding` that grants
-privileges that let the httpd pod run in an OpenShift cluster.
+privileges that let the httpd pod run in an OpenShift cluster as well
+as applying the OpenShift route CRD so support exposure of services.
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
-```shell hl_lines="13 14 18 27 28 35"
-KUBECONFIG=ks-core.kubeconfig curl -sSL \
-  https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml | kubectl apply -f -
+```shell hl_lines="13 17 20 25 26 33"
+KUBECONFIG=ks-core.kubeconfig \
+  kubectl apply -f https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml
 
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 
@@ -28,8 +29,7 @@ spec:
     namespaces: [ my-namespace ]
     objectNames: [ "*" ]
   - apiGroup: route.openshift.io
-    namespaces:
-    - my-namespace
+    namespaces: [ my-namespace ]
     objectNames: [ "*" ]
     resources: [ routes ]
   - apiGroup: apps
@@ -54,7 +54,7 @@ KUBECONFIG=ks-core.kubeconfig kubectl get edgeplacements -n kubestellar -o yaml
 ```
 
 Now, apply the HTTP server workload definition into the WMW on **ks-core**. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`my-first-edge-placement`) object created above. 
-```shell hl_lines="5 10 24 25"
+```shell hl_lines="5 10 24 25 53 67 80"
 KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
