@@ -3,8 +3,8 @@
 ### Create Kind cluster for space management
 
 ```shell
-kind create cluster --name space-mgt
-KUBECONFIG=~/.kube/config kubectl config rename-context kind-space-mgt space-mgt
+kind create cluster --name sm-mgt
+KUBECONFIG=~/.kube/config kubectl config rename-context kind-sm-mgt sm-mgt
 ```
 
 ### The space-manager controller
@@ -28,13 +28,13 @@ export PATH=$(pwd)/bin:$PATH
 ```
 Next deploy the space framework CRDs in the space management cluster.
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context space-mgt apply -f config/crds/
+KUBECONFIG=~/.kube/config kubectl --context sm-mgt apply -f config/crds/
 cd ..
 ```
 Finally, start the space-manager controller.
 
 ```shell
-space-manager --kubeconfig ~/.kube/config --context space-mgt -v 2 &
+space-manager --kubeconfig ~/.kube/config --context sm-mgt -v 2 &
 ```
 
 <!--example1-space-manager-end-->
