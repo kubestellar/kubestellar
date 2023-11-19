@@ -66,11 +66,16 @@ function ensure_imws() {
             if [ "$i" == "" ] ; then
                 continue
             fi
+            in_cluster=
+            if $IN_CLUSTER; then
+                in_cluster="--in-cluster"
+            fi 
+
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
             kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG --in-cluster --space-config-file $space_config
+            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
             if ! run_kubectl_in_space $space_config "get apibinding edge.kubestellar.io" ; then # &> /dev/null; then
                 run_kubectl_in_space $space_config "kcp bind apiexport root:espw:edge.kubestellar.io"
             fi
