@@ -72,7 +72,7 @@ fi
 if [ "$VERBOSITY" == "" ]; then
     VERBOSITY="2"
 fi
-if [ "$Namespace" == "" ]; then
+if [ "$NAMESPACE" == "" ]; then
     NAMESPACE="default"
 fi
 echo "VERBOSITY=${VERBOSITY}"

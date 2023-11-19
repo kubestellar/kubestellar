@@ -2,7 +2,7 @@
 
 #### Create a space provider description for KCP
 
-Space provider for KCP will allow to use KCP as backend provider for spaces.
+Space provider for KCP will allow you to use KCP as backend provider for spaces.
 Use the following commands to create a provider secret for KCP access and
 a space provider definition.
 

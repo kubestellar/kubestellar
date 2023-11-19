@@ -165,10 +165,10 @@ Wait for the mailbox controller to create the corresponding mailbox workspaces a
 
 ```shell
 KUBECONFIG=ks-core.kubeconfig kubectl ws root
-while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
-MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get spaces | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get spaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
 echo The mailbox for ks-edge-cluster1 is $MB1
-MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get spaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
 echo The mailbox for ks-edge-cluster2 is $MB2
 ```
 
