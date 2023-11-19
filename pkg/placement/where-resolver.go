@@ -176,6 +176,15 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 		logger.Error(err, "Failed to fetch SinglePlacementSlice from local cache", "cluster", cluster, "epName", epName)
 		return true // I think these errors are not transient
 	}
+
+	// Temp debug
+	if len(sps.Destinations) == 0 {
+		logger.Info("----------- empty SPS", "spsName", sps.Name)
+	}
+	for _, sp := range sps.Destinations {
+		logger.Info("----------- SP from SPS", "stName", sp.SyncTargetName)
+	}
+
 	if err == nil {
 		wr.resolutions.Put(objName, []*edgeapi.SinglePlacementSlice{sps})
 	} else {

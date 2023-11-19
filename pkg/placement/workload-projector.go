@@ -1355,6 +1355,10 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	})
 	changedDestinations.Visit(func(destination SinglePlacement) error {
 		mbwsName := SPMailboxWorkspaceName(destination)
+
+		// Temp debug
+		logger.Info("----------------------- mbwsNameToSP.Put", "mbws", mbwsName, "spSTname", destination.SyncTargetName)
+
 		wp.mbwsNameToSP.Put(mbwsName, destination)
 		logger := logger.WithValues("destination", destination)
 		wpd := MapGetAdd(wp.perDestination, destination, false, wp.newPerDestinationLocked)
