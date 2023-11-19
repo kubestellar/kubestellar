@@ -34,6 +34,7 @@ import (
 
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
@@ -46,7 +47,9 @@ import (
 
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func main() {
@@ -67,6 +70,9 @@ func main() {
 	rootClientOpts.AddFlags(fs)
 	espwClientOpts := clientopts.NewClientOpts("espw", "access to the edge service provider workspace")
 	espwClientOpts.AddFlags(fs)
+	baseClientOpts := clientopts.NewClientOpts("allclusters", "access to all clusters")
+	baseClientOpts.SetDefaultCurrentContext("base")
+	baseClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -120,8 +126,28 @@ func main() {
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
 
+	baseRestConfig, err := baseClientOpts.ToRESTConfig()
+	if err != nil {
+		logger.Error(err, "failed to make all-cluster config")
+		os.Exit(15)
+	}
+
+	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
+	if err != nil {
+		logger.Error(err, "Failed to build all-cluster edge clientset")
+		os.Exit(25)
+	}
+
+	serviceProviderClient, err := kubernetes.NewForConfig(espwRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create k8s clientset for service provider space")
+		os.Exit(6)
+	}
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, serviceProviderClient)
+
 	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
 		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
+		edgeClusterClientset.EdgeV2alpha1().SyncTargets(), kbSpaceRelation,
 	)
 
 	doneCh := ctx.Done()

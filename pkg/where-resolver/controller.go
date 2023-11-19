@@ -34,6 +34,7 @@ import (
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 const (
@@ -54,9 +55,9 @@ type queueItem struct {
 }
 
 type controller struct {
-	context context.Context
-	queue   workqueue.RateLimitingInterface
-
+	context           context.Context
+	queue             workqueue.RateLimitingInterface
+	kbSpaceRelation   kbuser.KubeBindSpaceRelation
 	edgeClusterClient edgeclientset.ClusterInterface
 
 	singlePlacementSliceLister  edgev2alpha1listers.SinglePlacementSliceLister
@@ -79,14 +80,15 @@ func NewController(
 	singlePlacementSliceAccess edgev2alpha1informers.SinglePlacementSliceInformer,
 	locationAccess edgev2alpha1informers.LocationInformer,
 	syncTargetAccess edgev2alpha1informers.SyncTargetInformer,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) (*controller, error) {
 	context = klog.NewContext(context, klog.FromContext(context).WithValues("controller", ControllerName))
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
 	c := &controller{
-		context: context,
-		queue:   queue,
-
+		context:           context,
+		queue:             queue,
+		kbSpaceRelation:   kbSpaceRelation,
 		edgeClusterClient: edgeClusterClient,
 
 		edgePlacementLister:  edgePlacementAccess.Lister(),

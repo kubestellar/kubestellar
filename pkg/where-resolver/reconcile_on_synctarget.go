@@ -132,7 +132,12 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 				return err
 			}
 			nextSPS := cleanSPSBySt(currentSPS, stws.String(), stName)
-			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			spaceID, err := c.getConsumerSpaceForSPS(currentSPS)
+			if err != nil {
+				logger.Error(err, "failed to get consumer space ID from a provider's copy", "singlePlacementSlice", name)
+				return err
+			}
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -172,7 +177,12 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			spaceID, err := c.getConsumerSpaceForSPS(currentSPS)
+			if err != nil {
+				logger.Error(err, "failed to get consumer space ID from a provider's copy", "singlePlacementSlice", name)
+				return err
+			}
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
@@ -213,7 +223,12 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 			additionalSingles := makeSinglePlacementsForSt(locsFilteredByStAndEp, st)
 			nextSPS = extendSPS(nextSPS, additionalSingles)
 
-			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(ws.Path()).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			spaceID, err := c.getConsumerSpaceForSPS(currentSPS)
+			if err != nil {
+				logger.Error(err, "failed to get consumer space ID from a provider's copy", "singlePlacementSlice", name)
+				return err
+			}
+			_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
 				return err
