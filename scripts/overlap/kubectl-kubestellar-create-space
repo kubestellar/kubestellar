@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -X)* synctarget_name
+
+# Purpose: Retrieve the kubeconfig information for a specific space and generate a kubeconfig for it
+
+
+bindir="$(dirname "$0")"
+
+provider_name="default"
+sm_context="sm-mgt"
+
+while (( $# > 0 )); do
+    case "$1" in
+	(-h|--help)
+	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath "
+	    exit 0;;
+	(-X) set -o xtrace;;
+	(--space-name)
+	    if (( $# >1 ))
+	    then space_name="$2"; shift
+	    else echo "$0: missing space name" >&2; exit 1
+	    fi;;
+	(--provider-name)
+	    if (( $# >1 ))
+	    then provider_name="$2"; shift
+	    else echo "$0: missing space provider name" >&2; exit 1
+	    fi;;	
+	(--sm-core-config)
+	    if (( $# >1 ))
+	    then sm_core_config="$2"; shift
+	    else echo "$0: missing space core config file name" >&2; exit 1
+	    fi;;
+    (-*)
+        echo "$0: unknown flag" >&2 ; exit 1;
+        exit 1;;
+    (*)
+        echo "$0: unknown positional argument" >&2; exit 1;
+        exit 1;;
+    esac
+    shift
+done
+
+if [ -z "$space_name" ]; then
+    echo "$0: must be given a non-empty space name" >&2
+    exit 1
+fi
+
+if [ -z "$provider_name" ]; then
+    echo "$0: must be given a non-empty space provider name" >&2
+    exit 1
+fi
+
+if [ -z "$sm_core_config" ]; then
+    echo "$0: must be given a non-empty SM core config file" >&2
+    exit 1
+fi
+
+space_ns="spaceprovider-${provider_name}"
+
+function create_space() { 
+    kubectl --kubeconfig $sm_core_config create -f - <<EOF
+apiVersion: space.kubestellar.io/v1alpha1
+kind: Space
+metadata:
+  name: $space_name
+  namespace: $space_ns
+spec:
+  SpaceProviderDescName: $provider_name
+  Type: "managed"
+EOF
+    echo "Waiting for space $space_name to get into the Ready phase."
+    until [ "$(kubectl --kubeconfig $sm_core_config get space $space_name -n $space_ns -o yaml | grep Ready)" != "" ]; do
+        sleep 1
+    done
+    echo "Space $space_name created."
+}
+
+if kubectl --kubeconfig $sm_core_config get space $space_name -n $space_ns 2>&1 | grep "not found" ; then
+    create_space $space_name
+fi

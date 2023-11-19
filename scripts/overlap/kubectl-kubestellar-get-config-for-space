@@ -58,11 +58,6 @@ while (( $# > 0 )); do
 	    fi;;
 	(--in-cluster)
 	    in_cluster="true";;
-	(--provider-name)
-	    if (( $# >1 ))
-	    then provider_name="$2"; shift
-	    else echo "$0: missing space provider name" >&2; exit 1
-	    fi;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
         exit 1;;
@@ -85,15 +80,13 @@ fi
 
 space_ns="spaceprovider-${provider_name}"
 
-file_pref="exterrnal"
 secret_ctx="externalSecretRef"
 if [ "$in_cluster" == "true" ]; then
     secret_ctx="inClusterSecretRef"
-	file_pref="incluster"
 fi
 
 if [ -z "$space_config_file_name" ]; then
-	space_config_file_name="${provider_name}_${space_name}_${file_pref}.config"
+	space_config_file_name="${provider_name}_${space_name}.config"
     echo "$0: output config file name was not supplied. Using $space_config_file_name" >&2
 fi
 

@@ -19,45 +19,6 @@
 
 # Usage: $0 ($kubectl_flag | --with-kube boolean | -X)* wmw_name
 
-function create_space() { # usage: space_name
-    space_name=$1
-    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} create -f - <<EOF
-apiVersion: space.kubestellar.io/v1alpha1
-kind: Space
-metadata:
-  name: $space_name
-  namespace: "${PROVIDER_NAMESPACE}"
-spec:
-  SpaceProviderDescName: "${PROVIDER_NAME}"
-  Type: "managed"
-EOF
-    echo "Waiting for space $space_name to get into the Ready phase."
-    until [ "$(kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n ${PROVIDER_NAMESPACE} -o yaml | grep Ready)" != "" ]; do
-        sleep 1
-    done
-}
-
-function get_kubeconfig_file() { # usage: space_name provider_namespace
-    space_name="$1"
-    provider_namespace="$2"
-    if [ "$IN_CLUSTER" == "true" ] ; then
-        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.name}'`
-        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.inClusterSecretRef.namespace}'`
-    else
-        secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.name}'`
-        secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n $provider_namespace -o jsonpath='{$.status.externalSecretRef.namespace}'`
-    fi
-    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > ${KUBECONFIG_DIR}/${provider_namespace}-${space_name}
-}
-
-function create_space_if_needed_and_get_config() { # usage: space_name
-    space_name="$1"
-    if kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get space $space_name -n ${PROVIDER_NAMESPACE} 2>&1 | grep "not found" ; then
-        create_space $space_name
-    fi
-    get_kubeconfig_file $space_name ${PROVIDER_NAMESPACE}
-}
-
 want_kube=true
 wmw_name=""
 
@@ -136,10 +97,11 @@ esac
 
 set -e
 
-create_space_if_needed_and_get_config ${wmw_name}
-kubectl ws "${kubectl_flags[@]}" root:"$wmw_name"
+space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${wmw_name}"
+kubectl-kubestellar-create-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
+kubectl-kubestellar-get-config-for-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG --in-cluster --space-config-file $space_config
 
-if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-espw &> /dev/null; then
+if ! kubectl --kubeconfig $space_config "${kubectl_flags[@]}" get APIBinding bind-espw &> /dev/null; then
 kubectl "${kubectl_flags[@]}" apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
@@ -156,7 +118,7 @@ fi
 function bind_iff_wanted() { # usage: export_name
     export_name=$1
     binding_name=bind-$export_name
-    if [ "$want_kube" == true ] && ! kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
+    if [ "$want_kube" == true ] && ! kubectl --kubeconfig $space_config "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
 kubectl "${kubectl_flags[@]}" apply -f - <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
@@ -168,8 +130,8 @@ spec:
       path: root:compute
       name: ${export_name}
 EOF
-elif [ "$want_kube" == false ] && kubectl "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
-     kubectl "${kubectl_flags[@]}" delete APIBinding ${binding_name}
+elif [ "$want_kube" == false ] && kubectl --kubeconfig $space_config "${kubectl_flags[@]}" get APIBinding ${binding_name} &> /dev/null; then
+     kubectl --kubeconfig $space_config "${kubectl_flags[@]}" delete APIBinding ${binding_name}
 fi
 }
 
