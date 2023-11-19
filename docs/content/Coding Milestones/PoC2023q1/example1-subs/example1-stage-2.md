@@ -18,6 +18,7 @@ workload, with the following commands.
 
 ```shell
 IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubectl kubestellar ensure wmw wmw-c
+wmw_c_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -54,7 +55,7 @@ that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_c_space_config apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -133,7 +134,7 @@ selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.
    
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_c_space_config apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -171,6 +172,7 @@ workload.
 
 ```shell
 IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubectl kubestellar ensure wmw wmw-s
+wmw_s_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-s
 ```
 
 In this workload we will also demonstrate how to downsync objects
@@ -181,7 +183,7 @@ modified so that the resource it defines is in the category
 `all`. First, create the definition object with the following command.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -231,7 +233,7 @@ Next, use the following command to wait for the apiserver to process
 that definition.
 
 ```shell
-kubectl wait --for condition=Established crd crontabs.stable.example.com
+kubectl --kubeconfig $wmw_s_space_config wait --for condition=Established crd crontabs.stable.example.com
 ```
 
 Next, use `kubectl` to create the following workload objects in that
@@ -240,7 +242,7 @@ to the httpd workload but is here to demonstrate that `APIService`
 objects can be downsynced.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -350,7 +352,7 @@ common EdgePlacement, which does not explicitly mention the
 namespaces as needed in the WECs.
    
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -X)* synctarget_name
+# Usage: $0 (--space-name space-name | --space-config-file space-kubeconfig | --sm-context space-context | --provider-name provider-name | --core-config core-kubeconfig | --in-cluster | -X)* synctarget_name
 
 # Purpose: Retrieve the kubeconfig information for a specific space and generate a kubeconfig for it
 

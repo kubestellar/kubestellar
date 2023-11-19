@@ -14,15 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 ($kubectl_flag | -o file_pathname | --syncer-image container_image_ref | --imw worskpace_path | --espw workspace_path | -X)* synctarget_name
+# Usage: $0 (--space-name space-name | --provider-name provider-name | --sm-core-config sm-kubeconfig | -X)* 
 
-# Purpose: Retrieve the kubeconfig information for a specific space and generate a kubeconfig for it
+# Purpose: creates a space in the space framework.
 
 
 bindir="$(dirname "$0")"
 
 provider_name="default"
-sm_context="sm-mgt"
 
 while (( $# > 0 )); do
     case "$1" in

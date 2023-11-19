@@ -53,9 +53,13 @@ function run_kubectl_in_space() { # usage: space_config kubectl_cmd
 
 # current space at start does not matter, is ESPW on return
 function ensure_espw() {
+    in_cluster=
+    if $IN_CLUSTER; then
+        in_cluster="--in-cluster"
+    fi 
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
     kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG --in-cluster --space-config-file $space_config
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
     run_kubectl_in_space $space_config "apply -f \"$bindir/../config/exports\"" 
     echo "Finished populating the espw with kubestellar apiexports"
 }
@@ -144,7 +148,7 @@ if [ "$PROVIDER_NAMESPACE" == "" ]; then
     export PROVIDER_NAMESPACE
 fi
 if [ "$KUBECONFIG_DIR" == "" ]; then
-    KUBECONFIG_DIR="temp-space-config"
+    KUBECONFIG_DIR="${PWD}/temp-space-config"
     mkdir -p $KUBECONFIG_DIR
     export KUBECONFIG_DIR
 fi
