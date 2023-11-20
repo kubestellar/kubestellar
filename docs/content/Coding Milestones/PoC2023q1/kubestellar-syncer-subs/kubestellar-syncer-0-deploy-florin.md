@@ -25,7 +25,7 @@ Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service accou
 
 Creating or updating cluster role binding "kubestellar-syncer-florin-32uaph9l" to bind service account "kubestellar-syncer-florin-32uaph9l" to cluster role "kubestellar-syncer-florin-32uaph9l".
 
-Wrote WEC manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
+Wrote workload execution cluster manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
 
