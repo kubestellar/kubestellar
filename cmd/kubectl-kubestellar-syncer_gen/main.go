@@ -87,7 +87,6 @@ func syncerGenCommand() *cobra.Command {
 func main() {
 	cmd := syncerGenCommand()
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
 }

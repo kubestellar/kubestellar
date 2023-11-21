@@ -92,6 +92,8 @@ type EdgeSyncOptions struct {
 	SyncTargetLabels []string
 	// Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years))
 	Lifetime time.Duration
+	// Time to wait before giving up the command line process
+	Timeout time.Duration
 	// ServiceAccountTokenWait is how long syncer-gen will wait for the ServiceAccount Token controller
 	// to supply a token Secret for the syncer's ServiceAccount, before syncer-gen does the deed itself.
 	// Default is 20 seconds.
@@ -110,6 +112,7 @@ func NewEdgeSyncOptions(streams genericclioptions.IOStreams) *EdgeSyncOptions {
 		QPS:                     20,
 		Burst:                   30,
 		Lifetime:                87600 * time.Hour,
+		Timeout:                 20 * time.Second,
 		ServiceAccountTokenWait: 20 * time.Second,
 	}
 }
@@ -126,7 +129,8 @@ func (o *EdgeSyncOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().Float32Var(&o.QPS, "qps", o.QPS, "QPS to use when talking to API servers.")
 	cmd.Flags().IntVar(&o.Burst, "burst", o.Burst, "Burst to use when talking to API servers.")
 	cmd.Flags().StringSliceVar(&o.SyncTargetLabels, "labels", o.SyncTargetLabels, "Labels to apply on the SyncTarget created in kcp, each label should be in the format of key=value.")
-	cmd.Flags().DurationVar(&o.Lifetime, "lifetime", o.Lifetime, "Lifetime is the requested token lifetime. Optional. (default: 87600h (10 years)).")
+	cmd.Flags().DurationVar(&o.Lifetime, "lifetime", o.Lifetime, "Lifetime is the requested token lifetime. (default: 87600h (10 years)).")
+	cmd.Flags().DurationVar(&o.Timeout, "timeout", o.Timeout, "Time to wait before giving up the command line process (default: 20 sec)")
 	cmd.Flags().DurationVar(&o.ServiceAccountTokenWait, "service-account-token-wait", o.ServiceAccountTokenWait, "Time to wait for the ServiceAccount Token controller to create a token Secret (default: 20 sec)")
 }
 
@@ -181,10 +185,14 @@ func (o *EdgeSyncOptions) Validate() error {
 // Run prepares a kcp workspace for use with a syncer and outputs the
 // configuration required to deploy a syncer to the WEC to stdout.
 func (o *EdgeSyncOptions) Run(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, o.Timeout)
+	defer cancel()
+
 	config, err := o.ClientConfig.ClientConfig()
 	if err != nil {
 		return err
 	}
+	config.Timeout = o.Timeout
 
 	var outputFile *os.File
 	if o.OutputFile == "-" {
@@ -311,10 +319,12 @@ func (o *EdgeSyncOptions) enableSyncerForWorkspace(ctx context.Context, config *
 
 	var syncConfig *unstructured.Unstructured
 	if err := wait.PollImmediateInfiniteWithContext(ctx, time.Second*1, func(ctx context.Context) (bool, error) {
-		syncConfig, err = createEdgeSyncConfig(ctx, config, edgeSyncTargetName)
+		if syncConfig, err = createEdgeSyncConfig(ctx, config, edgeSyncTargetName); err != nil {
+			fmt.Fprintf(o.ErrOut, "failed to create EdgeSyncConfig. Retrying...\n Reason: %s\n", err.Error())
+		}
 		return err == nil, nil
 	}); err != nil {
-		return "", "", nil, fmt.Errorf("failed to get or create EdgeSyncConfig resource: %w", err)
+		return "", "", nil, fmt.Errorf("failed to get or create EdgeSyncConfig resource.\n Reason: %w\n", err)
 	}
 	syncerID = getKubeStellarSyncerID(edgeSyncTarget)
 	syncTargetOwnerReferences := []metav1.OwnerReference{{
