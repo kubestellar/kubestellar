@@ -60,7 +60,7 @@ containerized workloads from the four resources built into kcp TMC
 are meaningful in KubeStellar.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubestellar init
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubestellar init
 ```
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
@@ -123,11 +123,12 @@ KubeStellar. They label both florin and guilder with `env=prod`, and
 also label guilder with `extended=yes`.
 
 ```shell
-kubectl ws root:imw1
-kubectl kubestellar ensure location florin  loc-name=florin  env=prod
-kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
-echo "decribe the florin location object"
-kubectl describe location.edge.kubestellar.io florin
+imw1_space_config="${PWD}/temp-space-config/spaceprovider-default-imw1"
+kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --space-config-file $imw1_space_config
+KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
+KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
+echo "describe the florin location object"
+KUBECONFIG=$imw1_space_config kubectl describe location.edge.kubestellar.io florin
 ```
 
 Those two script invocations are equivalent to creating the following

@@ -20,7 +20,7 @@
 
 bindir="$(dirname "$0")"
 
-espw="espw"
+espw="root:espw"
 stname=""
 labels=()
 kubectl_flags=()
@@ -116,9 +116,9 @@ if [ "$imw" != "$original_ws" ]; then
 fi
 
 if [ "$silent" == "true" ]; then
-    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" "--imw ${imw}" > /dev/null
+    "$bindir/kubectl-kubestellar-ensure-location" --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}"  > /dev/null
 else
-    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" "--imw ${imw}"
+    "$bindir/kubectl-kubestellar-ensure-location" --imw ${imw} "${kubectl_flags[@]}" "$stname" "${labels[@]}" 
 fi
 
 "$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"

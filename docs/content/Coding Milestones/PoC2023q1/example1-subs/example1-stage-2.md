@@ -17,7 +17,7 @@ management workspace (WMW).  Start by creating a WMW for the common
 workload, with the following commands.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubectl kubestellar ensure wmw wmw-c
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-c
 wmw_c_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-c
 ```
 
@@ -171,7 +171,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=~/.kube/config kubectl kubestellar ensure wmw wmw-s
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-s
 wmw_s_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-s
 ```
 
@@ -413,7 +413,10 @@ following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.
 
 ```shell
-kubectl ws root:espw
+espw_space_config="${PWD}/temp-space-config/spaceprovider-default-espw"
+kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --space-config-file $espw_space_config
+# TODO: where-resolver needs access to multiple configs. Will remove when controllers support spaces.
+kubectl ws root:espw 
 kubestellar-where-resolver &
 sleep 10
 ```
@@ -422,12 +425,10 @@ The following commands wait until the where-resolver has done its job
 for the common and special `EdgePlacement` objects.
 
 ```shell
-kubectl ws root:wmw-c
-while ! kubectl get SinglePlacementSlice &> /dev/null; do
+while ! kubectl --kubeconfig $wmw_c_space_config get SinglePlacementSlice &> /dev/null; do
   sleep 10
 done
-kubectl ws root:wmw-s
-while ! kubectl get SinglePlacementSlice &> /dev/null; do
+while ! kubectl --kubeconfig $wmw_s_space_config get SinglePlacementSlice &> /dev/null; do
   sleep 10
 done
 ```
@@ -446,14 +447,7 @@ I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlace
 Check out a SinglePlacementSlice object as follows.
 
 ```shell
-kubectl ws root:wmw-c
-```
-``` { .bash .no-copy }
-Current workspace is "root:wmw-c".
-```
-
-```shell
-kubectl get SinglePlacementSlice -o yaml
+kubectl --kubeconfig $wmw_c_space_config get SinglePlacementSlice -o yaml
 ```
 ``` { .bash .no-copy }
 apiVersion: v1
