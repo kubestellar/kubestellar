@@ -1,0 +1,80 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: downsyncworkloadpartslices.edge.kubestellar.io
+spec:
+  group: edge.kubestellar.io
+  names:
+    kind: DownsyncWorkloadPartSlice
+    listKind: DownsyncWorkloadPartSliceList
+    plural: downsyncworkloadpartslices
+    shortNames:
+    - dwps
+    singular: downsyncworkloadpartslice
+  scope: Cluster
+  versions:
+  - name: v2alpha1
+    schema:
+      openAPIV3Schema:
+        description: DownsyncWorkloadPartSlice reports the identities of some of the
+          objects that match the "what predicate" of an EdgePlacement and the modalities
+          of their downsync. Collectively all the DownsyncWorkloadPartSlice objects
+          that share the same value of the "edge.kubestellar.io/source-placement"
+          label report on the identities of all the objects that match the "what predicate"
+          of the EdgePlacement named by that label.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          parts:
+            description: '`parts` is the object identities being reported and their
+              associated modalities.'
+            items:
+              description: DownsyncWorkloadPart identifies one workload object and
+                its downsync modalities.
+              properties:
+                createOnly:
+                  description: '`createOnly` indicates that the WDS supplies only
+                    the initial value for the desired state.'
+                  type: boolean
+                group:
+                  type: string
+                name:
+                  type: string
+                namespace:
+                  type: string
+                resource:
+                  type: string
+                returnSingletonState:
+                  description: '`returnSingletonState` indicates that the user intends
+                    this object to go to exactly 1 WEC and the reported state from
+                    there should be returned all the way to the WDS.'
+                  type: boolean
+                version:
+                  type: string
+              required:
+              - group
+              - name
+              - namespace
+              - resource
+              - version
+              type: object
+            type: array
+        required:
+        - parts
+        type: object
+    served: true
+    storage: true

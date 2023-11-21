@@ -30,6 +30,7 @@ import (
 type EdgeV2alpha1Interface interface {
 	RESTClient() rest.Interface
 	CustomizersGetter
+	DownsyncWorkloadPartSlicesGetter
 	EdgePlacementsGetter
 	EdgeSyncConfigsGetter
 	LocationsGetter
@@ -45,6 +46,10 @@ type EdgeV2alpha1Client struct {
 
 func (c *EdgeV2alpha1Client) Customizers(namespace string) CustomizerInterface {
 	return newCustomizers(c, namespace)
+}
+
+func (c *EdgeV2alpha1Client) DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceInterface {
+	return newDownsyncWorkloadPartSlices(c)
 }
 
 func (c *EdgeV2alpha1Client) EdgePlacements() EdgePlacementInterface {

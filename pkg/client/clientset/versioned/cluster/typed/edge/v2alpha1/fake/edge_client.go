@@ -48,6 +48,10 @@ func (c *EdgeV2alpha1ClusterClient) Customizers() kcpedgev2alpha1.CustomizerClus
 	return &customizersClusterClient{Fake: c.Fake}
 }
 
+func (c *EdgeV2alpha1ClusterClient) DownsyncWorkloadPartSlices() kcpedgev2alpha1.DownsyncWorkloadPartSliceClusterInterface {
+	return &downsyncWorkloadPartSlicesClusterClient{Fake: c.Fake}
+}
+
 func (c *EdgeV2alpha1ClusterClient) EdgePlacements() kcpedgev2alpha1.EdgePlacementClusterInterface {
 	return &edgePlacementsClusterClient{Fake: c.Fake}
 }
@@ -86,6 +90,10 @@ func (c *EdgeV2alpha1Client) RESTClient() rest.Interface {
 
 func (c *EdgeV2alpha1Client) Customizers(namespace string) edgev2alpha1.CustomizerInterface {
 	return &customizersClient{Fake: c.Fake, ClusterPath: c.ClusterPath, Namespace: namespace}
+}
+
+func (c *EdgeV2alpha1Client) DownsyncWorkloadPartSlices() edgev2alpha1.DownsyncWorkloadPartSliceInterface {
+	return &downsyncWorkloadPartSlicesClient{Fake: c.Fake, ClusterPath: c.ClusterPath}
 }
 
 func (c *EdgeV2alpha1Client) EdgePlacements() edgev2alpha1.EdgePlacementInterface {

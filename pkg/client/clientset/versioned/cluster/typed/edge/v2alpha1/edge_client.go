@@ -35,6 +35,7 @@ import (
 type EdgeV2alpha1ClusterInterface interface {
 	EdgeV2alpha1ClusterScoper
 	CustomizersClusterGetter
+	DownsyncWorkloadPartSlicesClusterGetter
 	EdgePlacementsClusterGetter
 	EdgeSyncConfigsClusterGetter
 	SinglePlacementSlicesClusterGetter
@@ -60,6 +61,10 @@ func (c *EdgeV2alpha1ClusterClient) Cluster(clusterPath logicalcluster.Path) edg
 
 func (c *EdgeV2alpha1ClusterClient) Customizers() CustomizerClusterInterface {
 	return &customizersClusterInterface{clientCache: c.clientCache}
+}
+
+func (c *EdgeV2alpha1ClusterClient) DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceClusterInterface {
+	return &downsyncWorkloadPartSlicesClusterInterface{clientCache: c.clientCache}
 }
 
 func (c *EdgeV2alpha1ClusterClient) EdgePlacements() EdgePlacementClusterInterface {

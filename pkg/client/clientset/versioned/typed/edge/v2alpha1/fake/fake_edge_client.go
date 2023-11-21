@@ -33,6 +33,10 @@ func (c *FakeEdgeV2alpha1) Customizers(namespace string) v2alpha1.CustomizerInte
 	return &FakeCustomizers{c, namespace}
 }
 
+func (c *FakeEdgeV2alpha1) DownsyncWorkloadPartSlices() v2alpha1.DownsyncWorkloadPartSliceInterface {
+	return &FakeDownsyncWorkloadPartSlices{c}
+}
+
 func (c *FakeEdgeV2alpha1) EdgePlacements() v2alpha1.EdgePlacementInterface {
 	return &FakeEdgePlacements{c}
 }

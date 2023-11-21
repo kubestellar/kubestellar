@@ -28,6 +28,8 @@ import (
 type ClusterInterface interface {
 	// Customizers returns a CustomizerClusterInformer
 	Customizers() CustomizerClusterInformer
+	// DownsyncWorkloadPartSlices returns a DownsyncWorkloadPartSliceClusterInformer
+	DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
 	EdgePlacements() EdgePlacementClusterInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
@@ -55,6 +57,11 @@ func New(f internalinterfaces.SharedInformerFactory, tweakListOptions internalin
 // Customizers returns a CustomizerClusterInformer
 func (v *version) Customizers() CustomizerClusterInformer {
 	return &customizerClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// DownsyncWorkloadPartSlices returns a DownsyncWorkloadPartSliceClusterInformer
+func (v *version) DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceClusterInformer {
+	return &downsyncWorkloadPartSliceClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // EdgePlacements returns a EdgePlacementClusterInformer
@@ -90,6 +97,8 @@ func (v *version) Locations() LocationClusterInformer {
 type Interface interface {
 	// Customizers returns a CustomizerInformer
 	Customizers() CustomizerInformer
+	// DownsyncWorkloadPartSlices returns a DownsyncWorkloadPartSliceInformer
+	DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceInformer
 	// EdgePlacements returns a EdgePlacementInformer
 	EdgePlacements() EdgePlacementInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigInformer
@@ -118,6 +127,11 @@ func NewScoped(f internalinterfaces.SharedScopedInformerFactory, namespace strin
 // Customizers returns a CustomizerInformer
 func (v *scopedVersion) Customizers() CustomizerInformer {
 	return &customizerScopedInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// DownsyncWorkloadPartSlices returns a DownsyncWorkloadPartSliceInformer
+func (v *scopedVersion) DownsyncWorkloadPartSlices() DownsyncWorkloadPartSliceInformer {
+	return &downsyncWorkloadPartSliceScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // EdgePlacements returns a EdgePlacementInformer

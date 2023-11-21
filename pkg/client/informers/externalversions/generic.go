@@ -89,6 +89,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=edge.kubestellar.io, Version=V2alpha1
 	case edgev2alpha1.SchemeGroupVersion.WithResource("customizers"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V2alpha1().Customizers().Informer()}, nil
+	case edgev2alpha1.SchemeGroupVersion.WithResource("downsyncworkloadpartslices"):
+		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V2alpha1().DownsyncWorkloadPartSlices().Informer()}, nil
 	case edgev2alpha1.SchemeGroupVersion.WithResource("edgeplacements"):
 		return &genericClusterInformer{resource: resource.GroupResource(), informer: f.Edge().V2alpha1().EdgePlacements().Informer()}, nil
 	case edgev2alpha1.SchemeGroupVersion.WithResource("edgesyncconfigs"):
@@ -113,6 +115,9 @@ func (f *sharedScopedInformerFactory) ForResource(resource schema.GroupVersionRe
 	// Group=edge.kubestellar.io, Version=V2alpha1
 	case edgev2alpha1.SchemeGroupVersion.WithResource("customizers"):
 		informer := f.Edge().V2alpha1().Customizers().Informer()
+		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
+	case edgev2alpha1.SchemeGroupVersion.WithResource("downsyncworkloadpartslices"):
+		informer := f.Edge().V2alpha1().DownsyncWorkloadPartSlices().Informer()
 		return &genericInformer{lister: cache.NewGenericLister(informer.GetIndexer(), resource.GroupResource()), informer: informer}, nil
 	case edgev2alpha1.SchemeGroupVersion.WithResource("edgeplacements"):
 		informer := f.Edge().V2alpha1().EdgePlacements().Informer()
