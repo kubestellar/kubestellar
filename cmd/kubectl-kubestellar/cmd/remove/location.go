@@ -74,9 +74,12 @@ func removeLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 
-	// Set context to root, later on we will append the IMW name to the root server
-	configContext := "root"
-	cliOpts.Context = &configContext
+	// Set context to root if no context is provided with --context flag
+	// Later on we will append the IMW name to the server provided by context
+	if *cliOpts.Context == "" {
+		configContext := "root"
+		cliOpts.Context = &configContext
+	}
 
 	// Get client config from flags
 	config, err := cliOpts.ToRESTConfig()

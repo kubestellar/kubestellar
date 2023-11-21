@@ -124,9 +124,11 @@ func init() {
 func getKubeconfig(cmdGetKubeconfig *cobra.Command, cliOpts *genericclioptions.ConfigFlags, args []string, isInternal bool) error {
 	ctx := cmdGetKubeconfig.Context()
 	logger := klog.FromContext(ctx)
-	// Set context from KUBECONFIG to use in client
-	configContext := ksContext
-	cliOpts.Context = &configContext
+	// Set context in KUBECONFIG to use in client, if no context is provided with --context flag
+	if *cliOpts.Context == "" {
+		configContext := ksContext
+		cliOpts.Context = &configContext
+	}
 
 	// Print all flags and their values if verbosity level is at least 1
 	cmdGetKubeconfig.Flags().VisitAll(func(flg *pflag.Flag) {

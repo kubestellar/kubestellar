@@ -66,9 +66,11 @@ func removeWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 
-	// Set context to root
-	configContext := "root"
-	cliOpts.Context = &configContext
+	// Set context to root if no context is provided with --context flag
+	if *cliOpts.Context == "" {
+		configContext := "root"
+		cliOpts.Context = &configContext
+	}
 
 	// Get client config from flags
 	config, err := cliOpts.ToRESTConfig()

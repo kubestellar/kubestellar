@@ -88,9 +88,12 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 		return err
 	}
 
-	// Set context to root, later on we will append the WDS name to the root server
-	configContext := "root"
-	cliOpts.Context = &configContext
+	// Set context to root if no context is provided with --context flag
+	// Later on we will append the WDS name to the server provided by context
+	if *cliOpts.Context == "" {
+		configContext := "root"
+		cliOpts.Context = &configContext
+	}
 
 	// Get client config from flags
 	config, err := cliOpts.ToRESTConfig()
