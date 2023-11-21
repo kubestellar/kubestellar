@@ -28,6 +28,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
@@ -96,14 +97,14 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 	}
 
 	// Get client config from flags
-	config, err := cliOpts.ToRESTConfig()
+	rootConfig, err := cliOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "Failed to get config from flags")
 		return err
 	}
 
 	// Create client-go instance from config
-	kcpClient, err := kcpclientset.NewForConfig(config)
+	kcpClient, err := kcpclientset.NewForConfig(rootConfig)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
@@ -116,12 +117,13 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 		return err
 	}
 
-	// Update host to work on objects within WDS workspace
-	config.Host += ":" + wdsName
-	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
+	// Make a config with the server set to work within WDS workspace
+	wdsConfig := rest.CopyConfig(rootConfig)
+	wdsConfig.Host += ":" + wdsName
+	logger.V(1).Info(fmt.Sprintf("Set host to %s", wdsConfig.Host))
 
-	// Update client to work in WDS workspace
-	kcpClient, err = kcpclientset.NewForConfig(config)
+	// Create client to work in WDS workspace
+	kcpClient, err = kcpclientset.NewForConfig(wdsConfig)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
