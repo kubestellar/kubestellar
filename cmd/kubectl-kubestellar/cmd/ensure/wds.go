@@ -41,7 +41,7 @@ var withKube bool // Variable for --with-kube flag
 func newCmdEnsureWDS(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make wds command
 	cmdWDS := &cobra.Command{
-		Use:     "wds <WDS_NAME> --with-kube=<TRUE/FALSE>",
+		Use:     "wds <WDS_NAME> [--with-kube=<TRUE/FALSE>]",
 		Aliases: []string{"wmw"},
 		Short:   "Ensure existence and configuration of a workload description space (WDS, formerly WMW)",
 		Args:    cobra.ExactArgs(1),
@@ -57,8 +57,7 @@ func newCmdEnsureWDS(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	}
 
 	// Add flag for
-	cmdWDS.Flags().BoolVar(&withKube, "with-kube", true, "Include root:compute API bindings")
-	cmdWDS.MarkFlagRequired("with-kube")
+	cmdWDS.Flags().BoolVar(&withKube, "with-kube", true, "Include Kubernetes API bindings")
 	return cmdWDS
 }
 
