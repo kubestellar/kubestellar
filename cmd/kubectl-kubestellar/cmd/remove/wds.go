@@ -20,7 +20,6 @@ limitations under the License.
 package remove
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -35,9 +34,9 @@ import (
 )
 
 // Create the Cobra sub-command for 'kubectl kubestellar remove wds'
-func newCmdRemoveWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
+func newCmdRemoveWDS(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make wds command
-	cmdWds := &cobra.Command{
+	cmdWDS := &cobra.Command{
 		Use:     "wds <WDS_NAME>",
 		Aliases: []string{"wmw"},
 		Short:   "Delete a workload description space (WDS, formerly WMW)",
@@ -48,22 +47,22 @@ func newCmdRemoveWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := removeWds(cmd, args, cliOpts)
+			err := removeWDS(cmd, args, cliOpts)
 			return err
 		},
 	}
 
-	return cmdWds
+	return cmdWDS
 }
 
 // Perform the actual workload management workspace removal
-func removeWds(cmdWds *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
+func removeWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	wdsName := args[0] // name of WDS to remove
-	ctx := context.Background()
+	ctx := cmdWDS.Context()
 	logger := klog.FromContext(ctx)
 
 	// Print all flags and their values if verbosity level is at least 1
-	cmdWds.Flags().VisitAll(func(flg *pflag.Flag) {
+	cmdWDS.Flags().VisitAll(func(flg *pflag.Flag) {
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 

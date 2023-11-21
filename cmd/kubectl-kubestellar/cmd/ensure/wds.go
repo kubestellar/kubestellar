@@ -22,7 +22,6 @@ limitations under the License.
 package ensure
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -39,9 +38,9 @@ import (
 var withKube bool // Variable for --with-kube flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar ensure wds'
-func newCmdEnsureWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
+func newCmdEnsureWDS(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 	// Make wds command
-	cmdWds := &cobra.Command{
+	cmdWDS := &cobra.Command{
 		Use:     "wds <WDS_NAME> --with-kube=<TRUE/FALSE>",
 		Aliases: []string{"wmw"},
 		Short:   "Ensure existence and configuration of a workload description space (WDS, formerly WMW)",
@@ -52,15 +51,15 @@ func newCmdEnsureWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 			// want the help to be displayed when the error is due to an
 			// invalid command.
 			cmd.SilenceUsage = true
-			err := ensureWds(cmd, args, cliOpts)
+			err := ensureWDS(cmd, args, cliOpts)
 			return err
 		},
 	}
 
 	// Add flag for
-	cmdWds.Flags().BoolVar(&withKube, "with-kube", true, "Include root:compute API bindings")
-	cmdWds.MarkFlagRequired("with-kube")
-	return cmdWds
+	cmdWDS.Flags().BoolVar(&withKube, "with-kube", true, "Include root:compute API bindings")
+	cmdWDS.MarkFlagRequired("with-kube")
+	return cmdWDS
 }
 
 // Perform validation of workload description space (WDS). The user will provide
@@ -73,13 +72,13 @@ func newCmdEnsureWds(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
 //   - If --with-kube is true, ensure a list of APIBindings exist with export path
 //     "root:compute" (create any that are missing). If --with-kube is false, make
 //     sure none of these exist (delete as needed).
-func ensureWds(cmdWds *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
+func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	wdsName := args[0] // name of WDS
-	ctx := context.Background()
+	ctx := cmdWDS.Context()
 	logger := klog.FromContext(ctx)
 
 	// Print all flags and their values if verbosity level is at least 1
-	cmdWds.Flags().VisitAll(func(flg *pflag.Flag) {
+	cmdWDS.Flags().VisitAll(func(flg *pflag.Flag) {
 		logger.V(1).Info(fmt.Sprintf("Command line flag %s=%s", flg.Name, flg.Value))
 	})
 

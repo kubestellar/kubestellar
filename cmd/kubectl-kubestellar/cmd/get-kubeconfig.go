@@ -28,7 +28,6 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -123,7 +122,7 @@ func init() {
 // Get KubeStellar kubeconfig, and write to output file (filename given by fname
 // variable, tied to --output flag).
 func getKubeconfig(cmdGetKubeconfig *cobra.Command, cliOpts *genericclioptions.ConfigFlags, args []string, isInternal bool) error {
-	ctx := context.Background()
+	ctx := cmdGetKubeconfig.Context()
 	logger := klog.FromContext(ctx)
 	// Set context from KUBECONFIG to use in client
 	configContext := ksContext

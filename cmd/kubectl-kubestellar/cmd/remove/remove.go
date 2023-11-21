@@ -66,5 +66,5 @@ func init() {
 	// Add location sub-command
 	RemoveCmd.AddCommand(newCmdRemoveLocation(cliOpts))
 	// Add wds sub-command
-	RemoveCmd.AddCommand(newCmdRemoveWds(cliOpts))
+	RemoveCmd.AddCommand(newCmdRemoveWDS(cliOpts))
 }

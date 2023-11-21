@@ -22,7 +22,6 @@ limitations under the License.
 package remove
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -67,7 +66,7 @@ func newCmdRemoveLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command
 // variable), and the location name is a command line argument.
 func removeLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	locationName := args[0]
-	ctx := context.Background()
+	ctx := cmdLocation.Context()
 	logger := klog.FromContext(ctx)
 
 	// Print all flags and their values if verbosity level is at least 1

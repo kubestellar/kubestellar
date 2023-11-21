@@ -23,7 +23,6 @@ limitations under the License.
 package ensure
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -83,7 +82,7 @@ func newCmdEnsureLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command
 func ensureLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericclioptions.ConfigFlags) error {
 	locationName := args[0]
 	labels := args[1:]
-	ctx := context.Background()
+	ctx := cmdLocation.Context()
 	logger := klog.FromContext(ctx)
 
 	// Print all flags and their values if verbosity level is at least 1

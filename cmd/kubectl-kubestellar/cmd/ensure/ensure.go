@@ -65,5 +65,5 @@ func init() {
 	// Add location sub-command
 	EnsureCmd.AddCommand(newCmdEnsureLocation(cliOpts))
 	// Add wds sub-command
-	EnsureCmd.AddCommand(newCmdEnsureWds(cliOpts))
+	EnsureCmd.AddCommand(newCmdEnsureWDS(cliOpts))
 }
