@@ -52,15 +52,18 @@ type SinglePlacementSlice struct {
 
 // SinglePlacement describes one Location that matches the relevant EdgePlacement.
 type SinglePlacement struct {
-	// Cluster is the logicalcluster.Name of the logical cluster that contains
+	// `cluster` is the logicalcluster.Name of the logical cluster that contains
 	// both the Location and the SyncTarget.
+	// This identifies the Inventory Space (IS), not the KCS (formerly ESPW).
 	Cluster string `json:"cluster"`
 
+	// `locationName` is the name of the Location object as it appears in the IS.
 	LocationName string `json:"locationName"`
 
-	// `syncTargetName` identifies the relevant SyncTarget at the Location
+	// `syncTargetName` is the name of the corresponding SyncTarget object, as it appears in the IS.
 	SyncTargetName string `json:"syncTargetName"`
 
+	// `syncTargetUID` is the `metadata.UID` of the SyncTarget object **in the KCS**.
 	SyncTargetUID apimachtypes.UID `json:"syncTargetUID"`
 }
 
