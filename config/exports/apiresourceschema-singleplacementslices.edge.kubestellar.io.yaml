@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v231113-f0837626.singleplacementslices.edge.kubestellar.io
+  name: v231121-62262f2a1.singleplacementslices.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -34,20 +34,21 @@ spec:
               EdgePlacement.
             properties:
               cluster:
-                description: Cluster is the logicalcluster.Name of the logical cluster
-                  that contains both the Location and the SyncTarget.
+                description: '`cluster` is the logicalcluster.Name of the logical
+                  cluster that contains both the Location and the SyncTarget. This
+                  identifies the Inventory Space (IS), not the KCS (formerly ESPW).'
                 type: string
               locationName:
+                description: '`locationName` is the name of the Location object as
+                  it appears in the IS.'
                 type: string
               syncTargetName:
-                description: '`syncTargetName` identifies the relevant SyncTarget
-                  at the Location'
+                description: '`syncTargetName` is the name of the corresponding SyncTarget
+                  object, as it appears in the IS.'
                 type: string
               syncTargetUID:
-                description: UID is a type that holds unique ID values, including
-                  UUIDs.  Because we don't ONLY use UUIDs, this is an alias to string.  Being
-                  a type captures intent and helps make sure that UIDs and names do
-                  not get conflated.
+                description: '`syncTargetUID` is the `metadata.UID` of the SyncTarget
+                  object **in the KCS**.'
                 type: string
             required:
             - cluster
