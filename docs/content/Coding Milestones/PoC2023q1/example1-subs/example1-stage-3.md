@@ -15,6 +15,7 @@ use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.
 
 ```shell
+# TODO: placement-translator needs access to multiple configs. Will remove when controllers support spaces.
 kubectl ws root:espw
 placement-translator &
 sleep 10
@@ -24,6 +25,7 @@ The following commands wait for the placement translator to get its
 job done for this example.
 
 ```shell
+# TODO: unfortunately, the $FLORIN_WS and $GUILDER_WS are mailbox ws names that we are not supporting in the space framework yet
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_WS $GUILDER_WS)
 for ii in "${mbxws[@]}"; do
@@ -71,6 +73,7 @@ the custom-columns listing near the end of [the section above about
 the mailbox controller](../#the-mailbox-controller).
 
 ```shell
+# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
 kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
 ```
 
@@ -110,6 +113,7 @@ That display should show objects in two different mailbox workspaces;
 the following command checks that.
 
 ```shell
+# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
 test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
 ```
 
@@ -117,6 +121,7 @@ The various APIBinding and CustomResourceDefinition objects involved
 should also appear in the mailbox workspaces.
 
 ```shell
+# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
 test $(kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -cw "name: bind-apps") -ge 2
 kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -w "name: bind-kubernetes"
 kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
@@ -127,6 +132,7 @@ with some error messages about `APIService` not being known in the
 other mailbox workspaces.
 
 ```shell
+# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
 kubestellar-list-syncing-objects --api-group apiregistration.k8s.io --api-kind APIService 2>&1 | grep -v "APIService.*the server could not find the requested resource" | fgrep -w "name: v1090.example.my"
 ```
 
@@ -135,6 +141,7 @@ The florin cluster gets only the common workload.  Examine florin's
 for florin (which you stored in Stage 1) here.
 
 ```shell
+# TODO: $FLORIN_WS is a mailbox workspace 
 kubectl ws root:$FLORIN_WS
 ```
 
@@ -197,6 +204,7 @@ Examine guilder's `SyncerConfig` object and workloads as follows,
 using the mailbox workspace name that you stored in Stage 1.
 
 ```shell
+# TODO: $GUILDER_WS is a mailbox workspace 
 kubectl ws root:$GUILDER_WS
 ```
 ``` { .bash .no-copy }

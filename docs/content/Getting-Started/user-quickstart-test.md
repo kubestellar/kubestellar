@@ -118,6 +118,8 @@ make userbuild
 export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
+export SM_CONFIG=~/.kube/config
+mkdir ${PWD}/temp-space-config
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -164,6 +166,7 @@ export PATH=$PWD/kcp/bin:$PATH
 Wait for the mailbox controller to create the corresponding mailbox workspaces and remember them.
 
 ```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
 KUBECONFIG=ks-core.kubeconfig kubectl ws root
 while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
 MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
@@ -185,7 +188,7 @@ Add a ServiceAccount that will be downsynced.
 
 ```shell
 wmw1_space_config="${PWD}/temp-space-config/spaceprovider-default-wmw1"
-kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config ks-core.kubeconfig --space-config-file $wmw1_space_config
+kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $wmw1_space_config
 
 KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
 apiVersion: v1
@@ -220,14 +223,24 @@ EOF
 Wait for the ServiceAccount to get to the mailbox workspaces.
 
 ```shell
-MB1_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB1}"
-kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config ks-core.kubeconfig --space-config-file $MB1_space_config
-while ! KUBECONFIG=$MB1_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+# Once the mailbox is converted to spaces, this is the code we want to use:
+# MB1_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB1}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $MB1_space_config
+# while ! KUBECONFIG=$MB1_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#     sleep 10
+# done
+# MB2_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB2}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $MB2_space_config
+# while ! KUBECONFIG=MB2_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#    sleep 10
+# done
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB1
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
 done
-MB2_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB2}"
-kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config ks-core.kubeconfig --space-config-file $MB2_space_config
-while ! KUBECONFIG=MB2_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB2
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
 done
 ```
@@ -261,10 +274,12 @@ for the `test-sa` ServiceAccount, and one generated locally for the
 `test-sa` ServiceAccount.
 
 ```shell
-for space_config in $MB1_space_config $MB2_space_config; do
-    KUBECONFIG=$space_config kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
-    KUBECONFIG=$space_config kubectl get secrets -n my-namespace
-    [ $(KUBECONFIG=$space_config kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+for mb in $MB1 $MB2; do
+    KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
+    KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
+    KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
 done
 ```
 

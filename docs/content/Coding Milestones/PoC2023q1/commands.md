@@ -518,7 +518,7 @@ controllers but does require that the KubeStellar Core Space (KCS) has been set 
 An example usage follows.
 
 ```shell
-kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw-1".
