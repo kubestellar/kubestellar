@@ -20,8 +20,7 @@
 
 bindir="$(dirname "$0")"
 
-imw=.
-espw="root:espw"
+espw="espw"
 stname=""
 labels=()
 kubectl_flags=()
@@ -86,6 +85,11 @@ while (( $# > 0 )); do
     shift
 done
 
+if [ -z "$imw" ]; then
+    echo "$0: must be given a non-empty imw space name" >&2
+    exit 1
+fi
+
 if [ "$stname" == "" ]; then
     echo "$0: SyncTarget name was not specified" >&2
     exit 1
@@ -93,26 +97,14 @@ fi
 
 set -e
 
-original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
-
-if [ "$imw" == "." ]
-then imw="$original_ws"
-elif ! [[ "$imw" =~ [a-z0-9].* ]]; then
+if ! [[ "$imw" =~ [a-z0-9].* ]]; then
     echo "$0: imw ${espw@Q} is not valid" >&2
     exit 1
 fi
 
-if [ "$espw" == "." ]
-then espw="$original_ws"
-elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
+if ! [[ "$espw" =~ [a-z0-9].* ]]; then
     echo "$0: espw ${espw@Q} is not valid" >&2
     exit 1
-fi
-
-if [ "$silent" == "true" ]; then
-    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws" > /dev/null' EXIT
-else
-    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
 fi
 
 if [ "$imw" != "$original_ws" ]; then
@@ -124,9 +116,9 @@ if [ "$imw" != "$original_ws" ]; then
 fi
 
 if [ "$silent" == "true" ]; then
-    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" > /dev/null
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" "--imw ${imw}" > /dev/null
 else
-    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}"
+    "$bindir/kubectl-kubestellar-ensure-location" "${kubectl_flags[@]}" "$stname" "${labels[@]}" "--imw ${imw}"
 fi
 
 "$bindir/kubectl-kubestellar-prep_for_syncer" "${kubectl_flags[@]}" --espw "$espw" "${prep_flags[@]}" "$stname"
