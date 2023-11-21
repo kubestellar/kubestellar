@@ -78,14 +78,14 @@ func removeWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 	}
 
 	// Create client-go instance from config
-	client, err := kcpclientset.NewForConfig(config)
+	kcpClient, err := kcpclientset.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
 	}
 
 	// Delete WDS KCP workspace
-	removed, err := plugin.DeleteWorkspace(client, ctx, wdsName)
+	removed, err := plugin.DeleteWorkspace(kcpClient, ctx, wdsName)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf("Problem removing workspace root:%s", wdsName))
 		return err

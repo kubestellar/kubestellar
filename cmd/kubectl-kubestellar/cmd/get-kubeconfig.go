@@ -66,7 +66,7 @@ func newGetExternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Com
 	}
 
 	// Add required flag for output filename (--output or -o)
-	cmdGetExternalKubeconfig.Flags().StringVarP(&fname, "output", "o", "", "Output path/filename")
+	cmdGetExternalKubeconfig.Flags().StringVarP(&outputName, "output", "o", "", "Output path/filename")
 	cmdGetExternalKubeconfig.MarkFlagRequired("output")
 	cmdGetExternalKubeconfig.MarkFlagFilename("output")
 	return cmdGetExternalKubeconfig
@@ -92,7 +92,7 @@ func newGetInternalKubeconfig(cliOpts *genericclioptions.ConfigFlags) *cobra.Com
 	}
 
 	// Add required flag for output filename (--output or -o)
-	cmdGetInternalKubeconfig.Flags().StringVarP(&fname, "output", "o", "", "Output path/filename")
+	cmdGetInternalKubeconfig.Flags().StringVarP(&outputName, "output", "o", "", "Output path/filename")
 	cmdGetInternalKubeconfig.MarkFlagRequired("output")
 	cmdGetInternalKubeconfig.MarkFlagFilename("output")
 	return cmdGetInternalKubeconfig
@@ -172,12 +172,12 @@ func getKubeconfig(cmdGetKubeconfig *cobra.Command, cliOpts *genericclioptions.C
 	logger.V(1).Info(fmt.Sprintf("kubeconfig: %s", string(ksConfig)))
 
 	// Write to file
-	err = os.WriteFile(fname, ksConfig, 0644)
+	err = os.WriteFile(outputName, ksConfig, 0644)
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Problem writing kubeconfig to output file %s", fname))
+		logger.Error(err, fmt.Sprintf("Problem writing kubeconfig to output file %s", outputName))
 		return err
 	}
-	logger.Info(fmt.Sprintf("Wrote kubeconfig to file %s", fname))
+	logger.Info(fmt.Sprintf("Wrote kubeconfig to file %s", outputName))
 
 	return nil
 }

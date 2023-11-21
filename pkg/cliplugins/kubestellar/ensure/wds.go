@@ -111,7 +111,7 @@ func VerifyOrCreateWDS(client *kcpclientset.Clientset, ctx context.Context, wdsN
 // Check for Kube APIBindings
 // If withKube is true, create any bindings that don't exist
 // If withKube is false, delete any bindings that exist
-func VerifyKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, withKube bool) error {
+func EnsureKubeAPIBindings(client *kcpclientset.Clientset, ctx context.Context, withKube bool) error {
 	logger := klog.FromContext(ctx)
 
 	// APIBindings to check

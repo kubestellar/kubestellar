@@ -101,7 +101,7 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 	}
 
 	// Create client-go instance from config
-	client, err := kcpclientset.NewForConfig(config)
+	kcpClient, err := kcpclientset.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
@@ -109,7 +109,7 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 
 	// Check for WDS workspace, create if it does not exist
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyOrCreateWDS(client, ctx, wdsName)
+	err = plugin.VerifyOrCreateWDS(kcpClient, ctx, wdsName)
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
 
 	// Update client to work in WDS workspace
-	client, err = kcpclientset.NewForConfig(config)
+	kcpClient, err = kcpclientset.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
@@ -127,14 +127,14 @@ func ensureWDS(cmdWDS *cobra.Command, args []string, cliOpts *genericclioptions.
 
 	// Check for APIBinding bind-espw, create if it does not exist
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyOrCreateAPIBinding(client, ctx, "bind-espw", "edge.kubestellar.io", "root:espw")
+	err = plugin.VerifyOrCreateAPIBinding(kcpClient, ctx, "bind-espw", "edge.kubestellar.io", "root:espw")
 	if err != nil {
 		return err
 	}
 
 	// Check for Kube APIBindings, add/remove as needed depending on withKube
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyKubeAPIBindings(client, ctx, withKube)
+	err = plugin.EnsureKubeAPIBindings(kcpClient, ctx, withKube)
 	if err != nil {
 		return err
 	}

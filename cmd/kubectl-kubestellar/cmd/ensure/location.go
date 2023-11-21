@@ -33,11 +33,11 @@ import (
 
 	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 
-	clientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/ensure"
 )
 
-var imw string // IMW name, provided by --imw flag
+var imwName string // IMW name, provided by --imw flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar ensure location'
 func newCmdEnsureLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
@@ -62,7 +62,7 @@ func newCmdEnsureLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command
 	}
 
 	// Add flag for IMW name
-	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW name")
+	cmdLocation.Flags().StringVar(&imwName, "imw", "", "IMW name")
 	cmdLocation.MarkFlagRequired("imw")
 	return cmdLocation
 }
@@ -116,7 +116,7 @@ func ensureLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 	}
 
 	// Update host to work on objects within IMW
-	config.Host += ":" + imw
+	config.Host += ":" + imwName
 	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
 
 	// Create client-go instance from config
@@ -134,7 +134,7 @@ func ensureLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 	}
 
 	// Create client-go instance from config
-	client, err := clientset.NewForConfig(config)
+	ksClient, err := ksclientset.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed create client-go instance")
 		return err
@@ -142,21 +142,21 @@ func ensureLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 
 	// Check that SyncTarget exists and is configured, create/update if not
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyOrCreateSyncTarget(client, ctx, imw, locationName, labels)
+	err = plugin.VerifyOrCreateSyncTarget(ksClient, ctx, imwName, locationName, labels)
 	if err != nil {
 		return err
 	}
 
 	// Check if Location exists and is configured, create/update if not
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyOrCreateLocation(client, ctx, imw, locationName, labels)
+	err = plugin.VerifyOrCreateLocation(ksClient, ctx, imwName, locationName, labels)
 	if err != nil {
 		return err
 	}
 
 	// Check if "default" Location exists, and delete it if so
 	// This function prints its own log messages, so no need to add any here.
-	err = plugin.VerifyNoDefaultLocation(client, ctx, imw)
+	err = plugin.EnsureNoDefaultLocation(ksClient, ctx, imwName)
 	if err != nil {
 		return err
 	}

@@ -90,28 +90,28 @@ func CheckLabelArgs(labels []string) error {
 }
 
 // Check if SyncTarget exists; if not, create one
-func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, imwName, locationName string, labels []string) error {
 	logger := klog.FromContext(ctx)
 
 	// Get the SyncTarget object
 	syncTarget, err := client.EdgeV2alpha1().SyncTargets().Get(ctx, locationName, metav1.GetOptions{})
 	if err == nil {
-		logger.Info(fmt.Sprintf("Found SyncTarget %s in workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Found SyncTarget %s in workspace root:%s", locationName, imwName))
 		// Check that SyncTarget has an "id" label matching locationName
-		err = VerifySyncTargetId(syncTarget, client, ctx, imw, locationName)
+		err = VerifyOrUpdateSyncTargetId(syncTarget, client, ctx, imwName, locationName)
 		if err != nil {
 			return err
 		}
 		// Check that SyncTarget has user provided key=value pairs, add them if not
-		err = VerifySyncTargetLabels(syncTarget, client, ctx, imw, locationName, labels)
+		err = VerifyOrUpdateSyncTargetLabels(syncTarget, client, ctx, imwName, locationName, labels)
 		return err
 	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
-		logger.Error(err, fmt.Sprintf("Problem checking for SyncTarget %s in workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Problem checking for SyncTarget %s in workspace root:%s", locationName, imwName))
 		return err
 	}
 	// SyncTarget does not exist, must create
-	logger.Info(fmt.Sprintf("No SyncTarget %s in workspace root:%s, creating it", locationName, imw))
+	logger.Info(fmt.Sprintf("No SyncTarget %s in workspace root:%s, creating it", locationName, imwName))
 
 	syncTarget = &v2alpha1.SyncTarget{
 		TypeMeta: metav1.TypeMeta{
@@ -133,7 +133,7 @@ func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, 
 	}
 	_, err = client.EdgeV2alpha1().SyncTargets().Create(ctx, syncTarget, metav1.CreateOptions{})
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Failed to create SyncTarget %s in workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Failed to create SyncTarget %s in workspace root:%s", locationName, imwName))
 		return err
 	}
 
@@ -141,7 +141,7 @@ func VerifyOrCreateSyncTarget(client *clientset.Clientset, ctx context.Context, 
 }
 
 // Make sure the SyncTarget has an id label matching locationName (update if not)
-func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imw, locationName string) error {
+func VerifyOrUpdateSyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imwName, locationName string) error {
 	logger := klog.FromContext(ctx)
 
 	if syncTarget.ObjectMeta.Labels != nil {
@@ -164,7 +164,7 @@ func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clien
 	// Apply updates to SyncTarget
 	_, err := client.EdgeV2alpha1().SyncTargets().Update(ctx, syncTarget, metav1.UpdateOptions{})
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Failed to update SyncTarget %s in workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Failed to update SyncTarget %s in workspace root:%s", locationName, imwName))
 		return err
 	}
 
@@ -172,7 +172,7 @@ func VerifySyncTargetId(syncTarget *v2alpha1.SyncTarget, client *clientset.Clien
 }
 
 // Check that SyncTarget has user provided key=value pairs, add them if not
-func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+func VerifyOrUpdateSyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.Clientset, ctx context.Context, imwName, locationName string, labels []string) error {
 	logger := klog.FromContext(ctx)
 
 	updateSyncTarget := false // bool to see if we need to update SyncTarget
@@ -206,7 +206,7 @@ func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.C
 		// Apply updates to SyncTarget
 		_, err := client.EdgeV2alpha1().SyncTargets().Update(ctx, syncTarget, metav1.UpdateOptions{})
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Failed to update SyncTarget %s in workspace root:%s", locationName, imw))
+			logger.Error(err, fmt.Sprintf("Failed to update SyncTarget %s in workspace root:%s", locationName, imwName))
 			return err
 		}
 	}
@@ -214,23 +214,23 @@ func VerifySyncTargetLabels(syncTarget *v2alpha1.SyncTarget, client *clientset.C
 }
 
 // Check if Location exists; if not, create one
-func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, imwName, locationName string, labels []string) error {
 	logger := klog.FromContext(ctx)
 
 	// Get the Location object
 	location, err := client.EdgeV2alpha1().Locations().Get(ctx, locationName, metav1.GetOptions{})
 	if err == nil {
-		logger.Info(fmt.Sprintf("Found Location %s in workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Found Location %s in workspace root:%s", locationName, imwName))
 		// Check that Location has user provided key=value pairs, add them if not
-		err = VerifyLocationLabels(location, client, ctx, imw, locationName, labels)
+		err = VerifyOrUpdateLocationLabels(location, client, ctx, imwName, locationName, labels)
 		return err
 	} else if !apierrors.IsNotFound(err) {
 		// Some error other than a non-existant SyncTarget
-		logger.Error(err, fmt.Sprintf("Problem checking for Location %s in workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Problem checking for Location %s in workspace root:%s", locationName, imwName))
 		return err
 	}
 	// Location does not exist, must create
-	logger.Info(fmt.Sprintf("No Location %s in workspace root:%s, creating it", locationName, imw))
+	logger.Info(fmt.Sprintf("No Location %s in workspace root:%s, creating it", locationName, imwName))
 
 	location = &v2alpha1.Location{
 		TypeMeta: metav1.TypeMeta{
@@ -267,7 +267,7 @@ func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, im
 	}
 	_, err = client.EdgeV2alpha1().Locations().Create(ctx, location, metav1.CreateOptions{})
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Failed to create Location %s in workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Failed to create Location %s in workspace root:%s", locationName, imwName))
 		return err
 	}
 
@@ -275,7 +275,7 @@ func VerifyOrCreateLocation(client *clientset.Clientset, ctx context.Context, im
 }
 
 // Check that Location has user provided key=value pairs, add them if not
-func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clientset, ctx context.Context, imw, locationName string, labels []string) error {
+func VerifyOrUpdateLocationLabels(location *v2alpha1.Location, client *clientset.Clientset, ctx context.Context, imwName, locationName string, labels []string) error {
 	logger := klog.FromContext(ctx)
 
 	updateLocation := false // bool to see if we need to update Location
@@ -309,7 +309,7 @@ func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clients
 		// Apply updates to Location
 		_, err := client.EdgeV2alpha1().Locations().Update(ctx, location, metav1.UpdateOptions{})
 		if err != nil {
-			logger.Error(err, fmt.Sprintf("Failed to update Location %s in workspace root:%s", locationName, imw))
+			logger.Error(err, fmt.Sprintf("Failed to update Location %s in workspace root:%s", locationName, imwName))
 			return err
 		}
 	}
@@ -317,7 +317,7 @@ func VerifyLocationLabels(location *v2alpha1.Location, client *clientset.Clients
 }
 
 // Check if default Location exists, delete it if so
-func VerifyNoDefaultLocation(client *clientset.Clientset, ctx context.Context, imw string) error {
+func EnsureNoDefaultLocation(client *clientset.Clientset, ctx context.Context, imwName string) error {
 	logger := klog.FromContext(ctx)
 
 	// Check for "default" Location object
@@ -325,19 +325,19 @@ func VerifyNoDefaultLocation(client *clientset.Clientset, ctx context.Context, i
 	if err != nil {
 		// Check if error is due to the lack of a "default" location object (what we want)
 		if apierrors.IsNotFound(err) {
-			logger.Info(fmt.Sprintf("Verified no default Location in workspace root:%s", imw))
+			logger.Info(fmt.Sprintf("Verified no default Location in workspace root:%s", imwName))
 			return nil
 		}
 		// There is some error other than trying to get a non-existent object
-		logger.Error(err, fmt.Sprintf("Could not check if default Location in workspace root:%s", imw))
+		logger.Error(err, fmt.Sprintf("Could not check if default Location in workspace root:%s", imwName))
 		return err
 	}
 
 	// "default" Location exists, delete it
-	logger.Info(fmt.Sprintf("Found default Location in workspace root:%s, deleting it", imw))
+	logger.Info(fmt.Sprintf("Found default Location in workspace root:%s, deleting it", imwName))
 	err = client.EdgeV2alpha1().Locations().Delete(ctx, "default", metav1.DeleteOptions{})
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Failed to delete default Location in workspace root:%s", imw))
+		logger.Error(err, fmt.Sprintf("Failed to delete default Location in workspace root:%s", imwName))
 		return err
 	}
 	return nil

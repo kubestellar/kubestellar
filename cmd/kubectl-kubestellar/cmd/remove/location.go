@@ -34,7 +34,7 @@ import (
 	plugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/remove"
 )
 
-var imw string // IMW name, provided by --imw flag
+var imwName string // IMW name, provided by --imw flag
 
 // Create the Cobra sub-command for 'kubectl kubestellar remove location'
 func newCmdRemoveLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command {
@@ -56,7 +56,7 @@ func newCmdRemoveLocation(cliOpts *genericclioptions.ConfigFlags) *cobra.Command
 	}
 
 	// Add flag for IMW name
-	cmdLocation.Flags().StringVar(&imw, "imw", "", "IMW name")
+	cmdLocation.Flags().StringVar(&imwName, "imw", "", "IMW name")
 	cmdLocation.MarkFlagRequired("imw")
 	return cmdLocation
 }
@@ -86,7 +86,7 @@ func removeLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 	}
 
 	// Update host to work on objects within IMW
-	config.Host += ":" + imw
+	config.Host += ":" + imwName
 	logger.V(1).Info(fmt.Sprintf("Set host to %s", config.Host))
 
 	// Create client-go instance from config
@@ -99,25 +99,25 @@ func removeLocation(cmdLocation *cobra.Command, args []string, cliOpts *genericc
 	// Delete the SyncTarget object
 	removed, err := plugin.DeleteSyncTarget(client, ctx, locationName)
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Problem removing SyncTarget %s from workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Problem removing SyncTarget %s from workspace root:%s", locationName, imwName))
 		return err
 	}
 	if removed {
-		logger.Info(fmt.Sprintf("Removed SyncTarget %s from workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Removed SyncTarget %s from workspace root:%s", locationName, imwName))
 	} else {
-		logger.Info(fmt.Sprintf("Verified no SyncTarget %s in workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Verified no SyncTarget %s in workspace root:%s", locationName, imwName))
 	}
 
 	// Delete the Location object
 	removed, err = plugin.DeleteLocation(client, ctx, locationName)
 	if err != nil {
-		logger.Error(err, fmt.Sprintf("Problem removing Location %s from workspace root:%s", locationName, imw))
+		logger.Error(err, fmt.Sprintf("Problem removing Location %s from workspace root:%s", locationName, imwName))
 		return err
 	}
 	if removed {
-		logger.Info(fmt.Sprintf("Removed Location %s from workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Removed Location %s from workspace root:%s", locationName, imwName))
 	} else {
-		logger.Info(fmt.Sprintf("Verified no Location %s in workspace root:%s", locationName, imw))
+		logger.Info(fmt.Sprintf("Verified no Location %s in workspace root:%s", locationName, imwName))
 	}
 
 	return nil
