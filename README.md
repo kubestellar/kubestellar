@@ -118,6 +118,8 @@ Thanks go to these wonderful people:
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/fab7"><img src="https://avatars.githubusercontent.com/u/15231306?v=4" width="100px;" alt=""/><br /><sub><b>Francois Abel</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afab7+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/nirrozenbaum"><img src="https://avatars.githubusercontent.com/u/19717747?v=4" width="100px;" alt=""/><br /><sub><b>Nir Rozenbaum</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anirrozenbaum+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/vMaroon"><img src="https://avatars.githubusercontent.com/u/73340153?v=4" width="100px;" alt=""/><br /><sub><b>Maroon Ayoub</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AvMaroon+" title="Contributed PRs">👀</a></td>
   </tr>
 </table>
 
