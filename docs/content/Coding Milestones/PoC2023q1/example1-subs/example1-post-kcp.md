@@ -52,15 +52,16 @@ The command below makes kube-bind binaries and dex binary available in `$PATH`.
 
 ```shell
 rm -rf kube-bind
-rm -rf kube-bind-autobind
-git clone https://github.com/kube-bind/kube-bind.git && \
+git clone https://github.com/waltforme/kube-bind.git && \
 pushd kube-bind && \
-IGNORE_GO_VERSION=1 make build && \
+mkdir bin && \
+IGNORE_GO_VERSION=1 go build -o ./bin/example-backend ./cmd/example-backend/main.go && \
+git checkout origin/syncmore && \
+IGNORE_GO_VERSION=1 go build -o ./bin/konnector ./cmd/konnector/main.go && \
+git checkout origin/autobind && \
+IGNORE_GO_VERSION=1 go build -o ./bin/kubectl-bind ./cmd/kubectl-bind/main.go && \
 export PATH=$(pwd)/bin:$PATH && \
-popd && \
-git clone -b autobind https://github.com/waltforme/kube-bind.git kube-bind-autobind && \
-pushd kube-bind-autobind && \
-IGNORE_GO_VERSION=1 go build -o ../kube-bind/bin/kubectl-bind cmd/kubectl-bind/main.go && \
+git checkout main && \
 popd && \
 git clone https://github.com/dexidp/dex.git && \
 pushd dex && \
