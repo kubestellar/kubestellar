@@ -2672,8 +2672,8 @@ EdgePlacement <code>all2all</code> selects all the 3 Locations in <code>root:com
 <p>To remove the example usage, delete the IMW and WMW and kind clusters run the following commands:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>rm<span class="w"> </span>florin-syncer.yaml<span class="w"> </span>guilder-syncer.yaml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 <a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-83-3" name="__codelineno-83-3" href="#__codelineno-83-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>example-imw
-<a id="__codelineno-83-4" name="__codelineno-83-4" href="#__codelineno-83-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<a id="__codelineno-83-3" name="__codelineno-83-3" href="#__codelineno-83-3"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>workspace<span class="w"> </span>imw1
+<a id="__codelineno-83-4" name="__codelineno-83-4" href="#__codelineno-83-4"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>wmw1
 <a id="__codelineno-83-5" name="__codelineno-83-5" href="#__codelineno-83-5"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>florin
 <a id="__codelineno-83-6" name="__codelineno-83-6" href="#__codelineno-83-6"></a>kind<span class="w"> </span>delete<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>guilder
 </code></pre></div>
