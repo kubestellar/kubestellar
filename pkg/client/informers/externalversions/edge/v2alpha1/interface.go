@@ -30,6 +30,8 @@ type ClusterInterface interface {
 	Customizers() CustomizerClusterInformer
 	// EdgePlacements returns a EdgePlacementClusterInformer
 	EdgePlacements() EdgePlacementClusterInformer
+	// EdgePlacementDecisions returns a EdgePlacementDecisionClusterInformer
+	EdgePlacementDecisions() EdgePlacementDecisionClusterInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
 	EdgeSyncConfigs() EdgeSyncConfigClusterInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceClusterInformer
@@ -62,6 +64,11 @@ func (v *version) EdgePlacements() EdgePlacementClusterInformer {
 	return &edgePlacementClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
+// EdgePlacementDecisions returns a EdgePlacementDecisionClusterInformer
+func (v *version) EdgePlacementDecisions() EdgePlacementDecisionClusterInformer {
+	return &edgePlacementDecisionClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
 // EdgeSyncConfigs returns a EdgeSyncConfigClusterInformer
 func (v *version) EdgeSyncConfigs() EdgeSyncConfigClusterInformer {
 	return &edgeSyncConfigClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
@@ -92,6 +99,8 @@ type Interface interface {
 	Customizers() CustomizerInformer
 	// EdgePlacements returns a EdgePlacementInformer
 	EdgePlacements() EdgePlacementInformer
+	// EdgePlacementDecisions returns a EdgePlacementDecisionInformer
+	EdgePlacementDecisions() EdgePlacementDecisionInformer
 	// EdgeSyncConfigs returns a EdgeSyncConfigInformer
 	EdgeSyncConfigs() EdgeSyncConfigInformer
 	// SinglePlacementSlices returns a SinglePlacementSliceInformer
@@ -123,6 +132,11 @@ func (v *scopedVersion) Customizers() CustomizerInformer {
 // EdgePlacements returns a EdgePlacementInformer
 func (v *scopedVersion) EdgePlacements() EdgePlacementInformer {
 	return &edgePlacementScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// EdgePlacementDecisions returns a EdgePlacementDecisionInformer
+func (v *scopedVersion) EdgePlacementDecisions() EdgePlacementDecisionInformer {
+	return &edgePlacementDecisionScopedInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // EdgeSyncConfigs returns a EdgeSyncConfigInformer
