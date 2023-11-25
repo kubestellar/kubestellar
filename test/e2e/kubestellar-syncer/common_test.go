@@ -29,11 +29,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 //go:embed testdata/*
@@ -111,18 +108,14 @@ var syncerConfigGvr = schema.GroupVersionResource{
 	Resource: "syncerconfigs",
 }
 
-func setup(t *testing.T) *edgeframework.StartedKubeStellarSyncerFixture {
+func setup(t *testing.T) *framework.StartedKubeStellarSyncerFixture {
 	framework.Suite(t, "kubestellar-syncer")
 
 	upstreamServer := framework.SharedKcpServer(t)
 
-	t.Log("Creating an organization")
-	orgPath, _ := framework.NewOrganizationFixture(t, upstreamServer, framework.TODO_WithoutMultiShardSupport())
-
 	t.Log("Creating a workspace")
-	_, ws := framework.NewWorkspaceFixture(t, upstreamServer, orgPath, framework.WithName("upstream-sink"), framework.TODO_WithoutMultiShardSupport())
-	wsPath := logicalcluster.NewPath(logicalcluster.Name(ws.Spec.Cluster).String())
-	syncerFixture := edgeframework.NewKubeStellarSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
+	wsPath, _ := framework.NewWorkspaceFixture(t, upstreamServer, logicalcluster.NewPath("root"), "e2e-tests-")
+	syncerFixture := framework.NewKubeStellarSyncerFixture(t, upstreamServer, wsPath).CreateEdgeSyncTargetAndApplyToDownstream(t).RunSyncer(t)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	t.Cleanup(cancelFunc)
@@ -140,7 +133,7 @@ func pathToTestdataDir() string {
 	return dir
 }
 
-func createNamespace(t *testing.T, ctx context.Context, upstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset, wsPath logicalcluster.Path, namespaceName string) *corev1.Namespace {
+func createNamespace(t *testing.T, ctx context.Context, upstreamKubeClusterClient *framework.KcpClusterClient, wsPath logicalcluster.Path, namespaceName string) *corev1.Namespace {
 	namespaceObj := &corev1.Namespace{
 		ObjectMeta: v1.ObjectMeta{
 			Name: namespaceName,

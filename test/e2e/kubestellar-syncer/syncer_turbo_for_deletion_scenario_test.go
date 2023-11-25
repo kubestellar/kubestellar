@@ -29,18 +29,16 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerForTurboForDeletionScenario(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 
 	var syncerConfig2Unst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config2.yaml", embedded, &syncerConfig2Unst)
+	err = framework.LoadFile("testdata/turbo-for-deletion-scenario/syncer-config2.yaml", embedded, &syncerConfig2Unst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")
@@ -83,7 +81,7 @@ func TestKubeStellarSyncerForTurboForDeletionScenario(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Logf("Delete workloads from upstream")
-	err = upstreamKubeClueterClient.AppsV1().Deployments().Cluster(wsPath).Namespace("optimized").Delete(ctx, "cpu-usage", v1.DeleteOptions{})
+	err = upstreamKubeClueterClient.Cluster(wsPath).AppsV1().Deployments("optimized").Delete(ctx, "cpu-usage", v1.DeleteOptions{})
 	require.NoError(t, err)
 
 	t.Logf("Delete APIBinding from upstream")

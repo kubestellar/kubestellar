@@ -20,12 +20,10 @@ import (
 	"bytes"
 	"context"
 	"embed"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -38,19 +36,15 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	kubernetesclient "k8s.io/client-go/kubernetes"
+
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/yaml"
 
-	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubernetesclientset "github.com/kcp-dev/client-go/kubernetes"
-	"github.com/kcp-dev/kcp/test/e2e/framework"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	workloadcliplugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
@@ -98,12 +92,9 @@ var syncerConfigGVR = schema.GroupVersionResource{
 
 type SyncerOption func(t *testing.T, fs *kubeStellarSyncerFixture)
 
-func NewKubeStellarSyncerFixture(t *testing.T, server framework.RunningServer, path logicalcluster.Path) *kubeStellarSyncerFixture {
+func NewKubeStellarSyncerFixture(t *testing.T, server *kcpServer, path logicalcluster.Path) *kubeStellarSyncerFixture {
 	t.Helper()
 
-	if !sets.NewString(framework.TestConfig.Suites()...).HasAny("kubestellar-syncer") {
-		t.Fatalf("invalid to use an kubestellar syncer fixture when only the following suites were requested: %v", framework.TestConfig.Suites())
-	}
 	sf := &kubeStellarSyncerFixture{
 		upstreamServer:     server,
 		edgeSyncTargetPath: path,
@@ -114,7 +105,7 @@ func NewKubeStellarSyncerFixture(t *testing.T, server framework.RunningServer, p
 
 // kubeStellarSyncerFixture configures a syncer fixture. Its `Start` method does the work of starting a syncer.
 type kubeStellarSyncerFixture struct {
-	upstreamServer     framework.RunningServer
+	upstreamServer     *kcpServer
 	edgeSyncTargetPath logicalcluster.Path
 	edgeSyncTargetName string
 }
@@ -127,7 +118,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	// Write the upstream logical cluster config to disk for the workspace plugin
 	upstreamRawConfig, err := sf.upstreamServer.RawConfig()
 	require.NoError(t, err)
-	_, kubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
+	_, kubeconfigPath := WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 
 	var downstreamConfig *rest.Config
 	var downstreamKubeconfigPath string
@@ -135,7 +126,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	// The syncer will target a logical cluster that is a child of the current workspace. A
 	// logical server provides as a lightweight approximation of a WEC for tests that
 	// don't need to validate running workloads or interaction with kube controllers.
-	downstreamServer := framework.NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
+	downstreamServer := NewFakeWorkloadServer(t, sf.upstreamServer, sf.edgeSyncTargetPath, sf.edgeSyncTargetName)
 	downstreamConfig = downstreamServer.BaseConfig(t)
 	downstreamKubeconfigPath = downstreamServer.KubeconfigPath()
 	syncerImage := "not-a-valid-image"
@@ -147,9 +138,8 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	require.NoError(t, err)
 	downstreamDynamicKubeClient, err := dynamic.NewForConfig(downstreamConfig)
 	require.NoError(t, err)
-	downstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(downstreamConfig)
 
-	logicalConfig, upstreamKubeconfigPath := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
+	logicalConfig, upstreamKubeconfigPath := WriteLogicalClusterConfig(t, upstreamRawConfig, "base", sf.edgeSyncTargetPath)
 	upstreamKubeConfig, err := logicalConfig.ClientConfig()
 	require.NoError(t, err)
 	upstreamKubeClient, err := kubernetesclient.NewForConfig(upstreamKubeConfig)
@@ -171,29 +161,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	_, err = upstreamDynamicKubeClient.Resource(crdGVR).Create(context.Background(), edgeSyncConfigCRDUnst, v1.CreateOptions{})
 	require.NoError(t, err)
 
-	var apibindingUnst *unstructured.Unstructured
-	err = LoadFile("testdata/apibinding.yaml", embedded, &apibindingUnst)
-	require.NoError(t, err)
-	t.Log("Create apibinding (root:compute:kubernetes) in workspace.")
-	_, err = upstreamDynamicKubeClient.Resource(apibindingGVR).Create(context.Background(), apibindingUnst, v1.CreateOptions{})
-	require.NoError(t, err)
-
 	require.Eventually(t, func() bool {
-		_, err := upstreamKubeClient.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			t.Logf("error seen waiting for deployment crd to become active: %v", err)
-			return false
-		}
-		_, err = upstreamKubeClient.CoreV1().Services("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			t.Logf("error seen waiting for service crd to become active: %v", err)
-			return false
-		}
-		_, err = upstreamKubeClient.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			t.Logf("error seen waiting for pods crd to become active: %v", err)
-			return false
-		}
 		_, err = upstreamDynamicKubeClient.Resource(edgeSyncConfigGVR).List(context.Background(), metav1.ListOptions{})
 		if err != nil {
 			t.Logf("error seen waiting for EdgeSyncConfig API to be available: %v", err)
@@ -207,12 +175,8 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 		return true
 	}, wait.ForeverTestTimeout, time.Millisecond*100)
 
-	upstreamConfig := sf.upstreamServer.BaseConfig(t)
-	upstreamDynamicClueterClient, err := kcpdynamic.NewForConfig(upstreamConfig)
-	require.NoError(t, err)
-	upstreamKubeClusterClient, err := kcpkubernetesclientset.NewForConfig(upstreamConfig)
-	require.NoError(t, err)
-	upstreamDiscoveryClient := discovery.NewDiscoveryClientForConfigOrDie(upstreamConfig)
+	sf.createComputeResources(t, upstreamKubeClient, upstreamDynamicKubeClient)
+	sf.createComputeResources(t, downstreamKubeClient, downstreamDynamicKubeClient)
 
 	// Run the plugin command to enable the kubestellar syncer and collect the resulting yaml
 	t.Logf("Configuring workspace %s for syncing", sf.edgeSyncTargetPath)
@@ -225,7 +189,7 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 	syncerYAML := RunKcpEdgeCliPlugin(t, kubeconfigPath, pluginArgs)
 
 	// Apply the yaml output from the plugin to the downstream server
-	framework.KubectlApply(t, downstreamKubeconfigPath, syncerYAML)
+	KubectlApply(t, downstreamKubeconfigPath, syncerYAML)
 
 	// Extract the configuration for an in-process syncer from the resources that were
 	// applied to the downstream server. This maximizes the parity between the
@@ -256,13 +220,39 @@ func (sf *kubeStellarSyncerFixture) CreateEdgeSyncTargetAndApplyToDownstream(t *
 		DownstreamKubeClient:        downstreamKubeClient,
 		DownstreamDynamicKubeClient: downstreamDynamicKubeClient,
 		DownstreamKubeconfigPath:    downstreamKubeconfigPath,
-		DownstreamDiscoveryClient:   downstreamDiscoveryClient,
-		UpstreamConfig:              upstreamConfig,
-		UpstreamKubeClusterClient:   upstreamKubeClusterClient,
-		UpstreamDynamicKubeClient:   upstreamDynamicClueterClient,
-		UpstreamDiscoveryClient:     upstreamDiscoveryClient,
+		UpstreamConfig:              upstreamKubeConfig,
+		UpstreamKubeClusterClient:   &KcpClusterClient{client: upstreamKubeClient},
+		UpstreamDynamicKubeClient:   &KcpDynamicClient{client: upstreamDynamicKubeClient},
 		UpstreamKubeconfigPath:      upstreamKubeconfigPath,
 	}
+}
+
+func (sf *kubeStellarSyncerFixture) createComputeResources(t *testing.T, client *kubernetesclient.Clientset, dynamicClient dynamic.Interface) {
+	var apibindingUnst *unstructured.Unstructured
+	err := LoadFile("testdata/apibinding.yaml", embedded, &apibindingUnst)
+	require.NoError(t, err)
+	t.Log("Create apibinding (root:compute:kubernetes) in workspace.")
+	_, err = dynamicClient.Resource(apibindingGVR).Create(context.Background(), apibindingUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		_, err := client.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for deployment crd to become active: %v", err)
+			return false
+		}
+		_, err = client.CoreV1().Services("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for service crd to become active: %v", err)
+			return false
+		}
+		_, err = client.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+		if err != nil {
+			t.Logf("error seen waiting for pods crd to become active: %v", err)
+			return false
+		}
+		return true
+	}, wait.ForeverTestTimeout, time.Millisecond*100)
 }
 
 // RunSyncer runs a new Syncer against the upstream kcp workspaces
@@ -301,13 +291,11 @@ type appliedKubeStellarSyncerFixture struct {
 	DownstreamConfig            *rest.Config
 	DownstreamKubeClient        kubernetesclient.Interface
 	DownstreamDynamicKubeClient dynamic.Interface
-	DownstreamDiscoveryClient   *discovery.DiscoveryClient
 	DownstreamKubeconfigPath    string
 
 	UpstreamConfig            *rest.Config
-	UpstreamKubeClusterClient *kcpkubernetesclientset.ClusterClientset
-	UpstreamDynamicKubeClient *kcpdynamic.ClusterClientset
-	UpstreamDiscoveryClient   *discovery.DiscoveryClient
+	UpstreamKubeClusterClient *KcpClusterClient
+	UpstreamDynamicKubeClient *KcpDynamicClient
 	UpstreamKubeconfigPath    string
 }
 
@@ -343,7 +331,7 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 
 	// Read the downstream token from the deployment's service account secret
 	var tokenSecret corev1.Secret
-	framework.Eventually(t, func() (bool, string) {
+	Eventually(t, func() (bool, string) {
 		secrets, err := downstreamKubeClient.CoreV1().Secrets(namespace).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			t.Errorf("failed to list secrets: %v", err)
@@ -362,7 +350,7 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 	require.NotEmpty(t, token, "token is required")
 
 	// Compose a new downstream config that uses the token
-	downstreamConfigWithToken := framework.ConfigWithToken(string(token), rest.CopyConfig(downstreamConfig))
+	downstreamConfigWithToken := ConfigWithToken(string(token), rest.CopyConfig(downstreamConfig))
 	return &syncer.SyncerConfig{
 		UpstreamConfig:   upstreamConfig,
 		DownstreamConfig: downstreamConfigWithToken,
@@ -374,7 +362,7 @@ func syncerConfigFromCluster(t *testing.T, downstreamConfig *rest.Config, namesp
 
 func modifyRootCompute(t *testing.T, upstreamRawConfig clientcmdapi.Config) {
 	// Write the upstream root:compute logical cluster config to disk for the workspace plugin
-	rootComputeClientConfig, _ := framework.WriteLogicalClusterConfig(t, upstreamRawConfig, "base", logicalcluster.NewPath("root:compute"))
+	rootComputeClientConfig, _ := WriteLogicalClusterConfig(t, upstreamRawConfig, "base", logicalcluster.NewPath("root:compute"))
 	rootComputeKubeconfig, err := rootComputeClientConfig.ClientConfig()
 	require.NoError(t, err)
 	rootComputeDynamicKubeClient, err := dynamic.NewForConfig(rootComputeKubeconfig)
@@ -448,27 +436,4 @@ func RunKcpEdgeCliPlugin(t *testing.T, kubeconfigPath string, subcommand []strin
 	}
 	require.NoError(t, err, "error running kcp plugin command")
 	return stdout.Bytes()
-}
-
-// RepositoryDir returns the absolute path of <repo-dir>.
-func repositoryDir() string {
-	// Caller(0) returns the path to the calling test file rather than the path to this framework file. That
-	// precludes assuming how many directories are between the file and the repo root. It's therefore necessary
-	// to search in the hierarchy for an indication of a path that looks like the repo root.
-	_, sourceFile, _, _ := runtime.Caller(0)
-	currentDir := filepath.Dir(sourceFile)
-	for {
-		// go.mod should always exist in the repo root
-		if _, err := os.Stat(filepath.Join(currentDir, "go.mod")); err == nil {
-			break
-		} else if errors.Is(err, os.ErrNotExist) {
-			currentDir, err = filepath.Abs(filepath.Join(currentDir, ".."))
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			panic(err)
-		}
-	}
-	return currentDir
 }
