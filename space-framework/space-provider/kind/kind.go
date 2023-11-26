@@ -36,7 +36,8 @@ type KindClusterProvider struct {
 }
 
 // New creates a new KindClusterProvider
-func New(pConfig string) (KindClusterProvider, error) {
+func New(configStrs map[string]string) (KindClusterProvider, error) {
+	pConfig := configStrs[clusterprovider.PROVIDER_CONFIG_KEY]
 	kindProvider := kind.NewProvider()
 	return KindClusterProvider{
 		kindProvider: kindProvider,
