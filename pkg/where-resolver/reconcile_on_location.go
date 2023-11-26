@@ -81,6 +81,15 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			return err
 		}
 	}
+	_, locOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(loc)
+	if err != nil {
+		return err
+	}
+	locSpaceID := c.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if locSpaceID == "" {
+		//TODO create new error
+		return nil
+	}
 
 	// 1)
 	epsSelectedLoc := store.epsBySelectedLoc[locKey]
@@ -140,7 +149,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	}
 
 	// 4)
-	singles := makeSinglePlacementsForLoc(loc, stsFilteredByLoc)
+	singles := c.makeSinglePlacementsForLoc(loc, stsFilteredByLoc)
 
 	for ep := range epsSelectedLoc {
 		if _, ok := epsSelectingLoc[ep]; !ok {
@@ -158,13 +167,6 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
 				return err
 			}
-
-			// Temp debug
-			logger.Info("---------- currentSPS")
-			for _, sp := range currentSPS.Destinations {
-				logger.Info("----------- SP stName", sp.SyncTargetName)
-			}
-
 			// get consumer's space ID by currentSPS
 			originalName, spaceID, err := c.getConsumerSpaceForSPS(currentSPS)
 			if err != nil {
@@ -172,15 +174,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 				return err
 			}
 
-			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
-
-			// Temp debug
-			logger.Info("---------- nextSPS")
-			for _, sp := range nextSPS.Destinations {
-				logger.Info("----------- SP stName", sp.SyncTargetName)
-			}
-
-			//_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
+			nextSPS := cleanSPSByLoc(currentSPS, locSpaceID, locOriginalName)
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
@@ -211,11 +205,8 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 				logger.Error(err, "failed to get consumer space ID from a provider's copy", "singlePlacementSlice", name)
 				return err
 			}
-
-			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
+			nextSPS := cleanSPSByLoc(currentSPS, locSpaceID, locOriginalName)
 			nextSPS = extendSPS(nextSPS, singles)
-
-			//_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
@@ -249,10 +240,8 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 				return err
 			}
 
-			nextSPS := cleanSPSByLoc(currentSPS, lws.String(), lName)
+			nextSPS := cleanSPSByLoc(currentSPS, locSpaceID, locOriginalName)
 			nextSPS = extendSPS(nextSPS, singles)
-
-			//_, err = c.edgeClusterClient.EdgeV2alpha1().SinglePlacementSlices().Cluster(logicalcluster.NewPath(spaceID)).Update(ctx, nextSPS, metav1.UpdateOptions{})
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
 				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
@@ -332,17 +321,28 @@ func cleanSPSByLoc(sps *edgev2alpha1.SinglePlacementSlice, lws, lName string) *e
 	return sps
 }
 
-func makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Location, sts []*edgev2alpha1.SyncTarget) []edgev2alpha1.SinglePlacement {
+func (c *controller) makeSinglePlacementsForLoc(locSelectingSts *edgev2alpha1.Location, sts []*edgev2alpha1.SyncTarget) []edgev2alpha1.SinglePlacement {
 	made := []edgev2alpha1.SinglePlacement{}
 	if locSelectingSts == nil || len(sts) == 0 {
 		return made
 	}
-	ws := logicalcluster.From(locSelectingSts).String()
+	_, locOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(locSelectingSts)
+	if err != nil {
+		return made
+	}
+	locSpaceID := c.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if locSpaceID == "" {
+		return made
+	}
 	for _, st := range sts {
+		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(st)
+		if err != nil {
+			continue
+		}
 		sp := edgev2alpha1.SinglePlacement{
-			Cluster:        ws,
-			LocationName:   locSelectingSts.Name,
-			SyncTargetName: st.Name,
+			Cluster:        locSpaceID,
+			LocationName:   locOriginalName,
+			SyncTargetName: stOriginalName,
 			SyncTargetUID:  st.UID,
 		}
 		made = append(made, sp)

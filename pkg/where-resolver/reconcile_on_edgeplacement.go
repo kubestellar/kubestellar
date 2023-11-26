@@ -84,36 +84,6 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	}
 	locsSelecting := packLocKeys(locsFilteredByEp)
 
-	// Temp debug
-	// if len(locsFilteredByEp) == 0 {
-	// 	logger.Info("----------- locsFilteredByEp is empty")
-	// }
-	// filtered := []*edgev2alpha1.Location{}
-	logger.Info("----------- current EP", "annotations", ep.Annotations)
-	for _, l := range locsAll {
-		logger.Info("----------- have location", "annotations", l.Annotations)
-		// for _, s := range ep.Spec.LocationSelectors {
-		// 	logger.Info("----------- have ep.Spec.LocationSelectors", s.String())
-		// 	selector, err := metav1.LabelSelectorAsSelector(&s)
-		// 	if err != nil {
-		// 		logger.Error(err, "------------ failed to get selector ", ep.Name)
-		// 	}
-		// 	if len(l.Labels) == 0 {
-		// 		logger.Info("----------- l.Labels empty")
-		// 	} else {
-		// 		for k, v := range l.Labels {
-		// 			logger.Info("----------", "label", k, "val", v)
-		// 		}
-		// 	}
-		// 	logger.Info("----------- labels.Set(l.Labels)", labels.Set(l.Labels).String())
-		// 	if selector.Matches(labels.Set(l.Labels)) {
-		// 		logger.Info("----------- appending", l.Name)
-		// 		filtered = append(filtered, l)
-		// 		break
-		// 	}
-		// }
-	}
-
 	singles := []edgev2alpha1.SinglePlacement{}
 	for _, loc := range locsFilteredByEp {
 		// 2)
@@ -128,22 +98,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 			logger.Error(err, "failed to find SyncTargets for Location", "locationWorkspace", lws.String(), "location", loc.Name)
 			return err
 		}
-
-		// Temp debug
-		if len(stsSelecting) == 0 {
-			logger.Info("----------- stsSelecting is empty")
-		}
-		if loc == nil {
-			logger.Info("----------- location is nil")
-		}
-
-		singles = append(singles, makeSinglePlacementsForLoc(loc, stsSelecting)...)
-	}
-
-	// Temp debug
-	logger.Info("---------- singles for initial create")
-	for _, sp := range singles {
-		logger.Info("----------- SP stName", sp.SyncTargetName)
+		singles = append(singles, c.makeSinglePlacementsForLoc(loc, stsSelecting)...)
 	}
 
 	// 3)

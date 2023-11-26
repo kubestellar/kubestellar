@@ -88,12 +88,12 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	espwClientset, err := edgeclientset.NewForConfig(espwRestConfig)
+	edgeClient, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for service provider space")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
+	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClient, resyncPeriod)
 
 	// create where-resolver
 	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
@@ -106,12 +106,12 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
 	}
-	serviceProviderClient, err := kubernetes.NewForConfig(espwRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for service provider space")
 		return err
 	}
-	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, serviceProviderClient)
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
 	es, err := wheresolver.NewController(
 		ctx,
 		edgeClusterClientset,

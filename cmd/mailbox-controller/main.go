@@ -47,7 +47,6 @@ import (
 
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
@@ -126,18 +125,6 @@ func main() {
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
 
-	baseRestConfig, err := baseClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "failed to make all-cluster config")
-		os.Exit(15)
-	}
-
-	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to build all-cluster edge clientset")
-		os.Exit(25)
-	}
-
 	serviceProviderClient, err := kubernetes.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for service provider space")
@@ -146,8 +133,7 @@ func main() {
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, serviceProviderClient)
 
 	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
-		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
-		edgeClusterClientset.EdgeV2alpha1().SyncTargets(), kbSpaceRelation,
+		workspaceScopedClientset.TenancyV1alpha1().Workspaces(), kbSpaceRelation,
 	)
 
 	doneCh := ctx.Done()

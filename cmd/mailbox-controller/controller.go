@@ -37,10 +37,8 @@ import (
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclusterclient "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/typed/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
@@ -62,7 +60,6 @@ type mbCtl struct {
 	workspaceScopedInformer cache.SharedIndexInformer
 	workspaceScopedLister   tenancylisters.WorkspaceLister
 	workspaceScopedClient   tenancyclient.WorkspaceInterface
-	stClusterInterface      edgeclusterclient.SyncTargetClusterInterface
 	kbSpaceRelation         kbuser.KubeBindSpaceRelation
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
@@ -77,7 +74,6 @@ func newMailboxController(ctx context.Context,
 	syncTargetPreInformer edgev2alpha1informers.SyncTargetInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
 	workspaceScopedClient tenancyclient.WorkspaceInterface,
-	stClusterInterface edgeclusterclient.SyncTargetClusterInterface,
 	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) *mbCtl {
 	syncTargetInformer := syncTargetPreInformer.Informer()
@@ -89,7 +85,6 @@ func newMailboxController(ctx context.Context,
 		workspaceScopedInformer: workspacesInformer,
 		workspaceScopedLister:   workspaceScopedPreInformer.Lister(),
 		workspaceScopedClient:   workspaceScopedClient,
-		stClusterInterface:      stClusterInterface,
 		kbSpaceRelation:         kbSpaceRelation,
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
@@ -348,7 +343,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 
 func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
 	logger := klog.FromContext(ctl.context)
-	_, stName, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
+	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
 	if err != nil {
 		//TODO should we return an error?
 		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", st.Name)
@@ -360,21 +355,8 @@ func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
 		logger.Error(nil, "failed to get consumer space ID from a provider's copy", "syncTarget", st.Name)
 		return ""
 	}
-	//get consumer SyncTarget for correct UID
-	consumerST, err := ctl.stClusterInterface.Cluster(logicalcluster.NewPath(spaceID)).Get(ctl.context, stName, metav1.GetOptions{})
-	if err != nil {
-		logger.Error(err, "failed to get consumer's object", "syncTarget", st.Name)
-		return ""
-	}
-
-	// TMP: try using provider side ST
-
-	logger.Info("", "consumerST", consumerST) // TODO remove this line
-
-	//return spaceID + wsNameSep + string(consumerST.UID)
-
-	cluster := logicalcluster.From(st)
-	return cluster.String() + wsNameSep + string(st.UID)
+	// Use consumer spaceID and provider st.UID
+	return spaceID + wsNameSep + string(st.UID)
 }
 
 func (ctl *mbCtl) mbwsNameOfObj(obj any) ([]string, error) {
