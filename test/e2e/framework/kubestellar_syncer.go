@@ -45,7 +45,7 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/yaml"
 
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 
 	workloadcliplugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
 	"github.com/kubestellar/kubestellar/pkg/syncer"

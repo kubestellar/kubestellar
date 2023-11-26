@@ -29,8 +29,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/kcp-dev/logicalcluster/v3"
 	"github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 )
 
 //go:embed testdata/*

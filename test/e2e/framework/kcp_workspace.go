@@ -33,7 +33,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -178,12 +178,11 @@ func NewFakeWorkloadServer(t *testing.T, server *kcpServer, org logicalcluster.P
 	t.Helper()
 
 	path, wsName := NewWorkspaceFixture(t, server, org, "downstream-")
-	logicalClusterName := logicalcluster.Name(wsName)
 	rawConfig, err := server.RawConfig()
 	require.NoError(t, err, "failed to read config for server")
 	logicalConfig, kubeconfigPath := WriteLogicalClusterConfig(t, rawConfig, "base", path)
 	fakeServer := &kcpServer{
-		name:           logicalClusterName.String(),
+		name:           wsName,
 		cfg:            logicalConfig,
 		kubeconfigPath: kubeconfigPath,
 		lock:           &sync.Mutex{},

@@ -32,7 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 
-	"github.com/kcp-dev/logicalcluster/v3"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 
 	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
