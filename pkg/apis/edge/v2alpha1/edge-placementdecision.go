@@ -57,22 +57,20 @@ type EdgePlacementDecisionSpec struct {
 	Destinations []Destination `json:"destinations,omitempty"`
 }
 
-// EdgePlacementDecisionSpecResources explicitly defines the resources to be synced.
-// Currently, the fields inside are taken from syncer-config.go.
+// EdgePlacementDecisionSpecResources explicitly defines the resources to be down-synced.
+// The ClusterScope list defines the cluster-scope resources, while NamespacedObjects packs individual resources
+// identifiable by namespace & name.
 type EdgePlacementDecisionSpecResources struct {
-	// +optional
-	NamespaceScope NamespaceScopeDownsyncs `json:"namespaceScope,omitempty"`
-
-	// `namespacedObjects` matches if and only if at least one member matches.
-	// +optional
-	NamespacedObjects []NamespaceScopeDownsyncObjects `json:"namespacedObjects,omitempty"`
-
 	// `clusterScope` holds a list of individual cluster-scoped objects
 	// to downsync, organized by resource.
 	// Remember that a "resource" is a kind/type/sort of objects,
 	// not an individual object.
 	// +optional
 	ClusterScope []ClusterScopeDownsyncResource `json:"clusterScope,omitempty"`
+
+	// `namespacedObjects` matches if and only if at least one member matches.
+	// +optional
+	NamespacedObjects []NamespaceScopeDownsyncObjects `json:"namespacedObjects,omitempty"`
 }
 
 // Destination wraps the identifiers required to uniquely identify a destination cluster.

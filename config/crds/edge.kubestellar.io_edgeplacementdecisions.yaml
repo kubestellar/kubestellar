@@ -94,43 +94,6 @@ spec:
                       - resource
                       type: object
                     type: array
-                  namespaceScope:
-                    description: NamespaceScopeDownsyncs describes what namespace-scoped
-                      objects to downsync. Note that it is factored into two orthogonal
-                      parts, one identifying namespaces and one identifying resources.
-                      An object is to be downsynced iff it matches both parts.
-                    properties:
-                      namespaces:
-                        description: '`namespaces` is the names of the namespaces
-                          to downsync. Empty list means to downsync no namespace contents.
-                          Whether the particulars of the Namespace object itself are
-                          to be downsynced are controlled by the `clusterScope`; if
-                          not then downsync will ensure that the namespace exists
-                          but take no further care to make it match upstream.'
-                        items:
-                          type: string
-                        type: array
-                      resources:
-                        description: '`resources` lists the namespace-scoped resources
-                          to downsync. Empty list means none of them.'
-                        items:
-                          properties:
-                            apiVersion:
-                              description: '`apiVeresion` holds just the version,
-                                not the group too. This is the version to use both
-                                upstream and downstream.'
-                              type: string
-                            group:
-                              type: string
-                            resource:
-                              type: string
-                          required:
-                          - apiVersion
-                          - group
-                          - resource
-                          type: object
-                        type: array
-                    type: object
                   namespacedObjects:
                     description: '`namespacedObjects` matches if and only if at least
                       one member matches.'
