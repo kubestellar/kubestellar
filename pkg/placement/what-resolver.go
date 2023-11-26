@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"time"
@@ -49,6 +50,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 type whatResolver struct {
@@ -65,6 +67,7 @@ type whatResolver struct {
 	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
+	kbSpaceRelation           kbuser.KubeBindSpaceRelation
 
 	// Hold this while accessing data listed below
 	sync.Mutex
@@ -121,6 +124,7 @@ func NewWhatResolver(
 	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 	numThreads int,
 ) WhatResolver {
 	controllerName := "what-resolver"
@@ -137,6 +141,7 @@ func NewWhatResolver(
 		crdClusterPreInformer:     crdClusterPreInformer,
 		bindingClusterPreInformer: bindingClusterPreInformer,
 		dynamicClusterClient:      dynamicClusterClient,
+		kbSpaceRelation:           kbSpaceRelation,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
@@ -512,6 +517,21 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 	epFound := err == nil
 	wr.Lock()
 	defer wr.Unlock()
+
+	//change to consumer SpaceID
+	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
+	if err != nil {
+		logger.Error(err, "failed to get ")
+		return true
+	}
+	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if spaceID == "" {
+		logger.Error(errors.New("failed to get consumer space ID from a provider's copy"), "failed to get ")
+		return true
+	}
+	cluster = logicalcluster.Name(spaceID)
+	epName = ObjectName(epOriginalName)
+
 	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]
 	if !wsDetailsFound {
 		if !epFound {

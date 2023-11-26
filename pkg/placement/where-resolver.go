@@ -18,6 +18,7 @@ package placement
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -34,6 +35,7 @@ import (
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 type whereResolver struct {
@@ -42,8 +44,9 @@ type whereResolver struct {
 	numThreads int
 	queue      workqueue.RateLimitingInterface
 
-	spsInformer upstreamcache.SharedIndexInformer
-	spsLister   edgev2alpha1listers.SinglePlacementSliceLister
+	spsInformer     upstreamcache.SharedIndexInformer
+	spsLister       edgev2alpha1listers.SinglePlacementSliceLister
+	kbSpaceRelation kbuser.KubeBindSpaceRelation
 
 	// resolutions maps EdgePlacement name to its ResolvedWhere
 	resolutions RelayMap[ExternalName, ResolvedWhere]
@@ -63,6 +66,7 @@ func (qi queueItem) toExternalName() ExternalName {
 func NewWhereResolver(
 	ctx context.Context,
 	spsPreInformer edgev2alpha1informers.SinglePlacementSliceInformer,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 	numThreads int,
 ) WhereResolver {
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhere]) Runnable {
@@ -70,13 +74,14 @@ func NewWhereResolver(
 		logger := klog.FromContext(ctx).WithValues("part", controllerName)
 		ctx = klog.NewContext(ctx, logger)
 		wr := &whereResolver{
-			ctx:         ctx,
-			logger:      logger,
-			numThreads:  numThreads,
-			queue:       workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-			spsInformer: spsPreInformer.Informer(),
-			spsLister:   spsPreInformer.Lister(),
-			resolutions: NewRelayMap[ExternalName, ResolvedWhere](false),
+			ctx:             ctx,
+			logger:          logger,
+			numThreads:      numThreads,
+			queue:           workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
+			spsInformer:     spsPreInformer.Informer(),
+			spsLister:       spsPreInformer.Lister(),
+			kbSpaceRelation: kbSpaceRelation,
+			resolutions:     NewRelayMap[ExternalName, ResolvedWhere](false),
 		}
 		wr.resolutions.AddReceiver(receiver, false)
 		wr.spsInformer.AddEventHandler(WhereResolverClusterHandler{wr, mkgk(edgeapi.SchemeGroupVersion.Group, "SinglePlacementSlice")})
@@ -170,20 +175,25 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 	logger := klog.FromContext(ctx)
 	cluster := item.Cluster
 	epName := item.Name
-	objName := item.toExternalName()
 	sps, err := wr.spsLister.Get(epName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
 		logger.Error(err, "Failed to fetch SinglePlacementSlice from local cache", "cluster", cluster, "epName", epName)
 		return true // I think these errors are not transient
 	}
-
-	// Temp debug
-	if len(sps.Destinations) == 0 {
-		logger.Info("----------- empty SPS", "spsName", sps.Name)
+	//change to consumer SpaceID
+	_, spsOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(sps)
+	if err != nil {
+		logger.Error(err, "failed to get ")
+		return true
 	}
-	for _, sp := range sps.Destinations {
-		logger.Info("----------- SP from SPS", "stName", sp.SyncTargetName)
+	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if spaceID == "" {
+		logger.Error(errors.New("failed to get consumer space ID from a provider's copy"), "failed to get ")
+		return true
 	}
+	item.Name = spsOriginalName
+	item.Cluster = logicalcluster.Name(spaceID)
+	objName := item.toExternalName()
 
 	if err == nil {
 		wr.resolutions.Put(objName, []*edgeapi.SinglePlacementSlice{sps})
