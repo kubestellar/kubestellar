@@ -33,8 +33,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 	"github.com/stretchr/testify/require"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -45,6 +45,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 )
 
 type kcpServer struct {

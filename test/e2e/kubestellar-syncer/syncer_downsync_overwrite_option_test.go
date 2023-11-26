@@ -32,9 +32,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 
-	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
-
 	"github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 )
 
 func TestKubeStellarDownsyncOverwriteOption(t *testing.T) {

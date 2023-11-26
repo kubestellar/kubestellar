@@ -39,16 +39,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	kubernetesclient "k8s.io/client-go/kubernetes"
-
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/yaml"
 
-	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
-
 	workloadcliplugin "github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/syncer-gen"
 	"github.com/kubestellar/kubestellar/pkg/syncer"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 )
 
 //go:embed testdata/*
