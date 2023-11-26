@@ -20,12 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// SourceEdgePlacementLabelKey is the key of the label used in a EdgePlacementDecision.
-// to reference the EdgePlacement that it is part of the response to.
-// We use a label rather than a field because field selectors do not work
-// on a resource defined by a CRD.
-const SourceEdgePlacementLabelKey string = "edge.kubestellar.io/source-edgeplacement"
-
 // EdgePlacementDecision exists in the center and is bound to a single EdgePlacement resource.
 // The decision resource reflects the resolution of the bounded EdgePlacement's placement selectors,
 // and explicitly reflects which resources should go to what destinations.
