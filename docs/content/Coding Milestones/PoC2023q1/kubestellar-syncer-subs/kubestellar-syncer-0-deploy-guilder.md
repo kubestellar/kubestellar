@@ -2,12 +2,11 @@
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
 # just for testing till we change the code that creates the MB name
+kubectl ws root:imw1
+UID=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.uid}"`
 kubectl ws root:espw
-kubectl get SyncTargets
-kubectl get synctargets.edge.kubestellar.io
-kubectl describe synctargets.edge.kubestellar.io guilder
-#kubectl describe Synctarget guilder
-mbws=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
+mbws=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-$UID"`
+
 echo "mailbox workspace name = $mbws"
 ```
 ``` { .bash .no-copy }
