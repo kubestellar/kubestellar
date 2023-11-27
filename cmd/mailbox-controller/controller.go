@@ -230,14 +230,19 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
 	if workspace == nil {
+		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(syncTarget)
+		if err != nil {
+			logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", syncTarget.Name)
+			return true
+		}
 		ws := &tenancyv1alpha1.Workspace{
 			ObjectMeta: metav1.ObjectMeta{
-				Annotations: map[string]string{SyncTargetNameAnnotationKey: syncTarget.Name},
+				Annotations: map[string]string{SyncTargetNameAnnotationKey: stOriginalName},
 				Name:        mbwsName,
 			},
 			Spec: tenancyv1alpha1.WorkspaceSpec{},
 		}
-		_, err := ctl.workspaceScopedClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
+		_, err = ctl.workspaceScopedClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
 		if err == nil {
 			logger.V(2).Info("Created missing workspace", "mbwsName", mbwsName)
 			return false
