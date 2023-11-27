@@ -22,6 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
@@ -31,6 +33,7 @@ import (
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
 )
 
@@ -86,12 +89,12 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create config from flags")
 		return err
 	}
-	espwClientset, err := edgeclientset.NewForConfig(espwRestConfig)
+	edgeClient, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for service provider space")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(espwClientset, resyncPeriod)
+	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClient, resyncPeriod)
 
 	// create where-resolver
 	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
@@ -104,6 +107,12 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		logger.Error(err, "failed to create edge clientset for controller")
 		return err
 	}
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create k8s clientset for service provider space")
+		return err
+	}
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
 	es, err := wheresolver.NewController(
 		ctx,
 		edgeClusterClientset,
@@ -111,6 +120,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 		edgeSharedInformerFactory.Edge().V2alpha1().SinglePlacementSlices(),
 		edgeSharedInformerFactory.Edge().V2alpha1().Locations(),
 		edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets(),
+		kbSpaceRelation,
 	)
 	if err != nil {
 		logger.Error(err, "failed to create controller", "name", wheresolver.ControllerName)
@@ -121,7 +131,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	doneCh := ctx.Done()
 
 	edgeSharedInformerFactory.Start(doneCh)
-
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
 
 	es.Run(numThreads)

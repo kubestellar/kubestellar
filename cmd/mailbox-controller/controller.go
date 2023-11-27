@@ -37,10 +37,10 @@ import (
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 const wsNameSep = "-mb-"
@@ -60,6 +60,7 @@ type mbCtl struct {
 	workspaceScopedInformer cache.SharedIndexInformer
 	workspaceScopedLister   tenancylisters.WorkspaceLister
 	workspaceScopedClient   tenancyclient.WorkspaceInterface
+	kbSpaceRelation         kbuser.KubeBindSpaceRelation
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
 
@@ -73,21 +74,23 @@ func newMailboxController(ctx context.Context,
 	syncTargetPreInformer edgev2alpha1informers.SyncTargetInformer,
 	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
 	workspaceScopedClient tenancyclient.WorkspaceInterface,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) *mbCtl {
 	syncTargetInformer := syncTargetPreInformer.Informer()
-	syncTargetInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: mbwsNameOfObj})
 	workspacesInformer := workspaceScopedPreInformer.Informer()
 
 	ctl := &mbCtl{
 		context:                 ctx,
 		espwPath:                espwPath,
-		syncTargetInformer:      syncTargetInformer,
-		syncTargetIndexer:       syncTargetInformer.GetIndexer(),
 		workspaceScopedInformer: workspacesInformer,
 		workspaceScopedLister:   workspaceScopedPreInformer.Lister(),
 		workspaceScopedClient:   workspaceScopedClient,
+		kbSpaceRelation:         kbSpaceRelation,
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
+	syncTargetInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: ctl.mbwsNameOfObj})
+	ctl.syncTargetInformer = syncTargetInformer
+	ctl.syncTargetIndexer = syncTargetInformer.GetIndexer()
 
 	syncTargetInformer.AddEventHandler(ctl)
 	workspacesInformer.AddEventHandler(ctl)
@@ -140,7 +143,7 @@ func (ctl *mbCtl) enqueue(obj any) {
 		logger.V(4).Info("Enqueuing reference due to workspace", "wsName", typed.Name)
 		ctl.queue.Add(typed.Name)
 	case *edgev2alpha1.SyncTarget:
-		mbwsName := mbwsNameOfSynctarget(typed)
+		mbwsName := ctl.mbwsNameOfSynctarget(typed)
 		logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
 		ctl.queue.Add(mbwsName)
 	default:
@@ -338,15 +341,26 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	return false
 }
 
-func mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
-	cluster := logicalcluster.From(st)
-	return cluster.String() + wsNameSep + string(st.UID)
+func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
+	logger := klog.FromContext(ctl.context)
+	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
+	if err != nil {
+		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", st.Name)
+		return ""
+	}
+	spaceID := ctl.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if spaceID == "" {
+		logger.Error(nil, "failed to get consumer space ID from a provider's copy", "syncTarget", st.Name)
+		return ""
+	}
+	// Use consumer spaceID and provider st.UID
+	return spaceID + wsNameSep + string(st.UID)
 }
 
-func mbwsNameOfObj(obj any) ([]string, error) {
+func (ctl *mbCtl) mbwsNameOfObj(obj any) ([]string, error) {
 	st, ok := obj.(*edgev2alpha1.SyncTarget)
 	if !ok {
 		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
 	}
-	return []string{mbwsNameOfSynctarget(st)}, nil
+	return []string{ctl.mbwsNameOfSynctarget(st)}, nil
 }

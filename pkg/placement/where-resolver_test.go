@@ -24,12 +24,14 @@ import (
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	fakeupkube "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func TestWhereResolver(t *testing.T) {
@@ -56,7 +58,9 @@ func TestWhereResolver(t *testing.T) {
 	edgeInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, 0)
 	spsClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
 	spsClusterPreInformer.Informer() // get the informer created so that it will start
-	whereResolver := NewWhereResolver(ctx, spsClusterPreInformer, 3)
+	fakeUpKubeClient := fakeupkube.NewSimpleClientset()
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, fakeUpKubeClient)
+	whereResolver := NewWhereResolver(ctx, spsClusterPreInformer, kbSpaceRelation, 3)
 	edgeInformerFactory.Start(ctx.Done())
 	rcvr := NewMapMap[ExternalName, ResolvedWhere](nil)
 	runnable := whereResolver(rcvr)

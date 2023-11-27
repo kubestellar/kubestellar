@@ -148,8 +148,8 @@ also label guilder with `extended=yes`.
 
 ```shell
 kubectl ws root:imw1
-kubectl kubestellar ensure location florin  loc-name=florin  env=prod
-kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
+kubectl kubestellar ensure location ex1 florin  loc-name=florin  env=prod
+kubectl kubestellar ensure location ex1 guilder loc-name=guilder env=prod extended=yes
 echo "decribe the florin location object"
 kubectl describe location.edge.kubestellar.io florin
 ```

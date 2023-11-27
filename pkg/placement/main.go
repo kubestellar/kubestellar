@@ -38,6 +38,7 @@ import (
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 type placementTranslator struct {
@@ -97,6 +98,7 @@ func NewPlacementTranslator(
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
 	// for creating namespaces in mailbox workspaces
 	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) *placementTranslator {
 	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
 	mbwsPreInformer.Lister()
@@ -117,13 +119,11 @@ func NewPlacementTranslator(
 		nsClusterPreInformer:   nsClusterPreInformer,
 		nsClusterClient:        nsClusterClient,
 		whatResolver: NewWhatResolver(ctx, epPreInformer, discoveryClusterClient,
-			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, numThreads),
-		whereResolver: NewWhereResolver(ctx, spsPreInformer, numThreads),
+			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, kbSpaceRelation, numThreads),
+		whereResolver: NewWhereResolver(ctx, spsPreInformer, kbSpaceRelation, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes, pt.mbwsInformer, pt.mbwsLister,
-		locationPreInformer.Informer(), locationPreInformer.Lister(),
-		pt.syncfgInformer, pt.syncfgLister,
-		customizerPreInformer.Informer(), customizerPreInformer.Lister(),
+		pt.syncfgInformer,
 		edgeClusterClientset, dynamicClusterClient,
 		nsClusterPreInformer, nsClusterClient)
 

@@ -36,8 +36,10 @@ import (
 	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
@@ -56,6 +58,7 @@ import (
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -214,12 +217,20 @@ func main() {
 	kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClusterClientset, 0)
 	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
 
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create k8s clientset for service provider space")
+		os.Exit(90)
+	}
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
+
 	doneCh := ctx.Done()
 	// TODO: more
 	pt := placement.NewPlacementTranslator(concurrency, ctx, locationPreInformer, epPreInformer, spsPreInformer, syncfgPreInformer, customizerPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient, kbSpaceRelation)
 
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)
 	rootInformerFactory.Start(doneCh)

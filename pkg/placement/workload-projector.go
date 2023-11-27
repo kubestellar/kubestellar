@@ -53,7 +53,6 @@ import (
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev2a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
@@ -86,12 +85,7 @@ func NewWorkloadProjector(
 	resourceModes ResourceModes,
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
-	locationInformer k8scache.SharedIndexInformer,
-	locationLister edgev2a1listers.LocationLister,
 	syncfgInformer k8scache.SharedIndexInformer,
-	syncfgLister edgev2a1listers.SyncerConfigLister,
-	customizerInformer k8scache.SharedIndexInformer,
-	customizerLister edgev2a1listers.CustomizerLister,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
@@ -104,12 +98,7 @@ func NewWorkloadProjector(
 		resourceModes:        resourceModes,
 		queue:                workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
 		mbwsLister:           mbwsLister,
-		locationInformer:     locationInformer,
-		locationLister:       locationLister,
 		syncfgInformer:       syncfgInformer,
-		syncfgLister:         syncfgLister,
-		customizerInformer:   customizerInformer,
-		customizerLister:     customizerLister,
 		edgeClusterClientset: edgeClusterClientset,
 		dynamicClusterClient: dynamicClusterClient,
 		nsClusterPreInformer: nsClusterPreInformer,
@@ -314,12 +303,7 @@ type workloadProjector struct {
 	delay                time.Duration // to slow down for debugging
 	queue                workqueue.RateLimitingInterface
 	mbwsLister           tenancyv1a1listers.WorkspaceLister
-	locationInformer     k8scache.SharedIndexInformer
-	locationLister       edgev2a1listers.LocationLister
 	syncfgInformer       k8scache.SharedIndexInformer
-	syncfgLister         edgev2a1listers.SyncerConfigLister
-	customizerInformer   k8scache.SharedIndexInformer
-	customizerLister     edgev2a1listers.CustomizerLister
 	edgeClusterClientset edgeclusterclientset.ClusterInterface
 	dynamicClusterClient clusterdynamic.ClusterInterface
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer
@@ -697,7 +681,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		return true
 	}
 	logger = logger.WithValues("destination", sp)
-	syncfg, err := wp.syncfgLister.Get(string(scRef.Name))
+	syncfg, err := wp.edgeClusterClientset.Cluster(scRef.Cluster.Path()).EdgeV2alpha1().SyncerConfigs().Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
 	if err != nil {
 		if k8sapierrors.IsNotFound(err) {
 			goodConfigSpecRelations := wp.syncerConfigRelations(sp)
@@ -1247,7 +1231,7 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 		if len(refParts) == 1 {
 			custNS = srcObjU.GetNamespace()
 		}
-		customizer, err = wp.customizerLister.Customizers(custNS).Get(custName)
+		customizer, err = wp.edgeClusterClientset.Cluster(srcCluster.Path()).EdgeV2alpha1().Customizers(custNS).Get(wp.ctx, custName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Customizer")
 		} else {
@@ -1256,7 +1240,7 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 	}
 	var location *edgeapi.Location
 	if expandParameters {
-		location, err = wp.locationLister.Get(destSP.LocationName)
+		location, err = wp.edgeClusterClientset.Cluster(logicalcluster.NewPath(destSP.Cluster)).EdgeV2alpha1().Locations().Get(wp.ctx, destSP.LocationName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Location")
 		}

@@ -133,13 +133,15 @@ if [ "$silent" == "true" ]; then
 else
     kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
+spaceID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}")
 
 if [ "$central" == "true" ]; then
     echo "looking for synctargets in the center"
     kubectl ws "${kubectl_flags[@]}" "$espw"
 fi
 prefixed_stname="$(kubectl get synctargets.edge --no-headers=true -o custom-columns=":metadata.name" | grep $stname)"
-mbwsname=$(kubectl get synctargets.edge $prefixed_stname -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+stUID=$(kubectl get synctargets.edge $prefixed_stname -o jsonpath="{.metadata.uid}")
+mbwsname="$spaceID"-mb-"$stUID"
 
 if [ "$silent" == "true" ]; then
     kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
