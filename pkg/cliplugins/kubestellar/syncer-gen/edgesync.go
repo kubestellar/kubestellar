@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"strings"
 	"text/template"
@@ -55,8 +56,7 @@ import (
 	"k8s.io/klog/v2"
 	"k8s.io/utils/pointer"
 
-	"github.com/kcp-dev/kcp/pkg/cliplugins/base"
-	"github.com/kcp-dev/kcp/pkg/cliplugins/helpers"
+	"github.com/kubestellar/kubestellar/pkg/cliplugins/kubestellar/base"
 )
 
 //go:embed *.yaml
@@ -211,7 +211,7 @@ func (o *EdgeSyncOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	configURL, _, err := helpers.ParseClusterURL(config.Host)
+	configURL, err := parseApiServerURL(config.Host)
 	if err != nil {
 		return fmt.Errorf("current URL %q does not point to workspace", config.Host)
 	}
@@ -720,4 +720,20 @@ func createEdgeSyncConfig(ctx context.Context, cfg *rest.Config, edgeSyncTargetN
 	} else {
 		return cr, nil
 	}
+}
+
+func parseApiServerURL(host string) (*url.URL, error) {
+	u, err := url.Parse(host)
+	if err != nil {
+		return nil, err
+	}
+	ret := *u
+
+	// If a space provider is KCP, the host is <API Server URL>/clusters/<workspace name>. Extract the api server url.
+	prefix := "/clusters/"
+	if clusterIndex := strings.Index(u.Path, prefix); clusterIndex >= 0 {
+		ret.Path = ret.Path[:clusterIndex]
+		return &ret, nil
+	}
+	return &ret, nil
 }
