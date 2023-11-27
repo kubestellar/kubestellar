@@ -1,7 +1,8 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
-kubectl ws root:imw1
+# just for testing till we change the code that creates the MB name
+kubectl ws root:espw
 kubectl get SyncTargets
 kubectl get synctargets.edge.kubestellar.io
 kubectl describe synctargets.edge.kubestellar.io guilder
