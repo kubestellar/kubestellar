@@ -16,7 +16,20 @@
 image:
   repository: quay.io/kubestellar/kubestellar
   pullPolicy: IfNotPresent
-  tag: release-0.9
+  tag: release-0.14
+
+# Space abstraction layer image parameters
+spaceimage:
+  repository: quay.io/kubestellar/space-framework
+  pullPolicy: IfNotPresent
+  tag: sp-mgt
+
+# The namespace used by the space abstraction layer.  
+spaceNamespace: default
+
+# The space framework default provider
+# Possible values: [kcp|kubeflex]
+defaultSpaceProvider: kcp
 
 # Storage size
 storageSize: 8Gi

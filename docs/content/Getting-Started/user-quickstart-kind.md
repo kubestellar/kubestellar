@@ -1,6 +1,7 @@
 ---
 short_name: user-quickstart-kind
 manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
+qs_sort: kind
 ---
 [![User QuickStart Kind test]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml/badge.svg?branch={{config.ks_branch}})]({{config.repo_url}}/actions/workflows/docs-ecutable-user-quickstart-kind.yml)&nbsp;&nbsp;&nbsp;
 
@@ -150,18 +151,18 @@ manifest_name: 'docs/content/Getting-Started/user-quickstart-kind.md'
 !!! tip ""
     === "deploy"
          {%
-           include-markdown "../common-subs/kubestellar-apply-apache.md"
-           start="<!--kubestellar-apply-apache-start-->"
-           end="<!--kubestellar-apply-apache-end-->"
+           include-markdown "../common-subs/kubestellar-apply-apache-kind.md"
+           start="<!--kubestellar-apply-apache-kind-start-->"
+           end="<!--kubestellar-apply-apache-kind-end-->"
          %}
 
 #### 6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-kind.md"
+           start="<!--kubestellar-test-apache-kind-start-->"
+           end="<!--kubestellar-test-apache-kind-end-->"
          %}
     === "uh oh, error?"
          {%
@@ -186,7 +187,7 @@ TODO
 
 what's next...  
 how to upsync a resource  
-how to create, but not overrite/update a synchronized resource  
+how to create, but not overwrite/update a synchronized resource  
 
 <br>
 ---
@@ -244,18 +245,18 @@ how to create, but not overrite/update a synchronized resource
 !!! tip ""
     === "deploy"
          {%
-           include-markdown "../common-subs/kubestellar-apply-apache.md"
-           start="<!--kubestellar-apply-apache-start-->"
-           end="<!--kubestellar-apply-apache-end-->"
+           include-markdown "../common-subs/kubestellar-apply-apache-kind.md"
+           start="<!--kubestellar-apply-apache-kind-start-->"
+           end="<!--kubestellar-apply-apache-kind-end-->"
          %}
 
 #### 4. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
     === "view"
          {%
-           include-markdown "../common-subs/kubestellar-test-apache.md"
-           start="<!--kubestellar-test-apache-start-->"
-           end="<!--kubestellar-test-apache-end-->"
+           include-markdown "../common-subs/kubestellar-test-apache-kind.md"
+           start="<!--kubestellar-test-apache-kind-start-->"
+           end="<!--kubestellar-test-apache-kind-end-->"
          %}
     === "uh oh, error?"
          {%
@@ -274,9 +275,11 @@ how to create, but not overrite/update a synchronized resource
 
 ## 5. Check the status of your Apache Server on ks-edge-cluster1 and ks-edge-cluster2
 
-```
-TODO
-```
+{%
+           include-markdown "../common-subs/kubestellar-list-syncing.md"
+           start="<!--kubestellar-list-syncing-start-->"
+           end="<!--kubestellar-list-syncing-end-->"
+%}
 
 <br>
 ---

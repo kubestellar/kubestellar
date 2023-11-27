@@ -4,13 +4,26 @@ site_url: https://docs.kubestellar.io/
 
 repo_short_name: kubestellar/kubestellar
 repo_default_file_path: kubestellar
+helm_repo_short_name: kubestellar/helm
+helm_repo_default_file_path: helm
+brew_repo_short_name: kubestellar/homebrew-kubestellar
+brew_repo_default_file_path: homebrew-kubestellar
 docs_url: https://docs.kubestellar.io
 repo_raw_url: https://raw.githubusercontent.com/kubestellar/kubestellar
 edit_uri: edit/main/docs/content
 ks_branch: 'main'
-ks_tag: 'v0.9.0'
-ks_next_branch: 'release-0.10'
-ks_next_tag: 'v0.10.0'
+ks_tag: 'latest'
+
+ks_stable_tag: 'v0.9.0'
+
+ks_current_branch: 'release-0.14'
+ks_current_tag: 'v0.14.0'
+ks_current_helm_version: '7'
+
+ks_next_branch: 'release-0.15'
+ks_next_tag: 'v0.15.0'
+ks_next_helm_version: '8'
+
 ks_kind_port_num: '1119'
 
 # Site content
@@ -27,6 +40,7 @@ nav:
   - Getting Started:
       - Quickstart using Kind: Getting-Started/user-quickstart-kind.md 
       - Quickstart using OpenShift: Getting-Started/user-quickstart-openshift.md 
+      - Quickstart for testing: Getting-Started/user-quickstart-test.md 
       - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
@@ -42,7 +56,7 @@ nav:
           - Contacts: Contribution guidelines/security/security_contacts.md
       - Operations: 
           - Code Management: Contribution guidelines/operations/code-management.md
-          - Packaing and Versioning: Contribution guidelines/operations/packaging-and-versioning.md
+          - Packaging and Versioning: Contribution guidelines/operations/packaging-and-versioning.md
           - Release Management: Contribution guidelines/operations/release-management.md
           - Document Management: Contribution guidelines/operations/document-management.md
           - Testing Documentation PRs: Contribution guidelines/operations/testing-doc-prs.md

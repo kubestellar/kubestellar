@@ -100,7 +100,11 @@ depending on the Kubernetes release and usage style, `ServiceAccount`.
 The extra consideration for `ServiceAccount` is when an associated
 `Secret` is a natural consequence.  However, that is not a practical
 problem because such `Secret` objects are recognized as system
-infrastructure (see [below](#system-infrastructure-objects)).  Another
+infrastructure (see [below](#system-infrastructure-objects)).
+Oops, oversight here: the controller that makes the associated
+Secret objects _also_ insists that the ServiceAccount to refer to them;
+see later about denaturing ServiceAccounts.
+Another
 consideration for `ServiceAccount` objects, as for `Secret` and
 `ConfigMap` objects, is that some are in some sense "reverse-natured":
 some are created by some other thing as part of the nature of that
@@ -245,7 +249,7 @@ the normal kcp behavior.
 
 **NOTE**: The denaturing described here is not implemented yet.  The
 kinds of objects listed above can be put into a workload management
-workspace and it will give them its usual interpretation. For ones
+workspace and it will give them its usual interpretation. For objects
 that add authorizations, this will indeed _add_ authorizations but not
 otherwise break something. The kcp server does not implement
 `FlowSchema` nor `PriorityLevelConfiguration`; those will indeed be
@@ -253,14 +257,32 @@ uninterpreted. For objects that configure calls to other servers,
 these will fail unless the user arranges for them to work when made in
 the center as well in the edge clusters.
 
+In kcp v0.11.0 the Token controller (for ServiceAccounts) creates a
+token Secret for each ServiceAccount that does not currently reference
+one created by that controller and updates the ServiceAccount to
+reference the Secret just created. Should another controller undo that
+change to that ServiceAccount, the two controllers will fight
+continually --- leading to an ever growning collection of Secret
+objects. To prevent the placement translator from fighting with a
+mailbox space, users must mark a downsynced ServiceAccount as
+"create-only". To prevent some non-KubeStellar controller from
+fighting with a WDS, users must use feature(s) of that non-KubeStellar
+controller. In later versions of kcp and Kubernetes there is not such
+automatic Secret creation.
+
 #### Needs to be natured in center and edge
 
 These should have their usual effect in both center and edge; they
 need no distinct treatment.
 
 Note, however, that they _do_ have some sequencing implications.  They
-have to be created before any dependent objects, deleted after all
-dependent objects.
+should be created before any dependent objects, deleted after all
+dependent objects. Ordering violations only cause log noise.
+
+These are also exceptional in their reported state. It is managed by
+the apiserver. Leaving them natured in the WDS and the mailbox
+workspace means that they can not hold their reported state from the
+WEC.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |

@@ -35,7 +35,8 @@ RUN mkdir -p .kcp && \
     tar -C kcp-plugins -zxf kcp-plugins.tar.gz && \
     rm kcp-plugins.tar.gz && \
     git config --global --add safe.directory /home/kubestellar && \
-    mkdir -p bin
+    mkdir -p bin && \
+    mkdir -p scripts
 
 ENV PATH=$PATH:/root/go/bin
 
@@ -44,14 +45,14 @@ ADD config/          config/
 ADD hack/            hack/
 ADD monitoring/      monitoring/
 ADD pkg/             pkg/
-ADD inner-scripts/   inner-scripts/
-ADD overlap-scripts/ overlap-scripts/
+ADD scripts/inner/   scripts/inner/
+ADD scripts/overlap/ scripts/overlap/
 ADD space-framework/ space-framework/
 ADD test/            test/
 ADD .git/            .git/
 ADD .gitattributes Makefile Makefile.venv go.mod go.sum .
 
-RUN make innerbuild GIT_DIRTY=$GIT_DIRTY
+RUN make innerbuild GIT_DIRTY=$GIT_DIRTY IGNORE_GO_VERSION=yesplease
 
 FROM redhat/ubi9
 

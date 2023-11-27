@@ -11,7 +11,7 @@ We support two ways to deploy kcp and KubeStellar. The older way is to run them 
 The following commands will download the kcp and **KubeStellar** executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar as bare processes, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about [the commands for bare process deployment](../../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment).
 
 ```shell
-bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }}
+bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 ```
@@ -78,7 +78,7 @@ The next command relies on `kubectl` already being configured to manipulate the 
 The following commands will (a) download the kcp and **KubeStellar** executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) kcp and KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for [the commands about deployment into a Kubernetes cluster](../../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster).
 
 ``` {.bash}
-bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_tag }} --external-endpoint hostname.favorite.my:{{ config.ks_kind_port_num }}
+bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }} --external-endpoint hostname.favorite.my:{{ config.ks_kind_port_num }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 ```
 

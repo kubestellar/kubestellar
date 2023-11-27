@@ -20,16 +20,17 @@ import (
 	"context"
 	"os"
 
+	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
+	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
 
@@ -86,9 +87,9 @@ func NewPlacementTranslator(
 	// needed for enumerating resources in workload mgmt workspaces
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	// needed to watch for new resources appearing
-	crdClusterPreInformer kcpkubeinformers.GenericClusterInformer,
+	crdClusterPreInformer apiextinformers.CustomResourceDefinitionClusterInformer,
 	// needed to watch for new resources appearing
-	bindingClusterPreInformer kcpkubeinformers.GenericClusterInformer,
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	// needed to read and write arbitrary objects
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	// to read and write syncer config objects
@@ -135,11 +136,12 @@ func (pt *placementTranslator) Run() {
 	logger := klog.FromContext(ctx)
 
 	doneCh := ctx.Done()
-	if !k8scache.WaitForNamedCacheSync("placement-translator", doneCh,
-		pt.spsClusterInformer.HasSynced, pt.mbwsInformer.HasSynced,
-		pt.crdClusterInformer.HasSynced, pt.bindingClusterInformer.HasSynced,
-		pt.syncfgClusterInformer.HasSynced,
-	) {
+	if !(k8scache.WaitForNamedCacheSync("placement-translator(sps)", doneCh, pt.spsClusterInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(mbws)", doneCh, pt.mbwsInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(crds)", doneCh, pt.crdClusterInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(bind)", doneCh, pt.bindingClusterInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(sync)", doneCh, pt.syncfgClusterInformer.HasSynced) &&
+		true) {
 		logger.Error(nil, "Informer syncs not achieved")
 		os.Exit(100)
 	}

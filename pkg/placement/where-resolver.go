@@ -50,13 +50,13 @@ type whereResolver struct {
 }
 
 type queueItem struct {
-	gk      schema.GroupKind
-	cluster logicalcluster.Name
-	name    string
+	GK      schema.GroupKind
+	Cluster logicalcluster.Name
+	Name    string
 }
 
 func (qi queueItem) toExternalName() ExternalName {
-	return ExternalName{Cluster: qi.cluster, Name: ObjectName(qi.name)}
+	return ExternalName{Cluster: qi.Cluster, Name: ObjectName(qi.Name)}
 }
 
 // NewWhereResolver returns a WhereResolver.
@@ -126,7 +126,7 @@ func (wr *whereResolver) enqueue(gk schema.GroupKind, objAny any) {
 	if err != nil {
 		wr.logger.Error(err, "Impossible! SplitMetaClusterNamespaceKey failed", "key", key)
 	}
-	item := queueItem{gk: gk, cluster: cluster, name: name}
+	item := queueItem{GK: gk, Cluster: cluster, Name: name}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -153,7 +153,7 @@ func (wr *whereResolver) processNextWorkItem() bool {
 	defer wr.queue.Done(itemAny)
 	item := itemAny.(queueItem)
 
-	logger := klog.FromContext(wr.ctx).WithValues("group", item.gk.Group, "kind", item.gk.Kind, "cluster", item.cluster, "name", item.name)
+	logger := klog.FromContext(wr.ctx).WithValues("group", item.GK.Group, "kind", item.GK.Kind, "cluster", item.Cluster, "name", item.Name)
 	ctx := klog.NewContext(wr.ctx, logger)
 	logger.V(4).Info("processing queueItem")
 
@@ -168,8 +168,8 @@ func (wr *whereResolver) processNextWorkItem() bool {
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 	logger := klog.FromContext(ctx)
-	cluster := item.cluster
-	epName := item.name
+	cluster := item.Cluster
+	epName := item.Name
 	objName := item.toExternalName()
 	sps, err := wr.spsLister.Cluster(cluster).Get(epName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {

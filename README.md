@@ -10,6 +10,9 @@
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
 <br/>
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubestellar/kubestellar)](https://goreportcard.com/report/github.com/kubestellar/kubestellar)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kubestellar/kubestellar.svg)](https://pkg.go.dev/github.com/kubestellar/kubestellar)
+[![License](https://img.shields.io/github/license/kubestellar/kubestellar)](/LICENSE)
 [![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch=main)](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
 [![Broken Links Crawler](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml/badge.svg)](https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml)
@@ -22,18 +25,35 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-## Overview
-Did you know kubernetes manages multiple nodes but does not manage multiple clusters out of the box? KubeStellar adds multi-cluster support to Kubernetes 
 
-### Distinguishing features of KubeStellar
+Imagine KubeStellar as a post office for your Kubernetes resources. When you drop packages at the post office, they don't open them; they deliver them to the right recipients. Similarly, KubeStellar works like this for your Kubernetes resources. Instead of running resources right away, KubeStellar safely stores and sends resources to selected clusters across the globe—whether they're in public clouds, private clouds, or on the edge of your network. It's a super useful tool for spreading your Kubernetes resources wherever you need them without disrupting your existing tools and workflows.
 
-- just point your kubectl client at KubeStellar and deploy your exisiting kubernetes objects to any remote cluster - no wrapping required
-- use rule-based customization (grouping) to automate the customization of your large-scale deployments (just like kustomize)
-- sync your workload across your pre-existing remote clusters
-- up-sync any object, not just status from your remote clusters
-- support clusters that are disconnected or have intermittent connectivity
-- lightweight logical cluster support (KubeFlex, kcp, kind, etc.)
-- scalability - scale to a large number of objects, overcoming default Kubernetes limitations
+How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
+
+KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure. 
+
+__Don't change anything, just add KubeStellar!__
+
+
+## KubeStellar treats multiple Kubernetes clusters as one so you can:
+
+- __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters 
+- Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required
+- __Discover__ dynamically created objects created on remote clusters
+- Make __disconnected__ cluster operation possible
+- __Scale__ with 1:many and many:1 scenarios
+- __Remain compatible__ with cloud-native solutions
+
+## KubeStellar virtual clusters (Spaces) are our secret
+- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
+- Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
+- Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
+- Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them
+- Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
+
+## QuickStart
+
+Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/user-quickstart-kind/)
 
 ## Roadmap for the Project
 
@@ -43,9 +63,6 @@ The current activity is refining the definition of, and producing, the
 [PoC2023q4](https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q4/outline/).
 Goals not addressed in that PoC are to be explored later.
 
-## QuickStart
-
-Checkout our [QuickStart Guide](https://docs.kubestellar.io/stable/Getting-Started/quickstart/)
 
 ## Contributing
 
@@ -101,6 +118,8 @@ Thanks go to these wonderful people:
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/fab7"><img src="https://avatars.githubusercontent.com/u/15231306?v=4" width="100px;" alt=""/><br /><sub><b>Francois Abel</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Afab7+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/nirrozenbaum"><img src="https://avatars.githubusercontent.com/u/19717747?v=4" width="100px;" alt=""/><br /><sub><b>Nir Rozenbaum</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3Anirrozenbaum+" title="Contributed PRs">👀</a></td>
+    <td align="center"><a href="https://github.com/vMaroon"><img src="https://avatars.githubusercontent.com/u/73340153?v=4" width="100px;" alt=""/><br /><sub><b>Maroon Ayoub</b></sub></a><br /><a href="https://github.com/kubestellar/kubestellar/issues?q=assignee%3AvMaroon+" title="Contributed PRs">👀</a></td>
   </tr>
 </table>
 

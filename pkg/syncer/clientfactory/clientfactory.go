@@ -74,6 +74,27 @@ func (cf *ClientFactory) GetResourceClient(group string, kind string) (Client, e
 	resourceClient = Client{
 		ResourceClient: client,
 		scope:          mapping.Scope,
+		hasStatusInSubresources: cf.hasStatus(groupResources, schema.GroupVersionResource{
+			Group:    mapping.Resource.Group,
+			Version:  mapping.Resource.Version,
+			Resource: mapping.Resource.Resource,
+		}),
 	}
 	return resourceClient, nil
+}
+
+func (cf *ClientFactory) hasStatus(groupResources []*restmapper.APIGroupResources, gvr schema.GroupVersionResource) bool {
+	for _, grs := range groupResources {
+		if grs.Group.Name == gvr.Group {
+			rs, found := grs.VersionedResources[gvr.Version]
+			if found {
+				for _, r := range rs {
+					if r.Name == gvr.Resource+"/status" {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }

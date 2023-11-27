@@ -52,6 +52,7 @@ repo_raw_url=$(yq -r ".repo_raw_url" $REPO_ROOT/docs/mkdocs.yml)
 ks_branch=$(yq -r ".ks_branch" $REPO_ROOT/docs/mkdocs.yml)
 ks_tag=$(yq -r ".ks_tag" $REPO_ROOT/docs/mkdocs.yml)
 ks_kind_port_num=$(yq -r ".ks_kind_port_num" $REPO_ROOT/docs/mkdocs.yml)
+ks_current_tag=$(yq -r ".ks_current_tag" $REPO_ROOT/docs/mkdocs.yml)
 
 code_blocks+=('set -o errexit')
 code_blocks+=('set -o nounset')
@@ -99,6 +100,7 @@ function parse_file()
           code_block="${code_block/\{\{ config.repo_url \}\}/$repo_url}"
           code_block="${code_block/\{\{ config.repo_raw_url \}\}/$repo_raw_url}"
           code_block="${code_block/\{\{ config.ks_branch \}\}/$ks_branch}"
+          code_block="${code_block/\{\{ config.ks_current_tag \}\}/$ks_current_tag}"
           code_block="${code_block/\{\{ config.ks_tag \}\}/$ks_tag}"
           code_block="${code_block/\{\{ config.ks_kind_port_num \}\}/$ks_kind_port_num}"
           echo $code_block

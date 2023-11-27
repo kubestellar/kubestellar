@@ -39,7 +39,7 @@ spec:
                 relevant EdgePlacement.
               properties:
                 cluster:
-                  description: Cluster is the logicacluster.Name of the logical cluster
+                  description: Cluster is the logicalcluster.Name of the logical cluster
                     that contains both the Location and the SyncTarget.
                   type: string
                 locationName:

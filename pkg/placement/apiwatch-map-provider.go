@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -29,7 +30,7 @@ import (
 	"k8s.io/klog/v2"
 
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
+	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
@@ -41,8 +42,8 @@ import (
 func NewAPIWatchMapProvider(ctx context.Context,
 	numThreads int,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	crdClusterPreInformer kcpinformers.GenericClusterInformer,
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
+	crdClusterPreInformer apiextinformers.CustomResourceDefinitionClusterInformer,
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 ) APIWatchMapProvider {
 	awp := &apiWatchProvider{
 		context:                   ctx,
@@ -65,8 +66,8 @@ type apiWatchProvider struct {
 	context                   context.Context
 	numThreads                int
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
-	crdClusterPreInformer     kcpinformers.GenericClusterInformer
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer
+	crdClusterPreInformer     apiextinformers.CustomResourceDefinitionClusterInformer
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	queue                     workqueue.RateLimitingInterface
 
 	sync.Mutex
@@ -82,6 +83,8 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	defer awp.Unlock()
 	wpc := MapGetAdd(awp.perCluster, clusterName, true, func(clusterName logicalcluster.Name) *apiWatchProviderPerCluster {
 		ctx := context.Background()
+		logger := klog.FromContext(ctx).WithValues("part", "apiwatch-map-provider")
+		ctx = klog.NewContext(ctx, logger)
 		wpc := &apiWatchProviderPerCluster{
 			awp:     awp,
 			cluster: clusterName,
@@ -99,7 +102,7 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	})
 	wpc.groupReceivers = append(MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{groupReceiver}, wpc.groupReceivers...)
 	wpc.resourceReceivers = append(MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{resourceReceiver}, wpc.resourceReceivers...)
-	// The following make sure that the new receiver is notified about aready-known resources
+	// The following make sure that the new receiver is notified about already-known resources
 	awp.queue.Add(receiverForCluster[string /*group name*/, APIGroupInfo]{groupReceiver, clusterName})
 	awp.queue.Add(receiverForCluster[metav1.GroupResource, ResourceDetails]{resourceReceiver, clusterName})
 }

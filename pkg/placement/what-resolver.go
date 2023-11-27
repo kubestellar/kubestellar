@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apiextkcpinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,7 +40,8 @@ import (
 	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpinformers "github.com/kcp-dev/client-go/informers"
+	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
+	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
@@ -59,8 +62,8 @@ type whatResolver struct {
 	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
-	crdClusterPreInformer     kcpinformers.GenericClusterInformer
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer
+	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
 
 	// Hold this while accessing data listed below
@@ -96,15 +99,17 @@ type resourceResolver struct {
 
 	// byObjName maps object namespace (if namespaced) and name to relevant details
 	byObjName map[NamespacedName]*objectDetails
+
+	definers Set[ksmetav1a1.Definer]
 }
 
 type NamespacedName = Pair[NamespaceName, ObjectName]
 
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	// placementBits holds an entry for each EdgePlacement whose what predicate
-	// matches the object, and the bool value is WantSingletonReportedState.
-	placementBits MutableMap[ObjectName, bool]
+	// PlacementBits holds an entry for each EdgePlacement whose what predicate
+	// matches the object.
+	PlacementBits MutableMap[ObjectName, DistributionBits]
 }
 
 // NewWhatResolver returns a WhatResolver;
@@ -113,8 +118,8 @@ func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	crdClusterPreInformer kcpinformers.GenericClusterInformer,
-	bindingClusterPreInformer kcpinformers.GenericClusterInformer,
+	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
+	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	numThreads int,
 ) WhatResolver {
@@ -157,9 +162,9 @@ func (wr *whatResolver) Run(ctx context.Context) {
 }
 
 type namespacedQueueItem struct {
-	gk      schema.GroupKind
-	cluster logicalcluster.Name
-	nn      NamespacedName
+	GK      schema.GroupKind
+	Cluster logicalcluster.Name
+	NN      NamespacedName
 }
 
 type WhatResolverClusterHandler struct {
@@ -192,7 +197,7 @@ func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
 	if namespace != "" {
 		panic("Namespace must be empty here")
 	}
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -226,22 +231,16 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 		wr.logger.Error(err, "Impossible! SplitMetaNamespaceKey failed", "key", key)
 	}
 	nn := NewPair(NamespaceName(namespace), ObjectName(name))
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: nn}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: nn}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
-}
-
-func (wr *whatResolver) Get(placement ExternalName, kont func(WorkloadParts)) {
-	wr.Lock()
-	defer wr.Unlock()
-	resolvedWhat := wr.getPartsLocked(placement.Cluster, placement.Name)
-	kont(resolvedWhat.Downsync)
 }
 
 func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName ObjectName) ResolvedWhat {
 	parts := WorkloadParts{}
 	var upsyncs []edgeapi.UpsyncSet
 	wsDetails, found := wr.workspaceDetails[wldCluster]
+	var definers MutableSet[ksmetav1a1.Definer] = NewEmptyMapSet[ksmetav1a1.Definer]()
 	if !found {
 		return ResolvedWhat{parts, upsyncs}
 	}
@@ -249,18 +248,47 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		upsyncs = ep.Spec.Upsync
 	}
 	for _, rr := range wsDetails.resources {
+		var gotSome bool
 		for objName, objDetails := range rr.byObjName {
 			// TODO: add index by EdgePlacement name to make this faster
-			wantSingletonReturn, found := objDetails.placementBits.Get(epName)
+			distrBits, found := objDetails.PlacementBits.Get(epName)
 			if !found {
 				continue
 			}
 			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
-			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, ReturnSingletonState: wantSingletonReturn}
+			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version}.setDistributionBits(distrBits)
+			wr.logger.V(4).Info("Returning part", "partID", partID, "partDetails", partDetails, "definers", rr.definers)
 			parts[partID] = partDetails
+			gotSome = true
+		}
+		if gotSome {
+			SetAddAll[ksmetav1a1.Definer](definers, rr.definers)
 		}
 	}
+	definers.Visit(func(definer ksmetav1a1.Definer) error {
+		if definer.Kind == "APIBinding" && definer.Name == "espw" {
+			// not neceesary to add, already in every mailbox workspace
+			return nil
+		}
+		nsName := NamespaceName("")
+		objName := ObjectName(definer.Name)
+		pieces := definerKindToPieces[definer.Kind]
+		definerID := NewTriple(pieces.First, nsName, objName)
+		otherDetails, found := parts[definerID]
+		if found {
+			return nil
+		}
+		pieces.Second.ReturnSingletonState = pieces.Second.ReturnSingletonState || otherDetails.ReturnSingletonState
+		parts[definerID] = pieces.Second
+		wr.logger.V(4).Info("Implicitly adding definer", "definerID", definerID, "details", pieces.Second)
+		return nil
+	})
 	return ResolvedWhat{parts, upsyncs}
+}
+
+var definerKindToPieces = map[string]Pair[metav1.GroupResource, WorkloadPartDetails]{
+	"CustomResourceDefinition": NewPair(metav1.GroupResource{Group: apiext.GroupName, Resource: "customresourcedefinitions"}, WorkloadPartDetails{APIVersion: apiext.SchemeGroupVersion.Version}),
+	"APIBinding":               NewPair(metav1.GroupResource{Group: apisv1alpha1.SchemeGroupVersion.Group, Resource: "apibindings"}, WorkloadPartDetails{APIVersion: apisv1alpha1.SchemeGroupVersion.Version}),
 }
 
 func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements Set[ObjectName]) {
@@ -306,12 +334,12 @@ func (wr *whatResolver) processNextWorkItem() bool {
 
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
-	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.cluster, item.nn.Second)
-	} else if item.gk.Group == ksmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
-		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
+	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
+		return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
+		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
-		return wr.processCenterObject(ctx, item.cluster, item.gk, item.nn)
+		return wr.processCenterObject(ctx, item.Cluster, item.GK, item.NN)
 	}
 }
 
@@ -362,10 +390,10 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 			return false
 		}
 	}
-	changedPlacements := NewMapMap[ObjectName, bool](nil)
-	// TODO: make a way to not enumerate two when the bool changes
-	MapEnumerateDifferences[ObjectName, bool](newDetails.placementBits, oldDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
-	MapEnumerateDifferences[ObjectName, bool](oldDetails.placementBits, newDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
+	changedPlacements := NewMapMap[ObjectName, DistributionBits](nil)
+	// TODO: make a way to not enumerate two when the bits change
+	MapEnumerateDifferences[ObjectName, DistributionBits](newDetails.PlacementBits, oldDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
+	MapEnumerateDifferences[ObjectName, DistributionBits](oldDetails.PlacementBits, newDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if changedPlacements.IsEmpty() {
 		return true
@@ -373,12 +401,12 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 	if rObj != nil {
 		rr.byObjName[objName] = newDetails
 	}
-	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, bool](changedPlacements))
+	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, DistributionBits](changedPlacements))
 	return true
 }
 
 func newObjectDetails() *objectDetails {
-	return &objectDetails{placementBits: NewMapMap[ObjectName, bool](nil)}
+	return &objectDetails{PlacementBits: NewMapMap[ObjectName, DistributionBits](nil)}
 }
 
 // process returns true on success or unrecoverable error, false to retry
@@ -411,7 +439,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		delete(wsDetails.resources, arName)
 		changedPlacements := NewEmptyMapSet[ObjectName]()
 		for _, objDetails := range rr.byObjName {
-			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -426,6 +454,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		Group:    ar.Spec.Group,
 		Resource: ar.Spec.Name,
 	}
+	logger = logger.WithValues("gvr", gvr, "arName", arName, "definers", ar.Spec.Definers)
 	if _, found := GRsNotSupported[gr]; found {
 		logger.V(4).Info("Ignoring unsupported resource")
 		return true
@@ -435,6 +464,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		return true
 	}
 	gk := schema.GroupKind{Group: ar.Spec.Group, Kind: ar.Spec.Kind}
+	logger = logger.WithValues("gk", gk)
 	if rr == nil {
 		informerCtx, stopInformer := context.WithCancel(wsDetails.ctx)
 		preInformer := wsDetails.dynamicInformerFactory.ForResource(gvr)
@@ -446,13 +476,24 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			lister:    preInformer.Lister(),
 			stop:      stopInformer,
 			byObjName: map[NamespacedName]*objectDetails{},
+			definers:  NewSliceSet(ar.Spec.Definers...),
 		}
 		go rr.informer.Run(informerCtx.Done())
-		logger.V(3).Info("Started watching resource", "gvr", gvr, "arName", arName, "gk", gk)
+		logger.V(3).Info("Started to watch resource")
 		wsDetails.resources[arName] = rr
 		wsDetails.gkToARName[gk] = arName
 	} else {
-		logger.V(4).Info("Continuing to watch resource")
+		var newDefiners Set[ksmetav1a1.Definer] = NewSliceSet(ar.Spec.Definers...)
+		changed := !SetEqual(rr.definers, newDefiners)
+		logger.V(4).Info("Continuing to watch resource", "changed", changed)
+		if changed {
+			rr.definers = newDefiners
+			changedPlacements := NewEmptyMapSet[ObjectName]()
+			for _, objDetails := range rr.byObjName {
+				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
+			}
+			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
+		}
 	}
 	return true
 }
@@ -481,7 +522,8 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		discoveryScopedClient := wr.discoveryClusterClient.Cluster(cluster.Path())
 		crdInformer := wr.crdClusterPreInformer.Cluster(cluster).Informer()
 		bindingInformer := wr.bindingClusterPreInformer.Cluster(cluster).Informer()
-		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false, crdInformer, bindingInformer)
+		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false,
+			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
 		scopedDynamic := wr.dynamicClusterClient.Cluster(cluster.Path())
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
@@ -513,8 +555,8 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		delete(wsDetails.placements, epName)
 		for _, rr := range wsDetails.resources {
 			for objName, objDetails := range rr.byObjName {
-				objDetails.placementBits.Delete(epName)
-				if objDetails.placementBits.IsEmpty() {
+				objDetails.PlacementBits.Delete(epName)
+				if objDetails.PlacementBits.IsEmpty() {
 					delete(rr.byObjName, objName)
 				}
 			}
@@ -597,20 +639,30 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 
 // returns `(changed bool, success bool)`
 func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
-	wantSingletonReturn, found := od.placementBits.Get(epName)
+	oldDistrBits, found := od.PlacementBits.Get(epName)
+	newDistrBits := DistributionBits{ReturnSingletonState: spec.WantSingletonReportedState,
+		CreateOnly: whatObj != nil && isCreateOnly(whatObj)}
 	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
 		return false, false
 	}
-	if objMatch == found && (wantSingletonReturn == spec.WantSingletonReportedState || !found) {
+	if objMatch == found && (oldDistrBits == newDistrBits || !found) {
 		return false, true
 	}
 	if objMatch {
-		od.placementBits.Put(epName, spec.WantSingletonReportedState)
+		od.PlacementBits.Put(epName, newDistrBits)
 	} else {
-		od.placementBits.Delete(epName)
+		od.PlacementBits.Delete(epName)
 	}
 	return true, true
+}
+
+func isCreateOnly(whatObj mrObject) bool {
+	annotations := whatObj.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+	return annotations[edgeapi.DownsyncOverwriteKey] == "false"
 }
 
 // whatMatches tests the given object against the "what predicate" of an EdgePlacementSpec.
@@ -624,62 +676,91 @@ func whatMatches(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePl
 	objNS := whatObj.GetNamespace()
 	objName := whatObj.GetName()
 	objLabels := whatObj.GetLabels()
-	for _, objTest := range spec.Downsync {
+	match, ok := downsyncMatches(logger, wsd, spec.Downsync, whatResource, gvk, objNS, objName, objLabels)
+	if !(match && ok) {
+		return match, ok
+	}
+	return !upsyncMatches(logger, wsd, spec.Upsync, whatResource, gvk, objNS, objName, objLabels), true
+}
+
+func upsyncMatches(logger klog.Logger, wsd *workspaceDetails, upsync []edgeapi.UpsyncSet, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) bool {
+	for _, objTest := range upsync {
 		if objTest.APIGroup != gvk.Group {
 			continue
 		}
-		if !(len(objTest.Resources) == 1 && objTest.Resources[0] == "*" || SliceContains(objTest.Resources, whatResource)) {
+		if !(SliceContains(objTest.Resources, "*") || SliceContains(objTest.Resources, whatResource)) {
 			continue
 		}
-		if objNS == "" {
-			if len(objTest.NamespaceSelectors) > 0 || len(objTest.Namespaces) > 0 {
-				continue
-			}
-		} else {
-			nsMatch, ok, retry := wsd.namespaceMatch(logger, objTest, objNS)
-			if !ok {
-				return retry, retry
-			}
-			if !nsMatch {
-				continue
-			}
+		if objNS != "" && !(SliceContains(objTest.Namespaces, "*") || SliceContains(objTest.Resources, objNS)) {
+			continue
 		}
-		if len(objTest.ObjectNames) == 1 && objTest.ObjectNames[0] == "*" || SliceContains(objTest.ObjectNames, objName) {
-			return true, true
+		if !(SliceContains(objTest.Names, "*") || SliceContains(objTest.Resources, objName)) {
+			continue
 		}
-		return labelsMatchAny(logger, objLabels, objTest.LabelSelectors), true
+		return true
+	}
+	return false
+}
+
+func downsyncMatches(logger klog.Logger, wsd *workspaceDetails, downsync []edgeapi.DownsyncObjectTest, whatResource string, gvk schema.GroupVersionKind, objNS, objName string, objLabels map[string]string) (bool, bool) {
+	for _, objTest := range downsync {
+		if objTest.APIGroup != nil && (*objTest.APIGroup) != gvk.Group {
+			continue
+		}
+		if len(objTest.Resources) > 0 && !(SliceContains(objTest.Resources, "*") || SliceContains(objTest.Resources, whatResource)) {
+			continue
+		}
+		if len(objTest.Namespaces) > 0 && !(SliceContains(objTest.Namespaces, "*") || SliceContains(objTest.Namespaces, objNS)) {
+			continue
+		}
+		nsMatch, ok, retry := wsd.namespaceLabelsMatch(logger, objTest, objNS)
+		if !ok {
+			return retry, retry
+		}
+		if !nsMatch {
+			continue
+		}
+		if len(objTest.ObjectNames) > 0 && !(SliceContains(objTest.ObjectNames, "*") || SliceContains(objTest.ObjectNames, objName)) {
+			continue
+		}
+		if len(objTest.LabelSelectors) > 0 && !labelsMatchAny(logger, objLabels, objTest.LabelSelectors) {
+			continue
+		}
+		return true, true
 	}
 	return false, true
 }
 
 // Returns match, ok, retry.
-func (wsd *workspaceDetails) namespaceMatch(logger klog.Logger, objTest edgeapi.DownsyncObjectTest, objNS string) (bool, bool, bool) {
-	if len(objTest.Namespaces) == 1 && objTest.Namespaces[0] == "*" || SliceContains(objTest.Namespaces, objNS) {
+func (wsd *workspaceDetails) namespaceLabelsMatch(logger klog.Logger, objTest edgeapi.DownsyncObjectTest, objNS string) (bool, bool, bool) {
+	if len(objTest.NamespaceSelectors) == 0 {
 		return true, true, false
 	}
-	if len(objTest.NamespaceSelectors) == 0 {
-		return false, true, false
-	}
-	nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
-	nsRR := wsd.resources[nsARName]
-	var objNSR k8sruntime.Object
-	if nsRR != nil {
+	var nsLabels map[string]string
+	if objNS == "" {
+		nsLabels = map[string]string{}
+	} else {
+		nsARName := wsd.gkToARName[schema.GroupKind{Kind: "Namespace"}]
+		nsRR := wsd.resources[nsARName]
+		var objNSR k8sruntime.Object
+		if nsRR == nil {
+			logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
+			return false, false, false
+		}
 		var err error
 		objNSR, err = nsRR.lister.Get(objNS)
 		if err != nil && !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Impossible: failed to fetch namespace from Lister", "objNS", objNS)
-			return false, true, true
+			return false, true, false
 		}
 		if objNSR == nil || err != nil && k8sapierrors.IsNotFound(err) {
 			logger.V(2).Info("Going around again because namespace is not known yet", "objNSR", objNSR)
-			return false, false, false
+			return false, false, true
 		}
 		objNSM := objNSR.(metav1.Object)
-		nsLabels := objNSM.GetLabels()
-		return labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors), true, false
+		nsLabels = objNSM.GetLabels()
 	}
-	logger.V(2).Info("Going around again because namespaces are not known yet", "objNSR", objNSR, "nsARName", nsARName)
-	return false, false, false
+	return labelsMatchAny(logger, nsLabels, objTest.NamespaceSelectors), true, false
 }
 
 func labelsMatchAny(logger klog.Logger, labelSet map[string]string, selectors []metav1.LabelSelector) bool {

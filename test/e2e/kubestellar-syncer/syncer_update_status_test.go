@@ -28,6 +28,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/kcp-dev/kcp/test/e2e/framework"
@@ -132,4 +133,127 @@ func TestKubeStellarSyncerForUpdateStatus(t *testing.T) {
 	updatedStatus = updateStatus(status2Obj)
 	t.Log("Wait for resource status to be upsynced.")
 	checkStatusUpsync(updatedStatus)
+}
+
+func TestKubeStellarSyncerForUpdateNonSubresourceStatus(t *testing.T) {
+	var syncerConfigUnst *unstructured.Unstructured
+	err := edgeframework.LoadFile("testdata/update-status/non-subresource/syncer-config.yaml", embedded, &syncerConfigUnst)
+	require.NoError(t, err)
+
+	var statusObj map[string]interface{}
+	err = edgeframework.LoadFile("testdata/update-status/non-subresource/status.yaml", embedded, &statusObj)
+	require.NoError(t, err)
+
+	var sampleCRDUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-crd.yaml", embedded, &sampleCRDUnst)
+	require.NoError(t, err)
+
+	var sampleSubresourceCRDUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd.yaml", embedded, &sampleSubresourceCRDUnst)
+	require.NoError(t, err)
+
+	var sampleCRUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-crd-cr.yaml", embedded, &sampleCRUnst)
+	require.NoError(t, err)
+
+	var sampleSubresourceCRUnst *unstructured.Unstructured
+	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd-cr.yaml", embedded, &sampleSubresourceCRUnst)
+	require.NoError(t, err)
+
+	var sampleCRGVR = schema.GroupVersionResource{
+		Group:    "my.domain",
+		Version:  "v1alpha1",
+		Resource: "samples",
+	}
+
+	var sampleSubresourceCRGVR = schema.GroupVersionResource{
+		Group:    "my.domain",
+		Version:  "v1alpha1",
+		Resource: "samplesubresources",
+	}
+
+	syncerFixture := setup(t)
+	wsPath := syncerFixture.WorkspacePath
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	t.Cleanup(cancelFunc)
+
+	upstreamDynamicClueterClient := syncerFixture.UpstreamDynamicKubeClient
+
+	t.Logf("Create a SyncerConfig for test in workspace %q.", wsPath.String())
+	_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(syncerConfigGvr).Create(ctx, syncerConfigUnst, v1.CreateOptions{})
+	require.NoError(t, err)
+
+	createCRD := func(crdUnst *unstructured.Unstructured, crGvr schema.GroupVersionResource) {
+		t.Logf("Create %q in workspace %q.", crdUnst.GetName(), wsPath.String())
+		_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(crdGVR).Create(ctx, crdUnst, v1.CreateOptions{})
+		require.NoError(t, err)
+		t.Logf("Wait for API %q to be available.", crdUnst.GetName())
+		framework.Eventually(t, func() (bool, string) {
+			_, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(crGvr).List(ctx, v1.ListOptions{})
+			if err != nil {
+				return false, fmt.Sprintf("Failed to list sample CR: %v", err)
+			}
+			return true, ""
+		}, wait.ForeverTestTimeout, time.Second*1, "API %q hasn't been available yet.", crdUnst.GetName())
+	}
+
+	createCRD(sampleCRDUnst, sampleCRGVR)
+	createCRD(sampleSubresourceCRDUnst, sampleSubresourceCRGVR)
+
+	dynamicClient := syncerFixture.DownstreamDynamicKubeClient
+
+	deployCR := func(crUnst *unstructured.Unstructured, crGvr schema.GroupVersionResource) {
+		t.Logf("Create %q in workspace %q.", crUnst.GetName(), wsPath.String())
+		_, err = upstreamDynamicClueterClient.Cluster(wsPath).Resource(crGvr).Namespace(crUnst.GetNamespace()).Create(ctx, crUnst, v1.CreateOptions{})
+		require.NoError(t, err)
+
+		t.Log("Wait for resources to be downsynced.")
+		framework.Eventually(t, func() (bool, string) {
+			_, err = dynamicClient.Resource(crGvr).Get(ctx, crUnst.GetName(), v1.GetOptions{})
+			if err != nil {
+				return false, fmt.Sprintf("Failed to get %s: %v", crUnst.GetName(), err)
+			}
+			return true, ""
+		}, wait.ForeverTestTimeout, time.Second*5, "All downsynced resources haven't been propagated to downstream yet.")
+	}
+
+	deployCR(sampleCRUnst, sampleCRGVR)
+	deployCR(sampleSubresourceCRUnst, sampleSubresourceCRGVR)
+
+	updateCR := func(crUnst *unstructured.Unstructured, crGvr schema.GroupVersionResource, isSubresource bool) {
+		fetched, _ := dynamicClient.Resource(crGvr).Get(ctx, crUnst.GetName(), v1.GetOptions{})
+		err = unstructured.SetNestedMap(fetched.Object, statusObj, "status")
+		require.NoError(t, err)
+		var updated *unstructured.Unstructured
+		if isSubresource {
+			updated, err = dynamicClient.Resource(crGvr).UpdateStatus(ctx, fetched, v1.UpdateOptions{})
+		} else {
+			updated, err = dynamicClient.Resource(crGvr).Update(ctx, fetched, v1.UpdateOptions{})
+		}
+		require.NoError(t, err)
+		updatedStatus, ok, err := unstructured.NestedMap(updated.Object, "status")
+		require.NoError(t, err)
+		require.True(t, ok)
+		require.NotEmpty(t, updatedStatus)
+	}
+
+	updateCR(sampleCRUnst, sampleCRGVR, false)
+	updateCR(sampleSubresourceCRUnst, sampleSubresourceCRGVR, true)
+
+	checkStatusUpsync := func(crUnst *unstructured.Unstructured, crGvr schema.GroupVersionResource) {
+		framework.Eventually(t, func() (bool, string) {
+			fetched, err := upstreamDynamicClueterClient.Cluster(wsPath).Resource(crGvr).Get(ctx, crUnst.GetName(), v1.GetOptions{})
+			if err != nil {
+				return false, fmt.Sprintf("Failed to get %s: %v", crUnst.GetName(), err)
+			}
+			fetchedStatus, ok, err := unstructured.NestedMap(fetched.Object, "status")
+			if err != nil || !ok {
+				return false, fmt.Sprintf("Failed to get status %s: %v", crUnst.GetName(), err)
+			}
+			return assert.ObjectsAreEqual(statusObj, fetchedStatus), ""
+		}, wait.ForeverTestTimeout, time.Second*1, "Statuses haven't been propagated to upstream.")
+	}
+
+	checkStatusUpsync(sampleCRUnst, sampleCRGVR)
+	checkStatusUpsync(sampleSubresourceCRUnst, sampleSubresourceCRGVR)
 }

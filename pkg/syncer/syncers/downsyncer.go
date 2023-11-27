@@ -19,7 +19,6 @@ package syncers
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -295,13 +294,13 @@ func (ds *DownSyncer) computeUpdatedResource(upstreamResource *unstructured.Unst
 	if !isDownsyncOverwrite(upstreamResource) {
 		ds.logger.V(2).Info(fmt.Sprintf("  downsync-overwrite of %q is marked as false", upstreamResource.GetName()))
 		annotations := downstreamResource.GetAnnotations()
-		value, ok := annotations[downsyncOverwriteKey]
+		value, ok := annotations[edgev2alpha1.DownsyncOverwriteKey]
 		if ok && value == "false" {
 			ds.logger.V(2).Info(fmt.Sprintf("  ignore updating %q in downstream", upstreamResource.GetName()))
 			return downstreamResource, true
 		} else {
 			ds.logger.V(2).Info(fmt.Sprintf("  update only annnotation %q in downstream since downsync-overwrite in downstream is still marked as true", upstreamResource.GetName()))
-			annotations[downsyncOverwriteKey] = "false"
+			annotations[edgev2alpha1.DownsyncOverwriteKey] = "false"
 			_updatedResource := *downstreamResource
 			_updatedResource.SetAnnotations(annotations)
 			return &_updatedResource, false
@@ -394,15 +393,10 @@ func (ds *DownSyncer) BackStatusMany(resource edgev2alpha1.EdgeSyncConfigResourc
 }
 
 func updateStatusByResource(upstreamClient *Client, resourceForUp edgev2alpha1.EdgeSyncConfigResource, upstreamResource *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	// TODO: make a more informed choice
-	if isKubeResource(resourceForUp) {
+	if upstreamClient.HasStatusInSubresources() {
 		return upstreamClient.UpdateStatus(resourceForUp, upstreamResource)
 	}
 	return upstreamClient.Update(resourceForUp, upstreamResource)
-}
-
-func isKubeResource(rsc edgev2alpha1.EdgeSyncConfigResource) bool {
-	return strings.HasSuffix(rsc.Group, ".k8s.io") || !strings.Contains(rsc.Group, ".")
 }
 
 func findWithObject(target unstructured.Unstructured, resourceList *unstructured.UnstructuredList) (*unstructured.Unstructured, bool) {
@@ -439,11 +433,7 @@ func makeOwnedValue(object *unstructured.Unstructured) string {
 	return gvk.Kind + "/" + object.GetNamespace() + "/" + object.GetName()
 }
 
-// Control parameter in annotation whether Syncer downsyns once or constantly.
-// Default (not given or brank) is to keep downsync as we do today.
-const downsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
-
 func isDownsyncOverwrite(resource *unstructured.Unstructured) bool {
-	value := getAnnotation(resource, downsyncOverwriteKey)
-	return value == "" || value == "true"
+	value := getAnnotation(resource, edgev2alpha1.DownsyncOverwriteKey)
+	return value != "false"
 }

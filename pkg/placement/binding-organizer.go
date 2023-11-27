@@ -62,7 +62,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		namespacedObjectDistributions := NewMappingReceiverFuncs(
 			func(key NamespacedDistributionTuple, val WorkloadPartDetails) {
 				logger.V(4).Info("NamespacedDistributionTuple added", "key", key, "returnSingleton", val.ReturnSingletonState)
-				sbo.workloadProjectionSections.NamespacedObjectDistributions.Put(key, val.ReturnSingletonState)
+				sbo.workloadProjectionSections.NamespacedObjectDistributions.Put(key, val.distributionBits())
 			},
 			func(key NamespacedDistributionTuple) {
 				logger.V(4).Info("NamespacedDistributionTuple removed", "key", key)
@@ -100,7 +100,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 
 		clusterObjectDistributionsReceiver := NewMappingReceiverFuncs(
 			func(key NonNamespacedDistributionTuple, val WorkloadPartDetails) {
-				sbo.workloadProjectionSections.NonNamespacedObjectDistributions.Put(key, val.ReturnSingletonState)
+				sbo.workloadProjectionSections.NonNamespacedObjectDistributions.Put(key, val.distributionBits())
 			},
 			func(key NonNamespacedDistributionTuple) {
 				sbo.workloadProjectionSections.NonNamespacedObjectDistributions.Delete(key)
@@ -141,7 +141,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			},
 		}
 		// clusterWhatWhereFull is a map from ClusterWhatWhereFullKey to API version (no group),
-		// factored into a map from NonNamespacedDistributionTuple to epName to API version.
+		// factored into a map from NonNamespacedDistributionTuple to epName to WorkloadPartDetails.
 		sbo.clusterWhatWhereFull = NewFactoredMapMap[ClusterWhatWhereFullKey, NonNamespacedDistributionTuple, ObjectName /* ep name */, WorkloadPartDetails](
 			factorClusterWhatWhereFullKey,
 			nil,
@@ -175,6 +175,7 @@ func detailsSansEP(versions Map[ObjectName /*epName*/, WorkloadPartDetails]) (Wo
 	versions.Visit(func(pair Pair[ObjectName /*epName*/, WorkloadPartDetails]) error {
 		ans.APIVersion = pair.Second.APIVersion // should be the same for every pair in versions
 		ans.ReturnSingletonState = ans.ReturnSingletonState || pair.Second.ReturnSingletonState
+		ans.CreateOnly = ans.CreateOnly || pair.Second.CreateOnly
 		return nil
 	})
 	return ans, true
@@ -205,15 +206,14 @@ var factorUpsyncTuple = NewFactorer(
 //
 // For the namespaced resources, as a SingleBinder this organizer
 // is given the stream of changes to the following map:
-// - WhatWheres: map of ((epCluster,epName),(GroupResource,NSName,ObjName),destination) -> (APIVersion, returnSingleton)
+// - WhatWheres: map of ((epCluster,epName),(GroupResource,NSName,ObjName),destination) -> (APIVersion, DistrBits)
 // and produces the change streams to the following two maps:
-// - map of NamespacedObjectDistributions ((GroupResource,destination), (epCluster,NSName,ObjName)) -> returnSingleton
+// - map of NamespacedObjectDistributions ((GroupResource,destination), (epCluster,NSName,ObjName)) -> DistrBits
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational algebra expression, the desired computation is as follows.
-// common = WhatWheres.GroupBy(all but epName).Aggregate(OR[returnSingleton])
-// (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> (APIVersion, returnSingleton))
-// // NamespacedDistributionTuples = common.Keys()
+// common = WhatWheres.GroupBy(all but epName).Aggregate(OR[DistrBits])
+// (that's a map (epCluster,(GroupResource,NSName,ObjName),destination) -> (APIVersion, DistrBits))
 // NamespacedObjectDistributions = common.ProjectOut(APIVersion)
 // ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
@@ -224,25 +224,22 @@ var factorUpsyncTuple = NewFactorer(
 //
 // For the cluster-scoped resources, as a SingleBinder this organizer
 // is given the stream of changes to the following map:
-// - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> (APIVersion, returnSingleton)
+// - WhatWheres: map of ((epCluster,epName),GroupResource,ObjName,destination) -> (APIVersion, DistrBits)
 // and produces the change streams to the following two maps:
-// // - set of NonNamespacedDistributionTuple (epCluster,GroupResource,ObjName,destination)
-// - map of NonNamespacedObjectDistribution (epCluster,GroupResource,ObjName,destination) -> returnSingleton
+// - map of NonNamespacedObjectDistribution (epCluster,GroupResource,ObjName,destination) -> DistrBits
 // - map of ProjectionModeKey (GroupResource,destination) -> ProjectionModeVal (APIVersion).
 //
 // As a relational algebra expression, the desired computation is as follows.
-// common = WhatWheres.GroupBy(all but epName).Aggregate(OR[returnSingleton])
-// (that's a map (epCluster,GroupResource,ObjName,destination) -> (APIVersion, returnSingleton))
+// common = WhatWheres.GroupBy(all but epName).Aggregate(OR[DistrBits])
+// (that's a map (epCluster,GroupResource,ObjName,destination) -> (APIVersion, DistrBits))
 // // NonNamespacedDistributionTuples = common.Keys()
 // NonNamespacedObjectDistributions = common.ProjectOut(APIVersion)
 // ProjectionModes = common.GroupBy(GroupResource,destination).Aggregate(PickVersion)
 //
 // The query plan is as follows.
 // clusterModesReceiver <- ctSansEPName.GroupBy(GroupResource,destination).Aggregate(PickVersion)
-// // clusterDistributionsReceiver <- ctSansEPName.keys()
 // clusterObjectDistributions <- ctSansEPName.ProjectOut(APIVersion)
-// // ctSansEPName <- WhatWheres.ProjectOut(epName)
-// ctSansEPName <- WhatWheres.GroupBy(all but epName).Aggregate(OR[returnSingleton])
+// ctSansEPName <- WhatWheres.GroupBy(all but epName).Aggregate(OR[DistrBits])
 //
 // For the upsyncs, as a SingleBinder this organizer is given the stream of changes
 // to the following relation:

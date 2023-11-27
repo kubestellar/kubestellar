@@ -1,9 +1,9 @@
 <!--quickstart-2-apache-example-deployment-d-create-and-deploy-apache-into-clusters-start-->
 KubeStellar will have automatically created a Workload Management
-Workspace (WMW) for the user to store workload descriptions and MCCM
+Workspace (WMW) for the user to store workload descriptions and KubeStellar Core
 control objects in. The automatically created WMW is at `root:wmw1`.
 
-Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters.
+Create the `EdgePlacement` object for your workload. Its “where predicate” (the locationSelectors array) has one label selector that matches the Location objects (`florin` and `guilder`) created earlier, thus directing the workload to both edge clusters. The `upsync` field is only a demonstration of the syntax, it plays no functional role in this scenario.
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
   
@@ -21,17 +21,15 @@ spec:
   downsync:
   - apiGroup: ""
     resources: [ configmaps ]
-    namespaceSelectors:
-    - matchLabels: {"common":"si"}
+    namespaces: [ commonstuff ]
     objectNames: [ "*" ]
   - apiGroup: apps
     resources: [ deployments ]
     namespaceSelectors:
-    - matchLabels: {"common":"si"}
+    - matchLabels: {common: "yes"}
     objectNames: [ commond ]
   - apiGroup: apis.kcp.io
     resources: [ apibindings ]
-    namespaceSelectors: []
     objectNames: [ "bind-kubernetes", "bind-apps" ]
   upsync:
   - apiGroup: "group1.test"
@@ -53,7 +51,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: commonstuff
-  labels: {common: "si"}
+  labels: {common: "yes"}
 ---
 apiVersion: v1
 kind: ConfigMap

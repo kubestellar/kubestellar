@@ -8,9 +8,9 @@ spec:
   - v231005-c6f7728ef.customizers.edge.kubestellar.io
   - v231005-c6f7728ef.edgesyncconfigs.edge.kubestellar.io
   - v231005-c6f7728ef.locations.edge.kubestellar.io
-  - v231005-c6f7728ef.singleplacementslices.edge.kubestellar.io
   - v231005-c6f7728ef.syncerconfigs.edge.kubestellar.io
-  - v231012-40bc43c42.edgeplacements.edge.kubestellar.io
   - v231020-4e62eaf7.synctargets.edge.kubestellar.io
+  - v231026-b37310b41.edgeplacements.edge.kubestellar.io
+  - v231113-f0837626.singleplacementslices.edge.kubestellar.io
   - v231126-2e8abf39c.edgeplacementdecisions.edge.kubestellar.io
 status: {}

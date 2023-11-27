@@ -63,19 +63,25 @@ spec:
                 items:
                   description: 'DownsyncObjectTest is a set of criteria that characterize
                     matching objects. An object matches if: - the `apiGroup` criterion
-                    is satisfied; - the `resources` criterion is satisfied; - EITHER
-                    the `namespaces` criterion or the `namespaceSelectors` criterion
-                    is satisfied; and - EITHER the `objectNames` criterion or the
-                    `labelSelectors` criterion matches.'
+                    is satisfied; - the `resources` criterion is satisfied; - the
+                    `namespaces` criterion is satisfied; - the `namespaceSelectors`
+                    criterion is satisfied; - the `objectNames` criterion is satisfied;
+                    and - the `labelSelectors` criterion is satisfied. At least one
+                    of the fields must make some discrimination; it is not valid for
+                    every field to match all objects. Validation might not be fully
+                    checked by apiservers until the Kubernetes dependency is release
+                    1.25; in the meantime validation error messages will appear in
+                    annotations whose key is `validation-error.kubestellar.io/{number}`.'
                   properties:
                     apiGroup:
                       description: '`apiGroup` is the API group of the referenced
-                        object, empty string for the core API group.'
+                        object, empty string for the core API group. `nil` matches
+                        every API group.'
                       type: string
                     labelSelectors:
-                      description: '`labelSelectors` allows matching objects by a
-                        rule rather than listing individuals. An object maches if
-                        and only if its labels match at least one member of this list.'
+                      description: '`labelSelectors` is a list of label selectors.
+                        At least one of them must match the labels of the object being
+                        tested. Empty list is a special case, it matches every object.'
                       items:
                         description: A label selector is a label query over a set
                           of resources. The result of matchLabels and matchExpressions
@@ -127,13 +133,13 @@ spec:
                         x-kubernetes-map-type: atomic
                       type: array
                     namespaceSelectors:
-                      description: '`namespaceSelectors` is another way to identify
-                        matching namespaces, alternative to the simple list in `namespaces`.
-                        This field tests the labels on the Namespace object (the one
-                        whose name equals the workload object''s namespace). A non-namespaced
-                        object matches if and only if this list and `namespaces` are
-                        empty. A namespaced object matches if and only if the namespace''s
-                        labels match at least one member of this list.'
+                      description: '`namespaceSelectors` a list of label selectors.
+                        For a namespaced object, at least one of these label selectors
+                        has to match the labels of the Namespace object that defines
+                        the namespace of the object that this DownsyncObjectTest is
+                        testing. For a cluster-scoped object, at least one of these
+                        label selectors must be `{}`. Empty list is a special case,
+                        it matches every object.'
                       items:
                         description: A label selector is a label query over a set
                           of resources. The result of matchLabels and matchExpressions
@@ -185,22 +191,20 @@ spec:
                         x-kubernetes-map-type: atomic
                       type: array
                     namespaces:
-                      description: '`namespaces` is a simple way to test the namespace
-                        of the potentially matching object. If this list contains
-                        `"*"` then it should contain nothing else. The object satisfies
-                        this criterion if any of the following is true. 1. The object
-                        is cluster-scoped and this list and `namespaceSelectors` are
-                        empty. 2. The object is namespaced and its namespace is in
-                        this list. 3. The object is namespaced and `"*"` (the 1-character
-                        string containing an asterisk) appears in this list.'
+                      description: '`namespaces` is a list of acceptable names for
+                        the object''s namespace. An entry of `"*"` means that any
+                        namespace is acceptable; this is the only way to match a cluster-scoped
+                        object. If this list contains `"*"` then it should contain
+                        nothing else. Empty list is a special case, it matches every
+                        object.'
                       items:
                         type: string
                       type: array
                     objectNames:
                       description: '`objectNames` is a list of object names that match.
                         An entry of `"*"` means that all match. If this list contains
-                        `"*"` then it should contain nothing else. Empty list means
-                        nothing matches.'
+                        `"*"` then it should contain nothing else. Empty list is a
+                        special case, it matches every object.'
                       items:
                         type: string
                       type: array
@@ -208,12 +212,13 @@ spec:
                       description: '`resources` is a list of lowercase plural names
                         for the sorts of objects to match. An entry of `"*"` means
                         that all match. If this list contains `"*"` then it should
-                        contain nothing else. Empty list means nothing matches.'
+                        contain nothing else. Empty list is a special case, it matches
+                        every object.'
                       items:
                         type: string
                       type: array
                   required:
-                  - resources
+                  - apiGroup
                   type: object
                 type: array
               locationSelectors:

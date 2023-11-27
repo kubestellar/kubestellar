@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/klog/v2"
 	kind "sigs.k8s.io/kind/pkg/cluster"
 
@@ -37,12 +36,12 @@ type KindClusterProvider struct {
 }
 
 // New creates a new KindClusterProvider
-func New(pConfig string) KindClusterProvider {
+func New(pConfig string) (KindClusterProvider, error) {
 	kindProvider := kind.NewProvider()
 	return KindClusterProvider{
 		kindProvider: kindProvider,
 		pConfig:      pConfig,
-	}
+	}, nil
 }
 
 func (k KindClusterProvider) Create(name string, opts clusterprovider.Options) error {
@@ -167,7 +166,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 							continue
 						}
 						k.ch <- clusterprovider.WatchEvent{
-							Type:      watch.Added,
+							Type:      clusterprovider.Added,
 							Name:      name,
 							SpaceInfo: spaceInfo,
 						}
@@ -176,7 +175,7 @@ func (k *KindWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					for _, cl := range setClusters.Difference(newSetClusters).UnsortedList() {
 						logger.V(2).Info("Processing Kind cluster delete", "name", cl)
 						k.ch <- clusterprovider.WatchEvent{
-							Type: watch.Deleted,
+							Type: clusterprovider.Deleted,
 							Name: cl,
 						}
 					}

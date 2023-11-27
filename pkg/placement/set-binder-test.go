@@ -50,7 +50,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	gr2 := metav1.GroupResource{
 		Group:    "",
 		Resource: "namespaces"}
-	workloadPartDetails2 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: false}
+	workloadPartDetails2 := WorkloadPartDetails{APIVersion: "v1", CreateOnly: true}
 	workloadPartID2 := WorkloadPartID{
 		First:  gr2,
 		Second: metav1.NamespaceNone,
@@ -72,9 +72,9 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 		Destinations: []SinglePlacement{spA},
 	}
 	where1 := ResolvedWhere{spsA}
-	NamespacedObjectDistributions := NewMapMap[NamespacedDistributionTuple, bool](nil)
+	NamespacedObjectDistributions := NewMapMap[NamespacedDistributionTuple, DistributionBits](nil)
 	NamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
-	NonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, bool](nil)
+	NonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, DistributionBits](nil)
 	NonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 	Upsyncs := NewHashSet(PairHashDomain[SinglePlacement, edgeapi.UpsyncSet](HashSinglePlacement{}, HashUpsyncSet{}))
 	projectionTracker := WorkloadProjectionSections{
@@ -98,9 +98,9 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	pmv2 := ProjectionModeVal{workloadPartDetails2.APIVersion}
 	objRef1 := ExternalName{Cluster: sc1, Name: workloadPartID1.Third}
 	objRef2 := ExternalName{Cluster: sc1, Name: workloadPartID2.Third}
-	expectedNonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, bool](nil)
-	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk1, objRef1), true)
-	if !MapEqual[NonNamespacedDistributionTuple, bool](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
+	expectedNonNamespacedObjectDistributions := NewMapMap[NonNamespacedDistributionTuple, DistributionBits](nil)
+	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk1, objRef1), DistributionBits{ReturnSingletonState: true})
+	if !MapEqual[NonNamespacedDistributionTuple, DistributionBits](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
 		t.Fatalf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions)
 	}
 	expectedNonNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
@@ -127,7 +127,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](expectedUpsyncs),
 			VisitableToSlice[Pair[SinglePlacement, edgeapi.UpsyncSet]](Upsyncs))
 	}
-	expectedNamespacedDistributions := NewMapMap[NamespacedDistributionTuple, bool](nil)
+	expectedNamespacedDistributions := NewMapMap[NamespacedDistributionTuple, DistributionBits](nil)
 	expectedNamespacedModes := NewMapMap[ProjectionModeKey, ProjectionModeVal](nil)
 
 	rd2 := ResourceDetails{Namespaced: true, SupportsInformers: true, PreferredVersion: workloadPartDetails2.APIVersion}
@@ -144,19 +144,15 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	}
 	expectedNonNamespacedObjectDistributions.Delete(NewPair(pmk1, objRef1))
 	expectedNonNamespacedModes.Delete(pmk1)
-	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk2, objRef2), false)
+	expectedNonNamespacedObjectDistributions.Put(NewPair(pmk2, objRef2), DistributionBits{CreateOnly: true})
 	expectedNonNamespacedModes.Put(pmk2, pmv2)
 
 	expectedUpsyncs.Add(NewPair(spA, ups2[1]))
 	expectedUpsyncs.Remove(NewPair(spA, ups1[1]))
-	//ndt2 := NamespacedDistributionTuple{sc1, NamespaceName(workloadPartID2.Name), spA}
-	//ndt2 := NamespacedDistributionTuple{pmk2, NewTriple(sc1, workloadPartID2.Second, workloadPartID2.Third)}
-	//expectedNamespacedDistributions.Add(ndt2)
-	//expectedNamespacedModes.Put(pmk2, pmv2)
-	if !MapEqual[NonNamespacedDistributionTuple, bool](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
+	if !MapEqual[NonNamespacedDistributionTuple, DistributionBits](expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions) {
 		t.Errorf("Wrong NonNamespacedDistributions; expected=%v, got=%v", expectedNonNamespacedObjectDistributions, NonNamespacedObjectDistributions)
 	}
-	if !MapEqual[NamespacedDistributionTuple, bool](expectedNamespacedDistributions, NamespacedObjectDistributions) {
+	if !MapEqual[NamespacedDistributionTuple, DistributionBits](expectedNamespacedDistributions, NamespacedObjectDistributions) {
 		t.Errorf("Wrong NamespacedDistributions; expected=%v, got=%v", expectedNamespacedDistributions, NamespacedObjectDistributions)
 	}
 	MapEnumerateDifferences[ProjectionModeKey, ProjectionModeVal](expectedNamespacedModes, NamespacedModes,

@@ -23,6 +23,8 @@ import (
 
 	k8scorev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	fakeapiext "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned/fake"
+	apiextinfact "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	machruntime "k8s.io/apimachinery/pkg/runtime"
@@ -35,6 +37,8 @@ import (
 	fakeclusterdynamic "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/dynamic/fake"
 	kcptesting "github.com/kcp-dev/client-go/third_party/k8s.io/client-go/testing"
 	kcpapisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
+	fakeclusterkcp "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster/fake"
+	bindingfactory "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
@@ -43,6 +47,7 @@ import (
 )
 
 func TestWhatResolver(t *testing.T) {
+	var emptyString string = ""
 	orDie := func(err error) {
 		if err != nil {
 			t.Fatalf("Eek! %v", err)
@@ -77,13 +82,22 @@ func TestWhatResolver(t *testing.T) {
 			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String()},
 			Labels:      map[string]string{"foo": "bar"},
 		}}
-	cm3 := &k8scorev1.ConfigMap{
+	cm2 := &k8scorev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{Kind: "ConfigMap", APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   "default",
-			Name:        "cm3",
+			Name:        "cm2",
 			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String()},
-			Labels:      map[string]string{"foo": "baz"},
+			Labels:      map[string]string{"foo": "bar"},
+		}}
+	cm3 := &k8scorev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{Kind: "ConfigMap", APIVersion: "v1"},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+			Name:      "cm3",
+			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String(),
+				edgeapi.DownsyncOverwriteKey: "false"},
+			Labels: map[string]string{"foo": "baz"},
 		}}
 	ep1 := &edgeapi.EdgePlacement{
 		TypeMeta: metav1.TypeMeta{Kind: "EdgePlacement", APIVersion: edgeapi.SchemeGroupVersion.String()},
@@ -93,12 +107,14 @@ func TestWhatResolver(t *testing.T) {
 		},
 		Spec: edgeapi.EdgePlacementSpec{
 			Downsync: []edgeapi.DownsyncObjectTest{
-				{Resources: []string{"configmaps"},
+				{APIGroup: &emptyString,
+					Resources:          []string{"configmaps"},
 					NamespaceSelectors: []metav1.LabelSelector{{MatchLabels: map[string]string{"kubernetes.io/metadata.name": "default"}}},
-					ObjectNames:        []string{"cm1"},
-					LabelSelectors:     []metav1.LabelSelector{{MatchLabels: map[string]string{"foo": "baz"}}},
+					ObjectNames:        []string{"cm1", "cmx", "cm3"},
+					LabelSelectors:     []metav1.LabelSelector{{MatchLabels: map[string]string{"foo": "baz"}}, {MatchLabels: map[string]string{"foo": "bar"}}},
 				},
-				{Resources: []string{"namespaces"},
+				{APIGroup: &emptyString,
+					Resources:   []string{"namespaces"},
 					ObjectNames: []string{"ns2"},
 				},
 			},
@@ -122,10 +138,17 @@ func TestWhatResolver(t *testing.T) {
 	orDie(apiextensionsv1.AddToScheme(scheme))
 	orDie(kcpapisv1alpha1.AddToScheme(scheme))
 	orDie(k8scorev1.AddToScheme(scheme))
-	fakeDynamicClusterClientset := fakeclusterdynamic.NewSimpleDynamicClient(scheme, ns1, cm1, ns2, cm3)
+	fakeKCPClient := fakeclusterkcp.NewSimpleClientset()
+	bindingFactory := bindingfactory.NewSharedInformerFactory(fakeKCPClient, 0)
+	bindingClusterPreInformer := bindingFactory.Apis().V1alpha1().APIBindings()
+	fakeDynamicClusterClientset := fakeclusterdynamic.NewSimpleDynamicClient(scheme, ns1, cm1, ns2, cm2, cm3)
 	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(fakeDynamicClusterClientset, 0)
-	crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
-	bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+	// crdClusterPreInformer := dynamicClusterInformerFactory.ForResource(apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions"))
+	// bindingClusterPreInformer := dynamicClusterInformerFactory.ForResource(kcpapisv1alpha1.SchemeGroupVersion.WithResource("apibindings"))
+
+	fakeApiExtClusterClientset := fakeapiext.NewSimpleClientset()
+	apiExtClusterFactory := apiextinfact.NewSharedInformerFactory(fakeApiExtClusterClientset, 0)
+	crdClusterPreInformer := apiExtClusterFactory.Apiextensions().V1().CustomResourceDefinitions()
 
 	whatResolver := NewWhatResolver(ctx, epClusterPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
 	edgeClusterInformerFactory.Start(ctx.Done())
@@ -137,14 +160,15 @@ func TestWhatResolver(t *testing.T) {
 	partdt1 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true}
 	partid2 := WorkloadPartID{metav1.GroupResource{Resource: "namespaces"}, "", "ns2"}
 	partid3 := WorkloadPartID{metav1.GroupResource{Resource: "configmaps"}, "default", "cm3"}
-	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt1}}
+	partdt3 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true, CreateOnly: true}
+	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt3}}
 	err := wait.PollWithContext(ctx, time.Second, 5*time.Second, func(context.Context) (bool, error) {
 		gotWhat, found := rcvr.Get(ep1EN)
 		t.Logf("gotWhat=%v, found=%v", gotWhat, found)
 		return found && apiequality.Semantic.DeepEqual(expectedWhat, gotWhat), nil
 	})
 	if err != nil {
-		t.Fatalf("Failed to get expected ResolvedWhat in time: %v", err)
+		t.Fatalf("Failed to get expected ResolvedWhat (%v) in time: %v", expectedWhat, err)
 	}
 }
 

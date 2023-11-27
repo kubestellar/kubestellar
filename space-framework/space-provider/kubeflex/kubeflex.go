@@ -23,14 +23,11 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	kfcp "github.com/kubestellar/kubeflex/api/v1alpha1"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -57,7 +54,7 @@ type KflexClusterProvider struct {
 }
 
 // New creates a new KflexClusterProvider
-func New(pConfig string) KflexClusterProvider {
+func New(pConfig string) (KflexClusterProvider, error) {
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -65,19 +62,19 @@ func New(pConfig string) KflexClusterProvider {
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(pConfig))
 	if err != nil {
 		logger.Error(err, "Error loading kubeconfig")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	dClient, err := dynamic.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed to create dynamic clientset")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		logger.Error(err, "Failed to create kube clientset")
-		return KflexClusterProvider{}
+		return KflexClusterProvider{}, err
 	}
 
 	return KflexClusterProvider{
@@ -86,7 +83,7 @@ func New(pConfig string) KflexClusterProvider {
 		kubeClient: kubeClient,
 		logger:     logger,
 		ctx:        ctx,
-	}
+	}, nil
 }
 
 func (k KflexClusterProvider) Create(name string, opts clusterprovider.Options) error {
@@ -154,31 +151,54 @@ func (k KflexClusterProvider) ListSpacesNames() ([]string, error) {
 		return nil, err
 	}
 
-	var cp kfcp.ControlPlane
+	for _, unspace := range listSpaces.Items {
 
-	for _, space := range listSpaces.Items {
-
-		spContent := space.UnstructuredContent()
-
-		err = runtime.DefaultUnstructuredConverter.FromUnstructured(spContent, &cp)
-		if err != nil {
-			k.logger.Error(err, "convert unstructured")
-			continue
-		}
-		if isSpaceReady(cp) {
-			listClusterNames = append(listClusterNames, cp.Name)
+		if isSpaceReady(unspace) {
+			metadata, found, err := unstructured.NestedMap(unspace.Object, "metadata")
+			if err != nil || !found {
+				k.logger.Error(err, "can't find the metadata field in the KF ControlPlan object")
+				return nil, err
+			}
+			listClusterNames = append(listClusterNames, metadata["name"].(string))
 		}
 	}
 
 	return listClusterNames, nil
 }
 
-func isSpaceReady(sp kfcp.ControlPlane) bool {
-	for _, cond := range sp.Status.Conditions {
-		if cond.Reason == kfcp.ReasonAvailable && cond.Type == kfcp.TypeReady {
-			return true
+func isSpaceReady(unspace unstructured.Unstructured) bool {
+
+	logger := klog.Background()
+
+	// Access the "status" field as a map.
+	status, found, err := unstructured.NestedMap(unspace.Object, "status")
+	if err != nil || !found {
+		logger.Error(err, "can't find the status field in the KF ControlPlan object")
+		return false
+	}
+
+	// Access the "conditions" field as a slice of maps.
+	conditions, found, err := unstructured.NestedSlice(status, "conditions")
+	if err != nil || !found {
+		logger.Error(err, "can't find the conditions field in the KF ControlPlan status")
+		return false
+	}
+
+	// Iterate through the array of maps and access a specific entry (e.g., "key1") in each map.
+	for _, item := range conditions {
+		if cond, ok := item.(map[string]interface{}); ok {
+			if reason, exists := cond["reason"]; exists {
+				if reason == "Available" {
+					if type1, exists := cond["type"]; exists {
+						if type1 == "Ready" {
+							return true
+						}
+					}
+				}
+			}
 		}
 	}
+
 	return false
 }
 
@@ -186,22 +206,31 @@ func isSpaceReady(sp kfcp.ControlPlane) bool {
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
 
+	var externalConf, internalConf []byte
 	secret, err := k.kubeClient.CoreV1().Secrets(lcName+"-system").Get(k.ctx, "admin-kubeconfig", v1.GetOptions{})
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
 
-	externalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig"])
-	internalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig-incluster"])
-
+	externalConf, err = base64.StdEncoding.DecodeString(string(secret.Data["kubeconfig"]))
 	if err != nil {
-		return clusterprovider.SpaceInfo{}, err
+		//We assume this happen because the data was not encoded pring message and get the string
+		externalConf = secret.Data["kubeconfig"]
+		k.logger.Info("Provider secret was not encoded", "Secret", secret.Name)
 	}
+
+	internalConf, err = base64.StdEncoding.DecodeString(string(secret.Data["kubeconfig-incluster"]))
+	if err != nil {
+		//We assume this happen because the data was not encoded pring message and get the string
+		internalConf = secret.Data["kubeconfig-incluster"]
+		k.logger.Info("Provider secret was not encoded", "Secret", secret.Name)
+	}
+
 	lcInfo := clusterprovider.SpaceInfo{
 		Name: lcName,
 		Config: map[string]string{
-			clusterprovider.EXTERNAL:  externalConf,
-			clusterprovider.INCLUSTER: internalConf,
+			clusterprovider.EXTERNAL:  string(externalConf),
+			clusterprovider.INCLUSTER: string(internalConf),
 		},
 	}
 	return lcInfo, nil
@@ -229,7 +258,8 @@ func (k KflexClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) 
 func (k KflexClusterProvider) Watch() (clusterprovider.Watcher, error) {
 	w := &KflexWatcher{
 		ch:       make(chan clusterprovider.WatchEvent),
-		provider: &k}
+		provider: &k,
+		chClosed: false}
 	k.watch = w
 	return w, nil
 }
@@ -240,6 +270,7 @@ type KflexWatcher struct {
 	ch       chan clusterprovider.WatchEvent
 	cancel   context.CancelFunc
 	provider *KflexClusterProvider
+	chClosed bool
 }
 
 func (k *KflexWatcher) Stop() {
@@ -247,7 +278,11 @@ func (k *KflexWatcher) Stop() {
 		k.cancel()
 	}
 	k.wg.Wait()
-	close(k.ch)
+	if !k.chClosed {
+		close(k.ch)
+		k.chClosed = true
+
+	}
 }
 
 func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
@@ -283,7 +318,7 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 							continue
 						}
 						k.ch <- clusterprovider.WatchEvent{
-							Type:      watch.Added,
+							Type:      clusterprovider.Added,
 							Name:      name,
 							SpaceInfo: spaceInfo,
 						}
@@ -292,7 +327,7 @@ func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {
 					for _, cl := range setClusters.Difference(newSetClusters).UnsortedList() {
 						logger.V(2).Info("Processing KubeFlex cluster delete", "name", cl)
 						k.ch <- clusterprovider.WatchEvent{
-							Type: watch.Deleted,
+							Type: clusterprovider.Deleted,
 							Name: cl,
 						}
 					}
