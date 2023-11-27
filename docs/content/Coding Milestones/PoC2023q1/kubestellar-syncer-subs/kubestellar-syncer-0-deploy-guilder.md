@@ -1,15 +1,15 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
-# just for testing till we change the code that creates the MB name
 kubectl ws root:espw
-stuid=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.uid}"`
+pvname=`kubectl get synctargets.edge.kubestellar.io | grep guilder | awk '{print $1}'`
+stuid=`kubectl get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
 kubectl ws root:imw1
 stcid=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}"`
 mbws="$stcid-mb-$stuid"
-
 echo "mailbox workspace name = $mbws"
 ```
+
 ``` { .bash .no-copy }
 Current workspace is "root:imw1".
 mailbox workspace name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e
