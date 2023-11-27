@@ -92,8 +92,8 @@ function ensure_imws() {
                     break
                 fi
             fi
-            kube-bind "$imw" "synctargets" --start-konnector true
-            kube-bind "$imw" "locations"
+            kubestellar-kube-bind "$imw" "synctargets" --start-konnector true
+            kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
     kubectl ws use $initial_ws &> /dev/null # go back to the initial state
@@ -351,7 +351,7 @@ function ensure_espw() {
 }
 
 function run_dex() {
-    echo "--< starting dex in background >--"
+    echo "starting dex in background"
     dex serve "$bindir/../dex/dex-config-dev.yaml" &
 
     run_status=$(wait_for_process dex)
@@ -365,7 +365,7 @@ function run_dex() {
 }
 
 function run_kb_backend() {
-    echo "--< starting kube-bind example-backend in background >--"
+    echo "starting kube-bind example-backend in background"
     kubectl ws root:espw
     kubectl apply -f "$bindir/../kube-bind/deploy/crd"
     example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &

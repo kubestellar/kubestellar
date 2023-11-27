@@ -267,7 +267,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
 
 	// The script must be idempotent.
-	shellScriptName := "kube-bind"
+	shellScriptName := "kubestellar-kube-bind"
 
 	resourcesToBind := []string{"syncerconfigs", "edgesyncconfigs"}
 	for idx, resource := range resourcesToBind {
