@@ -30,6 +30,7 @@ import (
 	machruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	upstreamdiscovery "k8s.io/client-go/discovery"
+	fakeupkube "k8s.io/client-go/kubernetes/fake"
 
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
 	fakekube "github.com/kcp-dev/client-go/kubernetes/fake"
@@ -44,6 +45,7 @@ import (
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func TestWhatResolver(t *testing.T) {
@@ -150,7 +152,10 @@ func TestWhatResolver(t *testing.T) {
 	apiExtClusterFactory := apiextinfact.NewSharedInformerFactory(fakeApiExtClusterClientset, 0)
 	crdClusterPreInformer := apiExtClusterFactory.Apiextensions().V1().CustomResourceDefinitions()
 
-	whatResolver := NewWhatResolver(ctx, epPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
+	fakeUpKubeClient := fakeupkube.NewSimpleClientset()
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, fakeUpKubeClient)
+
+	whatResolver := NewWhatResolver(ctx, epPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, kbSpaceRelation, 3)
 	edgeInformerFactory.Start(ctx.Done())
 	dynamicClusterInformerFactory.Start(ctx.Done())
 	rcvr := NewMapMap[ExternalName, ResolvedWhat](nil)

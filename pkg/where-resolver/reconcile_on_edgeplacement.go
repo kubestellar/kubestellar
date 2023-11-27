@@ -132,7 +132,6 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 		logger.Error(err, "failed to get consumer's object", "edgePlacement", originalName)
 		return err
 	}
-	// currentSPS, err := c.singlePlacementSliceLister.Get(epName)
 	_, err = c.singlePlacementSliceLister.Get(epName)
 	if err != nil {
 		if k8serrors.IsNotFound(err) { // create
@@ -170,15 +169,6 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 			logger.Error(err, "failed updating SinglePlacementSlice")
 			return err
 		}
-
-		//currentSPS.Destinations = singles
-		// _, err = c.edgeClusterClient.Cluster(logicalcluster.NewPath(spaceID)).EdgeV2alpha1().SinglePlacementSlices().Update(ctx, currentSPS, metav1.UpdateOptions{})
-		// if err != nil {
-		// 	logger.Error(err, "failed updating SinglePlacementSlice")
-		// 	return err
-		// } else {
-		// 	logger.V(1).Info("updated SinglePlacementSlice")
-		// }
 	}
 
 	return nil

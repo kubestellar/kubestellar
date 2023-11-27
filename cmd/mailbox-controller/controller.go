@@ -345,13 +345,11 @@ func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
 	logger := klog.FromContext(ctl.context)
 	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
 	if err != nil {
-		//TODO should we return an error?
 		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", st.Name)
 		return ""
 	}
 	spaceID := ctl.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
-		//TODO should we return an error?
 		logger.Error(nil, "failed to get consumer space ID from a provider's copy", "syncTarget", st.Name)
 		return ""
 	}

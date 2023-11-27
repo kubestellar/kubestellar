@@ -36,6 +36,7 @@ import (
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	cache "k8s.io/client-go/tools/cache"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
@@ -125,18 +126,20 @@ func main() {
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
 
-	serviceProviderClient, err := kubernetes.NewForConfig(espwRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for service provider space")
 		os.Exit(6)
 	}
-	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, serviceProviderClient)
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
+
+	doneCh := ctx.Done()
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 
 	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
 		workspaceScopedClientset.TenancyV1alpha1().Workspaces(), kbSpaceRelation,
 	)
 
-	doneCh := ctx.Done()
 	edgeSharedInformerFactory.Start(doneCh)
 
 	workspaceScopedInformerFactory.Start(doneCh)

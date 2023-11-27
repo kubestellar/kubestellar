@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
@@ -130,7 +131,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	doneCh := ctx.Done()
 
 	edgeSharedInformerFactory.Start(doneCh)
-
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 	edgeSharedInformerFactory.WaitForCacheSync(doneCh)
 
 	es.Run(numThreads)

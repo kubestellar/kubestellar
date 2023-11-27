@@ -53,7 +53,6 @@ import (
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev2a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
@@ -86,12 +85,7 @@ func NewWorkloadProjector(
 	resourceModes ResourceModes,
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
-	locationInformer k8scache.SharedIndexInformer,
-	locationLister edgev2a1listers.LocationLister,
 	syncfgInformer k8scache.SharedIndexInformer,
-	syncfgLister edgev2a1listers.SyncerConfigLister,
-	customizerInformer k8scache.SharedIndexInformer,
-	customizerLister edgev2a1listers.CustomizerLister,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
@@ -99,17 +93,12 @@ func NewWorkloadProjector(
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
-		ctx:               ctx,
-		configConcurrency: configConcurrency,
-		resourceModes:     resourceModes,
-		queue:             workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		mbwsLister:        mbwsLister,
-		//locationInformer:     locationInformer,
-		//locationLister:       locationLister,
-		//syncfgInformer:       syncfgInformer,
-		//syncfgLister:         syncfgLister,
-		//customizerInformer:   customizerInformer,
-		//customizerLister:     customizerLister,
+		ctx:                  ctx,
+		configConcurrency:    configConcurrency,
+		resourceModes:        resourceModes,
+		queue:                workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		mbwsLister:           mbwsLister,
+		syncfgInformer:       syncfgInformer,
 		edgeClusterClientset: edgeClusterClientset,
 		dynamicClusterClient: dynamicClusterClient,
 		nsClusterPreInformer: nsClusterPreInformer,
@@ -308,18 +297,13 @@ var _ Runnable = &workloadProjector{}
 //
 // The fields following the Mutex should only be accessed with the Mutex locked.
 type workloadProjector struct {
-	ctx               context.Context
-	configConcurrency int
-	resourceModes     ResourceModes
-	delay             time.Duration // to slow down for debugging
-	queue             workqueue.RateLimitingInterface
-	mbwsLister        tenancyv1a1listers.WorkspaceLister
-	//locationInformer     k8scache.SharedIndexInformer
-	//locationLister       edgev2a1listers.LocationLister
-	//syncfgInformer       k8scache.SharedIndexInformer
-	//syncfgLister         edgev2a1listers.SyncerConfigLister
-	//customizerInformer   k8scache.SharedIndexInformer
-	//customizerLister     edgev2a1listers.CustomizerLister
+	ctx                  context.Context
+	configConcurrency    int
+	resourceModes        ResourceModes
+	delay                time.Duration // to slow down for debugging
+	queue                workqueue.RateLimitingInterface
+	mbwsLister           tenancyv1a1listers.WorkspaceLister
+	syncfgInformer       k8scache.SharedIndexInformer
 	edgeClusterClientset edgeclusterclientset.ClusterInterface
 	dynamicClusterClient clusterdynamic.ClusterInterface
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer

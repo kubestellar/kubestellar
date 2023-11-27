@@ -87,8 +87,7 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	}
 	locSpaceID := c.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if locSpaceID == "" {
-		//TODO create new error
-		return nil
+		return errors.New("failed to obtain space ID from kube-bind reference")
 	}
 
 	// 1)

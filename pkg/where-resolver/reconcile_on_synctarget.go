@@ -18,8 +18,9 @@ package where_resolver
 
 import (
 	"context"
+	"errors"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/klog/v2"
@@ -66,7 +67,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	stDeleted := false
 	st, err := c.synctargetLister.Get(stName)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if k8sapierrors.IsNotFound(err) {
 			logger.V(1).Info("SyncTarget not found")
 			stDeleted = true
 		} else {
@@ -80,8 +81,7 @@ func (c *controller) reconcileOnSyncTarget(ctx context.Context, stKey string) er
 	}
 	stSpaceID := c.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if stSpaceID == "" {
-		//TODO create new error
-		return nil
+		return errors.New("failed to obtain space ID from kube-bind reference")
 	}
 
 	// 1)

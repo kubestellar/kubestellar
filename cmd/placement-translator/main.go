@@ -39,6 +39,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
@@ -229,6 +230,7 @@ func main() {
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
 		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient, kbSpaceRelation)
 
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)
 	rootInformerFactory.Start(doneCh)

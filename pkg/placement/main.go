@@ -123,9 +123,7 @@ func NewPlacementTranslator(
 		whereResolver: NewWhereResolver(ctx, spsPreInformer, kbSpaceRelation, numThreads),
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes, pt.mbwsInformer, pt.mbwsLister,
-		locationPreInformer.Informer(), locationPreInformer.Lister(),
-		pt.syncfgInformer, pt.syncfgLister,
-		customizerPreInformer.Informer(), customizerPreInformer.Lister(),
+		pt.syncfgInformer,
 		edgeClusterClientset, dynamicClusterClient,
 		nsClusterPreInformer, nsClusterClient)
 

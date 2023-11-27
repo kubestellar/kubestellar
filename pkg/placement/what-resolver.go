@@ -18,7 +18,6 @@ package placement
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"sync"
 	"time"
@@ -340,7 +339,7 @@ func (wr *whatResolver) processNextWorkItem() bool {
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
 	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+		return wr.processEdgePlacement(ctx, item.NN.Second)
 	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
 		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
@@ -504,7 +503,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName ObjectName) bool {
+func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectName) bool {
 	logger := klog.FromContext(ctx)
 	ep, err := wr.edgePlacementLister.Get(string(epName))
 	if err != nil {
@@ -521,15 +520,15 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 	//change to consumer SpaceID
 	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
 	if err != nil {
-		logger.Error(err, "failed to get ")
+		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object")
 		return true
 	}
 	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
-		logger.Error(errors.New("failed to get consumer space ID from a provider's copy"), "failed to get ")
+		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
 		return true
 	}
-	cluster = logicalcluster.Name(spaceID)
+	cluster := logicalcluster.Name(spaceID)
 	epName = ObjectName(epOriginalName)
 
 	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]
