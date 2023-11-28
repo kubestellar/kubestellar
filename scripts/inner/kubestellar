@@ -45,12 +45,6 @@ function echoerr() {
    echo "ERROR: $1" >&2
 }
 
-function run_kubectl_in_space() { # usage: space_config kubectl_cmd
-    space_config="$1"
-    cmd="$2"
-    KUBECONFIG=$space_config kubectl $cmd
-}
-
 # current space at start does not matter, is ESPW on return
 function ensure_espw() {
     in_cluster=
@@ -60,7 +54,7 @@ function ensure_espw() {
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
     kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
     kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
-    run_kubectl_in_space $space_config "apply -f \"$bindir/../config/exports\"" 
+    KUBECONFIG=$space_config kubectl apply -f \"$bindir/../config/exports\"
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
@@ -80,8 +74,8 @@ function ensure_imws() {
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
             kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
             kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
-            if ! run_kubectl_in_space $space_config "get apibinding edge.kubestellar.io" ; then # &> /dev/null; then
-                run_kubectl_in_space $space_config "kcp bind apiexport root:espw:edge.kubestellar.io"
+            if ! KUBECONFIG=$space_config kubectl get apibinding edge.kubestellar.io ; then # &> /dev/null; then
+                KUBECONFIG=$space_config kubectl kcp bind apiexport root:espw:edge.kubestellar.io
             fi
         done
     done <<< "$1"
@@ -196,6 +190,8 @@ function ensure_root_compute_configd() {
     # TODO: remove kcp dependency in PR3 once we switch to kube-bind.
     secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.name}'`
     secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.namespace}'`
+    echo "secret_name=${secret_name}"
+    echo "secret_namespace=${secret_namespace}"
     kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d > ${KUBECONFIG_DIR}/kcp.kubeconfig
     KUBECONFIG=${KUBECONFIG_DIR}/kcp.kubeconfig
     kubectl ws root:compute

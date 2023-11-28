@@ -119,7 +119,8 @@ export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
 export SM_CONFIG=~/.kube/config
-mkdir ${PWD}/temp-space-config
+export SM_CONTEXT=ks-core
+mkdir -p ${PWD}/temp-space-config
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -188,7 +189,7 @@ Add a ServiceAccount that will be downsynced.
 
 ```shell
 wmw1_space_config="${PWD}/temp-space-config/spaceprovider-default-wmw1"
-kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $wmw1_space_config
+kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $wmw1_space_config
 
 KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
 apiVersion: v1
@@ -226,12 +227,12 @@ Wait for the ServiceAccount to get to the mailbox workspaces.
 # TODO: the mailbox workspaces have not been converted into spaces yet.
 # Once the mailbox is converted to spaces, this is the code we want to use:
 # MB1_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB1}"
-# kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $MB1_space_config
+# kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB1_space_config
 # while ! KUBECONFIG=$MB1_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
 #     sleep 10
 # done
 # MB2_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB2}"
-# kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --space-config-file $MB2_space_config
+# kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB2_space_config
 # while ! KUBECONFIG=MB2_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
 #    sleep 10
 # done

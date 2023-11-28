@@ -106,8 +106,6 @@ spec:
           value: "{{ .Release.Namespace }}"
         - name: SPACE_PROVIDER_TYPE
           value: "{{ .Values.defaultSpaceProviderType }}"
-        - name: IN_CLUSTER
-          value: "{{ .Values.inClusterSpaces }}"
           # volumeMounts:
           # - name: kubestellar-secret
           #   mountPath: "/home/kubestellar/.kcp"

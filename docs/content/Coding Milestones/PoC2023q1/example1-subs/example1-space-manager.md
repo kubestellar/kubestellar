@@ -6,6 +6,7 @@
 kind create cluster --name sm-mgt
 KUBECONFIG=~/.kube/config kubectl config rename-context kind-sm-mgt sm-mgt
 export SM_CONFIG=~/.kube/config
+export SM_CONTEXT=sm-mgt
 ```
 
 ### The space-manager controller

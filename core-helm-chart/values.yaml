@@ -28,11 +28,6 @@ spaceimage:
 # Possible values: [kcp|kubeflex]
 defaultSpaceProviderType: kcp
 
-# Spaces can be accessed internally (i.e. inCluster) or externally.
-# true: spaces are accessed internally from a pod within the cluster that host them.
-# false: spaces are accessed outside of the hosting cluster. 
-inClusterSpaces: true
-
 # Storage size
 storageSize: 8Gi
 

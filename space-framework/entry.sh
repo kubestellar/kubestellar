@@ -41,10 +41,7 @@ function set_config_and_secret_and_crds() {
     kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
     kubectl config use-context space-mgt
 
-    echo "Delete if it exists and then create a secret for the core cluster."
-    if ! kubectl --kubeconfig /home/spacecore/.kube/config delete secret -n ${NAMESPACE} corecluster ; then
-        echo "Nothing to delete."
-    fi
+    kubectl --kubeconfig /home/spacecore/.kube/config delete secret -n ${NAMESPACE} corecluster > /dev/null 2>&1 || true 
     kubectl --kubeconfig /home/spacecore/.kube/config create secret generic -n ${NAMESPACE} corecluster --from-file=kubeconfig=/home/spacecore/.kube/config
 
     echo "Apply space manager CRDs."
