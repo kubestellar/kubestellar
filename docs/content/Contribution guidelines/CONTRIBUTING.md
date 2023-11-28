@@ -69,7 +69,7 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 Our [QuickStart](../../Getting-Started/quickstart/)
  guide shows a user how to install a
-local KCP server and install the KubeStellar components and run an
+local space provider server and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
