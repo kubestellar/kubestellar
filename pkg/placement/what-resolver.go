@@ -514,9 +514,6 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 		ep = nil
 	}
 	epFound := err == nil
-	wr.Lock()
-	defer wr.Unlock()
-
 	//change to consumer SpaceID
 	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
 	if err != nil {
@@ -526,11 +523,13 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
 		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
-		return true
+		return false
 	}
 	cluster := logicalcluster.Name(spaceID)
 	epName = ObjectName(epOriginalName)
 
+	wr.Lock()
+	defer wr.Unlock()
 	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]
 	if !wsDetailsFound {
 		if !epFound {

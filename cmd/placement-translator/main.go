@@ -155,7 +155,7 @@ func main() {
 
 	edgeClientset, err := ksclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create provider clientset from config")
+		logger.Error(err, "Failed to create provider clientset from config")
 		os.Exit(30)
 	}
 
