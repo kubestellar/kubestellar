@@ -347,43 +347,6 @@ EOF
     echo "Finished augmenting root:compute for KubeStellar"
 }
 
- 
-if [ "$subcommand" != init ]; then
-
-    # Check mailbox-controller is already running
-    if [ $(process_running mailbox-controller) == "running" ]
-    then
-	echo "An older deployment of mailbox-controller is already running - terminating it ...."
-	pkill -f mailbox-controller
-    fi
-
-    # Check kubestellar-where-resolver is already running
-    if [ $(process_running "kubestellar-where-resolver") == "running" ]
-    then
-	echo "An older deployment of kubestellar-where-resolver is already running - terminating it ...."
-	pkill -f "kubestellar-where-resolver"
-    fi
-
-    # Check placement-translator is already running
-    if [ $(process_running placement-translator) == "running" ]
-    then
-	echo "An older deployment of placement-translator is already running - terminating it ...."
-	pkill -f placement-translator
-    fi
-
-fi
-
-if [ $subcommand == stop ]; then
-   echo "kubestellar stopped ....."
-   exit 0
-fi
-
-ensure_root_compute_configd
-ensure_espw
-ensure_imws $imws
-ensure_wmws $wmws
-kubectl ws root &> /dev/null
-
 function ensure_espw() {
     in_cluster=
     if $IN_CLUSTER; then
@@ -396,8 +359,8 @@ function ensure_espw() {
     sleep 2
     run_kb_backend
     KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/crds/"
-    KUBECONFIG=$space_config kubectl get crd -oname | grep kubestellar.io | xargs -i KUBECONFIG=$space_config kubectl label {} kube-bind.io/exported=true
-    KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/exports" $verbdir
+    KUBECONFIG=$space_config kubectl get crd -oname | grep kubestellar.io | KUBECONFIG=$space_config xargs -i kubectl label {} kube-bind.io/exported=true
+    KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/exports" 
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
@@ -444,6 +407,42 @@ function run_kb_backend() {
         exit 1
     fi
 }
+ 
+if [ "$subcommand" != init ]; then
+
+    # Check mailbox-controller is already running
+    if [ $(process_running mailbox-controller) == "running" ]
+    then
+	echo "An older deployment of mailbox-controller is already running - terminating it ...."
+	pkill -f mailbox-controller
+    fi
+
+    # Check kubestellar-where-resolver is already running
+    if [ $(process_running "kubestellar-where-resolver") == "running" ]
+    then
+	echo "An older deployment of kubestellar-where-resolver is already running - terminating it ...."
+	pkill -f "kubestellar-where-resolver"
+    fi
+
+    # Check placement-translator is already running
+    if [ $(process_running placement-translator) == "running" ]
+    then
+	echo "An older deployment of placement-translator is already running - terminating it ...."
+	pkill -f placement-translator
+    fi
+
+fi
+
+if [ $subcommand == stop ]; then
+   echo "kubestellar stopped ....."
+   exit 0
+fi
+
+ensure_root_compute_configd
+ensure_espw
+ensure_imws $imws
+ensure_wmws $wmws
+kubectl ws root &> /dev/null
 
 if [ $subcommand == init ]; then
     exit 0

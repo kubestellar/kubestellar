@@ -26,38 +26,31 @@ function echoerr() {
 function wait_kcp_ready() {
     echo "Waiting for kcp to be ready... this may take a while."
     (
-        until [ "$(kubectl --kubeconfig $kubestellar_kubeconfig logs $(kubectl --kubeconfig $kubestellar_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
+        until [ "$(kubectl --kubeconfig $host_kubeconfig logs $(kubectl --kubeconfig $host_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c kcp | grep '***READY***')" != "" ]; do
            sleep 10
         done
     )
 }
 
 function get_kcp_kubeconfig() {
-    wait_kcp_ready
-    while [ $(KUBECONFIG=$kubestellar_kubeconfig kubectl get secret kubestellar | grep -c -e kubestellar) != "1" ]; do 
+    while ! KUBECONFIG=$host_kubeconfig kubectl get secret kubestellar; do
         echo "Waiting for kubestellar secret."
-        sleep 1
+        sleep 5
     done
     kcp_kubeconfig_dir="/home/kubestellar/.kcp"
     kcp_kubeconfig="${kcp_kubeconfig_dir}/admin.kubeconfig"
-    echo "Copying the admin.kubeconfig from kubestellar seret into ${kcp_kubeconfig}..."
+    external_kcp_kubeconfig="${kcp_kubeconfig_dir}/external.kubeconfig"
     mkdir -p $kcp_kubeconfig_dir
-    kubectl --kubeconfig $kubestellar_kubeconfig get secrets kubestellar -o jsonpath='{.data.admin\.kubeconfig}' | base64 --decode > $kcp_kubeconfig
+    echo "Copying the kubeconfigs from kubestellar seret into ${kcp_kubeconfig} and ${external_kcp_kubeconfig}..."
+    kubectl --kubeconfig $host_kubeconfig get secrets kubestellar -o jsonpath='{.data.admin\.kubeconfig}' | base64 --decode > $kcp_kubeconfig
+    kubectl --kubeconfig $host_kubeconfig get secrets kubestellar -o jsonpath='{.data.external\.kubeconfig}' | base64 --decode > $external_kcp_kubeconfig
 }
 
-function create_kcp_provider() {
+function create_kcp_provider_object() {
     get_kcp_kubeconfig     # kcp is created in a seperate container 
-    echo "Delete the kcp provider secret if it already exists, and then create it."
-    if ! kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG delete secret -n ${NAMESPACE} kcpsec ; then
-        echo "Nothing to delete."
-    fi
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig=$kcp_kubeconfig   
-
-    echo "Delete the kcp provider object if it already exists, and then create it."
-    if ! kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG delete spaceproviderdesc $PROVIDER_NAME ; then
-        echo "Nothing to delete."
-    fi
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG create -f - <<EOF
+    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG delete secret -n ${NAMESPACE} kcpsec > /dev/null 2>&1 || true
+    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig=$kcp_kubeconfig --from-file=external=$external_kcp_kubeconfig
+    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG apply -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -69,23 +62,19 @@ spec:
     namespace: ${NAMESPACE}
     name: kcpsec
 EOF
-    echo "Waiting for spaceprovider to reach the Ready phase."
+    echo "Waiting for spaceproviderdesc to reach the Ready phase."
     kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
 }
  
-function create_kubeflex_provider() {
+function create_kubeflex_provider_object() {
     echo "Waiting for the kubeflex provider to be ready... this may take a while."
     (
-        until [ "$(kubectl --kubeconfig $kubestellar_kubeconfig get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
+        until [ "$(kubectl --kubeconfig $host_kubeconfig get pods -A | grep kubeflex-controller-manager | grep Running)" != "" ]; do
             sleep 10
         done
     )
 
-    echo "Delete the kubeflex provider object if it already exists, and then create it."
-    if ! kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG delete spaceproviderdesc $PROVIDER_NAME ; then
-        echo "Nothing to delete."
-    fi
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG create -f - <<EOF
+    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG apply -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -97,31 +86,31 @@ spec:
     namespace: ${NAMESPACE}
     name: corecluster
 EOF
-    echo "Waiting for spaceprovider to reach the Ready phase."
+    echo "Waiting for spaceproviderdesc to reach the Ready phase."
     kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
 }
 
 
-function create_spaceprovider() {
+function create_spaceprovider_object() {
     echo "Waiting for space manager to be ready... this may take a while."
     (
-        until [ "$(kubectl --kubeconfig $kubestellar_kubeconfig logs $(kubectl --kubeconfig $kubestellar_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
+        until [ "$(kubectl --kubeconfig $host_kubeconfig logs $(kubectl --kubeconfig $host_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c space-manager | grep '***READY***')" != "" ]; do
             sleep 10
         done
     )
     if [ "$SPACE_PROVIDER_TYPE" == "kcp" ]; then
-        create_kcp_provider
+        create_kcp_provider_object
     elif [ "$SPACE_PROVIDER_TYPE" == "kubeflex" ]; then
-        create_kubeflex_provider
+        create_kubeflex_provider_object
     else
-        echo "No valid space provider."
+        echo "${SPACE_PROVIDER_TYPE} is not a valid space provider."
     fi
 }
 
 function wait-kubestellar-ready() {
     echo "Waiting for KubeStellar to be ready... this may take a while."
     (
-        until [ "$(kubectl --kubeconfig $kubestellar_kubeconfig logs $(kubectl --kubeconfig $kubestellar_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init | grep '***READY***')" != "" ]; do
+        until [ "$(kubectl --kubeconfig $host_kubeconfig logs $(kubectl --kubeconfig $host_kubeconfig get pod --selector=app=kubestellar -o jsonpath='{.items[0].metadata.name}') -c init | grep '***READY***')" != "" ]; do
             sleep 10
         done
     )
@@ -131,14 +120,14 @@ function wait-kubestellar-ready() {
 function guess_kcp_dns() {
     if [ -z "$EXTERNAL_HOSTNAME" ]; then
         # Try to guess the route
-        if kubectl --kubeconfig $kubestellar_kubeconfig get route kubestellar-route &> /dev/null; then
-            EXTERNAL_HOSTNAME=$(kubectl --kubeconfig $kubestellar_kubeconfig get route kubestellar-route -o yaml -o jsonpath={.spec.host} 2> /dev/null)
+        if kubectl --kubeconfig $host_kubeconfig get route kubestellar-route &> /dev/null; then
+            EXTERNAL_HOSTNAME=$(kubectl --kubeconfig $host_kubeconfig get route kubestellar-route -o yaml -o jsonpath={.spec.host} 2> /dev/null)
         fi
     fi
     if [ -z "$EXTERNAL_HOSTNAME" ]; then
         # Try to guess the ingress
-        if kubectl --kubeconfig $kubestellar_kubeconfig get ingress kubestellar-ingress &> /dev/null; then
-            EXTERNAL_HOSTNAME=$(kubectl --kubeconfig $kubestellar_kubeconfig get ingress kubestellar-ingress -o yaml -o jsonpath={.spec.rules[0].host} 2> /dev/null)
+        if kubectl --kubeconfig $host_kubeconfig get ingress kubestellar-ingress &> /dev/null; then
+            EXTERNAL_HOSTNAME=$(kubectl --kubeconfig $host_kubeconfig get ingress kubestellar-ingress -o yaml -o jsonpath={.spec.rules[0].host} 2> /dev/null)
         fi
     fi
     echo "${EXTERNAL_HOSTNAME}"
@@ -149,7 +138,7 @@ function run_kcp() {
 
     echo Attempting to delete kubestellar secret...
     (
-        KUBECONFIG=$kubestellar_kubeconfig
+        KUBECONFIG=$host_kubeconfig
         if ! kubectl delete secret kubestellar ; then
             echo "Nothing to delete."
         fi
@@ -213,11 +202,11 @@ function run_kcp() {
     # Ensure kubeconfig secret
     echo Creating the kubestellar secret...
     (
-        KUBECONFIG=$kubestellar_kubeconfig
+        KUBECONFIG=$host_kubeconfig
         if [ -n "${EXTERNAL_HOSTNAME}" ]; then
             kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp/cluster.kubeconfig" --from-file="${PWD}/.kcp/external.kubeconfig"
         else
-            kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig"
+            kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file=external="${PWD}/.kcp/external.kubeconfig"
         fi
     )
 
@@ -230,8 +219,8 @@ function run_kcp() {
 
 function run_init() {
     echo "--< Starting init >--"
-    create_spaceprovider 
-    kubestellar init --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW 
+    create_spaceprovider_object
+    kubestellar init --ensure-imw $ENSURE_IMW --ensure-wmw $ENSURE_WMW
     touch ready
     echo "***READY***"
     sleep infinity
@@ -276,20 +265,19 @@ function run_placement_translator() {
     fi
 }
 
-# If a space manager config is not passed into entry.sh then we assume that the host cluster is the space manager core cluster. 
-function set_kubestellar_kubeconfig() {
-    kubectl --kubeconfig $kubestellar_kubeconfig config set-cluster sm-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    kubectl --kubeconfig $kubestellar_kubeconfig config set-credentials sm-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-    kubectl --kubeconfig $kubestellar_kubeconfig config set-context sm-mgt --cluster=sm-mgt --user=sm-mgt
-    kubectl --kubeconfig $kubestellar_kubeconfig config use-context sm-mgt
+function set_host_kubeconfig() {
+    kubectl --kubeconfig $host_kubeconfig config set-cluster sm-mgt --server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}" --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    kubectl --kubeconfig $host_kubeconfig config set-credentials sm-mgt --token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    kubectl --kubeconfig $host_kubeconfig config set-context sm-mgt --cluster=sm-mgt --user=sm-mgt
+    kubectl --kubeconfig $host_kubeconfig config use-context sm-mgt
 }
 
 echo "--< Starting KubeStellar container >--"
 
 export KUBECONFIG_DIR="${PWD}/space-config"
 mkdir -p $KUBECONFIG_DIR
-kubestellar_kubeconfig="${KUBECONFIG_DIR}/config"
-set_kubestellar_kubeconfig
+host_kubeconfig="${KUBECONFIG_DIR}/config"
+set_host_kubeconfig
 
 echo "Environment variables:"
 if [ $# -ne 0 ] ; then
@@ -322,14 +310,10 @@ if [ "$PROVIDER_SECRET_NAMESPACE" == "" ]; then
     PROVIDER_SECRET_NAMESPACE=psecret_namespace
 fi
 if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
-    # if the space_manager_kubeconfig is not set, then we assume the kubestellar
-    # cluster is the space manager cluster.
-    SPACE_MANAGER_KUBECONFIG=$kubestellar_kubeconfig
+    # if the space_manager_kubeconfig is not set, then we assume the 
+    # hosting (aka core) cluster is the space manager cluster.
+    SPACE_MANAGER_KUBECONFIG=$host_kubeconfig
     export SPACE_MANAGER_KUBECONFIG
-fi
-if [ "$IN_CLUSTER" == "" ]; then
-    IN_CLUSTER=true
-    export IN_CLUSTER
 fi
 echo "ESPW_NAME=${ESPW_NAME}"
 echo "VERBOSITY=${VERBOSITY}"
@@ -341,6 +325,9 @@ echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
 echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
+
+# The IN_CLUSTER specify that we are using components such as the space manager in-cluster.
+export IN_CLUSTER=true
 echo "IN_CLUSTER=${IN_CLUSTER}"
 
 case "${ACTION}" in
