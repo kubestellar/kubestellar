@@ -54,7 +54,8 @@ type KflexClusterProvider struct {
 }
 
 // New creates a new KflexClusterProvider
-func New(pConfig string) (KflexClusterProvider, error) {
+func New(configStrs map[string]string) (KflexClusterProvider, error) {
+	pConfig := configStrs[clusterprovider.PROVIDER_CONFIG_KEY]
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)

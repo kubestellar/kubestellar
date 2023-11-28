@@ -41,8 +41,7 @@ import (
 
 // Each provider gets its own namespace named prefixNamespace+providerName
 const (
-	prefixNamespace     = "spaceprovider-"
-	PROVIDER_CONFIG_KEY = "kubeconfig"
+	prefixNamespace = "spaceprovider-"
 )
 
 func ProviderNS(name string) string {
@@ -66,16 +65,16 @@ type provider struct {
 }
 
 // TODO: this is termporary for stage 1. For stage 2 we expect to have a uniform interface for all informers.
-func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string) spaceprovider.ProviderClient {
+func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, configStrs map[string]string) spaceprovider.ProviderClient {
 	var pClient spaceprovider.ProviderClient = nil
 	var err error
 	switch pType {
 	case spacev1alpha1apis.KindProviderType:
-		pClient, err = kindprovider.New(config)
+		pClient, err = kindprovider.New(configStrs)
 	case spacev1alpha1apis.KubeflexProviderType:
-		pClient, err = kflexprovider.New(config)
+		pClient, err = kflexprovider.New(configStrs)
 	case spacev1alpha1apis.KcpProviderType:
-		pClient, err = providerkcp.New(config)
+		pClient, err = providerkcp.New(configStrs)
 	default:
 		return nil
 	}
@@ -89,7 +88,7 @@ func newProviderClient(pType spacev1alpha1apis.SpaceProviderType, config string)
 
 // CreateProvider returns new provider client
 func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProviderDesc) (*provider, error) {
-	var configStr string
+	var configStrs map[string]string
 	var err error
 	providerName := providerDesc.Name
 	c.lock.Lock()
@@ -102,15 +101,15 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 
 	if providerDesc.Spec.ProviderType != spacev1alpha1apis.KindProviderType {
 		if providerDesc.Spec.SecretRef == nil {
-			return nil, fmt.Errorf("Provider description for %s is missing secret reference", string(providerDesc.Name))
+			return nil, fmt.Errorf("provider description for %s is missing internal secret reference", string(providerDesc.Name))
 		}
 
-		configStr, err = getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
+		configStrs, err = getConfigFromSecret(*c.k8sClientset, providerDesc.Spec.SecretRef)
 		if err != nil {
 			return nil, err
 		}
 	}
-	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStr)
+	newProviderClient := newProviderClient(providerDesc.Spec.ProviderType, configStrs)
 	if newProviderClient == nil {
 		return nil, fmt.Errorf("failed to create client for provider: %s", string(providerDesc.Spec.ProviderType))
 	}
@@ -132,31 +131,30 @@ func CreateProvider(c *controller, providerDesc *spacev1alpha1apis.SpaceProvider
 	return p, nil
 }
 
-func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (string, error) {
+func getConfigFromSecret(cs kubeclient.Clientset, sRef *v1.SecretReference) (map[string]string, error) {
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
+	configStrs := make(map[string]string)
 
 	var kubeconfigBytes []byte
 	secret, err := cs.CoreV1().Secrets(sRef.Namespace).Get(ctx, sRef.Name, metav1.GetOptions{})
 	if err != nil {
-		return "", err
+		return configStrs, err
 	}
 
-	// Retrieve the kubeconfig data from the Secret
-	kubeconfigData, found := secret.Data[PROVIDER_CONFIG_KEY]
-	if !found {
-		return "", errors.New("secret doesn't have kubeconfig data")
+	for key, value := range secret.Data {
+		// Retrieve the kubeconfig data from the Secret
+		kubeconfigBytes, err = base64.StdEncoding.DecodeString(string(value))
+		if err != nil {
+			//We assume this happen because the data was not encoded pring message and get the string
+			kubeconfigBytes = value
+			logger.Info("Provider secret was not encoded", "Secret", sRef.Name)
+		}
+		configStrs[key] = string(kubeconfigBytes)
 	}
 
-	kubeconfigBytes, err = base64.StdEncoding.DecodeString(string(kubeconfigData))
-	if err != nil {
-		//We assume this happen because the data was not encoded pring message and get the string
-		kubeconfigBytes = kubeconfigData
-		logger.Info("Provider secret was not encoded", "Secret", sRef.Name)
-	}
-
-	return string(kubeconfigBytes), nil
+	return configStrs, nil
 }
 
 func (p *provider) filterOut(spaceName string) bool {
