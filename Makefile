@@ -248,6 +248,7 @@ crds: $(CONTROLLER_GEN) $(API_GEN) $(YAML_PATCH)
 .PHONY: crds
 
 codegen: crds $(CODE_GENERATOR)
+	rm -rf pkg/client/*
 	go mod download
 	./hack/update-codegen-clients.sh
 	$(MAKE) imports
