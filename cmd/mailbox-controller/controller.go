@@ -37,6 +37,7 @@ import (
 	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
 	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
+	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
@@ -144,6 +145,10 @@ func (ctl *mbCtl) enqueue(obj any) {
 		ctl.queue.Add(typed.Name)
 	case *edgev2alpha1.SyncTarget:
 		mbwsName := ctl.mbwsNameOfSynctarget(typed)
+		if mbwsName == "" {
+			logger.Error(nil, "Failed to construct mailbox workspace name from SyncTarget", "syncTargetName", typed.Name)
+			return
+		}
 		logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
 		ctl.queue.Add(mbwsName)
 	default:
@@ -265,6 +270,11 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 
 func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
 	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
+	mbwsCluster := logicalcluster.Name(workspace.Spec.Cluster)
+	if mbwsCluster == "" {
+		logger.V(2).Info("Mailbox workspace does not have a Spec.Cluster yet")
+		return true
+	}
 
 	// The script must be idempotent.
 	shellScriptName := "kubestellar-kube-bind"
