@@ -61,7 +61,6 @@ IGNORE_GO_VERSION=1 go build -o ./bin/konnector ./cmd/konnector/main.go && \
 git checkout origin/autobind && \
 IGNORE_GO_VERSION=1 go build -o ./bin/kubectl-bind ./cmd/kubectl-bind/main.go && \
 export PATH=$(pwd)/bin:$PATH && \
-git checkout main && \
 popd && \
 git clone https://github.com/dexidp/dex.git && \
 pushd dex && \
