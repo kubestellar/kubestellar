@@ -32,13 +32,17 @@ if ! [ -x "$(command -v go)" ]; then # validate go is installed
 fi
 
 if [ -z "${IGNORE_GO_VERSION}" ]; then # validate go version is sufficient
-  MINIMAL_VERSION_MAJOR=$(echo ${MINIMAL_VERSION} | awk -F '.' '{printf $1}')
-  MINIMAL_VERSION_MINOR=$(echo ${MINIMAL_VERSION} | awk -F '.' '{printf $2}')
+  REQUIRED_VERSION_MAJOR=$(echo ${MINIMAL_VERSION} | awk -F . '{printf $1}')
+  MINIMAL_VERSION_MINOR=$(echo ${MINIMAL_VERSION} | awk -F . '{printf $2}')
   ENV_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
-  ENV_VERSION_MAJOR=$(echo ${ENV_VERSION} | awk -F '.' '{printf $1}')
-  ENV_VERSION_MINOR=$(echo ${ENV_VERSION} | awk -F '.' '{printf $2}')
+  ENV_VERSION_MAJOR=$(echo ${ENV_VERSION} | awk -F . '{printf $1}')
+  ENV_VERSION_MINOR=$(echo ${ENV_VERSION} | awk -F . '{printf $2}')
 
-  if [ ${ENV_VERSION_MAJOR} -lt ${MINIMAL_VERSION_MAJOR} ] || [ ${ENV_VERSION_MINOR} -lt ${MINIMAL_VERSION_MINOR} ]; then
+  if [ "${ENV_VERSION_MAJOR}" != "${REQUIRED_VERSION_MAJOR}" ]; then
+    echo "Unexpected go version installed. expected go version major ${REQUIRED_VERSION_MAJOR}, while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
+	  exit 1
+  fi
+  if ! [ "${ENV_VERSION_MINOR}" -ge "${MINIMAL_VERSION_MINOR}" ]; then
 	  echo "Unexpected go version installed. expected minimal version ${MINIMAL_VERSION}, while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
 	  exit 1
   fi
