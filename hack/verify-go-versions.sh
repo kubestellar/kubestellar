@@ -40,10 +40,10 @@ if [ -z "${IGNORE_GO_VERSION}" ]; then # validate go version is sufficient
 
   if [ "${ENV_VERSION_MAJOR}" != "${REQUIRED_VERSION_MAJOR}" ]; then
     echo "Unexpected go version installed. expected go version major ${REQUIRED_VERSION_MAJOR}, while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
-	  exit 1
+    exit 1
   fi
   if ! [ "${ENV_VERSION_MINOR}" -ge "${MINIMAL_VERSION_MINOR}" ]; then
-	  echo "Unexpected go version installed. expected minimal version ${MINIMAL_VERSION}, while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
-	  exit 1
+    echo "Unexpected go version installed. expected minimal version ${MINIMAL_VERSION}, while your environment has version ${ENV_VERSION}. Use IGNORE_GO_VERSION=1 to skip this check."
+    exit 1
   fi
 fi
