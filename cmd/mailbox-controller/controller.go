@@ -42,6 +42,7 @@ import (
 
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
@@ -58,6 +59,7 @@ type mbCtl struct {
 	context                 context.Context
 	espwPath                string
 	syncTargetInformer      cache.SharedIndexInformer
+	synctargetLister        edgev2alpha1listers.SyncTargetLister
 	syncTargetIndexer       cache.Indexer
 	workspaceScopedInformer cache.SharedIndexInformer
 	workspaceScopedLister   tenancylisters.WorkspaceLister
@@ -65,6 +67,8 @@ type mbCtl struct {
 	kbSpaceRelation         kbuser.KubeBindSpaceRelation
 	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
 }
+
+type refSyncTarget string
 
 var suffix uint64 = 142857
 var errNoSpaceId = errors.New("failed to retrive spaceID")
@@ -85,6 +89,9 @@ func newMailboxController(ctx context.Context,
 	ctl := &mbCtl{
 		context:                 ctx,
 		espwPath:                espwPath,
+		syncTargetInformer:      syncTargetInformer,
+		synctargetLister:        syncTargetPreInformer.Lister(),
+		syncTargetIndexer:       syncTargetInformer.GetIndexer(),
 		workspaceScopedInformer: workspacesInformer,
 		workspaceScopedLister:   workspaceScopedPreInformer.Lister(),
 		workspaceScopedClient:   workspaceScopedClient,
@@ -92,8 +99,6 @@ func newMailboxController(ctx context.Context,
 		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
 	syncTargetInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: ctl.mbwsNameOfObj})
-	ctl.syncTargetInformer = syncTargetInformer
-	ctl.syncTargetIndexer = syncTargetInformer.GetIndexer()
 
 	syncTargetInformer.AddEventHandler(ctl)
 	workspacesInformer.AddEventHandler(ctl)
@@ -149,8 +154,8 @@ func (ctl *mbCtl) enqueue(obj any) {
 		mbwsName, err := ctl.mbwsNameOfSynctarget(typed)
 		if err != nil {
 			if err.Error() == errNoSpaceId.Error() {
-				logger.V(4).Info("Enqueuing SyncTarget for later retry", "syncTargetName", typed.Name)
-				ctl.queue.Add(obj)
+				logger.V(4).Info("Enqueuing SyncTarget reference for later retry", "syncTargetName", typed.Name)
+				ctl.queue.Add(refSyncTarget(typed.Name))
 			} else {
 				logger.Error(nil, "Failed to construct mailbox workspace name from SyncTarget", "syncTargetName", typed.Name)
 			}
@@ -199,8 +204,13 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 
 func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
-	st, ok := refany.(*edgev2alpha1.SyncTarget)
+	stName, ok := refany.(refSyncTarget)
 	if ok {
+		st, err := ctl.synctargetLister.Get(string(stName))
+		if err != nil {
+			logger.Error(err, "Failed to fetch SyncTarget from local cache", "stName", stName)
+			return false
+		}
 		mbwsName, err := ctl.mbwsNameOfSynctarget(st)
 		if err != nil {
 			return true
