@@ -130,6 +130,8 @@ The KubeFlex space provider exposes KubeFlex's ```ConrolPlane``` as the pSpaces.
 
 ### KCP SPA
 The KCP space provider exposes KCP's workspaces as the pSpaces. The KCP SPA interacts with the KCP server to manage these workspaces. 
+We don't support workspace hierarchy and all workspaces are created under the ```root``` workspace and therefor the KCP SPA uses the Space name as the unique identifier for the workspace.  
+Example: When the user creates a Space with name ```mySpace``` the SPA will create a workspace named ```mySpace``` with path of ```root:mySpace```
 
 ### KIND SPA
 
