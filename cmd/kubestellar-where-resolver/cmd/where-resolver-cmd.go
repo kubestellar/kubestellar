@@ -91,7 +91,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 	edgeClient, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create clientset for service provider space")
+		logger.Error(err, "failed to create clientset for KubeStellar Core Space")
 		return err
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClient, resyncPeriod)
@@ -109,7 +109,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to create k8s clientset for service provider space")
+		logger.Error(err, "failed to create k8s clientset for KubeStellar Core Space")
 		return err
 	}
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)

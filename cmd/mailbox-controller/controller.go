@@ -19,6 +19,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -66,6 +67,7 @@ type mbCtl struct {
 }
 
 var suffix uint64 = 142857
+var errNoSpaceId = errors.New("failed to retrive spaceID")
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
@@ -144,13 +146,18 @@ func (ctl *mbCtl) enqueue(obj any) {
 		logger.V(4).Info("Enqueuing reference due to workspace", "wsName", typed.Name)
 		ctl.queue.Add(typed.Name)
 	case *edgev2alpha1.SyncTarget:
-		mbwsName := ctl.mbwsNameOfSynctarget(typed)
-		if mbwsName == "" {
-			logger.Error(nil, "Failed to construct mailbox workspace name from SyncTarget", "syncTargetName", typed.Name)
-			return
+		mbwsName, err := ctl.mbwsNameOfSynctarget(typed)
+		if err != nil {
+			if err.Error() == errNoSpaceId.Error() {
+				logger.V(4).Info("Enqueuing SyncTarget for later retry", "syncTargetName", typed.Name)
+				ctl.queue.Add(obj)
+			} else {
+				logger.Error(nil, "Failed to construct mailbox workspace name from SyncTarget", "syncTargetName", typed.Name)
+			}
+		} else {
+			logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
+			ctl.queue.Add(mbwsName)
 		}
-		logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
-		ctl.queue.Add(mbwsName)
 	default:
 		logger.Error(nil, "Notified of object of unexpected type", "object", obj, "type", fmt.Sprintf("%T", obj))
 	}
@@ -192,6 +199,15 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 
 func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
+	st, ok := refany.(*edgev2alpha1.SyncTarget)
+	if ok {
+		mbwsName, err := ctl.mbwsNameOfSynctarget(st)
+		if err != nil {
+			return true
+		}
+		ctl.queue.Add(mbwsName)
+		return false
+	}
 	mbwsName, ok := refany.(string)
 	if !ok {
 		logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
@@ -238,7 +254,7 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(syncTarget)
 		if err != nil {
 			logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", syncTarget.Name)
-			return true
+			return false
 		}
 		ws := &tenancyv1alpha1.Workspace{
 			ObjectMeta: metav1.ObjectMeta{
@@ -356,20 +372,20 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	return false
 }
 
-func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) string {
+func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, error) {
 	logger := klog.FromContext(ctl.context)
 	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
 	if err != nil {
 		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", st.Name)
-		return ""
+		return "", err
 	}
 	spaceID := ctl.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
-		logger.Error(nil, "failed to get consumer space ID from a provider's copy", "syncTarget", st.Name)
-		return ""
+		logger.Error(errNoSpaceId, "failed to get consumer space ID from a provider's copy", "syncTarget", st.Name)
+		return "", errNoSpaceId
 	}
 	// Use consumer spaceID and provider st.UID
-	return spaceID + wsNameSep + string(st.UID)
+	return spaceID + wsNameSep + string(st.UID), nil
 }
 
 func (ctl *mbCtl) mbwsNameOfObj(obj any) ([]string, error) {
@@ -377,5 +393,9 @@ func (ctl *mbCtl) mbwsNameOfObj(obj any) ([]string, error) {
 	if !ok {
 		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
 	}
-	return []string{ctl.mbwsNameOfSynctarget(st)}, nil
+	mbwsName, err := ctl.mbwsNameOfSynctarget(st)
+	if err != nil {
+		return nil, err
+	}
+	return []string{mbwsName}, nil
 }
