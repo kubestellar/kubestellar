@@ -182,13 +182,13 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 	//change to consumer SpaceID
 	_, spsOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(sps)
 	if err != nil {
-		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object")
+		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object")
 		return true
 	}
 	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
-		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
-		return true
+		logger.Error(nil, "Failed to get consumer space ID from a provider's copy")
+		return false
 	}
 	item.Name = spsOriginalName
 	item.Cluster = logicalcluster.Name(spaceID)
