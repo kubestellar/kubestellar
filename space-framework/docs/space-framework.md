@@ -26,27 +26,27 @@ The Space Manager (SM) is a Kubernetes controller that is responsible for maint
 The SM uses a library of space provider adaptors to communicate with the space providers. Currently the SF supports 3 space providers KCP, KIND, and KubeFlex, and includes 3 space provider adaptors that the SM uses.
 
 ### Space provider adaptors
-The space manager uses a set of space provider adaptors that interact with the space provider. All space provider adaptors implement a simple "space client interface" that includes basic pSpace life cycle operations. In addition the interface also defines the events that are sent from the adaptors to the space manager.
+The space manager uses a set of space provider adaptors that interact with the space provider. All space provider adaptors implement a simple "space client interface" that includes basic pSpace life cycle operations. In addition the interface also defines the events that are sent from the adaptors to the space manager. Currently the space provider adaptors are implemented as library inside the Space Manager.
 
 ### Space aware client (SAC)
 The Space aware client (SAC) allows clients/controllers to easily get access to the underlying space by simply using the space name and optionally the SpaceProviderDesc name. There is no direct interaction between the SAC and the Space  provider, and therefore the SAC is transparent to the specific provider of the spaces. 
 ![Space Aware Client](SAC.drawio.svg "Space Aware Client")
 The only requirement is that the space can be accessed through regular Kube APIs when using the appropriate kubeconfig information. 
 
-**Main features**  
+#### Main features
 - Constantly watch for changes in the available spaces. The SAC is using an informer on Space objects using the SF Space client-go APIs.
     - Holds a cache of the pSpace access info for each Space 
 - Exposes utility functions to get the [rest.Config](https://pkg.go.dev/k8s.io/client-go@v0.28.3/rest#Config) data structure that gives access to a physical space with the identity of a user that is authorized to do everything. This convenient function only needs the space name, and optionally the provider name (if the provider name is omitted the default provider is being used. The namespace where the Space resides can be derived from the name of the provider. In the future we will add a SAC space aware ClientSets as well.
 
 ## Architecture details 
 When a new SpaceProviderDesc is created the SM creates a new namespace that will be used to host all the Space objects representing pSpaces on that space provider.  
-The name of the generated namespace will be `spaceprovider-<provider name>`
+The name of the generated namespace is `spaceprovider-<provider name>`
 
 ![Space, SpaceProviderDesc and the Space provider namespace](SF-NS.drawio.svg "SF Namespaces")
 
 Note: In the future the spaces will be created in their own namespace and not in namespace per provider. 
 
-The Space also holds a reference to the SpaceProviderDesc associated with this Space and some capabilities (e.g., the space type). The status of the space holds a secret reference to the secret holding the access information for that pSpace. As described before for managed spaces the SF retrieves that information from the space provider, and then creates the needed secrets and updates the Space object with the secret reference
+The Space also holds a reference to the SpaceProviderDesc associated with this Space and some capabilities (e.g., the space type). The status of the space holds references to secrets holding the access information for that pSpace (currently there are two secrets, one for accessing the pSpace from within the Kubernetes cluster that pSpace resides on and one for accessing th pSpace from outside that cluster). For managed spaces the SF retrieves the access information from the space provider, and then creates the relevant secrets and updates the Space object with the secret reference
 
 **Discovery**  
 As mentioned before, the Space manager also supports discovery of spaces created out of band (i.e., not through creating Space objects).
@@ -88,3 +88,52 @@ spec:
   SpaceProviderDescName: "pkflex"
   Type: "managed"
 ```
+
+## Space Provider adaptors (SPA)
+The space provider adaptor is responsible for all the interaction with the Space Provider (used by the SM). The SM today includes implementation of 3 provider adaptors for 3 space provider types - KCP, KubeFlex and KIND. 
+When a new SpaceProviderDesc is created, the SM creates an instance of an SPA of the corresponding provider type. 
+SPA implements the [ProviderClient](https://github.com/kubestellar/kubestellar/blob/main/space-framework/pkg/space-manager/providerclient/client_interface.go) interface. This interface is relatively simple and includes basic CRUD+Watch operations. 
+
+```
+type ProviderClient interface {
+	Create(name string, opts Options) error
+	Delete(name string, opts Options) error
+
+	// List returns a list of spaces.
+	// This method is used to discover the initial set of spaces
+	// and to refresh the list of spaces periodically.
+	ListSpaces() ([]SpaceInfo, error)
+
+	// List returns a list of space names.
+	// This method is used to discover the initial set of spaces
+	// and to refresh the list of spaces periodically.
+	ListSpacesNames() ([]string, error)
+
+	// Get returns a space info.
+	Get(name string) (SpaceInfo, error)
+
+	// Watch returns a Watcher that watches for changes to a list of spaces
+	// and react to potential changes.
+	Watch() (Watcher, error)
+}
+```
+
+When the SM creates an instance of the SPA, it also starts a background loop using the  ```Watch()``` interface of the SPA to continuously monitor the status of the pSpace.
+
+### KubeFlex SPA
+The KubeFlex space provider exposes KubeFlex's ```ConrolPlane``` as the pSpaces. The KubeFlex SPA interacts with the KubeFlex server to manage these workspaces. 
+
+### KCP SPA
+The KCP space provider exposes KCP's workspaces as the pSpaces. The KCP SPA interacts with the KCP server to manage these workspaces. 
+
+### KIND SPA
+
+#### Example: Create a Space on the KCP space provider
+Suppose we created a SpaceProviderDesc of type KCP named sp-kcp1, and we now want to create a Space. As mentioned before when the SpaceProviderDesc was created the SM also created a corresponding SPA instance. 
+1. Create a Space object with a reference to sp-kcp1
+2. The SM finds the SPA the corresponding SPA 
+3. The SM sends a ```Create()``` command through this SPA instance. 
+4. The SPA sends a command to create KCP workspace on that KCP server. 
+5. The SM sets the status of the Space to ```initialzing``` 
+6. When the workspace is "ready" the SPA generates the appropriate kubeconfig information to access this specific workspace and send back the relevant pSpace info back to the SM as a  [SpaceInfo](https://github.com/kubestellar/kubestellar/blob/main/space-framework/pkg/space-manager/providerclient/client_interface.go) object. 
+7. The SM creates the relevant access secrets and place a reference to those secrets in the Space status. The SM then move the Status of the Space to ```Ready```
