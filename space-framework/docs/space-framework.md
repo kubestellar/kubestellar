@@ -14,7 +14,12 @@ The Space Framework (SF) is a generic management framework for space providers a
 
 The space framework uses two CRDs:
 - **SpaceProviderDesc:** This CRD represents a space provider it holds the information needed in order to interact with a specific Space  provider. 
-- **Space:** This CRD represents a space as defined above. It includes reference to secrets that allow clients to connect to the pSpace that it represents and also several attributes used by the SF that will be described later on. 
+- **Space:** This CRD represents a space as defined above. Each Space includes reference to two secrets that allow clients to connect to the pSpace that it represents:
+  1. Secret for in-cluster access - accessing the pSpace from within the same cluster that hosts the pSpace
+  2. Secret for External access:  accessing the pSpace from outside the cluster that hosts the pSpace
+  
+  It's the responsibility of the space provider to be able to supply these access secrets. The details on how the SM retrieves the information is described in the following sections
+
 
 Spaces can be divided into two categories:
 1. Provider based spaces: The Space Manager (SM) uses a space provider to get information (or perform operations) on the spaces. We can think of such pSpaces as "belonging" to the space provider. There are two types of spaces in this category which controls the way these spaces are added to the space framework: 
