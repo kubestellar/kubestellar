@@ -18,6 +18,7 @@ space_name=""
 resource_to_bind=""
 start_konnector=false
 cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
+log_dir=$(pwd)/kubestellar-kube-bind-logs
 
 while (( $# > 0 )); do
     case "$1" in
@@ -72,7 +73,7 @@ kubectl ws root
 kcp_id="$(kubectl get ws $space_name -ojsonpath='{.spec.cluster}')"
 if [ -z "$kcp_id" ]
 then
-    echo "failed to find the kcp workspace ID for $space_name"
+    echo "Failed to find the kcp workspace ID for $space_name" >&2
     exit 1
 else
     echo "kcp workspace $space_name's ID is $kcp_id"
@@ -85,17 +86,22 @@ if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
     exit 0
 fi
 
+if [[ ! -d $log_dir ]]; then
+    mkdir -p $log_dir
+fi
+
 if [ "$start_konnector" == true ]
 then
     if ! kubectl get namespace kube-system &> /dev/null
     then kubectl create namespace kube-system &> /dev/null
     fi
-    echo "starting kube-bind konnector for space $space_name in background"
-    konnector &> /dev/null &
+    log_file=$log_dir/kube-bind-konnector-$space_name.log
+    echo "starting kube-bind konnector for space $space_name in background, logs writing to $log_file"
+    konnector &> $log_file &
     sleep 2
     if ! pgrep konnector &> /dev/null; then
         #TODO: how to identify the konnector for current space?
-        echo "kube-bind konnector process not found"
+        echo "Error: kube-bind konnector process not found" >&2
         exit 1
     fi
 fi
@@ -107,7 +113,7 @@ result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattende
 cluster_ns="$(echo $result | grep -e 'kube-bind-\w*' -o)"
 if [ -z "$cluster_ns" ]
 then
-    echo "failed to find the cluster namespace"
+    echo "Failed to find the cluster namespace" >&2
     exit 1
 else
     echo "cluster namespace is $cluster_ns"

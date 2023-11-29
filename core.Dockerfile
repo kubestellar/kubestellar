@@ -88,9 +88,9 @@ COPY --from=builder /home/kubestellar/kcp-plugins/bin                    kcp/bin
 COPY --from=builder /home/kubestellar/bin                                bin/
 COPY --from=builder /home/kubestellar/config                             config/
 COPY --from=builder /home/kubestellar/kube-bind/bin                      kube-bind/bin/
+COPY --from=builder /home/kubestellar/kube-bind/hack/dex-config-dev.yaml kube-bind/hack/dex-config-dev.yaml
 COPY --from=builder /home/kubestellar/kube-bind/deploy/crd               kube-bind/deploy/crd
 COPY --from=builder /home/kubestellar/dex/bin                            dex/bin/
-COPY --from=builder /home/kubestellar/kube-bind/hack/dex-config-dev.yaml dex/dex-config-dev.yaml
 
 # add entry script
 ADD core-container/entry.sh entry.sh
