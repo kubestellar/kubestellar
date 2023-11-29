@@ -83,7 +83,7 @@ Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```shell
-GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] | tostring | endswith("guilder")) | .name')
+GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "guilder") | .name')
 echo The guilder mailbox workspace name is $GUILDER_WS
 ```
 ``` { .bash .no-copy }
@@ -91,7 +91,7 @@ The guilder mailbox workspace name is 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954
 ```
 
 ```shell
-FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] | tostring | endswith("florin")) | .name')
+FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "florin") | .name')
 echo The florin mailbox workspace name is $FLORIN_WS
 ```
 ``` { .bash .no-copy }

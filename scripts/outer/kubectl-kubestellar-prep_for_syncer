@@ -38,7 +38,6 @@ output=""
 syncer_image="quay.io/kubestellar/syncer:release-0.15"
 kubectl_flags=()
 silent="false"
-central="false"
 
 while (( $# > 0 )); do
     case "$1" in
@@ -68,8 +67,6 @@ while (( $# > 0 )); do
 	    fi;;
 	(-s|--silent)
 	    silent="true";;
-	(-c|--central)
-	    central="true";;
 	(--context*)
 	    # TODO: support --context
 	    echo "$0: --context flag not supported" >&2; exit 1;;
@@ -135,12 +132,13 @@ else
 fi
 spaceID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}")
 
-if [ "$central" == "true" ]; then
-    echo "looking for synctargets in the center"
-    kubectl ws "${kubectl_flags[@]}" "$espw"
+kubectl ws "${kubectl_flags[@]}" "$espw"
+if ! cluster_ns_name="$(kubectl "${kubectl_flags[@]}" -n kubestellar get configmap kbmap-"$spaceID" -ojsonpath="{.metadata.labels['kubestellar\.io\/kube-bind-id']}")"; then
+	echo "error reading kube-bind cluster namespace from the configmap"
+	exit 1
 fi
-prefixed_stname="$(kubectl get synctargets.edge --no-headers=true -o custom-columns=":metadata.name" | grep $stname)"
-stUID=$(kubectl get synctargets.edge $prefixed_stname -o jsonpath="{.metadata.uid}")
+prefixed_stname="$cluster_ns_name"-"$stname"
+stUID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io $prefixed_stname -o jsonpath="{.metadata.uid}")
 mbwsname="$spaceID"-mb-"$stUID"
 
 if [ "$silent" == "true" ]; then
@@ -191,6 +189,5 @@ if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
     fi
 fi
 
-echo "what is the workspace now?"
-kubectl ws .
+echo "current workspace is now $(kubectl ws "${kubectl_flags[@]}" . --short)"
 "$bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"

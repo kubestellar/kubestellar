@@ -372,7 +372,7 @@ function run_kb_backend() {
 
     run_status=$(wait_for_process example-backend)
     if [ $run_status -eq 0 ]; then
-        echo " example-backend started"
+        echo "example-backend started"
     else
         echo "example-backend not started"
         sleep 2
