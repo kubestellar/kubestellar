@@ -351,8 +351,17 @@ function ensure_espw() {
 }
 
 function run_dex() {
+    if [ $(process_running dex) == "running" ]; then
+        echo "dex is already running"
+        return
+    fi
+
     echo "starting dex in background"
-    dex serve "$bindir/../dex/dex-config-dev.yaml" &
+    dex_config_file=$(dirname "$(which kubectl-bind)")/../hack/dex-config-dev.yaml
+    if [[ -f dex_config_file ]]; then
+        echo "Error looking for dex config file at $dex_config_file" >&2
+    fi
+    dex serve $dex_config_file &
 
     run_status=$(wait_for_process dex)
     if [ $run_status -eq 0 ]; then
@@ -365,6 +374,11 @@ function run_dex() {
 }
 
 function run_kb_backend() {
+    if [ $(process_running example-backend) == "running" ]; then
+        echo "example-backend is already running"
+        return
+    fi
+
     echo "starting kube-bind example-backend in background"
     kubectl ws root:espw
     kubectl apply -f "$bindir/../kube-bind/deploy/crd"

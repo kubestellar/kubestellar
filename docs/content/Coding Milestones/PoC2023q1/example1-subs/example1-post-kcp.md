@@ -66,8 +66,7 @@ git clone https://github.com/dexidp/dex.git && \
 pushd dex && \
 IGNORE_GO_VERSION=1 make build && \
 export PATH=$(pwd)/bin:$PATH && \
-popd && \
-cp ./kube-bind/hack/dex-config-dev.yaml ./dex/dex-config-dev.yaml
+popd
 ```
 
 #### Initialize the KubeStellar platform as bare processes
