@@ -130,8 +130,16 @@ if [ "$silent" == "true" ]; then
 else
     kubectl ws "${kubectl_flags[@]}" "$imw"
 fi
+spaceID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}")
 
-mbwsname=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
+kubectl ws "${kubectl_flags[@]}" "$espw"
+if ! cluster_ns_name="$(kubectl "${kubectl_flags[@]}" -n kubestellar get configmap kbmap-"$spaceID" -ojsonpath="{.metadata.labels['kubestellar\.io\/kube-bind-id']}")"; then
+	echo "error reading kube-bind cluster namespace from ConfigMap kbmap-$spaceID" >&2
+	exit 1
+fi
+prefixed_stname="$cluster_ns_name"-"$stname"
+stUID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io $prefixed_stname -o jsonpath="{.metadata.uid}")
+mbwsname="$spaceID"-mb-"$stUID"
 
 if [ "$silent" == "true" ]; then
     kubectl ws "${kubectl_flags[@]}" "$espw" > /dev/null
@@ -151,11 +159,13 @@ else
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
-    sleep 15 # maybe the mailbox controller is slow, give it a chance
+	echo "maybe the mailbox controller is slow, give it a chance"
+    sleep 15
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
-    sleep 15 # maybe the mailbox controller is slow, give it another chance
+	echo "maybe the mailbox controller is slow, give it another chance"
+    sleep 15
 fi
 
 if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
@@ -163,29 +173,18 @@ if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
     exit 5
 fi
 
-# Now that workspace _exists_, but is it _ready_?
+echo "now that workspace _exists_, but is it _ready_?"
 sleep 5
 
 if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+    echo "tried once to switch to $mbwsname"
     sleep 15
     if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
-	sleep 15
-	kubectl ws "${kubectl_flags[@]}" "$mbwsname"
+        echo "tried twice to switch to $mbwsname"
+        sleep 15
+        kubectl ws "${kubectl_flags[@]}" "$mbwsname"
     fi
 fi
 
-# Now the MBWS exists and is ready, but does it have the needed APIBinding?
-
-if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-edge &> /dev/null; then
-    sleep 15
-    if ! kubectl "${kubectl_flags[@]}" get APIBinding bind-edge &> /dev/null; then
-	sleep 15
-	kubectl "${kubectl_flags[@]}" get APIBinding bind-edge > /dev/null
-    fi
-fi
-
-# Now the needed APIBinding exists, has it taken effect?
-sleep 10 # hope so
-
-
-"$bindir/kubectl-kubestellar-syncer_gen" "$stname" --syncer-image "$syncer_image" -o "$output"
+echo "current workspace is now $(kubectl ws "${kubectl_flags[@]}" . --short)"
+"$bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"

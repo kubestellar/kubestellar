@@ -46,6 +46,35 @@ function echoerr() {
    echo "ERROR: $1" >&2
 }
 
+# Check if a given process name is running
+process_running() {
+  SERVICE="$1"
+  if pgrep -f "$SERVICE" >/dev/null
+  then
+      echo "running"
+  else
+      echo "stopped"
+  fi
+}
+
+wait_for_process(){
+  status=$(process_running $1)
+  MAX_RETRIES=10
+  retries=0
+  status_code=0
+  while [ $status != "running" ]; do
+      if [ $retries -eq $MAX_RETRIES ]; then
+           status_code=1
+           break
+      fi
+
+      retries=$(( retries + 1 ))
+      sleep 3
+      status=$(process_running $1)
+  done
+  echo $status_code
+}
+
 
 function ensure_imws() {
     initial_ws=$(kubectl ws . --short)
@@ -63,9 +92,8 @@ function ensure_imws() {
                     break
                 fi
             fi
-            if ! kubectl get apibinding "edge.kubestellar.io" &> /dev/null; then
-                kubectl kcp bind apiexport root:espw:edge.kubestellar.io
-            fi
+            kubestellar-kube-bind "$imw" "synctargets" --start-konnector true
+            kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
     kubectl ws use $initial_ws &> /dev/null # go back to the initial state
@@ -144,16 +172,6 @@ case "$local_kcp" in
 esac
 
 
-# Check if a given process name is running
-process_running() {
-  SERVICE="$1"
-  if pgrep -f "$SERVICE" >/dev/null
-  then
-      echo "running"
-  else
-      echo "stopped"
-  fi
-}
 
 function create_or_replace() { # usage: filename
     filename="$1"
@@ -323,8 +341,57 @@ function ensure_espw() {
     else
         kubectl ws create "$espw_name" --enter
     fi
+    run_dex
+    sleep 2
+    run_kb_backend
+    kubectl apply -f "$bindir/../config/crds/"
+    kubectl get crd -oname | grep kubestellar.io | xargs -i kubectl label {} kube-bind.io/exported=true
     eval kubectl apply -f "$bindir/../config/exports" $verbdir
     echo "Finished populating the espw with kubestellar apiexports"
+}
+
+function run_dex() {
+    if [ $(process_running dex) == "running" ]; then
+        echo "dex is already running"
+        return
+    fi
+
+    echo "starting dex in background"
+    dex_config_file=$(dirname "$(which kubectl-bind)")/../hack/dex-config-dev.yaml
+    if [[ -f dex_config_file ]]; then
+        echo "Error looking for dex config file at $dex_config_file" >&2
+    fi
+    dex serve $dex_config_file &
+
+    run_status=$(wait_for_process dex)
+    if [ $run_status -eq 0 ]; then
+        echo " dex started"
+    else
+        echo "dex not started"
+        sleep 2
+        exit 1
+    fi
+}
+
+function run_kb_backend() {
+    if [ $(process_running example-backend) == "running" ]; then
+        echo "example-backend is already running"
+        return
+    fi
+
+    echo "starting kube-bind example-backend in background"
+    kubectl ws root:espw
+    kubectl apply -f "$bindir/../kube-bind/deploy/crd"
+    example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &
+
+    run_status=$(wait_for_process example-backend)
+    if [ $run_status -eq 0 ]; then
+        echo "example-backend started"
+    else
+        echo "example-backend not started"
+        sleep 2
+        exit 1
+    fi
 }
 
 if [ "$subcommand" != init ]; then
@@ -382,23 +449,6 @@ if [ $subcommand == init ]; then
     exit 0
 fi
 
-wait_for_process(){
-  status=$(process_running $1)
-  MAX_RETRIES=5
-  retries=0
-  status_code=0
-  while [ $status != "running" ]; do
-      if [ $retries -eq $MAX_RETRIES ]; then
-           status_code=1
-           break
-      fi
-
-      retries=$(( retries + 1 ))
-      sleep 3
-      status=$(process_running $1)
-  done
-  echo $status_code
-}
 
 
 # Start the kubestellar controllers

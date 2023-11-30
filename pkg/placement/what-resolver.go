@@ -49,6 +49,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 type whatResolver struct {
@@ -58,13 +59,14 @@ type whatResolver struct {
 	queue      workqueue.RateLimitingInterface
 	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
-	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
-	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
+	edgePlacementInformer upstreamcache.SharedIndexInformer
+	edgePlacementLister   edgev2alpha1listers.EdgePlacementLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
 	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
+	kbSpaceRelation           kbuser.KubeBindSpaceRelation
 
 	// Hold this while accessing data listed below
 	sync.Mutex
@@ -116,11 +118,12 @@ type objectDetails struct {
 // invoke that function after the namespace informer has synced.
 func NewWhatResolver(
 	ctx context.Context,
-	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
+	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 	numThreads int,
 ) WhatResolver {
 	controllerName := "what-resolver"
@@ -137,6 +140,7 @@ func NewWhatResolver(
 		crdClusterPreInformer:     crdClusterPreInformer,
 		bindingClusterPreInformer: bindingClusterPreInformer,
 		dynamicClusterClient:      dynamicClusterClient,
+		kbSpaceRelation:           kbSpaceRelation,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
@@ -335,7 +339,7 @@ func (wr *whatResolver) processNextWorkItem() bool {
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
 	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.Cluster, item.NN.Second)
+		return wr.processEdgePlacement(ctx, item.NN.Second)
 	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
 		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
@@ -499,9 +503,9 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName ObjectName) bool {
+func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectName) bool {
 	logger := klog.FromContext(ctx)
-	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(string(epName))
+	ep, err := wr.edgePlacementLister.Get(string(epName))
 	if err != nil {
 		if !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Failed to fetch EdgePlacement from local cache")
@@ -510,6 +514,20 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		ep = nil
 	}
 	epFound := err == nil
+	//change to consumer SpaceID
+	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
+	if err != nil {
+		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object")
+		return true
+	}
+	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if spaceID == "" {
+		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
+		return false
+	}
+	cluster := logicalcluster.Name(spaceID)
+	epName = ObjectName(epOriginalName)
+
 	wr.Lock()
 	defer wr.Unlock()
 	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]

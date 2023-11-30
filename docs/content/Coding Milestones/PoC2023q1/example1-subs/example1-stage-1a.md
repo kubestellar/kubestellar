@@ -10,7 +10,7 @@ processes then launch this controller as follows.
 ```shell
 kubectl ws root:espw
 mailbox-controller -v=2 &
-sleep 10
+sleep 20
 ```
 
 This controller is in charge of maintaining the collection of mailbox

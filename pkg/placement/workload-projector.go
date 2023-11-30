@@ -43,7 +43,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
 	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
 	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
 	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
@@ -54,7 +53,6 @@ import (
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
-	edgev2a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/customize"
 )
 
@@ -87,12 +85,7 @@ func NewWorkloadProjector(
 	resourceModes ResourceModes,
 	mbwsInformer k8scache.SharedIndexInformer,
 	mbwsLister tenancyv1a1listers.WorkspaceLister,
-	locationClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	locationClusterLister edgev2a1listers.LocationClusterLister,
-	syncfgClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	syncfgClusterLister edgev2a1listers.SyncerConfigClusterLister,
-	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer,
-	customizerClusterLister edgev2a1listers.CustomizerClusterLister,
+	syncfgInformer k8scache.SharedIndexInformer,
 	edgeClusterClientset edgeclusterclientset.ClusterInterface,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
 	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
@@ -100,21 +93,16 @@ func NewWorkloadProjector(
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
-		ctx:                       ctx,
-		configConcurrency:         configConcurrency,
-		resourceModes:             resourceModes,
-		queue:                     workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		mbwsLister:                mbwsLister,
-		locationClusterInformer:   locationClusterInformer,
-		locationClusterLister:     locationClusterLister,
-		syncfgClusterInformer:     syncfgClusterInformer,
-		syncfgClusterLister:       syncfgClusterLister,
-		customizerClusterInformer: customizerClusterInformer,
-		customizerClusterLister:   customizerClusterLister,
-		edgeClusterClientset:      edgeClusterClientset,
-		dynamicClusterClient:      dynamicClusterClient,
-		nsClusterPreInformer:      nsClusterPreInformer,
-		nsClusterClient:           nsClusterClient,
+		ctx:                  ctx,
+		configConcurrency:    configConcurrency,
+		resourceModes:        resourceModes,
+		queue:                workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		mbwsLister:           mbwsLister,
+		syncfgInformer:       syncfgInformer,
+		edgeClusterClientset: edgeClusterClientset,
+		dynamicClusterClient: dynamicClusterClient,
+		nsClusterPreInformer: nsClusterPreInformer,
+		nsClusterClient:      nsClusterClient,
 
 		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
 		clusterToMBWSName: WrapMapWithMutex[logicalcluster.Name, string](NewMapMap[logicalcluster.Name, string](nil)),
@@ -282,7 +270,7 @@ func NewWorkloadProjector(
 		logger.V(4).Info("Enqueuing reference to SyncerConfig from informer", "scRef", scRef, "event", event)
 		wp.queue.Add(scRef)
 	}
-	syncfgClusterInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
+	syncfgInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
 		AddFunc:    func(obj any) { enqueueSCRef(obj, "add") },
 		UpdateFunc: func(oldObj, newObj any) { enqueueSCRef(newObj, "update") },
 		DeleteFunc: func(obj any) { enqueueSCRef(obj, "delete") },
@@ -309,22 +297,17 @@ var _ Runnable = &workloadProjector{}
 //
 // The fields following the Mutex should only be accessed with the Mutex locked.
 type workloadProjector struct {
-	ctx                       context.Context
-	configConcurrency         int
-	resourceModes             ResourceModes
-	delay                     time.Duration // to slow down for debugging
-	queue                     workqueue.RateLimitingInterface
-	mbwsLister                tenancyv1a1listers.WorkspaceLister
-	locationClusterInformer   kcpcache.ScopeableSharedIndexInformer
-	locationClusterLister     edgev2a1listers.LocationClusterLister
-	syncfgClusterInformer     kcpcache.ScopeableSharedIndexInformer
-	syncfgClusterLister       edgev2a1listers.SyncerConfigClusterLister
-	customizerClusterInformer kcpcache.ScopeableSharedIndexInformer
-	customizerClusterLister   edgev2a1listers.CustomizerClusterLister
-	edgeClusterClientset      edgeclusterclientset.ClusterInterface
-	dynamicClusterClient      clusterdynamic.ClusterInterface
-	nsClusterPreInformer      kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient           kcpkubecorev1client.NamespaceClusterInterface
+	ctx                  context.Context
+	configConcurrency    int
+	resourceModes        ResourceModes
+	delay                time.Duration // to slow down for debugging
+	queue                workqueue.RateLimitingInterface
+	mbwsLister           tenancyv1a1listers.WorkspaceLister
+	syncfgInformer       k8scache.SharedIndexInformer
+	edgeClusterClientset edgeclusterclientset.ClusterInterface
+	dynamicClusterClient clusterdynamic.ClusterInterface
+	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer
+	nsClusterClient      kcpkubecorev1client.NamespaceClusterInterface
 
 	mbwsNameToCluster MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
 	clusterToMBWSName MutableMap[logicalcluster.Name, string /*mailbox workspace name*/]
@@ -698,7 +681,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		return true
 	}
 	logger = logger.WithValues("destination", sp)
-	syncfg, err := wp.syncfgClusterLister.Cluster(scRef.Cluster).Get(string(scRef.Name))
+	syncfg, err := wp.edgeClusterClientset.Cluster(scRef.Cluster.Path()).EdgeV2alpha1().SyncerConfigs().Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
 	if err != nil {
 		if k8sapierrors.IsNotFound(err) {
 			goodConfigSpecRelations := wp.syncerConfigRelations(sp)
@@ -1248,7 +1231,7 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 		if len(refParts) == 1 {
 			custNS = srcObjU.GetNamespace()
 		}
-		customizer, err = wp.customizerClusterLister.Cluster(logicalcluster.Name(srcCluster)).Customizers(custNS).Get(custName)
+		customizer, err = wp.edgeClusterClientset.Cluster(srcCluster.Path()).EdgeV2alpha1().Customizers(custNS).Get(wp.ctx, custName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Customizer")
 		} else {
@@ -1257,7 +1240,7 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 	}
 	var location *edgeapi.Location
 	if expandParameters {
-		location, err = wp.locationClusterLister.Cluster(logicalcluster.Name(destSP.Cluster)).Get(destSP.LocationName)
+		location, err = wp.edgeClusterClientset.Cluster(logicalcluster.NewPath(destSP.Cluster)).EdgeV2alpha1().Locations().Get(wp.ctx, destSP.LocationName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Location")
 		}

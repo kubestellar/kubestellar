@@ -26,35 +26,30 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/spf13/pflag"
 
-	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
+	cache "k8s.io/client-go/tools/cache"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 	"github.com/kcp-dev/logicalcluster/v3"
 
-	resolveroptions "github.com/kubestellar/kubestellar/cmd/mailbox-controller/options"
 	clientopts "github.com/kubestellar/kubestellar/pkg/client-options"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func main() {
@@ -72,12 +67,12 @@ func main() {
 
 	rootClientOpts := clientopts.NewClientOpts("root", "access to the root workspace")
 	rootClientOpts.SetDefaultCurrentContext("root")
-
-	mbwsClientOpts := clientopts.NewClientOpts("mbws", "access to mailbox workspaces (really all clusters)")
-	mbwsClientOpts.SetDefaultCurrentContext("base")
-
 	rootClientOpts.AddFlags(fs)
-	mbwsClientOpts.AddFlags(fs)
+	espwClientOpts := clientopts.NewClientOpts("espw", "access to the edge service provider workspace")
+	espwClientOpts.AddFlags(fs)
+	baseClientOpts := clientopts.NewClientOpts("allclusters", "access to all clusters")
+	baseClientOpts.SetDefaultCurrentContext("base")
+	baseClientOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
 
@@ -101,23 +96,19 @@ func main() {
 	}()
 
 	// create edgeSharedInformerFactory
-	options := resolveroptions.NewOptions()
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	espwRestConfig, err := espwClientOpts.ToRESTConfig()
 	if err != nil {
 		logger.Error(err, "failed to create config from flags")
 		os.Exit(3)
 	}
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
-	if err != nil {
-		logger.Error(err, "failed to create config for view of edge exports")
-		os.Exit(4)
-	}
-	edgeViewClusterClientset, err := edgeclientset.NewForConfig(edgeViewConfig)
+
+	edgeClientset, err := edgeclientset.NewForConfig(espwRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create clientset for view of edge exports")
 		os.Exit(6)
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
+
+	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 	syncTargetClusterPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
 
 	rootRestConfig, err := rootClientOpts.ToRESTConfig()
@@ -135,24 +126,20 @@ func main() {
 	workspaceScopedInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(workspaceScopedClientset, resyncPeriod)
 	workspaceScopedPreInformer := workspaceScopedInformerFactory.Tenancy().V1alpha1().Workspaces()
 
-	mbwsClientConfig, err := mbwsClientOpts.ToRESTConfig()
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "failed to make all-cluster config")
-		os.Exit(20)
+		logger.Error(err, "failed to create k8s clientset for service provider space")
+		os.Exit(6)
 	}
-	mbwsClientConfig.UserAgent = "mailbox-controller"
-	mbwsClientset, err := kcpclusterclientset.NewForConfig(mbwsClientConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create all-cluster clientset")
-		os.Exit(24)
-	}
-
-	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
-		workspaceScopedClientset.TenancyV1alpha1().Workspaces(),
-		mbwsClientset.ApisV1alpha1().APIBindings(),
-	)
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
 
 	doneCh := ctx.Done()
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
+
+	ctl := newMailboxController(ctx, espwPath, syncTargetClusterPreInformer, workspaceScopedPreInformer,
+		workspaceScopedClientset.TenancyV1alpha1().Workspaces(), kbSpaceRelation,
+	)
+
 	edgeSharedInformerFactory.Start(doneCh)
 
 	workspaceScopedInformerFactory.Start(doneCh)
@@ -160,48 +147,4 @@ func main() {
 	ctl.Run(concurrency)
 
 	logger.Info("Time to stop")
-}
-
-func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exportName string) (*rest.Config, error) {
-	providerClient, err := kcpscopedclientset.NewForConfig(providerConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error creating client for service provider workspace: %w", err)
-	}
-	apiExportClient := providerClient.ApisV1alpha1().APIExports()
-	logger := klog.FromContext(ctx)
-	var apiExport *apisv1alpha1.APIExport
-	for {
-		apiExport, err = apiExportClient.Get(ctx, exportName, metav1.GetOptions{})
-		if err != nil {
-			if k8sapierrors.IsNotFound(err) {
-				logger.V(2).Info("Pause because APIExport not found", "exportName", exportName)
-				time.Sleep(time.Second * 15)
-				continue
-			}
-			return nil, fmt.Errorf("error reading APIExport %s: %w", exportName, err)
-		}
-		if isAPIExportReady(logger, apiExport) {
-			logger.V(2).Info(" ### export is ready, exportName: ", exportName)
-			break
-		}
-		logger.V(2).Info("Pause because APIExport not ready", "exportName", exportName)
-		time.Sleep(time.Second * 15)
-	}
-	viewConfig := rest.CopyConfig(providerConfig)
-	serverURL := apiExport.Status.VirtualWorkspaces[0].URL
-	logger.V(2).Info("Found APIExport view", "exportName", exportName, "serverURL", serverURL)
-	viewConfig.Host = serverURL
-	return viewConfig, nil
-}
-
-func isAPIExportReady(logger klog.Logger, apiExport *apisv1alpha1.APIExport) bool {
-	if !conditions.IsTrue(apiExport, apisv1alpha1.APIExportVirtualWorkspaceURLsReady) {
-		logger.V(2).Info("APIExport virtual workspace URLs are not ready", "APIExport", apiExport.Name)
-		return false
-	}
-	if len(apiExport.Status.VirtualWorkspaces) == 0 {
-		logger.V(2).Info("APIExport does not have any virtual workspace URLs", "APIExport", apiExport.Name)
-		return false
-	}
-	return true
 }
