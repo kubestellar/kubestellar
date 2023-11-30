@@ -108,7 +108,6 @@ IngressClass
 IPv
 ISA
 JSON
-KCP
 KCS
 Karve
 Keypair
@@ -401,8 +400,6 @@ joinus
 jq
 json
 jsonpath
-kcp
-kcp's
 ko
 ksmeta
 kube
