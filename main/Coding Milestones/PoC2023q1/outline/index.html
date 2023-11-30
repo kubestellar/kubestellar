@@ -1186,6 +1186,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#note-on-milieu" class="md-nav__link">
+    Note on milieu
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kube-bind-object-id-mapping" class="md-nav__link">
+    Kube-bind object ID mapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kube-bind-space-id-mapping" class="md-nav__link">
+    Kube-bind space ID mapping
+  </a>
+  
+    <nav class="md-nav" aria-label="Kube-bind space ID mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-of-space-identifier-mapping" class="md-nav__link">
+    Implementation of space identifier mapping
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#inventory-management-workspaces-imw" class="md-nav__link">
     Inventory Management workspaces (IMW)
   </a>
@@ -2246,6 +2280,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#note-on-milieu" class="md-nav__link">
+    Note on milieu
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kube-bind-object-id-mapping" class="md-nav__link">
+    Kube-bind object ID mapping
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kube-bind-space-id-mapping" class="md-nav__link">
+    Kube-bind space ID mapping
+  </a>
+  
+    <nav class="md-nav" aria-label="Kube-bind space ID mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-of-space-identifier-mapping" class="md-nav__link">
+    Implementation of space identifier mapping
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#inventory-management-workspaces-imw" class="md-nav__link">
     Inventory Management workspaces (IMW)
   </a>
@@ -2470,7 +2538,7 @@
 
   <h1>Details</h1>
 
-<p><img alt="poc2023q1 architecture" src="../Edge-PoC-2023q1.svg" /></p>
+<p><img alt="poc2023q1 architecture" src="../Kubestellar-Architecture-using-kube-bind.svg" /></p>
 <h2 id="status-of-this-memo">Status of this memo<a class="headerlink" href="#status-of-this-memo" title="Permanent link">#</a></h2>
 <p>This summarizes the design for a Proof-of-Concept intended to be
 completed in early 2023.  It has been completed except for the
@@ -2594,7 +2662,89 @@ born on the edge clusters.  On the inward path, the reported or full
 state goes from edge to the mailbox workspace and then is summarized
 to the workload management workspace.  State propagation is maintained
 in an eventually consistent way, it is not just one-and-done.</p>
+<h2 id="note-on-milieu">Note on milieu<a class="headerlink" href="#note-on-milieu" title="Permanent link">#</a></h2>
+<p>We have made a terminoloogy shift since this document was originally
+written, but not yet thoroughly updated this document to use the new
+terminology. Both old and new terminology and their relation is
+documented in <a href="../../../Getting-Started/user-guide/#glossary">the
+glossary</a>.</p>
+<p>This design is set in the context of kcp and currently in the midst of
+a transition away from that. This design uses kcp workspaces as
+spaces, and eschews the use of kcp APIExport+APIBinding in favor of
+using <a href="https://github.com/kube-bind/kube-bind">kube-bind</a>.</p>
+<h2 id="kube-bind-object-id-mapping">Kube-bind object ID mapping<a class="headerlink" href="#kube-bind-object-id-mapping" title="Permanent link">#</a></h2>
+<p>With kube-bind, a provider sees a different ID on an object than the
+consumer does. The namespace or name is modified so that the objects
+from all the consumers can be copied into the provider. This object ID
+mapping can be inverted with the following interface.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// AnalyzeObjectID examines an object in a kube-bind service provider</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">// cluster and returns the object&#39;s ID as known in the service consumer</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// cluster and the kube-bind ID for the consumer, or an error if</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">// the object does not appear to be a provider&#39;s copy of a consumer&#39;s object.</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AnalyzeObjectID</span><span class="p">(</span><span class="nx">obj</span><span class="w"> </span><span class="nx">metav1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">kbSpaceID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{..}</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">// ComposeClusterScopedName translates the name of a cluster-scoped object</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">// from what appears in the service consumer cluster to what appears in the</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">// service provider cluster. A Namespace is an example of a cluster-scoped</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">// object.</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">// For namespaced objects, kube-bind translates the name of their namespace.</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ComposeClusterScopedName</span><span class="p">(</span><span class="nx">kbSpaceID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{..}</span>
+</code></pre></div>
+<h2 id="kube-bind-space-id-mapping">Kube-bind space ID mapping<a class="headerlink" href="#kube-bind-space-id-mapping" title="Permanent link">#</a></h2>
+<p>The kube-bind module has its own identifiers for spaces. These are
+distinct from the ways that kcp identifies spaces. In kube-bind, for a
+given provider and consumer, the identifier is the "cluster namespace"
+in the provider cluster that corresponds to the consuer. We will not
+presume that these cluster namespace names are globally unique (across
+providers).</p>
+<p>In kcp there are two ways of identifying most spaces: (1)
+<code>logicalcluster.Name</code> and (2) the pathname of the corresponding
+<code>Workspace</code> object. In this design the controllers have been using
+<code>logicalcluster.Name</code> as the space identifier (using the <code>Path</code> method
+of <code>logicalcluster.Name</code> when passing a <code>Name</code> to a func that takes a
+<code>Path</code>).</p>
+<p>In kube-bind, for a given provider, there is a 1:1 relation between
+the kube-bind identifier for a consumer (the "cluster namespace" in
+the provider) and the kcp identifier for that consumer (the
+<code>logicalcluster.Name</code>). This relation is queried through the following
+interface.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// KubeBindSpaceRelation is specific to one kube-bind service provider</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1">// and reveals the 1:1 relation between the kube-bind identifier for</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// a consumer (i.e., the name of the &quot;cluster namespace&quot; for that consumer</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">// in the provider) and the underlying space identifier (i.e., the</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1">// `logicalcluster.Name`).</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">type</span><span class="w"> </span><span class="nx">KubeBindSpaceRelation</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="c1">// SpaceIDToKubeBind maps an underlying space ID to a kube-bind space ID.</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="c1">// Returns empty string if there is no relationship.</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nx">SpaceIDToKubeBind</span><span class="p">(</span><span class="nx">spaceID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="c1">// SpaceIDFromKubeBind maps a kube-bind space ID to an underlying space ID.</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="c1">// Returns empty string if there is no relationship.</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="nx">SpaceIDFromKubeBind</span><span class="p">(</span><span class="nx">kubeBindID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">}</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1">// NewKubeBindSpaceRelation creates a KubeBindSpaceRelation given a</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="c1">// Kubernetes client for the provider&#39;s space and a context bounding</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1">// the relation&#39;s lifetime.</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewKubeBindSpaceRelation</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="nx">kubernetes</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span><span class="w"> </span><span class="nx">KubeBindSpaceRelation</span><span class="w"> </span><span class="p">{..}</span>
+</code></pre></div>
+<h3 id="implementation-of-space-identifier-mapping">Implementation of space identifier mapping<a class="headerlink" href="#implementation-of-space-identifier-mapping" title="Permanent link">#</a></h3>
+<p>The underlying information is provided to our layers at just one point
+in time: when the kube-bind binding operation (<code>kubectl bind</code>) is
+done. At this time there is available: the <code>logicalcluster.Name</code> of
+the provider space, the <code>logicalcluster.Name</code> of the consumer space,
+and the kube-bind identifier of the consumer in relation to the
+provider. This triple of information is written to a <code>ConfigMap</code>
+object. That object is in the <code>kubestellar</code> namespace in the provider
+space, the object's name contains the <code>logicalcluster.Name</code> of the
+consumer space, and the object has a label whose key is
+<code>kubestellar.io/kube-bind-id</code> and whose value is the kube-bind
+identifier of that consumer for that provider. Putting the content in
+a label makes it easy to get a tabular listing: <code>kubectl get -n
+kubestellar cm -l kubestellar.io/kube-bind-id -L
+kubestellar.io/kube-bind-id</code>.</p>
 <h2 id="inventory-management-workspaces-imw">Inventory Management workspaces (IMW)<a class="headerlink" href="#inventory-management-workspaces-imw" title="Permanent link">#</a></h2>
+<p>Now called Inventory Space (IS).</p>
 <p>In this design the primary interface between infrastructure management
 and workload management is API objects in <em>inventory management</em>
 workspaces.  We use the <code>Location</code> and <code>SyncTarget</code> object types
@@ -2603,9 +2753,9 @@ this purpose.  The people doing infrastructure management are
 responsible for creating the inventory management workspaces and
 populating them with <code>Location</code> and <code>SyncTarget</code> objects, one
 <code>Location</code> and one <code>SyncTarget</code> per edge cluster.  These inventory
-management workspaces need to use APIBindings to APIExports defining
+management workspaces use APIServiceBindings to APIServiceExports defining
 <code>Location</code> and <code>SyncTarget</code> so that the workload management layer can
-use one APIExport view for each API group to read those objects.</p>
+use one informer factory on the KCS (formerly ESPW) to read those objects.</p>
 <p>To complete the plumbing of the syncers, each inventory workspace that
 contains a SyncTarget needs to also contain the following associated
 objects.  FYI, these are the things that <code>kubectl kcp workload sync</code>
@@ -2620,14 +2770,16 @@ is not among the things that this PoC takes a position on.</p>
    ClusterRole.</li>
 </ol>
 <h2 id="edge-service-provider-workspace-espw">Edge Service Provider workspace (ESPW)<a class="headerlink" href="#edge-service-provider-workspace-espw" title="Permanent link">#</a></h2>
+<p>Now called the KubeStellar Core Space (KCS).</p>
 <p>The edge multi-cluster service is provided by one workspace that
 includes the following things.</p>
 <ul>
-<li>An APIExport of the edge API group.</li>
+<li>An APIServiceExport of the edge API group.</li>
 <li>The edge controllers: Where Resolver, Placement Translator, Mailbox
   Controller, and Status Summarizer.</li>
 </ul>
 <h2 id="workload-management-workspaces-wmw">Workload Management workspaces (WMW)<a class="headerlink" href="#workload-management-workspaces-wmw" title="Permanent link">#</a></h2>
+<p>Now called a Workload Description Space (WDS).</p>
 <p>The users of edge multi-cluster primarily maintain these.  Each one of
 these has both control (API objects that direct the behavior of the
 edge computing platform) and data (API objects that hold workload
@@ -2801,17 +2953,23 @@ WEC.</p>
 <td>APIBinding</td>
 <td>false</td>
 </tr>
+<tr>
+<td>kube-bind.io/v1alpha1</td>
+<td>APIServiceBinding</td>
+<td>false</td>
+</tr>
 </tbody>
 </table>
-<p>A workload management workspace needs an APIBinding to the APIExport
-of the API group <code>edge.kubestellar.io</code> from the edge service provider
-workspace, in order to be able to contain EdgePlacement and related
-objects.  These objects and that APIBinding are not destined for the
-edge clusters.</p>
-<p>The edge clusters are not presumed to be kcp workspaces, so
-APIBindings do not propagate to the edge clusters.  However, it is
-possible that APIBindings for workload APIs may exist in a workload
-management workspace and be selected for downsync to mailbox
+<p>A workload management workspace needs APIServiceBindings to the
+APIServiceExports of the relevant control resources from the edge
+service provider workspace, in order to be able to contain
+EdgePlacement and related objects.  These objects and those
+APIServiceBindings are not destined for the edge clusters.</p>
+<p>The edge clusters are not presumed to be kcp workspaces nor
+participate in kube-bind, so APIBindings and APIServiceBindings do not
+propagate to the edge clusters.  However, it is possible that
+APIBindings or APIServiceBindings for workload APIs may exist in a
+workload management workspace and be selected for downsync to mailbox
 workspaces while the edge clusters have the same resources defined by
 CRDs (as mentioned later in the discussion of built-in resources and
 namespaces).</p>
@@ -2858,6 +3016,11 @@ their workload desired and reported state.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>kube-bind.io/v1alpha1</td>
+<td>APIServiceExport</td>
+<td>false</td>
+</tr>
 <tr>
 <td>apis.kcp.io/v1alpha1</td>
 <td>APIExport</td>
@@ -3192,47 +3355,47 @@ example, the following scenario is allowed.</p>
 <ul>
 <li>Some central team owns an API group and produces some
   CustomResourceDefinition (CRD) objects that populate that API group.</li>
-<li>That team derives APIResourceSchemas from those CRDs and a
-  corresponding APIExport of their API group.</li>
-<li>That team maintains a kcp workspace holding those APIResourceSchemas
-  and that APIExport.</li>
-<li>Some workload management workspaces have APIBindings to that
-  APIExport, and EdgePlacement objects that (1) select those
-  APIBinding objects for downsync and (2) select objects of kinds
-  defined through those APIBindings for either downsync or upsync.</li>
+<li>That team derives APIServiceExports of their CRDs.</li>
+<li>That team maintains a kcp workspace holding those APIServiceExports.</li>
+<li>Some workload management workspaces have APIServiceBindings to those
+  APIServiceExports, and EdgePlacement objects that (1) select those
+  APIServiceBinding objects for downsync and (2) select objects of
+  kinds defined through those APIServiceBindings for either downsync
+  or upsync (possibly letting 1 happen as an implicit consequence of
+  2).</li>
 <li>Those resources are built into the edge clusters by pre-deploying
   the aforementioned CRDs there.</li>
 <li>Those resources are <em>not</em> built into the mailbox workspaces.  In
-  this case the APIBindings would propagate from workload management
+  this case the APIServiceBindings would propagate from workload management
   workspace to mailbox workspaces but not edge clusters.</li>
-<li>As a consequence of those propagated APIBindings, the APIExport's
-  view includes all of the objects (in workload management workspaces,
-  in mailbox workspaces, and in any other workspaces where they
-  appear) whose kind is defined through those APIBindings.</li>
+<li>As a consequence of those propagated APIServiceBindings, the
+  APIServiceExport space gets kube-bound copies of all of the objects
+  (in workload management workspaces, in mailbox workspaces, and in
+  any other workspaces where they appear) whose kind is defined
+  through those APIServiceBindings.</li>
 </ul>
 <h3 id="control-objects">Control objects<a class="headerlink" href="#control-objects" title="Permanent link">#</a></h3>
 <p>These are the EdgePlacement objects, their associated
 SinglePlacementSlice objects, and the objects that direct
 customization and summarization.</p>
 <h4 id="edgeplacement-objects">EdgePlacement objects<a class="headerlink" href="#edgeplacement-objects" title="Permanent link">#</a></h4>
-<p>One of these is a binding between a "what" predicate and a "where"
-predicate.</p>
+<p>One of these is a binding between a "what" predicate (with downsync
+and upsync parts) and a "where" predicate.</p>
 <p>Overlaps between EdgePlacement objects are explicitly allowed.  Two
 EdgePlacement objects may have "where" predicates that both match some
 of the same destinations.  Two EdgePlacement objects may have "what"
 predicates that match some of the same workload descriptions.  Two
 EdgePlacement objects may overlap in both ways.</p>
-<p>An EdgePlacement object deliberately <em>only</em> binds "what" and "where",
-without any adverbs (such as prescriptions of customization or
-summarization).  This means that overlapping EdgePlacement objects can
-not conflict in those adverbs.</p>
-<p>However, another sort of conflict remains possible.  This is because
-the user controls the IDs --- that is, the names --- of the parts of
-the workload.  In full, a Kubernetes API object is identified by API
-group, API major version, Kind (equivalently, resource name),
-namespace if relevant, and name.  For simplicity in this PoC we will
-not worry about differences in API major version; each API group in
-Kubernetes and/or kcp currently has only one major version.</p>
+<p>An EdgePlacement object binds "what" and "where", with one adverb at
+present and more coming in the future. This requires clear definition
+of how these adverbs combine in the case of overlapping bindings.</p>
+<p>Conflicts are possible.  This is because the user controls the IDs ---
+that is, the names --- of the parts of the workload.  In full, a
+Kubernetes API object is identified by API group, API major version,
+Kind (equivalently, resource name), namespace if relevant, and name.
+For simplicity in this PoC we will not worry about differences in API
+major version; each API group in Kubernetes and/or kcp currently has
+only one major version.</p>
 <p>Two different workload descriptions can have objects with the same ID
 (i.e., if they appear in different workspaces).  These objects, when
 rendered to the same API version, might have different values.  And
@@ -3346,8 +3509,8 @@ corresponding edge cluster and the <code>SyncerConfig</code> object that guides
 the syncer.</p>
 <p>A mailbox workspace contains the following items.</p>
 <ol>
-<li>APIBindings (maintained by the mailbox controller) to APIExports of
-   workload object types.</li>
+<li>APIServiceBindings (maintained by the mailbox controller) to
+   APIServiceExports of workload object types.</li>
 <li>Workload objects, post customization in the case of downsynced
    objects.</li>
 <li>A <code>SyncerConfig</code> object.</li>
@@ -3386,7 +3549,10 @@ objects and maintains the results of matching.  For each EdgePlacement
 object this controller maintains an associated collection of
 SinglePlacementSlice objects holding the matches for that
 EdgePlacement.  These SinglePlacementSlice objects appear in the same
-workspace as the corresponding EdgePlacement; the remainder of how
+workspace as the corresponding EdgePlacement, and identify SyncTarget
+and Location objects by the identifiers of their original copies (not
+the copies in the KCS) --- with the exception of the UID of the
+SyncTarget, that comes from the copy in the KCS; the remainder of how
 they are linked is TBD.</p>
 <h2 id="placement-translator">Placement Translator<a class="headerlink" href="#placement-translator" title="Permanent link">#</a></h2>
 <p>This controller continually monitors all the EdgePlacement objects,
@@ -3436,9 +3602,7 @@ management workspaces.  Each such workspace needs to have the
 following items, which that user will create if they are not
 pre-populated by the workspace type.</p>
 <ul>
-<li>An APIBinding to the <code>workload.kcp.io</code> APIExport to get
-  <code>SyncTarget</code>.</li>
-<li>An APIBinding to the <code>scheduling.kcp.io</code> APIExport to get
+<li>APIServiceBindings to the APIServiceExports of <code>SyncTarget</code> and
   <code>Location</code>.</li>
 <li>A ServiceAccount (with associated token-bearing Secret) (details
   TBD) that the mailbox controller authenticates as.</li>
@@ -3458,8 +3622,8 @@ pre-populated by the workspace type.</p>
 management workspaces.  Each needs to have the following, which that
 user creates if the workload type did not already provide.</p>
 <ul>
-<li>An APIBinding to the APIExport of <code>edge.kubestellar.io</code> from the edge
-  service provider workspace.</li>
+<li>APIServiceBindings to the APIServiceExports of the relevant
+  resources from the edge service provider workspace.</li>
 <li>For each of the Where Resolver, the Placement Translator, and the
   Status Summarizer:</li>
 <li>A ServiceAccount for that controller to authenticate as;</li>
