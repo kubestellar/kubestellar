@@ -32,24 +32,21 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 
-	kcpdynamic "github.com/kcp-dev/client-go/dynamic"
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-	"github.com/kcp-dev/logicalcluster/v3"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/logicalcluster"
 )
 
 func TestKubeStellarDownsyncOverwriteOption(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/downsync-overwrite-option/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/downsync-overwrite-option/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 
 	var cmUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/downsync-overwrite-option/configmap.yaml", embedded, &cmUnst)
+	err = framework.LoadFile("testdata/downsync-overwrite-option/configmap.yaml", embedded, &cmUnst)
 	require.NoError(t, err)
 
 	var cmNotDownsyncOverwriteUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/downsync-overwrite-option/configmap-not-downsync-overwrite.yaml", embedded, &cmNotDownsyncOverwriteUnst)
+	err = framework.LoadFile("testdata/downsync-overwrite-option/configmap-not-downsync-overwrite.yaml", embedded, &cmNotDownsyncOverwriteUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")
@@ -228,7 +225,7 @@ type TestKubeStellarDownsyncOverwriteOptionFixture struct {
 	ctx                             context.Context
 	wsPath                          logicalcluster.Path
 	dynamicClient                   dynamic.Interface
-	upstreamDynamicClueterClient    *kcpdynamic.ClusterClientset
+	upstreamDynamicClueterClient    *framework.KcpDynamicClient
 	cmTest1Unst                     *unstructured.Unstructured
 	cmNotDownsyncOverwriteTest1Unst *unstructured.Unstructured
 	cmTest2Unst                     *unstructured.Unstructured

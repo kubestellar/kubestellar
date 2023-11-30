@@ -31,26 +31,24 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerForUpdateStatus(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/update-status/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/update-status/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 
 	var deploymentUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/update-status/deployment.yaml", embedded, &deploymentUnst)
+	err = framework.LoadFile("testdata/update-status/deployment.yaml", embedded, &deploymentUnst)
 	require.NoError(t, err)
 
 	var statusObj map[string]interface{}
-	err = edgeframework.LoadFile("testdata/update-status/status.yaml", embedded, &statusObj)
+	err = framework.LoadFile("testdata/update-status/status.yaml", embedded, &statusObj)
 	require.NoError(t, err)
 
 	var status2Obj map[string]interface{}
-	err = edgeframework.LoadFile("testdata/update-status/status2.yaml", embedded, &status2Obj)
+	err = framework.LoadFile("testdata/update-status/status2.yaml", embedded, &status2Obj)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")
@@ -137,27 +135,27 @@ func TestKubeStellarSyncerForUpdateStatus(t *testing.T) {
 
 func TestKubeStellarSyncerForUpdateNonSubresourceStatus(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/update-status/non-subresource/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/update-status/non-subresource/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 
 	var statusObj map[string]interface{}
-	err = edgeframework.LoadFile("testdata/update-status/non-subresource/status.yaml", embedded, &statusObj)
+	err = framework.LoadFile("testdata/update-status/non-subresource/status.yaml", embedded, &statusObj)
 	require.NoError(t, err)
 
 	var sampleCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-crd.yaml", embedded, &sampleCRDUnst)
+	err = framework.LoadFile("testdata/update-status/non-subresource/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
 	var sampleSubresourceCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd.yaml", embedded, &sampleSubresourceCRDUnst)
+	err = framework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd.yaml", embedded, &sampleSubresourceCRDUnst)
 	require.NoError(t, err)
 
 	var sampleCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-crd-cr.yaml", embedded, &sampleCRUnst)
+	err = framework.LoadFile("testdata/update-status/non-subresource/sample-crd-cr.yaml", embedded, &sampleCRUnst)
 	require.NoError(t, err)
 
 	var sampleSubresourceCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd-cr.yaml", embedded, &sampleSubresourceCRUnst)
+	err = framework.LoadFile("testdata/update-status/non-subresource/sample-subresource-crd-cr.yaml", embedded, &sampleSubresourceCRUnst)
 	require.NoError(t, err)
 
 	var sampleCRGVR = schema.GroupVersionResource{
