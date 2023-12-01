@@ -1,25 +1,39 @@
 #!/usr/bin/env bash
 
-# Usage: $0
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# This script will write the file counts/$githash/matrix.csv, where
-# $githash is $(git rev-parse --short HEAD).
-# The matrix has a row per directory (with certain ones excluded).
-# The matrix has the columns documented in count-directory.sh.
+# Usage: $0 $commit
 
-# This script also writes counts/$githash/sum-over-directories.csv.
-# This has one line, with the same columns as the matrix except that
-# the directory is replaced by two columns: one holding $githash
-# and one holding the unix timestamp of the commit date of HEAD.
-# Thus, the concatenation of all those sum files makes one CSV table.
+# This will `git checkout $commit`,
+# make copy in subdirectory `$PWD/forcount`,
+# remove subdirectories that should not be counted,
+# then apply `count-tree.sh $PWD/counts $commit $timestamp`.
+# The timestamp is found by `git show --no-patch --no-notes --format=%ct`.
 
-bindir=$(dirname $0)
-githash=$(git rev-parse --short HEAD)
-cmt=$(git show --no-patch --no-notes --format=%ct $githash)
-mkdir -p "counts/$githash"
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 \$commit" >&2
+    exit 1
+fi
 
-# find . \( -name '.[a-zA-Z]*' -prune \) -or \( -name venv -prune \) -or \( -name bin \) -or -type d -exec ${bindir}/count-directory.sh \{\} \; > "counts/$githash/matrix.csv"
+commit="$1"
+bindir=$(cd $(dirname $0); pwd)
 
-find . \( -path './.git/*' -prune \) -or -type d -exec ${bindir}/count-directory.sh \{\} \; > "counts/$githash/matrix.csv"
-
-grep '^\.,' "counts/$githash/matrix.csv" | sed "s/.,/${githash},${cmt},/" > "counts/$githash/sum-over-directories.csv"
+rm -rf forcount
+git checkout "$commit"
+timestamp=$(git show --no-patch --no-notes --format=%ct)
+cp -R . forcount
+cd forcount
+rm -rf counts .git .vscode docs/venv docs/__pycache__
+${bindir}/count-tree.sh ../counts "$commit" "$timestamp"
