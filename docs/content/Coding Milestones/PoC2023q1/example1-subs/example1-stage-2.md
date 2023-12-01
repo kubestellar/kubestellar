@@ -17,8 +17,8 @@ management workspace (WMW).  Start by creating a WMW for the common
 workload, with the following commands.
 
 ```shell
-kubectl ws root
-kubectl kubestellar ensure wmw wmw-c
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-c
+wmw_c_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-c
 ```
 
 This is equivalent to creating that workspace and then entering it and
@@ -55,7 +55,7 @@ that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_c_space_config apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -131,7 +131,7 @@ selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_c_space_config apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -168,8 +168,8 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-kubectl ws root
-kubectl kubestellar ensure wmw wmw-s
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-s
+wmw_s_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-s
 ```
 
 In this workload we will also demonstrate how to downsync objects
@@ -180,7 +180,7 @@ modified so that the resource it defines is in the category
 `all`. First, create the definition object with the following command.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -230,7 +230,7 @@ Next, use the following command to wait for the apiserver to process
 that definition.
 
 ```shell
-kubectl wait --for condition=Established crd crontabs.stable.example.com
+kubectl --kubeconfig $wmw_s_space_config wait --for condition=Established crd crontabs.stable.example.com
 ```
 
 Next, use `kubectl` to create the following workload objects in that
@@ -239,7 +239,7 @@ to the httpd workload but is here to demonstrate that `APIService`
 objects can be downsynced.
 
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -346,7 +346,7 @@ common EdgePlacement, which does not explicitly mention the
 namespaces as needed in the WECs.
    
 ```shell
-kubectl apply -f - <<EOF
+kubectl --kubeconfig $wmw_s_space_config apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -407,7 +407,10 @@ following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.
 
 ```shell
-kubectl ws root:espw
+espw_space_config="${PWD}/temp-space-config/spaceprovider-default-espw"
+kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --space-config-file $espw_space_config
+# TODO: where-resolver needs access to multiple configs. Will remove when controllers support spaces.
+kubectl ws root:espw 
 kubestellar-where-resolver &
 sleep 10
 ```
@@ -416,12 +419,10 @@ The following commands wait until the where-resolver has done its job
 for the common and special `EdgePlacement` objects.
 
 ```shell
-kubectl ws root:wmw-c
-while ! kubectl get SinglePlacementSlice &> /dev/null; do
+while ! kubectl --kubeconfig $wmw_c_space_config get SinglePlacementSlice &> /dev/null; do
   sleep 10
 done
-kubectl ws root:wmw-s
-while ! kubectl get SinglePlacementSlice &> /dev/null; do
+while ! kubectl --kubeconfig $wmw_s_space_config get SinglePlacementSlice &> /dev/null; do
   sleep 10
 done
 ```
@@ -440,14 +441,7 @@ I0423 01:33:37.391772   11305 reconcile_on_location.go:192] "updated SinglePlace
 Check out a SinglePlacementSlice object as follows.
 
 ```shell
-kubectl ws root:wmw-c
-```
-``` { .bash .no-copy }
-Current workspace is "root:wmw-c".
-```
-
-```shell
-kubectl get SinglePlacementSlice -o yaml
+kubectl --kubeconfig $wmw_c_space_config get SinglePlacementSlice -o yaml
 ```
 ``` { .bash .no-copy }
 apiVersion: v1

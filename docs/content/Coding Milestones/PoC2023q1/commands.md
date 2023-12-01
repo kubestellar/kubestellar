@@ -262,6 +262,11 @@ that import the namespaced Kubernetes resources (kinds of objects) for managemen
 containerized workloads. At the completion of `kubestellar init` the current workspace will be
 "root".
 
+6. Creates the space provider objects to be used by the space manager. Need to pass
+in two environment variables - SPACE_MANAGER_KUBECONFIG and IN_CLUSTER. SPACE_MANAGER_KUBECONFIG
+is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
+are accessed from within the hosting cluster or externally by kubestellar init.
+
 #### KubeStellar start
 
 This subcommand is used after installation or process stops.
@@ -518,7 +523,7 @@ controllers but does require that the KubeStellar Core Space (KCS) has been set 
 An example usage follows.
 
 ```shell
-kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw-1".

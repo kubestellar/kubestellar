@@ -34,9 +34,21 @@ they appear in this example.
 %}
 
 {%
+   include-markdown "example1-subs/example1-space-manager.md"
+   start="<!--example1-space-manager-start-->"
+   end="<!--example1-space-manager-end-->"
+%}
+
+{%
    include-markdown "example1-subs/example1-start-kcp.md"
    start="<!--example1-start-kcp-start-->"
    end="<!--example1-start-kcp-end-->"
+%}
+
+{%
+   include-markdown "example1-subs/example1-kcp-provider.md"
+   start="<!--example1-kcp-provider-start-->"
+   end="<!--example1-kcp-provider-end-->"
 %}
 
 {%
@@ -66,23 +78,21 @@ of executing copies to be reported.  Check that the reported number is
 2.
 
 ```shell
-kubectl ws root:wmw-c
-kubectl get rs -n commonstuff commond -o yaml | grep 'kubestellar.io/executing-count: "2"' || { kubectl get rs -n commonstuff commond -o yaml; false; }
+kubectl --kubeconfig $wmw_c_space_config get rs -n commonstuff commond -o yaml | grep 'kubestellar.io/executing-count: "2"' || { kubectl --kubeconfig $wmw_c_space_config get rs -n commonstuff commond -o yaml; false; }
 ```
 
 For the special workload, the number of executing copies should be 1.
 Check that the reported number agrees.
 
 ```shell
-kubectl ws root:wmw-s
-kubectl get deploy -n specialstuff speciald -o yaml | grep 'kubestellar.io/executing-count: "1"' || { kubectl get deploy -n specialstuff speciald -o yaml; false; }
+kubectl --kubeconfig $wmw_s_space_config get deploy -n specialstuff speciald -o yaml | grep 'kubestellar.io/executing-count: "1"' || { kubectl --kubeconfig $wmw_s_space_config get deploy -n specialstuff speciald -o yaml; false; }
 ```
 
 Look at the status section of the "speciald" `Deployment` and see that
 it has been filled in with the information from the guilder cluster.
 
 ```shell
-kubectl get deploy -n specialstuff speciald -o yaml
+kubectl --kubeconfig $wmw_s_space_config get deploy -n specialstuff speciald -o yaml
 ```
 
 Current status might not be there yet. The following command waits for
@@ -91,7 +101,7 @@ status that reports that there is a special workload pod "ready".
 ```shell
 let count=1
 while true; do
-    rsyaml=$(kubectl get deploy -n specialstuff speciald -o yaml)
+    rsyaml=$(kubectl --kubeconfig $wmw_s_space_config get deploy -n specialstuff speciald -o yaml)
     if grep 'readyReplicas: 1' <<<"$rsyaml"
     then break
     fi

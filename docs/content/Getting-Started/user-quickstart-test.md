@@ -118,6 +118,9 @@ make userbuild
 export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
+export SM_CONFIG=~/.kube/config
+export SM_CONTEXT=ks-core
+mkdir -p ${PWD}/temp-space-config
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -164,11 +167,12 @@ export PATH=$PWD/kcp/bin:$PATH
 Wait for the mailbox controller to create the corresponding mailbox workspaces and remember them.
 
 ```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
 KUBECONFIG=ks-core.kubeconfig kubectl ws root
-while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
-MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
 echo The mailbox for ks-edge-cluster1 is $MB1
-MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
 echo The mailbox for ks-edge-cluster2 is $MB2
 ```
 
@@ -184,8 +188,10 @@ echo The mailbox for ks-edge-cluster2 is $MB2
 Add a ServiceAccount that will be downsynced.
 
 ```shell
-KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
-KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
+wmw1_space_config="${PWD}/temp-space-config/spaceprovider-default-wmw1"
+kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $wmw1_space_config
+
+KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -199,7 +205,7 @@ EOF
 Add an EdgePlacement that calls for that ServiceAccount to be downsynced.
 
 ```shell
-KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
+KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
 apiVersion: edge.kubestellar.io/v2alpha1
 kind: EdgePlacement
 metadata:
@@ -218,6 +224,18 @@ EOF
 Wait for the ServiceAccount to get to the mailbox workspaces.
 
 ```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+# Once the mailbox is converted to spaces, this is the code we want to use:
+# MB1_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB1}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB1_space_config
+# while ! KUBECONFIG=$MB1_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#     sleep 10
+# done
+# MB2_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB2}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB2_space_config
+# while ! KUBECONFIG=MB2_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#    sleep 10
+# done
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB1
 while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
     sleep 10
@@ -231,10 +249,9 @@ done
 Thrash the ServiceAccount some in its WDS.
 
 ```shell
-KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 for key in k1 k2 k3 k4; do
     sleep 15
-    KUBECONFIG=ks-core.kubeconfig kubectl annotate sa -n my-namespace test-sa ${key}=${key}
+    KUBECONFIG=$wmw1_space_config kubectl annotate sa -n my-namespace test-sa ${key}=${key}
 done
 ```
 
@@ -248,9 +265,8 @@ Look for excess secrets in the WDS. Expect 2 token Secrets: one for
 the default ServiceAccount and one for `test-sa`.
 
 ```shell
-KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
-KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
-[ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
+KUBECONFIG=$wmw1_space_config kubectl get secrets -n my-namespace
+[ $(KUBECONFIG=$wmw1_space_config kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
 ```
 
 Look for excess secrets in the two mailbox spaces. Allow up to three:
@@ -259,6 +275,7 @@ for the `test-sa` ServiceAccount, and one generated locally for the
 `test-sa` ServiceAccount.
 
 ```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
 for mb in $MB1 $MB2; do
     KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
     KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml

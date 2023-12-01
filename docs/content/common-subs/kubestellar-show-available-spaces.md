@@ -4,6 +4,6 @@ KUBECONFIG=~/.kube/config kubectl --context ks-core get secrets kubestellar \
   -o jsonpath='{.data.external\.kubeconfig}' \
   -n kubestellar | base64 -d > ks-core.kubeconfig
 
-KUBECONFIG=ks-core.kubeconfig kubectl ws --context root tree
+KUBECONFIG=~/.kube/config kubectl --context ks-core get spaces -A 
 ```
 <!--kubestellar-show-available-spaces-end-->

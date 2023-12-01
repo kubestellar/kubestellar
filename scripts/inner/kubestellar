@@ -38,7 +38,6 @@ remove=0
 cleanup=0
 espw_name="espw"
 log_folder=$(pwd)/kubestellar-logs
-local_kcp=true
 imws="root:imw1"
 wmws="root:wmw1"
 
@@ -75,33 +74,30 @@ wait_for_process(){
   echo $status_code
 }
 
-
 function ensure_imws() {
-    initial_ws=$(kubectl ws . --short)
     while IFS=',' read -ra items; do
         for i in "${items[@]}"; do
             if [ "$i" == "" ] ; then
                 continue
             fi
+            in_cluster=
+            if $IN_CLUSTER; then
+                in_cluster="--in-cluster"
+            fi 
+
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
-            kubectl ws root &> /dev/null
-            if ! kubectl ws "$imw" &> /dev/null ; then #
-                if ! kubectl ws create "$imw" --enter &> /dev/null ; then
-                    echoerr 'unable to create "$imw"!'
-                    break
-                fi
-            fi
-            kubestellar-kube-bind "$imw" "synctargets" --start-konnector true
-            kubestellar-kube-bind "$imw" "locations"
+            space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
+            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
+            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
+            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "synctargets" --start-konnector true
+            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
-    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
 }
 
 
 function ensure_wmws() {
-    initial_ws=$(kubectl ws . --short)
     while IFS=',' read -ra items; do
         for i in "${items[@]}"; do
             if [ "$i" == "" ] ; then
@@ -109,11 +105,9 @@ function ensure_wmws() {
             fi
             wmw=${i#"root:"}
             echo "Ensuring WMW: $wmw"
-            kubectl ws root &> /dev/null
-            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true &> /dev/null
+            ${bindir}/kubectl-kubestellar-ensure-wmw $wmw $xflag --with-kube true # &> /dev/null
         done
     done <<< "$1"
-    kubectl ws use $initial_ws &> /dev/null # go back to the initial state
 }
 
 
@@ -124,11 +118,6 @@ while (( $# > 0 )); do
     (--log-folder)
         if (( $# > 1 ));
         then { log_folder="$2"; shift; }
-        else { echo "$0: missing log folder" >&2; exit 1; }
-        fi;;
-    (--local-kcp)
-        if (( $# > 1 ));
-        then { local_kcp="$2"; shift; }
         else { echo "$0: missing log folder" >&2; exit 1; }
         fi;;
     (--verbose|-V)
@@ -148,7 +137,7 @@ while (( $# > 0 )); do
         xflag="-X"
         set -x;;
     (-h|--help)
-        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--local-kcp bool] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [-V|--verbose] [-X]"
+        echo "Usage: $0 [init | start | stop] [--log-folder log_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--provider-name provider-name] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2 ; exit 1;
@@ -159,32 +148,58 @@ while (( $# > 0 )); do
     esac
     shift
 done
+if [ "$PROVIDER_NAME" == "" ]; then
+    PROVIDER_NAME="default"
+    export PROVIDER_NAME
+fi
+if [ "$PROVIDER_NAMESPACE" == "" ]; then
+    PROVIDER_NAMESPACE=spaceprovider-${PROVIDER_NAME}
+    export PROVIDER_NAMESPACE
+fi
+if [ "$KUBECONFIG_DIR" == "" ]; then
+    KUBECONFIG_DIR="${PWD}/temp-space-config"
+    mkdir -p $KUBECONFIG_DIR
+    export KUBECONFIG_DIR
+fi
+if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
+    SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
+    export SPACE_MANAGER_KUBECONFIG
+fi
+if [ "$IN_CLUSTER" == "" ]; then
+    IN_CLUSTER=true
+    export IN_CLUSTER
+fi
+echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
+echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "PROVIDER_NAME=${PROVIDER_NAME}"
+echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
+echo "IN_CLUSTER=${IN_CLUSTER}"
 
 if [ "$subcommand" == "" ]; then
     echo "$0: missing a subcommand" >&2
     exit 1
 fi
 
-case "$local_kcp" in
-    (true|false) ;;
-    (*) echo "$0: --local-kcp must be given 'true' or 'false', not '${local_kcp}'" >&2
-	exit 1;;
-esac
-
-
-
 function create_or_replace() { # usage: filename
     filename="$1"
     kind=$(grep kind: "$filename" | head -1 | awk '{ print $2 }')
     name=$(grep name: "$filename" | head -1 | awk '{ print $2 }')
-    if kubectl get "$kind" "$name" &> /dev/null
+    if kubectl get "$kind" "$name" # &> /dev/null
     then eval kubectl replace -f "$filename" $verbdir
     else eval kubectl create -f "$filename" $verbdir
     fi
 }
 
-# current ws at start does not matter, is root:compute on return
 function ensure_root_compute_configd() {
+    # TODO: remove kcp dependency in PR3 once we switch to kube-bind.
+    secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.name}'`
+    secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.namespace}'`
+    echo "secret_name=${secret_name}"
+    echo "secret_namespace=${secret_namespace}"
+    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d > ${KUBECONFIG_DIR}/kcp.kubeconfig
+    KUBECONFIG=${KUBECONFIG_DIR}/kcp.kubeconfig
+    kubectl ws root:compute
+    echo "set ws to root:compute"
     ( cd ${bindir}/../config/kube/exports/namespaced
       # Some are too big to `kubectl apply`
       for rsfn in apiresourceschema-*.yaml; do
@@ -332,21 +347,20 @@ EOF
     echo "Finished augmenting root:compute for KubeStellar"
 }
 
-# current ws at start does not matter, is ESPW on return
 function ensure_espw() {
-    kubectl ws root &> /dev/null
-    if kubectl get Workspace "$espw_name" &> /dev/null; then
-	echo "espw workspace already exists -- using it:"
-	kubectl ws "$espw_name"
-    else
-        kubectl ws create "$espw_name" --enter
-    fi
+    in_cluster=
+    if $IN_CLUSTER; then
+        in_cluster="--in-cluster"
+    fi 
+    space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
+    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
     run_dex
     sleep 2
     run_kb_backend
-    kubectl apply -f "$bindir/../config/crds/"
-    kubectl get crd -oname | grep kubestellar.io | xargs -i kubectl label {} kube-bind.io/exported=true
-    eval kubectl apply -f "$bindir/../config/exports" $verbdir
+    KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/crds/"
+    KUBECONFIG=$space_config kubectl get crd -oname | grep kubestellar.io | KUBECONFIG=$space_config xargs -i kubectl label {} kube-bind.io/exported=true
+    KUBECONFIG=$space_config kubectl apply -f "$bindir/../config/exports" 
     echo "Finished populating the espw with kubestellar apiexports"
 }
 
@@ -393,7 +407,7 @@ function run_kb_backend() {
         exit 1
     fi
 }
-
+ 
 if [ "$subcommand" != init ]; then
 
     # Check mailbox-controller is already running
@@ -424,21 +438,6 @@ if [ $subcommand == stop ]; then
    exit 0
 fi
 
-# Check if kcp is running
-if [ "$local_kcp" == true ] && [ $(process_running kcp) != "running" ]; then
-    echo "kcp is not running - please start it ...."
-    exit 1
-fi
-
-let tries=1
-while ! ( kubectl get workspaces && kubectl ws root:compute ); do
-    if (( ( tries & (tries-1) ) == 0 ))
-    then echo "$0: At $(date), kcp server not running yet or root:compute workspace not yet ready, waiting $(( tries * 15 )) sec..." >& 2
-    fi
-    let tries=tries+1
-    sleep 15
-done
-
 ensure_root_compute_configd
 ensure_espw
 ensure_imws $imws
@@ -449,6 +448,23 @@ if [ $subcommand == init ]; then
     exit 0
 fi
 
+wait_for_process(){
+  status=$(process_running $1)
+  MAX_RETRIES=5
+  retries=0
+  status_code=0
+  while [ $status != "running" ]; do
+      if [ $retries -eq $MAX_RETRIES ]; then
+           status_code=1
+           break
+      fi
+
+      retries=$(( retries + 1 ))
+      sleep 3
+      status=$(process_running $1)
+  done
+  echo $status_code
+}
 
 
 # Start the kubestellar controllers
@@ -456,7 +472,6 @@ echo "****************************************"
 echo "Launching KubeStellar ..."
 echo "****************************************"
 
-kubectl ws root:espw &> /dev/null
 sleep 5
 
 # Create the logs directory
@@ -504,5 +519,4 @@ sleep 10
 echo "****************************************"
 echo "Finished launching KubeStellar ..."
 echo "****************************************"
-kubectl ws root
 

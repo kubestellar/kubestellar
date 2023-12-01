@@ -48,7 +48,10 @@ spec:
           value: "{{ .Values.EXTERNAL_HOSTNAME }}"
         - name: EXTERNAL_PORT
           value: "{{ .Values.EXTERNAL_PORT }}"
+        - name: NAMESPACE 
+          value: "{{ .Release.Namespace }}"
 
+      {{ if eq .Values.defaultSpaceProviderType "kcp" }} 
       - name: kcp
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
@@ -76,6 +79,7 @@ spec:
         - name: ks-port
           protocol: TCP
           containerPort: 6443
+      {{ end }}
 
       - name: init
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
@@ -99,9 +103,9 @@ spec:
         - name: ENSURE_WMW
           value: "{{ .Values.ENSURE_WMW }}"
         - name: NAMESPACE 
-          value: "{{ .Values.spaceNamespace }}"
-        - name: SPACE_PROVIDER 
-          value: "{{ .Values.defaultSpaceProvider }}"
+          value: "{{ .Release.Namespace }}"
+        - name: SPACE_PROVIDER_TYPE
+          value: "{{ .Values.defaultSpaceProviderType }}"
           # volumeMounts:
           # - name: kubestellar-secret
           #   mountPath: "/home/kubestellar/.kcp"
