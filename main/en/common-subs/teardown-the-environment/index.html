@@ -1854,11 +1854,11 @@
 <p>The following command will stop whatever KubeStellar controllers are running.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubestellar<span class="w"> </span>stop
 </code></pre></div>
-<p>Stop and uninstall KubeStellar and kcp with the following command:</p>
+<p>Stop and uninstall KubeStellar and the space provider with the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>remove-kubestellar
 </code></pre></div>
 <h3 id="teardown-kubernetes-workload">Teardown Kubernetes workload<a class="headerlink" href="#teardown-kubernetes-workload" title="Permanent link">#</a></h3>
-<p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.</p>
+<p>With <code>kubectl</code> configured to manipulate the hosting cluster, the following command will remove the workload that is the space provider and KubeStellar.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>delete<span class="w"> </span>kubestellar
 </code></pre></div>
 <!--teardown-the-environment-end-->

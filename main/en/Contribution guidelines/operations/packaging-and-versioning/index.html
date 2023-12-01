@@ -2059,8 +2059,8 @@ tag to use in the reference to the syncer image.</p>
 </li>
 </ul>
 <h2 id="core-container-image">Core container image<a class="headerlink" href="#core-container-image" title="Permanent link">#</a></h2>
-<p>The core container runs the kcp server and the KubeStellar core
-controllers and initializes the kcp workspaces. It is built from some
+<p>The core container image is used in containers that run the KubeStellar core controllers
+, initialize the KubeStellar core, and run one of the supported space providers. It is built from some
 contents of <a href="https://github.com/kubestellar/kubestellar">the KubeStellar GitHub
 repo</a>, specifically
 excluding some that are only needed by users outside this
@@ -2083,7 +2083,7 @@ tag).</p>
 </ul>
 <h2 id="kubestellar-core-helm-chart">KubeStellar core Helm chart<a class="headerlink" href="#kubestellar-core-helm-chart" title="Permanent link">#</a></h2>
 <p>This Helm chart describes a deployment of the KubeStellar core
-components (kcp server, KubeStellar controllers, initialization) as
+components (a space provider, KubeStellar controllers, initialization) as
 workload for a Kubernetes cluster.</p>
 <p>The source of this Helm chart is in the <code>core-helm-chart</code> subdirectory
 of the <a href="#kubestellarkubestellar">kubestellar GitHub repo</a>.</p>
@@ -2141,9 +2141,8 @@ GitHub repo serves directly as the homebrew repository for
 KubeStellar. According to homebrew convention, users refer to it in
 homebrew as <code>kubestellar/kubestellar</code> (e.g., <code>brew tap
 kubestellar/kubestellar</code> connects directly to this GitHub repository).</p>
-<p>This HomeBrew repository has two formulae.  One called <code>kcp_cli</code> has
-the kubectl plugins of kcp. Release v0.11.0 of kcp is always used. A
-formula called <code>kubestellar_cli</code> has contents that are needed by a
+<p>This HomeBrew repository has two formulae.  One to control the space
+provider and another formula called <code>kubestellar_cli</code> containing tools needed by a
 user who deploys the KubeStellar core as workload in a Kubernetes
 cluster or another user of that deployment. This formula fetches and
 installs a <code>kubestellaruser</code> release archive from GitHub. Users invoke
@@ -2151,7 +2150,6 @@ the <code>brew</code> command directly to install, upgrade, and remove these
 formulae.</p>
 <p>Following are the versions available.</p>
 <ul>
-<li><code>kcp_cli</code> <code>v0.11.0</code> for that release of kcp</li>
 <li><code>kubestellar_cli</code> <code>v0.9.0</code>, for that release of KubeStellar.</li>
 </ul>
 <h3 id="kubestellarkubeflex">kubestellar/kubeflex<a class="headerlink" href="#kubestellarkubeflex" title="Permanent link">#</a></h3>

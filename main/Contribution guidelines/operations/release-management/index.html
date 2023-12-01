@@ -2555,93 +2555,38 @@ finally, push to the main branch
 <p>Check to make sure the GitHub workflows for doc generation, doc push, and broken links is working and passing
 <a href="https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml">https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml</a>
 <a href="https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml">https://github.com/kubestellar/kubestellar/actions/workflows/broken-links-crawler.yml</a></p>
-<!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
-- Configure prow for the new release branch
-
-    - Make sure you have openshift/release cloned
-    - Create a new branch
-    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
-    - Edit the new file
-    - Change main to the name of the release branch, such as release-0.15
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>zz_generated_metadata:
-<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>  branch: main
-</code></pre></div>
-Change latest to the name of the release branch
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>promotion:
-<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>  namespace: kubestellar
-<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>  tag: latest
-<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>  tag_by_commit: true
-</code></pre></div>
-    - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
-    - Copy the main branch configuration to a new release-x.y entry
-    - Run make update
-    - Add the new/updated files and commit your changes
-    - Push your branch to your fork
-    - Open a pull request
-    - Wait for it to be reviewed and merged
-    - Update testgrid
-
-- Make sure you have a clone of kubernetes/test-infra
-- Edit config/testgrids/kcp/kcp.yaml
-- In the test_groups section:
-- Copy all the entries under # main to the bottom of the map
-- Rename -main- to -release-<version>-
-- In the dashboard_groups section:
-    - Add a new entry under dashboard_names for kcp-release-<version>
-    - In the dashboards section:
-        - Copy the kcp-main entry, including dashboard_tab and all its entries, to a new entry called kcp-release-<version>
-        - Rename main to release-<version> in the new entry
-        - Commit your changes
-        - Push your branch to your fork
-        - Open a pull request
-        - Wait for it to be reviewed and merged
-        - Review/edit/publish the release in GitHub
-
-The goreleaser workflow automatically creates a draft GitHub release for each tag.
-
-Navigate to the draft release for the tag you just pushed. You'll be able to find it under the releases page.
-If the release notes have been pre-populated, delete them.
-For the "previous tag," select the most recent, appropriate tag as the starting point
-If this is a new minor release (e.g. v0.8.0), select the initial version of the previous minor release (e.g. v0.7.0)
-If this is a patch release (e.g. v0.8.7), select the previous patch release (e.g. v0.8.6)
-Click "Generate release notes"
-Publish the release
-Notify -->
-
 <h3 id="create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom">Create an email addressed to <a href="mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com">kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com</a><a class="headerlink" href="#create-an-email-addressed-to-kubestellar-devgooglegroupscom-and-kubestellar-usersgooglegroupscom" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Subject: KubeStellar release v0.15.0
-<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>
-<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>Body:
-<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a>
-<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a>Dear KubeStellar Community,
-<a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a>    Release v0.15.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.15.0
-<a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a>
-<a id="__codelineno-45-8" name="__codelineno-45-8" href="#__codelineno-45-8"></a>What&#39;s Changed
-<a id="__codelineno-45-9" name="__codelineno-45-9" href="#__codelineno-45-9"></a>
-<a id="__codelineno-45-10" name="__codelineno-45-10" href="#__codelineno-45-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
-<a id="__codelineno-45-11" name="__codelineno-45-11" href="#__codelineno-45-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
-<a id="__codelineno-45-12" name="__codelineno-45-12" href="#__codelineno-45-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
-<a id="__codelineno-45-13" name="__codelineno-45-13" href="#__codelineno-45-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
-<a id="__codelineno-45-14" name="__codelineno-45-14" href="#__codelineno-45-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
-<a id="__codelineno-45-15" name="__codelineno-45-15" href="#__codelineno-45-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
-<a id="__codelineno-45-16" name="__codelineno-45-16" href="#__codelineno-45-16"></a>📖Update dev-env.md by @francostellari in #1157
-<a id="__codelineno-45-17" name="__codelineno-45-17" href="#__codelineno-45-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
-<a id="__codelineno-45-18" name="__codelineno-45-18" href="#__codelineno-45-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
-<a id="__codelineno-45-19" name="__codelineno-45-19" href="#__codelineno-45-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
-<a id="__codelineno-45-20" name="__codelineno-45-20" href="#__codelineno-45-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
-<a id="__codelineno-45-21" name="__codelineno-45-21" href="#__codelineno-45-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
-<a id="__codelineno-45-22" name="__codelineno-45-22" href="#__codelineno-45-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
-<a id="__codelineno-45-23" name="__codelineno-45-23" href="#__codelineno-45-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
-<a id="__codelineno-45-24" name="__codelineno-45-24" href="#__codelineno-45-24"></a>New Contributors
-<a id="__codelineno-45-25" name="__codelineno-45-25" href="#__codelineno-45-25"></a>
-<a id="__codelineno-45-26" name="__codelineno-45-26" href="#__codelineno-45-26"></a>@fab7 made their first contribution in #1155
-<a id="__codelineno-45-27" name="__codelineno-45-27" href="#__codelineno-45-27"></a>Full Changelog: v0.8.0…v0.9.0
-<a id="__codelineno-45-28" name="__codelineno-45-28" href="#__codelineno-45-28"></a>
-<a id="__codelineno-45-29" name="__codelineno-45-29" href="#__codelineno-45-29"></a>Thank you for your continued support,
-<a id="__codelineno-45-30" name="__codelineno-45-30" href="#__codelineno-45-30"></a>
-<a id="__codelineno-45-31" name="__codelineno-45-31" href="#__codelineno-45-31"></a>Andy
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>Subject: KubeStellar release v0.15.0
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>Body:
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>Dear KubeStellar Community,
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a>    Release v0.15.0 is now available at https://github.com/kubestellar/kubestellar/releases/tag/v0.15.0
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>What&#39;s Changed
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a>
+<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a>🐛 Fix display of initial spaces after deploy in kube by @MikeSpreitzer in #1143
+<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1144
+<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a>✨ Generalize bootstrap wrt namespace in hosting cluster by @MikeSpreitzer in #1145
+<a id="__codelineno-43-13" name="__codelineno-43-13" href="#__codelineno-43-13"></a>✨ Switch to use k8s code generators by @ezrasilvera in #1139
+<a id="__codelineno-43-14" name="__codelineno-43-14" href="#__codelineno-43-14"></a>✨ Bump actions/checkout from 4.1.0 to 4.1.1 by @dependabot in #1151
+<a id="__codelineno-43-15" name="__codelineno-43-15" href="#__codelineno-43-15"></a>🌱 Align default core image ref in chart with coming release by @MikeSpreitzer in #1146
+<a id="__codelineno-43-16" name="__codelineno-43-16" href="#__codelineno-43-16"></a>📖Update dev-env.md by @francostellari in #1157
+<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a>📖Update Chart.yaml appVersion by @francostellari in #1158
+<a id="__codelineno-43-18" name="__codelineno-43-18" href="#__codelineno-43-18"></a>🐛 Use realpath to see through symlinks by @MikeSpreitzer in #1156
+<a id="__codelineno-43-19" name="__codelineno-43-19" href="#__codelineno-43-19"></a>✨ Increase kind version to v0.20 for ubuntu by @fab7 in #1155
+<a id="__codelineno-43-20" name="__codelineno-43-20" href="#__codelineno-43-20"></a>📖 Document syncer removal by @MikeSpreitzer in #1164
+<a id="__codelineno-43-21" name="__codelineno-43-21" href="#__codelineno-43-21"></a>🌱 Rename urmeta to ksmeta by @MikeSpreitzer in #1166
+<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a>✨ Make get-internal-kubeconfig fetch mid-level kubeconfig by @MikeSpreitzer in #1161
+<a id="__codelineno-43-23" name="__codelineno-43-23" href="#__codelineno-43-23"></a>✨ Make ensure/remove wmw insensitive to current workspace by @MikeSpreitzer in #1160
+<a id="__codelineno-43-24" name="__codelineno-43-24" href="#__codelineno-43-24"></a>New Contributors
+<a id="__codelineno-43-25" name="__codelineno-43-25" href="#__codelineno-43-25"></a>
+<a id="__codelineno-43-26" name="__codelineno-43-26" href="#__codelineno-43-26"></a>@fab7 made their first contribution in #1155
+<a id="__codelineno-43-27" name="__codelineno-43-27" href="#__codelineno-43-27"></a>Full Changelog: v0.8.0…v0.9.0
+<a id="__codelineno-43-28" name="__codelineno-43-28" href="#__codelineno-43-28"></a>
+<a id="__codelineno-43-29" name="__codelineno-43-29" href="#__codelineno-43-29"></a>Thank you for your continued support,
+<a id="__codelineno-43-30" name="__codelineno-43-30" href="#__codelineno-43-30"></a>
+<a id="__codelineno-43-31" name="__codelineno-43-31" href="#__codelineno-43-31"></a>Andy
 </code></pre></div>
 <h3 id="post-the-same-message-in-the-kubestellar-slack-channel">Post the same message in the <a href="https://kubestellar.io/slack">#kubestellar</a> Slack channel<a class="headerlink" href="#post-the-same-message-in-the-kubestellar-slack-channel" title="Permanent link">#</a></h3>
 
