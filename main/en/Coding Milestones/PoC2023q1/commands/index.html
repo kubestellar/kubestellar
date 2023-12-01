@@ -2561,6 +2561,12 @@ that import the namespaced Kubernetes resources (kinds of objects) for managemen
 containerized workloads. At the completion of <code>kubestellar init</code> the current workspace will be
 "root".</p>
 </li>
+<li>
+<p>Creates the space provider objects to be used by the space manager. Need to pass
+in two environment variables - SPACE_MANAGER_KUBECONFIG and IN_CLUSTER. SPACE_MANAGER_KUBECONFIG
+is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
+are accessed from within the hosting cluster or externally by kubestellar init.</p>
+</li>
 </ol>
 <h4 id="kubestellar-start">KubeStellar start<a class="headerlink" href="#kubestellar-start" title="Permanent link">#</a></h4>
 <p>This subcommand is used after installation or process stops.</p>
@@ -2766,7 +2772,7 @@ IMW.</p>
 <p>This command does not depend on the action of any of the KubeStellar
 controllers but does require that the KubeStellar Core Space (KCS) has been set up.</p>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
