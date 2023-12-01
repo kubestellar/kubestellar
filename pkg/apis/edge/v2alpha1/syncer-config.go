@@ -31,6 +31,7 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:resource:scope=Cluster,shortName=escfg
+// +kubebuilder:metadata:labels="kube-bind.io/exported=true"
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type SyncerConfig struct {
 	metav1.TypeMeta `json:",inline"`
