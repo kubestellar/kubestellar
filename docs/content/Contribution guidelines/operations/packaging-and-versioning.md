@@ -56,8 +56,8 @@ Following are some recent tags and what they correspond to.
 
 ## Core container image
 
-The core container runs a space provider server and the KubeStellar core
-controllers and initializes the space provider's spaces. It is built from some
+The core container runs a space provider and the KubeStellar core
+controllers and initializes the space provider's spaces used by KubeStellar. It is built from some
 contents of [the KubeStellar GitHub
 repo](https://github.com/kubestellar/kubestellar), specifically
 excluding some that are only needed by users outside this
@@ -79,7 +79,7 @@ Following are some recent tags and what they correspond to.
 ## KubeStellar core Helm chart
 
 This Helm chart describes a deployment of the KubeStellar core
-components (a space provider server, KubeStellar controllers, initialization) as
+components (a space provider, KubeStellar controllers, initialization) as
 workload for a Kubernetes cluster.
 
 The source of this Helm chart is in the `core-helm-chart` subdirectory
