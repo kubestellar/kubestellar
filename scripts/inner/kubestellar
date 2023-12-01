@@ -90,7 +90,7 @@ function ensure_imws() {
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
             kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
             kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
-            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "synctargets" --start-konnector true
+            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "synctargets"
             KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
@@ -379,7 +379,7 @@ function run_dex() {
 
     run_status=$(wait_for_process dex)
     if [ $run_status -eq 0 ]; then
-        echo " dex started"
+        echo "dex started"
     else
         echo "dex not started"
         sleep 2

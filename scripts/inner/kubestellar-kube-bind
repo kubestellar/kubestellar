@@ -16,24 +16,18 @@
 
 space_name=""
 resource_to_bind=""
-start_konnector=false
 cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
 log_dir=$(pwd)/kubestellar-kube-bind-logs
 
 while (( $# > 0 )); do
     case "$1" in
     (-h|--help)
-        echo "Usage: $0 (--start-konnector boolean | -X)* space_name resource_to_bind"
+        echo "Usage: $0 [-X] space_name resource_to_bind"
         echo "space_name is the name of a kube-bind consumer space, the space currently must be a direct child of the kcp 'root' workspace, note that space_name doesn't contain the 'root:' prefix"
         echo "resource_to_bind is a resource offered by the kube-bind provider, in lower case and plural form"
         exit 0;;
     (-X)
         set -o xtrace;;
-    (--start-konnector)
-        if (( $# >1 ))
-        then start_konnector="$2"; shift
-        else echo "$0: missing start-konnector value" >&2; exit 1
-        fi;;
     (-*)
         echo "$0: flag syntax error" >&2
         exit 1;;
@@ -60,12 +54,6 @@ then
     exit 1
 fi
 
-case "$start_konnector" in
-    (true|false) ;;
-    (*) echo "$0: start-konnector should be true or false" >&2
-	  exit 1;;
-esac
-
 initial_ws=$(kubectl ws . --short)
 trap "kubectl ws use $initial_ws &> /dev/null # go back to the initial state" EXIT
 
@@ -86,21 +74,18 @@ if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
     exit 0
 fi
 
-if [[ ! -d $log_dir ]]; then
-    mkdir -p $log_dir
-fi
-
-if [ "$start_konnector" == true ]
-then
+if pgrep konnector | xargs ps e -p 2>/dev/null | egrep "KB_CONSUMER=$space_name(\s|$)" &> /dev/null; then
+    echo "kube-bind konnector for space $space_name already running"
+else
     if ! kubectl get namespace kube-system &> /dev/null
     then kubectl create namespace kube-system &> /dev/null
     fi
+    mkdir -p $log_dir
     log_file=$log_dir/kube-bind-konnector-$space_name.log
     echo "starting kube-bind konnector for space $space_name in background, logs writing to $log_file"
-    konnector &> $log_file &
+    KB_CONSUMER=$space_name konnector &> $log_file &
     sleep 2
     if ! pgrep konnector &> /dev/null; then
-        #TODO: how to identify the konnector for current space?
         echo "Error: kube-bind konnector process not found" >&2
         exit 1
     fi
