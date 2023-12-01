@@ -56,8 +56,8 @@ Following are some recent tags and what they correspond to.
 
 ## Core container image
 
-The core container runs the kcp server and the KubeStellar core
-controllers and initializes the kcp workspaces. It is built from some
+The core container image is used in containers that run the KubeStellar core controllers
+, initialize the KubeStellar core, and run one of the supported space providers. It is built from some
 contents of [the KubeStellar GitHub
 repo](https://github.com/kubestellar/kubestellar), specifically
 excluding some that are only needed by users outside this
@@ -79,7 +79,7 @@ Following are some recent tags and what they correspond to.
 ## KubeStellar core Helm chart
 
 This Helm chart describes a deployment of the KubeStellar core
-components (kcp server, KubeStellar controllers, initialization) as
+components (a space provider, KubeStellar controllers, initialization) as
 workload for a Kubernetes cluster.
 
 The source of this Helm chart is in the `core-helm-chart` subdirectory
@@ -137,9 +137,8 @@ KubeStellar. According to homebrew convention, users refer to it in
 homebrew as `kubestellar/kubestellar` (e.g., `brew tap
 kubestellar/kubestellar` connects directly to this GitHub repository).
 
-This HomeBrew repository has two formulae.  One called `kcp_cli` has
-the kubectl plugins of kcp. Release v0.11.0 of kcp is always used. A
-formula called `kubestellar_cli` has contents that are needed by a
+This HomeBrew repository has two formulae.  One to control the space
+provider and another formula called `kubestellar_cli` containing tools needed by a
 user who deploys the KubeStellar core as workload in a Kubernetes
 cluster or another user of that deployment. This formula fetches and
 installs a `kubestellaruser` release archive from GitHub. Users invoke
@@ -148,7 +147,6 @@ formulae.
 
 Following are the versions available.
 
-- `kcp_cli` `v0.11.0` for that release of kcp
 - `kubestellar_cli` `v0.9.0`, for that release of KubeStellar.
 
 ### kubestellar/kubeflex

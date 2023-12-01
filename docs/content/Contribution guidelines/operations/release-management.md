@@ -369,67 +369,6 @@ Check to make sure the GitHub workflows for doc generation, doc push, and broken
 [{{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml]({{ config.repo_url }}/actions/workflows/docs-gen-and-push.yml)
 [{{ config.repo_url }}/actions/workflows/broken-links-crawler.yml]({{ config.repo_url }}/actions/workflows/broken-links-crawler.yml)
 
-
-
-
-<!-- ### Note sure if any of this PROW Stuff is necessary - we will see the next time we do a release..
-- Configure prow for the new release branch
-
-    - Make sure you have openshift/release cloned
-    - Create a new branch
-    - Copy ci-operator/config/kcp-dev/edge-md/kcp-dev-kcp-main.yaml to ci-operator/config/kubestellar/kubestellar/kcp-dev-kcp-release-<version>.yaml
-    - Edit the new file
-    - Change main to the name of the release branch, such as {{ config.ks_next_branch }}
-
-```
-zz_generated_metadata:
-  branch: main
-```
-Change latest to the name of the release branch
-
-```
-promotion:
-  namespace: kubestellar
-  tag: latest
-  tag_by_commit: true
-```
-    - Edit core-services/prow/02_config/kcp-dev/kcp/_prowconfig.yaml
-    - Copy the main branch configuration to a new release-x.y entry
-    - Run make update
-    - Add the new/updated files and commit your changes
-    - Push your branch to your fork
-    - Open a pull request
-    - Wait for it to be reviewed and merged
-    - Update testgrid
-
-- Make sure you have a clone of kubernetes/test-infra
-- Edit config/testgrids/kcp/kcp.yaml
-- In the test_groups section:
-- Copy all the entries under # main to the bottom of the map
-- Rename -main- to -release-<version>-
-- In the dashboard_groups section:
-    - Add a new entry under dashboard_names for kcp-release-<version>
-    - In the dashboards section:
-        - Copy the kcp-main entry, including dashboard_tab and all its entries, to a new entry called kcp-release-<version>
-        - Rename main to release-<version> in the new entry
-        - Commit your changes
-        - Push your branch to your fork
-        - Open a pull request
-        - Wait for it to be reviewed and merged
-        - Review/edit/publish the release in GitHub
-
-The goreleaser workflow automatically creates a draft GitHub release for each tag.
-
-Navigate to the draft release for the tag you just pushed. You'll be able to find it under the releases page.
-If the release notes have been pre-populated, delete them.
-For the "previous tag," select the most recent, appropriate tag as the starting point
-If this is a new minor release (e.g. v0.8.0), select the initial version of the previous minor release (e.g. v0.7.0)
-If this is a patch release (e.g. v0.8.7), select the previous patch release (e.g. v0.8.6)
-Click "Generate release notes"
-Publish the release
-Notify -->
-
-
 ### Create an email addressed to [kubestellar-dev@googlegroups.com and kubestellar-users@googlegroups.com](mailto:kubestellar-dev@googlegroups.com,kubestellar-users@googlegroups.com) 
 
 ```
