@@ -2,7 +2,7 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v231026-b37310b41.edgeplacements.edge.kubestellar.io
+  name: v231115-946a928e9.edgeplacements.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
   names:
@@ -210,8 +210,6 @@ spec:
                     items:
                       type: string
                     type: array
-                required:
-                - apiGroup
                 type: object
               type: array
             locationSelectors:
