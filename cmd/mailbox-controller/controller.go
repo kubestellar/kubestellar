@@ -306,7 +306,7 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	shellScriptName := "kubestellar-kube-bind"
 
 	resourcesToBind := []string{"syncerconfigs", "edgesyncconfigs"}
-	for idx, resource := range resourcesToBind {
+	for _, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
 		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
@@ -321,9 +321,6 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 			workspace.Name,
 			resource,
 		}, " ")
-		if idx == 0 {
-			invokeScript = invokeScript + " --start-konnector true"
-		}
 		cmdLine := strings.Join([]string{
 			makeCopyOfKubeConfig,
 			removeCopyWhenExits,
