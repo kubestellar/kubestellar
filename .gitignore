@@ -12,3 +12,6 @@ docs/scripts/generated_script.sh
 
 # Mac trash
 .DS_Store
+
+# word counts
+/counts
