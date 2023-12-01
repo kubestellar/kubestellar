@@ -56,8 +56,8 @@ Following are some recent tags and what they correspond to.
 
 ## Core container image
 
-The core container runs a space provider and the KubeStellar core
-controllers and initializes the space provider's spaces used by KubeStellar. It is built from some
+The core container image is used in containers that run the KubeStellar core controllers
+, initialize the KubeStellar core, and run one of the supported space providers. It is built from some
 contents of [the KubeStellar GitHub
 repo](https://github.com/kubestellar/kubestellar), specifically
 excluding some that are only needed by users outside this
