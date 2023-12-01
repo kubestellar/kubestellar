@@ -47,6 +47,7 @@ const CustomizerAnnotationKey string = "edge.kubestellar.io/customizer"
 
 // +crd
 // +genclient
+// +kubebuilder:metadata:labels="kube-bind.io/exported=true"
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Customizer defines modifications to make to the relevant objects as they propagate

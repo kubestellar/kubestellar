@@ -24,6 +24,7 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:resource:scope=Cluster,shortName=esc
+// +kubebuilder:metadata:labels="kube-bind.io/exported=true"
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type EdgeSyncConfig struct {
 	/*
