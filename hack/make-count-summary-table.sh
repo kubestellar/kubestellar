@@ -16,10 +16,8 @@
 
 # Usage: $0
 
-result=/tmp/sum-$$.csv
+result=counts/sum-over-directories-root.csv
 
 echo timestamp,commit,total,org,dotgo,gometa,dotsh,dotmd,dotyaml > $result
-( find counts -name sum-over-directories.csv | while read line; do cat $line; done | sort ) >> $result
-
-echo See $result
+find counts -name sum-over-directories.csv -exec cat \{\} \; | sort >> $result
 
