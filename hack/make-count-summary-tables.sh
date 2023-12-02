@@ -16,8 +16,17 @@
 
 # Usage: $0
 
-result=counts/sum-over-directories-root.csv
+# This creates summary tables in counts based on the per-commit data there.
+
+result=counts/sum-over-directories--table.csv
 
 echo timestamp,commit,descr,total,org,dotgo,gometa,dotsh,dotmd,dotyaml > $result
 find counts -name sum-over-directories.csv -exec cat \{\} \; | sort >> $result
 
+find counts -name matrix.csv -exec grep '^\./\(space-framework/\)\?[^/]*,' \{\} \; | cut -f1 -d, | sort | uniq | while read top; do
+    topn=${top:2}
+    topn=$(sed 's|/|-|' <<<"$topn")
+    result=counts/sum-over-directories-${topn}--table.csv
+    echo timestamp,commit,descr,total,org,dotgo,gometa,dotsh,dotmd,dotyaml > $result
+    find counts -name sum-over-directories-${topn}.csv -exec cat \{\} \; | sort >> $result
+done
