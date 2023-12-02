@@ -18,6 +18,6 @@
 
 result=counts/sum-over-directories-root.csv
 
-echo timestamp,commit,total,org,dotgo,gometa,dotsh,dotmd,dotyaml > $result
+echo timestamp,commit,descr,total,org,dotgo,gometa,dotsh,dotmd,dotyaml > $result
 find counts -name sum-over-directories.csv -exec cat \{\} \; | sort >> $result
 
