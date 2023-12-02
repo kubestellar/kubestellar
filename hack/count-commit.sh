@@ -32,7 +32,8 @@ bindir=$(cd $(dirname $0); pwd)
 
 rm -rf forcount
 git checkout "$commit"
-timestamp=$(git show --no-patch --no-notes --format=%cI)
+ts_secs=$(git show --no-patch --no-notes --format=%ct)
+ts_pretty=$(date -u -r "$ts_secs" "+%y-%m-%d %T")
 sumry=$(git show --no-patch --no-notes --format=%s)
 if grep -q '^Merge pull request #\([0-9]*\) from .*$' <<<"$sumry"
 then descr="PR $(sed 's/^Merge pull request #\([0-9]*\) from .*$/\1/' <<<"$sumry")"
@@ -41,4 +42,4 @@ fi
 cp -R . forcount
 cd forcount
 rm -rf counts .git .vscode docs/venv docs/__pycache__
-${bindir}/count-tree.sh ../counts "$timestamp" "$commit" "$descr"
+${bindir}/count-tree.sh ../counts "$ts_pretty" "$commit" "$descr"
