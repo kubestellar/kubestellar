@@ -14,28 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 $countdir $id $ts
+# Usage: $0 $countdir $timestamp $id $description
 
 # This script will write the file ${countdir}/${id}/matrix.csv.
 # The matrix has the columns documented in count-directory.sh.
 
 # This script also writes ${countdir}/${id}/sum-over-directories.csv.
 # This has one line, with the same columns as the matrix except that
-# the directory is replaced by two columns: one holding ${ts} and
-# and one holding ${id}.
+# the directory is replaced by three columns: one holding ${ts},
+# one holding ${id}, and one holding "${descr}".
 # Thus, the concatenation of all those sum files makes one CSV table.
 
-if [ $# -ne 3 ]; then
-    echo "Usage: $0 \$countdir \$id \$timestamp" >&2
+if [ $# -ne 4 ]; then
+    echo "Usage: $0 \$countdir \$timestamp \$id \$description" >&2
     exit 1
 fi
 
 countdir="$1"
-id="$2"
-ts="$3"
+ts="$2"
+id="$3"
+descr="$4"
 bindir=$(dirname $0)
 mkdir -p "${countdir}/${id}"
 
 find . -type d -exec ${bindir}/count-directory.sh \{\} \; > "${countdir}/${id}/matrix.csv"
 
-grep '^\.,' "${countdir}/${id}/matrix.csv" | sed "s/.,/${ts},${id},/" > "${countdir}/${id}/sum-over-directories.csv"
+grep '^\.,' "${countdir}/${id}/matrix.csv" | sed "s/.,/${ts},${id},\"${descr}\",/" > "${countdir}/${id}/sum-over-directories.csv"
