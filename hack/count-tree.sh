@@ -25,6 +25,11 @@
 # one holding ${id}, and one holding "${descr}".
 # Thus, the concatenation of all those sum files makes one CSV table.
 
+# This script write analogous single-line CVS files for high-level directories.
+
+# This script also writes a tops.csv file that has rows from matrix.csv
+# for high-level directories.
+
 if [ $# -ne 4 ]; then
     echo "Usage: $0 \$countdir \$timestamp \$id \$description" >&2
     exit 1
@@ -36,7 +41,16 @@ id="$3"
 descr="$4"
 bindir=$(dirname $0)
 mkdir -p "${countdir}/${id}"
+echo "${ts},${id},\"${descr}\"" > "${countdir}/${id}/ids.csv"
 
-find . -type d -exec ${bindir}/count-directory.sh \{\} \; > "${countdir}/${id}/matrix.csv"
+find . -type d -exec ${bindir}/count-directory.sh \{\} \; | sort > "${countdir}/${id}/matrix.csv"
 
 grep '^\.,' "${countdir}/${id}/matrix.csv" | sed "s/.,/${ts},${id},\"${descr}\",/" > "${countdir}/${id}/sum-over-directories.csv"
+
+grep '^\.\(/\(space-framework/\)\?[^/]*\)\?,' "${countdir}/${id}/matrix.csv" > "${countdir}/${id}/tops.csv"
+
+grep '^\./\(space-framework/\)\?[^/]*,' "${countdir}/${id}/matrix.csv" | cut -f1 -d, | while read top; do
+    topn=${top:2}
+    topn=$(sed 's|/|-|' <<<"$topn")
+    grep "^$top," "${countdir}/${id}/matrix.csv" | sed "s|^${top},|${ts},${id},\"${descr}\",|" > "${countdir}/${id}/sum-over-directories-${topn}.csv"
+done

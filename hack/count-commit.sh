@@ -22,6 +22,11 @@
 # then apply `count-tree.sh $PWD/counts $commit $timestamp`.
 # The timestamp is found by `git show --no-patch --no-notes --format=%ct`.
 
+# Note that this script navigates to subsidiary scripts in the same
+# directory that this script is executing from.
+# Thus, if you make a copy of hack outside the git directory
+# then you can invoke that copy of this script.
+
 if [ $# -ne 1 ]; then
     echo "Usage: $0 \$commit" >&2
     exit 1
