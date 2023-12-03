@@ -104,7 +104,7 @@ fi
 
 space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${wmw_name}"
 kubectl-kubestellar-create-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-kubectl-kubestellar-get-config-for-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
+kubectl-kubestellar-get-config-for-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
 
 KUBECONFIG=$space_config kubestellar-kube-bind "$wmw_name" "edgeplacements"
 KUBECONFIG=$space_config kubestellar-kube-bind "$wmw_name" "customizers"
