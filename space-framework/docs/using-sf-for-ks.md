@@ -11,6 +11,8 @@ KS: KubeStellar (the Multi Cluster Management Module)
 ![Using the Space Framework with KS](KS-SF-KF.drawio.svg "Using the Space Framework with KS")
 
 
+![Using the Space Framework with KS](KS-SF-KF.drawio.png "Using the Space Framework with KS")
+
 ## Deploying and using the SM
 The SM deployment is performed as part of the overall KS deployment. The SpaceManager is running on the `core-cluster` as one of the containers in the KS Pod.
 ### Accessing the SM resources
