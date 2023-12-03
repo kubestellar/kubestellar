@@ -1,4 +1,4 @@
-# Using KS with the SF and teh KF space provider
+# Using KS with the SF and the KF space provider
 
 ### Acronyms
 SF: Space Framework  
@@ -7,6 +7,9 @@ KS: KubeStellar (the Multi Cluster Management Module)
 
 ### Solution topology
  In this guide we will describe a specific topology in which all components are hosted on a **single Kube cluster** (In general KubeStellar KubeFlex and the SM can be deployed on different clusters). We will refer to that cluster as the `core-cluster`.
+
+![Using the Space Framework with KS](KS-SF-KF.drawio.svg "Using the Space Framework with KS")
+
 
 ## Deploying and using the SM
 The SM deployment is performed as part of the overall KS deployment. The SpaceManager is running on the `core-cluster` as one of the containers in the KS Pod.
@@ -63,7 +66,7 @@ Once the Space becomes ready the Status section is updated with the pSpace acces
 #TODO  Add a READY space output
 ```
 
-#### Accessing a space
+#### Accessing a pSpace
 In order to access a pSpace (get or create/update objects) the following procedure is used:
 1. Fetch the pSpace access info from the Space object: The status section of the Space object includes a secret reference (secret name and namespace). That secret holds the access config to the pSpace.
 2. Fetch and decode the actual secret into a KubeCOnfig file
