@@ -25,10 +25,16 @@ import (
 	clientoptions "github.com/kubestellar/kubestellar/pkg/client-options"
 )
 
+const (
+	defaultSpaceProviderName string = "default"
+	defaultKcsName           string = "espw"
+)
+
 type Options struct {
-	EspwClientOpts clientoptions.ClientOpts
-	BaseClientOpts clientoptions.ClientOpts
-	Logs           *logs.Options
+	SpaceMgtOpts  clientoptions.ClientOpts
+	Logs          *logs.Options
+	SpaceProvider string
+	KcsName       string
 }
 
 func NewOptions() *Options {
@@ -37,17 +43,18 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	return &Options{
-		EspwClientOpts: *clientoptions.NewClientOpts("espw", "access to the edge service provider workspace"),
-		BaseClientOpts: *clientoptions.NewClientOpts("base", "access to all logical clusters as kcp-admin"),
-		Logs:           logs,
+		SpaceMgtOpts:  *clientoptions.NewClientOpts("space-mgt", "access to space management"),
+		Logs:          logs,
+		SpaceProvider: defaultSpaceProviderName,
+		KcsName:       defaultKcsName,
 	}
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
-	options.EspwClientOpts.AddFlags(fs)
-	options.BaseClientOpts.SetDefaultUserAndCluster("kcp-admin", "base")
-	options.BaseClientOpts.AddFlags(fs)
+	options.SpaceMgtOpts.AddFlags(fs)
 	options.Logs.AddFlags(fs)
+	fs.StringVar(&options.SpaceProvider, "space-provider", options.SpaceProvider, "the name of the KubeStellar space provider")
+	fs.StringVar(&options.KcsName, "core-space", options.KcsName, "the name of the KubeStellar Core space")
 }
 
 func (options *Options) Complete() error {
