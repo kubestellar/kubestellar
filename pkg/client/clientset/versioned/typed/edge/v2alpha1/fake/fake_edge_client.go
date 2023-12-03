@@ -37,6 +37,10 @@ func (c *FakeEdgeV2alpha1) EdgePlacements() v2alpha1.EdgePlacementInterface {
 	return &FakeEdgePlacements{c}
 }
 
+func (c *FakeEdgeV2alpha1) EdgePlacementDecisions() v2alpha1.EdgePlacementDecisionInterface {
+	return &FakeEdgePlacementDecisions{c}
+}
+
 func (c *FakeEdgeV2alpha1) EdgeSyncConfigs() v2alpha1.EdgeSyncConfigInterface {
 	return &FakeEdgeSyncConfigs{c}
 }
