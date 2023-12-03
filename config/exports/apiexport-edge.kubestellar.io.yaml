@@ -12,4 +12,5 @@ spec:
   - v231020-4e62eaf7.synctargets.edge.kubestellar.io
   - v231113-f0837626.singleplacementslices.edge.kubestellar.io
   - v231115-946a928e9.edgeplacements.edge.kubestellar.io
+  - v231203-b58e8dfe7.edgeplacementdecisions.edge.kubestellar.io
 status: {}

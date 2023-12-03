@@ -31,6 +31,7 @@ type EdgeV2alpha1Interface interface {
 	RESTClient() rest.Interface
 	CustomizersGetter
 	EdgePlacementsGetter
+	EdgePlacementDecisionsGetter
 	EdgeSyncConfigsGetter
 	LocationsGetter
 	SinglePlacementSlicesGetter
@@ -49,6 +50,10 @@ func (c *EdgeV2alpha1Client) Customizers(namespace string) CustomizerInterface {
 
 func (c *EdgeV2alpha1Client) EdgePlacements() EdgePlacementInterface {
 	return newEdgePlacements(c)
+}
+
+func (c *EdgeV2alpha1Client) EdgePlacementDecisions() EdgePlacementDecisionInterface {
+	return newEdgePlacementDecisions(c)
 }
 
 func (c *EdgeV2alpha1Client) EdgeSyncConfigs() EdgeSyncConfigInterface {
