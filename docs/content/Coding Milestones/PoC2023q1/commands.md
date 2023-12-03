@@ -805,14 +805,35 @@ The acceptable flags include all those of `kubectl` except for
 This script works in idempotent style, doing whatever work remains to
 be done.
 
-The following session shows some example usages, including
-demonstration of idempotency and changing whether the kube APIBinding
-is included.
-
-```shell
-kubectl kubestellar ensure wmw example-wmw
+Identify the kubeconfig for Space Manager, for example:
+```
+kubectl config --kubeconfig ~/.kube/config current-context
 ```
 ``` { .bash .no-copy }
+sm-mgt
+```
+Set an environment variable for Space Manager:
+```
+SM_CONFIG=~/.kube/config
+```
+The following session shows some example usages, including
+demonstration of idempotency and changing whether the kube CRDs
+are included.
+
+```shell
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw
+```
+``` { .bash .no-copy }
+SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
+PROVIDER_NAME=default
+PROVIDER_NAMESPACE=spaceprovider-default
+IN_CLUSTER=false
+Error from server (NotFound): spaces.space.kubestellar.io "example-wmw" not found
+space.space.kubestellar.io/example-wmw created
+Waiting for space example-wmw to get into the Ready phase.
+Space example-wmw created.
+SECRET_NAME=external-example-wmw
+SECRET_NAMESPACE=spaceprovider-default
 Current workspace is "root".
 Workspace "example-wmw" (type root:universal) created. Waiting for it to be ready...
 Workspace "example-wmw" (type root:universal) is ready to use.
@@ -823,31 +844,82 @@ apibinding.apis.kcp.io/bind-kubernetes created
 ```
 
 ```shell
-kubectl ws ..
+kubectl ws .
 ```
 ``` { .bash .no-copy }
 Current workspace is "root".
 ```
 
 ```shell
-kubectl kubestellar ensure wmw example-wmw
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
+SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
+PROVIDER_NAME=default
+PROVIDER_NAMESPACE=spaceprovider-default
+IN_CLUSTER=false
+SECRET_NAME=external-example-wmw
+SECRET_NAMESPACE=spaceprovider-default
 Current workspace is "root".
-Current workspace is "root:example-wmw" (type root:universal).
+kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
+Current workspace is "root:example-wmw".
+CRD for edgeplacements already in place
+Current workspace is "root".
+kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
+Current workspace is "root:example-wmw".
+CRD for customizers already in place
+Current workspace is "root".
+kcp workspace example-wmw's ID is fcf8hzj7mlx156cm
+Current workspace is "root:example-wmw".
+CRD for singleplacementslices already in place
+customresourcedefinition.apiextensions.k8s.io/apiservices.apiregistration.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/persistentvolumes.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/flowschemas.flowcontrol.apiserver.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/prioritylevelconfigurations.flowcontrol.apiserver.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/ingressclasses.networking.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/runtimeclasses.node.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/priorityclasses.scheduling.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/csidrivers.storage.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/csinodes.storage.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/storageclasses.storage.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/volumeattachments.storage.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/daemonsets.apps serverside-applied
+customresourcedefinition.apiextensions.k8s.io/deployments.apps serverside-applied
+customresourcedefinition.apiextensions.k8s.io/replicasets.apps serverside-applied
+customresourcedefinition.apiextensions.k8s.io/statefulsets.apps serverside-applied
+customresourcedefinition.apiextensions.k8s.io/horizontalpodautoscalers.autoscaling serverside-applied
+customresourcedefinition.apiextensions.k8s.io/cronjobs.batch serverside-applied
+customresourcedefinition.apiextensions.k8s.io/jobs.batch serverside-applied
+customresourcedefinition.apiextensions.k8s.io/endpoints.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/persistentvolumeclaims.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/pods.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/podtemplates.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/replicationcontrollers.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/services.core serverside-applied
+customresourcedefinition.apiextensions.k8s.io/endpointslices.discovery.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/ingresses.networking.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/networkpolicies.networking.k8s.io serverside-applied
+customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy serverside-applied
+customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io serverside-applied
 ```
 
 ```shell
-kubectl ws ..
+kubectl ws .
 ```
 ``` { .bash .no-copy }
 Current workspace is "root".
 ```
 
 ```shell
-kubectl kubestellar ensure wmw example-wmw --with-kube false
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw --with-kube false
 ```
 ``` { .bash .no-copy }
+SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
+PROVIDER_NAME=default
+PROVIDER_NAMESPACE=spaceprovider-default
+IN_CLUSTER=false
+SECRET_NAME=external-example-wmw
+SECRET_NAMESPACE=spaceprovider-default
 Current workspace is "root".
 Current workspace is "root:example-wmw" (type root:universal).
 apibinding.apis.kcp.io "bind-kubernetes" deleted

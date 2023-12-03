@@ -117,7 +117,7 @@ the following command checks that.
 test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
 ```
 
-The various APIBinding and CustomResourceDefinition objects involved
+The CustomResourceDefinition objects involved
 should also appear in the mailbox workspaces.
 
 ```shell
@@ -125,6 +125,8 @@ should also appear in the mailbox workspaces.
 test $(kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -cw "name: bind-apps") -ge 2
 kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -w "name: bind-kubernetes"
 kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
+test $(kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: replicasets.apps") -ge 2
+test $(kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | grep -cw "name: deployments.apps") -ge 1
 ```
 
 The `APIService` of the special workload should also appear, along
