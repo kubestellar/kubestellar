@@ -1,4 +1,4 @@
-<!--example1-post-kcp-start-->
+<!--example1-post-provider-start-->
 #### Get KubeStellar
 
 You will need a local copy of KubeStellar.  You can either use the
@@ -138,12 +138,12 @@ KubeStellar. They label both florin and guilder with `env=prod`, and
 also label guilder with `extended=yes`.
 
 ```shell
-imw1_space_config="${PWD}/temp-space-config/spaceprovider-default-imw1"
-kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --space-config-file $imw1_space_config
-KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
-KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
+IMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-imw1"
+kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --output $IMW1_SPACE_CONFIG
+KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
+KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
 echo "describe the florin location object"
-KUBECONFIG=$imw1_space_config kubectl describe location.edge.kubestellar.io florin
+KUBECONFIG=$IMW1_SPACE_CONFIG kubectl describe location.edge.kubestellar.io florin
 ```
 
 Those two script invocations are equivalent to creating the following
@@ -199,4 +199,4 @@ spec:
 That script also deletes the Location named `default`, which is not
 used in this PoC, if it shows up.
 
-<!--example1-post-kcp-end-->
+<!--example1-post-provider-end-->

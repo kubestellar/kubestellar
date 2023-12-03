@@ -95,7 +95,7 @@ function ensure_imws() {
             echo "Ensuring IMW: $imw"
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
             kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
+            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
             KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "synctargets"
             KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "locations"
         done
@@ -193,7 +193,7 @@ function ensure_espw() {
     fi 
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
     kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
     run_dex
     sleep 2
     run_kb_backend
