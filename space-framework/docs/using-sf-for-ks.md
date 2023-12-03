@@ -8,7 +8,7 @@ KS: KubeStellar (the Multi Cluster Management Module)
 ### Solution topology
  In this guide we will describe a specific topology in which all components are hosted on a **single Kube cluster** (In general KubeStellar KubeFlex and the SM can be deployed on different clusters). We will refer to that cluster as the `core-cluster`.
 
-![Using the Space Framework with KS](KS-SF-KF1.drawio.png "Using the Space Framework with KS")
+![Using the Space Framework with KS](KS-SF-KF.drawio.png "Using the Space Framework with KS")
 
 ## Deploying and using the SM
 The SM deployment is performed as part of the overall KS deployment. The SpaceManager is running on the `core-cluster` as one of the containers in the KS Pod.
