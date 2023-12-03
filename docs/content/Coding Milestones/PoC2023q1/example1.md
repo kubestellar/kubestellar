@@ -28,9 +28,9 @@ they appear in this example.
 ## Stage 1
 
 {%
-   include-markdown "example1-subs/example1-pre-kcp.md"
-   start="<!--example1-pre-kcp-start-->"
-   end="<!--example1-pre-kcp-end-->"
+   include-markdown "example1-subs/example1-pre-provider.md"
+   start="<!--example1-pre-provider-start-->"
+   end="<!--example1-pre-provider-end-->"
 %}
 
 {%
@@ -52,9 +52,9 @@ they appear in this example.
 %}
 
 {%
-   include-markdown "example1-subs/example1-post-kcp.md"
-   start="<!--example1-post-kcp-start-->"
-   end="<!--example1-post-kcp-end-->"
+   include-markdown "example1-subs/example1-post-provider.md"
+   start="<!--example1-post-provider-start-->"
+   end="<!--example1-post-provider-end-->"
 %}
 
 {%
