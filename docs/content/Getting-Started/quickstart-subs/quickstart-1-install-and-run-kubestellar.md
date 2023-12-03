@@ -1,9 +1,5 @@
 <!--quickstart-1-install-and-run-kubestellar-start-->
 
-KubeStellar works in the context of [kcp](https://www.kcp.io/), so to use KubeStellar you also need kcp.
-
-KubeStellar works with release `v0.11.0` of kcp.
-
 We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.
 
 ### Deploy kcp and KubeStellar as bare processes
@@ -14,6 +10,8 @@ The following commands will download the kcp and **KubeStellar** executables int
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
+export SM_CONFIG=~/.kube/config
+mkdir ${PWD}/temp-space-config
 ```
 
 Check that `KubeStellar` is running.
@@ -32,10 +30,10 @@ user     1902  0.3  0.3 743652 27504 pts/1    Sl   10:51   0:02 kubestellar-wher
 user     1912  0.3  0.5 760428 41660 pts/1    Sl   10:51   0:02 placement-translator -v=2
 ``` 
 
-Second, check that TMC compute service provider workspace and the KubeStellar Edge Service Provider Workspace (`espw`) have been created with the following command:
+Second, check that TMC compute service provider space and the KubeStellar Edge Service Provider space (`espw`) have been created with the following command:
 
 ```shell
-kubectl ws tree
+KUBECONFIG=$SM_CONFIG kubectl get spaces -A
 ```
 
 which should yield:
@@ -80,6 +78,8 @@ The following commands will (a) download the kcp and **KubeStellar** executables
 ``` {.bash}
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }} --external-endpoint hostname.favorite.my:{{ config.ks_kind_port_num }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
+export SM_CONFIG=~/.kube/config
+mkdir ${PWD}/temp-space-config
 ```
 
 Using your original `kubectl` configuration that manipulates the hosting cluster, check that the KubeStellar Deployment has its intended one running Pod.
@@ -103,10 +103,10 @@ The bootstrap command above will print out instructions to set your KUBECONFIG e
 export KUBECONFIG="$(pwd)/kubestellar.kubeconfig"
 ```
 
-Check that the TMC compute service provider workspace and the KubeStellar Edge Service Provider Workspace (`espw`) have been created with the following command:
+Check that the TMC compute service provider spaces and the KubeStellar Edge Service Provider space (`espw`) have been created with the following command:
 
 ``` {.bash}
-kubectl ws tree
+KUBECONFIG=$SM_CONFIG kubectl get spaces -A
 ```
 
 which should yield:
