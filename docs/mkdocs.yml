@@ -40,7 +40,6 @@ nav:
   - Getting Started:
       - Quickstart using Kind: Getting-Started/user-quickstart-kind.md 
       - Quickstart using OpenShift: Getting-Started/user-quickstart-openshift.md 
-      - Quickstart for testing: Getting-Started/user-quickstart-test.md 
       - Detailed QuickStart: Getting-Started/quickstart.md
       - Extended Example: Coding Milestones/PoC2023q1/example1.md
       - User Guide: Getting-Started/user-guide.md
@@ -66,6 +65,7 @@ nav:
           - Invitation to Contribute: Coding Milestones/PoC2023q1/coding-milestone-invite-q1.md
           - KubeStellar-Syncer: Coding Milestones/PoC2023q1/kubestellar-syncer.md
           - Extended Example: Coding Milestones/PoC2023q1/example1.md
+          - Quickstart for testing: Getting-Started/user-quickstart-test.md 
           - KubeStellar Processes:
               - KubeStellar Where Resolver: Coding Milestones/PoC2023q1/where-resolver.md
               - KubeStellar Mailbox Controller: Coding Milestones/PoC2023q1/mailbox-controller.md
