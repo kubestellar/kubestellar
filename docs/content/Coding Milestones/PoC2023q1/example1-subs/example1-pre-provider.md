@@ -1,4 +1,4 @@
-<!--example1-pre-kcp-start-->
+<!--example1-pre-provider-start-->
 ![Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces.](../Edge-PoC-2023q1-Scenario-1-stage-1.svg "Stage 1 Summary")
 
 Stage 1 creates the infrastructure and the edge service provider
@@ -62,4 +62,4 @@ paying attention to `$KUBECONFIG` and, if that's empty,
 kind create cluster --name florin --config florin-config.yaml
 kind create cluster --name guilder --config guilder-config.yaml
 ```
-<!--example1-pre-kcp-end-->
+<!--example1-pre-provider-end-->
