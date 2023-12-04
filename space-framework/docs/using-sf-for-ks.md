@@ -33,7 +33,7 @@ Setting up a space provider includes two steps:
    * Create a SpaceProvidrDesc object that represents the space provider backend. The SpaceProviderDesc includes a Secret reference to the space provider secret mentioned above.   
 
 **Example: fetch a space provider secret**  
-The folowing creates a config file that can be used to access a space provider
+The following creates a config file that can be used to access a space provider
 ```shell
 KUBECONFIG=${SM_KUBECONFIG}
 s_name=`kubectl get spaceproviderdesc <provider-name> -o jsonpath='{$.spec.secretRef.name}'`
