@@ -48,9 +48,9 @@ The command line flags, beyond the basics, are as follows.
 
 At this point you should have cloned the KubeStellar repo and `cd`ed into it as directed above.
 {%
-   include-markdown "where-resolver-subs/where-resolver-0-pull-and-kubestellar-source-and-start.md"
-   start="<!--where-resolver-0-pull-and-kubestellar-source-and-start-start-->"
-   end="<!--where-resolver-0-pull-and-kubestellar-source-and-start-end-->"
+   include-markdown "where-resolver-subs/where-resolver-0-pull-kubestellar-source-and-start.md"
+   start="<!--where-resolver-0-pull-kubestellar-source-and-start-start-->"
+   end="<!--where-resolver-0-pull-kubestellar-source-and-start-end-->"
 %}
 
 ### Build and initialize KubeStellar
