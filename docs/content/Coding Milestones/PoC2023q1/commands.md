@@ -257,10 +257,15 @@ workspaces at pathname "root:imw1".
 
 5. Ensure the existence of zero, one, or more workload management workspaces 
 depending on the value of `--ensure-wmw` flag. Default is one workload management
-workspaces at pathname "root:wmw1". The workload management workspaceshace APIBindings
+workspaces at pathname "root:wmw1". The workload management workspaces have APIBindings
 that import the namespaced Kubernetes resources (kinds of objects) for management of
 containerized workloads. At the completion of `kubestellar init` the current workspace will be
 "root".
+
+6. Creates the space provider objects to be used by the space manager. Need to pass
+in two environment variables - SPACE_MANAGER_KUBECONFIG and IN_CLUSTER. SPACE_MANAGER_KUBECONFIG
+is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
+are accessed from within the hosting cluster or externally by kubestellar init.
 
 #### KubeStellar start
 
@@ -355,7 +360,7 @@ issue the following command.
 kubectl kubestellar deploy --external-endpoint my-long-application-name.my-region.some.cloud.com:1234
 ```
 
-The Helm chart takes care of setting up the KubeStellar MCCM core,
+The Helm chart takes care of setting up the KubeStellar Core,
 accomplishing the same thing as the [kubestellar
 start](#kubestellar-start) command above.
 
@@ -518,7 +523,7 @@ controllers but does require that the KubeStellar Core Space (KCS) has been set 
 An example usage follows.
 
 ```shell
-kubectl kubestellar ensure location --imw root:imw-1 demo1 foo=bar the-word=the-bird
+kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw-1".
@@ -933,7 +938,7 @@ Current workspace is "root".
 
 The `kubestellar-list-syncing-objects` command will list or watch one
 kind of objects in the mailbox spaces. These are full (not summarized)
-workload objects in the intermediate place between WDSes and WECs,
+workload objects in the intermediate place between WDS' and WEC',
 participating in downsync or upsync. The user of this command is not
 very exposed to the mailbox spaces themselves; the command is directed
 at the whole of this intermediate place and lists all of the requested
@@ -976,7 +981,7 @@ Following are the command line flags beyond the baseline golang flags.
       --parent-user string                 The name of the kubeconfig user to use for access to the parent of mailbox workspaces
 ```
 
-Following is an example of its usage; the elipses show where this
+Following is an example of its usage; the ellipses show where this
 document omits many lines for brevity.
 
 ```console

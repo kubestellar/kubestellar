@@ -2,7 +2,7 @@
 title: "Details"
 ---
 
-![poc2023q1 architecture](Edge-PoC-2023q1.svg)
+![poc2023q1 architecture](Kubestellar-Architecture-using-kube-bind.svg)
 
 ## Status of this memo
 
@@ -100,7 +100,11 @@ depending on the Kubernetes release and usage style, `ServiceAccount`.
 The extra consideration for `ServiceAccount` is when an associated
 `Secret` is a natural consequence.  However, that is not a practical
 problem because such `Secret` objects are recognized as system
-infrastructure (see [below](#system-infrastructure-objects)).  Another
+infrastructure (see [below](#system-infrastructure-objects)).
+Oops, oversight here: the controller that makes the associated
+Secret objects _also_ insists that the ServiceAccount to refer to them;
+see later about denaturing ServiceAccounts.
+Another
 consideration for `ServiceAccount` objects, as for `Secret` and
 `ConfigMap` objects, is that some are in some sense "reverse-natured":
 some are created by some other thing as part of the nature of that
@@ -149,7 +153,106 @@ state goes from edge to the mailbox workspace and then is summarized
 to the workload management workspace.  State propagation is maintained
 in an eventually consistent way, it is not just one-and-done.
 
+## Note on milieu
+
+We have made a terminoloogy shift since this document was originally
+written, but not yet thoroughly updated this document to use the new
+terminology. Both old and new terminology and their relation is
+documented in [the
+glossary](../../../Getting-Started/user-guide/#glossary).
+
+This design is set in the context of kcp and currently in the midst of
+a transition away from that. This design uses kcp workspaces as
+spaces, and eschews the use of kcp APIExport+APIBinding in favor of
+using [kube-bind](https://github.com/kube-bind/kube-bind).
+
+## Kube-bind object ID mapping
+
+With kube-bind, a provider sees a different ID on an object than the
+consumer does. The namespace or name is modified so that the objects
+from all the consumers can be copied into the provider. This object ID
+mapping can be inverted with the following interface.
+
+```go
+
+// AnalyzeObjectID examines an object in a kube-bind service provider
+// cluster and returns the object's ID as known in the service consumer
+// cluster and the kube-bind ID for the consumer, or an error if
+// the object does not appear to be a provider's copy of a consumer's object.
+func AnalyzeObjectID(obj metav1.Object) (namespace, name, kbSpaceID string, err error) {..}
+
+// ComposeClusterScopedName translates the name of a cluster-scoped object
+// from what appears in the service consumer cluster to what appears in the
+// service provider cluster. A Namespace is an example of a cluster-scoped
+// object.
+// For namespaced objects, kube-bind translates the name of their namespace.
+func ComposeClusterScopedName(kbSpaceID string, name string) string {..}
+```
+
+## Kube-bind space ID mapping
+
+The kube-bind module has its own identifiers for spaces. These are
+distinct from the ways that kcp identifies spaces. In kube-bind, for a
+given provider and consumer, the identifier is the "cluster namespace"
+in the provider cluster that corresponds to the consuer. We will not
+presume that these cluster namespace names are globally unique (across
+providers).
+
+In kcp there are two ways of identifying most spaces: (1)
+`logicalcluster.Name` and (2) the pathname of the corresponding
+`Workspace` object. In this design the controllers have been using
+`logicalcluster.Name` as the space identifier (using the `Path` method
+of `logicalcluster.Name` when passing a `Name` to a func that takes a
+`Path`).
+
+In kube-bind, for a given provider, there is a 1:1 relation between
+the kube-bind identifier for a consumer (the "cluster namespace" in
+the provider) and the kcp identifier for that consumer (the
+`logicalcluster.Name`). This relation is queried through the following
+interface.
+
+```go
+// KubeBindSpaceRelation is specific to one kube-bind service provider
+// and reveals the 1:1 relation between the kube-bind identifier for
+// a consumer (i.e., the name of the "cluster namespace" for that consumer
+// in the provider) and the underlying space identifier (i.e., the
+// `logicalcluster.Name`).
+type KubeBindSpaceRelation interface {
+	// SpaceIDToKubeBind maps an underlying space ID to a kube-bind space ID.
+	// Returns empty string if there is no relationship.
+	SpaceIDToKubeBind(spaceID string) string
+
+	// SpaceIDFromKubeBind maps a kube-bind space ID to an underlying space ID.
+	// Returns empty string if there is no relationship.
+	SpaceIDFromKubeBind(kubeBindID string) string
+}
+
+// NewKubeBindSpaceRelation creates a KubeBindSpaceRelation given a
+// Kubernetes client for the provider's space and a context bounding
+// the relation's lifetime.
+func NewKubeBindSpaceRelation(ctx context.Context, client kubernetes.Interface) KubeBindSpaceRelation {..}
+```
+
+### Implementation of space identifier mapping
+
+The underlying information is provided to our layers at just one point
+in time: when the kube-bind binding operation (`kubectl bind`) is
+done. At this time there is available: the `logicalcluster.Name` of
+the provider space, the `logicalcluster.Name` of the consumer space,
+and the kube-bind identifier of the consumer in relation to the
+provider. This triple of information is written to a `ConfigMap`
+object. That object is in the `kubestellar` namespace in the provider
+space, the object's name contains the `logicalcluster.Name` of the
+consumer space, and the object has a label whose key is
+`kubestellar.io/kube-bind-id` and whose value is the kube-bind
+identifier of that consumer for that provider. Putting the content in
+a label makes it easy to get a tabular listing: `kubectl get -n
+kubestellar cm -l kubestellar.io/kube-bind-id -L
+kubestellar.io/kube-bind-id`.
+
 ## Inventory Management workspaces (IMW)
+
+Now called Inventory Space (IS).
 
 In this design the primary interface between infrastructure management
 and workload management is API objects in _inventory management_
@@ -159,9 +262,9 @@ this purpose.  The people doing infrastructure management are
 responsible for creating the inventory management workspaces and
 populating them with `Location` and `SyncTarget` objects, one
 `Location` and one `SyncTarget` per edge cluster.  These inventory
-management workspaces need to use APIBindings to APIExports defining
+management workspaces use APIServiceBindings to APIServiceExports defining
 `Location` and `SyncTarget` so that the workload management layer can
-use one APIExport view for each API group to read those objects.
+use one informer factory on the KCS (formerly ESPW) to read those objects.
 
 To complete the plumbing of the syncers, each inventory workspace that
 contains a SyncTarget needs to also contain the following associated
@@ -178,14 +281,18 @@ is not among the things that this PoC takes a position on.
 
 ## Edge Service Provider workspace (ESPW)
 
+Now called the KubeStellar Core Space (KCS).
+
 The edge multi-cluster service is provided by one workspace that
 includes the following things.
 
-- An APIExport of the edge API group.
+- An APIServiceExport of the edge API group.
 - The edge controllers: Where Resolver, Placement Translator, Mailbox
   Controller, and Status Summarizer.
 
 ## Workload Management workspaces (WMW)
+
+Now called a Workload Description Space (WDS).
 
 The users of edge multi-cluster primarily maintain these.  Each one of
 these has both control (API objects that direct the behavior of the
@@ -245,13 +352,26 @@ the normal kcp behavior.
 
 **NOTE**: The denaturing described here is not implemented yet.  The
 kinds of objects listed above can be put into a workload management
-workspace and it will give them its usual interpretation. For ones
+workspace and it will give them its usual interpretation. For objects
 that add authorizations, this will indeed _add_ authorizations but not
 otherwise break something. The kcp server does not implement
 `FlowSchema` nor `PriorityLevelConfiguration`; those will indeed be
 uninterpreted. For objects that configure calls to other servers,
 these will fail unless the user arranges for them to work when made in
 the center as well in the edge clusters.
+
+In kcp v0.11.0 the Token controller (for ServiceAccounts) creates a
+token Secret for each ServiceAccount that does not currently reference
+one created by that controller and updates the ServiceAccount to
+reference the Secret just created. Should another controller undo that
+change to that ServiceAccount, the two controllers will fight
+continually --- leading to an ever growning collection of Secret
+objects. To prevent the placement translator from fighting with a
+mailbox space, users must mark a downsynced ServiceAccount as
+"create-only". To prevent some non-KubeStellar controller from
+fighting with a WDS, users must use feature(s) of that non-KubeStellar
+controller. In later versions of kcp and Kubernetes there is not such
+automatic Secret creation.
 
 #### Needs to be natured in center and edge
 
@@ -277,17 +397,19 @@ WEC.
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
 | apis.kcp.io/v1alpha1 | APIBinding | false |
+| kube-bind.io/v1alpha1 | APIServiceBinding | false |
 
-A workload management workspace needs an APIBinding to the APIExport
-of the API group `edge.kubestellar.io` from the edge service provider
-workspace, in order to be able to contain EdgePlacement and related
-objects.  These objects and that APIBinding are not destined for the
-edge clusters.
+A workload management workspace needs APIServiceBindings to the
+APIServiceExports of the relevant control resources from the edge
+service provider workspace, in order to be able to contain
+EdgePlacement and related objects.  These objects and those
+APIServiceBindings are not destined for the edge clusters.
 
-The edge clusters are not presumed to be kcp workspaces, so
-APIBindings do not propagate to the edge clusters.  However, it is
-possible that APIBindings for workload APIs may exist in a workload
-management workspace and be selected for downsync to mailbox
+The edge clusters are not presumed to be kcp workspaces nor
+participate in kube-bind, so APIBindings and APIServiceBindings do not
+propagate to the edge clusters.  However, it is possible that
+APIBindings or APIServiceBindings for workload APIs may exist in a
+workload management workspace and be selected for downsync to mailbox
 workspaces while the edge clusters have the same resources defined by
 CRDs (as mentioned later in the discussion of built-in resources and
 namespaces).
@@ -312,6 +434,7 @@ their workload desired and reported state.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
+| kube-bind.io/v1alpha1 | APIServiceExport | false |
 | apis.kcp.io/v1alpha1 | APIExport | false |
 | apis.kcp.io/v1alpha1 | APIExportEndpointSlice | false |
 | apis.kcp.io/v1alpha1 | APIResourceSchema | false |
@@ -437,23 +560,24 @@ example, the following scenario is allowed.
 
 - Some central team owns an API group and produces some
   CustomResourceDefinition (CRD) objects that populate that API group.
-- That team derives APIResourceSchemas from those CRDs and a
-  corresponding APIExport of their API group.
-- That team maintains a kcp workspace holding those APIResourceSchemas
-  and that APIExport.
-- Some workload management workspaces have APIBindings to that
-  APIExport, and EdgePlacement objects that (1) select those
-  APIBinding objects for downsync and (2) select objects of kinds
-  defined through those APIBindings for either downsync or upsync.
+- That team derives APIServiceExports of their CRDs.
+- That team maintains a kcp workspace holding those APIServiceExports.
+- Some workload management workspaces have APIServiceBindings to those
+  APIServiceExports, and EdgePlacement objects that (1) select those
+  APIServiceBinding objects for downsync and (2) select objects of
+  kinds defined through those APIServiceBindings for either downsync
+  or upsync (possibly letting 1 happen as an implicit consequence of
+  2).
 - Those resources are built into the edge clusters by pre-deploying
   the aforementioned CRDs there.
 - Those resources are _not_ built into the mailbox workspaces.  In
-  this case the APIBindings would propagate from workload management
+  this case the APIServiceBindings would propagate from workload management
   workspace to mailbox workspaces but not edge clusters.
-- As a consequence of those propagated APIBindings, the APIExport's
-  view includes all of the objects (in workload management workspaces,
-  in mailbox workspaces, and in any other workspaces where they
-  appear) whose kind is defined through those APIBindings.
+- As a consequence of those propagated APIServiceBindings, the
+  APIServiceExport space gets kube-bound copies of all of the objects
+  (in workload management workspaces, in mailbox workspaces, and in
+  any other workspaces where they appear) whose kind is defined
+  through those APIServiceBindings.
 
 ### Control objects
 
@@ -463,8 +587,8 @@ customization and summarization.
 
 #### EdgePlacement objects
 
-One of these is a binding between a "what" predicate and a "where"
-predicate.
+One of these is a binding between a "what" predicate (with downsync
+and upsync parts) and a "where" predicate.
 
 Overlaps between EdgePlacement objects are explicitly allowed.  Two
 EdgePlacement objects may have "where" predicates that both match some
@@ -472,18 +596,17 @@ of the same destinations.  Two EdgePlacement objects may have "what"
 predicates that match some of the same workload descriptions.  Two
 EdgePlacement objects may overlap in both ways.
 
-An EdgePlacement object deliberately _only_ binds "what" and "where",
-without any adverbs (such as prescriptions of customization or
-summarization).  This means that overlapping EdgePlacement objects can
-not conflict in those adverbs.
+An EdgePlacement object binds "what" and "where", with one adverb at
+present and more coming in the future. This requires clear definition
+of how these adverbs combine in the case of overlapping bindings.
 
-However, another sort of conflict remains possible.  This is because
-the user controls the IDs --- that is, the names --- of the parts of
-the workload.  In full, a Kubernetes API object is identified by API
-group, API major version, Kind (equivalently, resource name),
-namespace if relevant, and name.  For simplicity in this PoC we will
-not worry about differences in API major version; each API group in
-Kubernetes and/or kcp currently has only one major version.
+Conflicts are possible.  This is because the user controls the IDs ---
+that is, the names --- of the parts of the workload.  In full, a
+Kubernetes API object is identified by API group, API major version,
+Kind (equivalently, resource name), namespace if relevant, and name.
+For simplicity in this PoC we will not worry about differences in API
+major version; each API group in Kubernetes and/or kcp currently has
+only one major version.
 
 Two different workload descriptions can have objects with the same ID
 (i.e., if they appear in different workspaces).  These objects, when
@@ -607,8 +730,8 @@ the syncer.
 
 A mailbox workspace contains the following items.
 
-1. APIBindings (maintained by the mailbox controller) to APIExports of
-   workload object types.
+1. APIServiceBindings (maintained by the mailbox controller) to
+   APIServiceExports of workload object types.
 2. Workload objects, post customization in the case of downsynced
    objects.
 3. A `SyncerConfig` object.
@@ -652,7 +775,10 @@ objects and maintains the results of matching.  For each EdgePlacement
 object this controller maintains an associated collection of
 SinglePlacementSlice objects holding the matches for that
 EdgePlacement.  These SinglePlacementSlice objects appear in the same
-workspace as the corresponding EdgePlacement; the remainder of how
+workspace as the corresponding EdgePlacement, and identify SyncTarget
+and Location objects by the identifiers of their original copies (not
+the copies in the KCS) --- with the exception of the UID of the
+SyncTarget, that comes from the copy in the KCS; the remainder of how
 they are linked is TBD.
 
 ## Placement Translator
@@ -712,9 +838,7 @@ management workspaces.  Each such workspace needs to have the
 following items, which that user will create if they are not
 pre-populated by the workspace type.
 
-- An APIBinding to the `workload.kcp.io` APIExport to get
-  `SyncTarget`.
-- An APIBinding to the `scheduling.kcp.io` APIExport to get
+- APIServiceBindings to the APIServiceExports of `SyncTarget` and
   `Location`.
 - A ServiceAccount (with associated token-bearing Secret) (details
   TBD) that the mailbox controller authenticates as.
@@ -736,8 +860,8 @@ A user with workload authority starts by creating one or more workload
 management workspaces.  Each needs to have the following, which that
 user creates if the workload type did not already provide.
 
-- An APIBinding to the APIExport of `edge.kubestellar.io` from the edge
-  service provider workspace.
+- APIServiceBindings to the APIServiceExports of the relevant
+  resources from the edge service provider workspace.
 - For each of the Where Resolver, the Placement Translator, and the
   Status Summarizer:
   - A ServiceAccount for that controller to authenticate as;

@@ -12,7 +12,7 @@ This is a description of the concepts behind KubeStellar.
 
 **Inventory Space (IS)** - Holds the `SyncTarget` and `Location` objects describing the Workload Execution Clusters. 
 
-**kcp** - A project in whose context KubeStellar currently sits.  See [kcp.io](https://www.kcp.io) and [its concepts page](https://docs.kcp.io/kcp/main/concepts/).  KubeStellar relies on two aspects of the functionality of the core of kcp: (1) "logical clusters" and their API, "workspaces", and (2) API export and binding.  KubeStellar is in the process of separating from kcp, introducing an abstraction layer for "spaces" and developing the ability to use [kube-bind](https://github.com/kube-bind/kube-bind) for API export and binding.
++**kube-bind** - KubeStellar is introducing an abstraction layer for "spaces" and developing the ability to use [kube-bind](https://github.com/kube-bind/kube-bind) for API export and binding.
 
 **KubeStellar Core Space (KCS)** - Exports the Kubestellar API.
 
@@ -30,7 +30,7 @@ This is a description of the concepts behind KubeStellar.
 
 **Space Object** - A kind of Kubernetes API object that _represents_ a physical space.  Its "kind" is `Space`, so we include the "object" part when writing specifically about the API objects to clearly distinguish them from what they represent.
 
-**Space**, **physical space** (use the latter term to clearly distinguish from "space object") - A thing that behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (not management of containerized workloads). A kcp logical cluster is an example. A regular Kubernetes cluster is another example.
+**Space**, **physical space** (use the latter term to clearly distinguish from "space object") - A thing that behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (not management of containerized workloads). A KubeFlex logical cluster is an example. A regular Kubernetes cluster is another example.
 
 **Status Summarizer** - A planned central KubeStellar controller that will maintain the status summary objects in the Workload Description Spaces as a function of the `EdgePlacement` objects and the workload objects in the Mailbox Spaces.
 
@@ -48,9 +48,9 @@ This is a description of the concepts behind KubeStellar.
 
 ### Older Terminology
 
-There have been some terminology shifts since the start of the project.  The project started with a focus on edge computing scenarios; later we realized that the technical problems addressed are not limited to those scenarios.  The project started in the context of [kcp](https://github.com/kcp-dev/kcp) and unabashedly used concepts from kcp; later we began working on generalizing KubeStellar so that it can run in the context of kcp and also can run in other contexts that do not have kcp.
+There have been some terminology shifts since the start of the project.  The project started with a focus on edge computing scenarios; later we realized that the technical problems addressed are not limited to those scenarios.  We are working on generalizing KubeStellar so that it can run in the context of any space provider.
 
-- The term "space" is intended to be a generalization covering both a kcp "logical cluster" or "workspace" and other things that have the same essential behavior
+- The term "space" is intended to be a generalization covering both a "logical cluster" or "workspace" and other things that have the same essential behavior
 - The term "workload execution cluster" was formerly "edge cluster"
 - The term "workload description space" was formerly "workload management workspace"
 - The term "inventory space" was formerly "inventory management workspace"

@@ -30,6 +30,7 @@ import (
 	machruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	upstreamdiscovery "k8s.io/client-go/discovery"
+	fakeupkube "k8s.io/client-go/kubernetes/fake"
 
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
 	fakekube "github.com/kcp-dev/client-go/kubernetes/fake"
@@ -42,8 +43,9 @@ import (
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster/fake"
+	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func TestWhatResolver(t *testing.T) {
@@ -93,10 +95,11 @@ func TestWhatResolver(t *testing.T) {
 	cm3 := &k8scorev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{Kind: "ConfigMap", APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace:   "default",
-			Name:        "cm3",
-			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String()},
-			Labels:      map[string]string{"foo": "baz"},
+			Namespace: "default",
+			Name:      "cm3",
+			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String(),
+				edgeapi.DownsyncOverwriteKey: "false"},
+			Labels: map[string]string{"foo": "baz"},
 		}}
 	ep1 := &edgeapi.EdgePlacement{
 		TypeMeta: metav1.TypeMeta{Kind: "EdgePlacement", APIVersion: edgeapi.SchemeGroupVersion.String()},
@@ -121,8 +124,8 @@ func TestWhatResolver(t *testing.T) {
 		}}
 	ep1EN := ExternalName{wds1N, ObjectName(ep1.Name)}
 	edgeViewClusterClientset := fakeedge.NewSimpleClientset(ep1)
-	edgeClusterInformerFactory := edgeinformers.NewSharedInformerFactory(edgeViewClusterClientset, 0)
-	epClusterPreInformer := edgeClusterInformerFactory.Edge().V2alpha1().EdgePlacements()
+	edgeInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeViewClusterClientset, 0)
+	epPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
 	fakeKubeClusterClientset := fakekube.NewSimpleClientset(ns1, cm1)
 	k8sCoreGroupVersion := metav1.GroupVersion{Version: "v1"}
 	usualVerbs := []string{"get", "list", "watch"}
@@ -149,8 +152,11 @@ func TestWhatResolver(t *testing.T) {
 	apiExtClusterFactory := apiextinfact.NewSharedInformerFactory(fakeApiExtClusterClientset, 0)
 	crdClusterPreInformer := apiExtClusterFactory.Apiextensions().V1().CustomResourceDefinitions()
 
-	whatResolver := NewWhatResolver(ctx, epClusterPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, 3)
-	edgeClusterInformerFactory.Start(ctx.Done())
+	fakeUpKubeClient := fakeupkube.NewSimpleClientset()
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, fakeUpKubeClient)
+
+	whatResolver := NewWhatResolver(ctx, epPreInformer, fcd, crdClusterPreInformer, bindingClusterPreInformer, fakeDynamicClusterClientset, kbSpaceRelation, 3)
+	edgeInformerFactory.Start(ctx.Done())
 	dynamicClusterInformerFactory.Start(ctx.Done())
 	rcvr := NewMapMap[ExternalName, ResolvedWhat](nil)
 	runnable := whatResolver(rcvr)
@@ -159,7 +165,8 @@ func TestWhatResolver(t *testing.T) {
 	partdt1 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true}
 	partid2 := WorkloadPartID{metav1.GroupResource{Resource: "namespaces"}, "", "ns2"}
 	partid3 := WorkloadPartID{metav1.GroupResource{Resource: "configmaps"}, "default", "cm3"}
-	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt1}}
+	partdt3 := WorkloadPartDetails{APIVersion: "v1", ReturnSingletonState: true, CreateOnly: true}
+	expectedWhat := ResolvedWhat{Downsync: WorkloadParts{partid1: partdt1, partid2: partdt1, partid3: partdt3}}
 	err := wait.PollWithContext(ctx, time.Second, 5*time.Second, func(context.Context) (bool, error) {
 		gotWhat, found := rcvr.Get(ep1EN)
 		t.Logf("gotWhat=%v, found=%v", gotWhat, found)

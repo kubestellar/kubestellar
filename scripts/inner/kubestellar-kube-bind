@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+# Copyright 2023 The KubeStellar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+space_name=""
+resource_to_bind=""
+cm_namespace=kubestellar # the namespace where the configmaps live in on the provider side
+log_dir=$(pwd)/kubestellar-kube-bind-logs
+
+while (( $# > 0 )); do
+    case "$1" in
+    (-h|--help)
+        echo "Usage: $0 [-X] space_name resource_to_bind"
+        echo "space_name is the name of a kube-bind consumer space, the space currently must be a direct child of the kcp 'root' workspace, note that space_name doesn't contain the 'root:' prefix"
+        echo "resource_to_bind is a resource offered by the kube-bind provider, in lower case and plural form"
+        exit 0;;
+    (-X)
+        set -o xtrace;;
+    (-*)
+        echo "$0: flag syntax error" >&2
+        exit 1;;
+    (*)
+        if [ -z "$space_name" ]
+        then space_name="$1"
+        elif [ -z "$resource_to_bind" ]
+        then resource_to_bind="$1"
+        else echo "$0: too many positional arguments" >&2; exit 1
+        fi
+    esac
+    shift
+done
+
+if [ -z "$space_name" ]
+then
+    echo "space_name not specified" >&2
+    exit 1
+fi
+
+if [ -z "$resource_to_bind" ]
+then
+    echo "resource_to_bind not specified" >&2
+    exit 1
+fi
+
+initial_ws=$(kubectl ws . --short)
+trap "kubectl ws use $initial_ws &> /dev/null # go back to the initial state" EXIT
+
+kubectl ws root
+kcp_id="$(kubectl get ws $space_name -ojsonpath='{.spec.cluster}')"
+if [ -z "$kcp_id" ]
+then
+    echo "Failed to find the kcp workspace ID for $space_name" >&2
+    exit 1
+else
+    echo "kcp workspace $space_name's ID is $kcp_id"
+fi
+
+kubectl ws "root:$space_name"
+
+if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
+    echo "CRD for $resource_to_bind already in place"
+    exit 0
+fi
+
+if pgrep konnector | xargs ps e -p 2>/dev/null | egrep "KB_CONSUMER=$space_name(\s|$)" &> /dev/null; then
+    echo "kube-bind konnector for space $space_name already running"
+else
+    if ! kubectl get namespace kube-system &> /dev/null
+    then kubectl create namespace kube-system &> /dev/null
+    fi
+    mkdir -p $log_dir
+    log_file=$log_dir/kube-bind-konnector-$space_name.log
+    echo "starting kube-bind konnector for space $space_name in background, logs writing to $log_file"
+    KB_CONSUMER=$space_name konnector &> $log_file &
+    sleep 2
+    if ! pgrep konnector &> /dev/null; then
+        echo "Error: kube-bind konnector process not found" >&2
+        exit 1
+    fi
+fi
+
+#TODO: error check for the bind commmand
+echo "binding $resource_to_bind for $space_name"
+result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"
+
+cluster_ns="$(echo $result | grep -e 'kube-bind-\w*' -o)"
+if [ -z "$cluster_ns" ]
+then
+    echo "Failed to find the cluster namespace" >&2
+    exit 1
+else
+    echo "cluster namespace is $cluster_ns"
+fi
+
+kubectl ws root:espw
+if ! kubectl get namespace "$cm_namespace" &> /dev/null
+then kubectl create namespace "$cm_namespace"
+else echo "namespace $cm_namespace already exists"
+fi
+
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kbmap-$kcp_id
+  namespace: $cm_namespace
+  labels:
+    kubestellar.io/kube-bind-id: $cluster_ns
+data: {}
+EOF

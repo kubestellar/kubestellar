@@ -51,6 +51,7 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:resource:scope=Cluster,shortName=epl
+// +kubebuilder:metadata:labels="kube-bind.io/exported=true"
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type EdgePlacement struct {
 	metav1.TypeMeta `json:",inline"`
@@ -114,6 +115,14 @@ const ExecutingCountKey string = "kubestellar.io/executing-count"
 
 const validationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 
+// DownsyncOverwriteKey is the name or key of an annotation that can be used
+// to put a downsynced object in "create-only" mode. In this mode the desired state
+// (excluding object ID) of the object is malleable in the WECs and the state in
+// the WDS is only an initial value.
+// Omit this annotation or give it a value of "true" to get the normal behavior;
+// give it a value of "false" to get "create-only" mode.
+const DownsyncOverwriteKey = "edge.kubestellar.io/downsync-overwrite"
+
 // DownsyncObjectTest is a set of criteria that characterize matching objects.
 // An object matches if:
 // - the `apiGroup` criterion is satisfied;
@@ -130,7 +139,8 @@ const validationErrorKeyPrefix string = "validation-error.kubestellar.io/"
 type DownsyncObjectTest struct {
 	// `apiGroup` is the API group of the referenced object, empty string for the core API group.
 	// `nil` matches every API group.
-	APIGroup *string `json:"apiGroup"`
+	// +optional
+	APIGroup *string `json:"apiGroup,omitempty"`
 
 	// `resources` is a list of lowercase plural names for the sorts of objects to match.
 	// An entry of `"*"` means that all match.

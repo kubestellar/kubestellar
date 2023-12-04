@@ -28,28 +28,26 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerForKyvernoWithSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/kyverno/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/kyverno/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
 }
 
 func TestKubeStellarSyncerForKyvernoWithNamespacedObjectsSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
 }
 
 func TestKubeStellarSyncerForKyvernoWithNamespacedObjectsCoexistSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects-coexist.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/kyverno/syncer-config-namespaced-objects-coexist.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerForKyvernoWithSyncerConfig(t, syncerConfigUnst)
 }
@@ -57,11 +55,11 @@ func TestKubeStellarSyncerForKyvernoWithNamespacedObjectsCoexistSyncerConfig(t *
 func testKubeStellarSyncerForKyvernoWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var policyReportUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/kyverno/policy-report.yaml", embedded, &policyReportUnst)
+	err := framework.LoadFile("testdata/kyverno/policy-report.yaml", embedded, &policyReportUnst)
 	require.NoError(t, err)
 
 	var clusterPolicyReportUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/kyverno/cluster-policy-report.yaml", embedded, &clusterPolicyReportUnst)
+	err = framework.LoadFile("testdata/kyverno/cluster-policy-report.yaml", embedded, &clusterPolicyReportUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")

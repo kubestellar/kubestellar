@@ -17,8 +17,9 @@ limitations under the License.
 package providerclient
 
 const (
-	INCLUSTER = "incluster"
-	EXTERNAL  = "external"
+	INCLUSTER           = "incluster"
+	EXTERNAL            = "external"
+	PROVIDER_CONFIG_KEY = "kubeconfig"
 )
 
 // SpaceInfo is a minimal space information.

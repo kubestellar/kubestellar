@@ -1,8 +1,12 @@
 <!--kubestellar-syncer-0-deploy-florin-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
+kubectl ws root:espw
+pvname=`kubectl get synctargets.edge.kubestellar.io | grep florin | awk '{print $1}'`
+stuid=`kubectl get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
 kubectl ws root:imw1
-mbws=`kubectl get synctargets.edge.kubestellar.io florin -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}"`
+stcid=`kubectl get synctargets.edge.kubestellar.io florin -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}"`
+mbws="$stcid-mb-$stuid"
 echo "mailbox workspace name = $mbws"
 ```
 ``` { .bash .no-copy }
@@ -25,7 +29,7 @@ Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service accou
 
 Creating or updating cluster role binding "kubestellar-syncer-florin-32uaph9l" to bind service account "kubestellar-syncer-florin-32uaph9l" to cluster role "kubestellar-syncer-florin-32uaph9l".
 
-Wrote WEC manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
+Wrote workload execution cluster (WEC) manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
 

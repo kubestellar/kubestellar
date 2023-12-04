@@ -52,7 +52,8 @@ import (
 type KcpClusterProvider struct {
 	ctx            context.Context
 	logger         logr.Logger
-	kcpConfig      string
+	inConfig       string
+	externalConfig string
 	kcpWsClientset kcptenancyclusteredv1alpha1.WorkspaceClusterInterface
 	adminClientset *kcpclientset.ClusterClientset
 	workspaces     map[string]string
@@ -61,11 +62,25 @@ type KcpClusterProvider struct {
 }
 
 // New returns a new KcpClusterProvider
-func New(kcpConfig string) (*KcpClusterProvider, error) {
+func New(configStrs map[string]string) (*KcpClusterProvider, error) {
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
+	config := configStrs[clusterprovider.PROVIDER_CONFIG_KEY]
+	var externalConfig string
 
-	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(kcpConfig))
+	inclusterConfig, exists := configStrs[clusterprovider.INCLUSTER]
+	if exists {
+		externalConfig = config
+	} else {
+		inclusterConfig = config
+		externalConfig, exists = configStrs[clusterprovider.EXTERNAL]
+		if !exists {
+			err := errors.New("kcp secret does not contain incluster and external kubeconfigs")
+			return nil, err
+		}
+	}
+
+	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(config))
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +107,8 @@ func New(kcpConfig string) (*KcpClusterProvider, error) {
 	c := &KcpClusterProvider{
 		ctx:            ctx,
 		logger:         logger,
-		kcpConfig:      kcpConfig,
+		inConfig:       inclusterConfig,
+		externalConfig: externalConfig,
 		kcpWsClientset: baseClientset.TenancyV1alpha1().Workspaces(),
 		adminClientset: adminClientset,
 		workspaces:     make(map[string]string),
@@ -129,27 +145,42 @@ func (k *KcpClusterProvider) ListSpacesNames() ([]string, error) {
 	return []string{}, nil
 }
 
-func (k *KcpClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, error) {
-
-	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(k.kcpConfig))
+func (k *KcpClusterProvider) GetBasedOnConf(spaceName string, cfgString string) ([]byte, error) {
+	clientConfig, err := clientcmd.NewClientConfigFromBytes([]byte(cfgString))
 	if err != nil {
 		k.logger.Error(err, "Failed to get client config for workspace", "workspace", spaceName)
+		return nil, err
 	}
 	cfg, err := clientConfig.RawConfig()
 	if err != nil {
 		k.logger.Error(err, "Failed to get raw config for workspace", "workspace", spaceName)
+		return nil, err
 	}
 	cfgBytes, err := clientcmd.Write(buildRawConfig(cfg, spaceName))
 	if err != nil {
 		k.logger.Error(err, "Failed to write workspace config", "workspace", spaceName)
+		return nil, err
+	}
+	return cfgBytes, err
+}
+
+func (k *KcpClusterProvider) Get(spaceName string) (clusterprovider.SpaceInfo, error) {
+	inCfgBytes, err := k.GetBasedOnConf(spaceName, k.inConfig)
+	if err != nil {
+		k.logger.Error(err, "Failed to get internal config", "workspace", spaceName)
+		return clusterprovider.SpaceInfo{}, err
+	}
+	externalCfgBytes, err := k.GetBasedOnConf(spaceName, k.externalConfig)
+	if err != nil {
+		k.logger.Error(err, "Failed to get external config", "workspace", spaceName)
+		return clusterprovider.SpaceInfo{}, err
 	}
 
 	spaceInfo := clusterprovider.SpaceInfo{
 		Name: spaceName,
 		Config: map[string]string{
-			clusterprovider.INCLUSTER: string(cfgBytes[:]),
-			//TODO  get the incluster config
-			clusterprovider.EXTERNAL: string(cfgBytes[:]),
+			clusterprovider.INCLUSTER: string(inCfgBytes[:]),
+			clusterprovider.EXTERNAL:  string(externalCfgBytes[:]),
 		},
 	}
 	return spaceInfo, err

@@ -31,7 +31,7 @@
  
 ## Edge Syncer feasibility verification
 
-### Register an kubestellar-syncer on a p-cluster to connect a mailbox workspace specified by name
+### Register kubestellar-syncer on a workload execution cluster (WEC) to connect a mailbox workspace specified by name
 1. Created a mailbox workspace following to https://docs.kubestellar.io/main/Coding%20Milestones/PoC2023q1/mailbox-controller/
     ```
     $ kubectl get Workspace
@@ -64,7 +64,7 @@
 
     to verify the syncer pod is running.
     ```
-1. Deploy the generated bootstrap manifest (`/tmp/kubestellar-syncer.yaml`) in a p-cluster
+1. Deploy the generated bootstrap manifest (`/tmp/kubestellar-syncer.yaml`) to a workload execution cluster (WEC)
     ```
     $ KUBECONFIG=/tmp/kind-wec1/kubeconfig.yaml kubectl apply -f /tmp/kubestellar-syncer.yaml
     namespace/kubestellar-syncer-wec1-1na3tqcd created
@@ -116,7 +116,7 @@
         local-path-storage                      Active   13m
         ```
 
-### Deploy Kyverno and its policy from mailbox workspace to p-cluster just by using manifests (generated from Kyverno helm chart) rather than using OLM.
+### Deploy Kyverno and its policy from mailbox workspace to workload execution cluster (WEC) just by using manifests (generated from Kyverno helm chart) rather than using OLM.
 1. Update EdgeSyncConfig with required resources for Helm install of Kyverno [yaml](./scripts/edge-sync-config-for-kyverno-helm.yaml)
 1. Run Helm command
     ```
@@ -158,7 +158,7 @@
     policyreport.wgpolicyk8s.io/pol-sample-policy   0      1      0      0       0      77s
     ```
 
-### See policy reports generated at p-cluster via API Export on workload management workspace.
+### See policy reports generated at the workload execution cluster (WEC) via API Export on workload management workspace.
 1. In the previous case, PolicyReport CRD is deployed as a CRD. In order to share the API across workspaces, we define PolicyReport API as APIBinding
 1. Go to workload management workspace (`edge`)  
     ```
@@ -222,5 +222,5 @@
     1bz73lo0r5e6baep   pol-sample-policy   0      1      0      0       0      2023-03-22T12:15:27Z
     ```
 
-### Deploy the denatured objects on mailbox workspace to p-cluster by renaturing them automatically in kubestellar-syncer.
+### Deploy the denatured objects on mailbox workspace to workload execution cluster (WEC) by renaturing them automatically in kubestellar-syncer.
 The previous case covers this item since the denatured PolicyReport CRD was downsynced and deployed as PolicyReport CRD renatured by Edge Syncer.

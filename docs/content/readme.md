@@ -8,7 +8,6 @@
 <br/>
 
 ## Multi-cluster Configuration Management for Edge, Multi-Cloud, and Hybrid Cloud
-<br/>
 
 [![Generate and push docs](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml/badge.svg?branch={{ config.ks_branch }})](https://github.com/kubestellar/kubestellar/actions/workflows/docs-gen-and-push.yml)&nbsp;&nbsp;&nbsp;
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)&nbsp;&nbsp;&nbsp;
@@ -22,40 +21,44 @@
 <a href="https://kubernetes.slack.com/archives/C058SUSL5AA"> 
     <img alt="Join Slack" src="https://img.shields.io/badge/KubeStellar-Join%20Slack-blue?logo=slack">
   </a>
-## Overview
-KubeStellar is an opensource project focused on concerns arising from multi-cluster configuration management for edge, multi-cloud, and hybrid cloud use cases:
 
-- Hierarchy, infrastructure & platform, roles & responsibilities, integration architecture, security issues
-- Runtime in[ter]dependence: An edge location may need to operate independently of the center and other edge locations​
-- Non-namespaced objects: need general support
-- Cardinality of destinations: A source object may propagate to many thousands of destinations. 
+Imagine KubeStellar as a post office for your Kubernetes resources. When you drop packages at the post office, they don't open them; they deliver them to the right recipients. Similarly, KubeStellar works like this for your Kubernetes resources. Instead of running resources right away, KubeStellar safely stores and sends resources to selected clusters across the globe—whether they're in public clouds, private clouds, or on the edge of your network. It's a super useful tool for spreading your Kubernetes resources wherever you need them without disrupting your existing tools and workflows.
 
-## Goals
+How does KubeStellar resist the temptation to run your Kubernetes resources right away? KubeStellar accepts your applied resources in a special staging area (virtual cluster) where pods can't be created. Then, at your direction, KubeStellar transfers your applied resources to remote clusters where they can create pods and other required resource dependencies. KubeStellar does this using many different lightweight virtual cluster providers (Kind, KubeFlex, KCP, etc.) to create this special staging area. 
 
-- Collaboratively design a component set similar to those found in the current kcp TMC implementation (dedicated Workspace type, Where Resolver, syncer-like mechanism, edge placement object definition, status collection strategy, etc.)
-- Specify a multi-phased proof-of-concept inclusive of component architecture, interfaces, and example workloads
-- Validate phases of proof-of-concept with kcp, Kube SIG-Multicluster, and CNCF community members interested in Edge
+KubeStellar is an innovative way to stage inactive Kubernetes resources and then apply them to any cluster to run. KubeStellar introduces a native way to expand, optimize, and protect your Kubernetes resources from individual cluster misconfiguration, utilization, and failure. 
 
-## Areas of exploration
+__Don't change anything, just add KubeStellar!__
 
-- Desired placement expression​: Need a way for one center object to express large number of desired copies​
-- Scheduling/syncing interface​: Need something that scales to large number of destinations​
-- Rollout control​: Client needs programmatic control of rollout, possibly including domain-specific logic​
-- Customization: Need a way for one pattern in the center to express how to customize for all the desired destinations​
-- Status from many destinations​: Center clients may need a way to access status from individual edge copies
-- Status summarization​: Client needs a way to specify how statuses from edge copies are processed/reduced along the way from edge to center​.
 
-## Roadmap for the Project
+## KubeStellar treats multiple Kubernetes clusters as one so you can:
+
+- __Centrally__ apply Kubernetes resources for selective deployment across multiple clusters 
+- Use __standard Kubernetes native deployment tools__ (kubectl, Helm, Kustomize, ArgoCD, Flux); no resource bundling required
+- __Discover__ dynamically created objects created on remote clusters
+- Make __disconnected__ cluster operation possible
+- __Scale__ with 1:many and many:1 scenarios
+- __Remain compatible__ with cloud-native solutions
+
+## KubeStellar virtual clusters (Spaces) are our secret
+- KubeStellar uses lightweight virtual clusters (Spaces) that run inside the KubeStellar hosting cluster
+- Standard Kubernetes clusters have __2-300__ api-resources, KubeStellar Spaces have only __40__
+- Fewer api-resources mean resources remain inactive (denatured) – they do not expand into other resources like replicasets, pods, etc.
+- Denaturing is the key to accepting native, unbundled Kubernetes resources as input without running them
+- Unbundled resources are the default and preferred output of most cloud-native tools making KubeStellar use and integration easy
+
+## QuickStart
+
+Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/user-quickstart-kind/)
+
+
+## Roadmaps for the Project
 
 We have defined and largely completed the
 [PoC2023q1](../Coding%20Milestones/PoC2023q1/outline/).
 The current activity is refining the definition of, and producing, the
 [PoC2023q4](../Coding%20Milestones/PoC2023q4/outline/).
 Goals not addressed in that PoC are to be explored later.
-
-## QuickStart
-
-Checkout our [QuickStart Guide]({{ config.docs_url }}/{{ config.ks_branch }}/Getting-Started/quickstart/)
 
 ## Contributing
 

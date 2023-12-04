@@ -4,6 +4,7 @@ coverage.*
 tools
 build
 .vscode
+docs/scripts/generated_script.sh
 
 # JetBrains IDE files
 .idea/

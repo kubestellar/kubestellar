@@ -5,10 +5,14 @@ Workspace (WMW) for you to store kubernetes workload descriptions and KubeStella
 Create an EdgePlacement control object to direct where your workload runs using the 'location-group=edge' label selector. This label selector's value ensures your workload is directed to both clusters, as they were labeled with 'location-group=edge' when you issued the 'kubestellar prep-for-cluster' command above.
 
 This EdgePlacement includes downsync of a `RoleBinding` that grants
-privileges that let the httpd pod run in an OpenShift cluster.
+privileges that let the httpd pod run in an OpenShift cluster as well
+as applying the OpenShift route CRD so support exposure of services.
 
 In the `root:wmw1` workspace create the following `EdgePlacement` object: 
-```shell hl_lines="9 10 14 18 19"
+```shell hl_lines="13 17 20 25 26 33"
+KUBECONFIG=ks-core.kubeconfig \
+  kubectl apply -f https://raw.githubusercontent.com/openshift/router/master/deploy/route_crd.yaml
+
 KUBECONFIG=ks-core.kubeconfig kubectl ws root:wmw1
 
 KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
@@ -21,9 +25,13 @@ spec:
   - matchLabels: {"location-group":"edge"}
   downsync:
   - apiGroup: ""
-    resources: [ configmaps ]
+    resources: [ configmaps, services ]
     namespaces: [ my-namespace ]
     objectNames: [ "*" ]
+  - apiGroup: route.openshift.io
+    namespaces: [ my-namespace ]
+    objectNames: [ "*" ]
+    resources: [ routes ]
   - apiGroup: apps
     resources: [ deployments ]
     namespaces: [ my-namespace ]
@@ -46,7 +54,7 @@ KUBECONFIG=ks-core.kubeconfig kubectl get edgeplacements -n kubestellar -o yaml
 ```
 
 Now, apply the HTTP server workload definition into the WMW on **ks-core**. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`my-first-edge-placement`) object created above. 
-```shell hl_lines="5 10 24 25"
+```shell hl_lines="5 10 24 25 53 67 80"
 KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
@@ -80,15 +88,15 @@ spec:
     spec:
       containers:
       - name: httpd
-        image: library/httpd:2.4
+        image: registry.redhat.io/rhel8/httpd-24
         ports:
         - name: http
-          containerPort: 80
+          containerPort: 8080
           protocol: TCP
         volumeMounts:
         - name: htdocs
           readOnly: true
-          mountPath: /usr/local/apache2/htdocs
+          mountPath: /var/www/html/
       volumes:
       - name: htdocs
         configMap:
@@ -117,8 +125,8 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8080
+      targetPort: 8080
   selector:
     app: common
 ---
@@ -129,7 +137,7 @@ metadata:
   namespace: my-namespace
 spec:
   port:
-    targetPort: 80
+    targetPort: 8080
   to:
     kind: Service
     name: my-service

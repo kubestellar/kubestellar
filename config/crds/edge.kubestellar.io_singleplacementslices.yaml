@@ -3,8 +3,9 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.10.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.13.0
+  labels:
+    kube-bind.io/exported: "true"
   name: singleplacementslices.edge.kubestellar.io
 spec:
   group: edge.kubestellar.io
@@ -39,7 +40,7 @@ spec:
                 relevant EdgePlacement.
               properties:
                 cluster:
-                  description: Cluster is the logicacluster.Name of the logical cluster
+                  description: Cluster is the logicalcluster.Name of the logical cluster
                     that contains both the Location and the SyncTarget.
                   type: string
                 locationName:

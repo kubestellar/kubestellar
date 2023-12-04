@@ -69,7 +69,7 @@ If you have any questions about contributing, don't hesitate to reach out to us 
 
 Our [QuickStart](../../Getting-Started/quickstart/)
  guide shows a user how to install a
-local KCP server and install the KubeStellar components and run an
+local space provider and install the KubeStellar components and run an
 example.  As a contributor you will want a different setup flow,
 including `git clone` of this repo instead of fetching and unpacking a
 release archive.  The same example usage should work for you, and
@@ -154,7 +154,7 @@ cluster then you can use [kind
 load](https://kind.sigs.k8s.io/docs/user/quick-start#loading-an-image-into-your-cluster).
 
 To get the image you just built used in your testing, edit
-`outer-scripts/kubectl-kubestellar-deploy` and update the line that defines
+`scripts/outer/kubectl-kubestellar-deploy` and update the line that defines
 `$image_tag`; follow this with your `make build`.  For the sake of
 future users of a merged change, your last edit like this should refer
 to a tag that you pushed to quay.io/kubestellar/kubestellar.

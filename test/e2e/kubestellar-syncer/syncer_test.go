@@ -29,27 +29,25 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerWithEdgeSyncConfig(t *testing.T) {
 
 	var edgeSyncConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/edgesyncconfig/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
+	err := framework.LoadFile("testdata/edgesyncconfig/edge-sync-config.yaml", embedded, &edgeSyncConfigUnst)
 	require.NoError(t, err)
 
 	var sampleCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-crd.yaml", embedded, &sampleCRDUnst)
+	err = framework.LoadFile("testdata/edgesyncconfig/sample-crd.yaml", embedded, &sampleCRDUnst)
 	require.NoError(t, err)
 
 	var sampleCRUpsyncUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
+	err = framework.LoadFile("testdata/edgesyncconfig/sample-cr-upsync.yaml", embedded, &sampleCRUpsyncUnst)
 	require.NoError(t, err)
 
 	var sampleCRDownsyncUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/edgesyncconfig/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
+	err = framework.LoadFile("testdata/edgesyncconfig/sample-cr-downsync.yaml", embedded, &sampleCRDownsyncUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")

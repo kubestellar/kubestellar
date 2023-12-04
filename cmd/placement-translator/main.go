@@ -26,7 +26,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -35,12 +34,12 @@ import (
 
 	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned"
 	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
-	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/metrics/legacyregistry"
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
@@ -52,16 +51,14 @@ import (
 	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
 	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
 	kcpkubeclient "github.com/kcp-dev/client-go/kubernetes"
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	"github.com/kcp-dev/kcp/pkg/apis/third_party/conditions/util/conditions"
 	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
 	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
 	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
 
+	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
-	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	"github.com/kubestellar/kubestellar/pkg/placement"
 )
 
@@ -156,17 +153,10 @@ func main() {
 		os.Exit(25)
 	}
 
-	// Get client config for view of APIExport of edge API
-	edgeViewConfig, err := configForViewOfExport(ctx, espwRestConfig, "edge.kubestellar.io")
+	edgeClientset, err := ksclientset.NewForConfig(espwRestConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create client config for view of edge APIExport")
+		logger.Error(err, "Failed to create provider clientset from config")
 		os.Exit(30)
-	}
-
-	edgeViewClusterClientset, err := emcclusterclientset.NewForConfig(edgeViewConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create cluster clientset for view of edge APIExport")
-		os.Exit(40)
 	}
 
 	apiextClusterClient, err := apiextclient.NewForConfig(baseRestConfig)
@@ -187,12 +177,11 @@ func main() {
 	kubeClusterInformerFactory := kcpkubeinformers.NewSharedInformerFactory(kubeClusterClient, 0)
 	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
 
-	edgeInformerFactory := emcinformers.NewSharedInformerFactoryWithOptions(edgeViewClusterClientset, resyncPeriod)
-	epClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
-	spsClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
-	syncfgClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
-	customizerClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
-	var _ edgev1a1informers.SinglePlacementSliceClusterInformer = spsClusterPreInformer
+	edgeInformerFactory := emcinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
+	epPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
+	spsPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
+	syncfgPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
+	customizerPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
 
 	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
 	if err != nil {
@@ -202,10 +191,8 @@ func main() {
 
 	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
 	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
-	var _ tenancyv1a1informers.WorkspaceInformer = mbwsPreInformer
 
-	locationClusterPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
-	var _ edgev1a1informers.LocationClusterInformer = locationClusterPreInformer
+	locationPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
 
 	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
 	if err != nil {
@@ -230,12 +217,20 @@ func main() {
 	kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClusterClientset, 0)
 	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
 
+	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
+	if err != nil {
+		logger.Error(err, "failed to create k8s clientset for service provider space")
+		os.Exit(90)
+	}
+	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
+
 	doneCh := ctx.Done()
 	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, locationClusterPreInformer, epClusterPreInformer, spsClusterPreInformer, syncfgClusterPreInformer, customizerClusterPreInformer,
+	pt := placement.NewPlacementTranslator(concurrency, ctx, locationPreInformer, epPreInformer, spsPreInformer, syncfgPreInformer, customizerPreInformer,
 		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient)
+		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient, kbSpaceRelation)
 
+	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
 	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)
 	rootInformerFactory.Start(doneCh)
@@ -244,47 +239,4 @@ func main() {
 	kcpClusterInformerFactory.Start(doneCh)
 	pt.Run()
 	logger.Info("Time to stop")
-}
-
-func configForViewOfExport(ctx context.Context, providerConfig *rest.Config, exportName string) (*rest.Config, error) {
-	providerScopedClient, err := kcpscopedclientset.NewForConfig(providerConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error creating client for service provider workspace: %w", err)
-	}
-	apiExportClient := providerScopedClient.ApisV1alpha1().APIExports()
-	logger := klog.FromContext(ctx)
-	var apiExport *apisv1alpha1.APIExport
-	for {
-		apiExport, err = apiExportClient.Get(ctx, exportName, metav1.GetOptions{})
-		if err != nil {
-			if k8sapierrors.IsNotFound(err) {
-				logger.V(2).Info("Pause because APIExport not found", "exportName", exportName)
-				time.Sleep(time.Second * 15)
-				continue
-			}
-			return nil, fmt.Errorf("error reading APIExport %s: %w", exportName, err)
-		}
-		if isAPIExportReady(logger, apiExport) {
-			break
-		}
-		logger.V(2).Info("Pause because APIExport not ready", "exportName", exportName)
-		time.Sleep(time.Second * 15)
-	}
-	viewConfig := rest.CopyConfig(providerConfig)
-	serverURL := apiExport.Status.VirtualWorkspaces[0].URL
-	logger.V(2).Info("Found APIExport view", "exportName", exportName, "serverURL", serverURL)
-	viewConfig.Host = serverURL
-	return viewConfig, nil
-}
-
-func isAPIExportReady(logger klog.Logger, apiExport *apisv1alpha1.APIExport) bool {
-	if !conditions.IsTrue(apiExport, apisv1alpha1.APIExportVirtualWorkspaceURLsReady) {
-		logger.V(2).Info("APIExport virtual workspace URLs are not ready", "APIExport", apiExport.Name)
-		return false
-	}
-	if len(apiExport.Status.VirtualWorkspaces) == 0 {
-		logger.V(2).Info("APIExport does not have any virtual workspace URLs", "APIExport", apiExport.Name)
-		return false
-	}
-	return true
 }

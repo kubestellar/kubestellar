@@ -14,7 +14,7 @@ GitHub](https://github.com/kubestellar/kubestellar/releases)) and
 `$os_type` and `$arch_type` are chosen according to the list of
 "assets" for your chosen release.
 
-```{.base}
+``` {.bash}
 curl -SL -o kubestellar.tar.gz "https://github.com/kubestellar/kubestellar/releases/download/${kubestellar_version}/kubestellar_${kubestellar_version}_${os_type}_${arch_type}.tar.gz
 tar xzf kubestellar.tar.gz
 export PATH=$PWD/bin:$PATH
@@ -26,7 +26,7 @@ You can get the latest version from GitHub with the following command,
 which will get you the default branch (which is named "main"); add `-b
 $branch` to the `git` command in order to get a different branch.
 
-```{.base}
+``` {.bash}
 git clone {{ config.repo_url }}
 cd kubestellar
 ```
@@ -47,6 +47,28 @@ The kubectl plugin lines use fully specific executables (e.g.,
 `kubectl kubestellar prep-for-syncer` corresponds to
 `bin/kubectl-kubestellar-prep_for_syncer`).
 
+#### Get binaries of kube-bind and dex
+The command below makes kube-bind binaries and dex binary available in `$PATH`.
+
+```shell
+rm -rf kube-bind
+git clone https://github.com/waltforme/kube-bind.git && \
+pushd kube-bind && \
+mkdir bin && \
+IGNORE_GO_VERSION=1 go build -o ./bin/example-backend ./cmd/example-backend/main.go && \
+git checkout origin/syncmore && \
+IGNORE_GO_VERSION=1 go build -o ./bin/konnector ./cmd/konnector/main.go && \
+git checkout origin/autobind && \
+IGNORE_GO_VERSION=1 go build -o ./bin/kubectl-bind ./cmd/kubectl-bind/main.go && \
+export PATH=$(pwd)/bin:$PATH && \
+popd && \
+git clone https://github.com/dexidp/dex.git && \
+pushd dex && \
+IGNORE_GO_VERSION=1 make build && \
+export PATH=$(pwd)/bin:$PATH && \
+popd
+```
+
 #### Initialize the KubeStellar platform as bare processes
 
 In this step KubeStellar creates and populates the Edge Service
@@ -60,7 +82,7 @@ containerized workloads from the four resources built into kcp TMC
 are meaningful in KubeStellar.
 
 ```shell
-kubestellar init
+IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubestellar init
 ```
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
@@ -104,7 +126,7 @@ commands to fetch and start using that kubeconfig file; the first
 assumes that you deployed the core into a Kubernetes namespace named
 "kubestellar".
 
-```{.base}
+``` {.bash}
 kubectl kubestellar get-external-kubeconfig -n kubestellar -o kcs.kubeconfig
 export KUBECONFIG=$(pwd)/kcs.kubeconfig
 ```
@@ -123,11 +145,12 @@ KubeStellar. They label both florin and guilder with `env=prod`, and
 also label guilder with `extended=yes`.
 
 ```shell
-kubectl ws root:imw1
-kubectl kubestellar ensure location florin  loc-name=florin  env=prod
-kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes
-echo "decribe the florin location object"
-kubectl describe location.edge.kubestellar.io florin
+imw1_space_config="${PWD}/temp-space-config/spaceprovider-default-imw1"
+kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --space-config-file $imw1_space_config
+KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
+KUBECONFIG=$imw1_space_config kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
+echo "describe the florin location object"
+KUBECONFIG=$imw1_space_config kubectl describe location.edge.kubestellar.io florin
 ```
 
 Those two script invocations are equivalent to creating the following

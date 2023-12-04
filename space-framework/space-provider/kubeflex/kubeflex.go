@@ -54,7 +54,8 @@ type KflexClusterProvider struct {
 }
 
 // New creates a new KflexClusterProvider
-func New(pConfig string) (KflexClusterProvider, error) {
+func New(configStrs map[string]string) (KflexClusterProvider, error) {
+	pConfig := configStrs[clusterprovider.PROVIDER_CONFIG_KEY]
 
 	ctx := context.Background()
 	logger := klog.FromContext(ctx)
@@ -206,22 +207,31 @@ func isSpaceReady(unspace unstructured.Unstructured) bool {
 // TODO: switch from cli to kube directives
 func (k KflexClusterProvider) Get(lcName string) (clusterprovider.SpaceInfo, error) {
 
+	var externalConf, internalConf []byte
 	secret, err := k.kubeClient.CoreV1().Secrets(lcName+"-system").Get(k.ctx, "admin-kubeconfig", v1.GetOptions{})
 	if err != nil {
 		return clusterprovider.SpaceInfo{}, err
 	}
 
-	externalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig"])
-	internalConf := base64.StdEncoding.EncodeToString(secret.Data["kubeconfig-incluster"])
-
+	externalConf, err = base64.StdEncoding.DecodeString(string(secret.Data["kubeconfig"]))
 	if err != nil {
-		return clusterprovider.SpaceInfo{}, err
+		//We assume this happen because the data was not encoded pring message and get the string
+		externalConf = secret.Data["kubeconfig"]
+		k.logger.Info("Provider secret was not encoded", "Secret", secret.Name)
 	}
+
+	internalConf, err = base64.StdEncoding.DecodeString(string(secret.Data["kubeconfig-incluster"]))
+	if err != nil {
+		//We assume this happen because the data was not encoded pring message and get the string
+		internalConf = secret.Data["kubeconfig-incluster"]
+		k.logger.Info("Provider secret was not encoded", "Secret", secret.Name)
+	}
+
 	lcInfo := clusterprovider.SpaceInfo{
 		Name: lcName,
 		Config: map[string]string{
-			clusterprovider.EXTERNAL:  externalConf,
-			clusterprovider.INCLUSTER: internalConf,
+			clusterprovider.EXTERNAL:  string(externalConf),
+			clusterprovider.INCLUSTER: string(internalConf),
 		},
 	}
 	return lcInfo, nil
@@ -249,7 +259,8 @@ func (k KflexClusterProvider) ListSpaces() ([]clusterprovider.SpaceInfo, error) 
 func (k KflexClusterProvider) Watch() (clusterprovider.Watcher, error) {
 	w := &KflexWatcher{
 		ch:       make(chan clusterprovider.WatchEvent),
-		provider: &k}
+		provider: &k,
+		chClosed: false}
 	k.watch = w
 	return w, nil
 }
@@ -260,6 +271,7 @@ type KflexWatcher struct {
 	ch       chan clusterprovider.WatchEvent
 	cancel   context.CancelFunc
 	provider *KflexClusterProvider
+	chClosed bool
 }
 
 func (k *KflexWatcher) Stop() {
@@ -267,7 +279,11 @@ func (k *KflexWatcher) Stop() {
 		k.cancel()
 	}
 	k.wg.Wait()
-	close(k.ch)
+	if !k.chClosed {
+		close(k.ch)
+		k.chClosed = true
+
+	}
 }
 
 func (k *KflexWatcher) ResultChan() <-chan clusterprovider.WatchEvent {

@@ -150,6 +150,8 @@ func (c *controller) handleAdd(space interface{}, spaceKey string) {
 		c.handleDelete(spaceKey)
 		return
 	}
+	// add space reference to cache
+	c.cacheSpaceReference(nSpace, spaceKey)
 
 	// TODO We assume the space is in a pod in the same cluster where the controllers are deployed
 	// Need to add flags to indicate it
@@ -168,8 +170,23 @@ func (c *controller) handleAdd(space interface{}, spaceKey string) {
 func (c *controller) handleDelete(spaceKey string) {
 	c.msClient.lock.Lock()
 	defer c.msClient.lock.Unlock()
-	if _, ok := c.msClient.configs[spaceKey]; !ok {
-		return
+	for ref, space := range c.msClient.refToSpace {
+		if space == spaceKey {
+			delete(c.msClient.refToSpace, ref)
+			break
+		}
 	}
 	delete(c.msClient.configs, spaceKey)
+}
+
+func (c *controller) cacheSpaceReference(space *spacev1alpha1.Space, spaceKey string) {
+	annotations := space.GetAnnotations()
+	if annotations == nil {
+		return
+	}
+	c.msClient.lock.Lock()
+	defer c.msClient.lock.Unlock()
+	if ref, ok := annotations[refAnnotationKey]; ok {
+		c.msClient.refToSpace[ref] = spaceKey
+	}
 }

@@ -29,6 +29,58 @@ spec:
       serviceAccountName: kubestellar-sa
       containers:
 
+      - name: space-manager
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.spaceimage.repository }}:{{ .Values.spaceimage.tag }}
+        imagePullPolicy: {{ .Values.spaceimage.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/spacecore/entry.sh" , "space-manager" ]
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+        - name: NAMESPACE 
+          value: "{{ .Release.Namespace }}"
+
+      {{ if eq .Values.defaultSpaceProviderType "kcp" }} 
+      - name: kcp
+        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        {{ end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # command: [ "sleep" , "infinity" ]
+        command: [ "/home/kubestellar/entry.sh" , "kcp" ]
+        env:
+        - name: EXTERNAL_HOSTNAME
+          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
+        - name: EXTERNAL_PORT
+          value: "{{ .Values.EXTERNAL_PORT }}"
+        volumeMounts:
+        - name: kubestellar-pv
+          mountPath: "/home/kubestellar/.kcp"
+          readOnly: false
+        ports:
+        - name: ks-port
+          protocol: TCP
+          containerPort: 6443
+      {{ end }}
+
       - name: init
         {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
         securityContext:
@@ -50,6 +102,10 @@ spec:
           value: "{{ .Values.ENSURE_IMW }}"
         - name: ENSURE_WMW
           value: "{{ .Values.ENSURE_WMW }}"
+        - name: NAMESPACE 
+          value: "{{ .Release.Namespace }}"
+        - name: SPACE_PROVIDER_TYPE
+          value: "{{ .Values.defaultSpaceProviderType }}"
           # volumeMounts:
           # - name: kubestellar-secret
           #   mountPath: "/home/kubestellar/.kcp"
@@ -117,34 +173,6 @@ spec:
         # - name: kubestellar-secret
         #   mountPath: "/home/kubestellar/.kcp"
         #   readOnly: true
-
-      - name: kcp
-        {{ if eq .Values.clusterType "OpenShift" }} # OpenShift
-        securityContext:
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
-        {{ end }}
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # command: [ "sleep" , "infinity" ]
-        command: [ "/home/kubestellar/entry.sh" , "kcp" ]
-        env:
-        - name: EXTERNAL_HOSTNAME
-          value: "{{ .Values.EXTERNAL_HOSTNAME }}"
-        - name: EXTERNAL_PORT
-          value: "{{ .Values.EXTERNAL_PORT }}"
-        volumeMounts:
-        - name: kubestellar-pv
-          mountPath: "/home/kubestellar/.kcp"
-          readOnly: false
-        ports:
-        - name: ks-port
-          protocol: TCP
-          containerPort: 6443
 
       volumes:
       - name: kubestellar-pv

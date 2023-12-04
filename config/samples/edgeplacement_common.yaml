@@ -1,0 +1,11 @@
+apiVersion: edge.kubestellar.io/v2alpha1
+kind: EdgePlacement
+metadata:
+  name: common
+spec:
+  locationSelectors: [{}]
+  downsync:
+  - apiGroup: ""
+    resources: [ configmaps ]
+    namespaces: [ common-namespace ]
+    objectNames: [ "*" ]

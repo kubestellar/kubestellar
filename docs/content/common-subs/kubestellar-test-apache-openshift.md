@@ -1,7 +1,8 @@
 <!--kubestellar-test-apache-openshift-start-->
 Now, let's check that the deployment was created in the kind **ks-edge-cluster1** cluster (it may take up to 30 seconds to appear):
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 get deployments -A
+KUBECONFIG=~/.kube/config kubectl --context \
+  ks-edge-cluster1 get deployments -A | grep my-namespace
 ```
 
 you should see output including:
@@ -12,7 +13,8 @@ my-namespace        my-first-kubestellar-deployment    1/1        1            1
 
 And, check the **ks-edge-cluster2** kind cluster for the same:
 ```shell
-KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster2 get deployments -A
+KUBECONFIG=~/.kube/config kubectl --context \
+  ks-edge-cluster2 get deployments -A | grep my-namespace
 ```
 
 you should see output including:
@@ -28,12 +30,12 @@ while [[ $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 get pod 
   -l "app=common" -n my-namespace -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do 
     sleep 5; 
   done;
-curl http://$(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 \
+curl $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster1 \
   get route/my-route -n my-namespace -o jsonpath='{.spec.host}')
 ```
 
 you should see the output:
-```html
+``` {.bash .no-copy}
 <!DOCTYPE html>
 <html>
   <body>
@@ -48,12 +50,12 @@ while [[ $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster2 get pod 
   -l "app=common" -n my-namespace -o jsonpath='{.items[0].status.phase}') != "Running" ]]; do 
     sleep 5; 
   done;
-curl http://$(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster2 \
+curl $(KUBECONFIG=~/.kube/config kubectl --context ks-edge-cluster2 \
   get route/my-route -n my-namespace -o jsonpath='{.spec.host}')
 ```
 
 you should see the output:
-```html
+``` {.bash .no-copy}
 <!DOCTYPE html>
 <html>
   <body>

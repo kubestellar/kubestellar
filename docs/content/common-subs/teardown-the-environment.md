@@ -4,8 +4,8 @@ To remove the example usage, delete the IMW and WMW and kind clusters run the fo
 ``` {.bash}
 rm florin-syncer.yaml guilder-syncer.yaml || true
 kubectl ws root
-kubectl delete workspace example-imw
-kubectl kubestellar remove wmw example-wmw
+kubectl delete workspace imw1
+kubectl kubestellar remove wmw wmw1
 kind delete cluster --name florin
 kind delete cluster --name guilder
 ```
@@ -20,7 +20,7 @@ The following command will stop whatever KubeStellar controllers are running.
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following command:
+Stop and uninstall KubeStellar and the space provider with the following command:
 
 ``` {.bash}
 remove-kubestellar
@@ -28,7 +28,7 @@ remove-kubestellar
 
 ### Teardown Kubernetes workload
 
-With `kubectl` configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.
+With `kubectl` configured to manipulate the hosting cluster, the following command will remove the workload that is the space provider and KubeStellar.
 
 ``` {.bash}
 helm delete kubestellar

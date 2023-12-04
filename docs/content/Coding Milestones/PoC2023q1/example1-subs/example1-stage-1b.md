@@ -7,7 +7,7 @@ write a file containing YAML for deploying the syncer in the guilder
 cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw1 guilder
+kubectl kubestellar prep-for-syncer --imw imw1 --espw espw guilder
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw1".
@@ -68,7 +68,7 @@ local-path-storage                 local-path-provisioner             1/1     1 
 Do the analogous stuff for the florin cluster.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw1 florin
+kubectl kubestellar prep-for-syncer --imw imw1 --espw espw florin
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:imw1".
@@ -82,7 +82,7 @@ Creating cluster role "kubestellar-syncer-florin-32uaph9l" to give service accou
 
 Creating or updating cluster role binding "kubestellar-syncer-florin-32uaph9l" to bind service account "kubestellar-syncer-florin-32uaph9l" to cluster role "kubestellar-syncer-florin-32uaph9l".
 
-Wrote WEC manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
+Wrote workload execution cluster (WEC) manifest to florin-syncer.yaml for namespace "kubestellar-syncer-florin-32uaph9l". Use
 
   KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "florin-syncer.yaml"
 

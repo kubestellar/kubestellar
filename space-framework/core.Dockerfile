@@ -23,10 +23,10 @@ ENV PATH=$PATH:/root/go/bin
 
 ADD cmd/             cmd/
 ADD config/          config/
+ADD config/crds/     config/crds/
 ADD hack/            hack/
 ADD pkg/             pkg/
 ADD space-provider/  space-provider/
-ADD scripts/         scripts/
 ADD test/            test/
 ADD Makefile go.mod go.sum git-info.txt .
 
@@ -43,13 +43,15 @@ RUN dnf install -y jq procps && \
     dnf -y upgrade openssl && \
     groupadd spacecore && \
     adduser -g spacecore spacecore && \
-    mkdir -p clusterconfigs
+    mkdir -p clusterconfigs && \
+    mkdir -p .kube
 
 # copy binaries from the builder image
-COPY --from=builder /root/go/bin                      /usr/local/bin/
-COPY --from=builder /usr/local/bin/kubectl            /usr/local/bin/kubectl
+COPY --from=builder /root/go/bin                    /usr/local/bin/
+COPY --from=builder /usr/local/bin/kubectl          /usr/local/bin/kubectl
 COPY --from=builder /home/spacecore/bin             bin/
 COPY --from=builder /home/spacecore/config          config/
+COPY --from=builder /home/spacecore/config/crds     config/crds
 
 # add entry script
 ADD entry.sh entry.sh
@@ -59,7 +61,7 @@ RUN chown -R spacecore:0 /home/spacecore && \
 
 # setup the environment variables
 ENV PATH=/home/spacecore/bin:$PATH
-ENV KUBECONFIG=/home/spacecore/clusterconfigs/cluster.kubeconfig
+ENV KUBECONFIG=/home/spacecore/.kube/config
 ENV EXTERNAL_HOSTNAME=""
 ENV EXTERNAL_PORT=""
 

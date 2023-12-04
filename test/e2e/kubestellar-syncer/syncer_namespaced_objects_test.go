@@ -31,14 +31,12 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerForNamespacedObjects(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/namespaced-objects/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/namespaced-objects/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerForNamespacedObjects(t, syncerConfigUnst)
 }
@@ -62,7 +60,7 @@ func testKubeStellarSyncerForNamespacedObjects(t *testing.T, syncerConfigUnst *u
 	_test2secret := typeUnstObjWithPath{UnstObj: &test2secret, Path: testDataDirectory + "/secret-test2.yaml"} // pragma: allowlist secret
 	_test3secret := typeUnstObjWithPath{UnstObj: &test3secret, Path: testDataDirectory + "/secret-test3.yaml"} // pragma: allowlist secret
 	for _, test := range []*typeUnstObjWithPath{&_test1cm1, &_test1cm2, &_test2cm1, &_test2cm2, &_test3cm1, &_test1secret, &_test2secret, &_test3secret} {
-		err := edgeframework.LoadFile(test.Path, embedded, &test.UnstObj)
+		err := framework.LoadFile(test.Path, embedded, &test.UnstObj)
 		require.NoError(t, err)
 	}
 	framework.Suite(t, "kubestellar-syncer")

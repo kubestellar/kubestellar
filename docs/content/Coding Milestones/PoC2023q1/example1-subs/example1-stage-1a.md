@@ -8,9 +8,10 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.
 
 ```shell
+# TODO: mailbox controller has kcp dependencies. Will remove when controllers support spaces.
 kubectl ws root:espw
 mailbox-controller -v=2 &
-sleep 10
+sleep 20
 ```
 
 This controller is in charge of maintaining the collection of mailbox
@@ -20,6 +21,7 @@ appearance of the mailbox workspaces implied by the florin and guilder
 `SyncTarget` objects that you made earlier.
 
 ```shell
+# TODO: leaving this here so we get a list of all the workspaces.  Once all the workspaces, including the ones created by the mailbox are converted to spaces, we'll remove this ws."
 kubectl ws root
 while [ $(kubectl ws tree | grep "\-mb\-" | wc -l) -ne 2 ]; do
   sleep 10
@@ -52,6 +54,7 @@ A mailbox workspace name is distinguished by `-mb-` separator.
 You can get a listing of those mailbox workspaces as follows.
 
 ```shell
+# TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code.
 kubectl ws root
 kubectl get Workspaces
 ```
@@ -68,6 +71,7 @@ More usefully, using custom columns you can get a listing that shows
 the _name_ of the associated SyncTarget.
 
 ```shell
+# TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code
 kubectl get Workspace -o "custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations['edge\.kubestellar\.io/sync-target-name'],CLUSTER:.spec.cluster"
 ```
 ``` { .bash .no-copy }
@@ -83,6 +87,7 @@ Also: if you ever need to look up just one mailbox workspace by
 SyncTarget name, you could do it as follows.
 
 ```shell
+# TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code
 GUILDER_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "guilder") | .name')
 echo The guilder mailbox workspace name is $GUILDER_WS
 ```
@@ -91,6 +96,7 @@ The guilder mailbox workspace name is 1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954
 ```
 
 ```shell
+# TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code
 FLORIN_WS=$(kubectl get Workspace -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "florin") | .name')
 echo The florin mailbox workspace name is $FLORIN_WS
 ```

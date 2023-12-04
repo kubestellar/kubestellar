@@ -29,28 +29,26 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/kcp-dev/kcp/test/e2e/framework"
-
-	edgeframework "github.com/kubestellar/kubestellar/test/e2e/framework"
+	"github.com/kubestellar/kubestellar/test/e2e/framework"
 )
 
 func TestKubeStellarSyncerWithSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/syncerconfig/syncer-config.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
 func TestKubeStellarSyncerWithWildcardSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/syncerconfig/syncer-config-wildcard.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
 
 func TestKubeStellarSyncerWithNamespacedObjectsSyncerConfig(t *testing.T) {
 	var syncerConfigUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncerconfig/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
+	err := framework.LoadFile("testdata/syncerconfig/syncer-config-namespaced-objects.yaml", embedded, &syncerConfigUnst)
 	require.NoError(t, err)
 	testKubeStellarSyncerWithSyncerConfig(t, syncerConfigUnst)
 }
@@ -58,19 +56,19 @@ func TestKubeStellarSyncerWithNamespacedObjectsSyncerConfig(t *testing.T) {
 func testKubeStellarSyncerWithSyncerConfig(t *testing.T, syncerConfigUnst *unstructured.Unstructured) {
 
 	var sampleDownsyncCRDUnst *unstructured.Unstructured
-	err := edgeframework.LoadFile("testdata/syncerconfig/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
+	err := framework.LoadFile("testdata/syncerconfig/sample-downsync-crd.yaml", embedded, &sampleDownsyncCRDUnst)
 	require.NoError(t, err)
 
 	var sampleUpsyncCRDUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/syncerconfig/sample-upsync-crd.yaml", embedded, &sampleUpsyncCRDUnst)
+	err = framework.LoadFile("testdata/syncerconfig/sample-upsync-crd.yaml", embedded, &sampleUpsyncCRDUnst)
 	require.NoError(t, err)
 
 	var sampleDownsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/syncerconfig/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
+	err = framework.LoadFile("testdata/syncerconfig/sample-downsync-cr.yaml", embedded, &sampleDownsyncCRUnst)
 	require.NoError(t, err)
 
 	var sampleUpsyncCRUnst *unstructured.Unstructured
-	err = edgeframework.LoadFile("testdata/syncerconfig/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
+	err = framework.LoadFile("testdata/syncerconfig/sample-upsync-cr.yaml", embedded, &sampleUpsyncCRUnst)
 	require.NoError(t, err)
 
 	framework.Suite(t, "kubestellar-syncer")

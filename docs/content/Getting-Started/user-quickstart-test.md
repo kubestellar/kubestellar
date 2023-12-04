@@ -110,25 +110,18 @@ qs_sort: test
 %}
 
 #### 2. Install <span class="Space-Bd-BT">KUBESTELLAR</span>'s user commands and kubectl plugins
-!!! tip ""
-    === "install"
-         {%
-           include-markdown "../common-subs/brew-install.md"
-           start="<!--brew-install-start-->"
-           end="<!--brew-install-end-->"
-         %}
-    === "remove"
-         {%
-           include-markdown "../common-subs/brew-remove.md"
-           start="<!--brew-remove-start-->"
-           end="<!--brew-remove-end-->"
-         %}
-    === "uh oh, no brew?"
-         {%
-           include-markdown "../common-subs/brew-no.md"
-           start="<!--brew-no-start-->"
-           end="<!--brew-no-end-->"
-         %}
+
+```shell
+pwd
+rm -f bin/*
+make userbuild
+export PATH=$PWD/bin:$PATH
+bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
+export PATH=$PWD/kcp/bin:$PATH
+export SM_CONFIG=~/.kube/config
+export SM_CONTEXT=ks-core
+mkdir -p ${PWD}/temp-space-config
+```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
 !!! tip ""
@@ -171,6 +164,18 @@ qs_sort: test
            end="<!--kubestellar-apply-syncer-end-->"
          %}
 
+Wait for the mailbox controller to create the corresponding mailbox workspaces and remember them.
+
+```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+KUBECONFIG=ks-core.kubeconfig kubectl ws root
+while [ $(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces | grep -c -e -mb-) -lt 2 ]; do sleep 10; done
+MB1=$(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster1") | .name')
+echo The mailbox for ks-edge-cluster1 is $MB1
+MB2=$(KUBECONFIG=ks-core.kubeconfig kubectl get workspaces -o json | jq -r '.items | .[] | .metadata | select(.annotations ["edge.kubestellar.io/sync-target-name"] == "ks-edge-cluster2") | .name')
+echo The mailbox for ks-edge-cluster2 is $MB2
+```
+
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
     === "deploy"
@@ -179,6 +184,105 @@ qs_sort: test
            start="<!--kubestellar-apply-apache-kind-start-->"
            end="<!--kubestellar-apply-apache-kind-end-->"
          %}
+
+Add a ServiceAccount that will be downsynced.
+
+```shell
+wmw1_space_config="${PWD}/temp-space-config/spaceprovider-default-wmw1"
+kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $wmw1_space_config
+
+KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    edge.kubestellar.io/downsync-overwrite: "false"
+  namespace: my-namespace
+  name: test-sa
+EOF
+```
+
+Add an EdgePlacement that calls for that ServiceAccount to be downsynced.
+
+```shell
+KUBECONFIG=$wmw1_space_config kubectl apply -f - <<EOF
+apiVersion: edge.kubestellar.io/v2alpha1
+kind: EdgePlacement
+metadata:
+  name: sa-test
+spec:
+  locationSelectors:
+  - matchLabels: {"location-group":"edge"}
+  downsync:
+  - apiGroup: ""
+    resources: [ serviceaccounts ]
+    namespaces: [ my-namespace ]
+    objectNames: [ test-sa ]
+EOF
+```
+
+Wait for the ServiceAccount to get to the mailbox workspaces.
+
+```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+# Once the mailbox is converted to spaces, this is the code we want to use:
+# MB1_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB1}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB1} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB1_space_config
+# while ! KUBECONFIG=$MB1_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#     sleep 10
+# done
+# MB2_space_config="${PWD}/temp-space-config/spaceprovider-default-${MB2}"
+# kubectl-kubestellar-get-config-for-space --space-name ${MB2} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --space-config-file $MB2_space_config
+# while ! KUBECONFIG=MB2_space_config kubectl get ServiceAccount -n my-namespace test-sa ; do
+#    sleep 10
+# done
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB1
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
+    sleep 10
+done
+KUBECONFIG=ks-core.kubeconfig kubectl ws root:$MB2
+while ! KUBECONFIG=ks-core.kubeconfig kubectl get ServiceAccount -n my-namespace test-sa ; do
+    sleep 10
+done
+```
+
+Thrash the ServiceAccount some in its WDS.
+
+```shell
+for key in k1 k2 k3 k4; do
+    sleep 15
+    KUBECONFIG=$wmw1_space_config kubectl annotate sa -n my-namespace test-sa ${key}=${key}
+done
+```
+
+Give the controllers some time to fight over ServiceAccount secrets.
+
+```shell
+sleep 120
+```
+
+Look for excess secrets in the WDS. Expect 2 token Secrets: one for
+the default ServiceAccount and one for `test-sa`.
+
+```shell
+KUBECONFIG=$wmw1_space_config kubectl get secrets -n my-namespace
+[ $(KUBECONFIG=$wmw1_space_config kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 3 ]
+```
+
+Look for excess secrets in the two mailbox spaces. Allow up to three:
+one for the `default` ServiceAccount, one dragged down from the WDS
+for the `test-sa` ServiceAccount, and one generated locally for the
+`test-sa` ServiceAccount.
+
+```shell
+# TODO: the mailbox workspaces have not been converted into spaces yet.
+for mb in $MB1 $MB2; do
+    KUBECONFIG=ks-core.kubeconfig kubectl ws root:$mb
+    KUBECONFIG=ks-core.kubeconfig kubectl get sa -n my-namespace test-sa --show-managed-fields -o yaml
+    KUBECONFIG=ks-core.kubeconfig kubectl get secrets -n my-namespace
+    [ $(KUBECONFIG=ks-core.kubeconfig kubectl get Secret -n my-namespace -o jsonpath='{.items[?(@.type=="kubernetes.io/service-account-token")]}' | jq length | wc -l) -lt 4 ]
+done
+```
 
 #### 6. View the Apache Web Server running on ks-edge-cluster1 and ks-edge-cluster2
 !!! tip ""
@@ -211,7 +315,7 @@ TODO
 
 what's next...  
 how to upsync a resource  
-how to create, but not overrite/update a synchronized resource  
+how to create, but not overwrite/update a synchronized resource  
 
 <br>
 ---
@@ -312,10 +416,22 @@ how to create, but not overrite/update a synchronized resource
 <br>
 
 ## Tear it all down
-!!! tip ""
-    === "uninstall brew, delete kind clusters, delete kubernetes contexts"
-        {%
-          include-markdown "../common-subs/tear-down-kind.md"
-          start="<!--tear-down-kind-start-->"
-          end="<!--tear-down-kind-end-->"
-        %}
+
+The following command deletes the `kind` clusters created above.
+
+``` {.bash}
+kind delete cluster --name ks-core; kind delete cluster --name ks-edge-cluster1; kind delete cluster --name ks-edge-cluster2
+```
+
+Or, you could get out the big footgun and delete all your `kind` clusters as follows.
+
+``` {.bash}
+for clu in $(kind get clusters | grep -v enabling); do kind delete cluster --name "$clu"; done
+```
+
+The following commands delete the filesystem contents created above.
+
+``` {.bash}
+rm ks-core.kubeconfig ks-edge-cluster1-syncer.yaml ks-edge-cluster2-syncer.yaml
+rm -rf kcp
+```

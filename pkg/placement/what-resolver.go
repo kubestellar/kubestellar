@@ -49,6 +49,7 @@ import (
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 type whatResolver struct {
@@ -58,13 +59,14 @@ type whatResolver struct {
 	queue      workqueue.RateLimitingInterface
 	receiver   MappingReceiver[ExternalName, ResolvedWhat]
 
-	edgePlacementInformer kcpcache.ScopeableSharedIndexInformer
-	edgePlacementLister   edgev2alpha1listers.EdgePlacementClusterLister
+	edgePlacementInformer upstreamcache.SharedIndexInformer
+	edgePlacementLister   edgev2alpha1listers.EdgePlacementLister
 
 	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
 	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
 	dynamicClusterClient      clusterdynamic.ClusterInterface
+	kbSpaceRelation           kbuser.KubeBindSpaceRelation
 
 	// Hold this while accessing data listed below
 	sync.Mutex
@@ -107,20 +109,21 @@ type NamespacedName = Pair[NamespaceName, ObjectName]
 
 // holds the data for a given object (necessarily in a particular WDS)
 type objectDetails struct {
-	// placementBits holds an entry for each EdgePlacement whose what predicate
-	// matches the object, and the bool value is WantSingletonReportedState.
-	placementBits MutableMap[ObjectName, bool]
+	// PlacementBits holds an entry for each EdgePlacement whose what predicate
+	// matches the object.
+	PlacementBits MutableMap[ObjectName, DistributionBits]
 }
 
 // NewWhatResolver returns a WhatResolver;
 // invoke that function after the namespace informer has synced.
 func NewWhatResolver(
 	ctx context.Context,
-	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementClusterInformer,
+	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementInformer,
 	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
 	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
 	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
 	dynamicClusterClient clusterdynamic.ClusterInterface,
+	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 	numThreads int,
 ) WhatResolver {
 	controllerName := "what-resolver"
@@ -137,6 +140,7 @@ func NewWhatResolver(
 		crdClusterPreInformer:     crdClusterPreInformer,
 		bindingClusterPreInformer: bindingClusterPreInformer,
 		dynamicClusterClient:      dynamicClusterClient,
+		kbSpaceRelation:           kbSpaceRelation,
 		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
 	}
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
@@ -162,9 +166,9 @@ func (wr *whatResolver) Run(ctx context.Context) {
 }
 
 type namespacedQueueItem struct {
-	gk      schema.GroupKind
-	cluster logicalcluster.Name
-	nn      NamespacedName
+	GK      schema.GroupKind
+	Cluster logicalcluster.Name
+	NN      NamespacedName
 }
 
 type WhatResolverClusterHandler struct {
@@ -197,7 +201,7 @@ func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
 	if namespace != "" {
 		panic("Namespace must be empty here")
 	}
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -231,7 +235,7 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 		wr.logger.Error(err, "Impossible! SplitMetaNamespaceKey failed", "key", key)
 	}
 	nn := NewPair(NamespaceName(namespace), ObjectName(name))
-	item := namespacedQueueItem{gk: gk, cluster: cluster, nn: nn}
+	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: nn}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -251,12 +255,12 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		var gotSome bool
 		for objName, objDetails := range rr.byObjName {
 			// TODO: add index by EdgePlacement name to make this faster
-			wantSingletonReturn, found := objDetails.placementBits.Get(epName)
+			distrBits, found := objDetails.PlacementBits.Get(epName)
 			if !found {
 				continue
 			}
 			partID := NewTriple(SchemaGroupResourceToMeta(rr.gvr.GroupResource()), objName.First, objName.Second)
-			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version, ReturnSingletonState: wantSingletonReturn}
+			partDetails := WorkloadPartDetails{APIVersion: rr.gvr.Version}.setDistributionBits(distrBits)
 			wr.logger.V(4).Info("Returning part", "partID", partID, "partDetails", partDetails, "definers", rr.definers)
 			parts[partID] = partDetails
 			gotSome = true
@@ -334,12 +338,12 @@ func (wr *whatResolver) processNextWorkItem() bool {
 
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) bool {
-	if item.gk.Group == edgeapi.SchemeGroupVersion.Group && item.gk.Kind == "EdgePlacement" {
-		return wr.processEdgePlacement(ctx, item.cluster, item.nn.Second)
-	} else if item.gk.Group == ksmetav1a1.SchemeGroupVersion.Group && item.gk.Kind == "APIResource" {
-		return wr.processResource(ctx, item.cluster, string(item.nn.Second))
+	if item.GK.Group == edgeapi.SchemeGroupVersion.Group && item.GK.Kind == "EdgePlacement" {
+		return wr.processEdgePlacement(ctx, item.NN.Second)
+	} else if item.GK.Group == ksmetav1a1.SchemeGroupVersion.Group && item.GK.Kind == "APIResource" {
+		return wr.processResource(ctx, item.Cluster, string(item.NN.Second))
 	} else {
-		return wr.processCenterObject(ctx, item.cluster, item.gk, item.nn)
+		return wr.processCenterObject(ctx, item.Cluster, item.GK, item.NN)
 	}
 }
 
@@ -390,10 +394,10 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 			return false
 		}
 	}
-	changedPlacements := NewMapMap[ObjectName, bool](nil)
-	// TODO: make a way to not enumerate two when the bool changes
-	MapEnumerateDifferences[ObjectName, bool](newDetails.placementBits, oldDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
-	MapEnumerateDifferences[ObjectName, bool](oldDetails.placementBits, newDetails.placementBits, MappingReceiverDiscardsPrevious[ObjectName, bool](changedPlacements))
+	changedPlacements := NewMapMap[ObjectName, DistributionBits](nil)
+	// TODO: make a way to not enumerate two when the bits change
+	MapEnumerateDifferences[ObjectName, DistributionBits](newDetails.PlacementBits, oldDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
+	MapEnumerateDifferences[ObjectName, DistributionBits](oldDetails.PlacementBits, newDetails.PlacementBits, MappingReceiverDiscardsPrevious[ObjectName, DistributionBits](changedPlacements))
 	logger.V(4).Info("Processed object", "newDetails", newDetails, "changedPlacements", changedPlacements)
 	if changedPlacements.IsEmpty() {
 		return true
@@ -401,12 +405,12 @@ func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logical
 	if rObj != nil {
 		rr.byObjName[objName] = newDetails
 	}
-	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, bool](changedPlacements))
+	wr.notifyReceiversOfPlacements(cluster, MapKeySet[ObjectName, DistributionBits](changedPlacements))
 	return true
 }
 
 func newObjectDetails() *objectDetails {
-	return &objectDetails{placementBits: NewMapMap[ObjectName, bool](nil)}
+	return &objectDetails{PlacementBits: NewMapMap[ObjectName, DistributionBits](nil)}
 }
 
 // process returns true on success or unrecoverable error, false to retry
@@ -439,7 +443,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 		delete(wsDetails.resources, arName)
 		changedPlacements := NewEmptyMapSet[ObjectName]()
 		for _, objDetails := range rr.byObjName {
-			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+			SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 		}
 		logger.V(4).Info("Removing resource", "changedPlacements", changedPlacements)
 		wr.notifyReceiversOfPlacements(cluster, changedPlacements)
@@ -490,7 +494,7 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 			rr.definers = newDefiners
 			changedPlacements := NewEmptyMapSet[ObjectName]()
 			for _, objDetails := range rr.byObjName {
-				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, bool](objDetails.placementBits))
+				SetAddAll[ObjectName](changedPlacements, MapKeySet[ObjectName, DistributionBits](objDetails.PlacementBits))
 			}
 			wr.notifyReceiversOfPlacements(cluster, changedPlacements)
 		}
@@ -499,9 +503,9 @@ func (wr *whatResolver) processResource(ctx context.Context, cluster logicalclus
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logicalcluster.Name, epName ObjectName) bool {
+func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectName) bool {
 	logger := klog.FromContext(ctx)
-	ep, err := wr.edgePlacementLister.Cluster(cluster).Get(string(epName))
+	ep, err := wr.edgePlacementLister.Get(string(epName))
 	if err != nil {
 		if !k8sapierrors.IsNotFound(err) {
 			logger.Error(err, "Failed to fetch EdgePlacement from local cache")
@@ -510,6 +514,20 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		ep = nil
 	}
 	epFound := err == nil
+	//change to consumer SpaceID
+	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
+	if err != nil {
+		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object")
+		return true
+	}
+	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
+	if spaceID == "" {
+		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
+		return false
+	}
+	cluster := logicalcluster.Name(spaceID)
+	epName = ObjectName(epOriginalName)
+
 	wr.Lock()
 	defer wr.Unlock()
 	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]
@@ -555,8 +573,8 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, cluster logica
 		delete(wsDetails.placements, epName)
 		for _, rr := range wsDetails.resources {
 			for objName, objDetails := range rr.byObjName {
-				objDetails.placementBits.Delete(epName)
-				if objDetails.placementBits.IsEmpty() {
+				objDetails.PlacementBits.Delete(epName)
+				if objDetails.PlacementBits.IsEmpty() {
 					delete(rr.byObjName, objName)
 				}
 			}
@@ -639,20 +657,30 @@ func whatMatchingPlacements(logger klog.Logger, wsd *workspaceDetails, candidate
 
 // returns `(changed bool, success bool)`
 func (od *objectDetails) setByMatch(logger klog.Logger, wsd *workspaceDetails, spec *edgeapi.EdgePlacementSpec, epName ObjectName, whatResource string, whatObj mrObject) (bool, bool) {
-	wantSingletonReturn, found := od.placementBits.Get(epName)
+	oldDistrBits, found := od.PlacementBits.Get(epName)
+	newDistrBits := DistributionBits{ReturnSingletonState: spec.WantSingletonReportedState,
+		CreateOnly: whatObj != nil && isCreateOnly(whatObj)}
 	objMatch, success := whatMatches(logger, wsd, spec, whatResource, whatObj)
 	if !success {
 		return false, false
 	}
-	if objMatch == found && (wantSingletonReturn == spec.WantSingletonReportedState || !found) {
+	if objMatch == found && (oldDistrBits == newDistrBits || !found) {
 		return false, true
 	}
 	if objMatch {
-		od.placementBits.Put(epName, spec.WantSingletonReportedState)
+		od.PlacementBits.Put(epName, newDistrBits)
 	} else {
-		od.placementBits.Delete(epName)
+		od.PlacementBits.Delete(epName)
 	}
 	return true, true
+}
+
+func isCreateOnly(whatObj mrObject) bool {
+	annotations := whatObj.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+	return annotations[edgeapi.DownsyncOverwriteKey] == "false"
 }
 
 // whatMatches tests the given object against the "what predicate" of an EdgePlacementSpec.
