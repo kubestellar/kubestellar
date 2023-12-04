@@ -57,7 +57,7 @@ then
 fi
 
 conf_file="/tmp/$space_name.conf"
-kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $conf_file
+kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SPACE_MANAGER_KUBECONFIG --in_cluster --output $conf_file
 KUBECONFIG=$conf_file
 
 if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
