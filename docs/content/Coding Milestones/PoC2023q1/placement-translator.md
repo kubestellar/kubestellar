@@ -136,9 +136,9 @@ where resolver and mailbox controller long enough for them to create what
 this scenario calls for, but they can be terminated after that.
 
 {%
-   include-markdown "example1-subs/example1-pre-kcp.md"
-   start="<!--example1-pre-kcp-start-->"
-   end="<!--example1-pre-kcp-end-->"
+   include-markdown "example1-subs/example1-pre-provider.md"
+   start="<!--example1-pre-provider-start-->"
+   end="<!--example1-pre-provider-end-->"
 %}
 
 {%
@@ -148,9 +148,9 @@ this scenario calls for, but they can be terminated after that.
 %}
 
 {%
-   include-markdown "example1-subs/example1-post-kcp.md"
-   start="<!--example1-post-kcp-start-->"
-   end="<!--example1-post-kcp-end-->"
+   include-markdown "example1-subs/example1-post-provider.md"
+   start="<!--example1-post-provider-start-->"
+   end="<!--example1-post-provider-end-->"
 %}
 
 Continue to follow the steps until the start of Stage 3 of the
