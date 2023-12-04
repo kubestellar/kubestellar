@@ -309,9 +309,9 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, spacename string) bool {
 	for _, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
-		// We assume that SPACE_MANAGER_KUBECONFIG was set on the script that created the MB controller
+		// We assume that SM_CONFIG was set on the script that created the MB controller
 		invokeScript := strings.Join([]string{
-			"KUBECONFIG=$SPACE_MANAGER_KUBECONFIG",
+			"KUBECONFIG=$SM_CONFIG",
 			shellScriptName,
 			spacename,
 			resource,

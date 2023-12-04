@@ -17,7 +17,7 @@ management workspace (WMW).  Start by creating a WMW for the common
 workload, with the following commands.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-c
+IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-c
 WMW_C_SPACE_CONFIG=$PWD/temp-space-config/spaceprovider-default-wmw-c
 ```
 
@@ -168,7 +168,7 @@ Use the following `kubectl` commands to create the WMW for the special
 workload.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw wmw-s
+IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-s
 WMW_S_SPACE_CONFIG=$PWD/temp-space-config/spaceprovider-default-wmw-s
 ```
 
