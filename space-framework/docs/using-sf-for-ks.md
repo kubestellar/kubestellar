@@ -8,7 +8,7 @@ KS: KubeStellar (the Multi Cluster Management Module)
 ### Solution topology
  In this guide we will describe a specific topology in which all components are hosted on a **single Kube cluster** (In general KubeStellar KubeFlex and the SM can be deployed on different clusters). We will refer to that cluster as the `core-cluster`.
 
-![Using the Space Framework with KS](KS-SF-KF.drawio.png "Using the Space Framework with KS")
+![Using the Space Framework with KS](images/KS-SF-KF.drawio.png "Using the Space Framework with KS")
 
 ## Deploying and using the SM
 The SM deployment is performed as part of the overall KS deployment. The SpaceManager is running on the `core-cluster` as one of the containers in the KS Pod.
@@ -33,7 +33,7 @@ Setting up a space provider includes two steps:
    * Create a SpaceProvidrDesc object that represents the space provider backend. The SpaceProviderDesc includes a Secret reference to the space provider secret mentioned above.   
 
 **Example: fetch a space provider secret**  
-The folowing creates a config file that can be used to access a space provider
+The following creates a config file that can be used to access a space provider
 ```shell
 KUBECONFIG=${SM_KUBECONFIG}
 s_name=`kubectl get spaceproviderdesc <provider-name> -o jsonpath='{$.spec.secretRef.name}'`
