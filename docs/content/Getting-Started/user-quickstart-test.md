@@ -119,7 +119,8 @@ export PATH=$PWD/bin:$PATH
 bash -c "$(cat bootstrap/install-kcp-with-plugins.sh)" -V -V --version v0.11.0
 export PATH=$PWD/kcp/bin:$PATH
 export SM_CONFIG=~/.kube/config
-mkdir ${PWD}/temp-space-config
+export SM_CONTEXT=ks-core
+mkdir -p ${PWD}/temp-space-config
 ```
 
 #### 3. View your <span class="Space-Bd-BT">KUBESTELLAR</span> Core Space environment
@@ -177,7 +178,7 @@ kubectl-kubestellar-get-config-for-space --space-name $MB1 --provider-name defau
 MB2_SPACE="${PWD}/temp-space-config/${MB2}"
 kubectl-kubestellar-get-config-for-space --space-name $MB2 --provider-name default --sm-core-config $SM_CONFIG --output $MB2_SPACE
 WMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-wmw1"
-kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context ks-core --output $WMW1_SPACE_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $WMW1_SPACE_CONFIG
 ```
 
 #### 5. Deploy an Apache Web Server to ks-edge-cluster1 and ks-edge-cluster2
