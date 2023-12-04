@@ -24,9 +24,9 @@ KubeStellar-Syncer runs in the target cluster and sync kubernetes resource objec
 The KubeStellar-Syncer can be exercised after setting up KubeStellar mailbox workspaces. Firstly we'll follow to similar steps in [example1](../example1) until `The mailbox controller` in stage 2. 
 
 {%
-   include-markdown "example1-subs/example1-pre-kcp.md"
-   start="<!--example1-pre-kcp-start-->"
-   end="<!--example1-pre-kcp-end-->"
+   include-markdown "example1-subs/example1-pre-provider.md"
+   start="<!--example1-pre-provider-start-->"
+   end="<!--example1-pre-provider-end-->"
 %}
 
 {%
@@ -48,9 +48,9 @@ The KubeStellar-Syncer can be exercised after setting up KubeStellar mailbox wor
 %}
 
 {%
-   include-markdown "example1-subs/example1-post-kcp.md"
-   start="<!--example1-post-kcp-start-->"
-   end="<!--example1-post-kcp-end-->"
+   include-markdown "example1-subs/example1-post-provider.md"
+   start="<!--example1-post-provider-start-->"
+   end="<!--example1-post-provider-end-->"
 %}
 
 {%
