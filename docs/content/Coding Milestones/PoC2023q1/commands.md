@@ -9,7 +9,8 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
-There are two ways of deploying kcp, referred to as 'the space provider' in this 
+This document refers to KCP as a space provider that KubeStellar can use. 
+There are two ways of deploying the space provider in this 
 document, and the central KubeStellar components: (1) as processes on 
 a machine of supported OS and ISA, and
 (2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
@@ -326,7 +327,7 @@ configuration needed to execute Helm commands. The following flags can
 appear on the command line, in any order.
 
 - `--openshift $bool`, saying whether the hosting cluster is an
-  OpenShift cluster.  If so then a Route will be created to the kcp
+  OpenShift cluster.  If so then a Route will be created to the space provider
   server; otherwise, an Ingress object will direct incoming TLS
   connections to the space provider's server.  The default is `false`.
 - `--external-endpoint $domain_name:$port`, saying how the space provider's server
@@ -733,7 +734,7 @@ the list of things that went into the WEC.
 The following command is a combination of `kubectl kubestellar
 ensure-location` and `kubectl kubestellar prep-for-syncer`, and takes
 the union of their command line flags and arguments.  Upon completion,
-the kcp current workspace will be what it was at the start.
+the current workspace will be what it was at the start.
 
 An example usage follows.
 
@@ -851,17 +852,7 @@ Current workspace is "root".
 Current workspace is "root:example-wmw" (type root:universal).
 apibinding.apis.kcp.io "bind-kubernetes" deleted
 apibinding.apis.kcp.io "bind-apiregistration.k8s.io" deleted
-apibinding.apis.kcp.io "bind-apps" deleted
-apibinding.apis.kcp.io "bind-autoscaling" deleted
-apibinding.apis.kcp.io "bind-batch" deleted
-apibinding.apis.kcp.io "bind-core.k8s.io" deleted
-apibinding.apis.kcp.io "bind-discovery.k8s.io" deleted
-apibinding.apis.kcp.io "bind-flowcontrol.apiserver.k8s.io" deleted
-apibinding.apis.kcp.io "bind-networking.k8s.io" deleted
-apibinding.apis.kcp.io "bind-node.k8s.io" deleted
-apibinding.apis.kcp.io "bind-policy" deleted
-apibinding.apis.kcp.io "bind-scheduling.k8s.io" deleted
-apibinding.apis.kcp.io "bind-storage.k8s.io" deleted
+...
 ```
 
 ## Removing a Workload Management Workspace
@@ -1003,11 +994,11 @@ The script can be read directly from
 {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh
 and does the following things.
 
-1. Downloads and installs kcp executables if they are not already
+1. Downloads and installs the space provider's executables if they are not already
    evident on `$PATH`.
 2. Downloads and installs kubestellar executables if they are not
    already evident on `$PATH`.
-3. Ensures that kcp and KubeStellar are deployed (i.e., their
+3. Ensures that the space provider and KubeStellar are deployed (i.e., their
    processes are running and their initial configurations have been
    established) either as bare processes or as workload in a
    pre-existing Kubernetes cluster.
@@ -1018,14 +1009,14 @@ This script accepts the following command line flags; all are optional.  The `--
   KubeStellar to use.  When using a specific version, include the
   leading "v".  The default is the latest regular release, and the
   value "latest" means the same thing.
-- `--kcp-version $version`: specifies the kcp release to use.  The
+- `--kcp-version $version`: specifies the space provider's release to use.  The
   default is the one that works with the chosen release of
   KubeStellar.
 - `--openshift $bool`: specifies whether to the hosting cluster is an
   OpenShift cluster. The default value is `false`.
 - `--endpoint-address $domain_name:$port`: specifies where an Ingress
   controller or OpenShift router is listening for incoming TLS
-  connections from external (to the hosting cluster) clients of kcp
+  connections from external (to the hosting cluster) clients of the space provider
   and KubeStellar.
 - `--os $OS`: specifies the operating system to use in selecting the
   executables to download and install.  Choices are `linux` and
@@ -1033,14 +1024,14 @@ This script accepts the following command line flags; all are optional.  The `--
 - `--arch $IAS`: specifies the instruction set architecture to use in
   selecting the executables to download and install.  Choices are
   `amd64` and `arm64`.  Auto-detected if omitted.
-- `--bind-address $IPADDR`: directs that the kcp server (a) write that
+- `--bind-address $IPADDR`: directs that the space provider's server (a) write that
   address for itself in the kubeconfig file that it constructs and (b)
   listens only at that address.  The default is to pick one of the
   host's non-loopback addresses to write into the kubeconfig file and
   not bind a listening address.
 - `--ensure-folder $install_parent_dir`: specifies the parent folder
   for downloads.  Will be `mkdir -p`.  The default is the current
-  working directory.  The download of kcp, if any, will go in
+  working directory.  The download of the space provider, if any, will go in
   `$install_parent_dir/kcp`.  The download of KubeStellar will go in
   `$install_parent_dir/kubestellar`.
 - `--host-ns $namespace_in_hosting_cluster`: specifies the namespace

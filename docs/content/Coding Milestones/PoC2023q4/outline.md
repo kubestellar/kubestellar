@@ -27,16 +27,16 @@ highlighted.
   an inventory of infrastructure.
 - What passes from inventory to workload management is kcp TMC
   Location and SyncTarget objects.
-- **Compared to PoC2023q1, decoupling from kcp TMC by making our own
+- **Compared to PoC2023q1, decoupling from TMC by making our own
   copy of the definitions of SyncTarget and Location.**
 - **Potentially: switch from using SyncTarget and Location to some
   other representation of inventory.**
-- **Compared to PoC2023q1, decoupling from kcp core by (1) introducing
+- **Compared to PoC2023q1, decoupling from a single logical cluster server by (1) introducing
   an abstraction layer that delivers the essential functionality of
-  kcp's logical clusters based on a variety of implementations and (2)
+  a logical cluster's server based on a variety of implementations and (2)
   using [kube-bind](https://github.com/kube-bind/kube-bind) instead of
-  kcp's APIExport/APIBinding.  Where PoC2023q1 used the concept of a
-  kcp workspace, PoC2023q4 uses the abstract concept that we call a
+  APIExport/APIBinding.  Where PoC2023q1 used the concept of a
+  workspace, PoC2023q4 uses the abstract concept that we call a
   "space".**
 - Use of a space as the container for the central spec of a workload.
 - Propagation of desired state from center outward, as directed by
@@ -45,7 +45,7 @@ highlighted.
 - Interfaces designed with the intention that workload execution
   clusters operate independently of each other and the center (e.g.,
   can tolerate only occasional connectivity) and thus any "service
-  providers" (in the technical sense from kcp) in the center or
+  providers" in the center or
   elsewhere.
 - Rule-based customization of desired state.
 - Propagation of reported state from workload execution clusters to center.

@@ -26,7 +26,7 @@ As outlined in [PR 241]({{ config.repo_url }}/pull/241):
 - the C2P team maintains CRDs, APIResourceSchemas, and an APIExport for
   the policy and report resources;
 - the C2P team puts those APIResourceSchemas and that APIExport in a
-  kcp workspace of their choice;
+  workspace of their choice;
 - the workload management workspace has an APIBinding to that APIExport;
 - the EdgePlacement selects that APIBinding for downsync;
 - the APIBinding goes to the mailbox workspace but not the edge cluster;

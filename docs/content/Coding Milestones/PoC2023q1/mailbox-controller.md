@@ -68,13 +68,13 @@ The command line flags, beyond the basics, are as follows.
 
 ## Try out the mailbox controller
 
-### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start
+### Pull the KubeStellar and it's dependent source code, build the kubectl-ws binary, and start
 Open a terminal window(1) and clone the latest KubeStellar source:
 
 {%
-   include-markdown "where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
-   start="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
-   end="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
+   include-markdown "where-resolver-subs/where-resolver-0-pull-kubestellar-source-and-start.md"
+   start="<!--where-resolver-0-pull-kubestellar-source-and-start-start-->"
+   end="<!--where-resolver-0-pull-kubestellar-source-and-start-end-->"
 %}
 
 ### Create the Edge Service Provider Workspace (ESPW)

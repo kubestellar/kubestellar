@@ -67,13 +67,13 @@ echo "* CronTab my-new-cron-object is in its mailbox"
 You can check that the common workload's ReplicaSet objects got to
 their mailbox workspaces with the following command. It will list the
 two copies of that object, each with an annotation whose key is
-`kcp.io/cluster` and whose value is the kcp `logicalcluster.Name` of
+`kcp.io/cluster` and whose value is the server `logicalcluster.Name` of
 the mailbox workspace; those names appear in the "CLUSTER" column of
 the custom-columns listing near the end of [the section above about
 the mailbox controller](../#the-mailbox-controller).
 
 ```shell
-# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
+# TODO: kubestellar-list-syncing-objects has server dependencies. Will remove when controllers support spaces.
 kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet
 ```
 
@@ -113,7 +113,7 @@ That display should show objects in two different mailbox workspaces;
 the following command checks that.
 
 ```shell
-# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
+# TODO: kubestellar-list-syncing-objects has server dependencies. Will remove when controllers support spaces.
 test $(kubestellar-list-syncing-objects --api-group apps --api-kind ReplicaSet | grep "^ *kcp.io/cluster: [0-9a-z]*$" | sort | uniq | wc -l) -ge 2
 ```
 
@@ -121,7 +121,7 @@ The various APIBinding and CustomResourceDefinition objects involved
 should also appear in the mailbox workspaces.
 
 ```shell
-# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
+# TODO: kubestellar-list-syncing-objects has server dependencies. Will remove when controllers support spaces.
 test $(kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -cw "name: bind-apps") -ge 2
 kubestellar-list-syncing-objects --api-group apis.kcp.io --api-version v1alpha1 --api-kind APIBinding | grep -w "name: bind-kubernetes"
 kubestellar-list-syncing-objects --api-group apiextensions.k8s.io --api-kind CustomResourceDefinition | fgrep -w "name: crontabs.stable.example.com"
@@ -132,7 +132,7 @@ with some error messages about `APIService` not being known in the
 other mailbox workspaces.
 
 ```shell
-# TODO: kubestellar-list-syncing-objects has kcp dependencies. Will remove when controllers support spaces.
+# TODO: kubestellar-list-syncing-objects has server dependencies. Will remove when controllers support spaces.
 kubestellar-list-syncing-objects --api-group apiregistration.k8s.io --api-kind APIService 2>&1 | grep -v "APIService.*the server could not find the requested resource" | fgrep -w "name: v1090.example.my"
 ```
 
