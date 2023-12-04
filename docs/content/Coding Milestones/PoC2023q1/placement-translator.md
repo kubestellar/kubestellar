@@ -77,8 +77,7 @@ from the MBWS and making the following changes.
   - A destination annotation that has the same value as the
     corresponding annotation in the source is unchanged.
   - A "system" annotation is unchanged.  The system annotations are
-    those whose key (a) starts with `kcp.io/` or other stuff followed
-    by `.kcp.io/` and (b) does not start with `edge.kubestellar.io/`.
+    those whose key (a) includes `kcp.io/` and (b) does not start with `edge.kubestellar.io/`.
 - The source object's labels are merged into the destination object
   using the same rules as for annotations, and `edge.kubestellar.io/projected`
   is set to `yes`.
@@ -98,7 +97,7 @@ takes the position that there might be other parties that create
 The placement translator needs two kube client configurations.  One
 points to the edge service provider workspace and provides authority
 to (a) read the APIExport view of the edge API and (b) write into the
-mailbox workspaces.  The other points to the kcp server base (i.e.,
+mailbox workspaces.  The other points to the server base (i.e.,
 does not identify a particular logical cluster nor `*`) and is
 authorized to read all clusters.  In the kubeconfig created by `kcp
 start` that is satisfied by the context named `system:admin`.
@@ -136,21 +135,21 @@ where resolver and mailbox controller long enough for them to create what
 this scenario calls for, but they can be terminated after that.
 
 {%
-   include-markdown "example1-subs/example1-pre-kcp.md"
-   start="<!--example1-pre-kcp-start-->"
-   end="<!--example1-pre-kcp-end-->"
+   include-markdown "example1-subs/example1-pre-cp.md"
+   start="<!--example1-pre-cp-start-->"
+   end="<!--example1-pre-cp-end-->"
 %}
 
 {%
-   include-markdown "example1-subs/example1-start-kcp.md"
-   start="<!--example1-start-kcp-start-->"
-   end="<!--example1-start-kcp-end-->"
+   include-markdown "example1-subs/example1-start-cp.md"
+   start="<!--example1-start-cp-start-->"
+   end="<!--example1-start-cp-end-->"
 %}
 
 {%
-   include-markdown "example1-subs/example1-post-kcp.md"
-   start="<!--example1-post-kcp-start-->"
-   end="<!--example1-post-kcp-end-->"
+   include-markdown "example1-subs/example1-post-cp.md"
+   start="<!--example1-post-cp-start-->"
+   end="<!--example1-post-cp-end-->"
 %}
 
 Continue to follow the steps until the start of Stage 3 of the

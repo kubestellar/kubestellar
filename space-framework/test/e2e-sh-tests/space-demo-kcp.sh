@@ -16,7 +16,7 @@
 
 # ------------------------------------------------------------------------
 ## Before running this script, make sure KCP is running (./bin/kcp start)
-## and KCPCONFIG in line 32 is set correctly
+## and CPCONFIG in line 32 is set correctly
 # ------------------------------------------------------------------------
 
 . demo-magic.sh
@@ -28,8 +28,8 @@ DEMO_PROMPT="\[\033[01;32m\]\u@WSL2\[\033[00m\]:\[\033[01;34m\]\[\033[00m\]\$"
 
 MGT_NAME="mgt"
 MGT_CTX="kind-$MGT_NAME"
-# change KCPCONFIG to point to KCP admin.kubeconfig file
-KCPCONFIG="/home/user/go/src/github.com/kcp-dev/kcp/.kcp/admin.kubeconfig"
+# change CPCONFIG to point to its admin.kubeconfig file
+CPCONFIG="/home/user/go/src/github.com/kcp-dev/kcp/.kcp/admin.kubeconfig"
 
 # For live demo use 'pe'  for recording or auto demo use 'pei'
 #PCMD="pe"
@@ -57,7 +57,7 @@ p "press <enter> to continue."
 echo "  "
 
 #5 Create a provider (set config, show the provider yaml,  filter prefix, etc..)
-$PCMD "./cmd/ms-client-test/set-provider-config.sh $KCPCONFIG config/samples/spaceproviderdesc_kcp.yaml"
+$PCMD "./cmd/ms-client-test/set-provider-config.sh $CPCONFIG config/samples/spaceproviderdesc_kcp.yaml"
 echo " "
 $PCMD "cat config/samples/spaceproviderdesc_kcp.yaml"
 echo " "
@@ -95,8 +95,8 @@ kubectl --context $MGT_CTX wait spaces -n spaceprovider-default space2 --for=jso
 kubectl --context $MGT_CTX describe space space2 -n spaceprovider-default  2>&1 | grep 'Phase: '
 echo " "
 
-#11 list KCP workspaces - show the created workspaces X1 & X2
-$PCMD "kubectl ws tree --kubeconfig $KCPCONFIG"
+#11 list workspaces - show the created workspaces X1 & X2
+$PCMD "kubectl ws tree --kubeconfig $CPCONFIG"
 echo "  "
 
 $PCMD "kubectl --context $MGT_CTX get space -A"
@@ -111,14 +111,14 @@ $PCMD "kubectl --context $MGT_CTX get space -A"
 echo "  "
 
 #13 List workspaces
-$PCMD "kubectl ws tree --kubeconfig $KCPCONFIG"
+$PCMD "kubectl ws tree --kubeconfig $CPCONFIG"
 echo "  "
 
-#14 Delete space2 on the KCP
-$PCMD "kubectl delete ws space2 --kubeconfig $KCPCONFIG"
+#14 Delete space2
+$PCMD "kubectl delete ws space2 --kubeconfig $CPCONFIG"
 echo "  "
 
-$PCMD "kubectl ws tree --kubeconfig $KCPCONFIG"
+$PCMD "kubectl ws tree --kubeconfig $CPCONFIG"
 echo "  "
 
 $PCMD "kubectl --context $MGT_CTX get space -A"
@@ -132,18 +132,18 @@ echo "  "
 $PCMD "kubectl --context $MGT_CTX delete space -n spaceprovider-default space2"
 echo "  "
 
-#17 Create Y1 on KCP
-$PCMD "kubectl ws create lc3 --kubeconfig $KCPCONFIG"
+#17 Create Y1
+$PCMD "kubectl ws create lc3 --kubeconfig $CPCONFIG"
 echo "  "
 
-$PCMD "kubectl ws tree --kubeconfig $KCPCONFIG"
+$PCMD "kubectl ws tree --kubeconfig $CPCONFIG"
 echo "  "
 
 $PCMD "kubectl --context $MGT_CTX get space -A"
 echo "  "
 
-#18 Create prefix-Y2 on KCP
-$PCMD "kubectl ws create ks-lc4 --kubeconfig $KCPCONFIG"
+#18 Create prefix-Y2
+$PCMD "kubectl ws create ks-lc4 --kubeconfig $CPCONFIG"
 echo "  "
 
 #19 List LCs - show that we discover only prefix-Y2

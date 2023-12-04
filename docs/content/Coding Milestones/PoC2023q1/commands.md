@@ -9,25 +9,26 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
-There are two ways of deploying kcp and the central KubeStellar
-components: (1) as processes on a machine of supported OS and ISA, and
+There are two ways of deploying kcp, referred to as 'the space provider' in this 
+document, and the central KubeStellar components: (1) as processes on 
+a machine of supported OS and ISA, and
 (2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
 latter is newer and not yet well exercised.
 
 This document describes both commands that a platform administrator
 uses and commands that a platform user uses.
 
-Most of these executables require that the kcp server be running and
+Most of these executables require that the space provider's server be running and
 that `kubectl` is configured to use the kubeconfig file produced by
 `kcp start`. That is: either `$KUBECONFIG` holds the pathname of that
 kubeconfig file, its contents appear at `~/.kube/config`, or
 `--kubeconfig $pathname` appears on the command line.  The exceptions
-are the bootstrap script, [the kcp control script that runs before
-starting the kcp server](#kubestellar-ensure-kcp-server-creds), and
+are the bootstrap script, [the space provider's control script that runs before
+starting the space provider's server](#kubestellar-ensure-kcp-server-creds), and
 the admin commands for deploying KubeStellar in a Kubernetes cluster.
 
 **NOTE**: most of the kubectl plugin usages described here certainly
-or potentially change the setting of which kcp workspace is "current"
+or potentially change the setting of which space provider's workspace is "current"
 in your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.  The exceptions are the admin commands for deploying
@@ -35,20 +36,20 @@ KubeStellar in a Kubernetes cluster.
 
 ## Bare process deployment
 
-### kcp process control
+### kcp space provider's process control
 
 KubeStellar has some commands to support situations in which some
-clients of the kcp server need to connect to it by opening a
+clients of the space provider's server need to connect to it by opening a
 connection to a DNS domain name rather than an IP address that the
 server can bind its socket to.  The key idea is using the
 `--tls-sni-cert-key` command line flag of `kcp start` to configure the
 server to respond with a bespoke server certificate in TLS handshakes
 in which the client addresses the server by a given domain name.
 
-These commands are used separately from starting the kcp server and
+These commands are used separately from starting the space provider's server and
 are designed so that they can be used multiple times if there are
 multiple sets of clients that need to use a distinct domain name.
-Starting the kcp server is not described here, beyond the particular
+Starting the space provider's server is not described here, beyond the particular
 consideration needed for the `--tls-sni-cert-key` flag, because it is
 otherwise ordinary.
 
@@ -72,7 +73,7 @@ that installed too.
 
 This command is given exactly one thing on the command line, a DNS
 domain name.  This command creates --- or re-uses if it finds already
-existing --- a private key and public X.509 certificate for the kcp
+existing --- a private key and public X.509 certificate for the space provider's
 server to use.  The certificate has exactly one
 SubjectAlternativeName, which is of the DNS form and specifies the
 given domain name.  For example: `kubestellar-ensure-kcp-server-creds
@@ -118,7 +119,7 @@ bash-5.2$ echo ${pieces[2]}
 /Users/mspreitz/go/src/github.com/kubestellar/kubestellar/pki/private/kcp-DNS-yep.yep.key
 ```
 
-Following is an example of using those results in launching the kcp
+Following is an example of using those results in launching the space provider's
 server.  The `--tls-sni-cert-key` flag can appear multiple times on
 the command line, configuring the server to respond in a different way
 to each of multiple different SNIs.
@@ -130,11 +131,9 @@ bash-5.2$ kcp start --tls-sni-cert-key ${pieces[1]},${pieces[2]} &> /tmp/kcp.log
 
 #### wait-and-switch-domain
 
-This command is for using after the kcp server has been launched.
-Since the `kcp start` command really means `kcp run`, all usage of
-that server has to be done by concurrent processes.  The
-`wait-and-switch-domain` command bundles two things: waiting for the
-kcp server to start handling kubectl requests, and making an alternate
+This command is for using after the space provider's server has been launched.
+The `wait-and-switch-domain` command bundles two things: waiting for the
+space provider's server to start handling kubectl requests, and making an alternate
 kubeconfig file for a set of clients to use.  This command is pointed
 at an existing kubeconfig file and reads it but does not write it; the
 alternate config file is written (its directory must already exist and
@@ -166,7 +165,7 @@ There will be the following two differences.
 
 Following is an example of using this command and examining the
 results.  The context and port number chosen work for the kubeconfig
-file that `kcp start` (kcp release v0.11.0) creates by default.
+file that `kcp start` (from release v0.11.0) creates by default.
 
 ```console
 bash-5.2$ wait-and-switch-domain .kcp/admin.kubeconfig test.yaml root yep.yep 6443 ${pieces[0]}
@@ -188,10 +187,10 @@ bash-5.2$ diff -w .kcp/admin.kubeconfig test.yaml
 
 Following is an example of using the alternate kubeconfig file, in a
 context where the domain name "yep.yep" resolves to an IP address of
-the network namespace in which the kcp server is running.
+the network namespace in which the space provider's server is running.
 
 ```console
-bash-5.2$ KUBECONFIG=.kcp-yep.yep/admin.kubeconfig kubectl ws .
+bash-5.2$ KUBECONFIG=.cp-yep.yep/admin.kubeconfig kubectl ws .
 Current workspace is "root".
 ```
 
@@ -283,7 +282,7 @@ the ESPW.
 ## Deployment into a Kubernetes cluster
 
 These commands administer a deployment of the central components ---
-the kcp server, PKI, and the central KubeStellar components --- in a
+the space provider's server, PKI, and the central KubeStellar components --- in a
 Kubernetes cluster that will be referred to as "the hosting cluster".
 These commands are framed as "kubectl plugins" and thus need to be
 explicitly or implicitly given a kubeconfig file for the hosting
@@ -329,8 +328,8 @@ appear on the command line, in any order.
 - `--openshift $bool`, saying whether the hosting cluster is an
   OpenShift cluster.  If so then a Route will be created to the kcp
   server; otherwise, an Ingress object will direct incoming TLS
-  connections to the kcp server.  The default is `false`.
-- `--external-endpoint $domain_name:$port`, saying how the kcp server
+  connections to the space provider's server.  The default is `false`.
+- `--external-endpoint $domain_name:$port`, saying how the space provider's server
   will be reached from outside the cluster.  The given domain name
   must be something that the external clients will resolve to an IP
   address where the cluster's Ingress controller or OpenShift router
@@ -382,7 +381,7 @@ takes the following on the command line.
 ### Fetch kubeconfig for external clients
 
 To fetch a kubeconfig for use by clients outside of the hosting
-cluster --- those that will reach the kcp server via the external
+cluster --- those that will reach the space provider's server via the external
 endpoint specified in the deployment command --- use the `kubectl
 kubestellar get-external-kubeconfig -n kubestellar` command.  It takes the following
 on the command line.
@@ -406,7 +405,7 @@ on the command line.
 
 ### Remove deployment to a Kubernetes cluster
 
-The deployment of kcp and KubeStellar as a Kubernetes workload is done
+The deployment of the space provider and KubeStellar as a Kubernetes workload is done
 by making a "release" (this is a [technical term in
 Helm](https://helm.sh/docs/intro/cheatsheet/#basic-interpretationscontext)
 whose meaning might surprise you) of a Helm chart.  This release is
@@ -481,12 +480,9 @@ kubestellar-version
 In this PoC, the interface between infrastructure and workload
 management is inventory API objects.  Specifically, for each edge
 cluster there is a unique pair of SyncTarget and Location objects in a
-so-called inventory management workspace.  These kinds of objects were
-originally defined in kcp TMC, and now there is a copy of those
-definitions in KubeStellar.  It is the definitions in KubeStellar that
-should be referenced.  Those are in the Kubernetes API group
+so-called inventory management workspace. Those are in the Kubernetes API group
 `edge.kubestellar.io`, and they are exported from the
-[KubeStellar Core Space (KCS)](../../../../Getting-Started/user-guide/)) (the kcp workspace
+[KubeStellar Core Space (KCS)](../../../../Getting-Started/user-guide/)) (the workspace
 named `root:espw`).
 
 The following command helps with making that SyncTarget and Location
@@ -529,10 +525,7 @@ kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
 Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo1 created
 location.scheduling.kcp.io/demo1 created
-synctarget.workload.kcp.io/demo1 labeled
-location.scheduling.kcp.io/demo1 labeled
-synctarget.workload.kcp.io/demo1 labeled
-location.scheduling.kcp.io/demo1 labeled
+...
 ```
 
 The above example shows using this script to create a SyncTarget and a
@@ -825,18 +818,7 @@ Workspace "example-wmw" (type root:universal) is ready to use.
 Current workspace is "root:example-wmw" (type root:universal).
 apibinding.apis.kcp.io/bind-espw created
 apibinding.apis.kcp.io/bind-kubernetes created
-apibinding.apis.kcp.io/bind-apiregistration.k8s.io created
-apibinding.apis.kcp.io/bind-apps created
-apibinding.apis.kcp.io/bind-autoscaling created
-apibinding.apis.kcp.io/bind-batch created
-apibinding.apis.kcp.io/bind-core.k8s.io created
-apibinding.apis.kcp.io/bind-discovery.k8s.io created
-apibinding.apis.kcp.io/bind-flowcontrol.apiserver.k8s.io created
-apibinding.apis.kcp.io/bind-networking.k8s.io created
-apibinding.apis.kcp.io/bind-node.k8s.io created
-apibinding.apis.kcp.io/bind-policy created
-apibinding.apis.kcp.io/bind-scheduling.k8s.io created
-apibinding.apis.kcp.io/bind-storage.k8s.io created
+...
 ```
 
 ```shell

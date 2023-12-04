@@ -1,9 +1,9 @@
-<!--example1-kcp-provider-start-->
+<!--example1-cp-provider-start-->
 
 #### Create a space provider description for KCP
 
-Space provider for KCP will allow you to use KCP as backend provider for spaces.
-Use the following commands to create a provider secret for KCP access and
+Space provider for KCP will allow you to use it as a backend provider for spaces.
+Use the following commands to create a provider secret for access and
 a space provider definition.
 
 ```shell
@@ -28,4 +28,4 @@ Next, use the following command to wait for the space-manger to process the prov
 KUBECONFIG=$SM_CONFIG kubectl --context sm-mgt wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc/default --timeout=90s
 ```
 
-<!--example1-kcp-provider-end-->
+<!--example1-cp-provider-end-->

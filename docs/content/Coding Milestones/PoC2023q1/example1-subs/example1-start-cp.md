@@ -1,4 +1,4 @@
-<!--example1-start-kcp-start-->
+<!--example1-start-cp-start-->
 ### Deploy kcp and KubeStellar
 
 You need kcp and KubeStellar and can deploy them in either of two
@@ -54,5 +54,5 @@ clusters, and the one that the kcp server creates. The remainder of
 this document assumes that your `kind` cluster contexts are in
 `~/.kube/config`.
 
-<!--example1-start-kcp-end-->
+<!--example1-start-cp-end-->
 <!-- > /dev/null & -->

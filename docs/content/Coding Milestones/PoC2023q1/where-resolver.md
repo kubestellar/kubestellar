@@ -44,13 +44,13 @@ The command line flags, beyond the basics, are as follows.
 
 ## Steps to try the Where Resolver
 
-### Pull the kcp source code, build kcp, and start kcp
+### Pull the kcp server source code, build it, and start it
 
 At this point you should have cloned the KubeStellar repo and `cd`ed into it as directed above.
 {%
-   include-markdown "where-resolver-subs/where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp.md"
-   start="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-start-->"
-   end="<!--where-resolver-0-pull-kcp-and-kubestellar-source-and-start-kcp-end-->"
+   include-markdown "where-resolver-subs/where-resolver-0-pull-and-kubestellar-source-and-start.md"
+   start="<!--where-resolver-0-pull-and-kubestellar-source-and-start-start-->"
+   end="<!--where-resolver-0-pull-and-kubestellar-source-and-start-end-->"
 %}
 
 ### Build and initialize KubeStellar
@@ -86,7 +86,6 @@ The outputs from the Where Resolver should be similar to:
 ``` { .bash .no-copy }
 I0605 10:53:00.156100   29786 main.go:212] "Found APIExport view" exportName="edge.kubestellar.io" serverURL="https://192.168.1.13:6443/services/apiexport/jxch2kyb3c1h6bac/edge.kubestellar.io"
 I0605 10:53:00.157874   29786 main.go:212] "Found APIExport view" exportName="scheduling.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/scheduling.kcp.io"
-I0605 10:53:00.159242   29786 main.go:212] "Found APIExport view" exportName="workload.kcp.io" serverURL="https://192.168.1.13:6443/services/apiexport/root/workload.kcp.io"
 I0605 10:53:00.261128   29786 controller.go:201] "starting controller" controller="where-resolver"
 ```
 
@@ -107,7 +106,7 @@ kubectl create -f config/samples/synctarget_dev.yaml
 sleep 5
 ```
 
-Note that kcp automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
+Note that the server automatically creates a Location `default`. So there are 3 Locations and 2 SyncTargets in `root:compute`.
 ```shell
 kubectl get locations,synctargets
 ```

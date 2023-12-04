@@ -8,7 +8,7 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.
 
 ```shell
-# TODO: mailbox controller has kcp dependencies. Will remove when controllers support spaces.
+# TODO: mailbox controller has server dependencies. Will remove when controllers support spaces.
 kubectl ws root:espw
 mailbox-controller -v=2 &
 sleep 20

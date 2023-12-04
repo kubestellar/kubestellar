@@ -1,11 +1,11 @@
 # Space Framework
 
 ## Terminology 
-**Physical Space**, **pSpace** An entity that behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (without the management of containerized workloads). A kcp logical cluster is an example. A regular Kubernetes cluster is another example.
+**Physical Space**, **pSpace** An entity that behaves like a Kubernetes kube-apiserver (including the persistent storage behind it) and the subset of controllers in the kube-controller-manager that are concerned with API machinery generalities (without the management of containerized workloads). A KubeFlex logical cluster is an example. A regular Kubernetes cluster is another example.
 
 **Space Object**, **Space** - A kind of Kubernetes API object that _represents_ a pSpace.  Its "kind" is `Space`, we sometimes include the "object" part when writing specifically about the API objects to clearly distinguish them from what they represent.
 
-**Space Provider** - A Thing that manages the life cycle of multiple pSpaces. This includes at minimal create/delete/List operations on pSpaces. KIND is an example for Space Provider (that manages KIND clusters), KCP is another example - KCP manages KCP's workspaces. 
+**Space Provider** - A Thing that manages the life cycle of multiple pSpaces. This includes at minimal create/delete/List operations on pSpaces. KIND is an example for Space Provider (that manages KIND clusters), KubeFlex is another example - KubeFlex manages KubeFlex ControlPlanes. 
 
 ## High level architecture  & Main components
 ![SF overall view](images/SF-All.drawio.svg "SF overall view")
@@ -95,7 +95,7 @@ spec:
 ```
 
 ## Space Provider adaptors (SPA)
-The space provider adaptor is responsible for all the interaction with the Space Provider (used by the SM). The SM today includes implementation of 3 provider adaptors for 3 space provider types - KCP, KubeFlex and KIND. 
+The space provider adaptor is responsible for all the interaction with the Space Provider (used by the SM). The SM today includes implementation of provider adaptors space provider types. 
 When a new SpaceProviderDesc is created, the SM creates an instance of an SPA of the corresponding provider type. 
 SPA implements the [ProviderClient](https://github.com/kubestellar/kubestellar/blob/main/space-framework/pkg/space-manager/providerclient/client_interface.go) interface. This interface is relatively simple and includes basic CRUD+Watch operations. 
 
@@ -126,21 +126,21 @@ type ProviderClient interface {
 When the SM creates an instance of the SPA, it also starts a background loop using the  ```Watch()``` interface of the SPA to continuously monitor the status of the pSpace.
 
 ### KubeFlex SPA
-The KubeFlex space provider exposes KubeFlex's ```ConrolPlane``` as the pSpaces. The KubeFlex SPA interacts with the KubeFlex server to manage these workspaces. 
+The KubeFlex space provider exposes KubeFlex's ```ControlPlane``` as the pSpaces. The KubeFlex SPA interacts with the KubeFlex server to manage these workspaces. 
 
 ### KCP SPA
-The KCP space provider exposes KCP's workspaces as the pSpaces. The KCP SPA interacts with the KCP server to manage these workspaces. 
-We don't support workspace hierarchy and all workspaces are created under the ```root``` workspace and therefor the KCP SPA uses the Space name as the unique identifier for the workspace.  
+This space provider exposes its workspaces as pSpaces. This SPA interacts with the KCP server to manage these workspaces. 
+We don't support workspace hierarchy and all workspaces are created under the ```root``` workspace and therefore this SPA uses the Space name as the unique identifier for the workspace.  
 Example: When the user creates a Space with name ```mySpace``` the SPA will create a workspace named ```mySpace``` with path of ```root:mySpace```
 
 ### KIND SPA
 
-#### Example: Create a Space on the KCP space provider
-Suppose we created a SpaceProviderDesc of type KCP named sp-kcp1, and we now want to create a Space. As mentioned before when the SpaceProviderDesc was created the SM also created a corresponding SPA instance. 
-1. Create a Space object with a reference to sp-kcp1
+#### Example: Create a Space on the KubeFlex space provider
+Suppose we created a SpaceProviderDesc of type KubeFlex named sp-kubeflex1, and we now want to create a Space. As mentioned before when the SpaceProviderDesc was created the SM also created a corresponding SPA instance. 
+1. Create a Space object with a reference to sp-kubeflex1
 2. The SM finds the SPA the corresponding SPA 
 3. The SM sends a ```Create()``` command through this SPA instance. 
-4. The SPA sends a command to create KCP workspace on that KCP server. 
+4. The SPA sends a command to create KubeFlex ControlPlane. 
 5. The SM sets the status of the Space to ```initialzing``` 
 6. When the workspace is "ready" the SPA generates the appropriate kubeconfig information to access this specific workspace and send back the relevant pSpace info back to the SM as a  [SpaceInfo](https://github.com/kubestellar/kubestellar/blob/main/space-framework/pkg/space-manager/providerclient/client_interface.go) object. 
 7. The SM creates the relevant access secrets and place a reference to those secrets in the Space status. The SM then move the Status of the Space to ```Ready```

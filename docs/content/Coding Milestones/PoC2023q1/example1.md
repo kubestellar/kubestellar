@@ -28,9 +28,9 @@ they appear in this example.
 ## Stage 1
 
 {%
-   include-markdown "example1-subs/example1-pre-kcp.md"
-   start="<!--example1-pre-kcp-start-->"
-   end="<!--example1-pre-kcp-end-->"
+   include-markdown "example1-subs/example1-pre-cp.md"
+   start="<!--example1-pre-cp-start-->"
+   end="<!--example1-pre-cp-end-->"
 %}
 
 {%
@@ -40,21 +40,21 @@ they appear in this example.
 %}
 
 {%
-   include-markdown "example1-subs/example1-start-kcp.md"
-   start="<!--example1-start-kcp-start-->"
-   end="<!--example1-start-kcp-end-->"
+   include-markdown "example1-subs/example1-start-cp.md"
+   start="<!--example1-start-cp-start-->"
+   end="<!--example1-start-cp-end-->"
 %}
 
 {%
-   include-markdown "example1-subs/example1-kcp-provider.md"
-   start="<!--example1-kcp-provider-start-->"
-   end="<!--example1-kcp-provider-end-->"
+   include-markdown "example1-subs/example1-cp-provider.md"
+   start="<!--example1-cp-provider-start-->"
+   end="<!--example1-cp-provider-end-->"
 %}
 
 {%
-   include-markdown "example1-subs/example1-post-kcp.md"
-   start="<!--example1-post-kcp-start-->"
-   end="<!--example1-post-kcp-end-->"
+   include-markdown "example1-subs/example1-post-cp.md"
+   start="<!--example1-post-cp-start-->"
+   end="<!--example1-post-cp-end-->"
 %}
 
 {%

@@ -23,7 +23,7 @@ The following command will stop whatever KubeStellar controllers are running.
 kubestellar stop
 ```
 
-Stop and uninstall KubeStellar and kcp with the following command:
+Stop and uninstall KubeStellar with the following command:
 
 ``` {.bash}
 remove-kubestellar
@@ -31,7 +31,7 @@ remove-kubestellar
 
 ### Teardown Kubernetes workload
 
-With `kubectl` configured to manipulate the hosting cluster, the following command will remove the workload that is kcp and KubeStellar.
+With `kubectl` configured to manipulate the hosting cluster, the following command will remove the KubeStellar workload.
 
 ``` {.bash}
 helm delete kubestellar

@@ -1,4 +1,4 @@
-<!--example1-post-kcp-start-->
+<!--example1-post-cp-start-->
 #### Get KubeStellar
 
 You will need a local copy of KubeStellar.  You can either use the
@@ -73,11 +73,11 @@ popd
 
 In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API, and also
-augments the `root:compute` workspace from kcp TMC as needed here.
+augments the `root:compute` workspace from kcp's TMC as needed here.
 That augmentation consists of adding authorization to update the
-relevant `/status` and `/scale` subresources (missing in kcp TMC) and
+relevant `/status` and `/scale` subresources (missing in TMC) and
 extending the supported subset of the Kubernetes API for managing
-containerized workloads from the four resources built into kcp TMC
+containerized workloads from the four resources built into TMC
 (`Deployment`, `Pod`, `Service`, and `Ingress`) to the other ones that
 are meaningful in KubeStellar.
 
@@ -96,7 +96,7 @@ an IP address that the client can use to open a TCP connection to the
 Ingress controller's listening socket.
 
 You will need the kcp `kubectl` plugins.  See [the "Start kcp" section
-above](../#start-kcp) for instructions on how to get all of the kcp
+above](../#start-kcp) for instructions on how to get all of the necessary
 executables.
 
 You will need to get a build of KubeStellar.  See
@@ -206,4 +206,4 @@ spec:
 That script also deletes the Location named `default`, which is not
 used in this PoC, if it shows up.
 
-<!--example1-post-kcp-end-->
+<!--example1-post-cp-end-->

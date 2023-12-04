@@ -69,7 +69,7 @@ subjects:
 EOL
 ```
 
-Get the serviceaccount token that will be set in the upstream kubeconfig manifest.  **NOTE** This part is outdated due to the recent denaturing of ServiceAccounts in kcp workspaces; the syncer-gen plugin will actually wait a little while and then create the Secret if nothing else has.
+Get the serviceaccount token that will be set in the upstream kubeconfig manifest.  **NOTE** This part is outdated due to the recent denaturing of ServiceAccounts in workspaces; the syncer-gen plugin will actually wait a little while and then create the Secret if nothing else has.
 ```shell
 secret_name=`kubectl get secret -o custom-columns=":.metadata.name"| grep $syncer_id`
 token=`kubectl get secret $secret_name -o jsonpath='{.data.token}' | base64 -d`

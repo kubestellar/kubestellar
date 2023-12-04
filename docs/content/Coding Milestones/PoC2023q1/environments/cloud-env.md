@@ -14,10 +14,10 @@ description: >-
 ### Description
 This example shows how to deploy monitoring tools (prometheus, grafana and node exporter) for KubeStellar components (core and edge regions) - see architecture image above. Prometheus server is deployed in the core region running the KCP server alongside the components for KubeStellar. A Prometheus agent is deployed in the edge regions running the workload execution clusters.
 
-1. Create your hosts file with the list of target hosts (KCP server & workload execution cluster)
+1. Create your hosts file with the list of target hosts (server & workload execution cluster)
 
 ```
-[kcp-server]
+[server]
 192.168.56.2
 
 [workload-execution-clusters]
@@ -50,7 +50,7 @@ scrape_configs:
   - targets:
     - '<host-ipAddress>:9100'
 
-- job_name: kcp
+- job_name: cp
   scrape_interval: 15s
   scheme: https
   metrics_path: /metrics

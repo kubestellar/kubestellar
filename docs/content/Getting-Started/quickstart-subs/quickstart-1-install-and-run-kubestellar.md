@@ -1,14 +1,12 @@
 <!--quickstart-1-install-and-run-kubestellar-start-->
 
-KubeStellar works in the context of [kcp](https://www.kcp.io/), so to use KubeStellar you also need kcp.
+KubeStellar can use release `v0.11.0` of [kcp](https://www.kcp.io/) as a pace provider.
 
-KubeStellar works with release `v0.11.0` of kcp.
+We support two ways to deploy KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.
 
-We support two ways to deploy kcp and KubeStellar. The older way is to run them as bare processes. The newer way is to deploy them as workload in a Kubernetes (possibly OpenShift) cluster.
+### Deploy KubeStellar as bare processes
 
-### Deploy kcp and KubeStellar as bare processes
-
-The following commands will download the kcp and **KubeStellar** executables into subdirectories of your current working directory, deploy (i.e., start and configure) kcp and KubeStellar as bare processes, and configure your shell to use kcp and KubeStellar.  If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about [the commands for bare process deployment](../../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment).
+The following commands will download **KubeStellar** and it's dependant executables into subdirectories of your current working directory, deploy (i.e., start and configure)  KubeStellar as bare processes, and configure your shell to use KubeStellar.  If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation about [the commands for bare process deployment](../../../Coding Milestones/PoC2023q1/commands/#bare-process-deployment).
 
 ```shell
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }}
@@ -49,7 +47,7 @@ which should yield:
     └── wmw1
 ```
 
-### Deploy kcp and KubeStellar as Kubernetes workload
+### Deploy KubeStellar as Kubernetes workload
 
 This requires a KubeStellar release GREATER THAN v0.5.0.
 
@@ -58,7 +56,7 @@ into [a known issue with a known
 work-around](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files),
 so take care of that.
 
-Before you can deploy kcp and KubeStellar as workload in a Kubernetes
+Before you can deploy KubeStellar as workload in a Kubernetes
 cluster, you need a Kubernetes cluster and it needs to have an Ingress
 controller installed.  We use the term "hosting cluster" for the
 cluster that plays this role.  In this quickstart, we make such a
@@ -75,7 +73,7 @@ sudo sh -c "echo a_good_IP_address_for_this_machine hostname.favorite.my >> /etc
 
 The next command relies on `kubectl` already being configured to manipulate the hosting cluster, which is indeed the state that `kind create cluster` leaves it in.
 
-The following commands will (a) download the kcp and **KubeStellar** executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) kcp and KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for [the commands about deployment into a Kubernetes cluster](../../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster).
+The following commands will (a) download **KubeStellar** and it's dependant executables into subdirectories of your current working directory and (b) deploy (i.e., start and configure) KubeStellar as workload in the hosting cluster. If you want to suppress the deployment part then add `--deploy false` to the first command's flags (e.g., after the specification of the KubeStellar version); for the deployment-only part, once the executable have been fetched, see the documentation for [the commands about deployment into a Kubernetes cluster](../../../Coding Milestones/PoC2023q1/commands/#deployment-into-a-kubernetes-cluster).
 
 ``` {.bash}
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }} --external-endpoint hostname.favorite.my:{{ config.ks_kind_port_num }}
@@ -97,7 +95,7 @@ kubestellar-server   1/1     1            1           2m42s
 
 It may take some time for that Pod to reach Running state.
 
-The bootstrap command above will print out instructions to set your KUBECONFIG environment variable to the pathname of a kubeconfig file that you can use as a user of kcp and KubeStellar.  Do that now, for the benefit of the remaining commands in this example.  It will look something like the following command.
+The bootstrap command above will print out instructions to set your KUBECONFIG environment variable to the pathname of a kubeconfig file that you can use as a user KubeStellar.  Do that now, for the benefit of the remaining commands in this example.  It will look something like the following command.
 
 ``` {.bash}
 export KUBECONFIG="$(pwd)/kubestellar.kubeconfig"

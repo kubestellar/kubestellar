@@ -68,7 +68,7 @@ The command line flags, beyond the basics, are as follows.
 
 ## Try out the mailbox controller
 
-### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start kcp
+### Pull the kcp and KubeStellar source code, build the kubectl-ws binary, and start
 Open a terminal window(1) and clone the latest KubeStellar source:
 
 {%

@@ -18,16 +18,15 @@ multi-cluster.  It is intended to demonstrate the following points.
 - Separation of infrastructure and workload management.
 - The focus here is on workload management, and that strictly reads
   an inventory of infrastructure.
-- What passes from inventory to workload management is kcp TMC
+- What passes from inventory to workload management is TMC
   Location and SyncTarget objects.
-- Use of a kcp workspace as the container for the central spec of a workload.
+- Use of a workspace as the container for the central spec of a workload.
 - Propagation of desired state from center to edge, as directed by
   EdgePlacement objects and the Location and SyncTarget objects they reference.
 - Interfaces designed for a large number of edge clusters.
 - Interfaces designed with the intention that edge clusters operate
   independently of each other and the center (e.g., can tolerate only
-  occasional connectivity) and thus any "service providers" (in the
-  technical sense from kcp) in the center or elsewhere.
+  occasional connectivity) and thus any "service providers" in the center or elsewhere.
 - Rule-based customization of desired state.
 - Propagation of reported state from edge to center.
 - Summarization of reported state in the center.
@@ -42,7 +41,7 @@ Some important things that are not attempted in this PoC include the following.
 
 - An implementation that supports a large number of edge clusters or
   any other thing that requires sharding for scale. In this PoC we
-  will use a single kcp server to hold all the workspaces, and will
+  will use a single server to hold all the workspaces, and will
   not shard any controller.
 - More than one SyncTarget per Location.
 - A hierarchy with more than two levels.
@@ -118,7 +117,7 @@ objects.  These are: `MutatingWebhookConfiguration`,
 
 For some resources, the need to denature is only a matter of
 anticipation.  `FlowSchema` and `PriorityLevelConfiguration` currently
-are not interpreted by kcp servers and so are effectively already
+are not interpreted by servers and so are effectively already
 denatured there.  Hopefully they will be given interpretations in the
 future, and then those resources will join the previous category.
 
@@ -162,8 +161,8 @@ documented in [the
 glossary](../../../Getting-Started/user-guide/#glossary).
 
 This design is set in the context of kcp and currently in the midst of
-a transition away from that. This design uses kcp workspaces as
-spaces, and eschews the use of kcp APIExport+APIBinding in favor of
+a transition away from that. This design uses workspaces as
+spaces, and eschews the use of APIExport+APIBinding in favor of
 using [kube-bind](https://github.com/kube-bind/kube-bind).
 
 ## Kube-bind object ID mapping
@@ -194,11 +193,11 @@ func ComposeClusterScopedName(kbSpaceID string, name string) string {..}
 The kube-bind module has its own identifiers for spaces. These are
 distinct from the ways that kcp identifies spaces. In kube-bind, for a
 given provider and consumer, the identifier is the "cluster namespace"
-in the provider cluster that corresponds to the consuer. We will not
+in the provider cluster that corresponds to the consumer. We will not
 presume that these cluster namespace names are globally unique (across
 providers).
 
-In kcp there are two ways of identifying most spaces: (1)
+There are two ways of identifying most spaces: (1)
 `logicalcluster.Name` and (2) the pathname of the corresponding
 `Workspace` object. In this design the controllers have been using
 `logicalcluster.Name` as the space identifier (using the `Path` method
@@ -319,7 +318,7 @@ into the regular ("natured"?) versions for appearance in the edge
 cluster.  Furthermore, for some kinds of objects that modify apiserver
 behavior we want them "natured" at both center and edge.  There are
 thus a few categories of kinds of objects.  Following is a listing,
-with with the particular kinds that appear in kcp or plain kubernetes.
+with with the particular kinds that appear in kubernetes.
 
 #### Needs to be denatured in center, natured in edge
 
@@ -327,13 +326,13 @@ For these kinds of objects: clients of the real workload management
 workspace can manipulate some such objects that will modify the
 behavior of the workspace, while clients of the edge computing view
 will manipulate distinct objects that have no effect on the behavior
-of the workspace.  These are kinds of objects to which kcp normally
+of the workspace.  These are kinds of objects to which kubernetes normally
 associates some behavior.  To be fully precise, the concern here is
 with behavior that is externally visible (including externally visible
 behavior of the server itself); we do not care to dissociate
 server-internal behavior such as storing encrypted at rest.  The edge
 computing platform will have to implement that view which dissociates
-the normal kcp behavior.
+the normal kubernetes behavior.
 
 | APIVERSION | KIND | NAMESPACED |
 | ---------- | ---- | ---------- |
@@ -354,13 +353,13 @@ the normal kcp behavior.
 kinds of objects listed above can be put into a workload management
 workspace and it will give them its usual interpretation. For objects
 that add authorizations, this will indeed _add_ authorizations but not
-otherwise break something. The kcp server does not implement
+otherwise break something. The server does not implement
 `FlowSchema` nor `PriorityLevelConfiguration`; those will indeed be
 uninterpreted. For objects that configure calls to other servers,
 these will fail unless the user arranges for them to work when made in
 the center as well in the edge clusters.
 
-In kcp v0.11.0 the Token controller (for ServiceAccounts) creates a
+In v0.11.0 the Token controller (for ServiceAccounts) creates a
 token Secret for each ServiceAccount that does not currently reference
 one created by that controller and updates the ServiceAccount to
 reference the Secret just created. Should another controller undo that
@@ -370,7 +369,7 @@ objects. To prevent the placement translator from fighting with a
 mailbox space, users must mark a downsynced ServiceAccount as
 "create-only". To prevent some non-KubeStellar controller from
 fighting with a WDS, users must use feature(s) of that non-KubeStellar
-controller. In later versions of kcp and Kubernetes there is not such
+controller. In later versions there is not such
 automatic Secret creation.
 
 #### Needs to be natured in center and edge
@@ -405,7 +404,7 @@ service provider workspace, in order to be able to contain
 EdgePlacement and related objects.  These objects and those
 APIServiceBindings are not destined for the edge clusters.
 
-The edge clusters are not presumed to be kcp workspaces nor
+The edge clusters are not presumed to be workspaces nor
 participate in kube-bind, so APIBindings and APIServiceBindings do not
 propagate to the edge clusters.  However, it is possible that
 APIBindings or APIServiceBindings for workload APIs may exist in a
@@ -416,7 +415,7 @@ namespaces).
 
 #### For features not supported
 
-These are part of k8s or kcp APIs that are not supported by the edge
+These are part of k8s APIs that are not supported by the edge
 computing platform.
 
 | APIVERSION | KIND | NAMESPACED |
@@ -469,7 +468,7 @@ to, and that is what KubeStellar needs from the center workspaces.
 
 This is the default category of kind of object --- any kind of data
 object not specifically listed in another category is implicitly in
-this category.  Following are the kinds from k8s and kcp that fall in
+this category.  Following are the kinds that fall in
 this category.
 
 | APIVERSION | KIND | NAMESPACED |
@@ -507,7 +506,7 @@ differently, as explained in the next section.
 
 #### System infrastructure objects
 
-Even in a kcp workspace, some certain objects --- called here "system
+Even in a workspace, some certain objects --- called here "system
 infrastructure objects" --- are created as a consequence of certain
 other objects or things.  The system infrastructure objects are
 tolerated in the center and do not propagate toward the edge.  Here is
@@ -561,7 +560,7 @@ example, the following scenario is allowed.
 - Some central team owns an API group and produces some
   CustomResourceDefinition (CRD) objects that populate that API group.
 - That team derives APIServiceExports of their CRDs.
-- That team maintains a kcp workspace holding those APIServiceExports.
+- That team maintains a workspace holding those APIServiceExports.
 - Some workload management workspaces have APIServiceBindings to those
   APIServiceExports, and EdgePlacement objects that (1) select those
   APIServiceBinding objects for downsync and (2) select objects of
@@ -605,7 +604,7 @@ that is, the names --- of the parts of the workload.  In full, a
 Kubernetes API object is identified by API group, API major version,
 Kind (equivalently, resource name), namespace if relevant, and name.
 For simplicity in this PoC we will not worry about differences in API
-major version; each API group in Kubernetes and/or kcp currently has
+major version; each API group currently has
 only one major version.
 
 Two different workload descriptions can have objects with the same ID
@@ -693,11 +692,11 @@ are handled differently.
 For the above, the most recently updated object is determined by
 parsing the ResourceVersion as an `int64` and picking the highest
 value.  This is meaningful under the assumption that all the source
-workspaces are from the same kcp server --- which will be true for
+workspaces are from the same server --- which will be true for
 this PoC but is not a reasonable assumption in general.  Also:
 interpreting ResourceVersion breaks a rule for Kubernetes clients ---
 but this is dismayingly common.  Beyond this PoC we could hope to do
-better by looking at the ManagedFields.  But currently kcp does not
+better by looking at the ManagedFields.  But currently the server does not
 include https://github.com/kubernetes/kubernetes/pull/110058 so the
 ManagedFields often do not properly reflect the update times.  Even
 so, those timestamps have only 1-second precision --- so conflicts
@@ -813,7 +812,7 @@ downsync from and upsync to the mailbox workspace.  The syncer
 monitors a SyncerConfig object in the mailbox workspace to know what
 to downsync and upsync.
 
-For those familiar with kcp's TMC syncer, note that the edge syncer
+For those familiar with the TMC syncer, note that the edge syncer
 differs in the following ways.
 
 - Create self-sufficient edge clusters.

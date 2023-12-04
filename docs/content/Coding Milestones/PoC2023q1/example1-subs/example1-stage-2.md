@@ -404,7 +404,7 @@ If you have deployed the KubeStellar core in a Kubernetes cluster then
 the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
 following commands to launch the where-resolver; it requires the ESPW
-to be the current kcp workspace at start time.
+to be the current workspace at start time.
 
 ```shell
 espw_space_config="${PWD}/temp-space-config/spaceprovider-default-espw"
