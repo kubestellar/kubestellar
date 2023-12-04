@@ -24,7 +24,6 @@ import (
 	"io"
 	"os/exec"
 	"strings"
-	"sync/atomic"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -310,21 +309,14 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, spacename string) bool {
 	for _, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
-		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
-		// This is a compromise due to the situation that we are using kcp which modifies kubeconfig file when changing workspaces.
-		freshSuffix := atomic.AddUint64(&suffix, 1)
-
-		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", freshSuffix)
-		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", freshSuffix)
+		// We assume that SPACE_MANAGER_KUBECONFIG was set on the script that created the MB controller
 		invokeScript := strings.Join([]string{
-			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", freshSuffix),
+			"KUBECONFIG=$SPACE_MANAGER_KUBECONFIG",
 			shellScriptName,
 			spacename,
 			resource,
 		}, " ")
 		cmdLine := strings.Join([]string{
-			makeCopyOfKubeConfig,
-			removeCopyWhenExits,
 			invokeScript,
 		}, "; ")
 		logger.V(2).Info("About to exec", "cmdLine", cmdLine)
