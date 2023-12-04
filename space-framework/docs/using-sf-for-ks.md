@@ -44,7 +44,7 @@ kubectl get secret $s_name -n $s_ns -o jsonpath='{$.data.kubeconfig}' | base64 -
 #### Creating a space
 Once a space provider is defined we can now create spaces. To create a space we simply need to create a Space object. When the space becomes ready the status of the space will include reference to secrets that are used to access the space.   
 **Example:**  
-Crating a Space named `space`. Applying this on the core-cluster should include a pSpace on the KubeFlex space provider backend.
+Creating a Space named `space1`. Applying this on the core-cluster should include a pSpace on the KubeFlex space provider backend.
 ```shell
 cat <<EOF | kubectl --kubeconfig sm-kubeconfig.config apply -f -
 apiVersion: space.kubestellar.io/v1alpha1
@@ -68,7 +68,7 @@ Once the Space becomes ready the Status section is updated with the pSpace acces
 #### Accessing a pSpace
 In order to access a pSpace (get or create/update objects) the following procedure is used:
 1. Fetch the pSpace access info from the Space object: The status section of the Space object includes a secret reference (secret name and namespace). That secret holds the access config to the pSpace.
-2. Fetch and decode the actual secret into a KubeCOnfig file
+2. Fetch and decode the actual secret into a KubeConfig file
 3. The space can now be accessed with regular `kubectl` commands using that KubeConfig file  
 
 **Example: List the namespaces on the pSpace `space1`**
