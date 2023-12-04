@@ -88,10 +88,10 @@ function ensure_imws() {
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
-            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
-            KUBECONFIG=$SPACE_MANAGER_KUBECONFIG kubestellar-kube-bind "$imw" "synctargets"
-            KUBECONFIG=$SPACE_MANAGER_KUBECONFIG kubestellar-kube-bind "$imw" "locations"
+            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG
+            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output $space_config
+            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "synctargets"
+            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
 }
@@ -161,16 +161,16 @@ if [ "$KUBECONFIG_DIR" == "" ]; then
     mkdir -p $KUBECONFIG_DIR
     export KUBECONFIG_DIR
 fi
-if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
-    SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
-    export SPACE_MANAGER_KUBECONFIG
+if [ "$SM_CONFIG" == "" ]; then
+    SM_CONFIG="${KUBECONFIG_DIR}/config"
+    export SM_CONFIG
 fi
 if [ "$IN_CLUSTER" == "" ]; then
     IN_CLUSTER=true
     export IN_CLUSTER
 fi
 echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
-echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "SM_CONFIG=${SM_CONFIG}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 echo "IN_CLUSTER=${IN_CLUSTER}"
@@ -192,11 +192,11 @@ function create_or_replace() { # usage: filename
 
 function ensure_root_compute_configd() {
     # TODO: remove kcp dependency in PR3 once we switch to kube-bind.
-    secret_name=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.name}'`
-    secret_namespace=`kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.namespace}'`
+    secret_name=`kubectl --kubeconfig ${SM_CONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.name}'`
+    secret_namespace=`kubectl --kubeconfig ${SM_CONFIG} get spaceproviderdesc $PROVIDER_NAME -o jsonpath='{$.spec.secretRef.namespace}'`
     echo "secret_name=${secret_name}"
     echo "secret_namespace=${secret_namespace}"
-    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d > ${KUBECONFIG_DIR}/kcp.kubeconfig
+    kubectl --kubeconfig ${SM_CONFIG} get secret $secret_name -n $secret_namespace -o jsonpath='{$.data.kubeconfig}' | base64 -d > ${KUBECONFIG_DIR}/kcp.kubeconfig
     KUBECONFIG=${KUBECONFIG_DIR}/kcp.kubeconfig
     kubectl ws root:compute
     echo "set ws to root:compute"
@@ -353,8 +353,8 @@ function ensure_espw() {
         in_cluster="--in-cluster"
     fi 
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
-    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
+    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG 
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output $space_config
     run_dex
     sleep 2
     run_kb_backend
@@ -394,7 +394,7 @@ function run_kb_backend() {
 
     echo "starting kube-bind example-backend in background"
 
-    kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output "/tmp/espw-conf"
+    kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output "/tmp/espw-conf"
     
     ( 
         KUBECONFIG="/tmp/espw-conf"
