@@ -8,7 +8,7 @@
 **Space Provider** - A Thing that manages the life cycle of multiple pSpaces. This includes at minimal create/delete/List operations on pSpaces. KIND is an example for Space Provider (that manages KIND clusters), KCP is another example - KCP manages KCP's workspaces. 
 
 ## High level architecture  & Main components
-![SF overall view](SF-All.drawio.svg "SF overall view")
+![SF overall view](images/SF-All.drawio.svg "SF overall view")
 
 The Space Framework (SF) is a generic management framework for space providers and pSpaces. The framework defines an abstraction layer for space providers and pSpace management that allows clients (both script/kubectl based and client-go based clients) to use spaces while maintaining the clients decoupled from the specific pSpace and space provider that is being used. 
 
@@ -35,7 +35,7 @@ The space manager uses a set of space provider adaptors that interact with the s
 
 ### Space aware client (SAC)
 The Space aware client (SAC) allows clients/controllers to easily get access to the underlying space by simply using the space name and optionally the SpaceProviderDesc name. There is no direct interaction between the SAC and the Space  provider, and therefore the SAC is transparent to the specific provider of the spaces. 
-![Space Aware Client](SAC.drawio.svg "Space Aware Client")
+![Space Aware Client](images/SAC.drawio.svg "Space Aware Client")
 The only requirement is that the space can be accessed through regular Kube APIs when using the appropriate kubeconfig information. 
 
 #### Main features
@@ -47,7 +47,7 @@ The only requirement is that the space can be accessed through regular Kube APIs
 When a new SpaceProviderDesc is created the SM creates a new namespace that will be used to host all the Space objects representing pSpaces on that space provider.  
 The name of the generated namespace is `spaceprovider-<provider name>`
 
-![Space, SpaceProviderDesc and the Space provider namespace](SF-NS.drawio.svg "SF Namespaces")
+![Space, SpaceProviderDesc and the Space provider namespace](images/SF-NS.drawio.svg "SF Namespaces")
 
 Note: In the future the spaces will be created in their own namespace and not in namespace per provider. 
 
