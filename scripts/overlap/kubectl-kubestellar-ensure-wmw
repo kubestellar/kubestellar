@@ -71,16 +71,16 @@ if [ "$KUBECONFIG_DIR" == "" ]; then
     mkdir -p $KUBECONFIG_DIR
     export KUBECONFIG_DIR
 fi
-if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
-    SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
-    export SPACE_MANAGER_KUBECONFIG
+if [ "$SM_CONFIG" == "" ]; then
+    SM_CONFIG="${KUBECONFIG_DIR}/config"
+    export SM_CONFIG
 fi
 if [ "$IN_CLUSTER" == "" ]; then
     IN_CLUSTER=true
     export IN_CLUSTER
 fi
 
-echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "SM_CONFIG=${SM_CONFIG}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 echo "IN_CLUSTER=${IN_CLUSTER}"
@@ -104,12 +104,12 @@ if $IN_CLUSTER; then
 fi
 
 space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${wmw_name}"
-kubectl-kubestellar-create-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-kubectl-kubestellar-get-config-for-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --output $space_config
+kubectl-kubestellar-create-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name $wmw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output $space_config
 
-KUBECONFIG=$SPACE_MANAGER_KUBECONFIG kubestellar-kube-bind "$wmw_name" "edgeplacements"
-KUBECONFIG=$SPACE_MANAGER_KUBECONFIG kubestellar-kube-bind "$wmw_name" "customizers"
-KUBECONFIG=$SPACE_MANAGER_KUBECONFIG kubestellar-kube-bind "$wmw_name" "singleplacementslices"
+KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$wmw_name" "edgeplacements"
+KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$wmw_name" "customizers"
+KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$wmw_name" "singleplacementslices"
 
 function reconcile_kube_CRDs() {
 	if [ "$want_kube" == true ]; then

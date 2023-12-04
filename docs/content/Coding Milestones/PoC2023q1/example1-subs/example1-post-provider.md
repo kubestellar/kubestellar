@@ -75,7 +75,7 @@ In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API.
 
 ```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubestellar init
+IN_CLUSTER=false kubestellar init
 ```
 
 ### Deploy kcp and KubeStellar as a workload in a Kubernetes cluster
