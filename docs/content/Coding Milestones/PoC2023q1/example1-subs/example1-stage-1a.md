@@ -79,7 +79,7 @@ compute                                                    <none>       mqnl7r5f
 espw                                                       <none>       2n88ugkhysjbxqp5
 imw1                                                       <none>       4d2r9stcyy2qq5c1
 ```
-  
+
 Also: if you ever need to look up just one mailbox space by
 SyncTarget name, you could do it as follows.
 
