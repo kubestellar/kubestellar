@@ -11,7 +11,7 @@ bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootst
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export KUBECONFIG="$(pwd)/.kcp/admin.kubeconfig"
 export SM_CONFIG=~/.kube/config
-mkdir ${PWD}/temp-space-config
+mkdir -p ${PWD}/temp-space-config
 ```
 
 Check that `KubeStellar` is running.
@@ -79,7 +79,7 @@ The following commands will (a) download the kcp and **KubeStellar** executables
 bash <(curl -s {{ config.repo_raw_url }}/{{ config.ks_branch }}/bootstrap/bootstrap-kubestellar.sh) --kubestellar-version {{ config.ks_current_tag }} --external-endpoint hostname.favorite.my:{{ config.ks_kind_port_num }}
 export PATH="$PATH:$(pwd)/kcp/bin:$(pwd)/kubestellar/bin"
 export SM_CONFIG=~/.kube/config
-mkdir ${PWD}/temp-space-config
+mkdir -p ${PWD}/temp-space-config
 ```
 
 Using your original `kubectl` configuration that manipulates the hosting cluster, check that the KubeStellar Deployment has its intended one running Pod.
