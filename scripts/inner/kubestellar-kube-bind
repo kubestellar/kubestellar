@@ -57,7 +57,7 @@ then
 fi
 
 conf_file="/tmp/$space_name.conf"
-kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SM_CONFIG --in_cluster --output $conf_file
+kubectl-kubestellar-get-config-for-space --space-name $space_name --sm-core-config $SM_CONFIG --in-cluster --output $conf_file
 KUBECONFIG=$conf_file
 
 if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
@@ -75,8 +75,9 @@ else
     log_file=$log_dir/kube-bind-konnector-$space_name.log
     echo "starting kube-bind konnector for space $space_name in background, logs writing to $log_file"
     KB_CONSUMER=$space_name konnector &> $log_file &
-    sleep 2
+    sleep 10
     if ! pgrep konnector &> /dev/null; then
+        cat $log_file
         echo "Error: kube-bind konnector process not found" >&2
         exit 1
     fi
@@ -95,7 +96,7 @@ else
     echo "cluster namespace is $cluster_ns"
 fi
 
-kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output "/tmp/espw-conf"
+kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG --in-cluster --output "/tmp/espw-conf"
 KUBECONFIG="/tmp/espw-conf"
 
 if ! kubectl get namespace "$cm_namespace" &> /dev/null
