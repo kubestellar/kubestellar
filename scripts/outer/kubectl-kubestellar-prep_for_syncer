@@ -174,4 +174,4 @@ fi
 mbwsname_space_config="${PWD}/temp-space-config/spaceprovider-default-${mbwsname}"
 kubectl-kubestellar-get-config-for-space --space-name ${mbwsname} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
 
-"KUBECONFIG=$mbwsname_space_config $bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
+KUBECONFIG=$mbwsname_space_config $bindir/kubectl-kubestellar-syncer_gen "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
