@@ -16,19 +16,18 @@
 
 # Usage: $0
 
-# This script deploys kcp and Kubestellar, either as bare processes
+# This script deploys Kubestellar, either as bare processes
 # or as Kubernetes workload, and installs executables to a folder of choice
 #
 # Arguments:
-# [--deploy bool] indicate if kubestellar (and kcp) will be deployed
+# [--deploy bool] indicate if kubestellar will be deployed
 # [--external-endpoint domain-name:port]
 # [--openshift bool]
-# [--kcp-version release] set a specific kcp release version, default: latest
 # [--kubestellar-version release] set a specific KubeStellar release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
 # [--ensure-folder name] sets the installation folder, default: $PWD/kubestellar
-# [--bind-address address] bind kcp to a specific ip address
+# [--bind-address address] bind the space provider to a specific ip address
 # [--ensure-imw name] create a Inventory Management Workspace (IMW)
 # [--ensure-wmw name] create a Workload Management Workspace (WMW)
 # [--host-ns namespace] specify namespace in hosting cluster that gets chart
@@ -37,38 +36,38 @@
 
 set -e
 
-kcp_installed() {
-    if [[ "$(which kcp)" == "" || "$(which kubectl-ws)" == "" ]]; then
+sp_installed() {
+    if [[ "$(which $sp_name)" == "" || "$(which kubectl-ws)" == "" ]]; then
         echo "false"
     else
         echo "true"
     fi
 }
 
-kcp_download() {
+sp_download() {
     if [ $verbose == "true" ]; then
-        curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
-        curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -SL -o "${sp_name}.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/${sp_name}_${sp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -SL -o "${sp_name}-plugins.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/kubectl-${sp_name}-plugin_${sp_version//v}_${os_type}_${arch_type}.tar.gz"
     else
-        curl -sSL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
-        curl -sSL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -sSL -o "${sp_name}.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/${sp_name}_${sp_version//v}_${os_type}_${arch_type}.tar.gz"
+        curl -sSL -o "${sp_name}-plugins.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/kubectl-${sp_name}-plugin_${sp_version//v}_${os_type}_${arch_type}.tar.gz"
     fi
 }
 
-kcp_install() {
-    tar -C $kcp_folder -zxf kcp-plugins.tar.gz
-    tar -C $kcp_folder -zxf kcp.tar.gz
+sp_install() {
+    tar -C $sp_folder -zxf "${sp_name}-plugins.tar.gz"
+    tar -C $sp_folder -zxf "${sp_name}.tar.gz"
 }
 
-kcp_running() {
-    if [ "$(pgrep -f 'kcp start')" == "" ]; then
+sp_running() {
+    if [ "$(pgrep -f "${sp_name} start")" == "" ]; then
         echo "false"
     else
         echo "true"
     fi
 }
 
-kcp_ready() {
+sp_ready() {
     if [ "$(kubectl ws root:compute 2> /dev/null)" == "" ]; then
         echo "false"
     else
@@ -76,16 +75,16 @@ kcp_ready() {
     fi
 }
 
-kcp_version() {
-    if [ "$(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')" != "" ]; then
-        echo "$(kubectl version --short 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+sp_version() {
+    if [ "$(kubectl version --short 2> /dev/null | grep ${sp_name} | sed "s/.*${sp_name}-//")" != "" ]; then
+        echo "$(kubectl version --short 2> /dev/null | grep ${sp_name} | sed "s/.*${sp_name}-//")"
     else
-        echo "$(kubectl version 2> /dev/null | grep kcp | sed 's/.*kcp-//')"
+        echo "$(kubectl version 2> /dev/null | grep ${sp_name} | sed "s/.*${sp_name}-//")"
     fi
 }
 
-kcp_get_latest_version() {
-    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
+sp_get_latest_version() {
+    curl -sL "https://github.com/${sp_name}-dev/${sp_name}/releases/latest" | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 kubeconfig_valid() {
@@ -148,26 +147,24 @@ get_arch_type() {
 }
 
 get_full_path() {
-    # echo "check folder '$1'"
     echo "$(cd "$1"; pwd)"
 }
 
 ensure_folder() {
-    # echo "ensure folder '$1'"
     if [ -d "$1" ]; then :
     else
         mkdir -p "$1"
     fi
 }
 
-KCP_REQUIRED_VERSION="v0.11.0"
-kcp_version=""
+export sp_name="kcp"
+sp_version="v0.11.0"
 kubestellar_version=""
 deploy="true"
 os_type=""
 arch_type=""
 folder=""
-kcp_address=""
+sp_address=""
 kubestellar_imw="imw1"
 kubestellar_wmw="wmw1"
 verbose="false"
@@ -181,11 +178,6 @@ echo "< KubeStellar bootstrap started >----------------"
 
 while (( $# > 0 )); do
     case "$1" in
-    (--kcp-version)
-        if (( $# > 1 ));
-        then { kcp_version="$2"; shift; }
-        else { echo "$0: missing release version" >&2; exit 1; }
-        fi;;
     (--kubestellar-version)
         if (( $# > 1 ));
         then { kubestellar_version="$2"; shift; }
@@ -208,7 +200,7 @@ while (( $# > 0 )); do
         fi;;
     (--bind-address)
         if (( $# > 1 ));
-        then { kcp_address="$2"; shift; }
+        then { sp_address="$2"; shift; }
         else { echo "$0: missing ip address" >&2; exit 1; }
         fi;;
     (--ensure-imw)
@@ -247,7 +239,7 @@ while (( $# > 0 )); do
 	set -x
 	flagx="-X";;
     (-h|--help)
-        echo "Usage: $0 [--kcp-version release_version] [--kubestellar-version release_version] [--deploy bool] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--host-ns namespace-in-hosting-cluster] [-V|--verbose] [-X]"
+        echo "Usage: $0 [--kubestellar-version release_version] [--deploy bool] [--os linux|darwin] [--arch amd64|arm64] [--ensure-folder installation_folder] [--ensure-imw imw-list] [--ensure-wmw wmw-list] [--host-ns namespace-in-hosting-cluster] [-V|--verbose] [-X]"
         exit 0;;
     (-*)
         echo "$0: unknown flag" >&2
@@ -258,10 +250,6 @@ while (( $# > 0 )); do
     esac
     shift
 done
-
-if [ "$kcp_version" == "" ]; then
-    kcp_version=$KCP_REQUIRED_VERSION
-fi
 
 if [ "$kubestellar_version" == "" ] || [ "$kubestellar_version" == latest ]; then
     kubestellar_version=$(kubestellar_get_latest_version)
@@ -316,77 +304,77 @@ if [ "$openshift" == true ]; then
     deploy_flags[${#deploy_flags[*]}]=true
 fi
 
-# Ensure kcp is installed
-echo "< Ensure kcp is installed >----------------------"
-if [ "$(kcp_installed)" == "true" ]; then
-    echo "kcp found in the PATH at '$(which kcp)' ... skip installation."
+# Ensure space provider is installed
+echo "< Ensure that the space provider is installed >----------------------"
+if [ "$(sp_installed)" == "true" ]; then
+    echo "Space provider found in the PATH at \"$(which ${sp_name})\" ... skip installation."
 else
-    echo "kcp not found in the PATH."
-    if [ "$(kcp_running)" == "true" ]; then
-        echo "kcp process is running already: pid=$(pgrep kcp) ... add kcp folder to the PATH or stop kcp ... exiting."
+    echo "Space provider not found in the PATH."
+    if [ "$(sp_running)" == "true" ]; then
+        echo "Space provider process is running already: pid=$(pgrep ${sp_name}) ... add the space provider folder to the PATH or stop the space provider ... exiting."
         exit 2
     fi
-    ensure_folder "$folder/kcp"
-    kcp_folder=$(get_full_path "$folder/kcp")
-    kcp_bin_folder="$kcp_folder/bin"
-    echo "Downloading kcp+plugins $kcp_version $os_type/$arch_type..."
-    kcp_download
-    echo "Installing kcp+plugins into '$kcp_folder'..."
-    kcp_install
-    rm kcp.tar.gz kcp-plugins.tar.gz
-    if [[ ! ":$PATH:" == *":$kcp_bin_folder:"* ]]; then
-        export PATH=$kcp_bin_folder:$PATH
-        echo "Add kcp folder to the PATH: export PATH=\"$kcp_bin_folder:\$PATH\""
-        user_exports="$user_exports"$'\n'"export PATH=\"$kcp_bin_folder:\$PATH\""
+    ensure_folder "$folder/${sp_name}"
+    sp_folder=$(get_full_path "$folder/${sp_name}")
+    sp_bin_folder="$sp_folder/bin"
+    echo "Downloading the space provider and plugins $sp_version $os_type/$arch_type..."
+    sp_download
+    echo "Installing the space provider and plugins into '$sp_folder'..."
+    sp_install
+    rm "${sp_name}.tar.gz" "${sp_name}-plugins.tar.gz"
+    if [[ ! ":$PATH:" == *":$sp_bin_folder:"* ]]; then
+        export PATH=$sp_bin_folder:$PATH
+        echo "Add the space provider folder to the PATH: export PATH=\"$sp_bin_folder:\$PATH\""
+        user_exports="$user_exports"$'\n'"export PATH=\"$sp_bin_folder:\$PATH\""
     fi
 fi
 
 if [ "$deploy" == true ] && [ "$deploy_style" == bare ]; then
-    # Ensure kcp is running
-    echo "< Ensure kcp is running >-----------------------"
-    if [ "$(kcp_running)" == "true" ]; then
-	echo "kcp process is running already: pid=$(pgrep kcp) ... skip running."
+    # Ensure the space provider is running
+    echo "< Ensure that the space provider is running >-----------------------"
+    if [ "$(sp_running)" == "true" ]; then
+	echo "The space provider process is running already: pid=$(pgrep ${sp_name}) ... skip running."
 	if [ "$(kubeconfig_valid)" == "false" ]; then
             echo "KUBECONFIG environment variable is not set correctly: KUBECONFIG='$KUBECONFIG' ... exiting!"
             exit 3
 	fi
 	echo "Using 'KUBECONFIG=$KUBECONFIG'"
-	echo "Waiting for kcp to be ready... it may take a while"
-	until $(kcp_ready)
+	echo "Waiting for the space provider to be ready... it may take a while"
+	until $(sp_ready)
 	do
             sleep 1
 	done
-	found_kcp_version="$(kcp_version)"
-	if [ "$found_kcp_version" != "$kcp_version" ]; then
-            echo "kcp running version ${found_kcp_version@Q} does not match the desired version $kcp_version ... exiting!"
+	found_sp_version="$(sp_version)"
+	if [ "$found_sp_version" != "$sp_version" ]; then
+            echo "Space provider running version ${found_sp_version@Q} does not match the desired version $sp_version ... exiting!"
 	    echo "FYI: \`kubectl version --short\` reports: $(kubectl version --short)"
             exit 4
 	else
-            echo "kcp version $(kcp_version) ... ok"
+            echo "Space provider version $(sp_version) ... ok"
 	fi
     else
-	if [ "$kcp_address" == "" ]; then
-            echo "Running kcp... logfile=$PWD/kcp_log.txt"
-            kcp start >& kcp_log.txt &
+	if [ "$sp_address" == "" ]; then
+            echo "Running the space provider... logfile=$PWD/${sp_name}_log.txt"
+            ${sp_name} start >& "${sp_name}_log.txt" &
 	else
-            echo "Running kcp bound to address $kcp_address... logfile=$PWD/kcp_log.txt"
-            kcp start --bind-address $kcp_address >& kcp_log.txt &
+            echo "Running the space provider bound to address $sp_address... logfile=$PWD/${sp_name}_log.txt"
+            ${sp_name} start --bind-address $sp_address >& "${sp_name}_log.txt" &
 	fi
-	export KUBECONFIG="$PWD/.kcp/admin.kubeconfig"
-	echo "Waiting for kcp to be ready... it may take a while"
+	export KUBECONFIG="$PWD/.${sp_name}/admin.kubeconfig"
+	echo "Waiting for the space provider to be ready... it may take a while"
 	sleep 10
-	until $(kcp_ready)
+	until $(sp_ready)
 	do
             sleep 1
 	done
 	sleep 10
-	found_kcp_version="$(kcp_version)"
-	if [ "$found_kcp_version" != "$KCP_REQUIRED_VERSION" ]; then
-            echo "kcp version ${found_kcp_version@Q} is not supported, KubeStellar requires kcp $KCP_REQUIRED_VERSION ... exiting!"
+	found_sp_version="$(sp_version)"
+	if [ "$found_sp_version" != "$sp_version" ]; then
+            echo "Space provider version ${found_sp_version@Q} is not supported, KubeStellar requires ${sp_name} $sp_version ... exiting!"
 	    echo "FYI: \`kubectl version --short\` reports: $(kubectl version --short)"
             exit 4
 	else
-            echo "kcp version $(kcp_version) ... ok"
+            echo "Space provider version $(sp_version) ... ok"
 	fi
 	echo "Export KUBECONFIG environment variable: export KUBECONFIG=\"$KUBECONFIG\""
 	user_exports="$user_exports"$'\n'"export KUBECONFIG=\"$KUBECONFIG\""
@@ -442,7 +430,7 @@ elif [ "$deploy_style" == bare ]; then
 	fi
     fi
 else
-    echo "< Deploy kcp and KubeStellar into Kubernetes, namespace=$host_ns >---------------"
+    echo "< Deploy KubeStellar into Kubernetes, namespace=$host_ns >---------------"
     kubectl get ns $host_ns || kubectl create ns $host_ns
     kubectl kubestellar deploy "${deploy_flags[@]}" -n $host_ns
     echo "< Waiting for startup and fetching $folder/kubestellar.kubeconfig >---------------"

@@ -16,22 +16,23 @@
 
 # Usage: $0
 
-# This script installs KCP binaries and plugins to a folder of choice
+# This script installs space provider binaries and plugins to a folder of choice
 #
 # Arguments:
-# [--version release] set a specific KCP release version, default: latest
+# [--version release] set a specific space provider release version, default: latest
 # [--os linux|darwin] set a specific OS type, default: autodetect
 # [--arch amd64|arm64] set a specific architecture type, default: autodetect
-# [--ensure-folder name] sets the installation folder, default: $PWD/KCP
+# [--ensure-folder name] sets the installation folder.
 # [--strip-bin] remove the bin sub-folder
 # [-V|--verbose] verbose output
 # [-X] `set -x`
 
 set -e
 
-kcp_version=""
-kcp_os=""
-kcp_arch=""
+sp_name="kcp"
+sp_version=""
+sp_os=""
+sp_arch=""
 folder=""
 strip_bin="false"
 verbose="false"
@@ -54,7 +55,7 @@ get_arch_type() {
 }
 
 get_latest_version() {
-    curl -sL https://github.com/kcp-dev/kcp/releases/latest | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
+    curl -sL "https://github.com/${sp_name}-dev/${sp_name}/releases/latest" | grep "</h1>" | tail -n 1 | sed -e 's/<[^>]*>//g' | xargs
 }
 
 get_full_path() {
@@ -65,17 +66,17 @@ while (( $# > 0 )); do
     case "$1" in
     (--version)
         if (( $# > 1 ));
-        then { kcp_version="$2"; shift; }
+        then { sp_version="$2"; shift; }
         else { echo "$0: missing release version" >&2; exit 1; }
         fi;;
     (--os)
         if (( $# > 1 ));
-        then { kcp_os="$2"; shift; }
+        then { sp_os="$2"; shift; }
         else { echo "$0: missing OS type" >&2; exit 1; }
         fi;;
     (--arch)
         if (( $# > 1 ));
-        then { kcp_arch="$2"; shift; }
+        then { sp_arch="$2"; shift; }
         else { echo "$0: missing architecture type" >&2; exit 1; }
         fi;;
     (--ensure-folder)
@@ -102,20 +103,20 @@ while (( $# > 0 )); do
     shift
 done
 
-if [ "$kcp_version" == "" ]; then
-    kcp_version=$(get_latest_version)
+if [ "$sp_version" == "" ]; then
+    sp_version=$(get_latest_version)
 fi
 
-if [ "$kcp_os" == "" ]; then
-    kcp_os=$(get_os_type)
+if [ "$sp_os" == "" ]; then
+    sp_os=$(get_os_type)
 fi
 
-if [ "$kcp_arch" == "" ]; then
-    kcp_arch=$(get_arch_type)
+if [ "$sp_arch" == "" ]; then
+    sp_arch=$(get_arch_type)
 fi
 
 if [ "$folder" == "" ]; then
-    folder="$PWD/kcp"
+    folder="$PWD/${sp_name}"
 fi
 
 if [ -d "$folder" ]; then :
@@ -127,13 +128,13 @@ else
 fi
 
 if [ $verbose == "true" ]; then
-    echo "Downloading KCP $kcp_version $kcp_os/$kcp_arch..."
-    curl -SL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
-    echo "Downloading KCP plugins $kcp_version $kcp_os/$kcp_arch..."
-    curl -SL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
+    echo "Downloading ${sp_name} $sp_version $sp_os/$sp_arch..."
+    curl -SL -o "${sp_name}.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/${sp_name}_${sp_version//v}_${sp_os}_${sp_arch}.tar.gz"
+    echo "Downloading ${sp_name} plugins $sp_version $sp_os/$sp_arch..."
+    curl -SL -o "${sp_name}-plugins.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/kubectl-${sp_name}-plugin_${sp_version//v}_${sp_os}_${sp_arch}.tar.gz"
 else
-    curl -sSL -o kcp.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kcp_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
-    curl -sSL -o kcp-plugins.tar.gz "https://github.com/kcp-dev/kcp/releases/download/${kcp_version}/kubectl-kcp-plugin_${kcp_version//v}_${kcp_os}_${kcp_arch}.tar.gz"
+    curl -sSL -o "${sp_name}.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/${sp_name}_${sp_version//v}_${sp_os}_${sp_arch}.tar.gz"
+    curl -sSL -o "${sp_name}-plugins.tar.gz" "https://github.com/${sp_name}-dev/${sp_name}/releases/download/${sp_version}/kubectl-${sp_name}-plugin_${sp_version//v}_${sp_os}_${sp_arch}.tar.gz"
 fi
 
 if [ $verbose == "true" ]; then
@@ -141,12 +142,12 @@ if [ $verbose == "true" ]; then
 fi
 
 if [ $strip_bin == "true" ]; then
-    tar -C $folder -zxf kcp-plugins.tar.gz --wildcards --strip-components=1 bin/*
-    tar -C $folder -zxf kcp.tar.gz --wildcards --strip-components=1 bin/*
+    tar -C $folder -zxf "${sp_name}-plugins.tar.gz" --wildcards --strip-components=1 bin/*
+    tar -C $folder -zxf "${sp_name}.tar.gz" --wildcards --strip-components=1 bin/*
     bin_folder=$(get_full_path "$folder")
 else
-    tar -C $folder -zxf kcp-plugins.tar.gz
-    tar -C $folder -zxf kcp.tar.gz
+    tar -C $folder -zxf "${sp_name}-plugins.tar.gz"
+    tar -C $folder -zxf "${sp_name}.tar.gz"
     bin_folder=$(get_full_path "$folder/bin")
 fi
 
@@ -154,8 +155,8 @@ if [ $verbose == "true" ]; then
     echo "Removing downloaded archives..."
 fi
 
-rm kcp.tar.gz
-rm kcp-plugins.tar.gz
+rm "${sp_name}.tar.gz"
+rm "${sp_name}-plugins.tar.gz"
 
 if [[ ! ":$PATH:" == *":$bin_folder:"* ]]; then
     echo "Add KCP folder to the path: export PATH="\$PATH:$bin_folder""
