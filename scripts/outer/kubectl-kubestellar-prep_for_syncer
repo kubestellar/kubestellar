@@ -114,69 +114,44 @@ imw_space_config="${PWD}/temp-space-config/spaceprovider-default-${imw}"
 kubectl-kubestellar-get-config-for-space --space-name ${imw} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $imw_space_config
 mbwsname=$(KUBECONFIG=$imw_space_config kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io "$stname" -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}-mb-{.metadata.uid}")
 
-original_ws=$(kubectl ws "${kubectl_flags[@]}" . --short)
-
-if [ "$imw" == "." ]
-then imw="$original_ws"
-elif ! [[ "$imw" =~ [a-z0-9].* ]]; then
+if ! [[ "$imw" =~ [a-z0-9].* ]]; then
     echo "$0: imw ${espw@Q} is not valid" >&2
     exit 1
 fi
 
-if [ "$espw" == "." ]
-then espw="$original_ws"
-elif ! [[ "$espw" =~ [a-z0-9].* ]]; then
+lif ! [[ "$espw" =~ [a-z0-9].* ]]; then
     echo "$0: espw ${espw@Q} is not valid" >&2
     exit 1
 fi
 
-if [ "$silent" == "true" ]; then
-    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws" > /dev/null' EXIT
-else
-    trap 'kubectl ws "${kubectl_flags[@]}" "$original_ws"' EXIT
-fi
+espw_space_config="${PWD}/temp-space-config/spaceprovider-default-${espw}"
+kubectl-kubestellar-get-config-for-space --space-name ${espw} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $espw_space_config
 
-if [ "$silent" == "true" ]; then
-    kubectl ws "${kubectl_flags[@]}" "${rootws}:${imw}" > /dev/null
-else
-    kubectl ws "${kubectl_flags[@]}" "${rootws}:${imw}"
-fi
-kubectl ws "${kubectl_flags[@]}" "${rootws}:${imw}"
-
-kubectl ws "${kubectl_flags[@]}" "${rootws}:${espw}"
-if ! cluster_ns_name="$(kubectl "${kubectl_flags[@]}" -n kubestellar get configmap kbmap-"$imw" -ojsonpath="{.metadata.labels['kubestellar\.io\/kube-bind-id']}")"; then
+if ! cluster_ns_name="$(KUBECONFIG=$espw_space_config kubectl "${kubectl_flags[@]}" -n kubestellar get configmap kbmap-"$imw" -ojsonpath="{.metadata.labels['kubestellar\.io\/kube-bind-id']}")"; then
 	echo "error reading kube-bind cluster namespace from ConfigMap kbmap-$imw" >&2
 	exit 1
 fi
+
 prefixed_stname="$cluster_ns_name"-"$stname"
-stUID=$(kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io $prefixed_stname -o jsonpath="{.metadata.uid}")
+stUID=$(KUBECONFIG=$espw_space_config kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io $prefixed_stname -o jsonpath="{.metadata.uid}")
 mbwsname="$imw"-mb-"$stUID"
 
-espw_space_config="${PWD}/temp-space-config/spaceprovider-default-${espw}"
-kubectl-kubestellar-get-config-for-space --space-name ${espw} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $espw_space_config
 if ! KUBECONFIG=$espw_space_config kubectl "${kubectl_flags[@]}" get APIExport edge.kubestellar.io &> /dev/null ; then
     echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
     exit 2
 fi
 
-# TODO: mailbox does not support spaces yet
-if [ "$silent" == "true" ]; then
-    kubectl ws "${kubectl_flags[@]}" "$rootws" > /dev/null
-else
-    kubectl ws "${kubectl_flags[@]}" "$rootws"
-fi
-
-if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+if ! KUBECONFIG=$SM_CONFIG kubectl get space -n spaceprovider-default "$mbwsname" &> /dev/null; then
 	echo "maybe the mailbox controller is slow, give it a chance"
     sleep 15
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+if ! KUBECONFIG=$SM_CONFIG kubectl get space -n spaceprovider-default "$mbwsname" &> /dev/null; then
 	echo "maybe the mailbox controller is slow, give it another chance"
     sleep 15
 fi
 
-if ! kubectl "${kubectl_flags[@]}" get Workspace "$mbwsname" &> /dev/null; then
+if ! KUBECONFIG=$SM_CONFIG kubectl get space -n spaceprovider-default "$mbwsname" &> /dev/null; then
     echo "$0: did not find the mailbox workspace $mbwsname; is the mailbox controller running?" >&2
     exit 5
 fi
@@ -184,15 +159,19 @@ fi
 echo "now that workspace _exists_, but is it _ready_?"
 sleep 5
 
-if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+TESTMB_CMD="KUBECONFIG=$SM_CONFIG kubectl get space -n spaceprovider-default "$mbwsname" -o=jsonpath='{.status.Phase}'"
+
+
+if  phase=$(TESTMB_CMD); [ "$phase" != "READY" ]; then
     echo "tried once to switch to $mbwsname"
     sleep 15
-    if ! kubectl ws "${kubectl_flags[@]}" "$mbwsname" &> /dev/null; then
+    if phase=$(TESTMB_CMD); [ "$phase" != "READY" ]; then
         echo "tried twice to switch to $mbwsname"
         sleep 15
-        kubectl ws "${kubectl_flags[@]}" "$mbwsname"
     fi
 fi
 
-echo "current workspace is now $(kubectl ws "${kubectl_flags[@]}" . --short)"
-"$bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
+mbwsname_space_config="${PWD}/temp-space-config/spaceprovider-default-${mbwsname}"
+kubectl-kubestellar-get-config-for-space --space-name ${mbwsname} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
+
+#"KUBECONFIG=$mbwsname_space_config $bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
