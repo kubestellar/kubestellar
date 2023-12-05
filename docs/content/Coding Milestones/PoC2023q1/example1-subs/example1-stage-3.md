@@ -25,8 +25,8 @@ The following commands wait for the placement translator to get its
 job done for this example.
 
 ```shell
-$FLORIN_MB_CONFIG="${PWD}/temp-space-config/${FLORIN_SPACE}"
-$GUILDER_MB_CONFIG="${PWD}/temp-space-config/${GUILDER_SPACE}"
+FLORIN_MB_CONFIG="${PWD}/temp-space-config/${FLORIN_SPACE}"
+GUILDER_MB_CONFIG="${PWD}/temp-space-config/${GUILDER_SPACE}"
 kubectl-kubestellar-get-config-for-space --space-name $FLOWIN_SPACE --provider-name default --sm-core-config $SM_CONFIG --output $FLORIN_MB_CONFIG
 kubectl-kubestellar-get-config-for-space --space-name $GUILDER_SPACE --provider-name default --sm-core-config $SM_CONFIG --output $GUILDER_MB_CONFIG
 
