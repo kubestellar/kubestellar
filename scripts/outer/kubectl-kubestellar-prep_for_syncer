@@ -119,7 +119,7 @@ if ! [[ "$imw" =~ [a-z0-9].* ]]; then
     exit 1
 fi
 
-lif ! [[ "$espw" =~ [a-z0-9].* ]]; then
+if ! [[ "$espw" =~ [a-z0-9].* ]]; then
     echo "$0: espw ${espw@Q} is not valid" >&2
     exit 1
 fi
@@ -174,4 +174,4 @@ fi
 mbwsname_space_config="${PWD}/temp-space-config/spaceprovider-default-${mbwsname}"
 kubectl-kubestellar-get-config-for-space --space-name ${mbwsname} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
 
-#"KUBECONFIG=$mbwsname_space_config $bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
+"KUBECONFIG=$mbwsname_space_config $bindir/kubectl-kubestellar-syncer_gen" "$prefixed_stname" --syncer-image "$syncer_image" -o "$output"
