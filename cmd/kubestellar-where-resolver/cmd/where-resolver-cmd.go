@@ -25,6 +25,8 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/component-base/featuregate"
+	"k8s.io/component-base/logs"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
@@ -43,7 +45,14 @@ func NewResolverCommand() *cobra.Command {
 		Use:   "where-resolver",
 		Short: "Maintains SinglePlacementSlice API objects for EdgePlacements",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := options.Logs.ValidateAndApply(utilfeature.DefaultFeatureGate); err != nil {
+			featureGate := utilfeature.DefaultMutableFeatureGate
+			if err := featureGate.Add(map[featuregate.Feature]featuregate.FeatureSpec{
+				logs.ContextualLogging: {Default: true, PreRelease: featuregate.Alpha},
+			}); err != nil {
+				return err
+			}
+
+			if err := options.Logs.ValidateAndApply(featureGate); err != nil {
 				return err
 			}
 			if err := options.Complete(); err != nil {
