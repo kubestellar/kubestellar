@@ -229,10 +229,8 @@ function run_init() {
 function run_mailbox_controller() {
     echo "--< Starting mailbox-controller >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
+    KUBECONFIG=$SM_CONFIG
     if ! mailbox-controller -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
@@ -242,10 +240,8 @@ function run_mailbox_controller() {
 function run_where_resolver() {
     echo "--< Starting where-resolver >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
+    KUBECONFIG=$SM_CONFIG
     if ! kubestellar-where-resolver -v ${VERBOSITY} ; then
         echoerr "unable to start kubestellar-where-resolver!"
         exit 1
@@ -255,10 +251,8 @@ function run_where_resolver() {
 function run_placement_translator() {
     echo "--< Starting placement-translator >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
+    KUBECONFIG=$SM_CONFIG
     if ! placement-translator --allclusters-context  "system:admin" -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
