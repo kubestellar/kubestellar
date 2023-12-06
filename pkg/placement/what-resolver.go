@@ -560,6 +560,9 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 		bindingInformer := kcpInformerFactory.Apis().V1alpha1().APIBindings().Informer()
 
 		wsCtx, stopWS := context.WithCancel(wr.ctx)
+		doneCh := wsCtx.Done()
+		apiextFactory.Start(doneCh)
+		kcpInformerFactory.Start(doneCh)
 
 		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, spaceID, discoveryScopedClient, false,
 			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
@@ -577,9 +580,9 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 		wr.workspaceDetails[spaceID] = wsDetails
 		apiInformer.AddEventHandler(WhatResolverScopedHandler{wr, mkgk(ksmetav1a1.SchemeGroupVersion.Group, "APIResource"), spaceID})
 		logger.V(2).Info("Started watching space")
-		go apiInformer.Run(wsCtx.Done())
-		dynamicInformerFactory.Start(wsCtx.Done())
-		if !upstreamcache.WaitForCacheSync(wsCtx.Done(), apiInformer.HasSynced) {
+		go apiInformer.Run(doneCh)
+		dynamicInformerFactory.Start(doneCh)
+		if !upstreamcache.WaitForCacheSync(doneCh, apiInformer.HasSynced) {
 			logger.Error(nil, "Failed to sync API informer in time")
 			return true
 		}
