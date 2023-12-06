@@ -136,7 +136,7 @@ prefixed_stname="$cluster_ns_name"-"$stname"
 stUID=$(KUBECONFIG=$espw_space_config kubectl "${kubectl_flags[@]}" get synctargets.edge.kubestellar.io $prefixed_stname -o jsonpath="{.metadata.uid}")
 mbwsname="$imw"-mb-"$stUID"
 
-if ! KUBECONFIG=$espw_space_config kubectl "${kubectl_flags[@]}" get APIExport edge.kubestellar.io &> /dev/null ; then
+if [ $(KUBECONFIG=$espw_space_config kubectl get crd -l kube-bind.io/exported=true -oname 2>/dev/null | wc -l) -eq 0 ]; then
     echo "$0: it looks like ${espw@Q} is not the edge service provider workspace" >&2
     exit 2
 fi
