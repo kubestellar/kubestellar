@@ -86,12 +86,12 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	singles := []edgev2alpha1.SinglePlacement{}
 	for _, loc := range locsFilteredByEp {
 		// 2)
-		stsInLws, err := c.synctargetLister.List(labels.Everything())
+		allSts, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "Failed to list SyncTargets in local cache")
 			return err
 		}
-		stsSelecting, err := filterStsByLoc(stsInLws, loc)
+		stsSelecting, err := filterStsByLoc(allSts, loc)
 		if err != nil {
 			logger.Error(err, "failed to find SyncTargets for Location", "location", loc.Name)
 			return err
