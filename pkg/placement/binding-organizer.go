@@ -22,8 +22,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -38,7 +36,7 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 			resourceModes:     resourceModes,
 			eventHandler:      eventHandler,
 			workloadProjector: workloadProjector,
-			perSourceCluster:  NewMapMap[logicalcluster.Name, *simpleBindingPerCluster](nil),
+			perSourceCluster:  NewMapMap[string, *simpleBindingPerCluster](nil),
 		}
 		namespacedModesReceiver := MappingReceiverFuncs[ProjectionModeKey, ProjectionModeVal]{
 			OnPut: func(mk ProjectionModeKey, val ProjectionModeVal) {
@@ -52,10 +50,10 @@ func SimpleBindingOrganizer(logger klog.Logger) BindingOrganizer {
 		}
 
 		sbo.resourceDiscoveryReceiver = NewMappingReceiverFuncs(
-			func(key Pair[logicalcluster.Name, metav1.GroupResource], val ProjectionModeVal) {
+			func(key Pair[string, metav1.GroupResource], val ProjectionModeVal) {
 				// TODO: implement version agreement
 			},
-			func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+			func(key Pair[string, metav1.GroupResource]) {
 				// TODO: implement version agreement
 			})
 
@@ -262,7 +260,7 @@ type simpleBindingOrganizer struct {
 
 	sync.Mutex
 
-	perSourceCluster MutableMap[logicalcluster.Name, *simpleBindingPerCluster]
+	perSourceCluster MutableMap[string, *simpleBindingPerCluster]
 
 	workloadProjectionSections WorkloadProjectionSections // non-zero only during a transaction!
 
@@ -276,13 +274,13 @@ type simpleBindingOrganizer struct {
 	resourceDiscoveryReceiver MappingReceiver[ResourceDiscoveryKey, ProjectionModeVal]
 }
 
-var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, logicalcluster.Name]{
-	First: func(whole NamespacedJoinKeyLessnS) Pair[ProjectionModeKey, logicalcluster.Name] {
-		return Pair[ProjectionModeKey, logicalcluster.Name]{
+var factorNamespacedJoinKeyLessNS = Factorer[NamespacedJoinKeyLessnS, ProjectionModeKey, string]{
+	First: func(whole NamespacedJoinKeyLessnS) Pair[ProjectionModeKey, string] {
+		return Pair[ProjectionModeKey, string]{
 			First:  ProjectionModeKey{whole.Second, whole.Third},
 			Second: whole.First}
 	},
-	Second: func(parts Pair[ProjectionModeKey, logicalcluster.Name]) NamespacedJoinKeyLessnS {
+	Second: func(parts Pair[ProjectionModeKey, string]) NamespacedJoinKeyLessnS {
 		return NamespacedJoinKeyLessnS{
 			First:  parts.Second,
 			Second: parts.First.GroupResource,
@@ -348,7 +346,7 @@ var factorClusterWhatWhereFullKey = Factorer[ClusterWhatWhereFullKey, NonNamespa
 	},
 }
 
-type ResourceDiscoveryKey = Pair[logicalcluster.Name /*wmw*/, metav1.GroupResource]
+type ResourceDiscoveryKey = Pair[string /*wmw*/, metav1.GroupResource]
 
 type NamespacedWhatWhereFullKey = Triple[ExternalName, WorkloadPartID, SinglePlacement]
 
@@ -423,7 +421,7 @@ func (sxo sboXnOps) Delete(tup Triple[ExternalName, WorkloadPartID, SinglePlacem
 	}
 }
 
-func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name, want bool) *simpleBindingPerCluster {
+func (sbo *simpleBindingOrganizer) getSourceCluster(cluster string, want bool) *simpleBindingPerCluster {
 	sbc, have := sbo.perSourceCluster.Get(cluster)
 	if want && !have {
 		sbc = &simpleBindingPerCluster{
@@ -441,7 +439,7 @@ func (sbo *simpleBindingOrganizer) getSourceCluster(cluster logicalcluster.Name,
 
 type simpleBindingPerCluster struct {
 	*simpleBindingOrganizer
-	cluster          logicalcluster.Name
+	cluster          string
 	groupReceiver    MappingReceiverHolder[string /*group name*/, APIGroupInfo]
 	resourceReceiver MappingReceiverHolder[metav1.GroupResource, ResourceDetails]
 }

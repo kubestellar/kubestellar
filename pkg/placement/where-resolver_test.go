@@ -26,8 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	fakeupkube "k8s.io/client-go/kubernetes/fake"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	fakeedge "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
@@ -41,15 +39,14 @@ func TestWhereResolver(t *testing.T) {
 		ctx, cancel = context.WithDeadline(ctx, deadline)
 		t.Cleanup(cancel)
 	}
-	is1N := logicalcluster.Name("is1clusterid")
-	wds1N := logicalcluster.Name("wds1clusterid")
+	is1N := "is1clusterid"
+	wds1N := "wds1clusterid"
 	// wantedLabels := map[string]string{"foo":"bar"}
-	sp1 := SinglePlacement{Cluster: is1N.String(), LocationName: "l1", SyncTargetName: "s1", SyncTargetUID: "s1uid"}
+	sp1 := SinglePlacement{Cluster: is1N, LocationName: "l1", SyncTargetName: "s1", SyncTargetUID: "s1uid"}
 	sps1 := &edgeapi.SinglePlacementSlice{
 		TypeMeta: metav1.TypeMeta{Kind: "SinglePlacementSlice", APIVersion: edgeapi.SchemeGroupVersion.String()},
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{logicalcluster.AnnotationKey: wds1N.String()},
-			Name:        "ep1",
+			Name: "ep1",
 		},
 		Destinations: []edgeapi.SinglePlacement{sp1},
 	}
