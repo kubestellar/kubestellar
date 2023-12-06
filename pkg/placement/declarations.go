@@ -26,8 +26,6 @@ import (
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -101,7 +99,7 @@ type WorkloadProjectionSections struct {
 
 type SinglePlacement = edgeapi.SinglePlacement
 
-type ExternalNamespacedName = Triple[logicalcluster.Name, NamespaceName, ObjectName]
+type ExternalNamespacedName = Triple[string, NamespaceName, ObjectName]
 
 type NamespacedDistributionTuple = Pair[ProjectionModeKey, ExternalNamespacedName /*of downsynced object*/]
 
@@ -314,13 +312,13 @@ type APIMapProvider interface {
 	//AddClient(cluster logicalcluster.Name, client Client[ScopedAPIProvider])
 
 	// Neither receiver is invoked synchronously.
-	AddReceivers(cluster logicalcluster.Name,
+	AddReceivers(cluster string,
 		groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 		resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails])
 
 	// The receiver values have to be comparable.
 	// Neither receiver is invoked synchronously.
-	RemoveReceivers(cluster logicalcluster.Name,
+	RemoveReceivers(cluster string,
 		groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 		resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails])
 
@@ -422,10 +420,10 @@ func (rscMode ResourceMode) GoesToEdge() bool {
 }
 
 func SPMailboxWorkspaceName(sp SinglePlacement) string {
-	return sp.Cluster + WSNameSep + string(sp.SyncTargetUID)
+	return sp.Cluster + MBspaceNameSep + string(sp.SyncTargetUID)
 }
 
-const WSNameSep = "-mb-"
+const MBspaceNameSep = "-mb-"
 
 // EventHandler can be given Event objects.
 type EventHandler interface {
@@ -449,6 +447,6 @@ type NamespaceName string
 
 type NamespaceAndDestination = Pair[NamespaceName, SinglePlacement]
 
-type SourceAndDestination = Pair[logicalcluster.Name, SinglePlacement]
+type SourceAndDestination = Pair[string, SinglePlacement]
 
-type NamespacedJoinKeyLessnS = Triple[logicalcluster.Name, metav1.GroupResource, SinglePlacement]
+type NamespacedJoinKeyLessnS = Triple[string, metav1.GroupResource, SinglePlacement]

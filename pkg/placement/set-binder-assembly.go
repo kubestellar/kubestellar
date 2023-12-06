@@ -21,8 +21,6 @@ import (
 
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -40,7 +38,7 @@ type setBinder struct {
 	downsyncPartsDifferencerConstructor DownsyncsDifferencerConstructor
 	upsyncsDifferenceConstructor        UpsyncsDifferenceConstructor
 	resolvedWhereDifferencerConstructor ResolvedWhereDifferencerConstructor
-	perCluster                          map[logicalcluster.Name]*setBindingForCluster
+	perCluster                          map[string]*setBindingForCluster
 	singleBinder                        SingleBinder
 	downsyncJoinLeftInput               MappingReceiver[Pair[ExternalName, WorkloadPartID], WorkloadPartDetails]
 	bothJoinRightInput                  SetWriter[Pair[ExternalName, SinglePlacement]]
@@ -51,7 +49,7 @@ type setBinder struct {
 
 type setBindingForCluster struct {
 	*setBinder
-	cluster      logicalcluster.Name
+	cluster      string
 	perPlacement map[ObjectName]*setBindingForPlacement
 }
 
@@ -84,7 +82,7 @@ func NewSetBinder(
 			downsyncPartsDifferencerConstructor: downsyncPartsDifferencerConstructor,
 			upsyncsDifferenceConstructor:        upsyncsDifferenceConstructor,
 			resolvedWhereDifferencerConstructor: resolvedWhereDifferencerConstructor,
-			perCluster:                          map[logicalcluster.Name]*setBindingForCluster{},
+			perCluster:                          map[string]*setBindingForCluster{},
 			singleBinder:                        singleBinder,
 		}
 
@@ -193,7 +191,7 @@ func (sb sbAsResolvedWhereReceiver) Delete(epName ExternalName) {
 	})
 }
 
-func (sb *setBinder) getCluster(cluster logicalcluster.Name, want bool) *setBindingForCluster {
+func (sb *setBinder) getCluster(cluster string, want bool) *setBindingForCluster {
 	sbc := sb.perCluster[cluster]
 	if sbc == nil && want {
 		sbc = &setBindingForCluster{

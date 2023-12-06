@@ -25,8 +25,6 @@ import (
 	machtypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/uuid"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -182,8 +180,8 @@ func (generator) String() string {
 	return builder.String()
 }
 
-func (gen generator) ClusterName() logicalcluster.Name {
-	return logicalcluster.Name(gen.String())
+func (gen generator) ClusterName() string {
+	return gen.String()
 }
 
 func (gen generator) NamespaceName() NamespaceName {

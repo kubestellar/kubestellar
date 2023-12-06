@@ -21,38 +21,38 @@ import (
 	"fmt"
 	"sync"
 
-	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
+	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/informers/externalversions"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/discovery"
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
-	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
+	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
+	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
 
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	apiwatch "github.com/kubestellar/kubestellar/pkg/apiwatch"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 // NewAPIWatchMapProvider constructs an APIMapProvider that gets its information
 // from apiwatch.
 func NewAPIWatchMapProvider(ctx context.Context,
 	numThreads int,
-	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	crdClusterPreInformer apiextinformers.CustomResourceDefinitionClusterInformer,
-	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 ) APIWatchMapProvider {
 	awp := &apiWatchProvider{
-		context:                   ctx,
-		numThreads:                numThreads,
-		discoveryClusterClient:    discoveryClusterClient,
-		crdClusterPreInformer:     crdClusterPreInformer,
-		bindingClusterPreInformer: bindingClusterPreInformer,
-		queue:                     workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		perCluster:                NewMapMap[logicalcluster.Name, *apiWatchProviderPerCluster](nil),
+		context:         ctx,
+		numThreads:      numThreads,
+		queue:           workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		perCluster:      NewMapMap[string, *apiWatchProviderPerCluster](nil),
+		spaceclient:     spaceclient,
+		spaceProviderNs: spaceProviderNs,
 	}
 	return awp
 }
@@ -63,25 +63,24 @@ type APIWatchMapProvider interface {
 }
 
 type apiWatchProvider struct {
-	context                   context.Context
-	numThreads                int
-	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
-	crdClusterPreInformer     apiextinformers.CustomResourceDefinitionClusterInformer
-	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
-	queue                     workqueue.RateLimitingInterface
+	context    context.Context
+	numThreads int
+	queue      workqueue.RateLimitingInterface
 
 	sync.Mutex
 
-	perCluster MutableMap[logicalcluster.Name, *apiWatchProviderPerCluster]
+	perCluster      MutableMap[string, *apiWatchProviderPerCluster]
+	spaceclient     msclient.KubestellarSpaceInterface
+	spaceProviderNs string
 }
 
-func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
+func (awp *apiWatchProvider) AddReceivers(clusterName string,
 	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails],
 ) {
 	awp.Lock()
 	defer awp.Unlock()
-	wpc := MapGetAdd(awp.perCluster, clusterName, true, func(clusterName logicalcluster.Name) *apiWatchProviderPerCluster {
+	wpc := MapGetAdd(awp.perCluster, clusterName, true, func(clusterName string) *apiWatchProviderPerCluster {
 		ctx := context.Background()
 		logger := klog.FromContext(ctx).WithValues("part", "apiwatch-map-provider")
 		ctx = klog.NewContext(ctx, logger)
@@ -92,10 +91,31 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 			groupReceivers:    MappingReceiverHolderFork[string /*group name*/, APIGroupInfo]{},
 			resourceReceivers: MappingReceiverHolderFork[metav1.GroupResource, ResourceDetails]{},
 		}
-		discoveryScopedClient := awp.discoveryClusterClient.Cluster(clusterName.Path())
-		crdInformer := awp.crdClusterPreInformer.Cluster(clusterName).Informer()
-		bindingInformer := awp.bindingClusterPreInformer.Cluster(clusterName).Informer()
-		wpc.informer, wpc.lister, _ = apiwatch.NewAPIResourceInformer(ctx, clusterName.String(), discoveryScopedClient, false, crdInformer, bindingInformer)
+
+		config, err := awp.spaceclient.ConfigForSpace(clusterName, awp.spaceProviderNs)
+		if err != nil {
+			logger.Error(err, "Failed to get space config", "space", clusterName)
+		}
+		discoveryScopedClient, err := discovery.NewDiscoveryClientForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create discovery client", "space", clusterName)
+		}
+
+		apiextClient, err := apiextclient.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create clientset for CustomResourceDefinitions")
+		}
+		apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClient, 0)
+		crdInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions().Informer()
+
+		kcpClientset, err := kcpclientset.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
+		}
+		kcpInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(kcpClientset, 0)
+		bindingInformer := kcpInformerFactory.Apis().V1alpha1().APIBindings().Informer()
+
+		wpc.informer, wpc.lister, _ = apiwatch.NewAPIResourceInformer(ctx, clusterName, discoveryScopedClient, false, crdInformer, bindingInformer)
 		wpc.informer.AddEventHandler(wpc)
 		go wpc.informer.Run(ctx.Done())
 		return wpc
@@ -107,7 +127,7 @@ func (awp *apiWatchProvider) AddReceivers(clusterName logicalcluster.Name,
 	awp.queue.Add(receiverForCluster[metav1.GroupResource, ResourceDetails]{resourceReceiver, clusterName})
 }
 
-func (awp *apiWatchProvider) RemoveReceivers(clusterName logicalcluster.Name,
+func (awp *apiWatchProvider) RemoveReceivers(clusterName string,
 	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
 	awp.Lock()
@@ -123,7 +143,7 @@ func (awp *apiWatchProvider) RemoveReceivers(clusterName logicalcluster.Name,
 
 type apiWatchProviderPerCluster struct {
 	awp      *apiWatchProvider
-	cluster  logicalcluster.Name
+	cluster  string
 	informer upstreamcache.SharedInformer
 	lister   apiwatch.APIResourceLister
 
@@ -161,13 +181,13 @@ func (wpc *apiWatchProviderPerCluster) enqueueResourceRef(obj any, action string
 }
 
 type resourceRef struct {
-	cluster  logicalcluster.Name
+	cluster  string
 	metaname string
 }
 
 type receiverForCluster[Key comparable, Val any] struct {
 	receiver MappingReceiver[Key, Val]
-	cluster  logicalcluster.Name
+	cluster  string
 }
 
 // Run animates the controller, finishing and returning when the context of
@@ -263,14 +283,14 @@ func externalizeReceiver(receiver MappingReceiver[metav1.GroupResource, Resource
 	}
 }
 
-func (awp *apiWatchProvider) syncGroupReceiver(ctx context.Context, cluster logicalcluster.Name, receiver MappingReceiver[string /*group name*/, APIGroupInfo]) bool {
+func (awp *apiWatchProvider) syncGroupReceiver(ctx context.Context, cluster string, receiver MappingReceiver[string /*group name*/, APIGroupInfo]) bool {
 	// TODO: implement, once apiwatch supplies this information
 	logger := klog.FromContext(ctx)
 	logger.V(4).Info("syncGroupReceiver not implemented")
 	return false
 }
 
-func (awp *apiWatchProvider) syncResourceReceiver(ctx context.Context, cluster logicalcluster.Name, receiver MappingReceiver[metav1.GroupResource, ResourceDetails]) bool {
+func (awp *apiWatchProvider) syncResourceReceiver(ctx context.Context, cluster string, receiver MappingReceiver[metav1.GroupResource, ResourceDetails]) bool {
 	logger := klog.FromContext(ctx)
 	wpc := func() *apiWatchProviderPerCluster {
 		awp.Lock()

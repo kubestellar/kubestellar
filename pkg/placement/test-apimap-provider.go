@@ -22,14 +22,12 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
-
-	"github.com/kcp-dev/logicalcluster/v3"
 )
 
 func NewTestAPIMapProvider(logger klog.Logger) *TestAPIMapProvider {
 	tap := &TestAPIMapProvider{
 		logger:     logger,
-		perCluster: NewMapMap[logicalcluster.Name, *TestAPIPerCluster](nil),
+		perCluster: NewMapMap[string, *TestAPIPerCluster](nil),
 	}
 	logger.V(2).Info("NewTestAPIMapProvider", "tap", fmt.Sprintf("%p", tap))
 	return tap
@@ -44,7 +42,7 @@ func NewTestAPIMapProvider(logger klog.Logger) *TestAPIMapProvider {
 type TestAPIMapProvider struct {
 	logger klog.Logger
 	sync.Mutex
-	perCluster MutableMap[logicalcluster.Name, *TestAPIPerCluster]
+	perCluster MutableMap[string, *TestAPIPerCluster]
 }
 
 type TestAPIPerCluster struct {
@@ -56,7 +54,7 @@ type TestAPIPerCluster struct {
 
 var _ APIMapProvider = &TestAPIMapProvider{}
 
-func (tap *TestAPIMapProvider) AddReceivers(cluster logicalcluster.Name,
+func (tap *TestAPIMapProvider) AddReceivers(cluster string,
 	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
 	tap.Lock()
@@ -69,8 +67,8 @@ func (tap *TestAPIMapProvider) AddReceivers(cluster logicalcluster.Name,
 	tap.logger.V(2).Info("AddReceivers", "tap", fmt.Sprintf("%p", tap), "cluster", cluster, "tpc", fmt.Sprintf("%p", tpc))
 }
 
-func (tap *TestAPIMapProvider) ensureClusterLocked(cluster logicalcluster.Name) *TestAPIPerCluster {
-	return MapGetAdd(tap.perCluster, cluster, true, func(cluster logicalcluster.Name) *TestAPIPerCluster {
+func (tap *TestAPIMapProvider) ensureClusterLocked(cluster string) *TestAPIPerCluster {
+	return MapGetAdd(tap.perCluster, cluster, true, func(cluster string) *TestAPIPerCluster {
 		tpc := &TestAPIPerCluster{}
 		tpc.GroupInfo = NewMapMap(MappingReceiverDiscardsPrevious(MappingReceiverFunc(
 			func() MappingReceiver[string /*group name*/, APIGroupInfo] { return tpc.groupReceivers })))
@@ -80,7 +78,7 @@ func (tap *TestAPIMapProvider) ensureClusterLocked(cluster logicalcluster.Name) 
 	})
 }
 
-func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
+func (tap *TestAPIMapProvider) RemoveReceivers(cluster string,
 	groupReceiver *MappingReceiverHolder[string /*group name*/, APIGroupInfo],
 	resourceReceiver *MappingReceiverHolder[metav1.GroupResource, ResourceDetails]) {
 	tap.Lock()
@@ -93,16 +91,16 @@ func (tap *TestAPIMapProvider) RemoveReceivers(cluster logicalcluster.Name,
 	tpc.resourceReceivers = SliceRemoveFunctional(tpc.resourceReceivers, resourceReceiver)
 }
 
-func (tap *TestAPIMapProvider) AsResourceReceiver() MappingReceiver[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails] {
-	return MappingReceiverFuncs[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails]{
-		OnPut: func(key Pair[logicalcluster.Name, metav1.GroupResource], val ResourceDetails) {
+func (tap *TestAPIMapProvider) AsResourceReceiver() MappingReceiver[Pair[string, metav1.GroupResource], ResourceDetails] {
+	return MappingReceiverFuncs[Pair[string, metav1.GroupResource], ResourceDetails]{
+		OnPut: func(key Pair[string, metav1.GroupResource], val ResourceDetails) {
 			tap.Lock()
 			defer tap.Unlock()
 			tpc := tap.ensureClusterLocked(key.First)
 			tap.logger.V(2).Info("AsResourceReceiver.Put", "tap", fmt.Sprintf("%p", tap), "cluster", key.First, "tpc", fmt.Sprintf("%p", tpc), "numReceivers", len(tpc.resourceReceivers))
 			tpc.ResourceInfo.Put(key.Second, val)
 		},
-		OnDelete: func(key Pair[logicalcluster.Name, metav1.GroupResource]) {
+		OnDelete: func(key Pair[string, metav1.GroupResource]) {
 			tap.Lock()
 			defer tap.Unlock()
 			tpc := tap.ensureClusterLocked(key.First)

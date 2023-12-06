@@ -28,9 +28,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
@@ -53,7 +50,7 @@ type whereResolver struct {
 
 type queueItem struct {
 	GK      schema.GroupKind
-	Cluster logicalcluster.Name
+	Cluster string
 	Name    string
 }
 
@@ -121,16 +118,17 @@ func (wrh WhereResolverClusterHandler) OnDelete(obj any) {
 }
 
 func (wr *whereResolver) enqueue(gk schema.GroupKind, objAny any) {
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(objAny)
+	key, err := upstreamcache.DeletionHandlingMetaNamespaceKeyFunc(objAny)
 	if err != nil {
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
 		return
 	}
-	cluster, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	_, name, err := upstreamcache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		wr.logger.Error(err, "Impossible! SplitMetaClusterNamespaceKey failed", "key", key)
 	}
-	item := queueItem{GK: gk, Cluster: cluster, Name: name}
+	// enqueue with empty cluster. set it later
+	item := queueItem{GK: gk, Cluster: "", Name: name}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -172,11 +170,10 @@ func (wr *whereResolver) processNextWorkItem() bool {
 // process returns true on success or unrecoverable error, false to retry
 func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 	logger := klog.FromContext(ctx)
-	cluster := item.Cluster
 	epName := item.Name
 	sps, err := wr.spsLister.Get(epName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Failed to fetch SinglePlacementSlice from local cache", "cluster", cluster, "epName", epName)
+		logger.Error(err, "Failed to fetch SinglePlacementSlice from local cache", "epName", epName)
 		return true // I think these errors are not transient
 	}
 	//change to consumer SpaceID
@@ -191,7 +188,7 @@ func (wr *whereResolver) process(ctx context.Context, item queueItem) bool {
 		return false
 	}
 	item.Name = spsOriginalName
-	item.Cluster = logicalcluster.Name(spaceID)
+	item.Cluster = spaceID
 	objName := item.toExternalName()
 
 	if err == nil {

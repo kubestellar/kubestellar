@@ -16,31 +16,10 @@ limitations under the License.
 
 package placement
 
-import (
-	"github.com/kcp-dev/logicalcluster/v3"
-)
-
 // ExternalName identifies a cluster-scoped object of some implicit kind
 type ExternalName struct {
-	// Cluster identifies the cluster.  It is the one-part ID, not a path.
-	Cluster logicalcluster.Name
+	// Cluster identifies the cluster.  It is the space ID.
+	Cluster string
 
 	Name ObjectName
-}
-
-// NewExternalName assumes the given cluster identifier is proper
-func NewExternalName(cluster, name string) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(cluster), Name: ObjectName(name)}
-}
-
-func (ExternalName) OfSPLocation(sp SinglePlacement) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: ObjectName(sp.LocationName)}
-}
-
-func (ExternalName) OfSPTarget(sp SinglePlacement) ExternalName {
-	return ExternalName{Cluster: logicalcluster.Name(sp.Cluster), Name: ObjectName(sp.SyncTargetName)}
-}
-
-func (en ExternalName) String() string {
-	return en.Cluster.String() + ":" + en.Name.String()
 }
