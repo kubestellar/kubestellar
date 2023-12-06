@@ -174,9 +174,9 @@ MB2=$(KUBECONFIG=$SM_CONFIG kubectl get spaces -n spaceprovider-default -o json 
 echo The mailbox for ks-edge-cluster2 is $MB2
 
 MB1_SPACE="${PWD}/temp-space-config/${MB1}"
-kubectl-kubestellar-get-config-for-space --space-name $MB1 --provider-name default --sm-core-config $SM_CONFIG --output $MB1_SPACE
+kubectl-kubestellar-get-config-for-space --space-name $MB1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $MB1_SPACE
 MB2_SPACE="${PWD}/temp-space-config/${MB2}"
-kubectl-kubestellar-get-config-for-space --space-name $MB2 --provider-name default --sm-core-config $SM_CONFIG --output $MB2_SPACE
+kubectl-kubestellar-get-config-for-space --space-name $MB2 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $MB2_SPACE
 WMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-wmw1"
 kubectl-kubestellar-get-config-for-space --space-name wmw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $WMW1_SPACE_CONFIG
 ```
