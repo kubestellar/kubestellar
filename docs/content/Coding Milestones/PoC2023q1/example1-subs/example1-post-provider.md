@@ -146,7 +146,7 @@ also label guilder with `extended=yes`.
 
 ```shell
 IMW1_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-imw1"
-kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --output $IMW1_SPACE_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name imw1 --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $IMW1_SPACE_CONFIG
 KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location florin  loc-name=florin  env=prod --imw imw1
 KUBECONFIG=$IMW1_SPACE_CONFIG kubectl kubestellar ensure location guilder loc-name=guilder env=prod extended=yes --imw imw1
 echo "describe the florin location object"

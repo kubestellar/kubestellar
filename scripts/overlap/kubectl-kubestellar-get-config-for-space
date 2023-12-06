@@ -78,6 +78,11 @@ if [ -z "$sm_core_config" ]; then
     exit 1
 fi
 
+if [ -z "$sm_context" ]; then
+    echo "$0: must be given a non-empty SM context" >&2
+    exit 1
+fi
+
 if [ -z "$space_config_file_name" ]; then
     echo "$0: must be given a non-empty space config file name" >&2
     exit 1

@@ -9,7 +9,7 @@ processes then launch this controller as follows.
 
 ```shell
 ESPW_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-espw"
-kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --output $ESPW_SPACE_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $ESPW_SPACE_CONFIG
 (
   KUBECONFIG=$SM_CONFIG mailbox-controller -v=2 &
   sleep 20
