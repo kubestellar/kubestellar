@@ -95,12 +95,12 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	// 2a)
 	stsFilteredByLoc := []*edgev2alpha1.SyncTarget{}
 	if !locDeleted {
-		stsInLws, err := c.synctargetLister.List(labels.Everything())
+		allSts, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "failed to list SyncTargets")
 			return err
 		}
-		stsFilteredByLoc, err = filterStsByLoc(stsInLws, loc)
+		stsFilteredByLoc, err = filterStsByLoc(allSts, loc)
 		if err != nil {
 			logger.Error(err, "failed to find SyncTargets for Location")
 			return err
