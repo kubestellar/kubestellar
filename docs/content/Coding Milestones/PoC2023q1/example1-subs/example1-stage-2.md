@@ -408,7 +408,7 @@ to be the current kcp workspace at start time.
 
 ```shell
 (
-  KUBECONFIG=$SM_CONFIG kubestellar-where-resolver -v=4 &
+  KUBECONFIG=$SM_CONFIG kubestellar-where-resolver  &
   sleep 10
 )
 ```

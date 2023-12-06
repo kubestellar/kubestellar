@@ -16,7 +16,7 @@ requires the ESPW to be current at start time.
 
 ```shell
 (
-  KUBECONFIG=$SM_CONFIG placement-translator -v=4 &
+  KUBECONFIG=$SM_CONFIG placement-translator &
   sleep 10
 )
 ```
