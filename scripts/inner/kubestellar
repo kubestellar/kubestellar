@@ -48,7 +48,13 @@ function echoerr() {
 # Check if a given process name is running
 process_running() {
   SERVICE="$1"
-  if pgrep -f "$SERVICE" >/dev/null
+  NAME_LEN=${#SERVICE}
+  if [ $NAME_LEN -gt 15 ]; then
+    PGREP_FLAG="-f"
+  else
+    PGREP_FLAG="-x"
+  fi
+  if pgrep $PGREP_FLAG "$SERVICE" >/dev/null
   then
       echo "running"
   else
@@ -381,7 +387,6 @@ function run_dex() {
         echo "dex started"
     else
         echo "dex not started"
-        sleep 2
         exit 1
     fi
 }
@@ -402,7 +407,6 @@ function run_kb_backend() {
         echo "example-backend started"
     else
         echo "example-backend not started"
-        sleep 2
         exit 1
     fi
 }
