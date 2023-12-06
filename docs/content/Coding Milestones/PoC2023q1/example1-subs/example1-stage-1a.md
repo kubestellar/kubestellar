@@ -11,7 +11,7 @@ processes then launch this controller as follows.
 ESPW_SPACE_CONFIG="${PWD}/temp-space-config/spaceprovider-default-espw"
 kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $ESPW_SPACE_CONFIG
 (
-  KUBECONFIG=$SM_CONFIG mailbox-controller -v=4 &
+  KUBECONFIG=$SM_CONFIG mailbox-controller  &
   sleep 20
 )
 ```
