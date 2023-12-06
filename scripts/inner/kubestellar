@@ -89,7 +89,7 @@ function ensure_imws() {
             echo "Ensuring IMW: $imw"
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
             kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output $space_config
+            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
             KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "synctargets"
             KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "locations"
         done
@@ -165,12 +165,16 @@ if [ "$SM_CONFIG" == "" ]; then
     SM_CONFIG="${KUBECONFIG_DIR}/config"
     export SM_CONFIG
 fi
+if [ "$SM_CONTEXT" == "" ]; then
+    export SM_CONTEXT=sm-mgt
+fi
 if [ "$IN_CLUSTER" == "" ]; then
     IN_CLUSTER=true
     export IN_CLUSTER
 fi
 echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
 echo "SM_CONFIG=${SM_CONFIG}"
+echo "SM_CONTEXT=${SM_CONTEXT}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 echo "IN_CLUSTER=${IN_CLUSTER}"
@@ -354,7 +358,7 @@ function ensure_espw() {
     fi 
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
     kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output $space_config
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
     run_dex
     sleep 2
     run_kb_backend
@@ -394,7 +398,7 @@ function run_kb_backend() {
 
     echo "starting kube-bind example-backend in background"
 
-    kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --output "/tmp/espw-conf"
+    kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output "/tmp/espw-conf"
     
     ( 
         KUBECONFIG="/tmp/espw-conf"
