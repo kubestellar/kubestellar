@@ -10,7 +10,7 @@ processes then launch this controller as follows.
 ```shell
 # TODO: mailbox controller has server dependencies. Will remove when controllers support spaces.
 kubectl ws root:espw
-mailbox-controller -v=2 &
+mailbox-controller -v=4 &
 sleep 20
 ```
 
