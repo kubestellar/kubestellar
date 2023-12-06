@@ -23,12 +23,11 @@ bindir="$(dirname "$0")"
 
 in_cluster="false"
 provider_name="default"
-sm_context="sm-mgt"
 
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath | --sm-context sm context | -- provider-name provider name | --in-cluster | --output output config file )"
+	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath | --sm-context sm context | --provider-name provider name | --in-cluster | --output output config file )"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--space-name)

@@ -26,7 +26,7 @@ provider_name="default"
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath "
+	    echo "Usage: kubectl kubestellar create space (--space-name name | --sm-core-config filepath | --provider-name provider)"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--space-name)
@@ -56,11 +56,6 @@ done
 
 if [ -z "$space_name" ]; then
     echo "$0: must be given a non-empty space name" >&2
-    exit 1
-fi
-
-if [ -z "$provider_name" ]; then
-    echo "$0: must be given a non-empty space provider name" >&2
     exit 1
 fi
 

@@ -96,7 +96,7 @@ else
     echo "cluster namespace is $cluster_ns"
 fi
 
-kubectl-kubestellar-get-config-for-space --space-name "espw" --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --in-cluster --output "/tmp/espw-conf"
+kubectl-kubestellar-get-config-for-space --space-name "espw" --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --in-cluster --output "/tmp/espw-conf"
 KUBECONFIG="/tmp/espw-conf"
 
 if ! kubectl get namespace "$cm_namespace" &> /dev/null
