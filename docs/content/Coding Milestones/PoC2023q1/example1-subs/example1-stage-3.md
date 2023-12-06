@@ -27,8 +27,8 @@ job done for this example.
 ```shell
 FLORIN_MB_CONFIG="${PWD}/temp-space-config/${FLORIN_SPACE}"
 GUILDER_MB_CONFIG="${PWD}/temp-space-config/${GUILDER_SPACE}"
-kubectl-kubestellar-get-config-for-space --space-name $FLORIN_SPACE --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $FLORIN_MB_CONFIG
-kubectl-kubestellar-get-config-for-space --space-name $GUILDER_SPACE --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $GUILDER_MB_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name $FLORIN_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $FLORIN_MB_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name $GUILDER_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $GUILDER_MB_CONFIG
 
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
 mbxws=($FLORIN_SPACE $GUILDER_SPACE)
