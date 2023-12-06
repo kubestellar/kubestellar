@@ -246,7 +246,7 @@ func TestMailboxInformer(t *testing.T) {
 				invWSClusterS := fmt.Sprintf("ic%d", invWSNum)
 				syncTargetNum := rand.Intn(int(math.Sqrt(float64(iteration))))
 				syncTargetUID := fmt.Sprintf("beef-%d", syncTargetNum)
-				mbwsName := invWSClusterS + placement.WSNameSep + syncTargetUID
+				mbwsName := invWSClusterS + placement.MBspaceNameSep + syncTargetUID
 				mbwsNum := invWSNum*100 + syncTargetNum
 				mbwsClusterS := fmt.Sprintf("mc%d", mbwsNum)
 				mbwsClusterN := logicalcluster.Name(mbwsClusterS)

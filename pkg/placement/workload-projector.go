@@ -18,7 +18,6 @@ package placement
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -38,22 +37,18 @@ import (
 	k8sdynamicinformer "k8s.io/client-go/dynamic/dynamicinformer"
 	upstreaminformers "k8s.io/client-go/informers"
 	k8scorev1informers "k8s.io/client-go/informers/core/v1"
+	k8sclient "k8s.io/client-go/kubernetes"
 	k8scorev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
-	kcpcorev1a1 "github.com/kcp-dev/kcp/pkg/apis/core/v1alpha1"
-	tenancyv1a1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	"github.com/kubestellar/kubestellar/pkg/customize"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
+	spacev1a1listers "github.com/kubestellar/kubestellar/space-framework/pkg/client/listers/space/v1alpha1"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 const SyncerConfigName = "the-one"
@@ -83,42 +78,36 @@ func NewWorkloadProjector(
 	ctx context.Context,
 	configConcurrency int,
 	resourceModes ResourceModes,
-	mbwsInformer k8scache.SharedIndexInformer,
-	mbwsLister tenancyv1a1listers.WorkspaceLister,
+	spaceInformer k8scache.SharedIndexInformer,
+	spaceLister spacev1a1listers.SpaceLister,
 	syncfgInformer k8scache.SharedIndexInformer,
-	edgeClusterClientset edgeclusterclientset.ClusterInterface,
-	dynamicClusterClient clusterdynamic.ClusterInterface,
-	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
-	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
-		ctx:                  ctx,
-		configConcurrency:    configConcurrency,
-		resourceModes:        resourceModes,
-		queue:                workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
-		mbwsLister:           mbwsLister,
-		syncfgInformer:       syncfgInformer,
-		edgeClusterClientset: edgeClusterClientset,
-		dynamicClusterClient: dynamicClusterClient,
-		nsClusterPreInformer: nsClusterPreInformer,
-		nsClusterClient:      nsClusterClient,
+		ctx:               ctx,
+		configConcurrency: configConcurrency,
+		resourceModes:     resourceModes,
+		queue:             workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		spaceLister:       spaceLister,
+		syncfgInformer:    syncfgInformer,
+		spaceclient:       spaceclient,
+		spaceProviderNs:   spaceProviderNs,
 
-		mbwsNameToCluster: WrapMapWithMutex[string, logicalcluster.Name](NewMapMap[string, logicalcluster.Name](nil)),
-		clusterToMBWSName: WrapMapWithMutex[logicalcluster.Name, string](NewMapMap[logicalcluster.Name, string](nil)),
-		mbwsNameToSP:      WrapMapWithMutex[string, SinglePlacement](NewMapMap[string, SinglePlacement](nil)),
+		mbwsNameToSP: WrapMapWithMutex[string, SinglePlacement](NewMapMap[string, SinglePlacement](nil)),
 
-		perSource:      NewMapMap[logicalcluster.Name, *wpPerSource](nil),
+		perSource:      NewMapMap[string, *wpPerSource](nil),
 		perDestination: NewMapMap[SinglePlacement, *wpPerDestination](nil),
 
 		upsyncs: NewHashRelation2[SinglePlacement, edgeapi.UpsyncSet](
 			HashSinglePlacement{}, HashUpsyncSet{}),
 	}
 	wp.nsdDistributionsForProj = NewGenericFactoredMap[NamespacedDistributionTuple,
-		logicalcluster.Name, Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits,
+		string, Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits,
 		wpPerSourceNSDistributions, wpPerSourceNSDistributions](
 		factorNamespacedDistributionTupleForProj1and234,
-		func(source logicalcluster.Name) wpPerSourceNSDistributions {
+		func(source string) wpPerSourceNSDistributions {
 			wps := MapGetAdd(wp.perSource, source, true, wp.newPerSourceLocked)
 			return wpPerSourceNSDistributions{wps}
 		},
@@ -126,13 +115,13 @@ func NewWorkloadProjector(
 			return nsd.wps.nsdDistributions
 		},
 		Identity1[wpPerSourceNSDistributions],
-		NewMapMap[logicalcluster.Name, wpPerSourceNSDistributions](nil),
+		NewMapMap[string, wpPerSourceNSDistributions](nil),
 		nil, nil)
 	wp.nnsDistributionsForProj = NewGenericFactoredMap[NonNamespacedDistributionTuple,
-		logicalcluster.Name, Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits,
+		string, Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits,
 		wpPerSourceNNSDistributions, wpPerSourceNNSDistributions](
 		factorNonNamespacedDistributionTupleForProj1and234,
-		func(source logicalcluster.Name) wpPerSourceNNSDistributions {
+		func(source string) wpPerSourceNNSDistributions {
 			wps := MapGetAdd(wp.perSource, source, true, wp.newPerSourceLocked)
 			return wpPerSourceNNSDistributions{wps}
 		},
@@ -140,28 +129,28 @@ func NewWorkloadProjector(
 			return nsd.wps.nnsDistributions
 		},
 		Identity1[wpPerSourceNNSDistributions],
-		NewMapMap[logicalcluster.Name, wpPerSourceNNSDistributions](nil),
+		NewMapMap[string, wpPerSourceNNSDistributions](nil),
 		nil, nil)
-	wp.nsdDistributionsForSync = NewGenericFactoredMap[NamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceNamespacedName, logicalcluster.Name],
+	wp.nsdDistributionsForSync = NewGenericFactoredMap[NamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceNamespacedName, string],
 		DistributionBits, wpPerDestinationNSDistributions, wpPerDestinationNSDistributions](
 		factorNamespacedDistributionTupleForSync1,
 		func(destination SinglePlacement) wpPerDestinationNSDistributions {
 			wpd := MapGetAdd(wp.perDestination, destination, true, wp.newPerDestinationLocked)
 			return wpPerDestinationNSDistributions{wpd}
 		},
-		func(nsd wpPerDestinationNSDistributions) MutableMap[Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits] {
+		func(nsd wpPerDestinationNSDistributions) MutableMap[Pair[GroupResourceNamespacedName, string], DistributionBits] {
 			return nsd.wpd.nsdDistributions
 		},
 		Identity1[wpPerDestinationNSDistributions],
 		NewMapMap[SinglePlacement, wpPerDestinationNSDistributions](nil), nil, nil)
-	wp.nnsDistributionsForSync = NewGenericFactoredMap[NonNamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceObjectName, logicalcluster.Name],
+	wp.nnsDistributionsForSync = NewGenericFactoredMap[NonNamespacedDistributionTuple, SinglePlacement, Pair[GroupResourceObjectName, string],
 		DistributionBits, wpPerDestinationNNSDistributions, wpPerDestinationNNSDistributions](
 		factorNonNamespacedDistributionTupleForSync1,
 		func(destination SinglePlacement) wpPerDestinationNNSDistributions {
 			wpd := MapGetAdd(wp.perDestination, destination, true, wp.newPerDestinationLocked)
 			return wpPerDestinationNNSDistributions{wpd}
 		},
-		func(nsd wpPerDestinationNNSDistributions) MutableMap[Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits] {
+		func(nsd wpPerDestinationNNSDistributions) MutableMap[Pair[GroupResourceObjectName, string], DistributionBits] {
 			return nsd.wpd.nnsDistributions
 		},
 		Identity1[wpPerDestinationNNSDistributions],
@@ -178,77 +167,36 @@ func NewWorkloadProjector(
 	wp.nsModesForProj = NewFactoredMapMap[ProjectionModeKey, metav1.GroupResource, SinglePlacement, ProjectionModeVal](factorProjectionModeKeyForProj, nil, nil, nil)
 	wp.nnsModesForProj = NewFactoredMapMap[ProjectionModeKey, metav1.GroupResource, SinglePlacement, ProjectionModeVal](factorProjectionModeKeyForProj, nil, nil, nil)
 	logger := klog.FromContext(ctx)
-	mbwsInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
+	spaceInformer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj any) {
-			ws := obj.(*tenancyv1a1.Workspace)
-			cluster := logicalcluster.Name(ws.Spec.Cluster)
-			if !looksLikeMBWSName(ws.Name) {
-				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
+			space := obj.(*spacev1alpha1.Space)
+			if !looksLikeMBWSName(space.Name) {
+				logger.V(4).Info("Ignoring non-mailbox space", "spaceName", space.Name)
 				return
 			}
-			switch ws.Status.Phase {
-			case kcpcorev1a1.LogicalClusterPhaseReady: // the happy case
-			case kcpcorev1a1.LogicalClusterPhaseInitializing, kcpcorev1a1.LogicalClusterPhaseScheduling:
-				logger.V(4).Info("Ignoring mailbox workspace that is not ready yet", "wsName", ws.Name, "phase", ws.Status.Phase)
-				return
-			default:
-				logger.V(2).Info("Ignoring mailbox workspace with unexpected phase", "wsName", ws.Name, "phase", ws.Status.Phase)
+			if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
+				logger.V(4).Info("Ignoring mailbox space that is not ready", "spaceName", space.Name, "phase", space.Status.Phase)
 				return
 			}
-			if cluster == "" {
-				logger.Error(nil, "Impossible: mailbox workspace with empty cluster name", "wsName", ws.Name)
-				return
-			}
-			wp.mbwsNameToCluster.Put(ws.Name, cluster)
-			wp.clusterToMBWSName.Put(cluster, ws.Name)
-			scRef := syncerConfigRef{cluster, SyncerConfigName}
-			logger.V(4).Info("Enqueuing reference to SyncerConfig in new workspace", "wsName", ws.Name, "cluster", cluster)
+
+			scRef := syncerConfigRef{space.Name, SyncerConfigName}
+			logger.V(4).Info("Enqueuing reference to SyncerConfig in new space", "spaceName", space.Name)
 			wp.queue.Add(scRef)
 		},
 		UpdateFunc: func(oldObj, newObj any) {
-			ws := newObj.(*tenancyv1a1.Workspace)
-			cluster := logicalcluster.Name(ws.Spec.Cluster)
-			if !looksLikeMBWSName(ws.Name) {
-				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
+			space := newObj.(*spacev1alpha1.Space)
+			if !looksLikeMBWSName(space.Name) {
+				logger.V(4).Info("Ignoring non-mailbox workspace", "spaceName", space.Name)
 				return
 			}
-			switch ws.Status.Phase {
-			case kcpcorev1a1.LogicalClusterPhaseReady: // the happy case
-			case kcpcorev1a1.LogicalClusterPhaseInitializing, kcpcorev1a1.LogicalClusterPhaseScheduling:
-				logger.V(4).Info("Ignoring mailbox workspace that is not ready yet", "wsName", ws.Name, "phase", ws.Status.Phase)
-				return
-			default:
-				logger.V(2).Info("Ignoring mailbox workspace with unexpected phase", "wsName", ws.Name, "phase", ws.Status.Phase)
+			if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
+				logger.V(4).Info("Ignoring mailbox space that is not ready", "spaceName", space.Name, "phase", space.Status.Phase)
 				return
 			}
-			oldCluster, has := wp.mbwsNameToCluster.Get(ws.Name)
-			if cluster == "" {
-				logger.Error(nil, "Impossible: mailbox workspace with empty cluster name", "wsName", ws.Name)
-				return
-			}
-			if !has || cluster != oldCluster {
-				wp.mbwsNameToCluster.Put(ws.Name, cluster)
-				wp.clusterToMBWSName.Put(cluster, ws.Name)
-				scRef := syncerConfigRef{cluster, SyncerConfigName}
-				logger.V(4).Info("Enqueuing reference to SyncerConfig of modified workspace", "wsName", ws.Name, "cluster", cluster, "oldCluster", oldCluster)
-				wp.queue.Add(scRef)
-			}
-		},
-		DeleteFunc: func(obj any) {
-			innerObj := obj
-			switch typed := obj.(type) {
-			case k8scache.DeletedFinalStateUnknown:
-				innerObj = typed.Obj
-			default:
-			}
-			ws := innerObj.(*tenancyv1a1.Workspace)
-			cluster := logicalcluster.Name(ws.Spec.Cluster)
-			if !looksLikeMBWSName(ws.Name) {
-				logger.V(4).Info("Ignoring non-mailbox workspace", "wsName", ws.Name, "cluster", cluster)
-				return
-			}
-			wp.mbwsNameToCluster.Delete(ws.Name)
-			wp.clusterToMBWSName.Delete(cluster)
+
+			scRef := syncerConfigRef{space.Name, SyncerConfigName}
+			logger.V(4).Info("Enqueuing reference to SyncerConfig of modified space", "spaceName", space.Name)
+			wp.queue.Add(scRef)
 		},
 	})
 	enqueueSCRef := func(obj any, event string) {
@@ -257,16 +205,12 @@ func NewWorkloadProjector(
 			obj = dfu.Obj
 		}
 		syncfg := obj.(*edgeapi.SyncerConfig)
-		cluster := logicalcluster.From(syncfg)
 		if syncfg.Name != SyncerConfigName {
-			logger.V(4).Info("Ignoring SyncerConfig with non-standard name", "cluster", cluster, "name", syncfg.Name, "standardName", SyncerConfigName)
+			logger.V(4).Info("Ignoring SyncerConfig with non-standard name", "name", syncfg.Name, "standardName", SyncerConfigName)
 			return
 		}
-		if cluster == "" {
-			logger.Error(nil, "Impossible: SyncerConfig with empty cluster name", "syncfg", syncfg)
-			return
-		}
-		scRef := syncerConfigRef{cluster, ObjectName(syncfg.Name)}
+		// enqueue with empty cluster. set later
+		scRef := syncerConfigRef{"", ObjectName(syncfg.Name)}
 		logger.V(4).Info("Enqueuing reference to SyncerConfig from informer", "scRef", scRef, "event", event)
 		wp.queue.Add(scRef)
 	}
@@ -297,36 +241,32 @@ var _ Runnable = &workloadProjector{}
 //
 // The fields following the Mutex should only be accessed with the Mutex locked.
 type workloadProjector struct {
-	ctx                  context.Context
-	configConcurrency    int
-	resourceModes        ResourceModes
-	delay                time.Duration // to slow down for debugging
-	queue                workqueue.RateLimitingInterface
-	mbwsLister           tenancyv1a1listers.WorkspaceLister
-	syncfgInformer       k8scache.SharedIndexInformer
-	edgeClusterClientset edgeclusterclientset.ClusterInterface
-	dynamicClusterClient clusterdynamic.ClusterInterface
-	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient      kcpkubecorev1client.NamespaceClusterInterface
+	ctx               context.Context
+	configConcurrency int
+	resourceModes     ResourceModes
+	delay             time.Duration // to slow down for debugging
+	queue             workqueue.RateLimitingInterface
+	spaceLister       spacev1a1listers.SpaceLister
+	syncfgInformer    k8scache.SharedIndexInformer
+	spaceclient       msclient.KubestellarSpaceInterface
+	spaceProviderNs   string
 
-	mbwsNameToCluster MutableMap[string /*mailbox workspace name*/, logicalcluster.Name]
-	clusterToMBWSName MutableMap[logicalcluster.Name, string /*mailbox workspace name*/]
-	mbwsNameToSP      MutableMap[string /*mailbox workspace name*/, SinglePlacement]
+	mbwsNameToSP MutableMap[string /*mailbox workspace name*/, SinglePlacement]
 
 	sync.Mutex
 
-	perSource      MutableMap[logicalcluster.Name, *wpPerSource]
+	perSource      MutableMap[string, *wpPerSource]
 	perDestination MutableMap[SinglePlacement, *wpPerDestination]
 
 	// changedDestinations is the destinations affected during a transaction
 	changedDestinations *MutableSet[SinglePlacement]
 
 	// NonNamespacedDistributions indexed for projection
-	nsdDistributionsForProj GenericFactoredMap[NamespacedDistributionTuple, logicalcluster.Name,
+	nsdDistributionsForProj GenericFactoredMap[NamespacedDistributionTuple, string,
 		Triple[metav1.GroupResource, NamespacedName, SinglePlacement], DistributionBits, wpPerSourceNSDistributions]
 
 	// NonNamespacedDistributions indexed for projection
-	nnsDistributionsForProj GenericFactoredMap[NonNamespacedDistributionTuple, logicalcluster.Name,
+	nnsDistributionsForProj GenericFactoredMap[NonNamespacedDistributionTuple, string,
 		Triple[metav1.GroupResource, ObjectName, SinglePlacement], DistributionBits, wpPerSourceNNSDistributions]
 
 	nsModesForProj  FactoredMap[ProjectionModeKey, metav1.GroupResource, SinglePlacement, ProjectionModeVal]
@@ -334,11 +274,11 @@ type workloadProjector struct {
 
 	// NamespacedDistributions indexed for SyncerConfig maintenance
 	nsdDistributionsForSync GenericFactoredMap[NamespacedDistributionTuple, SinglePlacement,
-		Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits, wpPerDestinationNSDistributions]
+		Pair[GroupResourceNamespacedName, string], DistributionBits, wpPerDestinationNSDistributions]
 
 	// NonNamespacedDistributions indexed for SyncerConfig maintenance
 	nnsDistributionsForSync GenericFactoredMap[NonNamespacedDistributionTuple, SinglePlacement,
-		Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits, wpPerDestinationNNSDistributions]
+		Pair[GroupResourceObjectName, string], DistributionBits, wpPerDestinationNNSDistributions]
 
 	nsModesForSync  FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal]
 	nnsModesForSync FactoredMap[ProjectionModeKey, SinglePlacement, metav1.GroupResource, ProjectionModeVal]
@@ -353,8 +293,8 @@ type GroupResourceObjectName = Pair[metav1.GroupResource, ObjectName]
 func (wp *workloadProjector) newPerDestinationLocked(destination SinglePlacement) *wpPerDestination {
 	wpd := &wpPerDestination{wp: wp, destination: destination,
 		logger:           klog.FromContext(wp.ctx).WithValues("destination", destination),
-		nsdDistributions: NewSingleIndexedMapMap2[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits](),
-		nnsDistributions: NewSingleIndexedMapMap2[GroupResourceObjectName, logicalcluster.Name, DistributionBits](),
+		nsdDistributions: NewSingleIndexedMapMap2[GroupResourceNamespacedName, string, DistributionBits](),
+		nnsDistributions: NewSingleIndexedMapMap2[GroupResourceObjectName, string, DistributionBits](),
 		preInformers:     NewMapMap[metav1.GroupResource, dynamicDuo](nil),
 	}
 	return wpd
@@ -367,8 +307,8 @@ type wpPerDestination struct {
 	wp               *workloadProjector
 	destination      SinglePlacement
 	logger           klog.Logger
-	nsdDistributions SingleIndexedMap2[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits]
-	nnsDistributions SingleIndexedMap2[GroupResourceObjectName, logicalcluster.Name, DistributionBits]
+	nsdDistributions SingleIndexedMap2[GroupResourceNamespacedName, string, DistributionBits]
+	nnsDistributions SingleIndexedMap2[GroupResourceObjectName, string, DistributionBits]
 
 	namespaceClient      k8scorev1client.NamespaceInterface
 	namespacePreInformer k8scorev1informers.NamespaceInformer
@@ -411,11 +351,16 @@ func (wpd *wpPerDestination) getDynamicDuoLocked(gr metav1.GroupResource, apiVer
 	if wpd.dynamicClient == nil {
 		wpd.logger.V(4).Info("Creating dynamicClient")
 		mbwsName := SPMailboxWorkspaceName(wpd.destination)
-		mbwsCluster, have := wpd.wp.mbwsNameToCluster.Get(mbwsName)
-		if !have {
-			return dynamicDuo{}, nil, errors.New("unable to map mailbox workspace name to cluster")
+		// create dynamic client with space-aware client
+		config, err := wpd.wp.spaceclient.ConfigForSpace(mbwsName, wpd.wp.spaceProviderNs)
+		if err != nil {
+			return dynamicDuo{}, nil, err
 		}
-		wpd.dynamicClient = wpd.wp.dynamicClusterClient.Cluster(mbwsCluster.Path())
+		wpd.dynamicClient, err = k8sdynamic.NewForConfig(config)
+		if err != nil {
+			return dynamicDuo{}, nil, err
+		}
+
 		justMine, err := labels.NewRequirement(ProjectedLabelKey, selection.Equals, []string{ProjectedLabelVal})
 		if err != nil {
 			panic(err)
@@ -429,8 +374,15 @@ func (wpd *wpPerDestination) getDynamicDuoLocked(gr metav1.GroupResource, apiVer
 					opts.LabelSelector = opts.LabelSelector + "," + justMineStr
 				}
 			})
-		wpd.namespaceClient = wpd.wp.nsClusterClient.Cluster(mbwsCluster.Path())
-		wpd.namespacePreInformer = wpd.wp.nsClusterPreInformer.Cluster(mbwsCluster)
+		mbsClient, err := k8sclient.NewForConfig(config)
+		if err != nil {
+			return dynamicDuo{}, nil, err
+		}
+		wpd.namespaceClient = mbsClient.CoreV1().Namespaces()
+		k8sInformerFactory := upstreaminformers.NewSharedInformerFactory(mbsClient, 0)
+		wpd.namespacePreInformer = k8sInformerFactory.Core().V1().Namespaces()
+		k8sInformerFactory.Start(wpd.wp.ctx.Done())
+
 		nsInformer := wpd.namespacePreInformer.Informer()
 		nsReadyChan := make(chan struct{})
 		wpd.nsReadyChan = nsReadyChan
@@ -486,7 +438,7 @@ type wpPerDestinationNSDistributions struct {
 	wpd *wpPerDestination
 }
 
-func (nsd wpPerDestinationNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceNamespacedName, logicalcluster.Name, DistributionBits, sourcesWantReturns] {
+func (nsd wpPerDestinationNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceNamespacedName, string, DistributionBits, sourcesWantReturns] {
 	return nsd.wpd.nsdDistributions.GetIndex()
 }
 
@@ -494,15 +446,25 @@ type wpPerDestinationNNSDistributions struct {
 	wpd *wpPerDestination
 }
 
-func (nsd wpPerDestinationNNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceObjectName, logicalcluster.Name, DistributionBits, sourcesWantReturns] {
+func (nsd wpPerDestinationNNSDistributions) GetIndex() GenericFactoredMapIndex[GroupResourceObjectName, string, DistributionBits, sourcesWantReturns] {
 	return nsd.wpd.nnsDistributions.GetIndex()
 }
 
-type sourcesWantReturns = Map[logicalcluster.Name, DistributionBits]
+type sourcesWantReturns = Map[string, DistributionBits]
 
 // Constructs the data structure specific to a workload management workspace
-func (wp *workloadProjector) newPerSourceLocked(source logicalcluster.Name) *wpPerSource {
-	dynamicClient := wp.dynamicClusterClient.Cluster(source.Path())
+func (wp *workloadProjector) newPerSourceLocked(source string) *wpPerSource {
+	logger := klog.FromContext(wp.ctx).WithValues("source", source)
+	config, err := wp.spaceclient.ConfigForSpace(source, wp.spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "Failed to get config for space", "space", source)
+		// TODO more
+	}
+	dynamicClient, err := k8sdynamic.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "failed to create clientset from config", "space", source)
+		// TODO more
+	}
 	dynamicInformerFactory := k8sdynamicinformer.NewDynamicSharedInformerFactory(dynamicClient, 0)
 	wps := &wpPerSource{wp: wp, source: source,
 		logger:                 klog.FromContext(wp.ctx).WithValues("source", source),
@@ -521,7 +483,7 @@ func (wp *workloadProjector) newPerSourceLocked(source logicalcluster.Name) *wpP
 // All the clients and informers are about accessing the contents of the WDS.
 type wpPerSource struct {
 	wp                     *workloadProjector
-	source                 logicalcluster.Name
+	source                 string
 	logger                 klog.Logger
 	nsdDistributions       SingleIndexedMap3[metav1.GroupResource, NamespacedName, SinglePlacement, DistributionBits]
 	nnsDistributions       SingleIndexedMap3[metav1.GroupResource, ObjectName, SinglePlacement, DistributionBits]
@@ -570,7 +532,7 @@ type syncerConfigRef ExternalName
 
 // sourceObjectRef refers to an namespaced object in a workload management workspace
 type sourceObjectRef struct {
-	Cluster       logicalcluster.Name
+	Cluster       string
 	GroupResource metav1.GroupResource
 	Namespace     string // == noNamespace iff not namespaced
 	Name          string
@@ -647,16 +609,8 @@ func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
 // Returns `retry bool`.
 func (wp *workloadProjector) syncConfigDestination(ctx context.Context, destination SinglePlacement) bool {
 	mbwsName := SPMailboxWorkspaceName(destination)
-	mbwsCluster, ok := wp.mbwsNameToCluster.Get(mbwsName)
 	logger := klog.FromContext(ctx)
-	if !ok {
-		return true
-	}
-	if mbwsCluster == "" {
-		logger.Error(nil, "Impossible: mailbox workspace corresponds with empty cluster ID", "mbwsName", mbwsName)
-		return true
-	}
-	scRef := syncerConfigRef{mbwsCluster, SyncerConfigName}
+	scRef := syncerConfigRef{mbwsName, SyncerConfigName}
 	logger.V(3).Info("Finally able to enqueue SyncerConfig ref", "scRef", scRef)
 	wp.queue.Add(scRef)
 	return false
@@ -670,18 +624,25 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		logger.Error(nil, "Impossible: syncerConfigRef with empty string for Cluster")
 		return false
 	}
-	mbwsName, ok := wp.clusterToMBWSName.Get(scRef.Cluster)
-	if !ok {
-		logger.Error(nil, "Failed to map mailbox cluster Name to mailbox WS name")
-		return true
-	}
+	mbwsName := scRef.Cluster
 	sp, ok := wp.mbwsNameToSP.Get(mbwsName)
 	if !ok {
 		logger.Error(nil, "Failed to map mailbox workspace name to SinglePlacement", "mbwsName", mbwsName)
 		return true
 	}
 	logger = logger.WithValues("destination", sp)
-	syncfg, err := wp.edgeClusterClientset.Cluster(scRef.Cluster.Path()).EdgeV2alpha1().SyncerConfigs().Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
+
+	config, err := wp.spaceclient.ConfigForSpace(mbwsName, wp.spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "Failed to fetch space config", "spacename", mbwsName)
+		return true
+	}
+	edgeClientset, err := edgeclientset.NewForConfig(config)
+	if err != nil {
+		logger.Error(err, "Failed to create edge clientset for space", "spacename", mbwsName)
+		return false
+	}
+	syncfg, err := edgeClientset.EdgeV2alpha1().SyncerConfigs().Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
 	if err != nil {
 		if k8sapierrors.IsNotFound(err) {
 			goodConfigSpecRelations := wp.syncerConfigRelations(sp)
@@ -690,7 +651,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 					Name: string(scRef.Name),
 				},
 				Spec: wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)}
-			client := wp.edgeClusterClientset.EdgeV2alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
+			client := edgeClientset.EdgeV2alpha1().SyncerConfigs()
 			syncfg2, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: FieldManager})
 			if logger.V(4).Enabled() {
 				logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
@@ -712,7 +673,7 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		return false
 	}
 	syncfg.Spec = wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)
-	client := wp.edgeClusterClientset.EdgeV2alpha1().Cluster(scRef.Cluster.Path()).SyncerConfigs()
+	client := edgeClientset.EdgeV2alpha1().SyncerConfigs()
 	syncfg2, err := client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: FieldManager})
 	if logger.V(4).Enabled() {
 		logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
@@ -778,14 +739,14 @@ func (wp *workloadProjector) syncDestinationObject(ctx context.Context, doRef de
 				logger.V(4).Info("Ignoring destination object that is being deleted", "namespaced", namespaced)
 				return returnFalse
 			}
-			logger.V(4).Info("Retaining destination object", "namespaced", namespaced, "sources", VisitableToSlice[Pair[logicalcluster.Name, DistributionBits]](sourcesWants))
+			logger.V(4).Info("Retaining destination object", "namespaced", namespaced, "sources", VisitableToSlice[Pair[string, DistributionBits]](sourcesWants))
 			if doRef.GroupResource == crdGR {
 				return returnFalse
 			}
 			tryem := triers{}
 			addRetry := false
 			// accumulate reported state return tasks
-			sourcesWants.Visit(func(sourceWant Pair[logicalcluster.Name, DistributionBits]) error {
+			sourcesWants.Visit(func(sourceWant Pair[string, DistributionBits]) error {
 				if !sourceWant.Second.ReturnSingletonState {
 					return nil
 				}
@@ -1140,7 +1101,7 @@ func LabelsGet[Val any](labels map[string]Val, key string) Val {
 const ProjectedLabelKey string = "edge.kubestellar.io/projected"
 const ProjectedLabelVal string = "yes"
 
-func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Name, destSP SinglePlacement, srcObj mrObject) *unstructured.Unstructured {
+func (wp *workloadProjector) xformForDestination(sourceCluster string, destSP SinglePlacement, srcObj mrObject) *unstructured.Unstructured {
 	srcObjU := srcObj.(*unstructured.Unstructured)
 	logger := klog.FromContext(wp.ctx).WithValues(
 		"sourceCluster", sourceCluster,
@@ -1168,7 +1129,7 @@ func (wp *workloadProjector) xformForDestination(sourceCluster logicalcluster.Na
 	return destObj
 }
 
-func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Name, destSP SinglePlacement,
+func (wp *workloadProjector) genericObjectMerge(sourceCluster string, destSP SinglePlacement,
 	srcObj mrObject, inputDest *unstructured.Unstructured) *unstructured.Unstructured {
 	srcObjU := srcObj.(*unstructured.Unstructured)
 	logger := klog.FromContext(wp.ctx).WithValues(
@@ -1218,12 +1179,11 @@ func (wp *workloadProjector) genericObjectMerge(sourceCluster logicalcluster.Nam
 	return outputDestU
 }
 
-func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logicalcluster.Name, srcObjU *unstructured.Unstructured, destSP edgeapi.SinglePlacement, insistCopy bool) *unstructured.Unstructured {
+func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster string, srcObjU *unstructured.Unstructured, destSP edgeapi.SinglePlacement, insistCopy bool) *unstructured.Unstructured {
 	srcAnnotations := srcObjU.GetAnnotations()
 	expandParameters := srcAnnotations[edgeapi.ParameterExpansionAnnotationKey] == "true"
 	customizerRef := srcAnnotations[edgeapi.CustomizerAnnotationKey]
 	var customizer *edgeapi.Customizer
-	var err error
 	if len(customizerRef) != 0 {
 		refParts := strings.SplitN(customizerRef, "/", 2)
 		custNS := refParts[0]
@@ -1231,7 +1191,16 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 		if len(refParts) == 1 {
 			custNS = srcObjU.GetNamespace()
 		}
-		customizer, err = wp.edgeClusterClientset.Cluster(srcCluster.Path()).EdgeV2alpha1().Customizers(custNS).Get(wp.ctx, custName, metav1.GetOptions{})
+		//TODO get customizer from Lister
+		config, err := wp.spaceclient.ConfigForSpace(srcCluster, wp.spaceProviderNs)
+		if err != nil {
+			logger.Error(err, "Failed to fetch space config", "spacename", srcCluster)
+		}
+		edgeClientset, err := edgeclientset.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create edge clientset for space", "spacename", srcCluster)
+		}
+		customizer, err = edgeClientset.EdgeV2alpha1().Customizers(custNS).Get(wp.ctx, custName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Customizer")
 		} else {
@@ -1240,7 +1209,15 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 	}
 	var location *edgeapi.Location
 	if expandParameters {
-		location, err = wp.edgeClusterClientset.Cluster(logicalcluster.NewPath(destSP.Cluster)).EdgeV2alpha1().Locations().Get(wp.ctx, destSP.LocationName, metav1.GetOptions{})
+		config, err := wp.spaceclient.ConfigForSpace(destSP.Cluster, wp.spaceProviderNs)
+		if err != nil {
+			logger.Error(err, "Failed to fetch space config", "spacename", destSP.Cluster)
+		}
+		edgeClientset, err := edgeclientset.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create edge clientset for space", "spacename", destSP.Cluster)
+		}
+		location, err = edgeClientset.EdgeV2alpha1().Locations().Get(wp.ctx, destSP.LocationName, metav1.GetOptions{})
 		if err != nil {
 			logger.Error(err, "Failed to find referenced Location")
 		}
@@ -1258,7 +1235,6 @@ func (wp *workloadProjector) customizeOrCopy(logger klog.Logger, srcCluster logi
 
 func kvIsSystem(which, key string) bool {
 	return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/"))
-	// return (strings.Contains(key, ".kcp.io/") || strings.HasPrefix(key, "kcp.io/")) && !strings.Contains(key, "edge.kubestellar.io/")
 }
 
 func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
@@ -1269,7 +1245,7 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 	changedDestinations := WrapSetWithMutex[SinglePlacement](NewMapSet[SinglePlacement]())
 	wp.changedDestinations = &changedDestinations
 	recordLogger := logger.V(4)
-	changedSources := WrapSetWithMutex[logicalcluster.Name](NewMapSet[logicalcluster.Name]())
+	changedSources := WrapSetWithMutex[string](NewMapSet[string]())
 	nsod := MappingReceiverFork[NamespacedDistributionTuple, DistributionBits]{
 		MapKeySetReceiverLossy[NamespacedDistributionTuple, DistributionBits](SetWriterFork[NamespacedDistributionTuple](false,
 			recordPart(recordLogger, "nsd.src", &changedDestinations, factorNamespacedDistributionTupleForSync1),
@@ -1290,8 +1266,8 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 		wp.upsyncs})
 	logger.V(3).Info("Transaction response",
 		"changedDestinations", VisitableToSlice[SinglePlacement](changedDestinations),
-		"changedSources", VisitableToSlice[logicalcluster.Name](changedSources))
-	changedSources.Visit(func(source logicalcluster.Name) error {
+		"changedSources", VisitableToSlice[string](changedSources))
+	changedSources.Visit(func(source string) error {
 		wps, have := wp.perSource.Get(source)
 		logger := logger.WithValues("source", source)
 		if !have {
@@ -1346,8 +1322,8 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			logger.Error(nil, "Impossible: no per-destination record for affected destination")
 			return nil
 		}
-		logger.V(4).Info("NamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceNamespacedName, logicalcluster.Name], DistributionBits]](wpd.nsdDistributions))
-		logger.V(4).Info("NonNamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceObjectName, logicalcluster.Name], DistributionBits]](wpd.nnsDistributions))
+		logger.V(4).Info("NamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceNamespacedName, string], DistributionBits]](wpd.nsdDistributions))
+		logger.V(4).Info("NonNamespacedDistributions after transaction", "them", VisitableToSlice[Pair[Pair[GroupResourceObjectName, string], DistributionBits]](wpd.nnsDistributions))
 		nsms, have := wp.nsModesForSync.GetIndex().Get(destination)
 		if have {
 			logger.V(4).Info("Namespaced modes after transaction", "modes", MapMapCopy[metav1.GroupResource, ProjectionModeVal](nil, nsms))
@@ -1375,18 +1351,9 @@ func (wp *workloadProjector) Transact(xn func(WorkloadProjectionSections)) {
 			wpd.resyncGroupResource(tup.First, tup.Second)
 			return nil
 		})
-		mbwsCluster, ok := wp.mbwsNameToCluster.Get(mbwsName)
-		if !ok {
-			logger.Error(nil, "Mailbox workspace not known yet")
-			wp.queue.Add(destination)
-		} else if mbwsCluster == "" {
-			logger.Error(nil, "Mailbox workspace has empty clustername")
-			wp.queue.Add(destination)
-		} else {
-			scRef := syncerConfigRef{mbwsCluster, SyncerConfigName}
-			logger.V(4).Info("Enqueuing reference to SyncerConfig affected by transaction", "mbwsName", mbwsName, "scRef", scRef)
-			wp.queue.Add(scRef)
-		}
+		scRef := syncerConfigRef{mbwsName, SyncerConfigName}
+		logger.V(4).Info("Enqueuing reference to SyncerConfig affected by transaction", "mbwsName", mbwsName, "scRef", scRef)
+		wp.queue.Add(scRef)
 		wpd.nsdDistributions.GetIndex().Visit(func(tup Pair[GroupResourceNamespacedName, sourcesWantReturns]) error {
 			if tup.Second.IsEmpty() {
 				return nil
@@ -1530,57 +1497,57 @@ func recordPart[Whole, Part, Rest any](logger klog.Logger, partType string, reco
 }
 
 var factorNamespacedDistributionTupleForSync1 = NewFactorer(
-	func(whole NamespacedDistributionTuple) Pair[SinglePlacement, Pair[GroupResourceNamespacedName, logicalcluster.Name]] {
+	func(whole NamespacedDistributionTuple) Pair[SinglePlacement, Pair[GroupResourceNamespacedName, string]] {
 		grni := NewPair(whole.First.GroupResource, NamespacedName{whole.Second.Second, whole.Second.Third})
 		return NewPair(whole.First.Destination, NewPair(grni, whole.Second.First))
 	},
-	func(parts Pair[SinglePlacement, Pair[GroupResourceNamespacedName, logicalcluster.Name]]) NamespacedDistributionTuple {
+	func(parts Pair[SinglePlacement, Pair[GroupResourceNamespacedName, string]]) NamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First.First, parts.First},
 			ExternalNamespacedName{parts.Second.Second, parts.Second.First.Second.First, parts.Second.First.Second.Second})
 	})
 
 var factorNamespacedDistributionTupleForProj1 = NewFactorer(
-	func(whole NamespacedDistributionTuple) Pair[logicalcluster.Name, Pair[GroupResourceNamespacedName, SinglePlacement]] {
+	func(whole NamespacedDistributionTuple) Pair[string, Pair[GroupResourceNamespacedName, SinglePlacement]] {
 		grni := NewPair(whole.First.GroupResource, NamespacedName{whole.Second.Second, whole.Second.Third})
 		return NewPair(whole.Second.First, NewPair(grni, whole.First.Destination))
 	},
-	func(parts Pair[logicalcluster.Name, Pair[GroupResourceNamespacedName, SinglePlacement]]) NamespacedDistributionTuple {
+	func(parts Pair[string, Pair[GroupResourceNamespacedName, SinglePlacement]]) NamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First.First, parts.Second.Second},
 			ExternalNamespacedName{parts.First, parts.Second.First.Second.First, parts.Second.First.Second.Second})
 	})
 
 var factorNamespacedDistributionTupleForProj1and234 = NewFactorer(
-	func(whole NamespacedDistributionTuple) Pair[logicalcluster.Name, Triple[metav1.GroupResource, NamespacedName, SinglePlacement]] {
+	func(whole NamespacedDistributionTuple) Pair[string, Triple[metav1.GroupResource, NamespacedName, SinglePlacement]] {
 		return NewPair(whole.Second.First, NewTriple(whole.First.GroupResource, NamespacedName{whole.Second.Second, whole.Second.Third}, whole.First.Destination))
 	},
-	func(parts Pair[logicalcluster.Name, Triple[metav1.GroupResource, NamespacedName, SinglePlacement]]) NamespacedDistributionTuple {
+	func(parts Pair[string, Triple[metav1.GroupResource, NamespacedName, SinglePlacement]]) NamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First, parts.Second.Third},
 			ExternalNamespacedName{parts.First, parts.Second.Second.First, parts.Second.Second.Second})
 	})
 
 var factorNonNamespacedDistributionTupleForSync1 = NewFactorer(
-	func(whole NonNamespacedDistributionTuple) Pair[SinglePlacement, Pair[GroupResourceObjectName, logicalcluster.Name]] {
+	func(whole NonNamespacedDistributionTuple) Pair[SinglePlacement, Pair[GroupResourceObjectName, string]] {
 		return NewPair(whole.First.Destination, NewPair(NewPair(whole.First.GroupResource, whole.Second.Name), whole.Second.Cluster))
 	},
-	func(parts Pair[SinglePlacement, Pair[GroupResourceObjectName, logicalcluster.Name]]) NonNamespacedDistributionTuple {
+	func(parts Pair[SinglePlacement, Pair[GroupResourceObjectName, string]]) NonNamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First.First, parts.First},
 			ExternalName{parts.Second.Second, parts.Second.First.Second})
 	})
 
 var factorNonNamespacedDistributionTupleForProj1 = NewFactorer(
-	func(whole NonNamespacedDistributionTuple) Pair[logicalcluster.Name, Pair[GroupResourceObjectName, SinglePlacement]] {
+	func(whole NonNamespacedDistributionTuple) Pair[string, Pair[GroupResourceObjectName, SinglePlacement]] {
 		return NewPair(whole.Second.Cluster, NewPair(NewPair(whole.First.GroupResource, whole.Second.Name), whole.First.Destination))
 	},
-	func(parts Pair[logicalcluster.Name, Pair[GroupResourceObjectName, SinglePlacement]]) NonNamespacedDistributionTuple {
+	func(parts Pair[string, Pair[GroupResourceObjectName, SinglePlacement]]) NonNamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First.First, parts.Second.Second},
 			ExternalName{parts.First, parts.Second.First.Second})
 	})
 
 var factorNonNamespacedDistributionTupleForProj1and234 = NewFactorer(
-	func(whole NonNamespacedDistributionTuple) Pair[logicalcluster.Name, Triple[metav1.GroupResource, ObjectName, SinglePlacement]] {
+	func(whole NonNamespacedDistributionTuple) Pair[string, Triple[metav1.GroupResource, ObjectName, SinglePlacement]] {
 		return NewPair(whole.Second.Cluster, NewTriple(whole.First.GroupResource, whole.Second.Name, whole.First.Destination))
 	},
-	func(parts Pair[logicalcluster.Name, Triple[metav1.GroupResource, ObjectName, SinglePlacement]]) NonNamespacedDistributionTuple {
+	func(parts Pair[string, Triple[metav1.GroupResource, ObjectName, SinglePlacement]]) NonNamespacedDistributionTuple {
 		return NewPair(ProjectionModeKey{parts.Second.First, parts.Second.Third},
 			ExternalName{parts.First, parts.Second.Second})
 	})
@@ -1796,7 +1763,7 @@ func csrEqual(a, b Pair[ProjectionModeVal, MutableSet[ObjectName]]) bool {
 	return a.First == b.First && SetEqual[ObjectName](a.Second, b.Second)
 }
 
-func looksLikeMBWSName(wsName string) bool {
-	mbwsNameParts := strings.Split(wsName, WSNameSep)
-	return len(mbwsNameParts) == 2
+func looksLikeMBWSName(spaceName string) bool {
+	mbsNameParts := strings.Split(spaceName, MBspaceNameSep)
+	return len(mbsNameParts) == 2
 }

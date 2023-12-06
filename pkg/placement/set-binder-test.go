@@ -23,8 +23,6 @@ import (
 	apimachtypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -33,7 +31,7 @@ import (
 // invoke this from TestFoo (or whatever).
 // At the current state of development, the test is utterly simple.
 // TODO: make this test harder.
-func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiver MappingReceiver[Pair[logicalcluster.Name, metav1.GroupResource], ResourceDetails], binder SetBinder) {
+func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiver MappingReceiver[Pair[string, metav1.GroupResource], ResourceDetails], binder SetBinder) {
 	gr1 := metav1.GroupResource{
 		Group:    "apiextensions.k8s.io",
 		Resource: "customresourcedefinitions"}
@@ -60,7 +58,7 @@ func exerciseSetBinder(t *testing.T, logger klog.Logger, resourceDiscoveryReceiv
 	ups2 := []edgeapi.UpsyncSet{
 		ups1[0],
 		{APIGroup: "group3.test", Resources: []string{"widgets"}, Names: []string{"*"}}}
-	sc1 := logicalcluster.Name("wm1")
+	sc1 := "wm1"
 	ep1Ref := ExternalName{Cluster: sc1, Name: "ep1"}
 	spA := SinglePlacement{
 		Cluster:        "inv1",
