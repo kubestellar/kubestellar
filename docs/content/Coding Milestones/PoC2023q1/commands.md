@@ -9,7 +9,7 @@ for the executable on the command line. The one exception is [the
 bootstrap script](#bootstrap), which is designed to be fetched from
 github and fed directly into `bash`.
 
-There are two ways of deploying kcp and the central KubeStellar
+There are two ways of deploying a space provider and the central KubeStellar
 components: (1) as processes on a machine of supported OS and ISA, and
 (2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
 latter is newer and not yet well exercised.
@@ -17,17 +17,17 @@ latter is newer and not yet well exercised.
 This document describes both commands that a platform administrator
 uses and commands that a platform user uses.
 
-Most of these executables require that the kcp server be running and
+Most of these executables require that the space provider be running and
 that `kubectl` is configured to use the kubeconfig file produced by
-`kcp start`. That is: either `$KUBECONFIG` holds the pathname of that
-kubeconfig file, its contents appear at `~/.kube/config`, or
+that space provider. That is: either `$KUBECONFIG` holds the pathname 
+of that kubeconfig file, its contents appear at `~/.kube/config`, or
 `--kubeconfig $pathname` appears on the command line.  The exceptions
 are the bootstrap script, [the kcp control script that runs before
 starting the kcp server](#kubestellar-ensure-kcp-server-creds), and
 the admin commands for deploying KubeStellar in a Kubernetes cluster.
 
 **NOTE**: most of the kubectl plugin usages described here certainly
-or potentially change the setting of which kcp workspace is "current"
+or potentially change the setting of which kubeconfig context is "current"
 in your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.  The exceptions are the admin commands for deploying
@@ -257,9 +257,10 @@ that import the namespaced Kubernetes resources (kinds of objects) for managemen
 containerized workloads. At the completion of `kubestellar init` the current workspace will be
 "root".
 
-6. Creates the space provider objects to be used by the space manager. Need to pass
-in two environment variables - SM_CONFIG and IN_CLUSTER. SM_CONFIG
-is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
+6. Creates the space provider objects to be used by the space manager. It requires
+several environment variables - SM_CONFIG, SM_CONTEXT, and IN_CLUSTER. SM_CONFIG
+is the path to the kubeconfig for the space manager. The SM_CONTEXT is the space manager
+context in the config file. The IN_CLUSTER variable specify whether spaces
 are accessed from within the hosting cluster or externally by kubestellar init.
 
 #### KubeStellar start
@@ -278,10 +279,10 @@ the ESPW.
 ## Deployment into a Kubernetes cluster
 
 These commands administer a deployment of the central components ---
-the kcp server, PKI, and the central KubeStellar components --- in a
-Kubernetes cluster that will be referred to as "the hosting cluster".
-These commands are framed as "kubectl plugins" and thus need to be
-explicitly or implicitly given a kubeconfig file for the hosting
+the space provider server, PKI, and the central KubeStellar components 
+--- in a Kubernetes cluster that will be referred to as "the hosting 
+cluster".  These commands are framed as "kubectl plugins" and thus need 
+to be explicitly or implicitly given a kubeconfig file for the hosting
 cluster.
 
 You need a Kubernetes cluster with an Ingress controller deployed and
@@ -502,15 +503,10 @@ The flags can also appear anywhere later on the command line.
 The acceptable flags include all those of `kubectl` except for
 `--context`.  This command also accepts the following flags.
 
-- `--imw workspace_path`: specifies which workspace to use as the
-  inventory management workspace.  The default value is the current
-  workspace.
+- `--imw space_name`: specifies which space to use as the
+  inventory management workspace.  
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
-
-The current workspaces does not matter if the IMW is explicitly
-specified.  Upon completion, the current workspace will be your chosen
-IMW.
 
 This command does not depend on the action of any of the KubeStellar
 controllers but does require that the KubeStellar Core Space (KCS) has been set up.
@@ -521,7 +517,6 @@ An example usage follows.
 kubectl kubestellar ensure location --imw imw-1 demo1 foo=bar the-word=the-bird
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo1 created
 location.scheduling.kcp.io/demo1 created
 synctarget.workload.kcp.io/demo1 labeled
@@ -535,8 +530,12 @@ Location named `demo1` with labels `foo=bar` and `the-word=the-bird`.
 This was equivalent to the following commands.
 
 ```shell
-kubectl ws root:imw-1
-kubectl create -f -<<EOF
+imw_space_config="${PWD}/temp-space-config/spaceprovider-default-imw-1"
+secret_name=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.name}")
+secret_namespace=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.namespace}")
+kubectl --kubeconfig $sm_core_config --context $sm_context get secret ${secret_name} -n ${secret_namespace} -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > $imw_space_config
+
+KUBECONFIG=$imw_space_config kubectl create -f -<<EOF
 apiVersion: workload.kcp.io/v1alpha1
 kind: SyncTarget
 metadata:
@@ -560,11 +559,14 @@ spec:
 EOF
 ```
 
+Note that the extraction of space kubeconfig file can be accomplished using the 
+kubectl-kubestellar-get-config-for-space script.
+
 The creation of the APIBinding is equivalent to the following command
-(in the same workspace).
+(in the same space).
 
 ```shell
-kubectl create -f <<EOF
+KUBECONFIG=$imw_space_config kubectl create -f <<EOF
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIBinding
 metadata:
@@ -594,14 +596,7 @@ This command does not depend on the action of any of the KubeStellar controllers
 The following session demonstrates usage, including idempotency.
 
 ```shell
-kubectl ws root:imw-1
-```
-``` { .bash .no-copy }
-Current workspace is "root:imw-1".
-```
-
-```shell
-kubectl kubestellar remove location demo1
+KUBECONFIG=$imw_space_config kubectl kubestellar remove location demo1
 ```
 ``` { .bash .no-copy }
 synctarget.workload.kcp.io "demo1" deleted
@@ -609,14 +604,36 @@ location.scheduling.kcp.io "demo1" deleted
 ```
 
 ```shell
-kubectl kubestellar remove location demo1
+KUBECONFIG=$imw_space_config kubectl kubestellar remove location demo1
+```
+
+## Getting a kubeconfig of a given space
+
+To access a particular space the kubeconfig file of that space needs to be
+obtained.  This can be done manually as follows: 
+
+```shell
+secret_name=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.name}")
+secret_namespace=$(kubectl --kubeconfig $sm_core_config --context $sm_context get space imw-1 -n spaceprovider-default -o jsonpath="{$.status.externalSecretRef.namespace}")
+kubectl --kubeconfig $sm_core_config --context $sm_context get secret ${secret_name} -n ${secret_namespace} -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > imw.kubeconfig
+```
+
+Alternatively, the kubectl-kubestellar-get-config-for-space can be used. This script takes
+as input the name of the space (--space-name), the name of the space provider (--provider-name) 
+which has a default of "default", the location of the space manager 
+kubeconfig (--sm-core-config), the context of the space manager (--sm-context), whether the space 
+manager is accessed in-cluster or externally (in_cluster), and the name of the output kubeconfig 
+file (--output).
+
+```shell
+kubectl-kubestellar-get-config-for-space --space-name imw-1 --sm-core-config $SM_CONFIG ${in_cluster} --output imw.kubeconfig
 ```
 
 ## Syncer preparation and installation
 
 The syncer runs in each edge cluster and also talks to the
-corresponding mailbox workspace.  In order for it to be able to do
-that, there is some work to do in the mailbox workspace to create a
+corresponding mailbox space.  In order for it to be able to do
+that, there is some work to do in the mailbox space to create a
 ServiceAccount for the syncer to authenticate as and create RBAC
 objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
@@ -636,11 +653,10 @@ The flags can also appear anywhere later on the command line.
 The acceptable flags include all those of `kubectl` except for
 `--context`.  This command also accepts the following flags.
 
-- `--imw workspace_path`: specifies which workspace holds the relevant
-  SyncTarget object.  The default value is the current workspace.
-- `--espw workspace_path`: specifies where to find the edge service
-  provider workspace.  The default is the standard location,
-  `root:espw`.
+- `--imw space_name`: specifies which space holds the relevant
+  SyncTarget object.
+- `--espw space_name`: specifies where to find the edge service
+  provider space.
 - `--syncer-image image_ref`: specifies the container image that runs
   the syncer.  The default is `quay.io/kubestellar/syncer:{{ config.ks_tag }}`.
 - `-o output_pathname`: specifies where to write the YAML definitions
@@ -651,23 +667,17 @@ The acceptable flags include all those of `kubectl` except for
 - `-X`: turn on debug echoing of commands inside the script that
   implements this command.
 
-The current workspaces does not matter if the IMW is explicitly
-specified.  Upon completion, the current workspace will be what it was
-when the command started.
-
 This command will only succeed if the mailbox controller has created
-and conditioned the mailbox workspace for the given SyncTarget.  This
+and conditioned the mailbox space for the given SyncTarget.  This
 command will wait for 10 to 70 seconds for that to happen.
 
 An example usage follows.
 
 ```shell
-kubectl kubestellar prep-for-syncer --imw root:imw-1 demo1
+kubectl kubestellar prep-for-syncer --imw imw-1 demo1
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
-Current workspace is "root:espw"
-Current workspace is "root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" (type root:universal).
+Current space is "4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010" 
 Creating service account "kubestellar-syncer-demo1-28at01r3"
 Creating cluster role "kubestellar-syncer-demo1-28at01r3" to give service account "kubestellar-syncer-demo1-28at01r3"
 
@@ -678,14 +688,13 @@ Creating or updating cluster role binding "kubestellar-syncer-demo1-28at01r3" to
 
 Wrote WEC manifest to demo1-syncer.yaml for namespace "kubestellar-syncer-demo1-28at01r3". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo1-syncer.yaml"
+  KUBECONFIG=<space-execution-cluster-config> kubectl apply -f "demo1-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-demo1-28at01r3" kubestellar-syncer-demo1-28at01r3
+  KUBECONFIG=<space-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-demo1-28at01r3" kubestellar-syncer-demo1-28at01r3
 
 to verify the syncer pod is running.
-Current workspace is "root:espw".
 ```
 
 Once that script has run, the YAML for the objects to create in the
@@ -740,17 +749,14 @@ the kcp current workspace will be what it was at the start.
 An example usage follows.
 
 ```shell
-kubectl kubestellar prep-for-cluster --imw root:imw-1 demo2 key1=val1
+kubectl kubestellar prep-for-cluster --imw imw-1 demo2 key1=val1
 ```
 ``` { .bash .no-copy }
-Current workspace is "root:imw-1".
 synctarget.workload.kcp.io/demo2 created
 location.scheduling.kcp.io/demo2 created
 synctarget.workload.kcp.io/demo2 labeled
 location.scheduling.kcp.io/demo2 labeled
-Current workspace is "root:imw-1".
-Current workspace is "root:espw".
-Current workspace is "root:espw:1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7" (type root:universal).
+Current space is "1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7" 
 Creating service account "kubestellar-syncer-demo2-15nq4e94"
 Creating cluster role "kubestellar-syncer-demo2-15nq4e94" to give service account "kubestellar-syncer-demo2-15nq4e94"
 
@@ -761,37 +767,28 @@ Creating or updating cluster role binding "kubestellar-syncer-demo2-15nq4e94" to
 
 Wrote WEC manifest to demo2-syncer.yaml for namespace "kubestellar-syncer-demo2-15nq4e94". Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl apply -f "demo2-syncer.yaml"
+  KUBECONFIG=<space-execution-cluster-config> kubectl apply -f "demo2-syncer.yaml"
 
 to apply it. Use
 
-  KUBECONFIG=<workload-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-demo2-15nq4e94" kubestellar-syncer-demo2-15nq4e94
+  KUBECONFIG=<space-execution-cluster-config> kubectl get deployment -n "kubestellar-syncer-demo2-15nq4e94" kubestellar-syncer-demo2-15nq4e94
 
 to verify the syncer pod is running.
 ```
 
-## Creating a Workload Management Workspace
+## Creating a Workload Management Space
 
-Such a workspace needs not only to be created but also populated with
+Such a space needs not only to be created but also populated with
 an `APIBinding` to the edge API and, if desired, some `APIBindings` to
 the Kubernetes API for management of containerized workloads.
-
-Every workload management workspace is a child of the `root`
-workspace.
 
 The usage synopsis for this command is as follows.
 
 ```shell
-kubectl kubestellar ensure wmw flag... wm_workspace_name
+kubectl kubestellar ensure wmw flag... wm_space_name
 ```
 
-Here `wm_workspace_name` is the name (not pathname, just a bare
-one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
-will be `root:wm_workspace_name`.
-
-Upon completion, the WMW will be the current workspace.
-
-The flags can also appear anywhere later on the command line.
+The flags can appear anywhere on the command line.
 
 The acceptable flags include all those of `kubectl` except for
 `--context`.  This command also accepts the following flags.
@@ -803,20 +800,18 @@ The acceptable flags include all those of `kubectl` except for
 - `-X`: turn on debug echoing of the commands inside the script that
   implements this command.
 
+The space manager is involved in the creation of the workload management
+space. To access the space manager, the following environment variables
+are used: SM_CONFIG specifies the path to the space manager kubeconfig 
+file. SM_CONTEXT specifies the context of the space manager within the 
+kubeconfig file. IN_CLUSTER specifies whether the space manager is
+accessed from within the hosting cluster or externally. Note that 
+SM_CONFIG, SM_CONTEXT, and IN_CLUSTER have default values of 
+SM_CONFIG=$PWD/temp-space-config/config, SM_CONTEXT=sm_mgt, IN_CLUSTER=true.
+
 This script works in idempotent style, doing whatever work remains to
 be done.
 
-Identify the kubeconfig for Space Manager, for example:
-```
-kubectl config --kubeconfig ~/.kube/config current-context
-```
-``` { .bash .no-copy }
-sm-mgt
-```
-Set an environment variable for Space Manager:
-```
-SM_CONFIG=~/.kube/config
-```
 The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube CRDs
 are included.
@@ -894,14 +889,7 @@ customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.i
 ```
 
 ```shell
-kubectl ws .
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw
+IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw
 ```
 ``` { .bash .no-copy }
 SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
@@ -954,14 +942,7 @@ customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.i
 ```
 
 ```shell
-kubectl ws .
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure wmw example-wmw --with-kube false
+IN_CLUSTER=false kubectl kubestellar ensure wmw example-wmw --with-kube false
 ```
 ``` { .bash .no-copy }
 SPACE_MANAGER_KUBECONFIG=/home/ubuntu/.kube/config
@@ -1015,18 +996,11 @@ customresourcedefinition.apiextensions.k8s.io "csistoragecapacities.storage.k8s.
 
 ## Removing a Workload Management Workspace
 
-Deleting a WMW can be done by simply deleting its `Workspace` object from
+Deleting a WMW can be done by simply deleting its `space` object from
 the parent.
 
 ```shell
-kubectl ws root
-```
-``` { .bash .no-copy }
-Current workspace is "root".
-```
-
-```shell
-kubectl delete Workspace example-wmw
+KUBECONFIG=$SM_CONFIG kubectl delete space example-wmw
 ```
 ``` { .bash .no-copy }
 workspace.tenancy.kcp.io "example-wmw" deleted
@@ -1049,13 +1023,6 @@ kubectl kubestellar remove wmw demo1
 ``` { .bash .no-copy }
 Current workspace is "root".
 workspace.tenancy.kcp.io "demo1" deleted
-```
-
-```shell
-kubectl ws .
-```
-``` { .bash .no-copy }
-Current workspace is "root".
 ```
 
 ```shell
