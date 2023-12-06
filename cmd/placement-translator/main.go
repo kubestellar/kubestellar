@@ -32,8 +32,6 @@ import (
 
 	"github.com/spf13/pflag"
 
-	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/kcp/clientset/versioned"
-	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions"
 	"k8s.io/apiserver/pkg/server/mux"
 	"k8s.io/apiserver/pkg/server/routes"
 	"k8s.io/client-go/kubernetes"
@@ -46,20 +44,14 @@ import (
 	"k8s.io/klog/v2"
 	utilflag "k8s.io/kubernetes/pkg/util/flag"
 
-	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
-	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	clusterdynamicinformer "github.com/kcp-dev/client-go/dynamic/dynamicinformer"
-	kcpkubeinformers "github.com/kcp-dev/client-go/informers"
-	kcpkubeclient "github.com/kcp-dev/client-go/kubernetes"
-	kcpscopedclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-
 	ksclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	emcclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	emcinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	"github.com/kubestellar/kubestellar/pkg/placement"
+	spaceclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	spaceinformers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions"
+	spaceclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 type ClientOpts struct {
@@ -95,19 +87,18 @@ func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10204"
+	coreSpace := "espw"
+	spaceProvider := "default"
 	fs := pflag.NewFlagSet("placement-translator", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	espwClientOpts := NewClientOpts("espw", "access to the edge service provider workspace")
-	espwClientOpts.AddFlags(fs)
-	rootClientOpts := NewClientOpts("root", "access to root workspace")
-	rootClientOpts.overrides.CurrentContext = "root"
-	rootClientOpts.AddFlags(fs)
-	baseClientOpts := NewClientOpts("allclusters", "access to all clusters")
-	baseClientOpts.overrides.CurrentContext = "system:admin"
-	baseClientOpts.AddFlags(fs)
+	fs.StringVar(&coreSpace, "core-space", coreSpace, "the name of the KubeStellar core space")
+	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
+
+	spaceMgtOpts := NewClientOpts("space-mgt", "access to space management")
+	spaceMgtOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -129,95 +120,44 @@ func main() {
 		}
 	}()
 
-	espwRestConfig, err := espwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", espwClientOpts.which)
-		os.Exit(10)
+		logger.Error(err, "Failed to create space management config from flags")
+		os.Exit(3)
+	}
+	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create space-aware client")
+		os.Exit(4)
+	}
+	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
+
+	coreRestConfig, err := spaceclient.ConfigForSpace(coreSpace, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "Failed to fetch space config", "spacename", coreSpace)
+		os.Exit(5)
 	}
 
-	rootRestConfig, err := rootClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", rootClientOpts.which)
-		os.Exit(11)
-	}
-
-	baseRestConfig, err := baseClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "Failed to build config from flags", "which", baseClientOpts.which)
-		os.Exit(15)
-	}
-
-	edgeClusterClientset, err := emcclusterclientset.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to build all-cluster edge clientset")
-		os.Exit(25)
-	}
-
-	edgeClientset, err := ksclientset.NewForConfig(espwRestConfig)
+	edgeClientset, err := ksclientset.NewForConfig(coreRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create provider clientset from config")
 		os.Exit(30)
 	}
 
-	apiextClusterClient, err := apiextclient.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create cluster clientset for CustomResourceDefinitions")
-		os.Exit(43)
-	}
-
-	apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClusterClient, 0)
-	crdClusterPreInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions()
-
-	kubeClusterClient, err := kcpkubeclient.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create kcp-kube all-cluster client")
-		os.Exit(44)
-	}
-	nsClusterClient := kubeClusterClient.CoreV1().Namespaces()
-	kubeClusterInformerFactory := kcpkubeinformers.NewSharedInformerFactory(kubeClusterClient, 0)
-	nsClusterPreInformer := kubeClusterInformerFactory.Core().V1().Namespaces()
-
 	edgeInformerFactory := emcinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 	epPreInformer := edgeInformerFactory.Edge().V2alpha1().EdgePlacements()
 	spsPreInformer := edgeInformerFactory.Edge().V2alpha1().SinglePlacementSlices()
 	syncfgPreInformer := edgeInformerFactory.Edge().V2alpha1().SyncerConfigs()
-	customizerPreInformer := edgeInformerFactory.Edge().V2alpha1().Customizers()
-
-	rootClientset, err := kcpscopedclientset.NewForConfig(rootRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create clientset for root workspace")
-		os.Exit(50)
-	}
-
-	rootInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(rootClientset, resyncPeriod)
-	mbwsPreInformer := rootInformerFactory.Tenancy().V1alpha1().Workspaces()
-
 	locationPreInformer := edgeInformerFactory.Edge().V2alpha1().Locations()
 
-	kcpClusterClientset, err := kcpclusterclientset.NewForConfig(baseRestConfig)
+	managementClientset, err := spaceclientset.NewForConfig(spaceManagementConfig)
 	if err != nil {
-		logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
-		os.Exit(60)
+		logger.Error(err, "Failed to create clientset for space management")
 	}
+	spaceInformerFactory := spaceinformers.NewSharedInformerFactory(managementClientset, resyncPeriod)
+	spacePreInformer := spaceInformerFactory.Space().V1alpha1().Spaces()
 
-	discoveryClusterClient, err := clusterdiscovery.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create all-cluster discovery client")
-		os.Exit(70)
-	}
-
-	dynamicClusterClient, err := clusterdynamic.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "Failed to create all-cluster dynamic client")
-		os.Exit(80)
-	}
-
-	dynamicClusterInformerFactory := clusterdynamicinformer.NewDynamicSharedInformerFactory(dynamicClusterClient, 0)
-
-	kcpClusterInformerFactory := kcpinformers.NewSharedInformerFactory(kcpClusterClientset, 0)
-	bindingClusterPreInformer := kcpClusterInformerFactory.Apis().V1alpha1().APIBindings()
-
-	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(coreRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for service provider space")
 		os.Exit(90)
@@ -225,18 +165,14 @@ func main() {
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
 
 	doneCh := ctx.Done()
-	// TODO: more
-	pt := placement.NewPlacementTranslator(concurrency, ctx, locationPreInformer, epPreInformer, spsPreInformer, syncfgPreInformer, customizerPreInformer,
-		mbwsPreInformer, kcpClusterClientset, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer,
-		dynamicClusterClient, edgeClusterClientset, nsClusterPreInformer, nsClusterClient, kbSpaceRelation)
+
+	pt := placement.NewPlacementTranslator(concurrency, ctx,
+		locationPreInformer, epPreInformer, spsPreInformer, syncfgPreInformer,
+		spaceclient, spaceProviderNs, spacePreInformer, kbSpaceRelation)
 
 	cache.WaitForCacheSync(doneCh, kbSpaceRelation.InformerSynced)
-	apiextFactory.Start(doneCh)
 	edgeInformerFactory.Start(doneCh)
-	rootInformerFactory.Start(doneCh)
-	dynamicClusterInformerFactory.Start(doneCh)
-	kubeClusterInformerFactory.Start(doneCh)
-	kcpClusterInformerFactory.Start(doneCh)
+	spaceInformerFactory.Start(doneCh)
 	pt.Run()
 	logger.Info("Time to stop")
 }

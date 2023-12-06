@@ -96,7 +96,7 @@ func (clw *crossClusterListerWatcher[Scoped, ListType]) OnDelete(obj any) {
 func (clw *crossClusterListerWatcher[Scoped, ListType]) setInclusion(obj any, include bool) {
 	ws := obj.(*tenancyv1a1.Workspace)
 	mbwsName := ws.Name
-	mbwsNameParts := strings.Split(mbwsName, placement.WSNameSep)
+	mbwsNameParts := strings.Split(mbwsName, placement.MBspaceNameSep)
 	if len(mbwsNameParts) != 2 {
 		// Only accept the workspace if its name looks like a mailbox workspace name
 		include = false

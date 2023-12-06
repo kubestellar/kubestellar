@@ -19,8 +19,6 @@ package placement
 import (
 	"hash/crc64"
 
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 )
 
@@ -123,19 +121,19 @@ func StringHash(arg string) HashValue { return crc64.Checksum([]byte(arg), ecmaT
 
 var SliceOfStringDomain = NewSliceHashDomain[string](HashDomainString{})
 
-var HashLogicalClusterName = NewTransformHashDomain[logicalcluster.Name, string](func(name logicalcluster.Name) string { return string(name) }, HashDomainString{})
+var HashLogicalClusterName = NewTransformHashDomain[string, string](func(name string) string { return string(name) }, HashDomainString{})
 
 var HashObjectName = NewTransformHashDomain[ObjectName, string](func(name ObjectName) string { return string(name) }, HashDomainString{})
 
-var HashClusterString = PairHashDomain[logicalcluster.Name, string](HashLogicalClusterName, HashDomainString{})
+var HashClusterString = PairHashDomain[string, string](HashLogicalClusterName, HashDomainString{})
 
-var HashClusterObjectName = PairHashDomain[logicalcluster.Name, ObjectName](HashLogicalClusterName, HashObjectName)
+var HashClusterObjectName = PairHashDomain[string, ObjectName](HashLogicalClusterName, HashObjectName)
 
 var factorExternalName = NewFactorer(
-	func(whole ExternalName) Pair[logicalcluster.Name, ObjectName] {
+	func(whole ExternalName) Pair[string, ObjectName] {
 		return NewPair(whole.Cluster, whole.Name)
 	},
-	func(parts Pair[logicalcluster.Name, ObjectName]) ExternalName {
+	func(parts Pair[string, ObjectName]) ExternalName {
 		return ExternalName{parts.First, parts.Second}
 	})
 
