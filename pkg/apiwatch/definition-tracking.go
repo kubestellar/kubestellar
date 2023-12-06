@@ -17,12 +17,15 @@ limitations under the License.
 package apiwatch
 
 import (
+	"encoding/json"
+	"strings"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (rlw *resourcesListWatcher) setDefinerLocked(oid objectID, enumr ResourceDefinitionEnumerator) {
 	oldRscs := ensureMap(rlw.definerToRscs[oid])
-	newRscs := map[metav1.GroupVersionResource]Empty{}
+	newRscs := GoSet[metav1.GroupVersionResource]{}
 	rlw.logger.V(4).Info("Start setDefinerLocked", "oid", oid, "oldRscs", oldRscs)
 	enumr(func(gvr metav1.GroupVersionResource) {
 		newRscs[gvr] = Empty{}
@@ -50,9 +53,58 @@ func (rlw *resourcesListWatcher) setDefinerLocked(oid objectID, enumr ResourceDe
 	rlw.logger.V(4).Info("Finish setDefinerLocked", "oid", oid, "newRscs", newRscs)
 }
 
-func ensureMap[Key comparable, Val any](in map[Key]Val) map[Key]Val {
+func ensureMap[Key comparable](in GoSet[Key]) GoSet[Key] {
 	if in != nil {
 		return in
 	}
-	return map[Key]Val{}
+	return GoSet[Key]{}
+}
+
+func MarshalMap[Key comparable, Val any](it map[Key]Val) ([]byte, error) {
+	if it == nil {
+		return []byte("null"), nil
+	}
+	var builder strings.Builder
+	enc := json.NewEncoder(&builder)
+	builder.WriteRune('[')
+	first := true
+	for key, val := range it {
+		item := struct{ Key, Val any }{key, val}
+		if first {
+			first = false
+		} else {
+			builder.WriteString(", ")
+		}
+		err := enc.Encode(item)
+		if err != nil {
+			errS := err.Error()
+			enc.Encode(errS)
+		}
+	}
+	builder.WriteRune(']')
+	return []byte(builder.String()), nil
+}
+
+func MarshalSet[Key comparable](it map[Key]Empty) ([]byte, error) {
+	if it == nil {
+		return []byte("null"), nil
+	}
+	var builder strings.Builder
+	enc := json.NewEncoder(&builder)
+	builder.WriteRune('[')
+	first := true
+	for key, _ := range it {
+		if first {
+			first = false
+		} else {
+			builder.WriteString(", ")
+		}
+		err := enc.Encode(key)
+		if err != nil {
+			errS := err.Error()
+			enc.Encode(errS)
+		}
+	}
+	builder.WriteRune(']')
+	return []byte(builder.String()), nil
 }
