@@ -51,3 +51,21 @@ jobs:
       - run: |
           make MANIFEST="${{ env.docs-ecutable-md-filename }}" \
           docs-ecutable
+
+      - name: Dump mailbox-controller log
+        if: always()
+        run: cat /tmp/mailbox-controller.log
+
+      - name: Dump where-resolver log
+        if: always()
+        run: cat /tmp/where-resolver.log
+
+      - name: Tail placement-translator log
+        if: always()
+        run: |
+          wc /tmp/placement-translator.log
+          tail /tmp/placement-translator.log
+
+      - name: Dump placement-translator log
+        if: always()
+        run: cat /tmp/placement-translator.log
