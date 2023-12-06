@@ -162,10 +162,10 @@ sleep 5
 TESTMB_CMD="KUBECONFIG=$SM_CONFIG kubectl get space -n spaceprovider-default "$mbwsname" -o=jsonpath='{.status.Phase}'"
 
 
-if  phase=$(TESTMB_CMD); [ "$phase" != "READY" ]; then
+if  phase=($TESTMB_CMD); [ "$phase" != "READY" ]; then
     echo "tried once to switch to $mbwsname"
     sleep 15
-    if phase=$(TESTMB_CMD); [ "$phase" != "READY" ]; then
+    if phase=($TESTMB_CMD); [ "$phase" != "READY" ]; then
         echo "tried twice to switch to $mbwsname"
         sleep 15
     fi
