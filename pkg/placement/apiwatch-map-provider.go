@@ -115,6 +115,10 @@ func (awp *apiWatchProvider) AddReceivers(clusterName string,
 		kcpInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(kcpClientset, 0)
 		bindingInformer := kcpInformerFactory.Apis().V1alpha1().APIBindings().Informer()
 
+		doneCh := ctx.Done()
+		apiextFactory.Start(doneCh)
+		kcpInformerFactory.Start(doneCh)
+
 		wpc.informer, wpc.lister, _ = apiwatch.NewAPIResourceInformer(ctx, clusterName, discoveryScopedClient, false, crdInformer, bindingInformer)
 		wpc.informer.AddEventHandler(wpc)
 		go wpc.informer.Run(ctx.Done())
