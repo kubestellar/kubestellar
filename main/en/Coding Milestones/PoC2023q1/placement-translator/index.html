@@ -3101,7 +3101,7 @@ hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="c1"># TODO: mailbox controller has kcp dependencies. Will remove when controllers support spaces.</span>
 <a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>sleep<span class="w"> </span><span class="m">20</span>
 </code></pre></div>
 <p>This controller is in charge of maintaining the collection of mailbox
@@ -3651,7 +3651,7 @@ to be the current kcp workspace at start time.</p>
 <a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>espw<span class="w"> </span>--provider-name<span class="w"> </span>default<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--space-config-file<span class="w"> </span><span class="nv">$espw_space_config</span>
 <a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="c1"># TODO: where-resolver needs access to multiple configs. Will remove when controllers support spaces.</span>
 <a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw<span class="w"> </span>
-<a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a>kubestellar-where-resolver<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a>kubestellar-where-resolver<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>
 <a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a>sleep<span class="w"> </span><span class="m">10</span>
 </code></pre></div>
 <p>The following commands wait until the where-resolver has done its job
