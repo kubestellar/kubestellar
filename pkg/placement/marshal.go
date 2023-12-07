@@ -45,3 +45,27 @@ func MarshalMap[Key comparable, Val any](it map[Key]Val) ([]byte, error) {
 	builder.WriteRune(']')
 	return []byte(builder.String()), nil
 }
+
+func MarshalSet[Key comparable](it map[Key]Empty) ([]byte, error) {
+	if it == nil {
+		return []byte("null"), nil
+	}
+	var builder strings.Builder
+	enc := json.NewEncoder(&builder)
+	builder.WriteRune('[')
+	first := true
+	for key := range it {
+		if first {
+			first = false
+		} else {
+			builder.WriteString(", ")
+		}
+		err := enc.Encode(key)
+		if err != nil {
+			errS := err.Error()
+			enc.Encode(errS)
+		}
+	}
+	builder.WriteRune(']')
+	return []byte(builder.String()), nil
+}

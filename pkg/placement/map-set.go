@@ -16,9 +16,12 @@ limitations under the License.
 
 package placement
 
+import "encoding/json"
+
 type MapSet[Elt comparable] map[Elt]Empty
 
 var _ MutableSet[string] = MapSet[string]{}
+var _ json.Marshaler = MapSet[string]{}
 
 func NewMapSet[Elt comparable](elts ...Elt) MapSet[Elt] {
 	ans := NewEmptyMapSet[Elt]()
@@ -76,6 +79,10 @@ func (ms MapSet[Elt]) Remove(elt Elt) bool /* change */ {
 		return true
 	}
 	return false
+}
+
+func (ms MapSet[Elt]) MarshalJSON() ([]byte, error) {
+	return MarshalSet(ms)
 }
 
 func MapSetAddNoResult[Elt comparable](set MapSet[Elt], elt Elt) {
