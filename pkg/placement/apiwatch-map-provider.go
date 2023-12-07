@@ -31,9 +31,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	apiwatch "github.com/kubestellar/kubestellar/pkg/apiwatch"
 	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
@@ -107,19 +104,9 @@ func (awp *apiWatchProvider) AddReceivers(clusterName string,
 		}
 		apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClient, 0)
 		crdInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions().Informer()
+		apiextFactory.Start(ctx.Done())
 
-		kcpClientset, err := kcpclientset.NewForConfig(config)
-		if err != nil {
-			logger.Error(err, "Failed to create all-cluster clientset for kcp APIs")
-		}
-		kcpInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(kcpClientset, 0)
-		bindingInformer := kcpInformerFactory.Apis().V1alpha1().APIBindings().Informer()
-
-		doneCh := ctx.Done()
-		apiextFactory.Start(doneCh)
-		kcpInformerFactory.Start(doneCh)
-
-		wpc.informer, wpc.lister, _ = apiwatch.NewAPIResourceInformer(ctx, clusterName, discoveryScopedClient, false, crdInformer, bindingInformer)
+		wpc.informer, wpc.lister, _ = apiwatch.NewAPIResourceInformer(ctx, clusterName, discoveryScopedClient, false, crdInformer)
 		wpc.informer.AddEventHandler(wpc)
 		go wpc.informer.Run(ctx.Done())
 		return wpc

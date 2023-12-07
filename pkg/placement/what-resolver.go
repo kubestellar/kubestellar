@@ -40,10 +40,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	kcpclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned"
-	kcpinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
 	"github.com/kubestellar/kubestellar/pkg/apiwatch"
@@ -266,10 +262,6 @@ func (wr *whatResolver) getPartsLocked(wldCluster string, epName ObjectName) Res
 		}
 	}
 	definers.Visit(func(definer ksmetav1a1.Definer) error {
-		if definer.Kind == "APIBinding" && definer.Name == "espw" {
-			// not neceesary to add, already in every mailbox workspace
-			return nil
-		}
 		nsName := NamespaceName("")
 		objName := ObjectName(definer.Name)
 		pieces := definerKindToPieces[definer.Kind]
@@ -288,7 +280,6 @@ func (wr *whatResolver) getPartsLocked(wldCluster string, epName ObjectName) Res
 
 var definerKindToPieces = map[string]Pair[metav1.GroupResource, WorkloadPartDetails]{
 	"CustomResourceDefinition": NewPair(metav1.GroupResource{Group: apiext.GroupName, Resource: "customresourcedefinitions"}, WorkloadPartDetails{APIVersion: apiext.SchemeGroupVersion.Version}),
-	"APIBinding":               NewPair(metav1.GroupResource{Group: apisv1alpha1.SchemeGroupVersion.Group, Resource: "apibindings"}, WorkloadPartDetails{APIVersion: apisv1alpha1.SchemeGroupVersion.Version}),
 }
 
 func (wr *whatResolver) notifyReceiversOfPlacements(cluster string, placements Set[ObjectName]) {
@@ -552,20 +543,13 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 		}
 		apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClient, 0)
 		crdInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions().Informer()
-		kcpClientset, err := kcpclientset.NewForConfig(config)
-		if err != nil {
-			logger.Error(err, "Failed to create clientset for kcp APIs")
-		}
-		kcpInformerFactory := kcpinformers.NewSharedScopedInformerFactoryWithOptions(kcpClientset, 0)
-		bindingInformer := kcpInformerFactory.Apis().V1alpha1().APIBindings().Informer()
 
 		wsCtx, stopWS := context.WithCancel(wr.ctx)
 		doneCh := wsCtx.Done()
 		apiextFactory.Start(doneCh)
-		kcpInformerFactory.Start(doneCh)
 
 		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, spaceID, discoveryScopedClient, false,
-			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
+			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer})
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
 			ctx:                    wsCtx,
@@ -846,10 +830,6 @@ var GRsNaturedInBoth = NewMapSet(
 	mkgr("", "namespaces"),
 )
 
-var NaturedInCenterGoToMailbox = NewMapSet(
-	mkgr("apis.kcp.io", "apibindings"),
-)
-
 var GRsNotSupported = NewMapSet(
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
@@ -892,8 +872,6 @@ func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
 		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
 	case GRsNaturedInBoth.Has(sgr):
 		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
-	case NaturedInCenterGoToMailbox.Has(sgr):
-		return ResourceMode{GoesToMailbox, NaturallyNatured, builtin}
 	case GRsNotSupported.Has(sgr):
 		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
 	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):
