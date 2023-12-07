@@ -253,7 +253,7 @@ function run_placement_translator() {
     wait-kubestellar-ready
     get_kcp_kubeconfig
     KUBECONFIG=$SM_CONFIG
-    if ! placement-translator --allclusters-context  "system:admin" -v=${VERBOSITY} ; then
+    if ! placement-translator -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
     fi
