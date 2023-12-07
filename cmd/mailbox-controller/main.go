@@ -115,6 +115,7 @@ func main() {
 		logger.Error(err, "Failed to create edge clientset for KubeStellar Core Space")
 		os.Exit(20)
 	}
+	kcsRestConfig.UserAgent = "mailbox-controller"
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 	syncTargetPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
 
