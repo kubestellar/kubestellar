@@ -80,7 +80,7 @@ type genericTransportController struct {
 	// simultaneously in two different workers.
 	workqueue workqueue.RateLimitingInterface
 
-	//transportObject is a speicific implementation for the transport interface.
+	//transport is a specific implementation for the transport interface.
 	transport Transport
 }
 
