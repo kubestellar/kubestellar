@@ -411,7 +411,7 @@ espw_space_config="${PWD}/temp-space-config/spaceprovider-default-espw"
 kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --space-config-file $espw_space_config
 # TODO: where-resolver needs access to multiple configs. Will remove when controllers support spaces.
 kubectl ws root:espw 
-kubestellar-where-resolver -v=4 &
+kubestellar-where-resolver -v=4 &> /tmp/where-resolver.log &
 sleep 10
 ```
 

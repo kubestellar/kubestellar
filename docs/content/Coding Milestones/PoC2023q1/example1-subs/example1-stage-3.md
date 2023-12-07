@@ -17,7 +17,7 @@ requires the ESPW to be current at start time.
 ```shell
 # TODO: placement-translator needs access to multiple configs. Will remove when controllers support spaces.
 kubectl ws root:espw
-placement-translator -v=4 &
+placement-translator -v=4 &> /tmp/placement-translator.log &
 sleep 10
 ```
 
