@@ -191,6 +191,7 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 	}
 }
 
+// sync returns true to retry, false on success or unrecoverable error
 func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
 	mbsName := ""
@@ -247,7 +248,7 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 			logger.V(3).Info("Both SyncTarget and Mailbox space are absent or deleting, nothing to do", "mbsName", mbsName)
 			return false
 		}
-		err := ctl.spaceManagementClient.SpaceV1alpha1().Spaces(ctl.spaceProviderNs).Delete(ctx, mbsName, metav1.DeleteOptions{})
+		err := ctl.spaceManagementClient.SpaceV1alpha1().Spaces(ctl.spaceProviderNs).Delete(ctx, mbsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &space.UID}})
 		if err == nil || k8sapierrors.IsNotFound(err) {
 			logger.V(2).Info("Deleted unwanted space", "mbsName", mbsName)
 			return false
