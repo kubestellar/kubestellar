@@ -22,7 +22,7 @@
 
 # This script requires the `kubestellar syncer-gen` kubectl plugin to
 # already exist at ../bin/kubectl-kubestellar-syncer_gen.
-
+ 
 bindir="$(dirname "$0")"
 
 if ! [ -x "$bindir/kubectl-kubestellar-syncer_gen" ]; then
