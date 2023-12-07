@@ -46,5 +46,5 @@ else descr="c $commit"
 fi
 cp -R . forcount
 cd forcount
-rm -rf counts .git .vscode docs/venv docs/__pycache__
+rm -rf counts bin .git .vscode docs/venv docs/__pycache__
 ${bindir}/count-tree.sh ../counts "$ts_pretty" "$commit" "$descr"
