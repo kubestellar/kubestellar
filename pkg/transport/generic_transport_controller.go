@@ -174,8 +174,7 @@ func (ctrl *genericTransportController) process(ctx context.Context, obj interfa
 		utilruntime.HandleError(fmt.Errorf("expected string in workqueue but got %#v", obj))
 		return nil
 	}
-	// Run the syncHandler, passing it the namespace/name string of the
-	// Foo resource to be synced.
+	// Run the syncHandler, passing it the namespace/name string of the EdgePlacementDecision resource to be synced.
 	if err := ctrl.syncHandler(ctx, key); err != nil {
 		// Put the item back on the workqueue to handle any transient errors.
 		ctrl.workqueue.AddRateLimited(key)
@@ -189,7 +188,6 @@ func (ctrl *genericTransportController) process(ctx context.Context, obj interfa
 }
 
 // syncHandler compares the actual state with the desired, and attempts to converge the two.
-// It then updates the Status block of the Foo resource with the current status of the resource.
 func (ctrl *genericTransportController) syncHandler(ctx context.Context, key string) error {
 	// Convert the namespace/name string into a distinct namespace and name
 	logger := klog.LoggerWithValues(klog.FromContext(ctx), "objectName", key)
