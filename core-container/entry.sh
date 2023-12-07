@@ -309,6 +309,10 @@ if [ "$SM_CONFIG" == "" ]; then
     SM_CONFIG=$host_kubeconfig
     export SM_CONFIG
 fi
+if [ "$SM_CONTEXT" == "" ]; then
+    export SM_CONTEXT=sm-mgt
+fi
+
 echo "ESPW_NAME=${ESPW_NAME}"
 echo "VERBOSITY=${VERBOSITY}"
 echo "ENSURE_IMW=${ENSURE_IMW}"
@@ -317,6 +321,7 @@ echo "NAMESPACE=${NAMESPACE}"
 echo "SPACE_PROVIDER_TYPE=${SPACE_PROVIDER_TYPE}"
 echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
 echo "SM_CONFIG=${SM_CONFIG}"
+echo "SM_CONTEXT=${SM_CONTEXT}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 
