@@ -349,7 +349,7 @@ fi
 
 # Start the Placement Translator
 sleep 3
-placement-translator --allclusters-context  "system:admin" -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
+placement-translator -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
 
 run_status=$(wait_for_process placement-translator)
 if [ $run_status -eq 0 ]; then
