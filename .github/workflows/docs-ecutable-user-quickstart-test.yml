@@ -10,10 +10,12 @@ on:
     branches:
       - "release-*"
       - "main"
+      - space-mgt
   push:
     branches:
       - "release-*"
       - "main"
+      - space-mgt
     tags:
       - 'v*'
       
