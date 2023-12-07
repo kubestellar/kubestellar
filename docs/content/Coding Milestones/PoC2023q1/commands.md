@@ -246,23 +246,18 @@ the following five things.
 2. Ensure that the edge service provider workspace (ESPW) exists and
 has the required contents.
 
-3. Ensure that the `root:compute` workspace has been extended with the
-RBAC objects that enable the syncer to propagate reported state for
-downsynced objects defined by the APIExport from that workspace of a
-subset of the Kubernetes API for managing containerized workloads.
-
-4. Ensure the existence of zero, one, or more inventory management workspaces
+3. Ensure the existence of zero, one, or more inventory management workspaces
 depending on the value of `--ensure-imw` flag. Default is one inventory management
 workspaces at pathname "root:imw1".
 
-5. Ensure the existence of zero, one, or more workload management workspaces 
+4. Ensure the existence of zero, one, or more workload management workspaces 
 depending on the value of `--ensure-wmw` flag. Default is one workload management
 workspaces at pathname "root:wmw1". The workload management workspaces have APIBindings
 that import the namespaced Kubernetes resources (kinds of objects) for management of
 containerized workloads. At the completion of `kubestellar init` the current workspace will be
 "root".
 
-6. Creates the space provider objects to be used by the space manager. Need to pass
+5. Creates the space provider objects to be used by the space manager. Need to pass
 in two environment variables - SPACE_MANAGER_KUBECONFIG and IN_CLUSTER. SPACE_MANAGER_KUBECONFIG
 is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
 are accessed from within the hosting cluster or externally by kubestellar init.

@@ -1,9 +1,0 @@
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIExport
-metadata:
-  creationTimestamp: null
-  name: cluster-networking.k8s.io
-spec:
-  latestResourceSchemas:
-  - v230615-d48020c8.ingressclasses.networking.k8s.io
-status: {}

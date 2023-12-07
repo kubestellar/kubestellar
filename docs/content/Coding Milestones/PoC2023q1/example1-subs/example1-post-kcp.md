@@ -72,14 +72,7 @@ popd
 #### Initialize the KubeStellar platform as bare processes
 
 In this step KubeStellar creates and populates the Edge Service
-Provider Workspace (ESPW), which exports the KubeStellar API, and also
-augments the `root:compute` workspace from kcp TMC as needed here.
-That augmentation consists of adding authorization to update the
-relevant `/status` and `/scale` subresources (missing in kcp TMC) and
-extending the supported subset of the Kubernetes API for managing
-containerized workloads from the four resources built into kcp TMC
-(`Deployment`, `Pod`, `Service`, and `Ingress`) to the other ones that
-are meaningful in KubeStellar.
+Provider Workspace (ESPW), which exports the KubeStellar API.
 
 ```shell
 IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubestellar init

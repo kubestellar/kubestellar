@@ -445,7 +445,7 @@ e2e-test-kubestellar-syncer: e2e-test-kubestellar-syncer-cleanup kcp/bin/kcp
 	echo 'kcp is ready. Wait for Workspace API to be ready' && \
 	export KUBECONFIG=$(WORK_DIR)/.kcp/admin.kubeconfig && \
 	while ! kubectl get workspaces &> /dev/null; do sleep 1; echo "Workspace API is not ready. wait for 1s...";done && \
-	echo 'Workspace API is ready. Setup root:compute workspace by kubestellar init' && \
+	echo 'Workspace API is ready. Setup spaces by kubestellar init' && \
 	bin/kubestellar init && \
 	echo 'Starting test(s). To add TEST_ARGS=-v option to Make command if displaying the detail logs' && \
 	NO_GORUN=1 GOOS=$(OS) GOARCH=$(ARCH) \

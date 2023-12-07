@@ -21,30 +21,6 @@ IN_CLUSTER=false SPACE_MANAGER_KUBECONFIG=$SM_CONFIG kubectl kubestellar ensure 
 wmw_c_space_config=$PWD/temp-space-config/spaceprovider-default-wmw-c
 ```
 
-This is equivalent to creating that workspace and then entering it and
-creating the following two `APIBinding` objects.
-
-```yaml
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-espw
-spec:
-  reference:
-    export:
-      path: root:espw
-      name: edge.kubestellar.io
----
-apiVersion: apis.kcp.io/v1alpha1
-kind: APIBinding
-metadata:
-  name: bind-kube
-spec:
-  reference:
-    export:
-      path: "root:compute"
-      name: kubernetes
-```
 ``` {.bash .hide-me}
 sleep 15
 ```
