@@ -3150,14 +3150,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 </code></pre></div>
 <h4 id="initialize-the-kubestellar-platform-as-bare-processes">Initialize the KubeStellar platform as bare processes<a class="headerlink" href="#initialize-the-kubestellar-platform-as-bare-processes" title="Permanent link">#</a></h4>
 <p>In this step KubeStellar creates and populates the Edge Service
-Provider Workspace (ESPW), which exports the KubeStellar API, and also
-augments the <code>root:compute</code> workspace from kcp TMC as needed here.
-That augmentation consists of adding authorization to update the
-relevant <code>/status</code> and <code>/scale</code> subresources (missing in kcp TMC) and
-extending the supported subset of the Kubernetes API for managing
-containerized workloads from the four resources built into kcp TMC
-(<code>Deployment</code>, <code>Pod</code>, <code>Service</code>, and <code>Ingress</code>) to the other ones that
-are meaningful in KubeStellar.</p>
+Provider Workspace (ESPW), which exports the KubeStellar API.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>init
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
