@@ -37,7 +37,7 @@ KUBECONFIG=$WMW1_SPACE_CONFIG kubectl get edgeplacements -n kubestellar -o yaml
 
 Now, apply the HTTP server workload definition into the WMW on **ks-core**. Note the namespace label matches the label in the namespaceSelector for the EdgePlacement (`my-first-edge-placement`) object created above. 
 ```shell hl_lines="5 10 24 25"
-KUBECONFIG=ks-core.kubeconfig kubectl apply -f - <<EOF
+KUBECONFIG=$WMW1_SPACE_CONFIG kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
