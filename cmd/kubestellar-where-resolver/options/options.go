@@ -31,10 +31,10 @@ const (
 )
 
 type Options struct {
-	SpaceMgtOpts  clientoptions.ClientOpts
-	Logs          *logs.Options
-	SpaceProvider string
-	KcsName       string
+	SpaceMgtClientOpts clientoptions.ClientOpts
+	Logs               *logs.Options
+	SpaceProvider      string
+	KcsName            string
 }
 
 func NewOptions() *Options {
@@ -43,15 +43,15 @@ func NewOptions() *Options {
 	logs.Config.Verbosity = config.VerbosityLevel(2)
 
 	return &Options{
-		SpaceMgtOpts:  *clientoptions.NewClientOpts("space-mgt", "access to space management"),
-		Logs:          logs,
-		SpaceProvider: defaultSpaceProviderName,
-		KcsName:       defaultKcsName,
+		SpaceMgtClientOpts: *clientoptions.NewClientOpts("space-mgt", "access to the space reference space"),
+		Logs:               logs,
+		SpaceProvider:      defaultSpaceProviderName,
+		KcsName:            defaultKcsName,
 	}
 }
 
 func (options *Options) AddFlags(fs *pflag.FlagSet) {
-	options.SpaceMgtOpts.AddFlags(fs)
+	options.SpaceMgtClientOpts.AddFlags(fs)
 	options.Logs.AddFlags(fs)
 	fs.StringVar(&options.SpaceProvider, "space-provider", options.SpaceProvider, "the name of the KubeStellar space provider")
 	fs.StringVar(&options.KcsName, "core-space", options.KcsName, "the name of the KubeStellar Core space")

@@ -68,7 +68,6 @@ type mbCtl struct {
 
 type refSyncTarget string
 
-var suffix uint64 = 142857
 var errNoSpaceId = errors.New("failed to retrive spaceID")
 
 // newMailboxController constructs a new mailbox controller.
