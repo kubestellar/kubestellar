@@ -18,6 +18,7 @@ package apiwatch
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -91,8 +92,8 @@ func NewAPIResourceInformer(ctx context.Context, clusterName string, client upst
 		clusterName:         clusterName,
 		cache:               cachediscovery.NewMemCacheClient(client),
 		resourceVersionI:    1,
-		rscToDefiners:       map[metav1.GroupVersionResource]map[objectID]Empty{},
-		definerToRscs:       map[objectID]map[metav1.GroupVersionResource]Empty{},
+		rscToDefiners:       GoMap[metav1.GroupVersionResource, GoSet[objectID]]{},
+		definerToRscs:       GoMap[objectID, GoSet[metav1.GroupVersionResource]]{},
 	}
 	rlw.cond = sync.NewCond(&rlw.mutex)
 	go func() {
@@ -164,18 +165,36 @@ type resourcesListWatcher struct {
 	needRelist       bool
 	relistAfter      time.Time
 	cancels          []context.CancelFunc
-	rscToDefiners    map[metav1.GroupVersionResource]map[objectID]Empty
-	definerToRscs    map[objectID]map[metav1.GroupVersionResource]Empty
+	rscToDefiners    GoMap[metav1.GroupVersionResource, GoSet[objectID]]
+	definerToRscs    GoMap[objectID, GoSet[metav1.GroupVersionResource]]
 }
 
 // objectID identifies an object that defines resources
 type objectID struct {
-	apiVersion string // including group
-	kind       string
-	name       string
+	APIVersion string // including group
+	Kind       string
+	Name       string
 }
 
 type Empty struct{}
+
+// GoMap is the usual with a MarshalJSON method
+type GoMap[Key comparable, Val any] map[Key]Val
+
+// GoSet is the usual with a MarshalJSON method
+type GoSet[Key comparable] GoMap[Key, Empty]
+
+var _ json.Marshaler = GoMap[int, func()]{}
+
+func (this GoMap[Key, Val]) MarshalJSON() ([]byte, error) {
+	return MarshalMap(this)
+}
+
+var _ json.Marshaler = GoSet[int]{}
+
+func (this GoSet[Key]) MarshalJSON() ([]byte, error) {
+	return MarshalSet(this)
+}
 
 func (rlw *resourcesListWatcher) InvalidateWithDefiner(obj any, supplier ResourceDefinitionSupplier, set bool) {
 	rlw.mutex.Lock()
@@ -203,10 +222,10 @@ func (rlw *resourcesListWatcher) invalidateWithDefinerLocked(obj any, supplier R
 	rlw.logger.V(4).Info("Examining resource definer", "obj", obj, "supplierType", fmt.Sprintf("%T", supplier), "gvk", gvk)
 	apiVersion, kind := gvk.ToAPIVersionAndKind()
 	oid := objectID{apiVersion, kind, objM.GetName()}
-	if oid.apiVersion == "" {
+	if oid.APIVersion == "" {
 		panic(obj)
 	}
-	if oid.kind == "" {
+	if oid.Kind == "" {
 		panic(obj)
 	}
 	var enumr ResourceDefinitionEnumerator = enumerateNothing
@@ -396,7 +415,7 @@ func (rlw *resourcesListWatcher) enumAPIResourcesLocked(resourceVersionS string,
 func definersToSlice(asSet map[objectID]Empty) []ksmetav1a1.Definer {
 	ans := make([]ksmetav1a1.Definer, 0, len(asSet))
 	for definer := range asSet {
-		ans = append(ans, ksmetav1a1.Definer{Kind: definer.kind, Name: definer.name})
+		ans = append(ans, ksmetav1a1.Definer{Kind: definer.Kind, Name: definer.Name})
 	}
 	return ans
 }
