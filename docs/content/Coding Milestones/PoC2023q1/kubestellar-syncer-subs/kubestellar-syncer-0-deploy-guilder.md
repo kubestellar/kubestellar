@@ -1,12 +1,12 @@
 <!--kubestellar-syncer-0-deploy-guilder-start-->
 Go to inventory management workspace and find the mailbox workspace name.
 ```shell
-kubectl ws root:espw
-pvname=`kubectl get synctargets.edge.kubestellar.io | grep guilder | awk '{print $1}'`
-stuid=`kubectl get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
-kubectl ws root:imw1
-stcid=`kubectl get synctargets.edge.kubestellar.io guilder -o jsonpath="{.metadata.annotations['kcp\.io/cluster']}"`
-mbws="$stcid-mb-$stuid"
+espw_space_config="${PWD}/temp-space-config/espw.config"
+kubectl-kubestellar-get-config-for-space --space-name espw --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $espw_space_config
+
+pvname=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io | grep guilder | awk '{print $1}'`
+stuid=`kubectl --kubeconfig $espw_space_config get synctargets.edge.kubestellar.io $pvname -o jsonpath="{.metadata.uid}"`
+mbws="imw1-mb-$stuid"
 echo "mailbox workspace name = $mbws"
 ```
 
@@ -17,8 +17,10 @@ mailbox workspace name = vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5
 
 Go to the mailbox workspace and run the following command to obtain yaml manifests to bootstrap KubeStellar-Syncer.
 ```shell
-kubectl ws root:$mbws
-./bin/kubectl-kubestellar-syncer_gen guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
+mbwsname_space_config="${PWD}/temp-space-config/${mbws}.config"
+kubectl-kubestellar-get-config-for-space --space-name ${mbws} --provider-name default --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $mbwsname_space_config
+
+./bin/kubectl-kubestellar-syncer_gen --kubeconfig $mbwsname_space_config guilder --syncer-image quay.io/kubestellar/syncer:v0.2.2 -o guilder-syncer.yaml
 ```
 ``` { .bash .no-copy }
 Current workspace is "root:vosh9816n2xmpdwm-mb-bf1277df-0da9-4a26-b0fc-3318862b1a5e".
