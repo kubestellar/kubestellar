@@ -92,9 +92,9 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	spaceManagementConfig, err := options.SpaceMgtOpts.ToRESTConfig()
+	spaceManagementConfig, err := options.SpaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to create space management config from flags")
+		logger.Error(err, "Failed to create space management API client config from flags")
 		return err
 	}
 	spaceClient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
@@ -104,13 +104,13 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	}
 	spaceProviderNs := spacemanager.ProviderNS(options.SpaceProvider)
 
-	coreRestConfig, err := spaceClient.ConfigForSpace(options.KcsName, spaceProviderNs)
+	kcsRestConfig, err := spaceClient.ConfigForSpace(options.KcsName, spaceProviderNs)
 	if err != nil {
-		logger.Error(err, "Failed to fetch space config", "spacename", options.KcsName)
+		logger.Error(err, "Failed to construct space config", "spacename", options.KcsName)
 		return err
 	}
 
-	edgeClientset, err := edgeclientset.NewForConfig(coreRestConfig)
+	edgeClientset, err := edgeclientset.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create edge clientset for KubeStellar Core Space")
 		return err
@@ -118,7 +118,7 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 
 	// create where-resolver
-	kubeClient, err := kubernetes.NewForConfig(coreRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for KubeStellar Core Space")
 		return err

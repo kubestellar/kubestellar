@@ -87,18 +87,18 @@ func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10204"
-	coreSpace := "espw"
+	kcsName := "espw"
 	spaceProvider := "default"
 	fs := pflag.NewFlagSet("placement-translator", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
 	fs.AddGoFlagSet(flag.CommandLine)
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	fs.StringVar(&coreSpace, "core-space", coreSpace, "the name of the KubeStellar core space")
+	fs.StringVar(&kcsName, "core-space", kcsName, "the name of the KubeStellar core space")
 	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
 
-	spaceMgtOpts := NewClientOpts("space-mgt", "access to space management")
-	spaceMgtOpts.AddFlags(fs)
+	spaceMgtClientOpts := NewClientOpts("space-mgt", "access to the space reference space")
+	spaceMgtClientOpts.AddFlags(fs)
 	fs.Parse(os.Args[1:])
 
 	ctx := context.Background()
@@ -120,9 +120,9 @@ func main() {
 		}
 	}()
 
-	spaceManagementConfig, err := spaceMgtOpts.ToRESTConfig()
+	spaceManagementConfig, err := spaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to create space management config from flags")
+		logger.Error(err, "Failed to create space management API client config from flags")
 		os.Exit(3)
 	}
 	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
@@ -132,13 +132,13 @@ func main() {
 	}
 	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
 
-	coreRestConfig, err := spaceclient.ConfigForSpace(coreSpace, spaceProviderNs)
+	kcsRestConfig, err := spaceclient.ConfigForSpace(kcsName, spaceProviderNs)
 	if err != nil {
-		logger.Error(err, "Failed to fetch space config", "spacename", coreSpace)
+		logger.Error(err, "Failed to construct space config", "spacename", kcsName)
 		os.Exit(5)
 	}
 
-	edgeClientset, err := ksclientset.NewForConfig(coreRestConfig)
+	edgeClientset, err := ksclientset.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create provider clientset from config")
 		os.Exit(30)
@@ -157,7 +157,7 @@ func main() {
 	spaceInformerFactory := spaceinformers.NewSharedInformerFactory(managementClientset, resyncPeriod)
 	spacePreInformer := spaceInformerFactory.Space().V1alpha1().Spaces()
 
-	kubeClient, err := kubernetes.NewForConfig(coreRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for service provider space")
 		os.Exit(90)

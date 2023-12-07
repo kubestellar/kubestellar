@@ -56,7 +56,7 @@ func main() {
 	resyncPeriod := time.Duration(0)
 	var concurrency int = 4
 	serverBindAddress := ":10203"
-	coreSpace := "espw"
+	kcsName := "espw"
 	spaceProvider := "default"
 	fs := pflag.NewFlagSet("mailbox-controller", pflag.ExitOnError)
 	klog.InitFlags(flag.CommandLine)
@@ -64,10 +64,10 @@ func main() {
 	fs.Var(&utilflag.IPPortVar{Val: &serverBindAddress}, "server-bind-address", "The IP address with port at which to serve /metrics and /debug/pprof/")
 
 	fs.IntVar(&concurrency, "concurrency", concurrency, "number of syncs to run in parallel")
-	fs.StringVar(&coreSpace, "core-space", coreSpace, "the name of the KubeStellar core space")
+	fs.StringVar(&kcsName, "core-space", kcsName, "the name of the KubeStellar core space")
 	fs.StringVar(&spaceProvider, "space-provider", spaceProvider, "the name of the KubeStellar space provider")
 
-	spaceMgtOpts := clientopts.NewClientOpts("space-mgt", "access to space management")
+	spaceMgtOpts := clientopts.NewClientOpts("space-mgt", "access to the space reference space")
 	spaceMgtOpts.AddFlags(fs)
 
 	fs.Parse(os.Args[1:])
@@ -94,26 +94,26 @@ func main() {
 	// create space-aware client
 	spaceManagementConfig, err := spaceMgtOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "Failed to create space management config from flags")
+		logger.Error(err, "Failed to create space management API client config from flags")
 		os.Exit(3)
 	}
 	spaceclient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create space-aware client")
-		os.Exit(4)
+		os.Exit(10)
 	}
 	spaceProviderNs := spacemanager.ProviderNS(spaceProvider)
 
-	coreRestConfig, err := spaceclient.ConfigForSpace(coreSpace, spaceProviderNs)
+	kcsRestConfig, err := spaceclient.ConfigForSpace(kcsName, spaceProviderNs)
 	if err != nil {
-		logger.Error(err, "Failed to fetch space config", "spacename", coreSpace)
-		os.Exit(5)
+		logger.Error(err, "Failed to construct space config", "spacename", kcsName)
+		os.Exit(15)
 	}
 
-	edgeClientset, err := edgeclientset.NewForConfig(coreRestConfig)
+	edgeClientset, err := edgeclientset.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create edge clientset for KubeStellar Core Space")
-		os.Exit(6)
+		os.Exit(20)
 	}
 	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 	syncTargetPreInformer := edgeSharedInformerFactory.Edge().V2alpha1().SyncTargets()
@@ -126,10 +126,10 @@ func main() {
 	spaceInformerFactory := spaceinformers.NewSharedInformerFactory(managementClientset, resyncPeriod)
 	spacePreInformer := spaceInformerFactory.Space().V1alpha1().Spaces()
 
-	kubeClient, err := kubernetes.NewForConfig(coreRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "Failed to create k8s clientset for KubeStellar Core Space")
-		os.Exit(6)
+		os.Exit(25)
 	}
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
 
