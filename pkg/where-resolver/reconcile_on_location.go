@@ -95,12 +95,12 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	// 2a)
 	stsFilteredByLoc := []*edgev2alpha1.SyncTarget{}
 	if !locDeleted {
-		stsInLws, err := c.synctargetLister.List(labels.Everything())
+		allSts, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "failed to list SyncTargets")
 			return err
 		}
-		stsFilteredByLoc, err = filterStsByLoc(stsInLws, loc)
+		stsFilteredByLoc, err = filterStsByLoc(allSts, loc)
 		if err != nil {
 			logger.Error(err, "failed to find SyncTargets for Location")
 			return err
@@ -256,7 +256,21 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 // filterStsByLoc returns those SyncTargets that selected by the Location
 func filterStsByLoc(sts []*edgev2alpha1.SyncTarget, loc *edgev2alpha1.Location) ([]*edgev2alpha1.SyncTarget, error) {
 	filtered := []*edgev2alpha1.SyncTarget{}
+
+	_, _, locKBSpaceID, err := kbuser.AnalyzeObjectID(loc)
+	if err != nil {
+		return filtered, err
+	}
+
 	for _, st := range sts {
+		_, _, stKBSpaceID, err := kbuser.AnalyzeObjectID(st)
+		if err != nil {
+			return filtered, err
+		}
+
+		if stKBSpaceID != locKBSpaceID {
+			continue
+		}
 		s := loc.Spec.InstanceSelector
 		selector, err := metav1.LabelSelectorAsSelector(s)
 		if err != nil {
