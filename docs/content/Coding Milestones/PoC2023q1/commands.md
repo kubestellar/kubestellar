@@ -252,8 +252,7 @@ workspaces at pathname "root:imw1".
 
 4. Ensure the existence of zero, one, or more workload management workspaces 
 depending on the value of `--ensure-wmw` flag. Default is one workload management
-workspaces at pathname "root:wmw1". The workload management workspaces have APIBindings
-that import the namespaced Kubernetes resources (kinds of objects) for management of
+workspaces at pathname "root:wmw1". The workload management workspaces have CRDs for management of
 containerized workloads. At the completion of `kubestellar init` the current workspace will be
 "root".
 
@@ -486,7 +485,7 @@ should be referenced.  Those are in the Kubernetes API group
 named `root:espw`).
 
 The following command helps with making that SyncTarget and Location
-pair and adding the APIBinding to `root:espw:edge.kubestellar.io` if needed.
+pair and binding the KubeStellar edge APIs if needed.
 
 The usage synopsis is as follows.
 
@@ -777,10 +776,9 @@ to verify the syncer pod is running.
 ```
 
 ## Creating a Workload Management Space
-
-Such a space needs not only to be created but also populated with
-an `APIBinding` to the edge API and, if desired, some `APIBindings` to
-the Kubernetes API for management of containerized workloads.
+Such a space needs not only to be created but also
+- the KubeStellar edge APIs bound through kube-bind;
+- if desired, some CRDs populated for the Kubernetes APIs for management of containerized workloads.
 
 The usage synopsis for this command is as follows.
 
