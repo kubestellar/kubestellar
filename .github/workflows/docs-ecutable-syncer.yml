@@ -21,7 +21,7 @@ on:
   push:
     branches:
       - main
-      
+      - space-mgt
       - "release-*"
     paths:
       - "docs/content/Coding Milestones/PoC2023q1/kubestellar-syncer.md"
