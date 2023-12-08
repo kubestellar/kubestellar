@@ -1531,6 +1531,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#getting-a-kubeconfig-of-a-given-space" class="md-nav__link">
+    Getting a kubeconfig of a given space
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#syncer-preparation-and-installation" class="md-nav__link">
     Syncer preparation and installation
   </a>
@@ -1552,8 +1559,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-workload-management-workspace" class="md-nav__link">
-    Creating a Workload Management Workspace
+  <a href="#creating-a-workload-management-space" class="md-nav__link">
+    Creating a Workload Management Space
   </a>
   
 </li>
@@ -2253,6 +2260,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#getting-a-kubeconfig-of-a-given-space" class="md-nav__link">
+    Getting a kubeconfig of a given space
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#syncer-preparation-and-installation" class="md-nav__link">
     Syncer preparation and installation
   </a>
@@ -2274,8 +2288,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#creating-a-workload-management-workspace" class="md-nav__link">
-    Creating a Workload Management Workspace
+  <a href="#creating-a-workload-management-space" class="md-nav__link">
+    Creating a Workload Management Space
   </a>
   
 </li>
@@ -2340,22 +2354,22 @@ a directory on the user's <code>$PATH</code> or by the user writing a pathname
 for the executable on the command line. The one exception is <a href="#bootstrap">the
 bootstrap script</a>, which is designed to be fetched from
 github and fed directly into <code>bash</code>.</p>
-<p>There are two ways of deploying kcp and the central KubeStellar
+<p>There are two ways of deploying a space provider and the central KubeStellar
 components: (1) as processes on a machine of supported OS and ISA, and
 (2) as workload in a Kubernetes (possibly OpenShift) cluster.  The
 latter is newer and not yet well exercised.</p>
 <p>This document describes both commands that a platform administrator
 uses and commands that a platform user uses.</p>
-<p>Most of these executables require that the kcp server be running and
+<p>Most of these executables require that the space provider be running and
 that <code>kubectl</code> is configured to use the kubeconfig file produced by
-<code>kcp start</code>. That is: either <code>$KUBECONFIG</code> holds the pathname of that
-kubeconfig file, its contents appear at <code>~/.kube/config</code>, or
+that space provider. That is: either <code>$KUBECONFIG</code> holds the pathname 
+of that kubeconfig file, its contents appear at <code>~/.kube/config</code>, or
 <code>--kubeconfig $pathname</code> appears on the command line.  The exceptions
 are the bootstrap script, <a href="#kubestellar-ensure-kcp-server-creds">the kcp control script that runs before
 starting the kcp server</a>, and
 the admin commands for deploying KubeStellar in a Kubernetes cluster.</p>
 <p><strong>NOTE</strong>: most of the kubectl plugin usages described here certainly
-or potentially change the setting of which kcp workspace is "current"
+or potentially change the setting of which kubeconfig context is "current"
 in your chosen kubeconfig file; for this reason, they are not suitable
 for executing concurrently with anything that depends on that setting
 in that file.  The exceptions are the admin commands for deploying
@@ -2556,9 +2570,10 @@ containerized workloads. At the completion of <code>kubestellar init</code> the 
 "root".</p>
 </li>
 <li>
-<p>Creates the space provider objects to be used by the space manager. Need to pass
-in two environment variables - SPACE_MANAGER_KUBECONFIG and IN_CLUSTER. SPACE_MANAGER_KUBECONFIG
-is the path to the kubeconfig for the space manager. IN_CLUSTER specify whether spaces
+<p>Creates the space provider objects to be used by the space manager. It requires
+several environment variables - SM_CONFIG, SM_CONTEXT, and IN_CLUSTER. SM_CONFIG
+is the path to the kubeconfig for the space manager. The SM_CONTEXT is the space manager
+context in the config file. The IN_CLUSTER variable specify whether spaces
 are accessed from within the hosting cluster or externally by kubestellar init.</p>
 </li>
 </ol>
@@ -2572,10 +2587,10 @@ stopping any running KubeStellar controllers.  It does <em>not</em> tear down
 the ESPW.</p>
 <h2 id="deployment-into-a-kubernetes-cluster">Deployment into a Kubernetes cluster<a class="headerlink" href="#deployment-into-a-kubernetes-cluster" title="Permanent link">#</a></h2>
 <p>These commands administer a deployment of the central components ---
-the kcp server, PKI, and the central KubeStellar components --- in a
-Kubernetes cluster that will be referred to as "the hosting cluster".
-These commands are framed as "kubectl plugins" and thus need to be
-explicitly or implicitly given a kubeconfig file for the hosting
+the space provider server, PKI, and the central KubeStellar components 
+--- in a Kubernetes cluster that will be referred to as "the hosting 
+cluster".  These commands are framed as "kubectl plugins" and thus need 
+to be explicitly or implicitly given a kubeconfig file for the hosting
 cluster.</p>
 <p>You need a Kubernetes cluster with an Ingress controller deployed and
 configured in a way that does <em>not</em> terminate TLS connections (this
@@ -2754,58 +2769,59 @@ and have at least the given labels.</p>
 <p>The acceptable flags include all those of <code>kubectl</code> except for
 <code>--context</code>.  This command also accepts the following flags.</p>
 <ul>
-<li><code>--imw workspace_path</code>: specifies which workspace to use as the
-  inventory management workspace.  The default value is the current
-  workspace.</li>
+<li><code>--imw space_name</code>: specifies which space to use as the
+  inventory management workspace.  </li>
 <li><code>-X</code>: turn on debug echoing of the commands inside the script that
   implements this command.</li>
 </ul>
-<p>The current workspaces does not matter if the IMW is explicitly
-specified.  Upon completion, the current workspace will be your chosen
-IMW.</p>
 <p>This command does not depend on the action of any of the KubeStellar
 controllers but does require that the KubeStellar Core Space (KCS) has been set up.</p>
 <p>An example usage follows.</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo1<span class="w"> </span><span class="nv">foo</span><span class="o">=</span>bar<span class="w"> </span>the-word<span class="o">=</span>the-bird
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>created
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>created
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>created
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>synctarget.workload.kcp.io/demo1<span class="w"> </span>labeled
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>location.scheduling.kcp.io/demo1<span class="w"> </span>labeled
 </code></pre></div></p>
 <p>The above example shows using this script to create a SyncTarget and a
 Location named <code>demo1</code> with labels <code>foo=bar</code> and <code>the-word=the-bird</code>.
 This was equivalent to the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="s">kind: SyncTarget</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="s">metadata:</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="s">  name: demo1</span>
-<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="s">  labels:</span>
-<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="s">    id: demo1</span>
-<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="s">    the-word: the-bird</span>
-<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="s">---</span>
-<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="s">apiVersion: scheduling.kcp.io/v1alpha1</span>
-<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="s">kind: Location</span>
-<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="s">metadata:</span>
-<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="s">  name: demo1</span>
-<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="s">  labels:</span>
-<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="s">    foo: bar</span>
-<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="s">    the-word: the-bird</span>
-<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="s">spec:</span>
-<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="s">  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}</span>
-<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="s">  instanceSelector:</span>
-<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="s">    matchLabels: {&quot;id&quot;:&quot;demo1&quot;}</span>
-<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="s">EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">imw_space_config</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/temp-space-config/spaceprovider-default-imw-1&quot;</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nv">secret_name</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>imw-1<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{</span>$<span class="s2">.status.externalSecretRef.name}&quot;</span><span class="k">)</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="nv">secret_namespace</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>imw-1<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{</span>$<span class="s2">.status.externalSecretRef.namespace}&quot;</span><span class="k">)</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span><span class="si">${</span><span class="nv">secret_name</span><span class="si">}</span><span class="w"> </span>-n<span class="w"> </span><span class="si">${</span><span class="nv">secret_namespace</span><span class="si">}</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{$.data.kubeconfig}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span>&gt;<span class="w"> </span><span class="nv">$imw_space_config</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>-<span class="s">&lt;&lt;EOF</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="s">apiVersion: workload.kcp.io/v1alpha1</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="s">kind: SyncTarget</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="s">metadata:</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="s">  name: demo1</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="s">  labels:</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="s">    id: demo1</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="s">    the-word: the-bird</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="s">---</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="s">apiVersion: scheduling.kcp.io/v1alpha1</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="s">kind: Location</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="s">metadata:</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="s">  name: demo1</span>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="s">  labels:</span>
+<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="s">    foo: bar</span>
+<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="s">    the-word: the-bird</span>
+<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="s">spec:</span>
+<a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a><span class="s">  resource: {group: workload.kcp.io, version: v1alpha1, resource: synctargets}</span>
+<a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a><span class="s">  instanceSelector:</span>
+<a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a><span class="s">    matchLabels: {&quot;id&quot;:&quot;demo1&quot;}</span>
+<a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a><span class="s">EOF</span>
 </code></pre></div>
+<p>Note that the extraction of space kubeconfig file can be accomplished using the 
+kubectl-kubestellar-get-config-for-space script.</p>
 <p>The creation of the APIBinding is equivalent to the following command
-(in the same workspace).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+(in the same space).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="s">apiVersion: apis.kcp.io/v1alpha1</span>
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="s">kind: APIBinding</span>
 <a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="s">metadata:</span>
@@ -2828,21 +2844,32 @@ command line syntax and semantics except that the
 <code>labelname=labelvalue</code> pairs do not appear.</p>
 <p>This command does not depend on the action of any of the KubeStellar controllers.</p>
 <p>The following session demonstrates usage, including idempotency.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:imw-1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>synctarget.workload.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>location.scheduling.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>synctarget.workload.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>location.scheduling.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
-</code></pre></div></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>location<span class="w"> </span>demo1
+<h2 id="getting-a-kubeconfig-of-a-given-space">Getting a kubeconfig of a given space<a class="headerlink" href="#getting-a-kubeconfig-of-a-given-space" title="Permanent link">#</a></h2>
+<p>To access a particular space the kubeconfig file of that space needs to be
+obtained.  This can be done manually as follows: </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">secret_name</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>imw-1<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{</span>$<span class="s2">.status.externalSecretRef.name}&quot;</span><span class="k">)</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="nv">secret_namespace</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>imw-1<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">&quot;{</span>$<span class="s2">.status.externalSecretRef.namespace}&quot;</span><span class="k">)</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$sm_core_config</span><span class="w"> </span>--context<span class="w"> </span><span class="nv">$sm_context</span><span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span><span class="si">${</span><span class="nv">secret_name</span><span class="si">}</span><span class="w"> </span>-n<span class="w"> </span><span class="si">${</span><span class="nv">secret_namespace</span><span class="si">}</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{$.data.kubeconfig}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span>&gt;<span class="w"> </span>imw.kubeconfig
+</code></pre></div>
+<p>Alternatively, the kubectl-kubestellar-get-config-for-space can be used. This script takes
+as input the name of the space (--space-name), the name of the space provider (--provider-name) 
+which has a default of "default", the location of the space manager 
+kubeconfig (--sm-core-config), the context of the space manager (--sm-context), whether the space 
+manager is accessed in-cluster or externally (in_cluster), and the name of the output kubeconfig 
+file (--output).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>imw-1<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="si">${</span><span class="nv">in_cluster</span><span class="si">}</span><span class="w"> </span>--output<span class="w"> </span>imw.kubeconfig
 </code></pre></div>
 <h2 id="syncer-preparation-and-installation">Syncer preparation and installation<a class="headerlink" href="#syncer-preparation-and-installation" title="Permanent link">#</a></h2>
 <p>The syncer runs in each edge cluster and also talks to the
-corresponding mailbox workspace.  In order for it to be able to do
-that, there is some work to do in the mailbox workspace to create a
+corresponding mailbox space.  In order for it to be able to do
+that, there is some work to do in the mailbox space to create a
 ServiceAccount for the syncer to authenticate as and create RBAC
 objects to give the syncer the privileges that it needs.  The
 following script does those things and also outputs YAML to be used to
@@ -2856,11 +2883,10 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
 <p>The acceptable flags include all those of <code>kubectl</code> except for
 <code>--context</code>.  This command also accepts the following flags.</p>
 <ul>
-<li><code>--imw workspace_path</code>: specifies which workspace holds the relevant
-  SyncTarget object.  The default value is the current workspace.</li>
-<li><code>--espw workspace_path</code>: specifies where to find the edge service
-  provider workspace.  The default is the standard location,
-  <code>root:espw</code>.</li>
+<li><code>--imw space_name</code>: specifies which space holds the relevant
+  SyncTarget object.</li>
+<li><code>--espw space_name</code>: specifies where to find the edge service
+  provider space.</li>
 <li><code>--syncer-image image_ref</code>: specifies the container image that runs
   the syncer.  The default is <code>quay.io/kubestellar/syncer:latest</code>.</li>
 <li><code>-o output_pathname</code>: specifies where to write the YAML definitions
@@ -2871,36 +2897,30 @@ relevant IMW, corresponding to the relevant edge cluster.</p>
 <li><code>-X</code>: turn on debug echoing of commands inside the script that
   implements this command.</li>
 </ul>
-<p>The current workspaces does not matter if the IMW is explicitly
-specified.  Upon completion, the current workspace will be what it was
-when the command started.</p>
 <p>This command will only succeed if the mailbox controller has created
-and conditioned the mailbox workspace for the given SyncTarget.  This
+and conditioned the mailbox space for the given SyncTarget.  This
 command will wait for 10 to 70 seconds for that to happen.</p>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-syncer<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>
-<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>
-<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
-<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Current<span class="w"> </span>space<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;4yqm57kx0m6mn76c-mb-406c54d1-64ce-4fdc-99b3-cef9c4fc5010&quot;</span><span class="w"> </span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>.
 <a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>
-<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>.
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>Wrote<span class="w"> </span>WEC<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo1-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>.<span class="w"> </span>Use
 <a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>
-<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>Wrote<span class="w"> </span>WEC<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo1-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;space-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo1-syncer.yaml&quot;</span>
 <a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>
-<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo1-syncer.yaml&quot;</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
 <a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>
-<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;space-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>kubestellar-syncer-demo1-28at01r3
 <a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>
-<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo1-28at01r3&quot;</span><span class="w"> </span>kubestellar-syncer-demo1-28at01r3
-<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>
-<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
-<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 </code></pre></div></p>
 <p>Once that script has run, the YAML for the objects to create in the
 edge cluster is in your chosen output file.  The default for the
@@ -2942,48 +2962,39 @@ ensure-location</code> and <code>kubectl kubestellar prep-for-syncer</code>, and
 the union of their command line flags and arguments.  Upon completion,
 the kcp current workspace will be what it was at the start.</p>
 <p>An example usage follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>root:imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>prep-for-cluster<span class="w"> </span>--imw<span class="w"> </span>imw-1<span class="w"> </span>demo2<span class="w"> </span><span class="nv">key1</span><span class="o">=</span>val1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>created
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>created
-<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>labeled
-<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>labeled
-<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:imw-1&quot;</span>.
-<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
-<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw:1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7&quot;</span><span class="w"> </span><span class="o">(</span><span class="nb">type</span><span class="w"> </span>root:universal<span class="o">)</span>.
-<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
-<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>created
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>created
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>synctarget.workload.kcp.io/demo2<span class="w"> </span>labeled
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>location.scheduling.kcp.io/demo2<span class="w"> </span>labeled
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>Current<span class="w"> </span>space<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;1cpf1cd4ydy13vo1-mb-3c354acd-ed86-45bb-a60d-cee8e59973f7&quot;</span><span class="w"> </span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>Creating<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>Creating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>give<span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
 <a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a>
-<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w"> </span><span class="m">1</span>.<span class="w"> </span>write<span class="w"> </span>and<span class="w"> </span>sync<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>synctarget<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>
-<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w"> </span><span class="m">2</span>.<span class="w"> </span>write<span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>apiresourceimports.
-<a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a>
-<a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>.
-<a id="__codelineno-33-16" name="__codelineno-33-16" href="#__codelineno-33-16"></a>
-<a id="__codelineno-33-17" name="__codelineno-33-17" href="#__codelineno-33-17"></a>Wrote<span class="w"> </span>WEC<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo2-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>.<span class="w"> </span>Use
-<a id="__codelineno-33-18" name="__codelineno-33-18" href="#__codelineno-33-18"></a>
-<a id="__codelineno-33-19" name="__codelineno-33-19" href="#__codelineno-33-19"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo2-syncer.yaml&quot;</span>
-<a id="__codelineno-33-20" name="__codelineno-33-20" href="#__codelineno-33-20"></a>
-<a id="__codelineno-33-21" name="__codelineno-33-21" href="#__codelineno-33-21"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
-<a id="__codelineno-33-22" name="__codelineno-33-22" href="#__codelineno-33-22"></a>
-<a id="__codelineno-33-23" name="__codelineno-33-23" href="#__codelineno-33-23"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;workload-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>kubestellar-syncer-demo2-15nq4e94
-<a id="__codelineno-33-24" name="__codelineno-33-24" href="#__codelineno-33-24"></a>
-<a id="__codelineno-33-25" name="__codelineno-33-25" href="#__codelineno-33-25"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a>Creating<span class="w"> </span>or<span class="w"> </span>updating<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span>binding<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>service<span class="w"> </span>account<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>to<span class="w"> </span>cluster<span class="w"> </span>role<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>.
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a>
+<a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a>Wrote<span class="w"> </span>WEC<span class="w"> </span>manifest<span class="w"> </span>to<span class="w"> </span>demo2-syncer.yaml<span class="w"> </span><span class="k">for</span><span class="w"> </span>namespace<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span>.<span class="w"> </span>Use
+<a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a>
+<a id="__codelineno-33-16" name="__codelineno-33-16" href="#__codelineno-33-16"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;space-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;demo2-syncer.yaml&quot;</span>
+<a id="__codelineno-33-17" name="__codelineno-33-17" href="#__codelineno-33-17"></a>
+<a id="__codelineno-33-18" name="__codelineno-33-18" href="#__codelineno-33-18"></a>to<span class="w"> </span>apply<span class="w"> </span>it.<span class="w"> </span>Use
+<a id="__codelineno-33-19" name="__codelineno-33-19" href="#__codelineno-33-19"></a>
+<a id="__codelineno-33-20" name="__codelineno-33-20" href="#__codelineno-33-20"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span>&lt;space-execution-cluster-config&gt;<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;kubestellar-syncer-demo2-15nq4e94&quot;</span><span class="w"> </span>kubestellar-syncer-demo2-15nq4e94
+<a id="__codelineno-33-21" name="__codelineno-33-21" href="#__codelineno-33-21"></a>
+<a id="__codelineno-33-22" name="__codelineno-33-22" href="#__codelineno-33-22"></a>to<span class="w"> </span>verify<span class="w"> </span>the<span class="w"> </span>syncer<span class="w"> </span>pod<span class="w"> </span>is<span class="w"> </span>running.
 </code></pre></div></p>
-<h2 id="creating-a-workload-management-workspace">Creating a Workload Management Workspace<a class="headerlink" href="#creating-a-workload-management-workspace" title="Permanent link">#</a></h2>
-<p>Such a workspace needs not only to be created but also populated with
+<h2 id="creating-a-workload-management-space">Creating a Workload Management Space<a class="headerlink" href="#creating-a-workload-management-space" title="Permanent link">#</a></h2>
+<p>Such a space needs not only to be created but also populated with
 an <code>APIBinding</code> to the edge API and, if desired, some <code>APIBindings</code> to
 the Kubernetes API for management of containerized workloads.</p>
-<p>Every workload management workspace is a child of the <code>root</code>
-workspace.</p>
 <p>The usage synopsis for this command is as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_workspace_name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>flag...<span class="w"> </span>wm_space_name
 </code></pre></div>
-<p>Here <code>wm_workspace_name</code> is the name (not pathname, just a bare
-one-segment name) of the WMW to ensure.  Thus, the pathname of the WMW
-will be <code>root:wm_workspace_name</code>.</p>
-<p>Upon completion, the WMW will be the current workspace.</p>
-<p>The flags can also appear anywhere later on the command line.</p>
+<p>The flags can appear anywhere on the command line.</p>
 <p>The acceptable flags include all those of <code>kubectl</code> except for
 <code>--context</code>.  This command also accepts the following flags.</p>
 <ul>
@@ -2994,226 +3005,210 @@ will be <code>root:wm_workspace_name</code>.</p>
 <li><code>-X</code>: turn on debug echoing of the commands inside the script that
   implements this command.</li>
 </ul>
+<p>The space manager is involved in the creation of the workload management
+space. To access the space manager, the following environment variables
+are used: SM_CONFIG specifies the path to the space manager kubeconfig 
+file. SM_CONTEXT specifies the context of the space manager within the 
+kubeconfig file. IN_CLUSTER specifies whether the space manager is
+accessed from within the hosting cluster or externally. Note that 
+SM_CONFIG, SM_CONTEXT, and IN_CLUSTER have default values of 
+SM_CONFIG=$PWD/temp-space-config/config, SM_CONTEXT=sm_mgt, IN_CLUSTER=true.</p>
 <p>This script works in idempotent style, doing whatever work remains to
 be done.</p>
-<p>Identify the kubeconfig for Space Manager, for example:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>kubectl config --kubeconfig ~/.kube/config current-context
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sm-mgt
-</code></pre></div>
-Set an environment variable for Space Manager:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>SM_CONFIG=~/.kube/config
-</code></pre></div>
-The following session shows some example usages, including
+<p>The following session shows some example usages, including
 demonstration of idempotency and changing whether the kube CRDs
 are included.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
-<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>Error<span class="w"> </span>from<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>NotFound<span class="o">)</span>:<span class="w"> </span>spaces.space.kubestellar.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>not<span class="w"> </span>found
-<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a>space.space.kubestellar.io/example-wmw<span class="w"> </span>created
-<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>to<span class="w"> </span>get<span class="w"> </span>into<span class="w"> </span>the<span class="w"> </span>Ready<span class="w"> </span>phase.
-<a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>Space<span class="w"> </span>example-wmw<span class="w"> </span>created.
-<a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
-<a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-39-12" name="__codelineno-39-12" href="#__codelineno-39-12"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
-<a id="__codelineno-39-13" name="__codelineno-39-13" href="#__codelineno-39-13"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
-<a id="__codelineno-39-14" name="__codelineno-39-14" href="#__codelineno-39-14"></a><span class="s1">starting kube-bind konnector for space example-wmw in background, logs writing to /home/ubuntu/kubestellar/kubestellar-kube-bind-logs/kube-bind-konnector-example-wmw.log</span>
-<a id="__codelineno-39-15" name="__codelineno-39-15" href="#__codelineno-39-15"></a><span class="s1">binding edgeplacements for example-wmw</span>
-<a id="__codelineno-39-16" name="__codelineno-39-16" href="#__codelineno-39-16"></a><span class="s1">cluster namespace is kube-bind-tmflg</span>
-<a id="__codelineno-39-17" name="__codelineno-39-17" href="#__codelineno-39-17"></a><span class="s1">Current workspace is &quot;root:espw&quot;.</span>
-<a id="__codelineno-39-18" name="__codelineno-39-18" href="#__codelineno-39-18"></a><span class="s1">namespace kubestellar already exists</span>
-<a id="__codelineno-39-19" name="__codelineno-39-19" href="#__codelineno-39-19"></a><span class="s1">configmap/kbmap-fcf8hzj7mlx156cm created</span>
-<a id="__codelineno-39-20" name="__codelineno-39-20" href="#__codelineno-39-20"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-39-21" name="__codelineno-39-21" href="#__codelineno-39-21"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-39-22" name="__codelineno-39-22" href="#__codelineno-39-22"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-39-23" name="__codelineno-39-23" href="#__codelineno-39-23"></a>kube-bind<span class="w"> </span>konnector<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>already<span class="w"> </span>running
-<a id="__codelineno-39-24" name="__codelineno-39-24" href="#__codelineno-39-24"></a>binding<span class="w"> </span>customizers<span class="w"> </span><span class="k">for</span><span class="w"> </span>example-wmw
-<a id="__codelineno-39-25" name="__codelineno-39-25" href="#__codelineno-39-25"></a>cluster<span class="w"> </span>namespace<span class="w"> </span>is<span class="w"> </span>kube-bind-tmflg
-<a id="__codelineno-39-26" name="__codelineno-39-26" href="#__codelineno-39-26"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
-<a id="__codelineno-39-27" name="__codelineno-39-27" href="#__codelineno-39-27"></a>namespace<span class="w"> </span>kubestellar<span class="w"> </span>already<span class="w"> </span>exists
-<a id="__codelineno-39-28" name="__codelineno-39-28" href="#__codelineno-39-28"></a>configmap/kbmap-fcf8hzj7mlx156cm<span class="w"> </span>configured
-<a id="__codelineno-39-29" name="__codelineno-39-29" href="#__codelineno-39-29"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-39-30" name="__codelineno-39-30" href="#__codelineno-39-30"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-39-31" name="__codelineno-39-31" href="#__codelineno-39-31"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-39-32" name="__codelineno-39-32" href="#__codelineno-39-32"></a>kube-bind<span class="w"> </span>konnector<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>already<span class="w"> </span>running
-<a id="__codelineno-39-33" name="__codelineno-39-33" href="#__codelineno-39-33"></a>binding<span class="w"> </span>singleplacementslices<span class="w"> </span><span class="k">for</span><span class="w"> </span>example-wmw
-<a id="__codelineno-39-34" name="__codelineno-39-34" href="#__codelineno-39-34"></a>cluster<span class="w"> </span>namespace<span class="w"> </span>is<span class="w"> </span>kube-bind-tmflg
-<a id="__codelineno-39-35" name="__codelineno-39-35" href="#__codelineno-39-35"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
-<a id="__codelineno-39-36" name="__codelineno-39-36" href="#__codelineno-39-36"></a>namespace<span class="w"> </span>kubestellar<span class="w"> </span>already<span class="w"> </span>exists
-<a id="__codelineno-39-37" name="__codelineno-39-37" href="#__codelineno-39-37"></a>configmap/kbmap-fcf8hzj7mlx156cm<span class="w"> </span>configured
-<a id="__codelineno-39-38" name="__codelineno-39-38" href="#__codelineno-39-38"></a>customresourcedefinition.apiextensions.k8s.io/apiservices.apiregistration.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-39" name="__codelineno-39-39" href="#__codelineno-39-39"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumes.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-40" name="__codelineno-39-40" href="#__codelineno-39-40"></a>customresourcedefinition.apiextensions.k8s.io/flowschemas.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-41" name="__codelineno-39-41" href="#__codelineno-39-41"></a>customresourcedefinition.apiextensions.k8s.io/prioritylevelconfigurations.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-42" name="__codelineno-39-42" href="#__codelineno-39-42"></a>customresourcedefinition.apiextensions.k8s.io/ingressclasses.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-43" name="__codelineno-39-43" href="#__codelineno-39-43"></a>customresourcedefinition.apiextensions.k8s.io/runtimeclasses.node.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-44" name="__codelineno-39-44" href="#__codelineno-39-44"></a>customresourcedefinition.apiextensions.k8s.io/priorityclasses.scheduling.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-45" name="__codelineno-39-45" href="#__codelineno-39-45"></a>customresourcedefinition.apiextensions.k8s.io/csidrivers.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-46" name="__codelineno-39-46" href="#__codelineno-39-46"></a>customresourcedefinition.apiextensions.k8s.io/csinodes.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-47" name="__codelineno-39-47" href="#__codelineno-39-47"></a>customresourcedefinition.apiextensions.k8s.io/storageclasses.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-48" name="__codelineno-39-48" href="#__codelineno-39-48"></a>customresourcedefinition.apiextensions.k8s.io/volumeattachments.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-49" name="__codelineno-39-49" href="#__codelineno-39-49"></a>customresourcedefinition.apiextensions.k8s.io/daemonsets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-50" name="__codelineno-39-50" href="#__codelineno-39-50"></a>customresourcedefinition.apiextensions.k8s.io/deployments.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-51" name="__codelineno-39-51" href="#__codelineno-39-51"></a>customresourcedefinition.apiextensions.k8s.io/replicasets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-52" name="__codelineno-39-52" href="#__codelineno-39-52"></a>customresourcedefinition.apiextensions.k8s.io/statefulsets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-53" name="__codelineno-39-53" href="#__codelineno-39-53"></a>customresourcedefinition.apiextensions.k8s.io/horizontalpodautoscalers.autoscaling<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-54" name="__codelineno-39-54" href="#__codelineno-39-54"></a>customresourcedefinition.apiextensions.k8s.io/cronjobs.batch<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-55" name="__codelineno-39-55" href="#__codelineno-39-55"></a>customresourcedefinition.apiextensions.k8s.io/jobs.batch<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-56" name="__codelineno-39-56" href="#__codelineno-39-56"></a>customresourcedefinition.apiextensions.k8s.io/endpoints.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-57" name="__codelineno-39-57" href="#__codelineno-39-57"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumeclaims.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-58" name="__codelineno-39-58" href="#__codelineno-39-58"></a>customresourcedefinition.apiextensions.k8s.io/pods.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-59" name="__codelineno-39-59" href="#__codelineno-39-59"></a>customresourcedefinition.apiextensions.k8s.io/podtemplates.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-60" name="__codelineno-39-60" href="#__codelineno-39-60"></a>customresourcedefinition.apiextensions.k8s.io/replicationcontrollers.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-61" name="__codelineno-39-61" href="#__codelineno-39-61"></a>customresourcedefinition.apiextensions.k8s.io/services.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-62" name="__codelineno-39-62" href="#__codelineno-39-62"></a>customresourcedefinition.apiextensions.k8s.io/endpointslices.discovery.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-63" name="__codelineno-39-63" href="#__codelineno-39-63"></a>customresourcedefinition.apiextensions.k8s.io/ingresses.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-64" name="__codelineno-39-64" href="#__codelineno-39-64"></a>customresourcedefinition.apiextensions.k8s.io/networkpolicies.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-65" name="__codelineno-39-65" href="#__codelineno-39-65"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
-<a id="__codelineno-39-66" name="__codelineno-39-66" href="#__codelineno-39-66"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>Error<span class="w"> </span>from<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>NotFound<span class="o">)</span>:<span class="w"> </span>spaces.space.kubestellar.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>not<span class="w"> </span>found
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>space.space.kubestellar.io/example-wmw<span class="w"> </span>created
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>Waiting<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>to<span class="w"> </span>get<span class="w"> </span>into<span class="w"> </span>the<span class="w"> </span>Ready<span class="w"> </span>phase.
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>Space<span class="w"> </span>example-wmw<span class="w"> </span>created.
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
+<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
+<a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="s1">starting kube-bind konnector for space example-wmw in background, logs writing to /home/ubuntu/kubestellar/kubestellar-kube-bind-logs/kube-bind-konnector-example-wmw.log</span>
+<a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="s1">binding edgeplacements for example-wmw</span>
+<a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a><span class="s1">cluster namespace is kube-bind-tmflg</span>
+<a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="s1">Current workspace is &quot;root:espw&quot;.</span>
+<a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a><span class="s1">namespace kubestellar already exists</span>
+<a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="s1">configmap/kbmap-fcf8hzj7mlx156cm created</span>
+<a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
+<a id="__codelineno-36-21" name="__codelineno-36-21" href="#__codelineno-36-21"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-36-22" name="__codelineno-36-22" href="#__codelineno-36-22"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-36-23" name="__codelineno-36-23" href="#__codelineno-36-23"></a>kube-bind<span class="w"> </span>konnector<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>already<span class="w"> </span>running
+<a id="__codelineno-36-24" name="__codelineno-36-24" href="#__codelineno-36-24"></a>binding<span class="w"> </span>customizers<span class="w"> </span><span class="k">for</span><span class="w"> </span>example-wmw
+<a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a>cluster<span class="w"> </span>namespace<span class="w"> </span>is<span class="w"> </span>kube-bind-tmflg
+<a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a>namespace<span class="w"> </span>kubestellar<span class="w"> </span>already<span class="w"> </span>exists
+<a id="__codelineno-36-28" name="__codelineno-36-28" href="#__codelineno-36-28"></a>configmap/kbmap-fcf8hzj7mlx156cm<span class="w"> </span>configured
+<a id="__codelineno-36-29" name="__codelineno-36-29" href="#__codelineno-36-29"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-36-30" name="__codelineno-36-30" href="#__codelineno-36-30"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-36-31" name="__codelineno-36-31" href="#__codelineno-36-31"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-36-32" name="__codelineno-36-32" href="#__codelineno-36-32"></a>kube-bind<span class="w"> </span>konnector<span class="w"> </span><span class="k">for</span><span class="w"> </span>space<span class="w"> </span>example-wmw<span class="w"> </span>already<span class="w"> </span>running
+<a id="__codelineno-36-33" name="__codelineno-36-33" href="#__codelineno-36-33"></a>binding<span class="w"> </span>singleplacementslices<span class="w"> </span><span class="k">for</span><span class="w"> </span>example-wmw
+<a id="__codelineno-36-34" name="__codelineno-36-34" href="#__codelineno-36-34"></a>cluster<span class="w"> </span>namespace<span class="w"> </span>is<span class="w"> </span>kube-bind-tmflg
+<a id="__codelineno-36-35" name="__codelineno-36-35" href="#__codelineno-36-35"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:espw&quot;</span>.
+<a id="__codelineno-36-36" name="__codelineno-36-36" href="#__codelineno-36-36"></a>namespace<span class="w"> </span>kubestellar<span class="w"> </span>already<span class="w"> </span>exists
+<a id="__codelineno-36-37" name="__codelineno-36-37" href="#__codelineno-36-37"></a>configmap/kbmap-fcf8hzj7mlx156cm<span class="w"> </span>configured
+<a id="__codelineno-36-38" name="__codelineno-36-38" href="#__codelineno-36-38"></a>customresourcedefinition.apiextensions.k8s.io/apiservices.apiregistration.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-39" name="__codelineno-36-39" href="#__codelineno-36-39"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumes.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-40" name="__codelineno-36-40" href="#__codelineno-36-40"></a>customresourcedefinition.apiextensions.k8s.io/flowschemas.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-41" name="__codelineno-36-41" href="#__codelineno-36-41"></a>customresourcedefinition.apiextensions.k8s.io/prioritylevelconfigurations.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-42" name="__codelineno-36-42" href="#__codelineno-36-42"></a>customresourcedefinition.apiextensions.k8s.io/ingressclasses.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-43" name="__codelineno-36-43" href="#__codelineno-36-43"></a>customresourcedefinition.apiextensions.k8s.io/runtimeclasses.node.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-44" name="__codelineno-36-44" href="#__codelineno-36-44"></a>customresourcedefinition.apiextensions.k8s.io/priorityclasses.scheduling.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-45" name="__codelineno-36-45" href="#__codelineno-36-45"></a>customresourcedefinition.apiextensions.k8s.io/csidrivers.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-46" name="__codelineno-36-46" href="#__codelineno-36-46"></a>customresourcedefinition.apiextensions.k8s.io/csinodes.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-47" name="__codelineno-36-47" href="#__codelineno-36-47"></a>customresourcedefinition.apiextensions.k8s.io/storageclasses.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-48" name="__codelineno-36-48" href="#__codelineno-36-48"></a>customresourcedefinition.apiextensions.k8s.io/volumeattachments.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-49" name="__codelineno-36-49" href="#__codelineno-36-49"></a>customresourcedefinition.apiextensions.k8s.io/daemonsets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-50" name="__codelineno-36-50" href="#__codelineno-36-50"></a>customresourcedefinition.apiextensions.k8s.io/deployments.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-51" name="__codelineno-36-51" href="#__codelineno-36-51"></a>customresourcedefinition.apiextensions.k8s.io/replicasets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-52" name="__codelineno-36-52" href="#__codelineno-36-52"></a>customresourcedefinition.apiextensions.k8s.io/statefulsets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-53" name="__codelineno-36-53" href="#__codelineno-36-53"></a>customresourcedefinition.apiextensions.k8s.io/horizontalpodautoscalers.autoscaling<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-54" name="__codelineno-36-54" href="#__codelineno-36-54"></a>customresourcedefinition.apiextensions.k8s.io/cronjobs.batch<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-55" name="__codelineno-36-55" href="#__codelineno-36-55"></a>customresourcedefinition.apiextensions.k8s.io/jobs.batch<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-56" name="__codelineno-36-56" href="#__codelineno-36-56"></a>customresourcedefinition.apiextensions.k8s.io/endpoints.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-57" name="__codelineno-36-57" href="#__codelineno-36-57"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumeclaims.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-58" name="__codelineno-36-58" href="#__codelineno-36-58"></a>customresourcedefinition.apiextensions.k8s.io/pods.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-59" name="__codelineno-36-59" href="#__codelineno-36-59"></a>customresourcedefinition.apiextensions.k8s.io/podtemplates.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-60" name="__codelineno-36-60" href="#__codelineno-36-60"></a>customresourcedefinition.apiextensions.k8s.io/replicationcontrollers.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-61" name="__codelineno-36-61" href="#__codelineno-36-61"></a>customresourcedefinition.apiextensions.k8s.io/services.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-62" name="__codelineno-36-62" href="#__codelineno-36-62"></a>customresourcedefinition.apiextensions.k8s.io/endpointslices.discovery.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-63" name="__codelineno-36-63" href="#__codelineno-36-63"></a>customresourcedefinition.apiextensions.k8s.io/ingresses.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-64" name="__codelineno-36-64" href="#__codelineno-36-64"></a>customresourcedefinition.apiextensions.k8s.io/networkpolicies.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-65" name="__codelineno-36-65" href="#__codelineno-36-65"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
+<a id="__codelineno-36-66" name="__codelineno-36-66" href="#__codelineno-36-66"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="s1">CRD for edgeplacements already in place</span>
+<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
+<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-38-13" name="__codelineno-38-13" href="#__codelineno-38-13"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-38-14" name="__codelineno-38-14" href="#__codelineno-38-14"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>customizers<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
+<a id="__codelineno-38-15" name="__codelineno-38-15" href="#__codelineno-38-15"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-38-16" name="__codelineno-38-16" href="#__codelineno-38-16"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-38-17" name="__codelineno-38-17" href="#__codelineno-38-17"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-38-18" name="__codelineno-38-18" href="#__codelineno-38-18"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>singleplacementslices<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
+<a id="__codelineno-38-19" name="__codelineno-38-19" href="#__codelineno-38-19"></a>customresourcedefinition.apiextensions.k8s.io/apiservices.apiregistration.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-20" name="__codelineno-38-20" href="#__codelineno-38-20"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumes.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-21" name="__codelineno-38-21" href="#__codelineno-38-21"></a>customresourcedefinition.apiextensions.k8s.io/flowschemas.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-22" name="__codelineno-38-22" href="#__codelineno-38-22"></a>customresourcedefinition.apiextensions.k8s.io/prioritylevelconfigurations.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-23" name="__codelineno-38-23" href="#__codelineno-38-23"></a>customresourcedefinition.apiextensions.k8s.io/ingressclasses.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-24" name="__codelineno-38-24" href="#__codelineno-38-24"></a>customresourcedefinition.apiextensions.k8s.io/runtimeclasses.node.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-25" name="__codelineno-38-25" href="#__codelineno-38-25"></a>customresourcedefinition.apiextensions.k8s.io/priorityclasses.scheduling.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-26" name="__codelineno-38-26" href="#__codelineno-38-26"></a>customresourcedefinition.apiextensions.k8s.io/csidrivers.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-27" name="__codelineno-38-27" href="#__codelineno-38-27"></a>customresourcedefinition.apiextensions.k8s.io/csinodes.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-28" name="__codelineno-38-28" href="#__codelineno-38-28"></a>customresourcedefinition.apiextensions.k8s.io/storageclasses.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-29" name="__codelineno-38-29" href="#__codelineno-38-29"></a>customresourcedefinition.apiextensions.k8s.io/volumeattachments.storage.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-30" name="__codelineno-38-30" href="#__codelineno-38-30"></a>customresourcedefinition.apiextensions.k8s.io/daemonsets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-31" name="__codelineno-38-31" href="#__codelineno-38-31"></a>customresourcedefinition.apiextensions.k8s.io/deployments.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-32" name="__codelineno-38-32" href="#__codelineno-38-32"></a>customresourcedefinition.apiextensions.k8s.io/replicasets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-33" name="__codelineno-38-33" href="#__codelineno-38-33"></a>customresourcedefinition.apiextensions.k8s.io/statefulsets.apps<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-34" name="__codelineno-38-34" href="#__codelineno-38-34"></a>customresourcedefinition.apiextensions.k8s.io/horizontalpodautoscalers.autoscaling<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-35" name="__codelineno-38-35" href="#__codelineno-38-35"></a>customresourcedefinition.apiextensions.k8s.io/cronjobs.batch<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-36" name="__codelineno-38-36" href="#__codelineno-38-36"></a>customresourcedefinition.apiextensions.k8s.io/jobs.batch<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-37" name="__codelineno-38-37" href="#__codelineno-38-37"></a>customresourcedefinition.apiextensions.k8s.io/endpoints.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-38" name="__codelineno-38-38" href="#__codelineno-38-38"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumeclaims.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-39" name="__codelineno-38-39" href="#__codelineno-38-39"></a>customresourcedefinition.apiextensions.k8s.io/pods.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-40" name="__codelineno-38-40" href="#__codelineno-38-40"></a>customresourcedefinition.apiextensions.k8s.io/podtemplates.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-41" name="__codelineno-38-41" href="#__codelineno-38-41"></a>customresourcedefinition.apiextensions.k8s.io/replicationcontrollers.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-42" name="__codelineno-38-42" href="#__codelineno-38-42"></a>customresourcedefinition.apiextensions.k8s.io/services.core<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-43" name="__codelineno-38-43" href="#__codelineno-38-43"></a>customresourcedefinition.apiextensions.k8s.io/endpointslices.discovery.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-44" name="__codelineno-38-44" href="#__codelineno-38-44"></a>customresourcedefinition.apiextensions.k8s.io/ingresses.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-45" name="__codelineno-38-45" href="#__codelineno-38-45"></a>customresourcedefinition.apiextensions.k8s.io/networkpolicies.networking.k8s.io<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-46" name="__codelineno-38-46" href="#__codelineno-38-46"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
+<a id="__codelineno-38-47" name="__codelineno-38-47" href="#__codelineno-38-47"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
-<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
-<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
-<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
-<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
-<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
-<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="s1">CRD for edgeplacements already in place</span>
-<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-43-12" name="__codelineno-43-12" href="#__codelineno-43-12"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-43-13" name="__codelineno-43-13" href="#__codelineno-43-13"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-43-14" name="__codelineno-43-14" href="#__codelineno-43-14"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>customizers<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
-<a id="__codelineno-43-15" name="__codelineno-43-15" href="#__codelineno-43-15"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-43-16" name="__codelineno-43-16" href="#__codelineno-43-16"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-43-18" name="__codelineno-43-18" href="#__codelineno-43-18"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>singleplacementslices<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
-<a id="__codelineno-43-19" name="__codelineno-43-19" href="#__codelineno-43-19"></a>customresourcedefinition.apiextensions.k8s.io/apiservices.apiregistration.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-20" name="__codelineno-43-20" href="#__codelineno-43-20"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumes.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-21" name="__codelineno-43-21" href="#__codelineno-43-21"></a>customresourcedefinition.apiextensions.k8s.io/flowschemas.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a>customresourcedefinition.apiextensions.k8s.io/prioritylevelconfigurations.flowcontrol.apiserver.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-23" name="__codelineno-43-23" href="#__codelineno-43-23"></a>customresourcedefinition.apiextensions.k8s.io/ingressclasses.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-24" name="__codelineno-43-24" href="#__codelineno-43-24"></a>customresourcedefinition.apiextensions.k8s.io/runtimeclasses.node.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-25" name="__codelineno-43-25" href="#__codelineno-43-25"></a>customresourcedefinition.apiextensions.k8s.io/priorityclasses.scheduling.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-26" name="__codelineno-43-26" href="#__codelineno-43-26"></a>customresourcedefinition.apiextensions.k8s.io/csidrivers.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-27" name="__codelineno-43-27" href="#__codelineno-43-27"></a>customresourcedefinition.apiextensions.k8s.io/csinodes.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-28" name="__codelineno-43-28" href="#__codelineno-43-28"></a>customresourcedefinition.apiextensions.k8s.io/storageclasses.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-29" name="__codelineno-43-29" href="#__codelineno-43-29"></a>customresourcedefinition.apiextensions.k8s.io/volumeattachments.storage.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-30" name="__codelineno-43-30" href="#__codelineno-43-30"></a>customresourcedefinition.apiextensions.k8s.io/daemonsets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-31" name="__codelineno-43-31" href="#__codelineno-43-31"></a>customresourcedefinition.apiextensions.k8s.io/deployments.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-32" name="__codelineno-43-32" href="#__codelineno-43-32"></a>customresourcedefinition.apiextensions.k8s.io/replicasets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-33" name="__codelineno-43-33" href="#__codelineno-43-33"></a>customresourcedefinition.apiextensions.k8s.io/statefulsets.apps<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-34" name="__codelineno-43-34" href="#__codelineno-43-34"></a>customresourcedefinition.apiextensions.k8s.io/horizontalpodautoscalers.autoscaling<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-35" name="__codelineno-43-35" href="#__codelineno-43-35"></a>customresourcedefinition.apiextensions.k8s.io/cronjobs.batch<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-36" name="__codelineno-43-36" href="#__codelineno-43-36"></a>customresourcedefinition.apiextensions.k8s.io/jobs.batch<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-37" name="__codelineno-43-37" href="#__codelineno-43-37"></a>customresourcedefinition.apiextensions.k8s.io/endpoints.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-38" name="__codelineno-43-38" href="#__codelineno-43-38"></a>customresourcedefinition.apiextensions.k8s.io/persistentvolumeclaims.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-39" name="__codelineno-43-39" href="#__codelineno-43-39"></a>customresourcedefinition.apiextensions.k8s.io/pods.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-40" name="__codelineno-43-40" href="#__codelineno-43-40"></a>customresourcedefinition.apiextensions.k8s.io/podtemplates.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-41" name="__codelineno-43-41" href="#__codelineno-43-41"></a>customresourcedefinition.apiextensions.k8s.io/replicationcontrollers.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-42" name="__codelineno-43-42" href="#__codelineno-43-42"></a>customresourcedefinition.apiextensions.k8s.io/services.core<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-43" name="__codelineno-43-43" href="#__codelineno-43-43"></a>customresourcedefinition.apiextensions.k8s.io/endpointslices.discovery.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-44" name="__codelineno-43-44" href="#__codelineno-43-44"></a>customresourcedefinition.apiextensions.k8s.io/ingresses.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-45" name="__codelineno-43-45" href="#__codelineno-43-45"></a>customresourcedefinition.apiextensions.k8s.io/networkpolicies.networking.k8s.io<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-46" name="__codelineno-43-46" href="#__codelineno-43-46"></a>customresourcedefinition.apiextensions.k8s.io/poddisruptionbudgets.policy<span class="w"> </span>serverside-applied
-<a id="__codelineno-43-47" name="__codelineno-43-47" href="#__codelineno-43-47"></a>customresourcedefinition.apiextensions.k8s.io/csistoragecapacities.storage.k8s.io<span class="w"> </span>serverside-applied
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>example-wmw<span class="w"> </span>--with-kube<span class="w"> </span><span class="nb">false</span>
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
-<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
-<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
-<a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
-<a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
-<a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-47-8" name="__codelineno-47-8" href="#__codelineno-47-8"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
-<a id="__codelineno-47-9" name="__codelineno-47-9" href="#__codelineno-47-9"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
-<a id="__codelineno-47-10" name="__codelineno-47-10" href="#__codelineno-47-10"></a><span class="s1">CRD for edgeplacements already in place</span>
-<a id="__codelineno-47-11" name="__codelineno-47-11" href="#__codelineno-47-11"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
-<a id="__codelineno-47-12" name="__codelineno-47-12" href="#__codelineno-47-12"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-47-13" name="__codelineno-47-13" href="#__codelineno-47-13"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-47-14" name="__codelineno-47-14" href="#__codelineno-47-14"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>customizers<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
-<a id="__codelineno-47-15" name="__codelineno-47-15" href="#__codelineno-47-15"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-47-16" name="__codelineno-47-16" href="#__codelineno-47-16"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
-<a id="__codelineno-47-17" name="__codelineno-47-17" href="#__codelineno-47-17"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
-<a id="__codelineno-47-18" name="__codelineno-47-18" href="#__codelineno-47-18"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>singleplacementslices<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
-<a id="__codelineno-47-19" name="__codelineno-47-19" href="#__codelineno-47-19"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;apiservices.apiregistration.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-20" name="__codelineno-47-20" href="#__codelineno-47-20"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;persistentvolumes.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-21" name="__codelineno-47-21" href="#__codelineno-47-21"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;flowschemas.flowcontrol.apiserver.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-22" name="__codelineno-47-22" href="#__codelineno-47-22"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;prioritylevelconfigurations.flowcontrol.apiserver.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-23" name="__codelineno-47-23" href="#__codelineno-47-23"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;ingressclasses.networking.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-24" name="__codelineno-47-24" href="#__codelineno-47-24"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;runtimeclasses.node.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-25" name="__codelineno-47-25" href="#__codelineno-47-25"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;priorityclasses.scheduling.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-26" name="__codelineno-47-26" href="#__codelineno-47-26"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csidrivers.storage.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-27" name="__codelineno-47-27" href="#__codelineno-47-27"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csinodes.storage.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-28" name="__codelineno-47-28" href="#__codelineno-47-28"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;storageclasses.storage.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-29" name="__codelineno-47-29" href="#__codelineno-47-29"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;volumeattachments.storage.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-30" name="__codelineno-47-30" href="#__codelineno-47-30"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;daemonsets.apps&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-31" name="__codelineno-47-31" href="#__codelineno-47-31"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;deployments.apps&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-32" name="__codelineno-47-32" href="#__codelineno-47-32"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;replicasets.apps&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-33" name="__codelineno-47-33" href="#__codelineno-47-33"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;statefulsets.apps&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-34" name="__codelineno-47-34" href="#__codelineno-47-34"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;horizontalpodautoscalers.autoscaling&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-35" name="__codelineno-47-35" href="#__codelineno-47-35"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;cronjobs.batch&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-36" name="__codelineno-47-36" href="#__codelineno-47-36"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;jobs.batch&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-37" name="__codelineno-47-37" href="#__codelineno-47-37"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;endpoints.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-38" name="__codelineno-47-38" href="#__codelineno-47-38"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;persistentvolumeclaims.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-39" name="__codelineno-47-39" href="#__codelineno-47-39"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;pods.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-40" name="__codelineno-47-40" href="#__codelineno-47-40"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;podtemplates.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-41" name="__codelineno-47-41" href="#__codelineno-47-41"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;replicationcontrollers.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-42" name="__codelineno-47-42" href="#__codelineno-47-42"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;services.core&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-43" name="__codelineno-47-43" href="#__codelineno-47-43"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;endpointslices.discovery.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-44" name="__codelineno-47-44" href="#__codelineno-47-44"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;ingresses.networking.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-45" name="__codelineno-47-45" href="#__codelineno-47-45"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;networkpolicies.networking.k8s.io&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-46" name="__codelineno-47-46" href="#__codelineno-47-46"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;poddisruptionbudgets.policy&quot;</span><span class="w"> </span>deleted
-<a id="__codelineno-47-47" name="__codelineno-47-47" href="#__codelineno-47-47"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csistoragecapacities.storage.k8s.io&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span>/home/ubuntu/.kube/config
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="nv">PROVIDER_NAME</span><span class="o">=</span>default
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="nv">PROVIDER_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="nv">SECRET_NAME</span><span class="o">=</span>external-example-wmw
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="nv">SECRET_NAMESPACE</span><span class="o">=</span>spaceprovider-default
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="s1">&#39;s ID is fcf8hzj7mlx156cm</span>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="s1">Current workspace is &quot;root:example-wmw&quot;.</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="s1">CRD for edgeplacements already in place</span>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="s1">Current workspace is &quot;root&quot;.</span>
+<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="s1">kcp workspace example-wmw&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>customizers<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
+<a id="__codelineno-40-15" name="__codelineno-40-15" href="#__codelineno-40-15"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-40-16" name="__codelineno-40-16" href="#__codelineno-40-16"></a>kcp<span class="w"> </span>workspace<span class="w"> </span>example-wmw<span class="err">&#39;</span>s<span class="w"> </span>ID<span class="w"> </span>is<span class="w"> </span>fcf8hzj7mlx156cm
+<a id="__codelineno-40-17" name="__codelineno-40-17" href="#__codelineno-40-17"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root:example-wmw&quot;</span>.
+<a id="__codelineno-40-18" name="__codelineno-40-18" href="#__codelineno-40-18"></a>CRD<span class="w"> </span><span class="k">for</span><span class="w"> </span>singleplacementslices<span class="w"> </span>already<span class="w"> </span><span class="k">in</span><span class="w"> </span>place
+<a id="__codelineno-40-19" name="__codelineno-40-19" href="#__codelineno-40-19"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;apiservices.apiregistration.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-20" name="__codelineno-40-20" href="#__codelineno-40-20"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;persistentvolumes.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-21" name="__codelineno-40-21" href="#__codelineno-40-21"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;flowschemas.flowcontrol.apiserver.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-22" name="__codelineno-40-22" href="#__codelineno-40-22"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;prioritylevelconfigurations.flowcontrol.apiserver.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-23" name="__codelineno-40-23" href="#__codelineno-40-23"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;ingressclasses.networking.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-24" name="__codelineno-40-24" href="#__codelineno-40-24"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;runtimeclasses.node.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-25" name="__codelineno-40-25" href="#__codelineno-40-25"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;priorityclasses.scheduling.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-26" name="__codelineno-40-26" href="#__codelineno-40-26"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csidrivers.storage.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-27" name="__codelineno-40-27" href="#__codelineno-40-27"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csinodes.storage.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-28" name="__codelineno-40-28" href="#__codelineno-40-28"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;storageclasses.storage.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-29" name="__codelineno-40-29" href="#__codelineno-40-29"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;volumeattachments.storage.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-30" name="__codelineno-40-30" href="#__codelineno-40-30"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;daemonsets.apps&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-31" name="__codelineno-40-31" href="#__codelineno-40-31"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;deployments.apps&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-32" name="__codelineno-40-32" href="#__codelineno-40-32"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;replicasets.apps&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-33" name="__codelineno-40-33" href="#__codelineno-40-33"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;statefulsets.apps&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-34" name="__codelineno-40-34" href="#__codelineno-40-34"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;horizontalpodautoscalers.autoscaling&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-35" name="__codelineno-40-35" href="#__codelineno-40-35"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;cronjobs.batch&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-36" name="__codelineno-40-36" href="#__codelineno-40-36"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;jobs.batch&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-37" name="__codelineno-40-37" href="#__codelineno-40-37"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;endpoints.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-38" name="__codelineno-40-38" href="#__codelineno-40-38"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;persistentvolumeclaims.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-39" name="__codelineno-40-39" href="#__codelineno-40-39"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;pods.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-40" name="__codelineno-40-40" href="#__codelineno-40-40"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;podtemplates.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-41" name="__codelineno-40-41" href="#__codelineno-40-41"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;replicationcontrollers.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-42" name="__codelineno-40-42" href="#__codelineno-40-42"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;services.core&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-43" name="__codelineno-40-43" href="#__codelineno-40-43"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;endpointslices.discovery.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-44" name="__codelineno-40-44" href="#__codelineno-40-44"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;ingresses.networking.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-45" name="__codelineno-40-45" href="#__codelineno-40-45"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;networkpolicies.networking.k8s.io&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-46" name="__codelineno-40-46" href="#__codelineno-40-46"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;poddisruptionbudgets.policy&quot;</span><span class="w"> </span>deleted
+<a id="__codelineno-40-47" name="__codelineno-40-47" href="#__codelineno-40-47"></a>customresourcedefinition.apiextensions.k8s.io<span class="w"> </span><span class="s2">&quot;csistoragecapacities.storage.k8s.io&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <h2 id="removing-a-workload-management-workspace">Removing a Workload Management Workspace<a class="headerlink" href="#removing-a-workload-management-workspace" title="Permanent link">#</a></h2>
-<p>Deleting a WMW can be done by simply deleting its <code>Workspace</code> object from
+<p>Deleting a WMW can be done by simply deleting its <code>space</code> object from
 the parent.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>delete<span class="w"> </span>space<span class="w"> </span>example-wmw
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>Workspace<span class="w"> </span>example-wmw
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;example-wmw&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
 <p>Alternatively, you can use the following command line whose design
 completes the square here.  Invoke it when the current workspace is
 the parent of the workload management workspace to delete.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>-h
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Usage:<span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span><span class="o">[</span>-X<span class="o">]</span><span class="w"> </span>kubectl_flag...<span class="w"> </span>wm_workspace_name
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>workspace.tenancy.kcp.io<span class="w"> </span><span class="s2">&quot;demo1&quot;</span><span class="w"> </span>deleted
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>.
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
-</code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>remove<span class="w"> </span>wmw<span class="w"> </span>demo1
-</code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>Current<span class="w"> </span>workspace<span class="w"> </span>is<span class="w"> </span><span class="s2">&quot;root&quot;</span>.
 </code></pre></div></p>
 <h2 id="kubestellar-list-syncing-objects">kubestellar-list-syncing-objects<a class="headerlink" href="#kubestellar-list-syncing-objects" title="Permanent link">#</a></h2>
 <p>The <code>kubestellar-list-syncing-objects</code> command will list or watch one
@@ -3237,49 +3232,49 @@ called "all", is for reading the chosen objects from all workspaces.
 The other, called "parent", is for reading the mailbox Workspace
 objects from their parent Workspace.</p>
 <p>Following are the command line flags beyond the baseline golang flags.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="w">      </span>--api-group<span class="w"> </span>string<span class="w">                 </span>API<span class="w"> </span>group<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>is<span class="w"> </span>Kubernetes<span class="w"> </span>core<span class="w"> </span>group<span class="o">)</span>
-<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a><span class="w">      </span>--api-kind<span class="w"> </span>string<span class="w">                  </span>kind<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch
-<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="w">      </span>--api-resource<span class="w"> </span>string<span class="w">              </span>API<span class="w"> </span>resource<span class="w"> </span><span class="o">(</span>lowercase<span class="w"> </span>plural<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>defaults<span class="w"> </span>to<span class="w"> </span>lowercase<span class="o">(</span>kind<span class="o">)</span>+<span class="s1">&#39;s&#39;</span><span class="o">)</span>
-<a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="w">      </span>--api-version<span class="w"> </span>string<span class="w">               </span>API<span class="w"> </span>version<span class="w"> </span><span class="o">(</span>just<span class="w"> </span>version,<span class="w"> </span>no<span class="w"> </span>group<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="o">)</span>
-<a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="w">      </span>--json<span class="w">                             </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>as<span class="w"> </span>lines<span class="w"> </span>of<span class="w"> </span>JSON<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>YAML
-<a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a><span class="w">      </span>--watch<span class="w">                            </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>inform<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>just<span class="w"> </span>list
-<a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a>...
-<a id="__codelineno-60-8" name="__codelineno-60-8" href="#__codelineno-60-8"></a><span class="w">      </span>--all-cluster<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
-<a id="__codelineno-60-9" name="__codelineno-60-9" href="#__codelineno-60-9"></a><span class="w">      </span>--all-context<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;system:admin&quot;</span><span class="o">)</span>
-<a id="__codelineno-60-10" name="__codelineno-60-10" href="#__codelineno-60-10"></a><span class="w">      </span>--all-kubeconfig<span class="w"> </span>string<span class="w">            </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
-<a id="__codelineno-60-11" name="__codelineno-60-11" href="#__codelineno-60-11"></a><span class="w">      </span>--all-user<span class="w"> </span>string<span class="w">                  </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
-<a id="__codelineno-60-12" name="__codelineno-60-12" href="#__codelineno-60-12"></a>...
-<a id="__codelineno-60-13" name="__codelineno-60-13" href="#__codelineno-60-13"></a><span class="w">      </span>--parent-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
-<a id="__codelineno-60-14" name="__codelineno-60-14" href="#__codelineno-60-14"></a><span class="w">      </span>--parent-context<span class="w"> </span>string<span class="w">            </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
-<a id="__codelineno-60-15" name="__codelineno-60-15" href="#__codelineno-60-15"></a><span class="w">      </span>--parent-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
-<a id="__codelineno-60-16" name="__codelineno-60-16" href="#__codelineno-60-16"></a><span class="w">      </span>--parent-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="w">      </span>--api-group<span class="w"> </span>string<span class="w">                 </span>API<span class="w"> </span>group<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span>is<span class="w"> </span>Kubernetes<span class="w"> </span>core<span class="w"> </span>group<span class="o">)</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="w">      </span>--api-kind<span class="w"> </span>string<span class="w">                  </span>kind<span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="w">      </span>--api-resource<span class="w"> </span>string<span class="w">              </span>API<span class="w"> </span>resource<span class="w"> </span><span class="o">(</span>lowercase<span class="w"> </span>plural<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>defaults<span class="w"> </span>to<span class="w"> </span>lowercase<span class="o">(</span>kind<span class="o">)</span>+<span class="s1">&#39;s&#39;</span><span class="o">)</span>
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a><span class="w">      </span>--api-version<span class="w"> </span>string<span class="w">               </span>API<span class="w"> </span>version<span class="w"> </span><span class="o">(</span>just<span class="w"> </span>version,<span class="w"> </span>no<span class="w"> </span>group<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>objects<span class="w"> </span>to<span class="w"> </span>watch<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="o">)</span>
+<a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a><span class="w">      </span>--json<span class="w">                             </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>as<span class="w"> </span>lines<span class="w"> </span>of<span class="w"> </span>JSON<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>YAML
+<a id="__codelineno-49-6" name="__codelineno-49-6" href="#__codelineno-49-6"></a><span class="w">      </span>--watch<span class="w">                            </span>indicates<span class="w"> </span>whether<span class="w"> </span>to<span class="w"> </span>inform<span class="w"> </span>rather<span class="w"> </span>than<span class="w"> </span>just<span class="w"> </span>list
+<a id="__codelineno-49-7" name="__codelineno-49-7" href="#__codelineno-49-7"></a>...
+<a id="__codelineno-49-8" name="__codelineno-49-8" href="#__codelineno-49-8"></a><span class="w">      </span>--all-cluster<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-49-9" name="__codelineno-49-9" href="#__codelineno-49-9"></a><span class="w">      </span>--all-context<span class="w"> </span>string<span class="w">               </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;system:admin&quot;</span><span class="o">)</span>
+<a id="__codelineno-49-10" name="__codelineno-49-10" href="#__codelineno-49-10"></a><span class="w">      </span>--all-kubeconfig<span class="w"> </span>string<span class="w">            </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-49-11" name="__codelineno-49-11" href="#__codelineno-49-11"></a><span class="w">      </span>--all-user<span class="w"> </span>string<span class="w">                  </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>chosen<span class="w"> </span>objects<span class="w"> </span><span class="k">in</span><span class="w"> </span>all<span class="w"> </span>clusters
+<a id="__codelineno-49-12" name="__codelineno-49-12" href="#__codelineno-49-12"></a>...
+<a id="__codelineno-49-13" name="__codelineno-49-13" href="#__codelineno-49-13"></a><span class="w">      </span>--parent-cluster<span class="w"> </span>string<span class="w">              </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>cluster<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+<a id="__codelineno-49-14" name="__codelineno-49-14" href="#__codelineno-49-14"></a><span class="w">      </span>--parent-context<span class="w"> </span>string<span class="w">            </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="o">)</span>
+<a id="__codelineno-49-15" name="__codelineno-49-15" href="#__codelineno-49-15"></a><span class="w">      </span>--parent-kubeconfig<span class="w"> </span>string<span class="w">           </span>Path<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
+<a id="__codelineno-49-16" name="__codelineno-49-16" href="#__codelineno-49-16"></a><span class="w">      </span>--parent-user<span class="w"> </span>string<span class="w">                 </span>The<span class="w"> </span>name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>kubeconfig<span class="w"> </span>user<span class="w"> </span>to<span class="w"> </span>use<span class="w"> </span><span class="k">for</span><span class="w"> </span>access<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>parent<span class="w"> </span>of<span class="w"> </span>mailbox<span class="w"> </span>workspaces
 </code></pre></div>
 <p>Following is an example of its usage; the ellipses show where this
 document omits many lines for brevity.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
-<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="go">---</span>
-<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a><span class="go">apiVersion: apps/v1</span>
-<a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a><span class="go">kind: ReplicaSet</span>
-<a id="__codelineno-61-5" name="__codelineno-61-5" href="#__codelineno-61-5"></a><span class="go">metadata:</span>
-<a id="__codelineno-61-6" name="__codelineno-61-6" href="#__codelineno-61-6"></a><span class="go">...</span>
-<a id="__codelineno-61-7" name="__codelineno-61-7" href="#__codelineno-61-7"></a><span class="go">status:</span>
-<a id="__codelineno-61-8" name="__codelineno-61-8" href="#__codelineno-61-8"></a><span class="go">  availableReplicas: 1</span>
-<a id="__codelineno-61-9" name="__codelineno-61-9" href="#__codelineno-61-9"></a><span class="go">  fullyLabeledReplicas: 1</span>
-<a id="__codelineno-61-10" name="__codelineno-61-10" href="#__codelineno-61-10"></a><span class="go">  observedGeneration: 1</span>
-<a id="__codelineno-61-11" name="__codelineno-61-11" href="#__codelineno-61-11"></a><span class="go">  readyReplicas: 1</span>
-<a id="__codelineno-61-12" name="__codelineno-61-12" href="#__codelineno-61-12"></a><span class="go">  replicas: 1</span>
-<a id="__codelineno-61-13" name="__codelineno-61-13" href="#__codelineno-61-13"></a>
-<a id="__codelineno-61-14" name="__codelineno-61-14" href="#__codelineno-61-14"></a><span class="go">---</span>
-<a id="__codelineno-61-15" name="__codelineno-61-15" href="#__codelineno-61-15"></a><span class="go">apiVersion: apps/v1</span>
-<a id="__codelineno-61-16" name="__codelineno-61-16" href="#__codelineno-61-16"></a><span class="go">kind: ReplicaSet</span>
-<a id="__codelineno-61-17" name="__codelineno-61-17" href="#__codelineno-61-17"></a><span class="go">metadata:</span>
-<a id="__codelineno-61-18" name="__codelineno-61-18" href="#__codelineno-61-18"></a><span class="go">...</span>
-<a id="__codelineno-61-19" name="__codelineno-61-19" href="#__codelineno-61-19"></a><span class="go">status:</span>
-<a id="__codelineno-61-20" name="__codelineno-61-20" href="#__codelineno-61-20"></a><span class="go">  availableReplicas: 1</span>
-<a id="__codelineno-61-21" name="__codelineno-61-21" href="#__codelineno-61-21"></a><span class="go">  fullyLabeledReplicas: 1</span>
-<a id="__codelineno-61-22" name="__codelineno-61-22" href="#__codelineno-61-22"></a><span class="go">  observedGeneration: 1</span>
-<a id="__codelineno-61-23" name="__codelineno-61-23" href="#__codelineno-61-23"></a><span class="go">  readyReplicas: 1</span>
-<a id="__codelineno-61-24" name="__codelineno-61-24" href="#__codelineno-61-24"></a><span class="go">  replicas: 1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="gp">$ </span>kubestellar-list-syncing-objects<span class="w"> </span>--api-group<span class="w"> </span>apps<span class="w"> </span>--api-kind<span class="w"> </span>ReplicaSet
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="go">---</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="go">apiVersion: apps/v1</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="go">kind: ReplicaSet</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="go">metadata:</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a><span class="go">...</span>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="go">status:</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="go">  availableReplicas: 1</span>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="go">  fullyLabeledReplicas: 1</span>
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="go">  observedGeneration: 1</span>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="go">  readyReplicas: 1</span>
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="go">  replicas: 1</span>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="go">---</span>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="go">apiVersion: apps/v1</span>
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="go">kind: ReplicaSet</span>
+<a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a><span class="go">metadata:</span>
+<a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="go">...</span>
+<a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a><span class="go">status:</span>
+<a id="__codelineno-50-20" name="__codelineno-50-20" href="#__codelineno-50-20"></a><span class="go">  availableReplicas: 1</span>
+<a id="__codelineno-50-21" name="__codelineno-50-21" href="#__codelineno-50-21"></a><span class="go">  fullyLabeledReplicas: 1</span>
+<a id="__codelineno-50-22" name="__codelineno-50-22" href="#__codelineno-50-22"></a><span class="go">  observedGeneration: 1</span>
+<a id="__codelineno-50-23" name="__codelineno-50-23" href="#__codelineno-50-23"></a><span class="go">  readyReplicas: 1</span>
+<a id="__codelineno-50-24" name="__codelineno-50-24" href="#__codelineno-50-24"></a><span class="go">  replicas: 1</span>
 </code></pre></div>
 <h2 id="bootstrap">Bootstrap<a class="headerlink" href="#bootstrap" title="Permanent link">#</a></h2>
 <p>This is a combination of some installation and setup steps, for use in

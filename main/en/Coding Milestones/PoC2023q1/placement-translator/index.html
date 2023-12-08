@@ -2820,7 +2820,7 @@ command line parameters, then <code>$KUBECONFIG</code>, then <code>~/.kube/confi
 scenario in <a href="../example1">example1</a>.  You will need to run the
 where resolver and mailbox controller long enough for them to create what
 this scenario calls for, but they can be terminated after that.</p>
-<!-- BEGIN INCLUDE example1-subs/example1-pre-kcp.md '&lt;!--example1-pre-kcp-start--&gt;' '&lt;!--example1-pre-kcp-end--&gt;' -->
+<!-- BEGIN INCLUDE example1-subs/example1-pre-provider.md '&lt;!--example1-pre-provider-start--&gt;' '&lt;!--example1-pre-provider-end--&gt;' -->
 
 <p><img alt="Boxes and arrows. Two kind clusters exist, named florin and guilder. The Inventory Management workspace contains two pairs of SyncTarget and Location objects. The Edge Service Provider workspace contains the PoC controllers; the mailbox controller reads the SyncTarget objects and creates two mailbox workspaces." src="../Edge-PoC-2023q1-Scenario-1-stage-1.svg" title="Stage 1 Summary" /></p>
 <p>Stage 1 creates the infrastructure and the edge service provider
@@ -2919,7 +2919,7 @@ this document assumes that your <code>kind</code> cluster contexts are in
 <code>~/.kube/config</code>.</p>
 <!-- END INCLUDE -->
 
-<!-- BEGIN INCLUDE example1-subs/example1-post-kcp.md '&lt;!--example1-post-kcp-start--&gt;' '&lt;!--example1-post-kcp-end--&gt;' -->
+<!-- BEGIN INCLUDE example1-subs/example1-post-provider.md '&lt;!--example1-post-provider-start--&gt;' '&lt;!--example1-post-provider-end--&gt;' -->
 
 <h4 id="get-kubestellar">Get KubeStellar<a class="headerlink" href="#get-kubestellar" title="Permanent link">#</a></h4>
 <p>You will need a local copy of KubeStellar.  You can either use the
@@ -2977,7 +2977,7 @@ The kubectl plugin lines use fully specific executables (e.g.,
 <h4 id="initialize-the-kubestellar-platform-as-bare-processes">Initialize the KubeStellar platform as bare processes<a class="headerlink" href="#initialize-the-kubestellar-platform-as-bare-processes" title="Permanent link">#</a></h4>
 <p>In this step KubeStellar creates and populates the Edge Service
 Provider Workspace (ESPW), which exports the KubeStellar API.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar<span class="w"> </span>init
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubestellar<span class="w"> </span>init
 </code></pre></div>
 <h3 id="deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster">Deploy kcp and KubeStellar as a workload in a Kubernetes cluster<a class="headerlink" href="#deploy-kcp-and-kubestellar-as-a-workload-in-a-kubernetes-cluster" title="Permanent link">#</a></h3>
 <p>(This style of deployment requires release v0.6 or later of KubeStellar.)</p>
@@ -3024,12 +3024,12 @@ assumes that your <code>kind</code> cluster contexts are in <code>~/.kube/config
 <code>root:imw1</code> that was automatically created during deployment of
 KubeStellar. They label both florin and guilder with <code>env=prod</code>, and
 also label guilder with <code>extended=yes</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nv">imw1_space_config</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/temp-space-config/spaceprovider-default-imw1&quot;</span>
-<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>imw1<span class="w"> </span>--provider-name<span class="w"> </span>default<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--space-config-file<span class="w"> </span><span class="nv">$imw1_space_config</span>
-<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw1_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>florin<span class="w">  </span>loc-name<span class="o">=</span>florin<span class="w">  </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span>--imw<span class="w"> </span>imw1
-<a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw1_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>guilder<span class="w"> </span>loc-name<span class="o">=</span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes<span class="w"> </span>--imw<span class="w"> </span>imw1
+<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="nv">IMW1_SPACE_CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/temp-space-config/spaceprovider-default-imw1&quot;</span>
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>imw1<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--sm-context<span class="w"> </span><span class="nv">$SM_CONTEXT</span><span class="w"> </span>--output<span class="w"> </span><span class="nv">$IMW1_SPACE_CONFIG</span>
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>florin<span class="w">  </span>loc-name<span class="o">=</span>florin<span class="w">  </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span>--imw<span class="w"> </span>imw1
+<a id="__codelineno-76-4" name="__codelineno-76-4" href="#__codelineno-76-4"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>location<span class="w"> </span>guilder<span class="w"> </span>loc-name<span class="o">=</span>guilder<span class="w"> </span><span class="nv">env</span><span class="o">=</span>prod<span class="w"> </span><span class="nv">extended</span><span class="o">=</span>yes<span class="w"> </span>--imw<span class="w"> </span>imw1
 <a id="__codelineno-76-5" name="__codelineno-76-5" href="#__codelineno-76-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;describe the florin location object&quot;</span>
-<a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$imw1_space_config</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
+<a id="__codelineno-76-6" name="__codelineno-76-6" href="#__codelineno-76-6"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$IMW1_SPACE_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>describe<span class="w"> </span>location.edge.kubestellar.io<span class="w"> </span>florin
 </code></pre></div>
 <p>Those two script invocations are equivalent to creating the following
 four objects plus the kcp <code>APIBinding</code> objects that import the
@@ -3092,21 +3092,21 @@ KubeStellar.  If you have deployed the KubeStellar core as Kubernetes
 workload then this controller is already running in a pod in your
 hosting cluster. If instead you are running these controllers as bare
 processes then launch this controller as follows.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="c1"># TODO: mailbox controller has kcp dependencies. Will remove when controllers support spaces.</span>
-<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw
-<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a>sleep<span class="w"> </span><span class="m">20</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="nv">ESPW_SPACE_CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/temp-space-config/spaceprovider-default-espw&quot;</span>
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>espw<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--sm-context<span class="w"> </span><span class="nv">$SM_CONTEXT</span><span class="w"> </span>--output<span class="w"> </span><span class="nv">$ESPW_SPACE_CONFIG</span>
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a><span class="o">(</span>
+<a id="__codelineno-78-4" name="__codelineno-78-4" href="#__codelineno-78-4"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>mailbox-controller<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/mailbox-controller.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-78-5" name="__codelineno-78-5" href="#__codelineno-78-5"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">20</span>
+<a id="__codelineno-78-6" name="__codelineno-78-6" href="#__codelineno-78-6"></a><span class="o">)</span>
 </code></pre></div>
 <p>This controller is in charge of maintaining the collection of mailbox
-workspaces, which are an implementation detail not intended for user
+spaces, which are an implementation detail not intended for user
 consumption. You can use the following command to wait for the
-appearance of the mailbox workspaces implied by the florin and guilder
+appearance of the mailbox spaces implied by the florin and guilder
 <code>SyncTarget</code> objects that you made earlier.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="c1"># TODO: leaving this here so we get a list of all the workspaces.  Once all the workspaces, including the ones created by the mailbox are converted to spaces, we&#39;ll remove this ws.&quot;</span>
-<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>ws<span class="w"> </span>tree<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;\-mb\-&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
-<a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a><span class="k">done</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;\-mb\-&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a><span class="k">done</span>
 </code></pre></div>
 <p>If it is working correctly, lines like the following will appear in
 the controller's log (which is being written into your shell if you ran the controller as a bare process above, otherwise you can fetch <a href="../commands/#fetch-a-log-from-a-kubestellar-runtime-container">as directed</a>).</p>
@@ -3125,12 +3125,10 @@ the controller's log (which is being written into your shell if you ran the cont
 <a id="__codelineno-80-13" name="__codelineno-80-13" href="#__codelineno-80-13"></a>^C
 </code></pre></div>
 <p>You need a <code>-v</code> setting of 2 or numerically higher to get log messages
-about individual mailbox workspaces.</p>
-<p>A mailbox workspace name is distinguished by <code>-mb-</code> separator.
-You can get a listing of those mailbox workspaces as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="c1"># TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code.</span>
-<a id="__codelineno-81-2" name="__codelineno-81-2" href="#__codelineno-81-2"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root
-<a id="__codelineno-81-3" name="__codelineno-81-3" href="#__codelineno-81-3"></a>kubectl<span class="w"> </span>get<span class="w"> </span>Workspaces
+about individual mailbox spaces.</p>
+<p>A mailbox space name is distinguished by <code>-mb-</code> separator.
+You can get a listing of those mailbox spaces as follows.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-A
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a>NAME<span class="w">                                                       </span>TYPE<span class="w">          </span>REGION<span class="w">   </span>PHASE<span class="w">   </span>URL<span class="w">                                                     </span>AGE
 <a id="__codelineno-82-2" name="__codelineno-82-2" href="#__codelineno-82-2"></a>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1<span class="w">   </span>universal<span class="w">              </span>Ready<span class="w">   </span>https://192.168.58.123:6443/clusters/1najcltzt2nqax47<span class="w">   </span>50s
@@ -3141,8 +3139,7 @@ You can get a listing of those mailbox workspaces as follows.</p>
 </code></pre></div></p>
 <p>More usefully, using custom columns you can get a listing that shows
 the <em>name</em> of the associated SyncTarget.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a><span class="c1"># TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code</span>
-<a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations[&#39;edge\.kubestellar\.io/sync-target-name&#39;],CLUSTER:.spec.cluster&quot;</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>spaces<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;custom-columns=NAME:.metadata.name,SYNCTARGET:.metadata.annotations[&#39;edge\.kubestellar\.io/sync-target-name&#39;],CLUSTER:.spec.cluster&quot;</span>
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a>NAME<span class="w">                                                       </span>SYNCTARGET<span class="w">   </span>CLUSTER
 <a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1<span class="w">   </span>florin<span class="w">       </span>1najcltzt2nqax47
@@ -3151,19 +3148,17 @@ the <em>name</em> of the associated SyncTarget.</p>
 <a id="__codelineno-84-5" name="__codelineno-84-5" href="#__codelineno-84-5"></a>espw<span class="w">                                                       </span>&lt;none&gt;<span class="w">       </span>2n88ugkhysjbxqp5
 <a id="__codelineno-84-6" name="__codelineno-84-6" href="#__codelineno-84-6"></a>imw1<span class="w">                                                       </span>&lt;none&gt;<span class="w">       </span>4d2r9stcyy2qq5c1
 </code></pre></div></p>
-<p>Also: if you ever need to look up just one mailbox workspace by
+<p>Also: if you ever need to look up just one mailbox space by
 SyncTarget name, you could do it as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="c1"># TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code</span>
-<a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a><span class="nv">GUILDER_WS</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;guilder&quot;) | .name&#39;</span><span class="k">)</span>
-<a id="__codelineno-85-3" name="__codelineno-85-3" href="#__codelineno-85-3"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>workspace<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$GUILDER_WS</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="nv">GUILDER_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;guilder&quot;) | .name&#39;</span><span class="k">)</span>
+<a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$GUILDER_SPACE</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>workspace<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>The<span class="w"> </span>guilder<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c
 </code></pre></div></p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="c1"># TODO: currently some workspaces are not created as spaces, specifically the mailbox workspaces, so leaving this code</span>
-<a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a><span class="nv">FLORIN_WS</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>Workspace<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;florin&quot;) | .name&#39;</span><span class="k">)</span>
-<a id="__codelineno-87-3" name="__codelineno-87-3" href="#__codelineno-87-3"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>workspace<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$FLORIN_WS</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="nv">FLORIN_SPACE</span><span class="o">=</span><span class="k">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>space<span class="w"> </span>-n<span class="w"> </span>spaceprovider-default<span class="w"> </span>-o<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.items | .[] | .metadata | select(.annotations [&quot;edge.kubestellar.io/sync-target-name&quot;] == &quot;florin&quot;) | .name&#39;</span><span class="k">)</span>
+<a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a><span class="nb">echo</span><span class="w"> </span>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span><span class="nv">$FLORIN_SPACE</span>
 </code></pre></div>
-<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>workspace<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
+<div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a>The<span class="w"> </span>florin<span class="w"> </span>mailbox<span class="w"> </span>space<span class="w"> </span>name<span class="w"> </span>is<span class="w"> </span>1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1
 </code></pre></div></p>
 <!-- END INCLUDE -->
 
@@ -3271,8 +3266,8 @@ edge clusters.  The other one is called "special".</p>
 <p>In this example, each workload description goes in its own workload
 management workspace (WMW).  Start by creating a WMW for the common
 workload, with the following commands.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-c
-<a id="__codelineno-99-2" name="__codelineno-99-2" href="#__codelineno-99-2"></a><span class="nv">wmw_c_space_config</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-c
+<div class="highlight"><pre><span></span><code><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-c
+<a id="__codelineno-99-2" name="__codelineno-99-2" href="#__codelineno-99-2"></a><span class="nv">WMW_C_SPACE_CONFIG</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-c
 </code></pre></div>
 <div class="hide-me highlight"><pre><span></span><code><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a>sleep<span class="w"> </span><span class="m">15</span>
 </code></pre></div>
@@ -3280,7 +3275,7 @@ workload, with the following commands.</p>
 workspace.  The workload in this example in an Apache httpd server
 that serves up a very simple web page, conveyed via a Kubernetes
 ConfigMap that is mounted as a volume for the httpd pod.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_c_space_config</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-101-2" name="__codelineno-101-2" href="#__codelineno-101-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-101-3" name="__codelineno-101-3" href="#__codelineno-101-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-101-4" name="__codelineno-101-4" href="#__codelineno-101-4"></a><span class="s">metadata:</span>
@@ -3353,7 +3348,7 @@ ConfigMap that is mounted as a volume for the httpd pod.</p>
 Its "where predicate" (the <code>locationSelectors</code> array) has one label
 selector that matches both Location objects created earlier, thus
 directing the common workload to both edge clusters.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_c_space_config</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-102-3" name="__codelineno-102-3" href="#__codelineno-102-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-102-4" name="__codelineno-102-4" href="#__codelineno-102-4"></a><span class="s">metadata:</span>
@@ -3385,8 +3380,8 @@ directing the common workload to both edge clusters.</p>
 <h3 id="create-and-populate-the-workload-management-workspace-for-the-special-workload">Create and populate the workload management workspace for the special workload<a class="headerlink" href="#create-and-populate-the-workload-management-workspace-for-the-special-workload" title="Permanent link">#</a></h3>
 <p>Use the following <code>kubectl</code> commands to create the WMW for the special
 workload.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">SPACE_MANAGER_KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-s
-<a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a><span class="nv">wmw_s_space_config</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-s
+<div class="highlight"><pre><span></span><code><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-s
+<a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a><span class="nv">WMW_S_SPACE_CONFIG</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-s
 </code></pre></div>
 <p>In this workload we will also demonstrate how to downsync objects
 whose kind is defined by a <code>CustomResourceDefinition</code> object. We will
@@ -3394,7 +3389,7 @@ use the one from <a href="https://kubernetes.io/docs/tasks/extend-kubernetes/cus
 CRDs</a>,
 modified so that the resource it defines is in the category
 <code>all</code>. First, create the definition object with the following command.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_s_space_config</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a><span class="s">apiVersion: apiextensions.k8s.io/v1</span>
 <a id="__codelineno-105-3" name="__codelineno-105-3" href="#__codelineno-105-3"></a><span class="s">kind: CustomResourceDefinition</span>
 <a id="__codelineno-105-4" name="__codelineno-105-4" href="#__codelineno-105-4"></a><span class="s">metadata:</span>
@@ -3441,13 +3436,13 @@ modified so that the resource it defines is in the category
 </code></pre></div>
 <p>Next, use the following command to wait for the apiserver to process
 that definition.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_s_space_config</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>crontabs.stable.example.com
+<div class="highlight"><pre><span></span><code><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="w"> </span><span class="nv">condition</span><span class="o">=</span>Established<span class="w"> </span>crd<span class="w"> </span>crontabs.stable.example.com
 </code></pre></div>
 <p>Next, use <code>kubectl</code> to create the following workload objects in that
 workspace. The <code>APIService</code> object included here does not contribute
 to the httpd workload but is here to demonstrate that <code>APIService</code>
 objects can be downsynced.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_s_space_config</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-107-2" name="__codelineno-107-2" href="#__codelineno-107-2"></a><span class="s">apiVersion: v1</span>
 <a id="__codelineno-107-3" name="__codelineno-107-3" href="#__codelineno-107-3"></a><span class="s">kind: Namespace</span>
 <a id="__codelineno-107-4" name="__codelineno-107-4" href="#__codelineno-107-4"></a><span class="s">metadata:</span>
@@ -3550,7 +3545,7 @@ labels and annotations) to be downsynced. This contrasts with the
 common EdgePlacement, which does not explicitly mention the
 <code>commonstuff</code> namespace, relying on the implicit creation of
 namespaces as needed in the WECs.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_s_space_config</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
 <a id="__codelineno-108-2" name="__codelineno-108-2" href="#__codelineno-108-2"></a><span class="s">apiVersion: edge.kubestellar.io/v2alpha1</span>
 <a id="__codelineno-108-3" name="__codelineno-108-3" href="#__codelineno-108-3"></a><span class="s">kind: EdgePlacement</span>
 <a id="__codelineno-108-4" name="__codelineno-108-4" href="#__codelineno-108-4"></a><span class="s">metadata:</span>
@@ -3618,19 +3613,17 @@ the where resolver is running in a pod there. If instead you are
 running the core controllers are bare processes then you can use the
 following commands to launch the where-resolver; it requires the ESPW
 to be the current kcp workspace at start time.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a><span class="nv">espw_space_config</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span><span class="s2">/temp-space-config/spaceprovider-default-espw&quot;</span>
-<a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a>kubectl-kubestellar-get-config-for-space<span class="w"> </span>--space-name<span class="w"> </span>espw<span class="w"> </span>--provider-name<span class="w"> </span>default<span class="w"> </span>--sm-core-config<span class="w"> </span><span class="nv">$SM_CONFIG</span><span class="w"> </span>--space-config-file<span class="w"> </span><span class="nv">$espw_space_config</span>
-<a id="__codelineno-110-3" name="__codelineno-110-3" href="#__codelineno-110-3"></a><span class="c1"># TODO: where-resolver needs access to multiple configs. Will remove when controllers support spaces.</span>
-<a id="__codelineno-110-4" name="__codelineno-110-4" href="#__codelineno-110-4"></a>kubectl<span class="w"> </span>ws<span class="w"> </span>root:espw<span class="w"> </span>
-<a id="__codelineno-110-5" name="__codelineno-110-5" href="#__codelineno-110-5"></a>kubestellar-where-resolver<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
-<a id="__codelineno-110-6" name="__codelineno-110-6" href="#__codelineno-110-6"></a>sleep<span class="w"> </span><span class="m">10</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a><span class="o">(</span>
+<a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a><span class="w">  </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="nv">$SM_CONFIG</span><span class="w"> </span>kubestellar-where-resolver<span class="w"> </span>-v<span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/tmp/where-resolver.log<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-110-3" name="__codelineno-110-3" href="#__codelineno-110-3"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-110-4" name="__codelineno-110-4" href="#__codelineno-110-4"></a><span class="o">)</span>
 </code></pre></div>
 <p>The following commands wait until the where-resolver has done its job
 for the common and special <code>EdgePlacement</code> objects.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_c_space_config</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="k">done</span>
-<a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_s_space_config</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="k">while</span><span class="w"> </span>!<span class="w"> </span>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_S_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">10</span>
 <a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="k">done</span>
 </code></pre></div>
@@ -3643,7 +3636,7 @@ following (among many others) in the where-resolver's log.</p>
 <a id="__codelineno-112-5" name="__codelineno-112-5" href="#__codelineno-112-5"></a>I0423<span class="w"> </span><span class="m">01</span>:33:37.391772<span class="w">   </span><span class="m">11305</span><span class="w"> </span>reconcile_on_location.go:192<span class="o">]</span><span class="w"> </span><span class="s2">&quot;updated SinglePlacementSlice&quot;</span><span class="w"> </span><span class="nv">controller</span><span class="o">=</span><span class="s2">&quot;kubestellar-where-resolver&quot;</span><span class="w"> </span><span class="nv">triggeringKind</span><span class="o">=</span>Location<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm|guilder&quot;</span><span class="w"> </span><span class="nv">locationWorkspace</span><span class="o">=</span><span class="s2">&quot;apmziqj9p9fqlflm&quot;</span><span class="w"> </span><span class="nv">location</span><span class="o">=</span><span class="s2">&quot;guilder&quot;</span><span class="w"> </span><span class="nv">workloadWorkspace</span><span class="o">=</span><span class="s2">&quot;10l175x6ejfjag3e&quot;</span><span class="w"> </span><span class="nv">singlePlacementSlice</span><span class="o">=</span><span class="s2">&quot;edge-placement-c&quot;</span>
 </code></pre></div>
 <p>Check out a SinglePlacementSlice object as follows.</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$wmw_c_space_config</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>kubectl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$WMW_C_SPACE_CONFIG</span><span class="w"> </span>get<span class="w"> </span>SinglePlacementSlice<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <div class="no-copy highlight"><pre><span></span><code><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a>apiVersion:<span class="w"> </span>v1
 <a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a>items:
