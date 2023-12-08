@@ -14,7 +14,10 @@ edge clusters.  The other one is called "special".
 
 In this example, each workload description goes in its own workload
 management workspace (WMW).  Start by creating a WMW for the common
-workload, with the following commands.
+workload, with the following commands.  These commands create the WMW,
+makes KubeStellar edge APIs available for the WMW via kube-bind, and
+optionally makes some Kubernetes APIs available for the WMW by
+populating a set of CRDs into the WMW.
 
 ```shell
 IN_CLUSTER=false kubectl kubestellar ensure wmw wmw-c
