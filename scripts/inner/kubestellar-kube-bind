@@ -65,32 +65,38 @@ if kubectl get crd $resource_to_bind.edge.kubestellar.io &> /dev/null; then
     exit 0
 fi
 
+mkdir -p $log_dir
+konnector_log_file=$log_dir/kube-bind-konnector-$space_name.log
+
 if pgrep konnector | xargs ps e -p 2>/dev/null | egrep "KB_CONSUMER=$space_name(\s|$)" &> /dev/null; then
     echo "kube-bind konnector for space $space_name already running"
 else
     if ! kubectl get namespace kube-system &> /dev/null
     then kubectl create namespace kube-system &> /dev/null
     fi
-    mkdir -p $log_dir
-    log_file=$log_dir/kube-bind-konnector-$space_name.log
-    echo "starting kube-bind konnector for space $space_name in background, logs writing to $log_file"
-    KB_CONSUMER=$space_name konnector &> $log_file &
+    echo "starting kube-bind konnector for space $space_name in background, logs writing to $konnector_log_file"
+    KB_CONSUMER=$space_name konnector &> $konnector_log_file &
     sleep 10
     if ! pgrep konnector &> /dev/null; then
-        cat $log_file
+        cat $konnector_log_file
         echo "Error: kube-bind konnector process not found" >&2
         exit 1
     fi
 fi
 
-#TODO: error check for the bind commmand
 echo "binding $resource_to_bind for $space_name"
-result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"
+if ! result="$(kubectl bind http://127.0.0.1:8080/export --skip-konnector --unattended --resource $resource_to_bind 2>&1)"; then
+    echo "Error occurred during binding $resource_to_bind for $space_name" >&2
+    echo "Result of kubectl bind: $result" >&2
+    echo "Tail of konnector's log at $konnector_log_file:" >&2
+    tail $konnector_log_file >&2
+    exit 1
+fi
 
 cluster_ns="$(echo $result | grep -e 'kube-bind-\w*' -o)"
 if [ -z "$cluster_ns" ]
 then
-    echo "Failed to find the cluster namespace" >&2
+    echo "Failed to find the cluster namespace, result of 'kubectl bind': $result" >&2
     exit 1
 else
     echo "cluster namespace is $cluster_ns"
