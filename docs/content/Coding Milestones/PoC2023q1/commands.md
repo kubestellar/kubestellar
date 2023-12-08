@@ -998,7 +998,7 @@ Deleting a WMW can be done by simply deleting its `space` object from
 the parent.
 
 ```shell
-KUBECONFIG=$SM_CONFIG kubectl delete space example-wmw
+KUBECONFIG=$SM_CONFIG kubectl delete space -n spaceprovider-default example-wmw
 ```
 ``` { .bash .no-copy }
 workspace.tenancy.kcp.io "example-wmw" deleted
