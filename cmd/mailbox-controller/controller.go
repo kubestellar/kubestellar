@@ -24,7 +24,6 @@ import (
 	"io"
 	"os/exec"
 	"strings"
-	"sync/atomic"
 
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,74 +33,74 @@ import (
 	_ "k8s.io/component-base/metrics/prometheus/clientgo"
 	"k8s.io/klog/v2"
 
-	tenancyv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/tenancy/v1alpha1"
-	tenancyclient "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/typed/tenancy/v1alpha1"
-	kcptenancyinformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
-	tenancylisters "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
+	spaceclientset "github.com/kubestellar/kubestellar/space-framework/pkg/client/clientset/versioned"
+	spacev1alpha1informers "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions/space/v1alpha1"
+	spacev1a1listers "github.com/kubestellar/kubestellar/space-framework/pkg/client/listers/space/v1alpha1"
 )
 
-const wsNameSep = "-mb-"
+const mbsNameSep = "-mb-"
 
 // This identifies an index in the SyncTarget informer
-const mbwsNameIndexKey = "mbwsName"
+const mbsNameIndexKey = "mbsName"
 
-// SyncTargetNameAnnotationKey identifies the annotation on a mailbox Workspace
+// SyncTargetNameAnnotationKey identifies the annotation on a mailbox space
 // that points to the corresponding SyncTarget.
 const SyncTargetNameAnnotationKey = "edge.kubestellar.io/sync-target-name"
 
 type mbCtl struct {
-	context                 context.Context
-	espwPath                string
-	syncTargetInformer      cache.SharedIndexInformer
-	synctargetLister        edgev2alpha1listers.SyncTargetLister
-	syncTargetIndexer       cache.Indexer
-	workspaceScopedInformer cache.SharedIndexInformer
-	workspaceScopedLister   tenancylisters.WorkspaceLister
-	workspaceScopedClient   tenancyclient.WorkspaceInterface
-	kbSpaceRelation         kbuser.KubeBindSpaceRelation
-	queue                   workqueue.RateLimitingInterface // of mailbox workspace Name
+	context               context.Context
+	syncTargetInformer    cache.SharedIndexInformer
+	synctargetLister      edgev2alpha1listers.SyncTargetLister
+	syncTargetIndexer     cache.Indexer
+	spaceInformer         cache.SharedIndexInformer
+	spaceLister           spacev1a1listers.SpaceNamespaceLister
+	spaceManagementClient spaceclientset.Clientset
+	spaceProvider         string
+	spaceProviderNs       string
+	kbSpaceRelation       kbuser.KubeBindSpaceRelation
+	queue                 workqueue.RateLimitingInterface
 }
 
 type refSyncTarget string
 
-var suffix uint64 = 142857
 var errNoSpaceId = errors.New("failed to retrive spaceID")
 
 // newMailboxController constructs a new mailbox controller.
 // syncTargetClusterPreInformer is a pre-informer for all the relevant
 // SyncTarget objects (not limited to one cluster).
 func newMailboxController(ctx context.Context,
-	espwPath string,
 	syncTargetPreInformer edgev2alpha1informers.SyncTargetInformer,
-	workspaceScopedPreInformer kcptenancyinformers.WorkspaceInformer,
-	workspaceScopedClient tenancyclient.WorkspaceInterface,
+	spacePreInformer spacev1alpha1informers.SpaceInformer,
+	spaceManagementClient *spaceclientset.Clientset,
+	spaceProvider string,
+	spaceProviderNs string,
 	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) *mbCtl {
 	syncTargetInformer := syncTargetPreInformer.Informer()
-	workspacesInformer := workspaceScopedPreInformer.Informer()
+	spacesInformer := spacePreInformer.Informer()
 
 	ctl := &mbCtl{
-		context:                 ctx,
-		espwPath:                espwPath,
-		syncTargetInformer:      syncTargetInformer,
-		synctargetLister:        syncTargetPreInformer.Lister(),
-		syncTargetIndexer:       syncTargetInformer.GetIndexer(),
-		workspaceScopedInformer: workspacesInformer,
-		workspaceScopedLister:   workspaceScopedPreInformer.Lister(),
-		workspaceScopedClient:   workspaceScopedClient,
-		kbSpaceRelation:         kbSpaceRelation,
-		queue:                   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
+		context:               ctx,
+		syncTargetInformer:    syncTargetInformer,
+		synctargetLister:      syncTargetPreInformer.Lister(),
+		syncTargetIndexer:     syncTargetInformer.GetIndexer(),
+		spaceInformer:         spacesInformer,
+		spaceLister:           spacePreInformer.Lister().Spaces(spaceProviderNs),
+		spaceManagementClient: *spaceManagementClient,
+		spaceProvider:         spaceProvider,
+		spaceProviderNs:       spaceProviderNs,
+		kbSpaceRelation:       kbSpaceRelation,
+		queue:                 workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mailbox-controller"),
 	}
-	syncTargetInformer.AddIndexers(cache.Indexers{mbwsNameIndexKey: ctl.mbwsNameOfObj})
+	syncTargetInformer.AddIndexers(cache.Indexers{mbsNameIndexKey: ctl.mbsNameOfObj})
 
 	syncTargetInformer.AddEventHandler(ctl)
-	workspacesInformer.AddEventHandler(ctl)
+	spacesInformer.AddEventHandler(ctl)
 	return ctl
 }
 
@@ -112,7 +111,7 @@ func (ctl *mbCtl) Run(concurrency int) {
 	ctx := ctl.context
 	logger := klog.FromContext(ctx)
 	doneCh := ctx.Done()
-	if !cache.WaitForNamedCacheSync("mailbox-controller", doneCh, ctl.syncTargetInformer.HasSynced, ctl.workspaceScopedInformer.HasSynced) {
+	if !cache.WaitForNamedCacheSync("mailbox-controller", doneCh, ctl.syncTargetInformer.HasSynced, ctl.spaceInformer.HasSynced) {
 		logger.Error(nil, "Informer syncs not achieved")
 		return
 	}
@@ -147,22 +146,12 @@ func (ctl *mbCtl) OnDelete(obj any) {
 func (ctl *mbCtl) enqueue(obj any) {
 	logger := klog.FromContext(ctl.context)
 	switch typed := obj.(type) {
-	case *tenancyv1alpha1.Workspace:
-		logger.V(4).Info("Enqueuing reference due to workspace", "wsName", typed.Name)
+	case *spacev1alpha1.Space:
+		logger.V(4).Info("Enqueuing reference due to space", "spaceName", typed.Name)
 		ctl.queue.Add(typed.Name)
 	case *edgev2alpha1.SyncTarget:
-		mbwsName, err := ctl.mbwsNameOfSynctarget(typed)
-		if err != nil {
-			if err.Error() == errNoSpaceId.Error() {
-				logger.V(4).Info("Enqueuing SyncTarget reference for later retry", "syncTargetName", typed.Name)
-				ctl.queue.Add(refSyncTarget(typed.Name))
-			} else {
-				logger.Error(nil, "Failed to construct mailbox workspace name from SyncTarget", "syncTargetName", typed.Name)
-			}
-		} else {
-			logger.V(4).Info("Enqueuing reference due to SyncTarget", "wsName", mbwsName, "syncTargetName", typed.Name)
-			ctl.queue.Add(mbwsName)
-		}
+		logger.V(4).Info("Enqueuing SyncTarget reference", "syncTargetName", typed.Name)
+		ctl.queue.Add(refSyncTarget(typed.Name))
 	default:
 		logger.Error(nil, "Notified of object of unexpected type", "object", obj, "type", fmt.Sprintf("%T", obj))
 	}
@@ -202,8 +191,10 @@ func (ctl *mbCtl) sync1(ctx context.Context, ref any) {
 	}
 }
 
+// sync returns true to retry, false on success or unrecoverable error
 func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	logger := klog.FromContext(ctx)
+	mbsName := ""
 	stName, ok := refany.(refSyncTarget)
 	if ok {
 		st, err := ctl.synctargetLister.Get(string(stName))
@@ -211,26 +202,32 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 			logger.Error(err, "Failed to fetch SyncTarget from local cache", "stName", stName)
 			return false
 		}
-		mbwsName, err := ctl.mbwsNameOfSynctarget(st)
+		mbsName, err = ctl.mbsNameOfSynctarget(st)
 		if err != nil {
-			return true
+			if err.Error() == errNoSpaceId.Error() {
+				logger.V(4).Info("Failed to retrieve Space ID. Retrying", "syncTargetName", st.Name)
+				return true
+			} else {
+				logger.Error(err, "Failed to construct mailbox space name from SyncTarget", "syncTargetName", st.Name)
+				return false
+			}
 		}
-		ctl.queue.Add(mbwsName)
-		return false
 	}
-	mbwsName, ok := refany.(string)
-	if !ok {
-		logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
-		return false
+	if mbsName == "" {
+		mbsName, ok = refany.(string)
+		if !ok {
+			logger.Error(nil, "Sync expected a string", "ref", refany, "type", fmt.Sprintf("%T", refany))
+			return false
+		}
 	}
-	parts := strings.Split(mbwsName, wsNameSep)
+	parts := strings.Split(mbsName, mbsNameSep)
 	if len(parts) != 2 {
-		logger.V(3).Info("Ignoring non-mailbox workspace name", "wsName", mbwsName)
+		logger.V(3).Info("Ignoring non-mailbox space name", "spaceName", mbsName)
 		return false
 	}
-	byIndex, err := ctl.syncTargetIndexer.ByIndex(mbwsNameIndexKey, mbwsName)
+	byIndex, err := ctl.syncTargetIndexer.ByIndex(mbsNameIndexKey, mbsName)
 	if err != nil {
-		logger.Error(err, "Failed to lookup SyncTargets by mailbox workspace name", "mbwsName", mbwsName)
+		logger.Error(err, "Failed to lookup SyncTargets by mailbox space name", "mbsName", mbsName)
 		return false
 	}
 	var syncTarget *edgev2alpha1.SyncTarget
@@ -238,69 +235,72 @@ func (ctl *mbCtl) sync(ctx context.Context, refany any) bool {
 	} else {
 		syncTarget = byIndex[0].(*edgev2alpha1.SyncTarget)
 		if len(byIndex) > 1 {
-			logger.Error(nil, "Impossible: more than one SyncTarget fetched from index; using the first", "mbwsName", mbwsName, "fetched", byIndex)
+			logger.Error(nil, "Impossible: more than one SyncTarget fetched from index; using the first", "mbsName", mbsName, "fetched", byIndex)
 		}
 	}
-	workspace, err := ctl.workspaceScopedLister.Get(mbwsName)
+	space, err := ctl.spaceLister.Get(mbsName)
 	if err != nil && !k8sapierrors.IsNotFound(err) {
-		logger.Error(err, "Unable to Get referenced Workspace", "mbwsName", mbwsName)
+		logger.Error(err, "Unable to Get referenced space", "mbsName", mbsName)
 		return true
 	}
 	if syncTarget == nil || syncTarget.DeletionTimestamp != nil {
-		if workspace == nil || workspace.DeletionTimestamp != nil {
-			logger.V(3).Info("Both SyncTarget and Workspace are absent or deleting, nothing to do", "mbwsName", mbwsName)
+		if space == nil || space.DeletionTimestamp != nil {
+			logger.V(3).Info("Both SyncTarget and Mailbox space are absent or deleting, nothing to do", "mbsName", mbsName)
 			return false
 		}
-		err := ctl.workspaceScopedClient.Delete(ctx, mbwsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &workspace.UID}})
+		err := ctl.spaceManagementClient.SpaceV1alpha1().Spaces(ctl.spaceProviderNs).Delete(ctx, mbsName, metav1.DeleteOptions{Preconditions: &metav1.Preconditions{UID: &space.UID}})
 		if err == nil || k8sapierrors.IsNotFound(err) {
-			logger.V(2).Info("Deleted unwanted workspace", "mbwsName", mbwsName)
+			logger.V(2).Info("Deleted unwanted space", "mbsName", mbsName)
 			return false
 		}
-		logger.Error(err, "Failed to delete unwanted workspace", "mbwsName", mbwsName)
+		logger.Error(err, "Failed to delete unwanted space", "mbsName", mbsName)
 		return true
 	}
 	// Now we have established that the SyncTarget exists and is not being deleted
-	if workspace == nil {
+	if space == nil {
 		_, stOriginalName, _, err := kbuser.AnalyzeObjectID(syncTarget)
 		if err != nil {
-			logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "syncTarget", syncTarget.Name)
+			logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object", "syncTarget", syncTarget.Name)
 			return false
 		}
-		ws := &tenancyv1alpha1.Workspace{
+		// create the mailbox space
+		mbspace := &spacev1alpha1.Space{
 			ObjectMeta: metav1.ObjectMeta{
 				Annotations: map[string]string{SyncTargetNameAnnotationKey: stOriginalName},
-				Name:        mbwsName,
+				Name:        mbsName,
 			},
-			Spec: tenancyv1alpha1.WorkspaceSpec{},
+			Spec: spacev1alpha1.SpaceSpec{
+				SpaceProviderDescName: ctl.spaceProvider,
+				Type:                  spacev1alpha1.SpaceTypeManaged,
+			},
 		}
-		_, err = ctl.workspaceScopedClient.Create(ctx, ws, metav1.CreateOptions{FieldManager: "mailbox-controller"})
+		_, err = ctl.spaceManagementClient.SpaceV1alpha1().Spaces(ctl.spaceProviderNs).Create(ctx, mbspace, metav1.CreateOptions{FieldManager: "mailbox-controller"})
 		if err == nil {
-			logger.V(2).Info("Created missing workspace", "mbwsName", mbwsName)
+			logger.V(2).Info("Created missing space", "mbsName", mbsName)
 			return false
 		}
 		if k8sapierrors.IsAlreadyExists(err) {
-			logger.V(3).Info("Missing workspace was created concurrently", "mbwsName", mbwsName)
+			logger.V(3).Info("Missing space was created concurrently", "mbsName", mbsName)
 			return false
 		}
-		logger.Error(err, "Failed to create workspace", "mbwsName", mbwsName)
+		logger.Error(err, "Failed to create space", "mbsName", mbsName)
 		return true
 	}
-	if workspace.DeletionTimestamp != nil {
-		logger.V(3).Info("Wanted workspace is being deleted, will retry later", "mbwsName", mbwsName)
+	if space.DeletionTimestamp != nil {
+		logger.V(3).Info("Wanted space is being deleted, will retry later", "mbsName", mbsName)
 		return true
 	}
-	logger.V(3).Info("Both SyncTarget and Workspace exist and are not being deleted, now check on the binding to edge", "mbwsName", mbwsName)
-	return ctl.ensureBinding(ctx, workspace)
+	if space.Status.Phase != spacev1alpha1.SpacePhaseReady {
+		logger.V(3).Info("Wanted space is not ready, will retry later", "mbsName", mbsName)
+		return true
+	}
+	logger.V(3).Info("Both SyncTarget and Mailbox space exist and are not being deleted, now check on the binding to edge", "mbsName", mbsName)
+	return ctl.ensureBinding(ctx, space.Name)
 
 }
 
-func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.Workspace) bool {
-	logger := klog.FromContext(ctx).WithValues("mbsName", workspace.Name)
-	mbwsCluster := logicalcluster.Name(workspace.Spec.Cluster)
-	if mbwsCluster == "" {
-		logger.V(2).Info("Mailbox workspace does not have a Spec.Cluster yet")
-		return true
-	}
+func (ctl *mbCtl) ensureBinding(ctx context.Context, spacename string) bool {
+	logger := klog.FromContext(ctx).WithValues("mbsName", spacename)
 
 	// The script must be idempotent.
 	shellScriptName := "kubestellar-kube-bind"
@@ -309,21 +309,14 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 	for _, resource := range resourcesToBind {
 		logger.V(2).Info("Ensuring binding", "script", shellScriptName, "resource", resource)
 
-		// suffix helps isolate this controller's multiple workers to prevent concurrent access of a single kubeconfig file.
-		// This is a compromise due to the situation that we are using kcp which modifies kubeconfig file when changing workspaces.
-		freshSuffix := atomic.AddUint64(&suffix, 1)
-
-		makeCopyOfKubeConfig := fmt.Sprintf("cp $KUBECONFIG $KUBECONFIG.copy%d", freshSuffix)
-		removeCopyWhenExits := fmt.Sprintf("trap 'rm $KUBECONFIG.copy%d' EXIT", freshSuffix)
+		// We assume that SM_CONFIG was set on the script that created the MB controller
 		invokeScript := strings.Join([]string{
-			fmt.Sprintf("KUBECONFIG=$KUBECONFIG.copy%d", freshSuffix),
+			"KUBECONFIG=$SM_CONFIG",
 			shellScriptName,
-			workspace.Name,
+			spacename,
 			resource,
 		}, " ")
 		cmdLine := strings.Join([]string{
-			makeCopyOfKubeConfig,
-			removeCopyWhenExits,
 			invokeScript,
 		}, "; ")
 		logger.V(2).Info("About to exec", "cmdLine", cmdLine)
@@ -372,14 +365,14 @@ func (ctl *mbCtl) ensureBinding(ctx context.Context, workspace *tenancyv1alpha1.
 			logger.V(2).Info("Stderr from exec", "resource", resource, "line", line)
 		}
 		if err = cmd.Wait(); err != nil {
-			logger.Error(err, "Unable to bind", "workspace", workspace.Name, "resrouce", resource)
+			logger.Error(err, "Unable to bind", "space", spacename, "resrouce", resource)
 			return true
 		}
 	}
 	return false
 }
 
-func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, error) {
+func (ctl *mbCtl) mbsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, error) {
 	logger := klog.FromContext(ctl.context)
 	_, _, kbSpaceID, err := kbuser.AnalyzeObjectID(st)
 	if err != nil {
@@ -392,17 +385,17 @@ func (ctl *mbCtl) mbwsNameOfSynctarget(st *edgev2alpha1.SyncTarget) (string, err
 		return "", errNoSpaceId
 	}
 	// Use consumer spaceID and provider st.UID
-	return spaceID + wsNameSep + string(st.UID), nil
+	return spaceID + mbsNameSep + string(st.UID), nil
 }
 
-func (ctl *mbCtl) mbwsNameOfObj(obj any) ([]string, error) {
+func (ctl *mbCtl) mbsNameOfObj(obj any) ([]string, error) {
 	st, ok := obj.(*edgev2alpha1.SyncTarget)
 	if !ok {
 		return nil, fmt.Errorf("expected a SyncTarget but got %#+v, a %T", obj, obj)
 	}
-	mbwsName, err := ctl.mbwsNameOfSynctarget(st)
+	mbsName, err := ctl.mbsNameOfSynctarget(st)
 	if err != nil {
 		return nil, err
 	}
-	return []string{mbwsName}, nil
+	return []string{mbsName}, nil
 }

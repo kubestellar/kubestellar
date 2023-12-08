@@ -48,9 +48,9 @@ function get_kcp_kubeconfig() {
 
 function create_kcp_provider_object() {
     get_kcp_kubeconfig     # kcp is created in a seperate container 
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG delete secret -n ${NAMESPACE} kcpsec > /dev/null 2>&1 || true
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig=$kcp_kubeconfig --from-file=external=$external_kcp_kubeconfig
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG apply -f - <<EOF
+    kubectl --kubeconfig $SM_CONFIG delete secret -n ${NAMESPACE} kcpsec > /dev/null 2>&1 || true
+    kubectl --kubeconfig $SM_CONFIG create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig=$kcp_kubeconfig --from-file=external=$external_kcp_kubeconfig
+    kubectl --kubeconfig $SM_CONFIG apply -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -63,7 +63,7 @@ spec:
     name: kcpsec
 EOF
     echo "Waiting for spaceproviderdesc to reach the Ready phase."
-    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
+    kubectl --kubeconfig ${SM_CONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
 }
  
 function create_kubeflex_provider_object() {
@@ -74,7 +74,7 @@ function create_kubeflex_provider_object() {
         done
     )
 
-    kubectl --kubeconfig $SPACE_MANAGER_KUBECONFIG apply -f - <<EOF
+    kubectl --kubeconfig $SM_CONFIG apply -f - <<EOF
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -87,7 +87,7 @@ spec:
     name: corecluster
 EOF
     echo "Waiting for spaceproviderdesc to reach the Ready phase."
-    kubectl --kubeconfig ${SPACE_MANAGER_KUBECONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
+    kubectl --kubeconfig ${SM_CONFIG} wait --for=jsonpath='{.status.Phase}'=Ready spaceproviderdesc $PROVIDER_NAME
 }
 
 
@@ -229,10 +229,8 @@ function run_init() {
 function run_mailbox_controller() {
     echo "--< Starting mailbox-controller >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
+    KUBECONFIG=$SM_CONFIG
     if ! mailbox-controller -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
@@ -242,10 +240,8 @@ function run_mailbox_controller() {
 function run_where_resolver() {
     echo "--< Starting where-resolver >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
+    KUBECONFIG=$SM_CONFIG
     if ! kubestellar-where-resolver -v ${VERBOSITY} ; then
         echoerr "unable to start kubestellar-where-resolver!"
         exit 1
@@ -255,11 +251,9 @@ function run_where_resolver() {
 function run_placement_translator() {
     echo "--< Starting placement-translator >--"
     wait-kubestellar-ready
-    # TODO: remove the kcp dependency in PR3
     get_kcp_kubeconfig
-    KUBECONFIG=$kcp_kubeconfig
-    kubectl ws root:espw
-    if ! placement-translator --allclusters-context  "system:admin" -v=${VERBOSITY} ; then
+    KUBECONFIG=$SM_CONFIG
+    if ! placement-translator -v=${VERBOSITY} ; then
         echoerr "unable to start mailbox-controller!"
         exit 1
     fi
@@ -309,12 +303,16 @@ fi
 if [ "$PROVIDER_SECRET_NAMESPACE" == "" ]; then
     PROVIDER_SECRET_NAMESPACE=psecret_namespace
 fi
-if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
+if [ "$SM_CONFIG" == "" ]; then
     # if the space_manager_kubeconfig is not set, then we assume the 
     # hosting (aka core) cluster is the space manager cluster.
-    SPACE_MANAGER_KUBECONFIG=$host_kubeconfig
-    export SPACE_MANAGER_KUBECONFIG
+    SM_CONFIG=$host_kubeconfig
+    export SM_CONFIG
 fi
+if [ "$SM_CONTEXT" == "" ]; then
+    export SM_CONTEXT=sm-mgt
+fi
+
 echo "ESPW_NAME=${ESPW_NAME}"
 echo "VERBOSITY=${VERBOSITY}"
 echo "ENSURE_IMW=${ENSURE_IMW}"
@@ -322,7 +320,8 @@ echo "ENSURE_WMW=${ENSURE_WMW}"
 echo "NAMESPACE=${NAMESPACE}"
 echo "SPACE_PROVIDER_TYPE=${SPACE_PROVIDER_TYPE}"
 echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
-echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "SM_CONFIG=${SM_CONFIG}"
+echo "SM_CONTEXT=${SM_CONTEXT}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 

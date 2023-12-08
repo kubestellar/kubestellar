@@ -23,7 +23,8 @@ import (
 	"time"
 
 	apiext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	apiextkcpinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
+	apiextclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apiextinfactory "k8s.io/apiextensions-apiserver/pkg/client/informers/externalversions"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	k8sapierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,17 +33,12 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	k8ssets "k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	kubedynamicinformer "k8s.io/client-go/dynamic/dynamicinformer"
 	upstreamcache "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
-
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
-	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	apisv1alpha1 "github.com/kcp-dev/kcp/pkg/apis/apis/v1alpha1"
-	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
-	"github.com/kcp-dev/logicalcluster/v3"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	ksmetav1a1 "github.com/kubestellar/kubestellar/pkg/apis/meta/v1alpha1"
@@ -50,6 +46,7 @@ import (
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 type whatResolver struct {
@@ -62,17 +59,15 @@ type whatResolver struct {
 	edgePlacementInformer upstreamcache.SharedIndexInformer
 	edgePlacementLister   edgev2alpha1listers.EdgePlacementLister
 
-	discoveryClusterClient    clusterdiscovery.DiscoveryClusterInterface
-	crdClusterPreInformer     apiextkcpinformers.CustomResourceDefinitionClusterInformer
-	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer
-	dynamicClusterClient      clusterdynamic.ClusterInterface
-	kbSpaceRelation           kbuser.KubeBindSpaceRelation
+	spaceclient     msclient.KubestellarSpaceInterface
+	spaceProviderNs string
+	kbSpaceRelation kbuser.KubeBindSpaceRelation
 
 	// Hold this while accessing data listed below
 	sync.Mutex
 
 	// workspaceDetails maps lc.Name of a workload LC (WDS) to all the relevant information for that LC.
-	workspaceDetails map[logicalcluster.Name]*workspaceDetails
+	workspaceDetails map[string]*workspaceDetails
 }
 
 // workspaceDetails holds the data for a given WDS
@@ -119,10 +114,8 @@ type objectDetails struct {
 func NewWhatResolver(
 	ctx context.Context,
 	edgePlacementPreInformer edgev2alpha1informers.EdgePlacementInformer,
-	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	crdClusterPreInformer apiextkcpinformers.CustomResourceDefinitionClusterInformer,
-	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
-	dynamicClusterClient clusterdynamic.ClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 	numThreads int,
 ) WhatResolver {
@@ -130,18 +123,16 @@ func NewWhatResolver(
 	logger := klog.FromContext(ctx).WithValues("part", controllerName)
 	ctx = klog.NewContext(ctx, logger)
 	wr := &whatResolver{
-		ctx:                       ctx,
-		logger:                    logger,
-		numThreads:                numThreads,
-		queue:                     workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
-		edgePlacementInformer:     edgePlacementPreInformer.Informer(),
-		edgePlacementLister:       edgePlacementPreInformer.Lister(),
-		discoveryClusterClient:    discoveryClusterClient,
-		crdClusterPreInformer:     crdClusterPreInformer,
-		bindingClusterPreInformer: bindingClusterPreInformer,
-		dynamicClusterClient:      dynamicClusterClient,
-		kbSpaceRelation:           kbSpaceRelation,
-		workspaceDetails:          map[logicalcluster.Name]*workspaceDetails{},
+		ctx:                   ctx,
+		logger:                logger,
+		numThreads:            numThreads,
+		queue:                 workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), controllerName),
+		edgePlacementInformer: edgePlacementPreInformer.Informer(),
+		edgePlacementLister:   edgePlacementPreInformer.Lister(),
+		spaceclient:           spaceclient,
+		spaceProviderNs:       spaceProviderNs,
+		kbSpaceRelation:       kbSpaceRelation,
+		workspaceDetails:      map[string]*workspaceDetails{},
 	}
 	return func(receiver MappingReceiver[ExternalName, ResolvedWhat]) Runnable {
 		wr.receiver = receiver
@@ -167,7 +158,7 @@ func (wr *whatResolver) Run(ctx context.Context) {
 
 type namespacedQueueItem struct {
 	GK      schema.GroupKind
-	Cluster logicalcluster.Name
+	Cluster string
 	NN      NamespacedName
 }
 
@@ -189,19 +180,20 @@ func (wrh WhatResolverClusterHandler) OnDelete(obj any) {
 }
 
 func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(objAny)
+	key, err := upstreamcache.DeletionHandlingMetaNamespaceKeyFunc(objAny)
 	if err != nil {
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
 		return
 	}
-	cluster, namespace, name, err := kcpcache.SplitMetaClusterNamespaceKey(key)
+	namespace, name, err := upstreamcache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		wr.logger.Error(err, "Impossible! SplitMetaClusterNamespaceKey failed", "key", key)
 	}
 	if namespace != "" {
 		panic("Namespace must be empty here")
 	}
-	item := namespacedQueueItem{GK: gk, Cluster: cluster, NN: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
+	// Enqueuewith empty cluster. Set it later
+	item := namespacedQueueItem{GK: gk, Cluster: "", NN: NewPair(NamespaceName(metav1.NamespaceNone), ObjectName(name))}
 	wr.logger.V(4).Info("Enqueuing", "item", item)
 	wr.queue.Add(item)
 }
@@ -209,7 +201,7 @@ func (wr *whatResolver) enqueue(gk schema.GroupKind, objAny any) {
 type WhatResolverScopedHandler struct {
 	*whatResolver
 	gk      schema.GroupKind
-	cluster logicalcluster.Name
+	cluster string
 }
 
 func (wrh WhatResolverScopedHandler) OnAdd(obj any) {
@@ -224,7 +216,7 @@ func (wrh WhatResolverScopedHandler) OnDelete(obj any) {
 	wrh.enqueueScoped(wrh.gk, wrh.cluster, obj)
 }
 
-func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluster.Name, objAny any) {
+func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster string, objAny any) {
 	key, err := upstreamcache.DeletionHandlingMetaNamespaceKeyFunc(objAny)
 	if err != nil {
 		wr.logger.Error(err, "Failed to extract object reference", "object", objAny)
@@ -240,7 +232,7 @@ func (wr *whatResolver) enqueueScoped(gk schema.GroupKind, cluster logicalcluste
 	wr.queue.Add(item)
 }
 
-func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName ObjectName) ResolvedWhat {
+func (wr *whatResolver) getPartsLocked(wldCluster string, epName ObjectName) ResolvedWhat {
 	parts := WorkloadParts{}
 	var upsyncs []edgeapi.UpsyncSet
 	wsDetails, found := wr.workspaceDetails[wldCluster]
@@ -270,10 +262,6 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 		}
 	}
 	definers.Visit(func(definer ksmetav1a1.Definer) error {
-		if definer.Kind == "APIBinding" && definer.Name == "espw" {
-			// not neceesary to add, already in every mailbox workspace
-			return nil
-		}
 		nsName := NamespaceName("")
 		objName := ObjectName(definer.Name)
 		pieces := definerKindToPieces[definer.Kind]
@@ -292,17 +280,16 @@ func (wr *whatResolver) getPartsLocked(wldCluster logicalcluster.Name, epName Ob
 
 var definerKindToPieces = map[string]Pair[metav1.GroupResource, WorkloadPartDetails]{
 	"CustomResourceDefinition": NewPair(metav1.GroupResource{Group: apiext.GroupName, Resource: "customresourcedefinitions"}, WorkloadPartDetails{APIVersion: apiext.SchemeGroupVersion.Version}),
-	"APIBinding":               NewPair(metav1.GroupResource{Group: apisv1alpha1.SchemeGroupVersion.Group, Resource: "apibindings"}, WorkloadPartDetails{APIVersion: apisv1alpha1.SchemeGroupVersion.Version}),
 }
 
-func (wr *whatResolver) notifyReceiversOfPlacements(cluster logicalcluster.Name, placements Set[ObjectName]) {
+func (wr *whatResolver) notifyReceiversOfPlacements(cluster string, placements Set[ObjectName]) {
 	placements.Visit(func(epName ObjectName) error {
 		wr.notifyReceivers(cluster, epName)
 		return nil
 	})
 }
 
-func (wr *whatResolver) notifyReceivers(wldCluster logicalcluster.Name, epName ObjectName) {
+func (wr *whatResolver) notifyReceivers(wldCluster string, epName ObjectName) {
 	resolvedWhat := wr.getPartsLocked(wldCluster, epName)
 	epRef := ExternalName{Cluster: wldCluster, Name: epName}
 	wr.receiver.Put(epRef, resolvedWhat)
@@ -348,7 +335,7 @@ func (wr *whatResolver) process(ctx context.Context, item namespacedQueueItem) b
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processCenterObject(ctx context.Context, cluster logicalcluster.Name, gk schema.GroupKind, objName NamespacedName) bool {
+func (wr *whatResolver) processCenterObject(ctx context.Context, cluster string, gk schema.GroupKind, objName NamespacedName) bool {
 	logger := klog.FromContext(ctx)
 	wr.Lock()
 	defer wr.Unlock()
@@ -414,7 +401,7 @@ func newObjectDetails() *objectDetails {
 }
 
 // process returns true on success or unrecoverable error, false to retry
-func (wr *whatResolver) processResource(ctx context.Context, cluster logicalcluster.Name, arName string) bool {
+func (wr *whatResolver) processResource(ctx context.Context, cluster string, arName string) bool {
 	logger := klog.FromContext(ctx)
 	wr.Lock()
 	defer wr.Unlock()
@@ -517,32 +504,52 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 	//change to consumer SpaceID
 	_, epOriginalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
 	if err != nil {
-		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object")
+		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object")
 		return true
 	}
 	spaceID := wr.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
-		logger.Error(nil, "failed to get consumer space ID from a provider's copy")
+		logger.Error(nil, "Failed to get consumer space ID from a provider's copy")
 		return false
 	}
-	cluster := logicalcluster.Name(spaceID)
 	epName = ObjectName(epOriginalName)
 
 	wr.Lock()
 	defer wr.Unlock()
-	wsDetails, wsDetailsFound := wr.workspaceDetails[cluster]
+	wsDetails, wsDetailsFound := wr.workspaceDetails[spaceID]
 	if !wsDetailsFound {
 		if !epFound {
 			logger.V(4).Info(`Both workspaceDetails and EdgePlacement were not found`)
 			return true
 		}
+		config, err := wr.spaceclient.ConfigForSpace(spaceID, wr.spaceProviderNs)
+		if err != nil {
+			logger.Error(err, "Failed to get space config", "space", spaceID)
+			return true
+		}
+		discoveryScopedClient, err := discovery.NewDiscoveryClientForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create discovery client", "space", spaceID)
+			return true
+		}
+		scopedDynamic, err := dynamic.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create dynamic client", "space", spaceID)
+			return true
+		}
+		apiextClient, err := apiextclient.NewForConfig(config)
+		if err != nil {
+			logger.Error(err, "Failed to create clientset for CustomResourceDefinitions")
+		}
+		apiextFactory := apiextinfactory.NewSharedInformerFactory(apiextClient, 0)
+		crdInformer := apiextFactory.Apiextensions().V1().CustomResourceDefinitions().Informer()
+
 		wsCtx, stopWS := context.WithCancel(wr.ctx)
-		discoveryScopedClient := wr.discoveryClusterClient.Cluster(cluster.Path())
-		crdInformer := wr.crdClusterPreInformer.Cluster(cluster).Informer()
-		bindingInformer := wr.bindingClusterPreInformer.Cluster(cluster).Informer()
-		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, cluster.String(), discoveryScopedClient, false,
-			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer}, apiwatch.APIBindingAnalyzer{ObjectNotifier: bindingInformer})
-		scopedDynamic := wr.dynamicClusterClient.Cluster(cluster.Path())
+		doneCh := wsCtx.Done()
+		apiextFactory.Start(doneCh)
+
+		apiInformer, apiLister, _ := apiwatch.NewAPIResourceInformer(wsCtx, spaceID, discoveryScopedClient, false,
+			apiwatch.CRDAnalyzer{ObjectNotifier: crdInformer})
 		dynamicInformerFactory := kubedynamicinformer.NewDynamicSharedInformerFactory(scopedDynamic, 0)
 		wsDetails = &workspaceDetails{
 			ctx:                    wsCtx,
@@ -554,12 +561,12 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 			resources:              map[string]*resourceResolver{},
 			gkToARName:             map[schema.GroupKind]string{},
 		}
-		wr.workspaceDetails[cluster] = wsDetails
-		apiInformer.AddEventHandler(WhatResolverScopedHandler{wr, mkgk(ksmetav1a1.SchemeGroupVersion.Group, "APIResource"), cluster})
-		logger.V(2).Info("Started watching logical cluster")
-		go apiInformer.Run(wsCtx.Done())
-		dynamicInformerFactory.Start(wsCtx.Done())
-		if !upstreamcache.WaitForCacheSync(wsCtx.Done(), apiInformer.HasSynced) {
+		wr.workspaceDetails[spaceID] = wsDetails
+		apiInformer.AddEventHandler(WhatResolverScopedHandler{wr, mkgk(ksmetav1a1.SchemeGroupVersion.Group, "APIResource"), spaceID})
+		logger.V(2).Info("Started watching space")
+		go apiInformer.Run(doneCh)
+		dynamicInformerFactory.Start(doneCh)
+		if !upstreamcache.WaitForCacheSync(doneCh, apiInformer.HasSynced) {
 			logger.Error(nil, "Failed to sync API informer in time")
 			return true
 		}
@@ -582,12 +589,12 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 		logger.V(3).Info("Stopped watching EdgePlacement")
 		if len(wsDetails.placements) == 0 {
 			wsDetails.stop()
-			logger.V(2).Info("Stopped watching logical cluster")
-			delete(wr.workspaceDetails, cluster)
+			logger.V(2).Info("Stopped watching space")
+			delete(wr.workspaceDetails, spaceID)
 		} else {
-			wr.notifyReceivers(cluster, epName)
+			wr.notifyReceivers(spaceID, epName)
 		}
-		wr.notifyReceivers(cluster, epName)
+		wr.notifyReceivers(spaceID, epName)
 		return true
 	}
 	// Now we know that ep != nil
@@ -633,7 +640,7 @@ func (wr *whatResolver) processEdgePlacement(ctx context.Context, epName ObjectN
 	}
 	logger.V(5).Info("Finished looping over resources", "numResources", len(wsDetails.resources))
 	if anyChange {
-		wr.notifyReceivers(cluster, epName)
+		wr.notifyReceivers(spaceID, epName)
 	}
 	return completeSuccess
 }
@@ -823,10 +830,6 @@ var GRsNaturedInBoth = NewMapSet(
 	mkgr("", "namespaces"),
 )
 
-var NaturedInCenterGoToMailbox = NewMapSet(
-	mkgr("apis.kcp.io", "apibindings"),
-)
-
 var GRsNotSupported = NewMapSet(
 	mkgr("apiresource.kcp.io", "apiresourceimports"),
 	mkgr("apiresource.kcp.io", "negotiatedapiresources"),
@@ -869,8 +872,6 @@ func DefaultResourceModes(mgr metav1.GroupResource) ResourceMode {
 		return ResourceMode{GoesToEdge, ForciblyDenatured, builtin}
 	case GRsNaturedInBoth.Has(sgr):
 		return ResourceMode{GoesToEdge, NaturallyNatured, builtin}
-	case NaturedInCenterGoToMailbox.Has(sgr):
-		return ResourceMode{GoesToMailbox, NaturallyNatured, builtin}
 	case GRsNotSupported.Has(sgr):
 		return ResourceMode{ErrorInCenter, NaturallyNatured, builtin}
 	case GroupsNotForEdge.Has(sgr.Group) || GRsNotForEdge.Has(sgr):

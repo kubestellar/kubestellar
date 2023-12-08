@@ -28,13 +28,11 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev2alpha1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev2alpha1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 const (
@@ -55,10 +53,11 @@ type queueItem struct {
 }
 
 type controller struct {
-	context           context.Context
-	queue             workqueue.RateLimitingInterface
-	kbSpaceRelation   kbuser.KubeBindSpaceRelation
-	edgeClusterClient edgeclientset.ClusterInterface
+	context         context.Context
+	queue           workqueue.RateLimitingInterface
+	kbSpaceRelation kbuser.KubeBindSpaceRelation
+	spaceClient     msclient.KubestellarSpaceInterface
+	spaceProviderNs string
 
 	singlePlacementSliceLister  edgev2alpha1listers.SinglePlacementSliceLister
 	singlePlacementSliceIndexer cache.Indexer
@@ -75,7 +74,8 @@ type controller struct {
 
 func NewController(
 	context context.Context,
-	edgeClusterClient edgeclientset.ClusterInterface,
+	spaceClient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
 	edgePlacementAccess edgev2alpha1informers.EdgePlacementInformer,
 	singlePlacementSliceAccess edgev2alpha1informers.SinglePlacementSliceInformer,
 	locationAccess edgev2alpha1informers.LocationInformer,
@@ -86,10 +86,11 @@ func NewController(
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), ControllerName)
 
 	c := &controller{
-		context:           context,
-		queue:             queue,
-		kbSpaceRelation:   kbSpaceRelation,
-		edgeClusterClient: edgeClusterClient,
+		context:         context,
+		queue:           queue,
+		kbSpaceRelation: kbSpaceRelation,
+		spaceClient:     spaceClient,
+		spaceProviderNs: spaceProviderNs,
 
 		edgePlacementLister:  edgePlacementAccess.Lister(),
 		edgePlacementIndexer: edgePlacementAccess.Informer().GetIndexer(),
@@ -138,7 +139,7 @@ func NewController(
 }
 
 func (c *controller) enqueueEdgePlacement(obj interface{}) {
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		runtime.HandleError(err)
 		return
@@ -154,7 +155,7 @@ func (c *controller) enqueueEdgePlacement(obj interface{}) {
 }
 
 func (c *controller) enqueueLocation(obj interface{}) {
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		runtime.HandleError(err)
 		return
@@ -170,7 +171,7 @@ func (c *controller) enqueueLocation(obj interface{}) {
 }
 
 func (c *controller) enqueueSyncTarget(obj interface{}) {
-	key, err := kcpcache.DeletionHandlingMetaClusterNamespaceKeyFunc(obj)
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		runtime.HandleError(err)
 		return

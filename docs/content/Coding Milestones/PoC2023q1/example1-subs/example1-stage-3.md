@@ -15,53 +15,62 @@ use the following commands to launch the placement translator; it
 requires the ESPW to be current at start time.
 
 ```shell
-# TODO: placement-translator needs access to multiple configs. Will remove when controllers support spaces.
-kubectl ws root:espw
-placement-translator -v=4 &> /tmp/placement-translator.log &
-sleep 10
+(
+  KUBECONFIG=$SM_CONFIG placement-translator -v=4  &> /tmp/placement-translator.log &
+  sleep 10
+)
 ```
 
 The following commands wait for the placement translator to get its
 job done for this example.
 
 ```shell
-# TODO: unfortunately, the $FLORIN_WS and $GUILDER_WS are mailbox ws names that we are not supporting in the space framework yet
+FLORIN_MB_CONFIG="${PWD}/temp-space-config/${FLORIN_SPACE}"
+GUILDER_MB_CONFIG="${PWD}/temp-space-config/${GUILDER_SPACE}"
+kubectl-kubestellar-get-config-for-space --space-name $FLORIN_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $FLORIN_MB_CONFIG
+kubectl-kubestellar-get-config-for-space --space-name $GUILDER_SPACE --sm-core-config $SM_CONFIG --sm-context $SM_CONTEXT --output $GUILDER_MB_CONFIG
+
 # wait until SyncerConfig, ReplicaSets and Deployments are ready
-mbxws=($FLORIN_WS $GUILDER_WS)
+mbxws=($FLORIN_SPACE $GUILDER_SPACE)
 for ii in "${mbxws[@]}"; do
-  kubectl ws root:$ii
-  # wait for SyncerConfig resource
-  while ! kubectl get SyncerConfig the-one &> /dev/null; do
+  (
+    export KUBECONFIG="${PWD}/temp-space-config/$ii"
+    # wait for SyncerConfig resource
+    while ! kubectl get SyncerConfig the-one &> /dev/null; do
+      sleep 10
+    done
+    echo "* SyncerConfig resource exists in mailbox $ii"
+    # wait for ReplicaSet resource
+    while ! kubectl get rs &> /dev/null; do
+      sleep 10
+    done
+    echo "* ReplicaSet resource exists in mailbox $ii"
+    # wait until ReplicaSet in mailbox
+    while ! kubectl get rs -n commonstuff commond; do
+      sleep 10
+    done
+    echo "* commonstuff ReplicaSet in mailbox $ii"
+  )
+done
+(
+  export KUBECONFIG=$GUILDER_MB_CONFIG
+  # check for deployment in guilder
+  while ! kubectl get deploy -A &> /dev/null; do
     sleep 10
   done
-  echo "* SyncerConfig resource exists in mailbox $ii"
-  # wait for ReplicaSet resource
-  while ! kubectl get rs &> /dev/null; do
+  echo "* Deployment resource exists"
+  while ! kubectl get deploy -n specialstuff speciald; do
     sleep 10
   done
-  echo "* ReplicaSet resource exists in mailbox $ii"
-  # wait until ReplicaSet in mailbox
-  while ! kubectl get rs -n commonstuff commond; do
-    sleep 10
-  done
-  echo "* commonstuff ReplicaSet in mailbox $ii"
-done
-# check for deployment in guilder
-while ! kubectl get deploy -A &> /dev/null; do
-  sleep 10
-done
-echo "* Deployment resource exists"
-while ! kubectl get deploy -n specialstuff speciald; do
-  sleep 10
-done
-echo "* specialstuff Deployment in its mailbox"
-# wait for crontab CRD to be established
-while ! kubectl get crd crontabs.stable.example.com; do sleep 10; done
-kubectl wait --for condition=Established crd crontabs.stable.example.com
-echo "* CronTab CRD is established in its mailbox"
-# wait for my-new-cron-object to be in its mailbox
-while ! kubectl get ct -n specialstuff my-new-cron-object; do sleep 10; done
-echo "* CronTab my-new-cron-object is in its mailbox"
+  echo "* specialstuff Deployment in its mailbox"
+  # wait for crontab CRD to be established
+  while ! kubectl get crd crontabs.stable.example.com; do sleep 10; done
+  kubectl wait --for condition=Established crd crontabs.stable.example.com
+  echo "* CronTab CRD is established in its mailbox"
+  # wait for my-new-cron-object to be in its mailbox
+  while ! kubectl get ct -n specialstuff my-new-cron-object; do sleep 10; done
+  echo "* CronTab my-new-cron-object is in its mailbox"
+)
 ```
 
 You can check that the common workload's ReplicaSet objects got to
@@ -141,16 +150,7 @@ The florin cluster gets only the common workload.  Examine florin's
 for florin (which you stored in Stage 1) here.
 
 ```shell
-# TODO: $FLORIN_WS is a mailbox workspace 
-kubectl ws root:$FLORIN_WS
-```
-
-``` { .bash .no-copy }
-Current workspace is "root:1t82bk54r6gjnzsp-mb-1a045336-8178-4026-8a56-5cd5609c0ec1" (type root:universal).
-```
-
-```shell
-kubectl get SyncerConfig the-one -o yaml
+KUBECONFIG=$FLORIN_MB_CONFIG kubectl get SyncerConfig the-one -o yaml
 ```
 
 ``` { .bash .no-copy }
@@ -204,15 +204,7 @@ Examine guilder's `SyncerConfig` object and workloads as follows,
 using the mailbox workspace name that you stored in Stage 1.
 
 ```shell
-# TODO: $GUILDER_WS is a mailbox workspace 
-kubectl ws root:$GUILDER_WS
-```
-``` { .bash .no-copy }
-Current workspace is "root:1t82bk54r6gjnzsp-mb-f0a82ab1-63f4-49ea-954d-3a41a35a9f1c" (type root:universal).
-```
-
-```shell
-kubectl get SyncerConfig the-one -o yaml
+KUBECONFIG=$GUILDER_MB_CONFIG kubectl get SyncerConfig the-one -o yaml
 ```
 ``` { .bash .no-copy }
 apiVersion: edge.kubestellar.io/v2alpha1
@@ -302,7 +294,7 @@ You can check for specific workload objects here with the following
 command.
 
 ```shell
-kubectl get deployments,replicasets -A
+KUBECONFIG=$GUILDER_MB_CONFIG kubectl get deployments,replicasets -A
 ```
 ``` { .bash .no-copy }
 NAMESPACE      NAME                       READY   UP-TO-DATE   AVAILABLE   AGE

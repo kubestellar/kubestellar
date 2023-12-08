@@ -20,43 +20,26 @@ import (
 	"context"
 	"os"
 
-	apiextinformers "k8s.io/apiextensions-apiserver/pkg/client/kcp/informers/externalversions/apiextensions/v1"
 	k8scache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	clusterdiscovery "github.com/kcp-dev/client-go/discovery"
-	clusterdynamic "github.com/kcp-dev/client-go/dynamic"
-	kcpkubecorev1informers "github.com/kcp-dev/client-go/informers/core/v1"
-	kcpkubecorev1client "github.com/kcp-dev/client-go/kubernetes/typed/core/v1"
-	kcpclusterclientset "github.com/kcp-dev/kcp/pkg/client/clientset/versioned/cluster"
-	bindinginformers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/apis/v1alpha1"
-	tenancyv1a1informers "github.com/kcp-dev/kcp/pkg/client/informers/externalversions/tenancy/v1alpha1"
-	tenancyv1a1listers "github.com/kcp-dev/kcp/pkg/client/listers/tenancy/v1alpha1"
-
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgev1a1informers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions/edge/v2alpha1"
 	edgev1a1listers "github.com/kubestellar/kubestellar/pkg/client/listers/edge/v2alpha1"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
+	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/client/informers/externalversions/space/v1alpha1"
+	spacev1a1listers "github.com/kubestellar/kubestellar/space-framework/pkg/client/listers/space/v1alpha1"
+	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
 type placementTranslator struct {
-	context                context.Context
-	apiProvider            APIWatchMapProvider
-	spsInformer            k8scache.SharedIndexInformer
-	syncfgInformer         k8scache.SharedIndexInformer
-	syncfgLister           edgev1a1listers.SyncerConfigLister
-	mbwsInformer           k8scache.SharedIndexInformer
-	mbwsLister             tenancyv1a1listers.WorkspaceLister
-	kcpClusterClientset    kcpclusterclientset.ClusterInterface
-	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface
-	crdClusterInformer     kcpcache.ScopeableSharedIndexInformer
-	bindingClusterInformer kcpcache.ScopeableSharedIndexInformer
-	dynamicClusterClient   clusterdynamic.ClusterInterface
-	edgeClusterClientset   edgeclusterclientset.ClusterInterface
-	nsClusterPreInformer   kcpkubecorev1informers.NamespaceClusterInformer
-	nsClusterClient        kcpkubecorev1client.NamespaceClusterInterface
+	context        context.Context
+	apiProvider    APIWatchMapProvider
+	spsInformer    k8scache.SharedIndexInformer
+	syncfgInformer k8scache.SharedIndexInformer
+	syncfgLister   edgev1a1listers.SyncerConfigLister
+	spaceInformer  k8scache.SharedIndexInformer
+	spaceLister    spacev1a1listers.SpaceLister
 
 	workloadProjector interface {
 		WorkloadProjector
@@ -71,61 +54,34 @@ func NewPlacementTranslator(
 	numThreads int,
 	ctx context.Context,
 	locationPreInformer edgev1a1informers.LocationInformer,
-	// pre-informer on all SinglePlacementSlice objects, cross-workspace
+	// pre-informer on SinglePlacementSlice objects
 	epPreInformer edgev1a1informers.EdgePlacementInformer,
-	// pre-informer on all SinglePlacementSlice objects, cross-workspace
+	// pre-informer on SinglePlacementSlice objects
 	spsPreInformer edgev1a1informers.SinglePlacementSliceInformer,
-	// pre-informer on syncer config objects, should be in mailbox workspaces
+	// pre-informer on syncer config objects, should be in mailbox spaces
 	syncfgPreInformer edgev1a1informers.SyncerConfigInformer,
 
-	customizerPreInformer edgev1a1informers.CustomizerInformer,
-	// pre-informer on Workspaces objects
-	mbwsPreInformer tenancyv1a1informers.WorkspaceInformer,
-	// all-cluster clientset for kcp APIs,
-	// needed to manipulate TMC objects in mailbox workspaces
-	kcpClusterClientset kcpclusterclientset.ClusterInterface,
-	// needed for enumerating resources in workload mgmt workspaces
-	discoveryClusterClient clusterdiscovery.DiscoveryClusterInterface,
-	// needed to watch for new resources appearing
-	crdClusterPreInformer apiextinformers.CustomResourceDefinitionClusterInformer,
-	// needed to watch for new resources appearing
-	bindingClusterPreInformer bindinginformers.APIBindingClusterInformer,
-	// needed to read and write arbitrary objects
-	dynamicClusterClient clusterdynamic.ClusterInterface,
-	// to read and write syncer config objects
-	edgeClusterClientset edgeclusterclientset.ClusterInterface,
-	// for monitoring namespaces in mailbox workspaces
-	nsClusterPreInformer kcpkubecorev1informers.NamespaceClusterInformer,
-	// for creating namespaces in mailbox workspaces
-	nsClusterClient kcpkubecorev1client.NamespaceClusterInterface,
+	spaceclient msclient.KubestellarSpaceInterface,
+	spaceProviderNs string,
+	spacePreInformer spacev1alpha1.SpaceInformer,
 	kbSpaceRelation kbuser.KubeBindSpaceRelation,
 ) *placementTranslator {
-	amp := NewAPIWatchMapProvider(ctx, numThreads, discoveryClusterClient, crdClusterPreInformer, bindingClusterPreInformer)
-	mbwsPreInformer.Lister()
+	amp := NewAPIWatchMapProvider(ctx, numThreads, spaceclient, spaceProviderNs)
 	pt := &placementTranslator{
-		context:                ctx,
-		apiProvider:            amp,
-		spsInformer:            spsPreInformer.Informer(),
-		syncfgInformer:         syncfgPreInformer.Informer(),
-		syncfgLister:           syncfgPreInformer.Lister(),
-		mbwsInformer:           mbwsPreInformer.Informer(),
-		mbwsLister:             mbwsPreInformer.Lister(),
-		kcpClusterClientset:    kcpClusterClientset,
-		discoveryClusterClient: discoveryClusterClient,
-		crdClusterInformer:     crdClusterPreInformer.Informer(),
-		bindingClusterInformer: bindingClusterPreInformer.Informer(),
-		dynamicClusterClient:   dynamicClusterClient,
-		edgeClusterClientset:   edgeClusterClientset,
-		nsClusterPreInformer:   nsClusterPreInformer,
-		nsClusterClient:        nsClusterClient,
-		whatResolver: NewWhatResolver(ctx, epPreInformer, discoveryClusterClient,
-			crdClusterPreInformer, bindingClusterPreInformer, dynamicClusterClient, kbSpaceRelation, numThreads),
+		context:        ctx,
+		apiProvider:    amp,
+		spsInformer:    spsPreInformer.Informer(),
+		syncfgInformer: syncfgPreInformer.Informer(),
+		syncfgLister:   syncfgPreInformer.Lister(),
+		spaceInformer:  spacePreInformer.Informer(),
+		spaceLister:    spacePreInformer.Lister(),
+
+		whatResolver:  NewWhatResolver(ctx, epPreInformer, spaceclient, spaceProviderNs, kbSpaceRelation, numThreads),
 		whereResolver: NewWhereResolver(ctx, spsPreInformer, kbSpaceRelation, numThreads),
 	}
-	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes, pt.mbwsInformer, pt.mbwsLister,
-		pt.syncfgInformer,
-		edgeClusterClientset, dynamicClusterClient,
-		nsClusterPreInformer, nsClusterClient)
+	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes,
+		pt.spaceInformer, pt.spaceLister, pt.syncfgInformer,
+		spaceclient, spaceProviderNs)
 
 	return pt
 }
@@ -136,9 +92,7 @@ func (pt *placementTranslator) Run() {
 
 	doneCh := ctx.Done()
 	if !(k8scache.WaitForNamedCacheSync("placement-translator(sps)", doneCh, pt.spsInformer.HasSynced) &&
-		k8scache.WaitForNamedCacheSync("placement-translator(mbws)", doneCh, pt.mbwsInformer.HasSynced) &&
-		k8scache.WaitForNamedCacheSync("placement-translator(crds)", doneCh, pt.crdClusterInformer.HasSynced) &&
-		k8scache.WaitForNamedCacheSync("placement-translator(bind)", doneCh, pt.bindingClusterInformer.HasSynced) &&
+		k8scache.WaitForNamedCacheSync("placement-translator(space)", doneCh, pt.spaceInformer.HasSynced) &&
 		k8scache.WaitForNamedCacheSync("placement-translator(sync)", doneCh, pt.syncfgInformer.HasSynced) &&
 		true) {
 		logger.Error(nil, "Informer syncs not achieved")

@@ -23,23 +23,22 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string) error {
 	logger := klog.FromContext(ctx)
-	epws, _, epName, err := kcpcache.SplitMetaClusterNamespaceKey(epKey)
+	_, epName, err := cache.SplitMetaNamespaceKey(epKey)
 	if err != nil {
 		logger.Error(err, "invalid EdgePlacement key")
 		return err
 	}
-	logger = logger.WithValues("workspace", epws, "edgePlacement", epName)
+	logger = logger.WithValues("edgePlacement", epName)
 	ctx = klog.NewContext(ctx, logger)
 	logger.V(2).Info("reconciling")
 
@@ -87,15 +86,14 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	singles := []edgev2alpha1.SinglePlacement{}
 	for _, loc := range locsFilteredByEp {
 		// 2)
-		lws := logicalcluster.From(loc)
-		stsInLws, err := c.synctargetLister.List(labels.Everything())
+		allSts, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
-			logger.Error(err, "failed to list SyncTargets in Location workspace", "locationWorkspace", lws.String())
+			logger.Error(err, "Failed to list SyncTargets in local cache")
 			return err
 		}
-		stsSelecting, err := filterStsByLoc(stsInLws, loc)
+		stsSelecting, err := filterStsByLoc(allSts, loc)
 		if err != nil {
-			logger.Error(err, "failed to find SyncTargets for Location", "locationWorkspace", lws.String(), "location", loc.Name)
+			logger.Error(err, "failed to find SyncTargets for Location", "location", loc.Name)
 			return err
 		}
 		singles = append(singles, c.makeSinglePlacementsForLoc(loc, stsSelecting)...)
@@ -118,16 +116,25 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 	// 4)
 	_, originalName, kbSpaceID, err := kbuser.AnalyzeObjectID(ep)
 	if err != nil {
-		logger.Error(err, "object does not appear to be a provider's copy of a consumer's object", "edgePlacement", ep.Name)
+		logger.Error(err, "Object does not appear to be a provider's copy of a consumer's object", "edgePlacement", ep.Name)
 		return err
 	}
 	spaceID := c.kbSpaceRelation.SpaceIDFromKubeBind(kbSpaceID)
 	if spaceID == "" {
 		relErr := errors.New("failed to obtain space ID from kube-bind reference")
-		logger.Error(relErr, "failed to get consumer space ID from a provider's copy", "edgePlacement", originalName)
+		logger.Error(relErr, "Failed to get consumer space ID from a provider's copy", "edgePlacement", originalName)
 		return relErr
 	}
-	originalEP, err := c.edgeClusterClient.Cluster(logicalcluster.NewPath(spaceID)).EdgeV2alpha1().EdgePlacements().Get(ctx, originalName, metav1.GetOptions{})
+
+	spaceConfig, err := c.spaceClient.ConfigForSpace(spaceID, c.spaceProviderNs)
+	if err != nil {
+		return err
+	}
+	edgeClientset, err := edgeclientset.NewForConfig(spaceConfig)
+	if err != nil {
+		return err
+	}
+	originalEP, err := edgeClientset.EdgeV2alpha1().EdgePlacements().Get(ctx, originalName, metav1.GetOptions{})
 	if err != nil {
 		logger.Error(err, "failed to get consumer's object", "edgePlacement", originalName)
 		return err
@@ -150,7 +157,7 @@ func (c *controller) reconcileOnEdgePlacement(ctx context.Context, epKey string)
 				},
 				Destinations: singles,
 			}
-			_, err = c.edgeClusterClient.Cluster(logicalcluster.NewPath(spaceID)).EdgeV2alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
+			_, err = edgeClientset.EdgeV2alpha1().SinglePlacementSlices().Create(ctx, sps, metav1.CreateOptions{})
 			if err != nil {
 				if !k8serrors.IsAlreadyExists(err) {
 					logger.Error(err, "failed creating SinglePlacementSlice")

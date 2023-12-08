@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Usage: $0 (--space-name space-name | --space-config-file space-kubeconfig | --sm-context space-context | --provider-name provider-name | --core-config core-kubeconfig | --in-cluster | -X)* synctarget_name
+# Usage: $0 (--space-name space-name | --output space-kubeconfig | --sm-context space-context | --provider-name provider-name | --core-config core-kubeconfig | --in-cluster | -X)* synctarget_name
 
 # Purpose: Retrieve the kubeconfig information for a specific space and generate a kubeconfig for it
 
@@ -23,12 +23,11 @@ bindir="$(dirname "$0")"
 
 in_cluster="false"
 provider_name="default"
-sm_context="sm-mgt"
 
 while (( $# > 0 )); do
     case "$1" in
 	(-h|--help)
-	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath "
+	    echo "Usage: kubectl kubestellar get-config-for-space (--space-name name | --sm-core-config filepath | --sm-context sm context | --provider-name provider name | --in-cluster | --output output config file )"
 	    exit 0;;
 	(-X) set -o xtrace;;
 	(--space-name)
@@ -36,7 +35,7 @@ while (( $# > 0 )); do
 	    then space_name="$2"; shift
 	    else echo "$0: missing space name" >&2; exit 1
 	    fi;;
-	(--space-config-file)
+	(--output)
 	    if (( $# >1 ))
 	    then space_config_file_name="$2"; shift
 	    else echo "$0: missing output filename" >&2; exit 1
@@ -78,18 +77,22 @@ if [ -z "$sm_core_config" ]; then
     exit 1
 fi
 
+if [ -z "$sm_context" ]; then
+    echo "$0: must be given a non-empty SM context" >&2
+    exit 1
+fi
+
+if [ -z "$space_config_file_name" ]; then
+    echo "$0: must be given a non-empty space config file name" >&2
+    exit 1
+fi
+
 space_ns="spaceprovider-${provider_name}"
 
 secret_ctx="externalSecretRef"
 if [ "$in_cluster" == "true" ]; then
     secret_ctx="inClusterSecretRef"
 fi
-
-if [ -z "$space_config_file_name" ]; then
-	space_config_file_name="${provider_name}_${space_name}.config"
-    echo "$0: output config file name was not supplied. Using $space_config_file_name" >&2
-fi
-
 
 sm_kubectl="kubectl --kubeconfig $sm_core_config  --context $sm_context"
 
@@ -98,5 +101,6 @@ echo "SECRET_NAME=${SECRET_NAME}"
 SECRET_NAMESPACE=$($sm_kubectl get space ${space_name} -n ${space_ns} -o jsonpath="{$.status.${secret_ctx}.namespace}")
 echo "SECRET_NAMESPACE=${SECRET_NAMESPACE}"
 
+echo "$sm_kubectl get secret ${SECRET_NAME} -n ${SECRET_NAMESPACE} -o jsonpath='{$.data.kubeconfig}' "
 $sm_kubectl get secret ${SECRET_NAME} -n ${SECRET_NAMESPACE} -o jsonpath='{$.data.kubeconfig}' | base64 -d | base64 -d > $space_config_file_name
 

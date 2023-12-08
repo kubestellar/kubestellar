@@ -94,10 +94,10 @@ function ensure_imws() {
             imw=${i#"root:"}
             echo "Ensuring IMW: $imw"
             space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${imw}"
-            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG
-            kubectl-kubestellar-get-config-for-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
-            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "synctargets"
-            KUBECONFIG=$space_config kubestellar-kube-bind "$imw" "locations"
+            kubectl-kubestellar-create-space --space-name $imw --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG
+            kubectl-kubestellar-get-config-for-space --space-name $imw --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
+            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "synctargets"
+            KUBECONFIG=$SM_CONFIG kubestellar-kube-bind "$imw" "locations"
         done
     done <<< "$1"
 }
@@ -167,16 +167,20 @@ if [ "$KUBECONFIG_DIR" == "" ]; then
     mkdir -p $KUBECONFIG_DIR
     export KUBECONFIG_DIR
 fi
-if [ "$SPACE_MANAGER_KUBECONFIG" == "" ]; then
-    SPACE_MANAGER_KUBECONFIG="${KUBECONFIG_DIR}/config"
-    export SPACE_MANAGER_KUBECONFIG
+if [ "$SM_CONFIG" == "" ]; then
+    SM_CONFIG="${KUBECONFIG_DIR}/config"
+    export SM_CONFIG
+fi
+if [ "$SM_CONTEXT" == "" ]; then
+    export SM_CONTEXT=sm-mgt
 fi
 if [ "$IN_CLUSTER" == "" ]; then
     IN_CLUSTER=true
     export IN_CLUSTER
 fi
 echo "KUBECONFIG_DIR=${KUBECONFIG_DIR}"
-echo "SPACE_MANAGER_KUBECONFIG=${SPACE_MANAGER_KUBECONFIG}"
+echo "SM_CONFIG=${SM_CONFIG}"
+echo "SM_CONTEXT=${SM_CONTEXT}"
 echo "PROVIDER_NAME=${PROVIDER_NAME}"
 echo "PROVIDER_NAMESPACE=${PROVIDER_NAMESPACE}"
 echo "IN_CLUSTER=${IN_CLUSTER}"
@@ -192,8 +196,8 @@ function ensure_espw() {
         in_cluster="--in-cluster"
     fi 
     space_config="${KUBECONFIG_DIR}/${PROVIDER_NAMESPACE}-${espw_name}"
-    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG 
-    kubectl-kubestellar-get-config-for-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SPACE_MANAGER_KUBECONFIG ${in_cluster} --space-config-file $space_config
+    kubectl-kubestellar-create-space --space-name $espw_name --provider-name $PROVIDER_NAME --sm-core-config $SM_CONFIG 
+    kubectl-kubestellar-get-config-for-space --space-name $espw_name --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output $space_config
     run_dex
     sleep 2
     run_kb_backend
@@ -231,9 +235,14 @@ function run_kb_backend() {
     fi
 
     echo "starting kube-bind example-backend in background"
-    kubectl ws root:espw
-    kubectl apply -f "$bindir/../kube-bind/deploy/crd"
-    example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &
+
+    kubectl-kubestellar-get-config-for-space --space-name "espw" --sm-core-config $SM_CONFIG ${in_cluster} --sm-context $SM_CONTEXT --output "/tmp/espw-conf"
+    
+    ( 
+        KUBECONFIG="/tmp/espw-conf"
+        kubectl apply -f "$bindir/../kube-bind/deploy/crd"
+        example-backend --oidc-issuer-client-id=kube-bind --oidc-issuer-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0 --oidc-issuer-url=http://127.0.0.1:5556/dex --oidc-callback-url=http://127.0.0.1:8080/callback --pretty-name="BigCorp.com" --namespace-prefix="kube-bind-" --cookie-signing-key=bGMHz7SR9XcI9JdDB68VmjQErrjbrAR9JdVqjAOKHzE= --cookie-encryption-key=wadqi4u+w0bqnSrVFtM38Pz2ykYVIeeadhzT34XlC1Y= --consumer-scope="Cluster" &> /dev/null &
+    )
 
     run_status=$(wait_for_process example-backend)
     if [ $run_status -eq 0 ]; then
@@ -340,7 +349,7 @@ fi
 
 # Start the Placement Translator
 sleep 3
-placement-translator --allclusters-context  "system:admin" -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
+placement-translator -v=2 >> $log_folder/placement-translator-log.txt 2>&1 &
 
 run_status=$(wait_for_process placement-translator)
 if [ $run_status -eq 0 ]; then

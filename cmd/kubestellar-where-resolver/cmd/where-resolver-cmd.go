@@ -22,19 +22,21 @@ import (
 
 	"github.com/spf13/cobra"
 
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/component-base/featuregate"
+	"k8s.io/component-base/logs"
 	"k8s.io/component-base/version"
 	"k8s.io/klog/v2"
 
-	kcpfeatures "github.com/kcp-dev/kcp/pkg/features"
-
 	resolveroptions "github.com/kubestellar/kubestellar/cmd/kubestellar-where-resolver/options"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
-	edgeclusterclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/cluster"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	wheresolver "github.com/kubestellar/kubestellar/pkg/where-resolver"
+	spaceclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
+	spacemanager "github.com/kubestellar/kubestellar/space-framework/pkg/space-manager"
 )
 
 func NewResolverCommand() *cobra.Command {
@@ -43,7 +45,14 @@ func NewResolverCommand() *cobra.Command {
 		Use:   "where-resolver",
 		Short: "Maintains SinglePlacementSlice API objects for EdgePlacements",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := options.Logs.ValidateAndApply(kcpfeatures.DefaultFeatureGate); err != nil {
+			featureGate := utilfeature.DefaultMutableFeatureGate
+			if err := featureGate.Add(map[featuregate.Feature]featuregate.FeatureSpec{
+				logs.ContextualLogging: {Default: true, PreRelease: featuregate.Alpha},
+			}); err != nil {
+				return err
+			}
+
+			if err := options.Logs.ValidateAndApply(featureGate); err != nil {
 				return err
 			}
 			if err := options.Complete(); err != nil {
@@ -83,39 +92,43 @@ func Run(ctx context.Context, options *resolveroptions.Options) error {
 	logger := klog.Background()
 	ctx = klog.NewContext(ctx, logger)
 
-	// create edgeSharedInformerFactory
-	espwRestConfig, err := options.EspwClientOpts.ToRESTConfig()
+	spaceManagementConfig, err := options.SpaceMgtClientOpts.ToRESTConfig()
 	if err != nil {
-		logger.Error(err, "failed to create config from flags")
+		logger.Error(err, "Failed to create space management API client config from flags")
 		return err
 	}
-	edgeClient, err := edgeclientset.NewForConfig(espwRestConfig)
+	spaceClient, err := spaceclient.NewMultiSpace(ctx, spaceManagementConfig)
 	if err != nil {
-		logger.Error(err, "failed to create clientset for KubeStellar Core Space")
+		logger.Error(err, "Failed to create space-aware client")
 		return err
 	}
-	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClient, resyncPeriod)
+	spaceProviderNs := spacemanager.ProviderNS(options.SpaceProvider)
+
+	kcsRestConfig, err := spaceClient.ConfigForSpace(options.KcsName, spaceProviderNs)
+	if err != nil {
+		logger.Error(err, "Failed to construct space config", "spacename", options.KcsName)
+		return err
+	}
+
+	edgeClientset, err := edgeclientset.NewForConfig(kcsRestConfig)
+	if err != nil {
+		logger.Error(err, "Failed to create edge clientset for KubeStellar Core Space")
+		return err
+	}
+	edgeSharedInformerFactory := edgeinformers.NewSharedScopedInformerFactoryWithOptions(edgeClientset, resyncPeriod)
 
 	// create where-resolver
-	baseRestConfig, err := options.BaseClientOpts.ToRESTConfig()
-	if err != nil {
-		logger.Error(err, "failed to create config from flags")
-		return err
-	}
-	edgeClusterClientset, err := edgeclusterclientset.NewForConfig(baseRestConfig)
-	if err != nil {
-		logger.Error(err, "failed to create edge clientset for controller")
-		return err
-	}
-	kubeClient, err := kubernetes.NewForConfig(espwRestConfig)
+	kubeClient, err := kubernetes.NewForConfig(kcsRestConfig)
 	if err != nil {
 		logger.Error(err, "failed to create k8s clientset for KubeStellar Core Space")
 		return err
 	}
 	kbSpaceRelation := kbuser.NewKubeBindSpaceRelation(ctx, kubeClient)
+
 	es, err := wheresolver.NewController(
 		ctx,
-		edgeClusterClientset,
+		spaceClient,
+		spaceProviderNs,
 		edgeSharedInformerFactory.Edge().V2alpha1().EdgePlacements(),
 		edgeSharedInformerFactory.Edge().V2alpha1().SinglePlacementSlices(),
 		edgeSharedInformerFactory.Edge().V2alpha1().Locations(),

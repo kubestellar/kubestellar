@@ -26,23 +26,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 
-	kcpcache "github.com/kcp-dev/apimachinery/v2/pkg/cache"
-	"github.com/kcp-dev/logicalcluster/v3"
-
 	edgev2alpha1 "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
+	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	"github.com/kubestellar/kubestellar/pkg/kbuser"
 )
 
 func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) error {
 	logger := klog.FromContext(ctx)
-	lws, _, lName, err := kcpcache.SplitMetaClusterNamespaceKey(locKey)
+	_, lName, err := cache.SplitMetaNamespaceKey(locKey)
 	if err != nil {
 		logger.Error(err, "invalid Location key")
 		return err
 	}
-	logger = logger.WithValues("locationWorkspace", lws, "location", lName)
+	logger = logger.WithValues("location", lName)
 	logger.V(2).Info("reconciling")
 
 	/*
@@ -96,12 +95,12 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 	// 2a)
 	stsFilteredByLoc := []*edgev2alpha1.SyncTarget{}
 	if !locDeleted {
-		stsInLws, err := c.synctargetLister.List(labels.Everything())
+		allSts, err := c.synctargetLister.List(labels.Everything())
 		if err != nil {
 			logger.Error(err, "failed to list SyncTargets")
 			return err
 		}
-		stsFilteredByLoc, err = filterStsByLoc(stsInLws, loc)
+		stsFilteredByLoc, err = filterStsByLoc(allSts, loc)
 		if err != nil {
 			logger.Error(err, "failed to find SyncTargets for Location")
 			return err
@@ -156,14 +155,14 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			// an (obsolete) ep doesn't select loc anymore
 			// we need to remove all relevant sp(s) from the corresponding sps where 'relevant' means an sp has loc
 			logger.V(1).Info("stop selecting Location", "edgePlacement", ep)
-			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			_, name, err := cache.SplitMetaNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
 			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
-				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				logger.Error(err, "failed to get SinglePlacementSlice", "singlePlacementSlice", name)
 				return err
 			}
 			// get consumer's space ID by currentSPS
@@ -176,10 +175,10 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			nextSPS := cleanSPSByLoc(currentSPS, locSpaceID, locOriginalName)
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
-				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.Error(err, "failed to update SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 				return err
 			} else {
-				logger.V(1).Info("updated SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.V(1).Info("updated SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 			}
 		} else {
 			// 4b)
@@ -188,14 +187,14 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			// the two sets of synctargets may or may not overlap
 			// thus, we need to clean then extend the corresponding sps
 			logger.V(1).Info("continue to select Location", "edgePlacement", ep)
-			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			_, name, err := cache.SplitMetaNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
 			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
-				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				logger.Error(err, "failed to get SinglePlacementSlice", "singlePlacementSlice", name)
 				return err
 			}
 			// get consumer's space ID by currentSPS
@@ -208,10 +207,10 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			nextSPS = extendSPS(nextSPS, singles)
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
-				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.Error(err, "failed to update SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 				return err
 			} else {
-				logger.V(1).Info("updated SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.V(1).Info("updated SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 			}
 		}
 	}
@@ -222,14 +221,14 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			// a (new) ep begins to select loc
 			// we need to ensure the existence of sp(s) in the corresponding sps
 			logger.V(1).Info("begin to select Location", "edgePlacement", ep)
-			ws, _, name, err := kcpcache.SplitMetaClusterNamespaceKey(ep)
+			_, name, err := cache.SplitMetaNamespaceKey(ep)
 			if err != nil {
 				logger.Error(err, "invalid EdgePlacement key")
 				return err
 			}
 			currentSPS, err := c.singlePlacementSliceLister.Get(name)
 			if err != nil {
-				logger.Error(err, "failed to get SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", name)
+				logger.Error(err, "failed to get SinglePlacementSlice", "singlePlacementSlice", name)
 				return err
 			}
 			// get consumer's space ID by currentSPS
@@ -243,10 +242,10 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 			nextSPS = extendSPS(nextSPS, singles)
 			err = c.patchSpsDestinations(nextSPS.Destinations, spaceID, originalName)
 			if err != nil {
-				logger.Error(err, "failed to update SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.Error(err, "failed to update SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 				return err
 			} else {
-				logger.V(1).Info("updated SinglePlacementSlice", "workloadWorkspace", ws, "singlePlacementSlice", nextSPS.Name)
+				logger.V(1).Info("updated SinglePlacementSlice", "singlePlacementSlice", nextSPS.Name)
 			}
 		}
 	}
@@ -257,7 +256,21 @@ func (c *controller) reconcileOnLocation(ctx context.Context, locKey string) err
 // filterStsByLoc returns those SyncTargets that selected by the Location
 func filterStsByLoc(sts []*edgev2alpha1.SyncTarget, loc *edgev2alpha1.Location) ([]*edgev2alpha1.SyncTarget, error) {
 	filtered := []*edgev2alpha1.SyncTarget{}
+
+	_, _, locKBSpaceID, err := kbuser.AnalyzeObjectID(loc)
+	if err != nil {
+		return filtered, err
+	}
+
 	for _, st := range sts {
+		_, _, stKBSpaceID, err := kbuser.AnalyzeObjectID(st)
+		if err != nil {
+			return filtered, err
+		}
+
+		if stKBSpaceID != locKBSpaceID {
+			continue
+		}
 		s := loc.Spec.InstanceSelector
 		selector, err := metav1.LabelSelectorAsSelector(s)
 		if err != nil {
@@ -292,7 +305,7 @@ func filterEpsByLoc(eps []*edgev2alpha1.EdgePlacement, loc *edgev2alpha1.Locatio
 func packEpKeys(eps []*edgev2alpha1.EdgePlacement) map[string]empty {
 	keys := map[string]empty{}
 	for _, ep := range eps {
-		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(ep)
+		key, _ := cache.MetaNamespaceKeyFunc(ep)
 		keys[key] = empty{}
 	}
 	return keys
@@ -302,17 +315,17 @@ func packEpKeys(eps []*edgev2alpha1.EdgePlacement) map[string]empty {
 func packStKeys(sts []*edgev2alpha1.SyncTarget) map[string]empty {
 	keys := map[string]empty{}
 	for _, st := range sts {
-		key, _ := kcpcache.MetaClusterNamespaceKeyFunc(st)
+		key, _ := cache.MetaNamespaceKeyFunc(st)
 		keys[key] = empty{}
 	}
 	return keys
 }
 
 // cleanSPSByLoc removes all singleplacements that has the specified location, from a singleplacementslice
-func cleanSPSByLoc(sps *edgev2alpha1.SinglePlacementSlice, lws, lName string) *edgev2alpha1.SinglePlacementSlice {
+func cleanSPSByLoc(sps *edgev2alpha1.SinglePlacementSlice, locSpaceID, lName string) *edgev2alpha1.SinglePlacementSlice {
 	nextDests := []edgev2alpha1.SinglePlacement{}
 	for _, sp := range sps.Destinations {
-		if sp.Cluster != lws || sp.LocationName != lName {
+		if sp.Cluster != locSpaceID || sp.LocationName != lName {
 			nextDests = append(nextDests, sp)
 		}
 	}
@@ -367,7 +380,16 @@ func (c *controller) patchSpsDestinations(destinations []edgev2alpha1.SinglePlac
 		return err
 	}
 	patch := []byte(fmt.Sprintf(`{"destinations": %s}`, destBytes))
-	_, err = c.edgeClusterClient.Cluster(logicalcluster.NewPath(spaceID)).EdgeV2alpha1().SinglePlacementSlices().Patch(c.context, spsName, types.MergePatchType, patch, metav1.PatchOptions{})
+
+	spaceConfig, err := c.spaceClient.ConfigForSpace(spaceID, c.spaceProviderNs)
+	if err != nil {
+		return err
+	}
+	edgeClientset, err := edgeclientset.NewForConfig(spaceConfig)
+	if err != nil {
+		return err
+	}
+	_, err = edgeClientset.EdgeV2alpha1().SinglePlacementSlices().Patch(c.context, spsName, types.MergePatchType, patch, metav1.PatchOptions{})
 	if err != nil {
 		return err
 	}
