@@ -26,45 +26,42 @@ import (
 
 // MultiSpaceClientGen is something that can create client stubs of a given kind
 // for any given space.
-type MultiSpaceClientGen[ClientStubs any] interface {
-	NewForSpace(name, providerNS string) (ClientStubs, error)
+type MultiSpaceClientGen[ClientInterface any] interface {
+	NewForSpace(name, providerNS string) (ClientInterface, error)
 }
 
 // MultiSpaceInformerGen is something that can create both client stubs and a shared informer factory.
 // IDK why FactoryOption is generated rather than imported.
-// The go type system is stupid about function subtyping and does not allow
-// one type parameter to constrain another, so this has to take two independent parameters for the client stubs
-// type: one for what NewForConfig returns, and one for what the informer factory consumes.
 // Bundling the NewInformerFactoryWithOptions method in here is not really providing any value.
-type MultiSpaceInformerGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory any] interface {
-	MultiSpaceClientGen[ClientStubs]
+type MultiSpaceInformerGen[ClientInterface, FactoryOption, InformerFactory any] interface {
+	MultiSpaceClientGen[ClientInterface]
 	NewInformerFactoryWithOptions(client ClientInterface, defaultResync time.Duration, options ...FactoryOption) InformerFactory
 }
 
 // NewMSC wraps a KubestellarSpaceInterface with the ability to make typed clients of a given kind.
-func NewMSC[ClientStubs, ClientInterface, FactoryOption, InformerFactory any](
+func NewMSC[ClientInterface, FactoryOption, InformerFactory any](
 	ksi spacemsc.KubestellarSpaceInterface,
-	newForConfig func(c *rest.Config) (ClientStubs, error),
+	newForConfig func(c *rest.Config) (ClientInterface, error),
 	newFactory func(client ClientInterface, defaultResync time.Duration, options ...FactoryOption) InformerFactory,
-) MultiSpaceInformerGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory] {
-	return multiSpaceClientGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory]{ksi, newForConfig, newFactory}
+) MultiSpaceInformerGen[ClientInterface, FactoryOption, InformerFactory] {
+	return multiSpaceClientGen[ClientInterface, FactoryOption, InformerFactory]{ksi, newForConfig, newFactory}
 }
 
-type multiSpaceClientGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory any] struct {
+type multiSpaceClientGen[ClientInterface, FactoryOption, InformerFactory any] struct {
 	ksi          spacemsc.KubestellarSpaceInterface
-	newForConfig func(c *rest.Config) (ClientStubs, error)
+	newForConfig func(c *rest.Config) (ClientInterface, error)
 	newFactory   func(client ClientInterface, defaultResync time.Duration, options ...FactoryOption) InformerFactory
 }
 
-func (msc multiSpaceClientGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory]) NewForSpace(name, providerNS string) (ClientStubs, error) {
+func (msc multiSpaceClientGen[ClientInterface, FactoryOption, InformerFactory]) NewForSpace(name, providerNS string) (ClientInterface, error) {
 	config, err := msc.ksi.ConfigForSpace(name, providerNS)
 	if err != nil {
-		var zero ClientStubs
+		var zero ClientInterface
 		return zero, err
 	}
 	return msc.newForConfig(config)
 }
 
-func (msc multiSpaceClientGen[ClientStubs, ClientInterface, FactoryOption, InformerFactory]) NewInformerFactoryWithOptions(client ClientInterface, defaultResync time.Duration, options ...FactoryOption) InformerFactory {
+func (msc multiSpaceClientGen[ClientInterface, FactoryOption, InformerFactory]) NewInformerFactoryWithOptions(client ClientInterface, defaultResync time.Duration, options ...FactoryOption) InformerFactory {
 	return msc.newFactory(client, defaultResync, options...)
 }

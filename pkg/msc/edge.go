@@ -20,17 +20,25 @@ import (
 	"context"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	rest "k8s.io/client-go/rest"
 
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
+	edgeclientsetfake "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned/fake"
 	edgeinformers "github.com/kubestellar/kubestellar/pkg/client/informers/externalversions"
 	spacemsc "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
 )
 
-type EdgeClientGen = MultiSpaceInformerGen[*edgeclientset.Clientset, edgeclientset.Interface, edgeinformers.SharedInformerOption, edgeinformers.SharedScopedInformerFactory]
+type EdgeClientGen = MultiSpaceInformerGen[edgeclientset.Interface, edgeinformers.SharedInformerOption, edgeinformers.SharedScopedInformerFactory]
 
 func NewEdgeClientGen(ksi spacemsc.KubestellarSpaceInterface) EdgeClientGen {
-	return NewMSC(ksi, edgeclientset.NewForConfig, edgeinformers.NewSharedScopedInformerFactoryWithOptions)
+	return NewMSC(ksi, EdgeNewForConfig, edgeinformers.NewSharedScopedInformerFactoryWithOptions)
+}
+
+// EdgeNewForConfig has the different return type that is required because
+// Go is stupid about function subtyping.
+func EdgeNewForConfig(config *rest.Config) (edgeclientset.Interface, error) {
+	return edgeclientset.NewForConfig(config)
 }
 
 func demoEdge(ksi spacemsc.KubestellarSpaceInterface) {
@@ -40,4 +48,11 @@ func demoEdge(ksi spacemsc.KubestellarSpaceInterface) {
 	client.EdgeV2alpha1().EdgePlacements().Create(context.Background(), &ep, metav1.CreateOptions{})
 	infact := gen.NewInformerFactoryWithOptions(client, 0)
 	infact.Edge().V2alpha1().EdgePlacements().Lister()
+
+	// Now for some fakery
+	fakeClientset := edgeclientsetfake.NewSimpleClientset(&ep)
+	mm := NewMapMSC(edgeinformers.NewSharedScopedInformerFactoryWithOptions)
+	mm.SetStubs("fred", "", fakeClientset)
+	fetchedFake, _ := mm.NewForSpace("frred", "")
+	fetchedFake.EdgeV2alpha1().EdgePlacements().Get(context.Background(), ep.Name, metav1.GetOptions{})
 }
