@@ -33,6 +33,11 @@ function create_or_replace() { # usage: filename
     fi
 }
 
+if base64 -w 0 <<<"" &>/dev/null
+then nolbs='-w 0'
+else nolbs=''
+fi
+
 function set_config_and_secret_and_crds() {
     mkdir -p /home/spacecore/.kube
     KUBECONFIG=/home/spacecore/.kube/config
@@ -41,8 +46,16 @@ function set_config_and_secret_and_crds() {
     kubectl config set-context space-mgt --cluster=space-mgt --user=space-mgt 
     kubectl config use-context space-mgt
 
-    kubectl --kubeconfig /home/spacecore/.kube/config delete secret -n ${NAMESPACE} corecluster > /dev/null 2>&1 || true 
-    kubectl --kubeconfig /home/spacecore/.kube/config create secret generic -n ${NAMESPACE} corecluster --from-file=kubeconfig=/home/spacecore/.kube/config
+    kubectl --kubeconfig /home/spacecore/.kube/config apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: ${NAMESPACE}
+  name: corecluster
+type: Opaque
+data:
+  kubeconfig: $(base64 $nolbs < /home/spacecore/.kube/config)
+EOF
 
     echo "Apply space manager CRDs."
     for crd in /home/spacecore/config/crds/*.yaml; do

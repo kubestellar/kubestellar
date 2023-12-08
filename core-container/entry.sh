@@ -18,6 +18,10 @@ set -e
 
 KUBESTELLAR_SERVICE="kubestellar"
 
+if base64 -w 0 <<<"" &>/dev/null
+then nolbs='-w 0'
+else nolbs=''
+fi
 
 function echoerr() {
    echo "ERROR: $1" >&2
@@ -48,9 +52,17 @@ function get_kcp_kubeconfig() {
 
 function create_kcp_provider_object() {
     get_kcp_kubeconfig     # kcp is created in a seperate container 
-    kubectl --kubeconfig $SM_CONFIG delete secret -n ${NAMESPACE} kcpsec > /dev/null 2>&1 || true
-    kubectl --kubeconfig $SM_CONFIG create secret generic -n ${NAMESPACE} kcpsec --from-file=kubeconfig=$kcp_kubeconfig --from-file=external=$external_kcp_kubeconfig
     kubectl --kubeconfig $SM_CONFIG apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: ${NAMESPACE}
+  name: kcpsec
+type: Opaque
+data:
+  kubeconfig: $(base64 $nolbs < $kcp_kubeconfig)
+  external: $(base64 $nolbs < $external_kcp_kubeconfig)
+---
 apiVersion: space.kubestellar.io/v1alpha1
 kind: SpaceProviderDesc
 metadata:
@@ -136,13 +148,6 @@ function guess_kcp_dns() {
 function run_kcp() {
     echo "--< Starting kcp >--"
 
-    echo Attempting to delete kubestellar secret...
-    (
-        KUBECONFIG=$host_kubeconfig
-        if ! kubectl delete secret kubestellar ; then
-            echo "Nothing to delete."
-        fi
-    )
     echo "EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME}"
 
     # Check EXTERNAL_HOSTNAME
@@ -201,14 +206,22 @@ function run_kcp() {
 
     # Ensure kubeconfig secret
     echo Creating the kubestellar secret...
-    (
-        KUBECONFIG=$host_kubeconfig
-        if [ -n "${EXTERNAL_HOSTNAME}" ]; then
-            kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file="${PWD}/.kcp/cluster.kubeconfig" --from-file="${PWD}/.kcp/external.kubeconfig"
-        else
-            kubectl create secret generic kubestellar --from-file="${PWD}/.kcp/admin.kubeconfig" --from-file=external="${PWD}/.kcp/external.kubeconfig"
-        fi
-    )
+    if [ -n "${EXTERNAL_HOSTNAME}" ]; then
+	clucfg="  cluster.kubeconfig: $(base64 $nolbs < "${PWD}/.kcp/cluster.kubeconfig")"
+    else
+	clucfg=""
+    fi
+    KUBECONFIG=$host_kubeconfig kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubestellar
+type: Opaque
+data:
+  admin.kubeconfig: $(base64 $nolbs < "${PWD}/.kcp/admin.kubeconfig")
+  external.kubeconfig: $(base64 $nolbs < "${PWD}/.kcp/external.kubeconfig")
+$clucfg
+EOF
 
     touch ready
     while true ; do
