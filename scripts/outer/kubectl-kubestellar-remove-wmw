@@ -59,7 +59,7 @@ fi
 set -e
 
 kubectl ws "${kubectl_flags[@]}" root
-if kubectl "${kubectl_flags[@]}" get workspaces.tenancy.kcp.io "$wmw_name" &>/dev/null
-then kubectl "${kubectl_flags[@]}" delete workspaces.tenancy.kcp.io "$wmw_name"
+if kubectl "${kubectl_flags[@]}" get spaces -n spaceprovider-default "$wmw_name" &>/dev/null
+then kubectl "${kubectl_flags[@]}" delete spaces -n spaceprovider-default "$wmw_name"
 fi
 
