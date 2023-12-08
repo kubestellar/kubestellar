@@ -46,6 +46,7 @@ import (
 	edgeapi "github.com/kubestellar/kubestellar/pkg/apis/edge/v2alpha1"
 	edgeclientset "github.com/kubestellar/kubestellar/pkg/client/clientset/versioned"
 	"github.com/kubestellar/kubestellar/pkg/customize"
+	"github.com/kubestellar/kubestellar/pkg/kbuser"
 	spacev1alpha1 "github.com/kubestellar/kubestellar/space-framework/pkg/apis/space/v1alpha1"
 	spacev1a1listers "github.com/kubestellar/kubestellar/space-framework/pkg/client/listers/space/v1alpha1"
 	msclient "github.com/kubestellar/kubestellar/space-framework/pkg/msclientlib"
@@ -83,6 +84,7 @@ func NewWorkloadProjector(
 	syncfgInformer k8scache.SharedIndexInformer,
 	spaceclient msclient.KubestellarSpaceInterface,
 	spaceProviderNs string,
+	kbsr kbuser.KubeBindSpaceRelation,
 ) *workloadProjector {
 	wp := &workloadProjector{
 		// delay:                 2 * time.Second,
@@ -94,6 +96,7 @@ func NewWorkloadProjector(
 		syncfgInformer:    syncfgInformer,
 		spaceclient:       spaceclient,
 		spaceProviderNs:   spaceProviderNs,
+		kbsr:              kbsr,
 
 		mbwsNameToSP: WrapMapWithMutex[string, SinglePlacement](NewMapMap[string, SinglePlacement](nil)),
 
@@ -205,12 +208,17 @@ func NewWorkloadProjector(
 			obj = dfu.Obj
 		}
 		syncfg := obj.(*edgeapi.SyncerConfig)
-		if syncfg.Name != SyncerConfigName {
-			logger.V(4).Info("Ignoring SyncerConfig with non-standard name", "name", syncfg.Name, "standardName", SyncerConfigName)
+		_, sourceName, kbIDForMBS, err := kbuser.AnalyzeObjectID(syncfg)
+		if err != nil {
+			logger.Error(err, "SyncerConfig name does not look like kube-bind projection", "name", syncfg.Name)
+			return
+		}
+		if sourceName != SyncerConfigName {
+			logger.V(4).Info("Ignoring SyncerConfig with non-standard name", "sourceName", sourceName, "kbIDForMBS", kbIDForMBS, "standardName", SyncerConfigName)
 			return
 		}
 		// enqueue with empty cluster. set later
-		scRef := syncerConfigRef{"", ObjectName(syncfg.Name)}
+		scRef := syncerConfigProjectionRef{kbIDForMBS, ObjectName(sourceName)}
 		logger.V(4).Info("Enqueuing reference to SyncerConfig from informer", "scRef", scRef, "event", event)
 		wp.queue.Add(scRef)
 	}
@@ -250,6 +258,7 @@ type workloadProjector struct {
 	syncfgInformer    k8scache.SharedIndexInformer
 	spaceclient       msclient.KubestellarSpaceInterface
 	spaceProviderNs   string
+	kbsr              kbuser.KubeBindSpaceRelation
 
 	mbwsNameToSP MutableMap[string /*mailbox workspace name*/, SinglePlacement]
 
@@ -530,6 +539,13 @@ type ObjectNameToObjectDestinations = GenericFactoredMap[Pair[ObjectName, Single
 // syncerConfigRef is a workqueue item that refers to a SyncerConfig in a mailbox workspace
 type syncerConfigRef ExternalName
 
+// syncerConfigProjectionRef is a workqueue item that refers to a SyncerConfig in the KCS.
+// The components are the result of kbuser.AnalyzeObjectID(object in KCS).
+type syncerConfigProjectionRef struct {
+	KBIDForMBS string
+	SourceName ObjectName
+}
+
 // sourceObjectRef refers to an namespaced object in a workload management workspace
 type sourceObjectRef struct {
 	Cluster       string
@@ -592,6 +608,8 @@ func (wp *workloadProjector) sync1Config(ctx context.Context, ref any) {
 		retry = wp.syncConfigDestination(ctx, typed)
 	case syncerConfigRef:
 		retry = wp.syncConfigObject(ctx, typed)
+	case syncerConfigProjectionRef:
+		retry = wp.syncConfigObjectProjection(ctx, typed)
 	case sourceObjectRef:
 		retry = wp.syncSourceObject(ctx, typed)
 	case destinationObjectRef:
@@ -613,6 +631,20 @@ func (wp *workloadProjector) syncConfigDestination(ctx context.Context, destinat
 	scRef := syncerConfigRef{mbwsName, SyncerConfigName}
 	logger.V(3).Info("Finally able to enqueue SyncerConfig ref", "scRef", scRef)
 	wp.queue.Add(scRef)
+	return false
+}
+
+// Returns `retry bool`.
+func (wp *workloadProjector) syncConfigObjectProjection(ctx context.Context, scRef syncerConfigProjectionRef) bool {
+	mbsName := wp.kbsr.SpaceIDFromKubeBind(scRef.KBIDForMBS)
+	if mbsName == "" {
+		logger := klog.FromContext(ctx)
+		logger.Info("Can not yet map kube-bind cluster namespace to mailbox space name", "scRef", scRef)
+		return true
+	}
+	// Run it through the queue rather than call syncConfigObject directly, to preserve
+	// the property that only one goroutine is processing it at a time.
+	wp.queue.Add(syncerConfigRef{Cluster: mbsName, Name: scRef.SourceName})
 	return false
 }
 
@@ -642,7 +674,8 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		logger.Error(err, "Failed to create edge clientset for space", "spacename", mbwsName)
 		return false
 	}
-	syncfg, err := edgeClientset.EdgeV2alpha1().SyncerConfigs().Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
+	client := edgeClientset.EdgeV2alpha1().SyncerConfigs()
+	syncfg, err := client.Get(wp.ctx, string(scRef.Name), metav1.GetOptions{})
 	if err != nil {
 		if k8sapierrors.IsNotFound(err) {
 			goodConfigSpecRelations := wp.syncerConfigRelations(sp)
@@ -651,7 +684,6 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 					Name: string(scRef.Name),
 				},
 				Spec: wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)}
-			client := edgeClientset.EdgeV2alpha1().SyncerConfigs()
 			syncfg2, err := client.Create(ctx, syncfg, metav1.CreateOptions{FieldManager: FieldManager})
 			if logger.V(4).Enabled() {
 				logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,
@@ -673,7 +705,6 @@ func (wp *workloadProjector) syncConfigObject(ctx context.Context, scRef syncerC
 		return false
 	}
 	syncfg.Spec = wp.syncerConfigSpecFromRelations(goodConfigSpecRelations)
-	client := edgeClientset.EdgeV2alpha1().SyncerConfigs()
 	syncfg2, err := client.Update(ctx, syncfg, metav1.UpdateOptions{FieldManager: FieldManager})
 	if logger.V(4).Enabled() {
 		logger = logger.WithValues("specNamespaces", syncfg.Spec.NamespaceScope.Namespaces,

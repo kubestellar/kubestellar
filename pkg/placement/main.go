@@ -81,7 +81,7 @@ func NewPlacementTranslator(
 	}
 	pt.workloadProjector = NewWorkloadProjector(ctx, numThreads, DefaultResourceModes,
 		pt.spaceInformer, pt.spaceLister, pt.syncfgInformer,
-		spaceclient, spaceProviderNs)
+		spaceclient, spaceProviderNs, kbSpaceRelation)
 
 	return pt
 }
