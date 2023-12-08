@@ -1870,7 +1870,10 @@ the Where Resolver react.  It has the following steps.</p>
 edge clusters.  The other one is called "special".</p>
 <p>In this example, each workload description goes in its own workload
 management workspace (WMW).  Start by creating a WMW for the common
-workload, with the following commands.</p>
+workload, with the following commands.  These commands create the WMW,
+makes KubeStellar edge APIs available for the WMW via kube-bind, and
+optionally makes some Kubernetes APIs available for the WMW by
+populating a set of CRDs into the WMW.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">IN_CLUSTER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>kubectl<span class="w"> </span>kubestellar<span class="w"> </span>ensure<span class="w"> </span>wmw<span class="w"> </span>wmw-c
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">WMW_C_SPACE_CONFIG</span><span class="o">=</span><span class="nv">$PWD</span>/temp-space-config/spaceprovider-default-wmw-c
 </code></pre></div>
